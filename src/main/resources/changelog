@@ -1,0 +1,6 @@
+=== CHANGELOG FILE ===
+
+05/05/2015
+    - ADD: rest test suite for user service
+    - MOD: setup parameter modification
+    - ADD: oauth2 client unique constraint
