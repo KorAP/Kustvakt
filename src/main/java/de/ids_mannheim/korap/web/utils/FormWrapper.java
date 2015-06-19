@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author hanl
- * @date 18/05/2015
  * Helper class to wrapp multivaluedmap into a hashmap. Depending on the strict parameter,
  * list values are retained in the resulting wrapper map.
+ *
+ * @author hanl
+ * @date 18/05/2015
  */
 public class FormWrapper extends HashMap<String, Object> {
 

@@ -1,12 +1,9 @@
 package de.ids_mannheim.korap.config;
 
 import de.ids_mannheim.korap.interfaces.AuditingIface;
-import de.ids_mannheim.korap.plugins.PluginManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
-
-import java.net.URL;
 
 /**
  * User: hanl
@@ -18,28 +15,17 @@ public class BeanConfiguration {
     private static final String config_file = "default-config.xml";
 
     private static ApplicationContext context = null;
-    private static PluginManager plugins;
 
-    private static void loadPlugins() {
-        plugins = new PluginManager();
-        plugins.loadPluginInterfaces();
-    }
-
-    public static void loadContext() {
-        URL url = BeanConfiguration.class.getClassLoader()
-                .getResource(config_file);
-        if (url != null && context == null)
+    public static void loadClasspathContext(String... files) {
+        if (context == null && files == null)
             context = new ClassPathXmlApplicationContext(config_file);
+        else if (context == null)
+            context = new ClassPathXmlApplicationContext(files);
     }
 
-    public static void loadContext(String filepath) {
-        if (filepath == null)
-            loadContext();
-        else {
-            if (context == null)
-                context = new FileSystemXmlApplicationContext(
-                        "file:" + filepath);
-        }
+    public static void loadFileContext(String filepath) {
+        if (context == null)
+            context = new FileSystemXmlApplicationContext("file:" + filepath);
     }
 
     public static <T extends KustvaktConfiguration> T getConfiguration() {

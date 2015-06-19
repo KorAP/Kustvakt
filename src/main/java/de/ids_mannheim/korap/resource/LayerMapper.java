@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.resource;
 
+import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.user.UserSettings;
 
 /**
@@ -9,11 +11,15 @@ import de.ids_mannheim.korap.user.UserSettings;
 public class LayerMapper {
 
     private UserSettings settings;
-    private ExtConfiguration config;
+    private KustvaktConfiguration config;
 
     public LayerMapper(UserSettings settings) {
         this.settings = settings;
-        this.config = ExtensionBeans.getConfiguration();
+        this.config = BeanConfiguration.getConfiguration();
+    }
+
+    public LayerMapper() {
+        this.config = BeanConfiguration.getConfiguration();
     }
 
     /**

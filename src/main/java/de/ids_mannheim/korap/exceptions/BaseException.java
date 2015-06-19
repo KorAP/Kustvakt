@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Serves as base exception to allow auditing the exception.
+ * By extending the exception, different types of exceptions and ways of handling the audits can be created
+ * (database, service, etc.)
+ *
  * @author hanl
  * @date 29/01/2014
  */
@@ -16,7 +20,6 @@ public abstract class BaseException extends Exception {
     protected List<AuditRecord> records = new ArrayList<>();
     private Integer statusCode;
     private String entity;
-
 
     public BaseException(int code) {
         this.statusCode = code;

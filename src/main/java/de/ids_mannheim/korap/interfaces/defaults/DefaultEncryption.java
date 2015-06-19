@@ -14,6 +14,7 @@ import java.util.Map;
  * @author hanl
  * @date 05/06/2015
  */
+//todo: init!
 public class DefaultEncryption implements EncryptionIface {
 
     private SecureRandom randomizer;

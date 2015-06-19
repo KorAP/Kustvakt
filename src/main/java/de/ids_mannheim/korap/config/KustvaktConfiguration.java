@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Properties;
 
 /**
  * if configuration class is extended, load method should be overriden
+ *
  * @author hanl
  * @date 05/02/2014
  */
@@ -23,20 +25,28 @@ public class KustvaktConfiguration {
 
     private final Logger jlog = KorAPLogger
             .initiate(KustvaktConfiguration.class);
+    private String indexDir;
+    private int port;
+    // todo: make exclusive so that the containg languages can really only be used then
+    private List<String> queryLanguages;
 
-    // deprec?!
-    private final BACKENDS DEFAULT_ENGINE = BACKENDS.LUCENE;
     private int maxhits;
 
-    private int port;
     private int returnhits;
     private String serverHost;
-    private String indexDir;
 
-    private List<String> queryLanguages;
     private String host;
 
     private URL issuer;
+
+    private String default_pos;
+    private String default_lemma;
+    private String default_surface;
+    private String default_dep;
+    private String default_const;
+
+    // deprec?!
+    private final BACKENDS DEFAULT_ENGINE = BACKENDS.LUCENE;
 
     /**
      * loading of the properties and mapping to parameter variables
@@ -61,11 +71,40 @@ public class KustvaktConfiguration {
         for (String querylang : qls)
             queryLanguages.add(querylang.trim().toUpperCase());
         //        issuer = new URL(korap.getProperty("korap.issuer", ""));
+
+        default_const = korap.getProperty("kustvakt.default.const", "mate");
+        default_dep = korap.getProperty("kustvakt.default.dep", "mate");
+        default_lemma = korap.getProperty("kustvakt.default.lemma", "tt");
+        default_pos = korap.getProperty("kustvakt.default.pos", "tt");
+        default_surface = korap
+                .getProperty("kustvakt.default.opennlp", "opennlp");
+
         return korap;
     }
 
+    /**
+     * set properties
+     *
+     * @param props
+     */
     public void setProperties(Properties props) {
         this.load(props);
+    }
+
+    /**
+     * properties can be overloaded after spring init
+     *
+     * @param stream
+     */
+    public void setProperties(InputStream stream) {
+        try {
+            Properties p = new Properties();
+            p.load(stream);
+            this.load(p);
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public BACKENDS chooseBackend(String value) {

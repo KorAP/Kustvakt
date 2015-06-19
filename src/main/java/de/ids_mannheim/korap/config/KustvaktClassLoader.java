@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.config;
 
 import org.reflections.Reflections;
 
+import java.lang.annotation.Annotation;
 import java.util.Set;
 
 /**
@@ -22,5 +23,10 @@ public class KustvaktClassLoader {
      */
     public static <T> Set<Class<? extends T>> load(Class<T> iface) {
         return reflections.getSubTypesOf(iface);
+    }
+
+    public static Set<Class<?>> loadFromAnnotation(
+            Class<? extends Annotation> annotation) {
+        return reflections.getTypesAnnotatedWith(annotation);
     }
 }

@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <artifactId>KorAP-core-modules</artifactId>
-    <groupId>KorAP-modules</groupId>
-    <version>1.1</version>
-  </parent>
   <modelVersion>4.0.0</modelVersion>
+  <groupId>de.ids_mannheim.korap</groupId>
   <artifactId>Kustvakt-core</artifactId>
+  <name>Kustvakt core</name>
   <version>0.2</version>
+  <description>Kustvakt core, basic rest api for testing purposes and default
+        interfaces</description>
   <build>
     <plugins>
       <plugin>
@@ -102,6 +101,14 @@
         <exclusion>
           <artifactId>groovy-xml</artifactId>
           <groupId>org.codehaus.groovy</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>httpclient</artifactId>
+          <groupId>org.apache.httpcomponents</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>httpmime</artifactId>
+          <groupId>org.apache.httpcomponents</groupId>
         </exclusion>
         <exclusion>
           <artifactId>hamcrest-library</artifactId>

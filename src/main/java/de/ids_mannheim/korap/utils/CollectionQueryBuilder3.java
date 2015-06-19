@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.utils;
 
+import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -64,10 +66,9 @@ public class CollectionQueryBuilder3 {
         List list = new ArrayList();
         if (!this.rq.isEmpty())
             list.addAll(this.rq);
-        System.out.println("RAW QUERY " + this.builder.toString());
-//        CollectionQueryProcessor tree = new CollectionQueryProcessor(this.verbose);
-//        tree.process(this.builder.toString());
-//        list.add(tree.getRequestMap());
+        CollectionQueryProcessor tree = new CollectionQueryProcessor(this.verbose);
+        tree.process(this.builder.toString());
+        list.add(tree.getRequestMap());
         return list;
     }
 

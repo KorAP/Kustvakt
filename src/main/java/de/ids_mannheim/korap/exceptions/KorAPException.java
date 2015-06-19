@@ -7,6 +7,8 @@ import lombok.Setter;
  * @author hanl
  * @date 11/12/2013
  */
+//fixme: redundant with baseexception
+@Deprecated
 @Setter
 @Getter
 public class KorAPException extends BaseException {

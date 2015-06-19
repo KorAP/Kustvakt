@@ -8,8 +8,6 @@
                             http://www.springframework.org/schema/util/spring-util-4.0.xsd">
 
 
-    <!--<context:property-placeholder location="classpath:kustvakt.conf"/>-->
-
     <util:properties id="props" location="classpath:kustvakt.conf"/>
 
     <bean id="auditingProvider"

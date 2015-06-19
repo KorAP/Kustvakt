@@ -1,9 +1,11 @@
 package de.ids_mannheim.korap.interfaces;
 
+import de.ids_mannheim.korap.config.KustvaktClassLoader;
 import de.ids_mannheim.korap.exceptions.KorAPException;
 import de.ids_mannheim.korap.user.*;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,10 +17,23 @@ public abstract class AuthenticationManagerIface {
 
     private Map<String, AuthenticationIface> providers;
 
-    //todo: test if constr actually called
     public AuthenticationManagerIface() {
-        System.out.println("TEST CONSTRUCTOR CALL");
         this.providers = new HashMap<>();
+        loadProviders();
+    }
+
+    private void loadProviders() {
+        Set<Class<? extends AuthenticationIface>> set = KustvaktClassLoader
+                .load(AuthenticationIface.class);
+        Set<AuthenticationIface> set2 = new HashSet<>();
+        for (Class<? extends AuthenticationIface> i : set) {
+            try {
+                set2.add(i.newInstance());
+            }catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        this.setProviders(set2);
     }
 
     public void setProviders(Set<AuthenticationIface> providers) {
@@ -35,13 +50,25 @@ public abstract class AuthenticationManagerIface {
         return iface;
     }
 
+    public abstract TokenContext getTokenStatus(String token, String host,
+            String useragent) throws KorAPException;
+
+    public abstract User getUser(String username) throws KorAPException;
+
     public abstract User authenticate(int type, String username,
             String password, Map<String, Object> attributes)
+            throws KorAPException;
+
+    public abstract TokenContext createTokenContext(User user,
+            Map<String, Object> attr, String provider_key)
             throws KorAPException;
 
     public abstract void logout(TokenContext context) throws KorAPException;
 
     public abstract void lockAccount(User user) throws KorAPException;
+
+    public abstract User createUserAccount(Map<String, Object> attributes)
+            throws KorAPException;
 
     public abstract boolean updateAccount(User user) throws KorAPException;
 
@@ -57,4 +84,10 @@ public abstract class AuthenticationManagerIface {
 
     public abstract void updateUserSettings(User user, UserSettings settings)
             throws KorAPException;
+
+    public abstract Object[] validateResetPasswordRequest(String username,
+            String email) throws KorAPException;
+
+    public abstract void confirmRegistration(String uriFragment,
+            String username) throws KorAPException;
 }

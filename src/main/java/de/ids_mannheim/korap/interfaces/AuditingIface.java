@@ -17,7 +17,7 @@ import java.util.List;
 public abstract class AuditingIface implements Runnable {
 
     protected static int BATCH_SIZE = 15;
-    protected final List<AuditRecord> records = new ArrayList<>(BATCH_SIZE + 5);
+    private final List<AuditRecord> records = new ArrayList<>(BATCH_SIZE + 5);
     private final List<AuditRecord> buffer = new ArrayList<>(BATCH_SIZE + 5);
 
     public abstract <T extends AuditRecord> List<T> retrieveRecords(
@@ -51,6 +51,10 @@ public abstract class AuditingIface implements Runnable {
     public <T extends AuditRecord> void audit(List<T> requests) {
         for (T rec : requests)
             addAndRun(rec);
+    }
+
+    protected List<AuditRecord> getRecordsToSave() {
+        return this.records;
     }
 
 }

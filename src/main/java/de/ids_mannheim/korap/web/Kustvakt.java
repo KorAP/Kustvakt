@@ -6,6 +6,8 @@ import com.sun.jersey.spi.container.servlet.ServletContainer;
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.utils.KorAPLogger;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 /**
@@ -15,10 +17,17 @@ import java.io.IOException;
 public class Kustvakt {
 
     private static Integer PORT = -1;
+    private static String CONFIG = null;
 
     public static void main(String[] args) throws Exception {
         attributes(args);
-        BeanConfiguration.loadContext();
+        BeanConfiguration.loadClasspathContext();
+
+        if (CONFIG != null) {
+            BeanConfiguration.getConfiguration()
+                    .setProperties(new FileInputStream(new File(CONFIG)));
+
+        }
         grizzlyServer(PORT);
     }
 
@@ -43,6 +52,9 @@ public class Kustvakt {
             switch ((args[i])) {
                 case "--debug":
                     KorAPLogger.DEBUG = true;
+                    break;
+                case "config":
+                    CONFIG = args[i + 1];
                     break;
                 case "--port":
                     PORT = Integer.valueOf(args[i + 1]);

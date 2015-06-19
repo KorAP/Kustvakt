@@ -1,18 +1,14 @@
 package de.ids_mannheim.korap.web.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KorAPException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.graphdb.collo.ColloQuery;
-import de.ids_mannheim.korap.graphdb.collo.Dependency;
-import de.ids_mannheim.korap.query.serialize.IdWriter;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
+import de.ids_mannheim.korap.resource.RewriteProcessor;
 import de.ids_mannheim.korap.utils.CollectionQueryBuilder;
-import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KorAPLogger;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.web.ClientsHandler;
@@ -25,13 +21,13 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
  * @author hanl
  * @date 29/01/2014
  */
+//todd test functions
 @Path("v0.1" + "/")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class LightService {
@@ -40,68 +36,19 @@ public class LightService {
 
     private SearchLucene searchLucene;
     private ClientsHandler graphDBhandler;
+    private RewriteProcessor processor;
 
     public LightService() {
         this.searchLucene = new SearchLucene(
                 BeanConfiguration.getConfiguration().getIndexDir());
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
         this.graphDBhandler = new ClientsHandler(builder.build());
-    }
-
-    /**
-     * @param properties
-     * @param sfs
-     * @param limit
-     * @param query
-     * @param ql
-     * @param context
-     * @param foundry
-     * @param wPaths
-     * @return
-     */
-    //todo: add entry point where a json collection can be injected as well
-    @GET
-    @Path("colloc")
-    public Response getCollocationsAll(@QueryParam("props") String properties,
-            @QueryParam("sfskip") Integer sfs,
-            @QueryParam("sflimit") Integer limit, @QueryParam("q") String query,
-            @QueryParam("ql") String ql, @QueryParam("context") Integer context,
-            @QueryParam("foundry") String foundry,
-            @QueryParam("paths") Boolean wPaths) {
-        ColloQuery.ColloQueryBuilder builder;
-        String result;
-        try {
-            builder = new ColloQuery.ColloQueryBuilder();
-            QuerySerializer s = new QuerySerializer().setQuery(query, ql);
-            //todo: fix collectionbuilder
-            //        s.setDeprCollection(builder);
-            IdWriter writer = new IdWriter(s.toJSON()).process();
-            List collprops = JsonUtils.convertToList(properties);
-
-            if (context != null)
-                builder.context(context).collocateProps(collprops);
-            if (limit != null)
-                builder.surfaceLimit(limit);
-            if (sfs != null)
-                builder.surfaceSkip(sfs);
-            if (foundry != null)
-                builder.foundry(foundry);
-            builder.nodeQueryJS(writer.toJSON())
-                    .dep(new ArrayList<Dependency>()).withPaths(wPaths);
-
-            result = graphDBhandler
-                    .getResponse("distCollo", "q", builder.build().toJSON());
-        }catch (KorAPException e) {
-            throw KustvaktResponseHandler.throwit(e);
-        }catch (JsonProcessingException e) {
-            throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT);
-        }
-        return Response.ok(result).build();
+        this.processor = new RewriteProcessor();
     }
 
     @POST
     @Path("colloc")
-    public Response getCollocatioBase(@QueryParam("q") String query) {
+    public Response getCollocationBase(@QueryParam("q") String query) {
         String result;
         try {
             result = graphDBhandler.getResponse("distCollo", "q", query);
@@ -111,6 +58,7 @@ public class LightService {
         return Response.ok(result).build();
     }
 
+    // todo
     public Response postMatchFavorite() {
         return Response.ok().build();
     }
@@ -140,7 +88,7 @@ public class LightService {
         ss.addMeta(meta);
         //todo: test this
         ss.setCollection(cq);
-        return Response.ok(ss.toJSON()).build();
+        return Response.ok(processor.process(ss.toJSON())).build();
     }
 
     @POST
@@ -149,11 +97,10 @@ public class LightService {
             String jsonld) {
         KustvaktConfiguration.BACKENDS eng = BeanConfiguration
                 .getConfiguration().chooseBackend(engine);
-
+        jsonld = processor.process(jsonld);
         // todo: should be possible to add the meta part to the query serialization
         jlog.info("Serialized search: {}", jsonld);
 
-        // todo: Security Parsing and rewrite
         // fixme: to use the systemarchitecture pointcut thingis, searchlucene must be injected via
         String result = searchLucene.search(jsonld);
         KorAPLogger.QUERY_LOGGER.trace("The result set: {}", result);
@@ -181,8 +128,7 @@ public class LightService {
         //        meta.addEntry("itemsPerResource", 1);
         serializer.addMeta(meta);
 
-        // policy rewrite!
-        String query = serializer.toJSON();
+        String query = processor.process(serializer.toJSON());
         jlog.info("the serialized query {}", query);
 
         if (eng.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
@@ -248,7 +194,7 @@ public class LightService {
             // should only apply to CQL queries
             //                meta.addEntry("itemsPerResource", 1);
             s.addMeta(meta);
-            query = s.toJSON();
+            query = processor.process(s.toJSON());
         }
         String result;
         try {
@@ -326,7 +272,6 @@ public class LightService {
                 results = searchLucene
                         .getMatch(matchid, new ArrayList<>(f_list),
                                 new ArrayList<>(l_list), spans, false, true);
-
             }
         }
         try {

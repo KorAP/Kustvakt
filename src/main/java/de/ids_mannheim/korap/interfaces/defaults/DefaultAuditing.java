@@ -6,6 +6,10 @@ import de.ids_mannheim.korap.user.User;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -14,37 +18,51 @@ import java.util.List;
  */
 public class DefaultAuditing extends AuditingIface {
 
-    public DefaultAuditing() {
+    private FileOutputStream stream;
 
+    public DefaultAuditing() {
+        try {
+            File f = new File("logs");
+            f.mkdirs();
+            stream = new FileOutputStream(new File(f, "audit.log"));
+        }catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public <T extends AuditRecord> List<T> retrieveRecords(
             AuditRecord.CATEGORY category, DateTime day, DateTime until,
             boolean exact, int limit) {
-        return null;
+        throw new UnsupportedOperationException("operation not supported!");
     }
 
     @Override
     public <T extends AuditRecord> List<T> retrieveRecords(
             AuditRecord.CATEGORY category, User user, int limit) {
-        return null;
+        throw new UnsupportedOperationException("operation not supported!");
     }
 
     @Override
     public <T extends AuditRecord> List<T> retrieveRecords(LocalDate day,
             int hitMax) {
-        return null;
+        throw new UnsupportedOperationException("operation not supported!");
     }
 
     @Override
     public <T extends AuditRecord> List<T> retrieveRecords(String userID,
             LocalDate start, LocalDate end, int hitMax) {
-        return null;
+        throw new UnsupportedOperationException("operation not supported!");
     }
 
     @Override
     public void run() {
-        //todo: append to logging file or other auditing file
+        try {
+            for (AuditRecord r : getRecordsToSave())
+                stream.write((r.toString() + "\n").getBytes());
+            stream.flush();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
