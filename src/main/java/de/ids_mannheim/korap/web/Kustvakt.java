@@ -53,7 +53,7 @@ public class Kustvakt {
                 case "--debug":
                     KorAPLogger.DEBUG = true;
                     break;
-                case "config":
+                case "--config":
                     CONFIG = args[i + 1];
                     break;
                 case "--port":
