@@ -16,6 +16,7 @@ public class RewriteTest {
     private static String simple_rewrite_query = "[base=Haus]";
     private static String complex_rewrite_query = "<c=INFC>";
     private static String complex_rewrite_query2 = "[orth=laufe/i & base!=Lauf]";
+    private static String complex_rewrite_query3 = "[(base=laufen | base=gehen) & tt/pos=VVFIN]";
 
     public RewriteTest() {
 
@@ -51,7 +52,7 @@ public class RewriteTest {
         RewriteProcessor processor = new RewriteProcessor();
 
         QuerySerializer s = new QuerySerializer();
-        s.setQuery(complex_rewrite_query2, "poliqarp");
+        s.setQuery(complex_rewrite_query3, "poliqarp");
         System.out.println("query " + s.toJSON());
         System.out.println("finished node " + processor.process(s.toJSON()));
     }

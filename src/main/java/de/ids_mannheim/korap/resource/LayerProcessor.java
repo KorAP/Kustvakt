@@ -28,15 +28,23 @@ public class LayerProcessor extends NodeProcessor {
             }
         }else if (node.at("/query/wrap/@type").asText()
                 .equals("koral:termGroup")) {
-            Iterator<JsonNode> nodes = node.at("/query/wrap/operands")
-                    .elements();
-            while (nodes.hasNext()) {
-                JsonNode n = nodes.next();
-                if (n.path("foundry").isMissingNode()) {
-                    String layer = n.path("layer").asText();
-                    ObjectNode obj = (ObjectNode) n;
-                    obj.put("foundry", mapper.findFoundry(layer));
-                }
+            processTermGroup(node.at("/query/wrap/operands"));
+        }
+        return node;
+    }
+
+    private JsonNode processTermGroup(JsonNode node) {
+        Iterator<JsonNode> nodes = node.elements();
+        while (nodes.hasNext()) {
+            JsonNode n = nodes.next();
+            if (n.path("@type").asText().equals("koral:termGroup"))
+                n = processTermGroup(n.path("operands"));
+
+            if (n.path("@type").asText().equals("koral:term") && n
+                    .path("foundry").isMissingNode()) {
+                String layer = n.path("layer").asText();
+                ObjectNode obj = (ObjectNode) n;
+                obj.put("foundry", mapper.findFoundry(layer));
             }
         }
         return node;
