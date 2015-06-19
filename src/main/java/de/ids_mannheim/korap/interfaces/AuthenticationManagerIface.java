@@ -11,12 +11,13 @@ import java.util.Set;
  * @author hanl
  * @date 15/06/2015
  */
-public abstract class UserControllerIface {
+public abstract class AuthenticationManagerIface {
 
     private Map<String, AuthenticationIface> providers;
 
     //todo: test if constr actually called
-    public UserControllerIface() {
+    public AuthenticationManagerIface() {
+        System.out.println("TEST CONSTRUCTOR CALL");
         this.providers = new HashMap<>();
     }
 
