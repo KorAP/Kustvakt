@@ -17,7 +17,7 @@ public class BeanConfiguration {
     private static ApplicationContext context = null;
 
     public static void loadClasspathContext(String... files) {
-        if (context == null && files == null)
+        if (context == null && files.length == 0)
             context = new ClassPathXmlApplicationContext(config_file);
         else if (context == null)
             context = new ClassPathXmlApplicationContext(files);
