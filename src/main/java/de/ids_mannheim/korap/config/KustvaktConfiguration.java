@@ -96,7 +96,7 @@ public class KustvaktConfiguration {
      *
      * @param stream
      */
-    public void setProperties(InputStream stream) {
+    public void setPropertiesAsStream(InputStream stream) {
         try {
             Properties p = new Properties();
             p.load(stream);
