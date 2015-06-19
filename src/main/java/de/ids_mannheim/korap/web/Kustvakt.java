@@ -25,7 +25,7 @@ public class Kustvakt {
 
         if (CONFIG != null) {
             BeanConfiguration.getConfiguration()
-                    .setProperties(new FileInputStream(new File(CONFIG)));
+                    .setPropertiesAsStream(new FileInputStream(new File(CONFIG)));
 
         }
         grizzlyServer(PORT);
