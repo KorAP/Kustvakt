@@ -9,7 +9,6 @@ import java.lang.annotation.Target;
  * @author hanl
  * @date 29/04/2014
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
-public @interface Benchmark {
+
+public class Benchmarker {
 }
