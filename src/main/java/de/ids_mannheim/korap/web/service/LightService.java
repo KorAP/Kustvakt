@@ -128,9 +128,13 @@ public class LightService {
         //        meta.addEntry("itemsPerResource", 1);
         serializer.addMeta(meta);
 
+        if (cq != null)
+            serializer.setCollection(cq);
+
         String query = processor.process(serializer.toJSON());
         jlog.info("the serialized query {}", query);
 
+        // This may not work with the the KoralQuery
         if (eng.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
             MultivaluedMap map = new MultivaluedMapImpl();
             map.add("q", query);
