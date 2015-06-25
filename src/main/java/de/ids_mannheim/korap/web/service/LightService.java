@@ -12,7 +12,7 @@ import de.ids_mannheim.korap.utils.CollectionQueryBuilder;
 import de.ids_mannheim.korap.utils.KorAPLogger;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.web.ClientsHandler;
-import de.ids_mannheim.korap.web.SearchLucene;
+import de.ids_mannheim.korap.web.SearchKrill;
 import de.ids_mannheim.korap.web.TRACE;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.slf4j.Logger;
@@ -34,12 +34,12 @@ public class LightService {
 
     private static Logger jlog = KorAPLogger.initiate(LightService.class);
 
-    private SearchLucene searchLucene;
+    private SearchKrill searchKrill;
     private ClientsHandler graphDBhandler;
     private RewriteProcessor processor;
 
     public LightService() {
-        this.searchLucene = new SearchLucene(
+        this.searchKrill = new SearchKrill(
                 BeanConfiguration.getConfiguration().getIndexDir());
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
         this.graphDBhandler = new ClientsHandler(builder.build());
@@ -101,8 +101,8 @@ public class LightService {
         // todo: should be possible to add the meta part to the query serialization
         jlog.info("Serialized search: {}", jsonld);
 
-        // fixme: to use the systemarchitecture pointcut thingis, searchlucene must be injected via
-        String result = searchLucene.search(jsonld);
+        // fixme: to use the systemarchitecture pointcut thingis, searchkrill must be injected via
+        String result = searchKrill.search(jsonld);
         KorAPLogger.QUERY_LOGGER.trace("The result set: {}", result);
         return Response.ok(result).build();
     }
@@ -149,7 +149,7 @@ public class LightService {
                 throw KustvaktResponseHandler.throwit(e);
             }
         }else
-            result = searchLucene.search(query);
+            result = searchKrill.search(query);
         KorAPLogger.QUERY_LOGGER.trace("The result set: {}", result);
         return Response.ok(result).build();
     }
@@ -216,7 +216,7 @@ public class LightService {
                         String.valueOf(meta.getSpanContext().getRight_size()));
                 result = this.graphDBhandler.getResponse(map, "distKwic");
             }else
-                result = searchLucene.search(query);
+                result = searchKrill.search(query);
 
         }catch (Exception e) {
             KorAPLogger.ERROR_LOGGER
@@ -235,7 +235,7 @@ public class LightService {
         CollectionQueryBuilder builder = new CollectionQueryBuilder();
         builder.addResource(json);
 
-        String stats = searchLucene.getStatistics(builder.toCollections());
+        String stats = searchKrill.getStatistics(builder.toCollections());
         if (stats.contains("-1"))
             throw KustvaktResponseHandler.throwit(StatusCodes.EMPTY_RESULTS);
 
@@ -251,7 +251,7 @@ public class LightService {
             @QueryParam("layer") Set<String> layers,
             @QueryParam("spans") Boolean spans) {
         spans = spans != null ? spans : false;
-        String matchid = searchLucene.getMatchId(id, docid, rest);
+        String matchid = searchKrill.getMatchId(id, docid, rest);
 
         if (layers == null || layers.isEmpty())
             layers = new HashSet<>();
@@ -273,18 +273,18 @@ public class LightService {
                     f_list.add(sep[0]);
                     l_list.add(sep[1]);
                 }
-                results = searchLucene
+                results = searchKrill
                         .getMatch(matchid, new ArrayList<>(f_list),
                                 new ArrayList<>(l_list), spans, false, true);
             }
         }
         try {
             if (!match_only)
-                results = searchLucene
+                results = searchKrill
                         .getMatch(matchid, new ArrayList<>(foundries),
                                 new ArrayList<>(layers), spans, false, true);
             else
-                results = searchLucene.getMatch(matchid);
+                results = searchKrill.getMatch(matchid);
         }catch (Exception e) {
             KorAPLogger.ERROR_LOGGER.error("Exception encountered!", e);
             throw KustvaktResponseHandler
