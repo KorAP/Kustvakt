@@ -18,15 +18,14 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * The SearchLucene class allows for searching in the Lucene backend
- * by JSON-LD serialized queries.
- * It supports span queries, virtual collections, and paging.
+ * The SearchKrill class allows for searching in the
+ * Lucene based Krill backend by applying KoralQuery.
  *
  * @author Nils Diewald
  */
-public class SearchLucene {
+public class SearchKrill {
     private final static Logger qlog = KorAPLogger.initiate("queryLogger");
-    private final static Logger log = KorAPLogger.initiate(SearchLucene.class);
+    private final static Logger log = KorAPLogger.initiate(SearchKrill.class);
     // Temporary
     String indexDir = "/data/prep_corpus/index/";
     String i = "/Users/hanl/Projects/prep_corpus";
@@ -38,7 +37,7 @@ public class SearchLucene {
      * Constructor
      */
     // todo: use korap.config to get index location
-    public SearchLucene(String path) {
+    public SearchKrill(String path) {
         try {
             File f = new File(path);
             log.info("Loading index from " + path);
@@ -47,7 +46,7 @@ public class SearchLucene {
                 System.exit(-1);
             }
             this.index = new KrillIndex(new MMapDirectory(new File(path)));
-        }catch (IOException e) {
+        } catch (IOException e) {
             KorAPLogger.ERROR_LOGGER
                     .error("Unable to load index: {}", e.getMessage());
         }
@@ -61,31 +60,28 @@ public class SearchLucene {
     public String search(String json) {
         qlog.trace(json);
         if (this.index != null)
-            return new Krill(json).setIndex(this.index).toJsonString();
+            return new Krill(json).apply(this.index).toJsonString();
 
         Result kr = new Result();
-        //        kr.setError("Index not found");
+        kr.addError(601, "Unable to find index");
         return kr.toJsonString();
-    }
-
-    ;
+    };
 
     /**
      * Search in the Lucene index and return matches as token lists.
      *
      * @param json JSON-LD string with search and potential meta filters.
      */
+    @Deprecated
     public String searchTokenList(String json) {
         qlog.trace(json);
         if (this.index != null)
-            return new Krill(json).setIndex(this.index).toJsonString();
+            return new Krill(json).apply(this.index).toTokenListJsonString();
 
         Result kr = new Result();
-        //        kr.setError("Index not found");
+        kr.addError(601, "Unable to find index");
         return kr.toJsonString();
-    }
-
-    ;
+    };
 
     /**
      * Get info on a match - by means of a richly annotated html snippet.
@@ -97,17 +93,17 @@ public class SearchLucene {
         if (this.index != null) {
             try {
                 return this.index.getMatch(id).toJsonString();
-            }catch (QueryException qe) {
+            } catch (QueryException qe) {
                 Match km = new Match();
-                km.setError(qe.getMessage());
+                km.addError(qe.getErrorCode(), qe.getMessage());
                 return km.toJsonString();
             }
-        }
+        };
 
         Match km = new Match();
-        km.setError("Index not found");
+        km.addError(601, "Unable to find index");
         return km.toJsonString();
-    }
+    };
 
     public String getMatch(String id, List<String> foundries,
             List<String> layers, boolean includeSpans,
@@ -119,18 +115,18 @@ public class SearchLucene {
                         .getMatchInfo(id, "tokens", true, foundries, layers,
                                 includeSpans, includeHighlights,
                                 sentenceExpansion).toJsonString();
-            }catch (QueryException qe) {
+            } catch (QueryException qe) {
                 Match km = new Match();
-                km.setError(qe.getMessage());
+                km.addError(qe.getErrorCode(), qe.getMessage());
                 return km.toJsonString();
             }
-        }
+        };
 
         Match km = new Match();
-        km.setError("Index not found");
+        km.addError(601, "Unable to find index");
         return km.toJsonString();
+    };
 
-    }
 
     /**
      * Get info on a match - by means of a richly annotated html snippet.
@@ -141,7 +137,7 @@ public class SearchLucene {
      * @param includeSpans      Should spans be included (or only token infos)?
      * @param includeHighlights Should highlight markup be included?
      */
-    public String getMatch(String id, String foundry, String layer,
+    public String getMatch (String id, String foundry, String layer,
             boolean includeSpans, boolean includeHighlights,
             boolean sentenceExpansion) {
 
@@ -163,24 +159,25 @@ public class SearchLucene {
                 return this.index.getMatchInfo(id, "tokens", foundry, layer,
                         includeSpans, includeHighlights, sentenceExpansion)
                         .toJsonString();
-            }catch (QueryException qe) {
+            } catch (QueryException qe) {
                 Match km = new Match();
-                km.setError(qe.getMessage());
+                km.addError(qe.getErrorCode(), qe.getMessage());
                 return km.toJsonString();
             }
-        }
+        };
 
         Match km = new Match();
-        km.setError("Index not found");
+        km.addError(601, "Unable to find index");
         return km.toJsonString();
-    }
+    };
 
     /**
      * Get statistics on (virtual) collections.
      *
      * @param json JSON-LD string with potential meta filters.
      */
-    public String getStatisticsLegacy(JsonNode json) throws QueryException {
+    @Deprecated
+    public String getStatisticsLegacy (JsonNode json) throws QueryException {
         qlog.trace(JsonUtils.toJSON(json));
         System.out.println("THE NODE BEFORE GETTING STATISTICS " + json);
 
@@ -196,9 +193,9 @@ public class SearchLucene {
         kc.setIndex(this.index);
 
         long docs = 0,
-                tokens = 0,
-                sentences = 0,
-                paragraphs = 0;
+            tokens = 0,
+            sentences = 0,
+            paragraphs = 0;
 
         // Get numbers from index (currently slow)
         try {
@@ -206,7 +203,7 @@ public class SearchLucene {
             tokens = kc.numberOf("tokens");
             sentences = kc.numberOf("sentences");
             paragraphs = kc.numberOf("paragraphs");
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -228,7 +225,8 @@ public class SearchLucene {
      *
      * @param json JSON-LD string with potential meta filters.
      */
-    public String getStatistics(String json) {
+    @Deprecated
+    public String getStatistics (String json) {
         qlog.trace(json);
 
         if (this.index == null) {
@@ -252,7 +250,7 @@ public class SearchLucene {
             tokens = kc.numberOf("tokens");
             sentences = kc.numberOf("sentences");
             paragraphs = kc.numberOf("paragraphs");
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -274,7 +272,8 @@ public class SearchLucene {
      *
      * @param json JSON-LD string with potential meta filters.
      */
-    public String getTermRelation(String json, String field) {
+    @Deprecated
+    public String getTermRelation (String json, String field) {
         qlog.trace(json);
 
         if (this.index == null) {
@@ -289,14 +288,14 @@ public class SearchLucene {
         long v = 0L;
         try {
             v = kc.numberOf("documents");
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
         try {
             // Get term relations as a json string
             return kc.getTermRelationJSON(field);
-        }catch (IOException e) {
+        } catch (IOException e) {
             KorAPLogger.ERROR_LOGGER
                     .error("Unable to retrieve term relations: {}",
                             e.getMessage());
@@ -304,7 +303,7 @@ public class SearchLucene {
         }
     }
 
-    public String getMatchId(String type, String docid, String tofrom) {
+    public String getMatchId (String type, String docid, String tofrom) {
         return new StringBuilder().append("contains-").append(type).append("!")
                 .append(type).append("_").append(docid).append("-")
                 .append(tofrom).toString();
