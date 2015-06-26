@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.web.service;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.config.QueryBuilderUtil;
 import de.ids_mannheim.korap.exceptions.KorAPException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
@@ -10,7 +11,6 @@ import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.resource.RewriteProcessor;
 import de.ids_mannheim.korap.utils.CollectionQueryBuilder;
 import de.ids_mannheim.korap.utils.KorAPLogger;
-import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.web.ClientsHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
 import de.ids_mannheim.korap.web.TRACE;
@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -76,16 +76,13 @@ public class LightService {
         QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
 
         MetaQueryBuilder meta = new MetaQueryBuilder();
-        if (pageIndex != null)
-            meta.addEntry("startIndex", pageIndex);
+        meta.addEntry("startIndex", pageIndex);
         if (pageIndex == null && startPage != null)
             meta.addEntry("startPage", startPage);
-        if (pageLength != null)
-            meta.addEntry("count", pageLength);
-        if (context != null)
-            meta.setSpanContext(context);
+        meta.addEntry("count", pageLength);
+        meta.setSpanContext(context);
         meta.addEntry("cutOff", cutoff);
-        ss.addMeta(meta);
+        ss.setMeta(meta);
         //todo: test this
         ss.setCollection(cq);
         return Response.ok(processor.process(ss.toJSON())).build();
@@ -122,12 +119,12 @@ public class LightService {
 
         String result;
         QuerySerializer serializer = new QuerySerializer().setQuery(q, ql, v);
-        MetaQueryBuilder meta = new MetaQueryBuilder();
-        meta.fillMeta(pageIndex, pageInteger, pageLength, ctx, cutoff);
+        MetaQueryBuilder meta = QueryBuilderUtil
+                .defaultMetaBuilder(pageIndex, pageInteger, pageLength, ctx,
+                        cutoff);
+        serializer.setMeta(meta);
         // fixme: should only apply to CQL queries per default!
         //        meta.addEntry("itemsPerResource", 1);
-        serializer.addMeta(meta);
-
         if (cq != null)
             serializer.setCollection(cq);
 
@@ -191,13 +188,15 @@ public class LightService {
         KustvaktConfiguration.BACKENDS eng = BeanConfiguration
                 .getConfiguration().chooseBackend(engine);
         raw = raw == null ? false : raw;
-        MetaQueryBuilder meta = new MetaQueryBuilder();
+        MetaQueryBuilder meta = QueryBuilderUtil
+                .defaultMetaBuilder(pageIndex, pageInteger, pageLength, ctx,
+                        cutoff);
         if (!raw) {
             QuerySerializer s = new QuerySerializer().setQuery(query, ql, v);
-            meta.fillMeta(pageIndex, pageInteger, pageLength, ctx, cutoff);
+
             // should only apply to CQL queries
             //                meta.addEntry("itemsPerResource", 1);
-            s.addMeta(meta);
+            s.setMeta(meta);
             query = processor.process(s.toJSON());
         }
         String result;
@@ -242,7 +241,7 @@ public class LightService {
         return Response.ok(stats).build();
     }
 
-    //fixme: only allowed for corpus?!
+
     @GET
     @Path("/corpus/{id}/{docid}/{rest}/matchInfo")
     public Response getMatchInfo(@PathParam("id") String id,
@@ -250,46 +249,24 @@ public class LightService {
             @QueryParam("foundry") Set<String> foundries,
             @QueryParam("layer") Set<String> layers,
             @QueryParam("spans") Boolean spans) {
-        spans = spans != null ? spans : false;
         String matchid = searchKrill.getMatchId(id, docid, rest);
+        List<String> f_list = null;
+        List<String> l_list = null;
+        if (layers != null && !layers.isEmpty())
+            l_list = new ArrayList<>(layers);
 
-        if (layers == null || layers.isEmpty())
-            layers = new HashSet<>();
+        if (foundries != null && !foundries.isEmpty() && !foundries
+                .contains("*"))
+            f_list = new ArrayList<>(foundries);
 
         boolean match_only = foundries == null || foundries.isEmpty();
-
         String results;
-        // fixme: checks for policy matching
-        // fixme: currently disabled, due to mishab in foundry/layer spec
-        // fixme:
-        if (foundries != null && foundries.size() > 1000) {
-            Set<String> f_list = new HashSet<>();
-            Set<String> l_list = new HashSet<>();
+        if (match_only)
+            results = searchKrill.getMatch(matchid);
+        else
+            results = searchKrill
+                    .getMatch(matchid, f_list, l_list, spans, false, true);
 
-            for (String spl : new ArrayList<>(foundries)) {
-
-                String[] sep = StringUtils.splitAnnotations(spl);
-                if (spl != null) {
-                    f_list.add(sep[0]);
-                    l_list.add(sep[1]);
-                }
-                results = searchKrill
-                        .getMatch(matchid, new ArrayList<>(f_list),
-                                new ArrayList<>(l_list), spans, false, true);
-            }
-        }
-        try {
-            if (!match_only)
-                results = searchKrill
-                        .getMatch(matchid, new ArrayList<>(foundries),
-                                new ArrayList<>(layers), spans, false, true);
-            else
-                results = searchKrill.getMatch(matchid);
-        }catch (Exception e) {
-            KorAPLogger.ERROR_LOGGER.error("Exception encountered!", e);
-            throw KustvaktResponseHandler
-                    .throwit(StatusCodes.ILLEGAL_ARGUMENT, e.getMessage(), "");
-        }
         return Response.ok(results).build();
     }
 }
