@@ -61,6 +61,9 @@ public class LayerMapper {
                     return config.getDefault_lemma();
                 case "surface":
                     return config.getDefault_surface();
+                // refers to "structure" and is used for paragraphs or sentence boundaries
+                case "s":
+                    return "base";
                 default:
                     // if the layer is not in this specific listing, assume a default layer
                     // like orth or other tokenization layers
