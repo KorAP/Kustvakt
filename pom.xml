@@ -140,7 +140,7 @@
             <version>2.2</version>
         </dependency>
         <dependency>
-            <groupId>KorAP-modules</groupId>
+            <groupId>de.ids_mannheim.korap</groupId>
             <artifactId>Koral</artifactId>
             <version>0.2</version>
             <exclusions>
