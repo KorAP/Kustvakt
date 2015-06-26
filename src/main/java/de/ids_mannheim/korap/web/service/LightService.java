@@ -123,7 +123,8 @@ public class LightService {
         MetaQueryBuilder meta = QueryBuilderUtil
                 .defaultMetaBuilder(pageIndex, pageInteger, pageLength, ctx,
                         cutoff);
-        meta.addEntry("fields", fields);
+        if (fields != null && !fields.isEmpty())
+            meta.addEntry("fields", fields);
         serializer.setMeta(meta);
         if (cq != null)
             serializer.setCollection(cq);
