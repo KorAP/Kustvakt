@@ -304,7 +304,7 @@ public class SearchKrill {
     }
 
     public String getMatchId (String type, String docid, String tofrom) {
-        return new StringBuilder().append("contains-").append(type).append("!")
+        return new StringBuilder().append("match-").append(type).append("!")
                 .append(type).append("_").append(docid).append("-")
                 .append(tofrom).toString();
     }
