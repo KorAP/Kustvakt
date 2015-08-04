@@ -50,7 +50,8 @@ public class SearchKrill {
             KorAPLogger.ERROR_LOGGER
                     .error("Unable to load index: {}", e.getMessage());
         }
-    }
+    };
+
 
     /**
      * Search in the Lucene index.
@@ -66,6 +67,7 @@ public class SearchKrill {
         kr.addError(601, "Unable to find index");
         return kr.toJsonString();
     };
+
 
     /**
      * Search in the Lucene index and return matches as token lists.
@@ -171,54 +173,6 @@ public class SearchKrill {
         return km.toJsonString();
     };
 
-    /**
-     * Get statistics on (virtual) collections.
-     *
-     * @param json JSON-LD string with potential meta filters.
-     */
-    @Deprecated
-    public String getStatisticsLegacy (JsonNode json) throws QueryException {
-        qlog.trace(JsonUtils.toJSON(json));
-        System.out.println("THE NODE BEFORE GETTING STATISTICS " + json);
-
-        if (this.index == null) {
-            return "{\"documents\" : -1, error\" : \"No index given\" }";
-        }
-
-        // Create Virtula VCollection from json search
-        KrillCollection kc = new KrillCollection();
-        kc.fromJsonLegacy(json);
-
-        // Set index
-        kc.setIndex(this.index);
-
-        long docs = 0,
-            tokens = 0,
-            sentences = 0,
-            paragraphs = 0;
-
-        // Get numbers from index (currently slow)
-        try {
-            docs = kc.numberOf("documents");
-            tokens = kc.numberOf("tokens");
-            sentences = kc.numberOf("sentences");
-            paragraphs = kc.numberOf("paragraphs");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-	/*
-    KorAPLogger.ERROR_LOGGER.error("Unable to retrieve statistics: {}", e.getMessage());
-	*/
-
-        // Build json response
-        StringBuilder sb = new StringBuilder("{");
-        sb.append("\"documents\":").append(docs).append(",\"tokens\":")
-                .append(tokens).append(",\"sentences\":").append(sentences)
-                .append(",\"paragraphs\":").append(paragraphs).append("}");
-        return sb.toString();
-    }
 
     /**
      * Get statistics on (virtual) collections.
@@ -252,12 +206,7 @@ public class SearchKrill {
             paragraphs = kc.numberOf("paragraphs");
         } catch (IOException e) {
             e.printStackTrace();
-        }
-
-
-	/*
-    KorAPLogger.ERROR_LOGGER.error("Unable to retrieve statistics: {}", e.getMessage());
-	*/
+        };
 
         // Build json response
         StringBuilder sb = new StringBuilder("{");
@@ -265,48 +214,12 @@ public class SearchKrill {
                 .append(tokens).append(",\"sentences\":").append(sentences)
                 .append(",\"paragraphs\":").append(paragraphs).append("}");
         return sb.toString();
-    }
+    };
 
-    /**
-     * Get set relations on field terms of (virtual) collections.
-     *
-     * @param json JSON-LD string with potential meta filters.
-     */
-    @Deprecated
-    public String getTermRelation (String json, String field) {
-        qlog.trace(json);
-
-        if (this.index == null) {
-            return "{\"documents\" : -1, \"error\" : \"No index given\" }";
-        }
-
-        // Create Virtula VCollection from json search
-        KrillCollection kc = new KrillCollection(json);
-
-        // Set index
-        kc.setIndex(this.index);
-        long v = 0L;
-        try {
-            v = kc.numberOf("documents");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            // Get term relations as a json string
-            return kc.getTermRelationJSON(field);
-        } catch (IOException e) {
-            KorAPLogger.ERROR_LOGGER
-                    .error("Unable to retrieve term relations: {}",
-                            e.getMessage());
-            return "{\"documents\" : -1, \"error\" : \"IO error\" }";
-        }
-    }
 
     public String getMatchId (String type, String docid, String tofrom) {
         return new StringBuilder().append("match-").append(type).append("!")
                 .append(type).append("_").append(docid).append("-")
                 .append(tofrom).toString();
-    }
-
-}
+    };
+};
