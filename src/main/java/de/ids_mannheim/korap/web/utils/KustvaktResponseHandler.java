@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class KustvaktResponseHandler {
 
-    private static AuditingIface auditing = BeanConfiguration
+    private static AuditingIface auditing = BeanConfiguration.getBeans()
             .getAuditingProvider();
 
     private static void register(List<AuditRecord> records) {

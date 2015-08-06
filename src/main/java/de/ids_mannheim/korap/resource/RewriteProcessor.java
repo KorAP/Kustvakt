@@ -1,7 +1,6 @@
 package de.ids_mannheim.korap.resource;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
@@ -17,10 +16,10 @@ public class RewriteProcessor {
     private KustvaktConfiguration config;
     private List<NodeProcessor> processors;
 
-    public RewriteProcessor() {
-        this.config = BeanConfiguration.getConfiguration();
+    public RewriteProcessor(KustvaktConfiguration config) {
+        this.config = config;
         this.processors = new ArrayList<>();
-        addProcessor(new LayerProcessor());
+        addProcessor(new LayerProcessor(config));
     }
 
     public JsonNode process(JsonNode node) {

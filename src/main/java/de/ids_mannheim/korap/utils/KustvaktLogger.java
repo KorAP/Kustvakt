@@ -9,7 +9,7 @@ import org.slf4j.Marker;
  * @date 28/03/2014
  */
 
-public class KorAPLogger implements Logger {
+public class KustvaktLogger implements Logger {
     // debugging flag, info, warn, error will always be logged though!
     public static boolean DEBUG = false;
 
@@ -17,28 +17,29 @@ public class KorAPLogger implements Logger {
     public static final String SECURITY_LOG = "securityLog";
 
     //fixme:
-    public static final KorAPLogger ERROR_LOGGER = KorAPLogger
+    public static final KustvaktLogger ERROR_LOGGER = KustvaktLogger
             .initiate(ERROR_LOG);
-    public static final KorAPLogger QUERY_LOGGER = KorAPLogger.initiate("ql");
+    public static final KustvaktLogger QUERY_LOGGER = KustvaktLogger
+            .initiate("ql");
 
     @Deprecated
-    public static final KorAPLogger SECURITY_LOGGER = KorAPLogger
+    public static final KustvaktLogger SECURITY_LOGGER = KustvaktLogger
             .initiate("security");
     private Logger log;
 
-    public static KorAPLogger initiate(Class cl) {
-        KorAPLogger l = new KorAPLogger();
+    public static KustvaktLogger initiate(Class cl) {
+        KustvaktLogger l = new KustvaktLogger();
         l.log = LoggerFactory.getLogger(cl);
         return l;
     }
 
-    public static KorAPLogger initiate(String name) {
-        KorAPLogger l = new KorAPLogger();
+    public static KustvaktLogger initiate(String name) {
+        KustvaktLogger l = new KustvaktLogger();
         l.log = LoggerFactory.getLogger(name);
         return l;
     }
 
-    private KorAPLogger() {
+    private KustvaktLogger() {
     }
 
     @Override

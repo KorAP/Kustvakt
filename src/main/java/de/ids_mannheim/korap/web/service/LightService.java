@@ -9,8 +9,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.resource.RewriteProcessor;
-import de.ids_mannheim.korap.utils.CollectionQueryBuilder;
-import de.ids_mannheim.korap.utils.KorAPLogger;
+import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.web.ClientsHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
 import de.ids_mannheim.korap.web.TRACE;
@@ -18,7 +17,10 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.slf4j.Logger;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -27,23 +29,23 @@ import java.util.Set;
  * @author hanl
  * @date 29/01/2014
  */
-//todd test functions
 @Path("v0.1" + "/")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class LightService {
 
-    private static Logger jlog = KorAPLogger.initiate(LightService.class);
+    private static Logger jlog = KustvaktLogger.initiate(LightService.class);
 
     private SearchKrill searchKrill;
     private ClientsHandler graphDBhandler;
     private RewriteProcessor processor;
+    private KustvaktConfiguration config;
 
     public LightService() {
-        this.searchKrill = new SearchKrill(
-                BeanConfiguration.getConfiguration().getIndexDir());
+        this.config = BeanConfiguration.getBeans().getConfiguration();
+        this.searchKrill = new SearchKrill(config.getIndexDir());
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
         this.graphDBhandler = new ClientsHandler(builder.build());
-        this.processor = new RewriteProcessor();
+        this.processor = new RewriteProcessor(this.config);
     }
 
     @POST
@@ -83,8 +85,8 @@ public class LightService {
         meta.setSpanContext(context);
         meta.addEntry("cutOff", cutoff);
         ss.setMeta(meta);
-        //todo: test this
-        ss.setCollection(cq);
+        if (cq != null)
+            ss.setCollection(cq);
         return Response.ok(processor.process(ss.toJSON())).build();
     }
 
@@ -92,30 +94,27 @@ public class LightService {
     @Path("search")
     public Response queryRaw(@QueryParam("engine") String engine,
             String jsonld) {
-        KustvaktConfiguration.BACKENDS eng = BeanConfiguration
-                .getConfiguration().chooseBackend(engine);
         jsonld = processor.process(jsonld);
         // todo: should be possible to add the meta part to the query serialization
         jlog.info("Serialized search: {}", jsonld);
 
         // fixme: to use the systemarchitecture pointcut thingis, searchkrill must be injected via
         String result = searchKrill.search(jsonld);
-        KorAPLogger.QUERY_LOGGER.trace("The result set: {}", result);
+        KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
         return Response.ok(result).build();
     }
 
     @GET
     @Path("search")
-    public Response searchbyNameAll(@Context SecurityContext securityContext,
-            @QueryParam("q") String q, @QueryParam("ql") String ql,
-            @QueryParam("v") String v, @QueryParam("context") String ctx,
+    public Response searchbyNameAll(@QueryParam("q") String q,
+            @QueryParam("ql") String ql, @QueryParam("v") String v,
+            @QueryParam("context") String ctx,
             @QueryParam("cutoff") Boolean cutoff,
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
             @QueryParam("page") Integer pageInteger,
             @QueryParam("cq") String cq, @QueryParam("engine") String engine) {
-        KustvaktConfiguration.BACKENDS eng = BeanConfiguration
-                .getConfiguration().chooseBackend(engine);
+        KustvaktConfiguration.BACKENDS eng = this.config.chooseBackend(engine);
 
         String result;
         QuerySerializer serializer = new QuerySerializer().setQuery(q, ql, v);
@@ -147,7 +146,7 @@ public class LightService {
             }
         }else
             result = searchKrill.search(query);
-        KorAPLogger.QUERY_LOGGER.trace("The result set: {}", result);
+        KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
         return Response.ok(result).build();
     }
 
@@ -171,32 +170,31 @@ public class LightService {
      * @param engine
      * @return
      */
-    //fixme: does not use policyrewrite!
+    //fixme: search in collection /collection/collection-id/search
     @GET
     @Path("/{type}/{id}/search")
-    public Response searchbyName(@QueryParam("q") String query,
+    public Response searchbyName(@PathParam("id") String id,
+            @PathParam("type") String type, @QueryParam("q") String query,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
             @QueryParam("context") String ctx,
             @QueryParam("cutoff") Boolean cutoff,
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
-            @QueryParam("page") Integer pageInteger, @PathParam("id") String id,
-            @PathParam("type") String type, @QueryParam("cq") String cq,
-            @QueryParam("raw") Boolean raw,
+            @QueryParam("page") Integer pageInteger,
+            @QueryParam("cq") String cq, @QueryParam("raw") Boolean raw,
             @QueryParam("engine") String engine) {
         // ref is a virtual collection id!
-        KustvaktConfiguration.BACKENDS eng = BeanConfiguration
-                .getConfiguration().chooseBackend(engine);
+        KustvaktConfiguration.BACKENDS eng = this.config.chooseBackend(engine);
+        jlog.info("RA??????????????????????????????????? W" + raw);
         raw = raw == null ? false : raw;
         MetaQueryBuilder meta = QueryBuilderUtil
                 .defaultMetaBuilder(pageIndex, pageInteger, pageLength, ctx,
                         cutoff);
         if (!raw) {
-            QuerySerializer s = new QuerySerializer().setQuery(query, ql, v);
-
             // should only apply to CQL queries
             //                meta.addEntry("itemsPerResource", 1);
-            s.setMeta(meta);
+            QuerySerializer s = new QuerySerializer().setQuery(query, ql, v)
+                    .setMeta(meta);
             query = processor.process(s.toJSON());
         }
         String result;
@@ -218,12 +216,12 @@ public class LightService {
                 result = searchKrill.search(query);
 
         }catch (Exception e) {
-            KorAPLogger.ERROR_LOGGER
+            KustvaktLogger.ERROR_LOGGER
                     .error("Exception for serialized query: " + query, e);
             throw KustvaktResponseHandler.throwit(500, e.getMessage(), null);
         }
 
-        KorAPLogger.QUERY_LOGGER.trace("The result set: {}", result);
+        KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
         return Response.ok(result).build();
     }
 
@@ -231,16 +229,16 @@ public class LightService {
     @POST
     @Path("stats")
     public Response getStats(String json) {
-        CollectionQueryBuilder builder = new CollectionQueryBuilder();
-        builder.addResource(json);
+        //        CollectionQueryBuilder builder = new CollectionQueryBuilder();
+        //        builder.addResource(json);
 
-        String stats = searchKrill.getStatistics(builder.toCollections());
+        // todo: policy override in extension!
+        String stats = searchKrill.getStatistics(json);
         if (stats.contains("-1"))
             throw KustvaktResponseHandler.throwit(StatusCodes.EMPTY_RESULTS);
 
         return Response.ok(stats).build();
     }
-
 
     @GET
     @Path("/corpus/{id}/{docid}/{rest}/matchInfo")

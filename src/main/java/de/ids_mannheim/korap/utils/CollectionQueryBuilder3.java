@@ -9,11 +9,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * convenience builder class for collection query -- new one
+ * convenience builder class for collection query
  *
  * @author hanl
  * @date 16/09/2014
  */
+@Deprecated
 public class CollectionQueryBuilder3 {
 
     private boolean verbose;

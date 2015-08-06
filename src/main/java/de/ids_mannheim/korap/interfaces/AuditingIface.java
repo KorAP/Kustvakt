@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.interfaces;
 
 import de.ids_mannheim.korap.auditing.AuditRecord;
 import de.ids_mannheim.korap.user.User;
+import edu.emory.mathcs.backport.java.util.Collections;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -14,10 +15,11 @@ import java.util.List;
  * Time: 10:45 AM
  */
 //fixme: move table to different database!
-public abstract class AuditingIface implements Runnable {
+public abstract class AuditingIface {
 
     protected static int BATCH_SIZE = 15;
-    private final List<AuditRecord> records = new ArrayList<>(BATCH_SIZE + 5);
+    private final List<AuditRecord> records = Collections
+            .synchronizedList(new ArrayList<>(BATCH_SIZE + 5));
     private final List<AuditRecord> buffer = new ArrayList<>(BATCH_SIZE + 5);
 
     public abstract <T extends AuditRecord> List<T> retrieveRecords(
@@ -37,7 +39,12 @@ public abstract class AuditingIface implements Runnable {
         if (buffer.size() > BATCH_SIZE) {
             records.clear();
             records.addAll(buffer);
-            run();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    apply();
+                }
+            }).start();
             buffer.clear();
         }
         if (buffer.size() <= BATCH_SIZE)
@@ -52,6 +59,8 @@ public abstract class AuditingIface implements Runnable {
         for (T rec : requests)
             addAndRun(rec);
     }
+
+    public abstract void apply();
 
     protected List<AuditRecord> getRecordsToSave() {
         return this.records;

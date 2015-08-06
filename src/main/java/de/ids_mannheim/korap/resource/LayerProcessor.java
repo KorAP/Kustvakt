@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.resource;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
 
 import java.util.Iterator;
 
@@ -13,8 +14,8 @@ public class LayerProcessor extends NodeProcessor {
 
     private LayerMapper mapper;
 
-    public LayerProcessor() {
-        this.mapper = new LayerMapper();
+    public LayerProcessor(KustvaktConfiguration config) {
+        this.mapper = new LayerMapper(config);
     }
 
     @Override

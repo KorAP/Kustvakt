@@ -27,6 +27,7 @@ public class Attributes {
 
     public static final String TYPE = "type";
 
+    public static final String ID = "ID";
     public static final String UID = "accountID";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";

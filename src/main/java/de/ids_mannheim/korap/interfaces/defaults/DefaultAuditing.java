@@ -1,6 +1,8 @@
 package de.ids_mannheim.korap.interfaces.defaults;
 
 import de.ids_mannheim.korap.auditing.AuditRecord;
+import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.Configurable;
 import de.ids_mannheim.korap.interfaces.AuditingIface;
 import de.ids_mannheim.korap.user.User;
 import org.joda.time.DateTime;
@@ -16,6 +18,7 @@ import java.util.List;
  * @author hanl
  * @date 05/06/2015
  */
+@Configurable(BeanConfiguration.KUSTVAKT_AUDITING)
 public class DefaultAuditing extends AuditingIface {
 
     private FileOutputStream stream;
@@ -56,7 +59,7 @@ public class DefaultAuditing extends AuditingIface {
     }
 
     @Override
-    public void run() {
+    public void apply() {
         try {
             for (AuditRecord r : getRecordsToSave())
                 stream.write((r.toString() + "\n").getBytes());

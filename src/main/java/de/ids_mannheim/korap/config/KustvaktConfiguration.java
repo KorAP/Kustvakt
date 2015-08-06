@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.config;
 
-import de.ids_mannheim.korap.utils.KorAPLogger;
+import de.ids_mannheim.korap.utils.KustvaktLogger;
 import lombok.Getter;
 import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * if configuration class is extended, load method should be overriden
+ * if configuration class is extended, loadSubTypes method should be overriden
  *
  * @author hanl
  * @date 05/02/2014
@@ -23,7 +23,7 @@ import java.util.Properties;
 @Getter
 public class KustvaktConfiguration {
 
-    private final Logger jlog = KorAPLogger
+    private final Logger jlog = KustvaktLogger
             .initiate(KustvaktConfiguration.class);
     private String indexDir;
     private int port;
@@ -115,7 +115,7 @@ public class KustvaktConfiguration {
     }
 
     private void loadLog4jLogger(String log4jconfig) {
-        /** load log4j configuration file programmatically */
+        /** loadSubTypes log4j configuration file programmatically */
         Properties log4j = new Properties();
         try {
             if (!log4jconfig.equals("")) {

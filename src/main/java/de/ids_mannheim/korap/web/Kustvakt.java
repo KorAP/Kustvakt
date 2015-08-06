@@ -4,7 +4,7 @@ import com.sun.grizzly.http.embed.GrizzlyWebServer;
 import com.sun.grizzly.http.servlet.ServletAdapter;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import de.ids_mannheim.korap.config.BeanConfiguration;
-import de.ids_mannheim.korap.utils.KorAPLogger;
+import de.ids_mannheim.korap.utils.KustvaktLogger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,7 +24,7 @@ public class Kustvakt {
         BeanConfiguration.loadClasspathContext();
 
         if (CONFIG != null) {
-            BeanConfiguration.getConfiguration()
+            BeanConfiguration.getBeans().getConfiguration()
                     .setPropertiesAsStream(new FileInputStream(new File(CONFIG)));
 
         }
@@ -33,7 +33,7 @@ public class Kustvakt {
 
     public static void grizzlyServer(int port) throws IOException {
         if (port == -1)
-            port = BeanConfiguration.getConfiguration().getPort();
+            port = BeanConfiguration.getBeans().getConfiguration().getPort();
         System.out.println("Starting grizzly on port " + port + " ...");
         GrizzlyWebServer gws = new GrizzlyWebServer(port);
         ServletAdapter jerseyAdapter = new ServletAdapter();
@@ -51,7 +51,7 @@ public class Kustvakt {
         for (int i = 0; i < args.length; i++) {
             switch ((args[i])) {
                 case "--debug":
-                    KorAPLogger.DEBUG = true;
+                    KustvaktLogger.DEBUG = true;
                     break;
                 case "--config":
                     CONFIG = args[i + 1];

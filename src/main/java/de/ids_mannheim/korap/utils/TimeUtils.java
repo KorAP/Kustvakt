@@ -25,7 +25,7 @@ public class TimeUtils {
 
     private static DecimalFormat df = new DecimalFormat("#.#############");
     private static final DateTimeZone dtz = DateTimeZone.forID("Europe/Berlin");
-    private static Logger jlog = KorAPLogger.initiate(TimeUtils.class);
+    private static Logger jlog = KustvaktLogger.initiate(TimeUtils.class);
 
     public static int convertTimeToSeconds(String expirationVal) {
         expirationVal = expirationVal.trim();

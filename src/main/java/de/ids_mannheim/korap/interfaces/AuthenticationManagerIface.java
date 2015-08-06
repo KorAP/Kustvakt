@@ -1,11 +1,9 @@
 package de.ids_mannheim.korap.interfaces;
 
-import de.ids_mannheim.korap.config.KustvaktClassLoader;
 import de.ids_mannheim.korap.exceptions.KorAPException;
 import de.ids_mannheim.korap.user.*;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,21 +17,6 @@ public abstract class AuthenticationManagerIface {
 
     public AuthenticationManagerIface() {
         this.providers = new HashMap<>();
-        loadProviders();
-    }
-
-    private void loadProviders() {
-        Set<Class<? extends AuthenticationIface>> set = KustvaktClassLoader
-                .load(AuthenticationIface.class);
-        Set<AuthenticationIface> set2 = new HashSet<>();
-        for (Class<? extends AuthenticationIface> i : set) {
-            try {
-                set2.add(i.newInstance());
-            }catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        this.setProviders(set2);
     }
 
     public void setProviders(Set<AuthenticationIface> providers) {
@@ -87,6 +70,9 @@ public abstract class AuthenticationManagerIface {
 
     public abstract Object[] validateResetPasswordRequest(String username,
             String email) throws KorAPException;
+
+    public abstract void resetPassword(String uriFragment, String username,
+            String newPassphrase) throws KorAPException;
 
     public abstract void confirmRegistration(String uriFragment,
             String username) throws KorAPException;

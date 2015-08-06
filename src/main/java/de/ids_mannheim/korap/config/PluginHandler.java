@@ -1,13 +1,6 @@
 package de.ids_mannheim.korap.config;
 
-import de.ids_mannheim.korap.interfaces.AuditingIface;
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
-import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.interfaces.EntityHandlerIface;
-
-import java.lang.annotation.Annotation;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,62 +10,45 @@ import java.util.Set;
  */
 public class PluginHandler {
 
-    private static Map<Class<? extends Annotation>, Class> interfaces;
-    private Map<Class<? extends Annotation>, Object> plugins;
-
-    // add resource handler annotation
-    static {
-        interfaces = new HashMap<>();
-        interfaces.put(AuditingHandler.class, AuditingIface.class);
-        interfaces.put(UserDbHandler.class, EntityHandlerIface.class);
-        interfaces.put(AuthenticationHandler.class,
-                AuthenticationManagerIface.class);
-        interfaces.put(EncryptionHandler.class, EncryptionIface.class);
-        //todo:
-        interfaces.put(ResourceHandler.class, ResourceHandler.class);
-    }
+    private Map<String, Object> defaults;
 
     public PluginHandler() {
-        this.plugins = new HashMap<>();
-        this.load();
+        this.defaults = new HashMap<>();
+        loadClasses();
     }
 
-    public void load() {
-        for (Map.Entry<Class<? extends Annotation>, Class> en : new HashSet<>(
-                interfaces.entrySet())) {
-            Set<Class<?>> set = KustvaktClassLoader
-                    .loadFromAnnotation(en.getKey());
-            if (set.size() > 1)
-                throw new UnsupportedOperationException(
-                        "handler declaration not unique!");
-            else if (set.size() == 0)
-                interfaces.remove(en.getKey());
+    private void loadClasses() {
+        Set<Class<?>> cls = KustvaktClassLoader
+                .loadFromAnnotation(Configurable.class);
+        for (Class clazz : cls) {
+            Configurable c = (Configurable) clazz
+                    .getAnnotation(Configurable.class);
+            try {
+                this.defaults.put(c.value(), clazz.newInstance());
+            }catch (InstantiationException | IllegalAccessException e) {
+                throw new RuntimeException("Could not instantiate class");
+            }
         }
     }
 
-    public void addInterface(Class<? extends Annotation> anno, Class<?> iface) {
-        interfaces.put(anno, iface);
+    public Object getDefault(String name) {
+        return this.defaults.get(name);
     }
 
-    public void registerPlugin(Object ob) {
-        for (Map.Entry<Class<? extends Annotation>, Class> en : interfaces
-                .entrySet()) {
-            if (en.getValue().isInstance(ob))
-                this.plugins.put(en.getKey(), ob);
+    public <T> T getDefault(Class<T> tClass) {
+        for (Object o : this.defaults.values()) {
+            if (o.getClass().equals(tClass))
+                return (T) o;
         }
+        return null;
     }
 
-    public Object getPluginInstance(Class<? extends Annotation> anno) {
-        Object o = this.plugins.get(anno);
-        if (o == null)
-            return new NullPointerException(
-                    "no plugin defined for type " + anno.toString());
-        return o;
+    public void remove(String name) {
+        this.defaults.remove(name);
     }
 
     @Override
     public String toString() {
-        System.out.println("PRINT INTERFACES " + interfaces.toString());
-        return plugins.toString();
+        return defaults.toString();
     }
 }

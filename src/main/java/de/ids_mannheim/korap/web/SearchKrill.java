@@ -9,7 +9,7 @@ import de.ids_mannheim.korap.response.Match;
 import de.ids_mannheim.korap.response.Result;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.utils.KorAPLogger;
+import de.ids_mannheim.korap.utils.KustvaktLogger;
 import org.apache.lucene.store.MMapDirectory;
 import org.slf4j.Logger;
 
@@ -24,8 +24,8 @@ import java.util.List;
  * @author Nils Diewald
  */
 public class SearchKrill {
-    private final static Logger qlog = KorAPLogger.initiate("queryLogger");
-    private final static Logger log = KorAPLogger.initiate(SearchKrill.class);
+    private final static Logger qlog = KustvaktLogger.initiate("queryLogger");
+    private final static Logger log = KustvaktLogger.initiate(SearchKrill.class);
     // Temporary
     String indexDir = "/data/prep_corpus/index/";
     String i = "/Users/hanl/Projects/prep_corpus";
@@ -42,13 +42,13 @@ public class SearchKrill {
             File f = new File(path);
             log.info("Loading index from " + path);
             if (!f.exists()) {
-                KorAPLogger.ERROR_LOGGER.error("Index not found!");
+                KustvaktLogger.ERROR_LOGGER.error("Index not found!");
                 System.exit(-1);
             }
             this.index = new KrillIndex(new MMapDirectory(new File(path)));
         } catch (IOException e) {
-            KorAPLogger.ERROR_LOGGER
-                    .error("Unable to load index: {}", e.getMessage());
+            KustvaktLogger.ERROR_LOGGER
+                    .error("Unable to loadSubTypes index: {}", e.getMessage());
         }
     }
 
@@ -296,7 +296,7 @@ public class SearchKrill {
             // Get term relations as a json string
             return kc.getTermRelationJSON(field);
         } catch (IOException e) {
-            KorAPLogger.ERROR_LOGGER
+            KustvaktLogger.ERROR_LOGGER
                     .error("Unable to retrieve term relations: {}",
                             e.getMessage());
             return "{\"documents\" : -1, \"error\" : \"IO error\" }";

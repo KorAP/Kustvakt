@@ -1,12 +1,13 @@
 package de.ids_mannheim.korap.utils;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 
 import java.util.*;
 
 public class StringUtils {
-    private final static Logger jlog = KorAPLogger.initiate(StringUtils.class);
+    private final static Logger jlog = KustvaktLogger
+            .initiate(StringUtils.class);
 
     private static final String SLASH = "/";
     private static final String SEP = ";";
@@ -153,11 +154,11 @@ public class StringUtils {
     }
 
     public static String normalizeHTML(String value) {
-        return StringEscapeUtils.escapeHtml4(value);
+        return StringEscapeUtils.escapeHtml(value);
     }
 
     public static String decodeHTML(String value) {
-        return StringEscapeUtils.unescapeHtml4(value);
+        return StringEscapeUtils.unescapeHtml(value);
     }
 
     /**

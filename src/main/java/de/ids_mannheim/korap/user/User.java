@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.user;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import de.ids_mannheim.korap.config.ParamFields;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.Data;
@@ -23,7 +24,7 @@ public abstract class User implements Serializable {
     private Long accountCreation;
     private boolean isAccountLocked;
     private int type;
-    private Map<String, Object> fields;
+    private ParamFields fields;
     private UserSettings settings;
     private UserDetails details;
     private List<UserQuery> queries;
@@ -32,7 +33,6 @@ public abstract class User implements Serializable {
         this.accountCreation = TimeUtils.getNow().getMillis();
         this.isAccountLocked = false;
         this.username = "";
-        this.fields = new HashMap<>();
         this.id = -1;
     }
 
@@ -46,12 +46,12 @@ public abstract class User implements Serializable {
         this.username = username;
     }
 
-    public void setField(String key, Object value) {
-        this.fields.put(key, value);
+    public void addField(ParamFields.Param param) {
+        this.fields.add(param);
     }
 
-    public Object getField(String key) {
-        return this.fields.get(key);
+    public <T extends ParamFields.Param> T getField(Class<T> cl) {
+        return this.fields.get(cl);
     }
 
     //todo: repair transfer

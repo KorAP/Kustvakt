@@ -279,7 +279,7 @@ public class UserSettings {
                 (String) m.get(Attributes.DEFAULT_REL_FOUNDRY));
     }
 
-    //load from configuration?
+    //loadSubTypes from configuration?
     private void setupDefaultSettings() {
         this.setFileNameForExport("export");
         //        this.setItemForSimpleAnnotation(0);
