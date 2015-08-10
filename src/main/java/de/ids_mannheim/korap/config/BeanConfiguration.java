@@ -87,6 +87,7 @@ public class BeanConfiguration {
         }
 
         private BeanHolder(ApplicationContext context) {
+            this();
             this.context = context;
         }
 
