@@ -48,6 +48,10 @@ public class LightService {
         this.processor = new RewriteProcessor(this.config);
     }
 
+    /**
+     * @param query
+     * @return response
+     */
     @POST
     @Path("colloc")
     public Response getCollocationBase(@QueryParam("q") String query) {
@@ -61,6 +65,7 @@ public class LightService {
     }
 
     // todo
+    @Deprecated
     public Response postMatchFavorite() {
         return Response.ok().build();
     }
@@ -185,7 +190,6 @@ public class LightService {
             @QueryParam("engine") String engine) {
         // ref is a virtual collection id!
         KustvaktConfiguration.BACKENDS eng = this.config.chooseBackend(engine);
-        jlog.info("RA??????????????????????????????????? W" + raw);
         raw = raw == null ? false : raw;
         MetaQueryBuilder meta = QueryBuilderUtil
                 .defaultMetaBuilder(pageIndex, pageInteger, pageLength, ctx,
