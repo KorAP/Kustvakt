@@ -1,3 +1,5 @@
+package de.ids_mannheim.korap.web.service;
+
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;

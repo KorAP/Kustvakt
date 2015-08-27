@@ -43,8 +43,8 @@ public class Attributes {
     public static final String ACCOUNTLOCK = "accountLock";
     public static final String ACCOUNTLINK = "accountLink";
     public static final String URI = "uri";
-    public static final String URI_FRAGMENT = "URIFragment";
-    public static final String URI_EXPIRATION = "uriExpiration";
+    public static final String URI_FRAGMENT = "uri_fragment";
+    public static final String URI_EXPIRATION = "uri_expiration";
     public static final String PRIVATE_USAGE = "privateUsage";
 
     /**

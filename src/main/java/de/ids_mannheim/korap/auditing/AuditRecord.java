@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * @author hanl
@@ -18,7 +19,7 @@ import java.util.Arrays;
 @Setter
 public class AuditRecord {
 
-    // fixme: handle via status codes
+    // todo: handle via status codes
     @Deprecated
     public enum Operation {
         GET, INSERT, UPDATE, DELETE, CREATE
@@ -100,16 +101,19 @@ public class AuditRecord {
         return userAgent + "@" + IP;
     }
 
+    // fixme: add id, useragent
     @Override
     public String toString() {
-        return "Record{" +
-                "account='" + userid + '\'' +
-                ", category=" + category +
-                ", loc='" + loc + '\'' +
-                ", timestamp=" + timestamp +
-                ", status='" + status + '\'' +
-                ", field_1='" + field_1 + '\'' +
-                '}';
+        StringBuilder b = new StringBuilder();
+        b.append(category.toString().toLowerCase() + " audit : ")
+                .append(userid + "@" + new Date(timestamp)).append("\n")
+                .append("Status " + status).append("; ");
+
+        if (this.args != null)
+            b.append("Args " + field_1).append("; ");
+        if (this.loc != null)
+            b.append("Location " + loc).append("; ");
+        return b.toString();
     }
 
     @Override

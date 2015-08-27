@@ -1,14 +1,12 @@
 // Connector to the Lucene Backend
 package de.ids_mannheim.korap.web;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.Krill;
 import de.ids_mannheim.korap.KrillCollection;
 import de.ids_mannheim.korap.KrillIndex;
 import de.ids_mannheim.korap.response.Match;
 import de.ids_mannheim.korap.response.Result;
 import de.ids_mannheim.korap.util.QueryException;
-import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import org.apache.lucene.store.MMapDirectory;
 import org.slf4j.Logger;
@@ -171,54 +169,6 @@ public class SearchKrill {
         return km.toJsonString();
     };
 
-    /**
-     * Get statistics on (virtual) collections.
-     *
-     * @param json JSON-LD string with potential meta filters.
-     */
-    @Deprecated
-    public String getStatisticsLegacy (JsonNode json) throws QueryException {
-        qlog.trace(JsonUtils.toJSON(json));
-        System.out.println("THE NODE BEFORE GETTING STATISTICS " + json);
-
-        if (this.index == null) {
-            return "{\"documents\" : -1, error\" : \"No index given\" }";
-        }
-
-        // Create Virtula VCollection from json search
-        KrillCollection kc = new KrillCollection();
-        kc.fromJsonLegacy(json);
-
-        // Set index
-        kc.setIndex(this.index);
-
-        long docs = 0,
-            tokens = 0,
-            sentences = 0,
-            paragraphs = 0;
-
-        // Get numbers from index (currently slow)
-        try {
-            docs = kc.numberOf("documents");
-            tokens = kc.numberOf("tokens");
-            sentences = kc.numberOf("sentences");
-            paragraphs = kc.numberOf("paragraphs");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-	/*
-    KorAPLogger.ERROR_LOGGER.error("Unable to retrieve statistics: {}", e.getMessage());
-	*/
-
-        // Build json response
-        StringBuilder sb = new StringBuilder("{");
-        sb.append("\"documents\":").append(docs).append(",\"tokens\":")
-                .append(tokens).append(",\"sentences\":").append(sentences)
-                .append(",\"paragraphs\":").append(paragraphs).append("}");
-        return sb.toString();
-    }
 
     /**
      * Get statistics on (virtual) collections.
@@ -265,42 +215,6 @@ public class SearchKrill {
                 .append(tokens).append(",\"sentences\":").append(sentences)
                 .append(",\"paragraphs\":").append(paragraphs).append("}");
         return sb.toString();
-    }
-
-    /**
-     * Get set relations on field terms of (virtual) collections.
-     *
-     * @param json JSON-LD string with potential meta filters.
-     */
-    @Deprecated
-    public String getTermRelation (String json, String field) {
-        qlog.trace(json);
-
-        if (this.index == null) {
-            return "{\"documents\" : -1, \"error\" : \"No index given\" }";
-        }
-
-        // Create Virtula VCollection from json search
-        KrillCollection kc = new KrillCollection(json);
-
-        // Set index
-        kc.setIndex(this.index);
-        long v = 0L;
-        try {
-            v = kc.numberOf("documents");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            // Get term relations as a json string
-            return kc.getTermRelationJSON(field);
-        } catch (IOException e) {
-            KustvaktLogger.ERROR_LOGGER
-                    .error("Unable to retrieve term relations: {}",
-                            e.getMessage());
-            return "{\"documents\" : -1, \"error\" : \"IO error\" }";
-        }
     }
 
     public String getMatchId (String type, String docid, String tofrom) {

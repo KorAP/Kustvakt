@@ -1,7 +1,6 @@
 package de.ids_mannheim.korap.web.utils;
 
 import de.ids_mannheim.korap.auditing.AuditRecord;
-import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.exceptions.BaseException;
 import de.ids_mannheim.korap.exceptions.KorAPException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -19,12 +18,18 @@ import java.util.List;
  */
 public class KustvaktResponseHandler {
 
-    private static AuditingIface auditing = BeanConfiguration.getBeans()
-            .getAuditingProvider();
+    private static AuditingIface auditing;
+
+    public static void init(AuditingIface iface) {
+        if (auditing == null)
+            auditing = iface;
+    }
 
     private static void register(List<AuditRecord> records) {
         if (auditing != null && !records.isEmpty())
             auditing.audit(records);
+        else if (auditing == null)
+            throw new RuntimeException("Auditing handler must be set!");
     }
 
     public static WebApplicationException throwit(BaseException e) {
@@ -53,7 +58,7 @@ public class KustvaktResponseHandler {
     }
 
     private static String buildNotification(BaseException e) {
-        KustvaktResponseHandler.register(e.getRecords());
+        register(e.getRecords());
         return buildNotification(e.getStatusCode(), e.getMessage(),
                 e.getEntity());
     }
@@ -73,5 +78,4 @@ public class KustvaktResponseHandler {
                                 "Basic realm=Kustvakt Authentication Service")
                         .entity(buildNotification(e)).build());
     }
-
 }

@@ -66,4 +66,6 @@ public abstract class AuditingIface {
         return this.records;
     }
 
+
+    public abstract void finish();
 }

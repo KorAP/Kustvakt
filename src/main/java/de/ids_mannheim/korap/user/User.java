@@ -30,6 +30,7 @@ public abstract class User implements Serializable {
     private List<UserQuery> queries;
 
     protected User() {
+        this.fields = new ParamFields();
         this.accountCreation = TimeUtils.getNow().getMillis();
         this.isAccountLocked = false;
         this.username = "";

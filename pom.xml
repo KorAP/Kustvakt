@@ -18,6 +18,19 @@
     </properties>
     <build>
         <plugins>
+            <!-- build tests jar, so extensions can use fastjerseytest class to build rest tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -48,7 +61,7 @@
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>
-                                        de.ids_mannheim.korap.web.Kustvakt
+                                        de.ids_mannheim.korap.web.KustvaktServer
                                     </mainClass>
                                 </transformer>
                                 <transformer
@@ -108,11 +121,13 @@
             <groupId>com.sun.jersey.jersey-test-framework</groupId>
             <artifactId>jersey-test-framework-core</artifactId>
             <version>1.19</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.jersey-test-framework</groupId>
             <artifactId>jersey-test-framework-grizzly</artifactId>
             <version>1.19</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -138,11 +153,13 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>0.11.8</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>
@@ -160,16 +177,18 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-grizzly2</artifactId>
-            <version>1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.grizzly</groupId>
-            <artifactId>grizzly-servlet-webserver</artifactId>
-            <version>1.9.18-i</version>
-        </dependency>
+        <!--
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-grizzly2</artifactId>
+                    <version>1.8</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.grizzly</groupId>
+                    <artifactId>grizzly-servlet-webserver</artifactId>
+                    <version>1.9.18-i</version>
+                </dependency>
+                -->
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
@@ -179,7 +198,7 @@
         <dependency>
             <groupId>de.ids_mannheim.korap</groupId>
             <artifactId>Krill</artifactId>
-            <version>0.52</version>
+            <version>0.53</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.xerial</groupId>
@@ -192,6 +211,7 @@
             <artifactId>reflections</artifactId>
             <version>0.9.9-RC1</version>
         </dependency>
+        <!-- deprecated? -->
         <dependency>
             <groupId>com.restfuse</groupId>
             <artifactId>com.eclipsesource.restfuse</artifactId>
@@ -237,6 +257,16 @@
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
             <version>3.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>8.1.8.v20121106</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+            <version>8.1.8.v20121106</version>
         </dependency>
         <!--
         not part of public release

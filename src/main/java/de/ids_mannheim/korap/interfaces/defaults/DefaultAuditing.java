@@ -27,7 +27,7 @@ public class DefaultAuditing extends AuditingIface {
         try {
             File f = new File("logs");
             f.mkdirs();
-            stream = new FileOutputStream(new File(f, "audit.log"));
+            stream = new FileOutputStream(new File(f, "default_audit.log"));
         }catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -37,33 +37,43 @@ public class DefaultAuditing extends AuditingIface {
     public <T extends AuditRecord> List<T> retrieveRecords(
             AuditRecord.CATEGORY category, DateTime day, DateTime until,
             boolean exact, int limit) {
-        throw new UnsupportedOperationException("operation not supported!");
+        throw new UnsupportedOperationException("Operation not supported!");
     }
 
     @Override
     public <T extends AuditRecord> List<T> retrieveRecords(
             AuditRecord.CATEGORY category, User user, int limit) {
-        throw new UnsupportedOperationException("operation not supported!");
+        throw new UnsupportedOperationException("Operation not supported!");
     }
 
     @Override
     public <T extends AuditRecord> List<T> retrieveRecords(LocalDate day,
             int hitMax) {
-        throw new UnsupportedOperationException("operation not supported!");
+        throw new UnsupportedOperationException("Operation not supported!");
     }
 
     @Override
     public <T extends AuditRecord> List<T> retrieveRecords(String userID,
             LocalDate start, LocalDate end, int hitMax) {
-        throw new UnsupportedOperationException("operation not supported!");
+        throw new UnsupportedOperationException("Operation not supported!");
     }
 
     @Override
     public void apply() {
+        List<AuditRecord> rcs = getRecordsToSave();
         try {
-            for (AuditRecord r : getRecordsToSave())
+            for (AuditRecord r : rcs)
                 stream.write((r.toString() + "\n").getBytes());
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void finish() {
+        try {
             stream.flush();
+            stream.close();
         }catch (IOException e) {
             e.printStackTrace();
         }

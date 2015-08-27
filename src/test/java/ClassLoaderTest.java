@@ -1,5 +1,5 @@
 import de.ids_mannheim.korap.config.BeanConfiguration;
-import de.ids_mannheim.korap.config.PluginHandler;
+import de.ids_mannheim.korap.config.DefaultHandler;
 import de.ids_mannheim.korap.interfaces.AuditingIface;
 import de.ids_mannheim.korap.interfaces.defaults.DefaultAuditing;
 import org.junit.Test;
@@ -18,9 +18,10 @@ public class ClassLoaderTest {
 
     @Test
     public void testDefaultCreationThrowsNoException() {
-        PluginHandler pl = new PluginHandler();
+        DefaultHandler pl = new DefaultHandler();
         Object o = pl.getDefault(BeanConfiguration.KUSTVAKT_AUDITING);
         assert o != null;
+        assert o instanceof AuditingIface;
     }
 
     @Test(expected = RuntimeException.class)

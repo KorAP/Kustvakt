@@ -8,11 +8,11 @@ import java.util.Set;
  * @author hanl
  * @date 17/06/2015
  */
-public class PluginHandler {
+public class DefaultHandler {
 
     private Map<String, Object> defaults;
 
-    public PluginHandler() {
+    public DefaultHandler() {
         this.defaults = new HashMap<>();
         loadClasses();
     }

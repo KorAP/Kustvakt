@@ -1,8 +1,9 @@
+package de.ids_mannheim.korap.web.service;
+
 import com.sun.jersey.api.client.ClientResponse;
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.service.LightService;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;

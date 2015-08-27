@@ -4,7 +4,10 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.resource.LayerMapper;
 import de.ids_mannheim.korap.resource.RewriteProcessor;
-import de.ids_mannheim.korap.resource.rewrite.*;
+import de.ids_mannheim.korap.resource.rewrite.CollectionCleanupFilter;
+import de.ids_mannheim.korap.resource.rewrite.CollectionConstraint;
+import de.ids_mannheim.korap.resource.rewrite.FoundryInject;
+import de.ids_mannheim.korap.resource.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,6 +40,8 @@ public class RewriteTest {
         s.setQuery(simple_add_query, "poliqarp");
         String result = processor.process(s.toJSON());
         JsonNode node = JsonUtils.readTree(result);
+
+        assert node != null;
         assert !node.at("/query/wrap/foundry").isMissingNode();
     }
 
@@ -59,6 +64,8 @@ public class RewriteTest {
         handler.add(new FoundryInject(config));
         String result = handler.apply(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
+
+        assert node != null;
         assert !node.at("/query/wrap/foundry").isMissingNode();
         assert !node.at("/query/wrap/rewrites").isMissingNode();
         assert node.at("/query/wrap/rewrites/0/@type").asText()
@@ -73,6 +80,8 @@ public class RewriteTest {
         handler.add(new FoundryInject(config));
         String result = handler.apply(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
+
+        assert node != null;
         assert node.at("/query/wrap/@type").asText().equals("koral:termGroup");
         assert !node.at("/query/wrap/operands/0/foundry").isMissingNode();
         assert !node.at("/query/wrap/operands/0/rewrites").isMissingNode();
@@ -89,6 +98,7 @@ public class RewriteTest {
         String result = handler.apply(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
 
+        assert node != null;
         assert node.at("/query/wrap/@type").asText().equals("koral:termGroup");
         assert !node.at("/query/wrap/operands/0/operands/0/foundry")
                 .isMissingNode();
@@ -112,6 +122,7 @@ public class RewriteTest {
         s.setCollection("textClass=politik & corpusID=WPD");
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.apply(result, null));
+        assert node != null;
         assert node.at("/collection/operands").size() == 1;
     }
 
@@ -124,6 +135,8 @@ public class RewriteTest {
         s.setCollection("corpusID=BRZ13 & corpusID=WPD");
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.apply(result, null));
+
+        assert node != null;
         assert node.at("/collection/operands").size() == 0;
     }
 
@@ -138,6 +151,7 @@ public class RewriteTest {
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.apply(result, null));
 
+        assert node != null;
         assert node.at("/collection/operands/0/@type").asText()
                 .equals("koral:docGroup");
         assert node.at("/collection/operands/0/operands/0/key").asText()
@@ -156,6 +170,7 @@ public class RewriteTest {
                 "(corpusID=BRZ13 & corpusID=WPD) & textClass=Wissenschaft & textClass=Sport");
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.apply(result, null));
+        assert node != null;
         assert node.at("/collection/@type").asText().equals("koral:docGroup");
         assert node.at("/collection/operands").size() == 2;
         assert node.at("/collection/operands/0/key").asText()
@@ -174,6 +189,7 @@ public class RewriteTest {
         s.setCollection("(corpusID=BRZ13 & textClass=Wissenschaft)");
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.apply(result, null));
+        assert node != null;
         assert node.at("/collection/@type").asText().equals("koral:doc");
     }
 
@@ -188,6 +204,7 @@ public class RewriteTest {
                 "(corpusID=BRZ13 & corpusID=WPD) & textClass=Wissenschaft");
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.apply(result, null));
+        assert node != null;
         assert node.at("/collection/@type").asText().equals("koral:doc");
         assert node.at("/collection/key").asText().equals("textClass");
     }

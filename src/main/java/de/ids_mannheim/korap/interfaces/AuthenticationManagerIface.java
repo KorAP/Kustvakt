@@ -76,4 +76,9 @@ public abstract class AuthenticationManagerIface {
 
     public abstract void confirmRegistration(String uriFragment,
             String username) throws KorAPException;
+
+    @Override
+    public String toString() {
+        return "provider list: " + this.providers.toString();
+    }
 }

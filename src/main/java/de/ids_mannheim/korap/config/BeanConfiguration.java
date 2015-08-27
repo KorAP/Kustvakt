@@ -24,18 +24,19 @@ public class BeanConfiguration {
     public static final String KUSTVAKT_AUDITING = "kustvakt_auditing";
     public static final String KUSTVAKT_CONFIG = "kustvakt_config";
 
-    private static BeanHolder beans;
+    private static BeanHolderHelper beans;
 
-    public static void setCustomBeansHolder(BeanHolder holder) {
+    public static void setCustomBeansHolder(BeanHolderHelper holder) {
         ApplicationContext context = beans.context;
         holder.context = context;
         BeanConfiguration.beans = holder;
     }
 
-    public static BeanHolder getBeans() {
+    public static BeanHolderHelper getBeans() {
         return BeanConfiguration.beans;
     }
 
+    @Deprecated
     public static void loadAuthenticationProviders() {
         Set<Class<? extends AuthenticationIface>> set = KustvaktClassLoader
                 .loadSubTypes(AuthenticationIface.class);
@@ -54,6 +55,10 @@ public class BeanConfiguration {
         }
     }
 
+    public static boolean hasContext() {
+        return beans != null;
+    }
+
     public static void loadClasspathContext(String... files) {
         if (beans == null) {
             ApplicationContext context;
@@ -61,7 +66,7 @@ public class BeanConfiguration {
                 context = new ClassPathXmlApplicationContext(config_file);
             else
                 context = new ClassPathXmlApplicationContext(files);
-            BeanConfiguration.beans = new BeanHolder(context);
+            BeanConfiguration.beans = new BeanHolderHelper(context);
         }
     }
 
@@ -69,42 +74,54 @@ public class BeanConfiguration {
         if (beans == null) {
             ApplicationContext context = new FileSystemXmlApplicationContext(
                     "file:" + filepath);
-            BeanConfiguration.beans = new BeanHolder(context);
+            BeanConfiguration.beans = new BeanHolderHelper(context);
         }
     }
+
+    public static void closeApplication() {
+        beans.finish();
+    }
+
     //todo: set response handler
+    @Deprecated
     public static KustvaktResponseHandler getResponseHandler() {
         return null;
     }
 
-    public static class BeanHolder {
+    public static class BeanHolderHelper {
 
         private ApplicationContext context = null;
-        private PluginHandler handler;
+        private DefaultHandler handler;
 
-        public BeanHolder() {
-            this.handler = new PluginHandler();
+        public BeanHolderHelper() {
+            this.handler = new DefaultHandler();
         }
 
-        private BeanHolder(ApplicationContext context) {
+        private BeanHolderHelper(ApplicationContext context) {
             this();
             this.context = context;
         }
 
         protected <T> T getBean(Class<T> clazz) {
-            try {
-                return context.getBean(clazz);
-            }catch (NoSuchBeanDefinitionException e) {
-                return this.handler.getDefault(clazz);
+            if (context != null) {
+                try {
+                    return context.getBean(clazz);
+                }catch (NoSuchBeanDefinitionException e) {
+                    // do nothing
+                }
             }
+            return this.handler.getDefault(clazz);
         }
 
         protected <T> T getBean(String name) {
-            try {
-                return (T) context.getBean(name);
-            }catch (NoSuchBeanDefinitionException e) {
-                return (T) this.handler.getDefault(name);
+            if (context != null) {
+                try {
+                    return (T) context.getBean(name);
+                }catch (NoSuchBeanDefinitionException e) {
+                    // do nothing
+                }
             }
+            return (T) this.handler.getDefault(name);
         }
 
         public AuditingIface getAuditingProvider() {
@@ -129,6 +146,11 @@ public class BeanConfiguration {
 
         public EncryptionIface getEncryption() {
             return getBean(KUSTVAKT_ENCRYPTION);
+        }
+
+        public void finish() {
+            this.getAuditingProvider().finish();
+            context = null;
         }
 
     }

@@ -12,33 +12,33 @@ import de.ids_mannheim.korap.user.UserSettings;
  * Time: 11:04 AM
  */
 public interface EntityHandlerIface {
-    public UserSettings getUserSettings(Integer userid) throws KorAPException;
+    UserSettings getUserSettings(Integer userid) throws KorAPException;
 
-    public int updateSettings(UserSettings settings) throws KorAPException;
+    int updateSettings(UserSettings settings) throws KorAPException;
 
-    public UserDetails getUserDetails(Integer userid) throws KorAPException;
+    UserDetails getUserDetails(Integer userid) throws KorAPException;
 
-    public int updateUserDetails(UserDetails details) throws KorAPException;
+    int updateUserDetails(UserDetails details) throws KorAPException;
 
-    //    public List<UserQuery> getUserQueries(User user) throws KorAPException;
+    //    List<UserQuery> getUserQueries(User user) throws KorAPException;
 
-    //    public UserQuery getUserQuery(String id) throws KorAPException;
+    //    UserQuery getUserQuery(String id) throws KorAPException;
 
-    //    public void updateUserQueries(User user, List<UserQuery> newOnes) throws KorAPException;
+    //    void updateUserQueries(User user, List<UserQuery> newOnes) throws KorAPException;
 
-    public User getAccount(String username) throws
+    User getAccount(String username) throws
             EmptyResultException, KorAPException;
 
-    public int updateAccount(User user) throws KorAPException;
+    int updateAccount(User user) throws KorAPException;
 
-    public int createAccount(User user) throws KorAPException;
+    int createAccount(User user) throws KorAPException;
 
-    public int deleteAccount(Integer userid) throws KorAPException;
+    int deleteAccount(Integer userid) throws KorAPException;
 
-    public int resetPassphrase(String username, String uriToken,
+    int resetPassphrase(String username, String uriToken,
             String passphrase) throws KorAPException;
 
-    public int activateAccount(String username, String uriToken)
+    int activateAccount(String username, String uriToken)
             throws KorAPException;
 
 }

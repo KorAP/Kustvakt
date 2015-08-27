@@ -10,6 +10,17 @@
   <build>
     <plugins>
       <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.9</version>
         <configuration>
@@ -34,7 +45,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>de.ids_mannheim.korap.web.Kustvakt</mainClass>
+                  <mainClass>de.ids_mannheim.korap.web.KustvaktServer</mainClass>
                 </transformer>
                 <transformer>
                   <resource>META-INF/spring.handlers</resource>
@@ -76,6 +87,44 @@
     </repository>
   </repositories>
   <dependencies>
+    <dependency>
+      <groupId>com.sun.jersey.jersey-test-framework</groupId>
+      <artifactId>jersey-test-framework-core</artifactId>
+      <version>1.19</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>javax.servlet-api</artifactId>
+          <groupId>javax.servlet</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jersey-client</artifactId>
+          <groupId>com.sun.jersey</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey.jersey-test-framework</groupId>
+      <artifactId>jersey-test-framework-grizzly</artifactId>
+      <version>1.19</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>grizzly-servlet-webserver</artifactId>
+          <groupId>com.sun.grizzly</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jersey-grizzly</artifactId>
+          <groupId>com.sun.jersey</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>com.restfuse</groupId>
       <artifactId>com.eclipsesource.restfuse</artifactId>
