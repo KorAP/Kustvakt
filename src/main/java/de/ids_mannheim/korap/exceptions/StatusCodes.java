@@ -35,6 +35,7 @@ public class StatusCodes {
     public static final Integer NAME_EXISTS = 207;
     public static final Integer PASSWORD_RESET_FAILED = 208;
     // fixme: ?!
+    @Deprecated
     public static final Integer AUTHENTICATION_DENIED = 209;
 
     public static final Integer LOGIN_SUCCESSFUL = 210;
