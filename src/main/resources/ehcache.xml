@@ -1,0 +1,32 @@
+<ehcache xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:noNamespaceSchemaLocation='http://ehcache.org/ehcache.xsd'>
+    <defaultCache eternal='true' overflowToDisk='false'/>
+    <!--maxBytesLocalHeap="200M"-->
+    <cache name='users'
+           timeToIdleSeconds="172800"
+           eternal='false'
+           memoryStoreEvictionPolicy="LRU"
+           maxEntriesLocalHeap="50"
+           overflowToDisk='false'/>
+    <cache name='id_tokens'
+           timeToIdleSeconds="172800"
+           eternal='false'
+           memoryStoreEvictionPolicy="LRU"
+           maxEntriesLocalHeap="50"
+           overflowToDisk='false'/>
+    <cache name='auth_codes'
+           timeToIdleSeconds="600"
+           eternal='false'
+           memoryStoreEvictionPolicy="LRU"
+           maxEntriesLocalHeap="100"
+           overflowToDisk='false'/>
+    <cache name='resources'
+           eternal='false'
+           overflowToDisk='false'
+           maxEntriesLocalHeap="60"
+           timeToIdleSeconds="172800"
+           diskSpoolBufferSizeMB="30"
+           diskExpiryThreadIntervalSeconds="120"
+           memoryStoreEvictionPolicy="LRU"
+           statistics="false"/>
+</ehcache>

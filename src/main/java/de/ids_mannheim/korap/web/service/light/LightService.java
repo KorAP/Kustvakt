@@ -1,10 +1,10 @@
-package de.ids_mannheim.korap.web.service;
+package de.ids_mannheim.korap.web.service.light;
 
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.QueryBuilderUtil;
-import de.ids_mannheim.korap.exceptions.KorAPException;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
@@ -58,7 +58,7 @@ public class LightService {
         String result;
         try {
             result = graphDBhandler.getResponse("distCollo", "q", query);
-        }catch (KorAPException e) {
+        }catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok(result).build();
@@ -146,7 +146,7 @@ public class LightService {
                     String.valueOf(meta.getSpanContext().getRight_size()));
             try {
                 result = this.graphDBhandler.getResponse(map, "distKwic");
-            }catch (KorAPException e) {
+            }catch (KustvaktException e) {
                 throw KustvaktResponseHandler.throwit(e);
             }
         }else

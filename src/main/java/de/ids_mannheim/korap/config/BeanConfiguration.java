@@ -17,7 +17,7 @@ import java.util.Set;
  */
 public class BeanConfiguration {
 
-    private static final String config_file = "default-config.xml";
+    private static final String config_file = "light-config.xml";
     public static final String KUSTVAKT_DB = "kustvakt_db";
 
     public static final String KUSTVAKT_ENCRYPTION = "kustvakt_encryption";

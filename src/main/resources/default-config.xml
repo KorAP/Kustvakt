@@ -1,25 +1,197 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
        xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns="http://www.springframework.org/schema/beans"
+       xmlns:cache="http://www.springframework.org/schema/cache"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                             http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+                            http://www.springframework.org/schema/tx
+                            http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+                            http://www.springframework.org/schema/aop
+                            http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+                            http://www.springframework.org/schema/cache
+                            http://www.springframework.org/schema/cache/spring-cache-4.0.xsd
+
+
                             http://www.springframework.org/schema/util
                             http://www.springframework.org/schema/util/spring-util-4.0.xsd">
 
-
+    <cache:annotation-driven/>
     <util:properties id="props" location="classpath:kustvakt.conf"/>
 
-    <bean id="kustvakt_auditing"
-          class="de.ids_mannheim.korap.interfaces.defaults.DefaultAuditing">
+    <bean id="jdbc_props"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations" value="classpath:jdbc.properties"/>
     </bean>
 
+    <bean id='cacheManager'
+          class='org.springframework.cache.ehcache.EhCacheCacheManager'
+          p:cacheManager-ref='ehcache'/>
+
+    <bean id='ehcache'
+          class='org.springframework.cache.ehcache.EhCacheManagerFactoryBean'
+          p:configLocation='classpath:ehcache.xml'
+          p:shared='true'/>
+
+    <!-- props are injected from default-config.xml -->
     <bean id="kustvakt_config"
-          class="de.ids_mannheim.korap.config.KustvaktConfiguration">
+          class="de.ids_mannheim.korap.ext.config.ExtConfiguration">
         <property name="properties" ref="props"/>
     </bean>
 
+    <bean id="dataSource"
+          class="org.springframework.jdbc.datasource.SingleConnectionDataSource"
+          lazy-init="true">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <!-- relevant for single connection datasource and sqlite -->
+        <property name="suppressClose">
+            <value>true</value>
+        </property>
+    </bean>
+
+    <!-- to configure database for sqlite, mysql, etc. migrations -->
+    <bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+        <property name="baselineOnMigrate" value="false"/>
+        <property name="locations"
+                  value="classpath:${jdbc.schemaPath}"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="kustvakt_db"
+          class="de.ids_mannheim.korap.ext.database.JDBCClient">
+        <constructor-arg index="0" ref="dataSource"/>
+        <!-- deprecated property -->
+        <property name="database" value="${jdbc.database}"/>
+    </bean>
+
+    <bean id="kustvakt_auditing"
+          class="de.ids_mannheim.korap.ext.database.JDBCAuditing">
+        <constructor-arg ref="kustvakt_db"/>
+    </bean>
+
+    <bean id="kustvakt_userdb"
+          class="de.ids_mannheim.korap.ext.database.EntityDao">
+        <constructor-arg ref="kustvakt_db"/>
+    </bean>
+
+    <bean id="collectionProvider"
+          class="de.ids_mannheim.korap.ext.database.CollectionDao">
+        <constructor-arg ref="kustvakt_db"/>
+    </bean>
+
+    <bean id="resourceProvider"
+          class="de.ids_mannheim.korap.ext.database.ResourceDao">
+        <constructor-arg ref="kustvakt_db"/>
+    </bean>
+
+    <bean id="kustvakt_policies"
+          class="de.ids_mannheim.korap.ext.security.dataAccess.PolicyDao">
+        <constructor-arg ref="kustvakt_db"/>
+    </bean>
+
     <bean name="kustvakt_encryption"
-          class="de.ids_mannheim.korap.interfaces.defaults.DefaultEncryption">
+          class="de.ids_mannheim.korap.ext.security.encryption.KorAPEncryption">
+        <constructor-arg ref="kustvakt_config"/>
+    </bean>
+
+    <bean id="resourceHandler"
+          class="de.ids_mannheim.korap.ext.security.accessControl.ResourceHandler"/>
+
+
+    <!-- authentication providers to use -->
+
+    <bean id="api_auth"
+          class="de.ids_mannheim.korap.ext.security.authentication.APIAuthentication">
+        <constructor-arg
+                type="de.ids_mannheim.korap.config.KustvaktConfiguration"
+                ref="kustvakt_config"/>
+    </bean>
+
+    <bean id="openid_auth"
+          class="de.ids_mannheim.korap.ext.security.authentication.OpenIDconnectAuthentication">
+        <constructor-arg
+                type="de.ids_mannheim.korap.config.KustvaktConfiguration"
+                ref="kustvakt_config"/>
+        <constructor-arg
+                type="de.ids_mannheim.korap.interfaces.PersistenceClient"
+                ref="kustvakt_db"/>
+    </bean>
+
+    <bean id="basic_auth"
+          class="de.ids_mannheim.korap.ext.security.authentication.BasicHttpAuth"/>
+
+
+    <bean id="session_auth"
+          class="de.ids_mannheim.korap.ext.security.authentication.SessionAuthentication">
+        <constructor-arg
+                type="de.ids_mannheim.korap.config.KustvaktConfiguration"
+                ref="kustvakt_config"/>
+        <constructor-arg
+                type="de.ids_mannheim.korap.interfaces.EncryptionIface"
+                ref="kustvakt_encryption"/>
+    </bean>
+
+    <util:list id="auth_providers"
+               value-type="de.ids_mannheim.korap.interfaces.AuthenticationIface">
+        <ref bean="basic_auth"/>
+        <ref bean="session_auth"/>
+        <ref bean="api_auth"/>
+        <ref bean="openid_auth"/>
+    </util:list>
+
+    <!-- specify type for constructor argument -->
+    <bean id="kustvakt_authenticationmanager"
+          class="de.ids_mannheim.korap.ext.security.authentication.KustvaktAuthenticationManager">
+        <constructor-arg
+                type="de.ids_mannheim.korap.interfaces.EntityHandlerIface"
+                ref="kustvakt_userdb"/>
+        <constructor-arg type="de.ids_mannheim.korap.interfaces.EncryptionIface"
+                         ref="kustvakt_encryption"/>
+        <constructor-arg ref="kustvakt_config"/>
+        <constructor-arg type="de.ids_mannheim.korap.interfaces.AuditingIface"
+                         ref="kustvakt_auditing"/>
+        <!-- inject authentication providers to use -->
+        <property name="providers" ref="auth_providers"/>
+    </bean>
+
+    <!--
+    <util:list id="providers"
+               value-type="de.ids_mannheim.korap.ext.interfaces.ResourceOperationIface">
+        <ref bean="resourceProvider"/>
+        <ref bean="collectionProvider"/>
+    </util:list>
+-->
+
+    <!-- todo: if db interfaces not loaded via spring, does transaction even work then? -->
+    <!-- the transactional advice (i.e. what 'happens'; see the <aop:advisor/> bean below) -->
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <!-- the transactional semantics... -->
+        <tx:attributes>
+            <!-- all methods starting with 'get' are read-only -->
+            <tx:method name="get*" read-only="true"
+                       rollback-for="KorAPException"/>
+            <!-- other methods use the default transaction settings (see below) -->
+            <tx:method name="*" rollback-for="KorAPException"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- ensure that the above transactional advice runs for any execution
+        of an operation defined by the service interface -->
+    <aop:config>
+        <aop:pointcut id="service"
+                      expression="execution(* de.ids_mannheim.korap.interfaces.*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="service"/>
+    </aop:config>
+
+    <!-- similarly, don't forget the PlatformTransactionManager -->
+    <bean id="txManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
     </bean>
 </beans>
