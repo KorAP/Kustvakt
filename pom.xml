@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.ids_mannheim.korap</groupId>
     <artifactId>Kustvakt-core</artifactId>
-    <version>0.2</version>
+    <version>0.4</version>
     <packaging>jar</packaging>
     <name>Kustvakt core</name>
     <description>Kustvakt core, basic rest api for testing purposes and default
@@ -17,6 +17,30 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.prop</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.conf</include>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.prop</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.conf</include>
+                    <include>**/*.properties</include>
+                </includes>
+            </testResource>
+        </testResources>
         <plugins>
             <!-- build tests jar, so extensions can use fastjerseytest class to build rest tests -->
             <plugin>
@@ -57,6 +81,53 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <finalName>
+                            Kustvakt-core-${project.version}-light
+                            </finalName>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>
+                                        de.ids_mannheim.korap.web.KustvaktLightServer
+                                    </mainClass>
+                                </transformer>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.handlers
+                                    </resource>
+                                </transformer>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                    <resource>META-INF/spring.schemas
+                                    </resource>
+                                </transformer>
+                            </transformers>
+                            <!-- Additional configuration. -->
+                            <!-- apparently there is a securityexception -->
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA
+                                        </exclude>
+                                        <exclude>META-INF/*.RSA
+                                        </exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>full</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>
+                                Kustvakt-core-${project.version}-full
+                            </finalName>
                             <transformers>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -191,9 +262,9 @@
                 -->
 
         <!--<dependency>-->
-            <!--<groupId>org.xerial</groupId>-->
-            <!--<artifactId>sqlite-jdbc</artifactId>-->
-            <!--<version>3.7.2</version>-->
+        <!--<groupId>org.xerial</groupId>-->
+        <!--<artifactId>sqlite-jdbc</artifactId>-->
+        <!--<version>3.7.2</version>-->
         <!--</dependency>-->
         <dependency>
             <groupId>com.nimbusds</groupId>
@@ -259,6 +330,38 @@
             <artifactId>spring-aspects</artifactId>
             <version>4.0.5.RELEASE</version>
         </dependency>
+
+        <!-- copied from extension -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>4.1.6.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>4.1.6.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache-core</artifactId>
+            <version>2.6.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.oltu.oauth2</groupId>
+            <artifactId>org.apache.oltu.oauth2.authzserver</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <!-- end copy -->
+
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
@@ -274,6 +377,7 @@
             <artifactId>jetty-servlet</artifactId>
             <version>8.1.8.v20121106</version>
         </dependency>
+
         <!--
         not part of public release
         <dependency>
