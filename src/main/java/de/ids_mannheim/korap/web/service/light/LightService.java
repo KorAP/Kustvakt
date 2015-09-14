@@ -118,6 +118,7 @@ public class LightService {
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
             @QueryParam("page") Integer pageInteger,
+            @QueryParam("fields") Set<String> fields,
             @QueryParam("cq") String cq, @QueryParam("engine") String engine) {
         KustvaktConfiguration.BACKENDS eng = this.config.chooseBackend(engine);
 
@@ -126,9 +127,9 @@ public class LightService {
         MetaQueryBuilder meta = QueryBuilderUtil
                 .defaultMetaBuilder(pageIndex, pageInteger, pageLength, ctx,
                         cutoff);
+        if (fields != null && !fields.isEmpty())
+            meta.addEntry("fields", fields);
         serializer.setMeta(meta);
-        // fixme: should only apply to CQL queries per default!
-        //        meta.addEntry("itemsPerResource", 1);
         if (cq != null)
             serializer.setCollection(cq);
 
