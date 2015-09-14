@@ -10,10 +10,10 @@ import java.util.Iterator;
  * @author hanl
  * @date 28/07/2015
  */
-//todo: test
 public class CollectionCleanupFilter extends RewriteQuery {
 
     // track path to operand
+    @Deprecated
     private StringBuilder builder;
 
     public CollectionCleanupFilter() {
@@ -30,6 +30,7 @@ public class CollectionCleanupFilter extends RewriteQuery {
     }
 
     private JsonNode process(JsonNode root) {
+        JsonNode sub = root;
         if (root.isObject()) {
             if (root.has("operands")) {
                 JsonNode node = root.at("/operands");
@@ -40,25 +41,28 @@ public class CollectionCleanupFilter extends RewriteQuery {
                     if (s == null)
                         it.remove();
                 }
+
+                int count = node.size();
+                if (count == 1)
+                    sub = node.path(0);
+                else if (count
+                        == 0) // can't do anything here -- fixme: edge case?!
+                    return null;
             }
 
-            JsonNode sub = processNodes(root);
             if (!root.equals(sub)) {
-                if (sub == null) {
-                    //can't do anything here -- fixme: edge case?!
-                    return null;
-                }else if (sub.isObject()) {
+                if (sub.isObject()) {
                     ObjectNode ob = (ObjectNode) root;
                     ob.removeAll();
                     ob.putAll((ObjectNode) sub);
                 }
-
             }
         }
         return root;
     }
 
     // return null deletes node, if node return replace at level -1
+    @Deprecated
     private JsonNode processNodes(JsonNode jsonNode) {
         if (jsonNode.isObject()) {
             if (jsonNode.has("operands")) {
