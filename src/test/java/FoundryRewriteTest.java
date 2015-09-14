@@ -17,7 +17,7 @@ import org.junit.Test;
  * @date 18/06/2015
  */
 //todo: refactor and structure tests
-public class RewriteTest {
+public class FoundryRewriteTest {
 
     private static String simple_add_query = "[pos=ADJA]";
     private static String simple_rewrite_query = "[base=Haus]";
