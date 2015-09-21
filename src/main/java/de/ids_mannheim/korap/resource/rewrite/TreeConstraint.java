@@ -40,7 +40,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @author hanl
  * @date 02/07/2015
  */
-public class TreeConstraint extends RewriteQuery {
+public class TreeConstraint extends RewriteTask.RewriteQuery {
 
     private String pointer;
 

@@ -10,7 +10,7 @@ import java.util.Iterator;
  * @author hanl
  * @date 28/07/2015
  */
-public class CollectionCleanupFilter extends RewriteQuery {
+public class CollectionCleanupFilter extends RewriteTask.RewriteQuery {
 
     // track path to operand
     @Deprecated

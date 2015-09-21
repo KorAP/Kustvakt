@@ -18,8 +18,8 @@ import java.util.Iterator;
 public class RewriteHandler {
 
     private static Logger jlog = KustvaktLogger.initiate(RewriteHandler.class);
-    private Collection<RewriteNode> node_processors;
-    private Collection<RewriteQuery> query_processors;
+    private Collection<RewriteTask.RewriteNode> node_processors;
+    private Collection<RewriteTask.RewriteQuery> query_processors;
 
     public RewriteHandler() {
         this.node_processors = new HashSet<>();
@@ -27,11 +27,11 @@ public class RewriteHandler {
         // add defaults?!
     }
 
-    public void add(RewriteNode node) {
+    public void add(RewriteTask.RewriteNode node) {
         this.node_processors.add(node);
     }
 
-    public void add(RewriteQuery node) {
+    public void add(RewriteTask.RewriteQuery node) {
         this.query_processors.add(node);
     }
 
@@ -73,10 +73,12 @@ public class RewriteHandler {
 
     private static boolean processNode(JsonNode node, User user,
             Collection<? extends RewriteTask> tasks) {
-        KoralNode knode = KoralNode.getNode(node);
+        KoralNode knode = KoralNode.getNode(node, user);
         for (RewriteTask task : tasks) {
-            jlog.debug("running node in processor " + node);
-            jlog.debug("on processor " + task.getClass().toString());
+            if (jlog.isDebugEnabled()) {
+                jlog.debug("running node in processor " + node);
+                jlog.debug("on processor " + task.getClass().toString());
+            }
             task.rewrite(knode);
             if (knode.toRemove())
                 break;

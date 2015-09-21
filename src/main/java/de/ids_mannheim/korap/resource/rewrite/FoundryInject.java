@@ -4,15 +4,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.resource.LayerMapper;
 
+
 /**
  * @author hanl
  * @date 30/06/2015
  */
-public class FoundryInject extends RewriteNode {
+public class FoundryInject extends RewriteTask.RewriteNode {
 
     private KustvaktConfiguration config;
 
     public FoundryInject(KustvaktConfiguration config) {
+        super();
         this.config = config;
     }
 

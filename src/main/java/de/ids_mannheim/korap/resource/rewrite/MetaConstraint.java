@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @author hanl
  * @date 04/07/2015
  */
-public class MetaConstraint extends RewriteQuery {
+public class MetaConstraint extends RewriteTask.RewriteQuery {
 
     public MetaConstraint() {
         super();

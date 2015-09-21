@@ -45,6 +45,11 @@ public abstract class KoralNode {
         };
     }
 
+    public static KoralNode getNode(JsonNode node, User user) {
+        return new KoralNode(node, user) {
+        };
+    }
+
     public void set(String name, Object value) {
 
         if (this.node.isObject()) {
