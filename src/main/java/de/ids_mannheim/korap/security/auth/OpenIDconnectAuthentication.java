@@ -46,10 +46,14 @@ public class OpenIDconnectAuthentication implements AuthenticationIface {
     @Override
     public TokenContext createUserSession(User user, Map<String, Object> attr)
             throws KustvaktException {
-        JWTSigner signer = new JWTSigner(
-                ((String) attr.get(Attributes.CLIENT_SECRET)).getBytes(),
+        String cl_secret = (String) attr.get(Attributes.CLIENT_SECRET);
+        if (cl_secret == null)
+            throw new KustvaktException(StatusCodes.REQUEST_INVALID);
+
+        JWTSigner signer = new JWTSigner(cl_secret.getBytes(),
                 config.getIssuer(), config.getTokenTTL());
-        TokenContext c = new TokenContext(user.getUsername());
+        TokenContext c = new TokenContext();
+        c.setUsername(user.getUsername());
         SignedJWT jwt = signer.createJWT(user, attr);
         try {
             c.setExpirationTime(jwt.getJWTClaimsSet().getExpirationTimeClaim());

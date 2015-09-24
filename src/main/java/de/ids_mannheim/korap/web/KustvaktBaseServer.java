@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.web;
 
 import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import lombok.Getter;
@@ -17,7 +18,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
  * @author hanl
  * @date 01/06/2015
  */
-public class KustvaktLightServer {
+public class KustvaktBaseServer {
 
     public static void main(String[] args) throws Exception {
         KustvaktArgs kargs = readAttributes(args);
@@ -28,7 +29,7 @@ public class KustvaktLightServer {
             BeanConfiguration.loadClasspathContext();
 
         kargs.setRootClasses(
-                new String[] { "de.ids_mannheim.korap.web.service" });
+                new String[] { "de.ids_mannheim.korap.web.service.light" });
         startServer(kargs);
     }
 
@@ -69,11 +70,12 @@ public class KustvaktLightServer {
             connector.setMaxIdleTime(60000);
 
             // http://stackoverflow.com/questions/9670363/how-do-i-programmatically-configure-jersey-to-use-jackson-for-json-deserializa
-            final PackagesResourceConfig prc = new PackagesResourceConfig(
+            final ResourceConfig rc = new PackagesResourceConfig(
                     kargs.rootClasses);
+
             // from http://stackoverflow.com/questions/7421574/embedded-jetty-with-jersey-or-resteasy
             contextHandler
-                    .addServlet(new ServletHolder(new ServletContainer(prc)),
+                    .addServlet(new ServletHolder(new ServletContainer(rc)),
                             "/api/*");
 
             server.setHandler(contextHandler);

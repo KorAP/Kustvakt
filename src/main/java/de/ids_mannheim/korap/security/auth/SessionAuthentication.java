@@ -63,7 +63,7 @@ public class SessionAuthentication implements AuthenticationIface {
                 .getExpiration(now.getMillis(), config.getExpiration());
         String token = crypto
                 .createToken(true, user.getUsername(), now.getMillis());
-        TokenContext ctx = new TokenContext(user.getUsername());
+        TokenContext ctx = new TokenContext();
         ctx.setUsername(user.getUsername());
         ctx.setTokenType(Attributes.SESSION_AUTHENTICATION);
         ctx.setToken(token);

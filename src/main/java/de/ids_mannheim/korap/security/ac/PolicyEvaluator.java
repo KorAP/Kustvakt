@@ -1,0 +1,148 @@
+package de.ids_mannheim.korap.security.ac;
+
+import de.ids_mannheim.korap.exceptions.NotAuthorizedException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.resources.KustvaktResource;
+import de.ids_mannheim.korap.resources.Permissions;
+import de.ids_mannheim.korap.security.PermissionsBuffer;
+import de.ids_mannheim.korap.security.SecurityPolicy;
+import de.ids_mannheim.korap.user.KorAPUser;
+import de.ids_mannheim.korap.user.User;
+import edu.emory.mathcs.backport.java.util.Collections;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by hanl on 5/22/14.
+ */
+public class PolicyEvaluator {
+
+    private final User user;
+    private final List<SecurityPolicy>[] policies;
+    private String resourceID;
+    private PermissionsBuffer permissions;
+    private boolean processed;
+    private int relationError = -1;
+    private Map<String, Object> flags;
+
+
+    public PolicyEvaluator(User user, List<SecurityPolicy>[] policies) {
+        this.user = user;
+        this.policies = policies;
+        this.permissions = new PermissionsBuffer();
+        this.flags = new HashMap<>();
+    }
+
+    private PolicyEvaluator(User user, KustvaktResource resource) {
+        this.user = user;
+        this.resourceID = resource.getPersistentID();
+        this.permissions = new PermissionsBuffer();
+        this.flags = new HashMap<>();
+        this.policies = null;
+    }
+
+    public String getResourceID() {
+        if (this.resourceID == null && policies[0] != null
+                && policies[0].get(0) != null)
+            this.resourceID = policies[0].get(0).getTarget();
+        return this.resourceID;
+    }
+
+
+    private List<SecurityPolicy> evaluate(List<SecurityPolicy>[] policies,
+                                          Permissions.PERMISSIONS perm) throws NotAuthorizedException {
+        //fixme: what happens in case a parent relation does not allow changing a resource, but the owner of child per default
+        // receives all rights? --> test casing
+        if (isOwner()) return policies[0];
+        if (!processed && policies != null) {
+            for (int i = policies.length - 1; i >= 0; i--) {
+                int idx = 0;
+                if (policies[i] != null) {
+                    int ow = getOwner(policies[i]);
+                    for (int internal = 0; internal < policies[i].size(); internal++) {
+                        SecurityPolicy s = policies[i].get(internal);
+                        if (i == policies.length - 1) {
+                            if (ow == user.getId())
+                                this.permissions.addPermission(127);
+                            else if (!(s instanceof SecurityPolicy.OwnerPolicy))
+                                this.permissions.addPermission(s.getPermissionByte());
+                        } else {
+                            if (ow == user.getId())
+                                this.permissions.retain(127);
+                            else if (!(s instanceof SecurityPolicy.OwnerPolicy))
+                                this.permissions.retain(s.getPermissionByte());
+                        }
+                        idx++;
+                    }
+                }
+                if (idx == 0) {
+                    relationError = i;
+                    throw new NotAuthorizedException(StatusCodes.PERMISSION_DENIED, this.getResourceID());
+                }
+            }
+            this.processed = true;
+            System.out.println("FINAL BYTE :" + this.permissions.getPbyte());
+            if (this.permissions.containsPermission(perm))
+                return policies[0];
+        } else if (processed && relationError == -1
+                && this.permissions.containsPermission(perm))
+            return this.policies[0];
+
+        return Collections.emptyList();
+    }
+
+    /**
+     * checks read permission
+     *
+     * @return
+     */
+    public boolean isAllowed() {
+        return isAllowed(Permissions.PERMISSIONS.READ);
+    }
+
+    public boolean isAllowed(Permissions.PERMISSIONS perm) {
+        try {
+            return !evaluate(this.policies, perm).isEmpty();
+        } catch (NotAuthorizedException e) {
+            return false;
+        }
+    }
+
+    public boolean isOwner() {
+        return policies != null && this.user.getId() != null && getOwner(this.policies[0]) == this.user.getId();
+    }
+
+    private int getOwner(List<SecurityPolicy> policies) {
+        if (policies != null && policies.get(0) != null
+                && policies.get(0) instanceof SecurityPolicy.OwnerPolicy) {
+            return ((SecurityPolicy.OwnerPolicy) policies.get(0)).getOwner();
+        }
+        return -1;
+    }
+
+    public static PolicyEvaluator setFlags(User user, KustvaktResource resource) {
+        PolicyEvaluator e = new PolicyEvaluator(user, resource);
+        e.setFlag("managed", resource.getOwner() == KorAPUser.ADMINISTRATOR_ID);
+        e.setFlag("shared", false);
+        return e;
+    }
+
+    public <V> V getFlag(String key, V value) {
+        return (V) this.flags.get(key);
+    }
+
+    private <V> void setFlag(String key, V value) {
+        this.flags.put(key, value);
+    }
+
+    public boolean isManaged() {
+        return getOwner(this.policies[0]) == KorAPUser.ADMINISTRATOR_ID;
+    }
+
+    public boolean isShared() {
+        return !isManaged() && !isOwner();
+    }
+
+}

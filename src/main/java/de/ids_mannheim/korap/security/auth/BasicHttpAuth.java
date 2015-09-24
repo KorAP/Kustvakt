@@ -39,7 +39,8 @@ public class BasicHttpAuth implements AuthenticationIface {
         authToken = StringUtils.stripTokenType(authToken);
         String[] values = decode(authToken);
         if (values != null) {
-            TokenContext c = new TokenContext(values[0]);
+            TokenContext c = new TokenContext();
+            c.setUsername(values[0]);
             c.setTokenType(Attributes.BASIC_AUTHENTICATION);
             c.setSecureRequired(true);
             c.setToken(authToken);

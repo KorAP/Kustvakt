@@ -11,7 +11,6 @@ import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.StringUtils;
-import lombok.AccessLevel;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.springframework.cache.annotation.CacheEvict;
@@ -50,7 +49,8 @@ public class APIAuthentication implements AuthenticationIface {
     @Override
     public TokenContext createUserSession(User user, Map<String, Object> attr)
             throws KustvaktException {
-        TokenContext c = new TokenContext(user.getUsername());
+        TokenContext c = new TokenContext();
+        c.setUsername(user.getUsername());
         SignedJWT jwt = signedToken.createJWT(user, attr);
         try {
             c.setExpirationTime(jwt.getJWTClaimsSet().getExpirationTimeClaim());
@@ -76,7 +76,6 @@ public class APIAuthentication implements AuthenticationIface {
     public TokenContext refresh(TokenContext context) throws KustvaktException {
         return null;
     }
-
 
     @Override
     public String getIdentifier() {
