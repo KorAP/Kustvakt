@@ -5,10 +5,10 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.test.framework.AppDescriptor;
-import com.sun.jersey.test.framework.WebAppDescriptor;
+import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import com.sun.jersey.test.framework.spi.container.TestContainer;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
-import com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory;
+import com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -69,13 +69,12 @@ public abstract class FastJerseyTest {
 
     public static void initServer() {
 
-        //        AppDescriptor ad = new LowLevelAppDescriptor.Builder(resourceConfig)
-        //                .build();
-        AppDescriptor ad = new WebAppDescriptor.Builder().build();
+                AppDescriptor ad = new LowLevelAppDescriptor.Builder(resourceConfig)
+                        .build();
 
         TestContainerFactory tcf = testContainerFactory;
         if (tcf == null) {
-            tcf = new GrizzlyWebTestContainerFactory();
+            tcf = new GrizzlyTestContainerFactory();
         }
         testContainer = tcf
                 .create(UriBuilder.fromUri("http://localhost/").port(9998)
