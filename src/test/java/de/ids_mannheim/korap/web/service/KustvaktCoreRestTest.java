@@ -4,6 +4,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.service.light.LightService;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -74,7 +75,7 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
                 .queryParam("q", "[base=Haus & surface=Hauses]")
                 .queryParam("ql", "poliqarp").queryParam("cutOff", "true")
                 .queryParam("page", "1").get(ClientResponse.class);
-        System.out.println("RESPONSE " + response);
+        System.out.println("RESPONSE " + response.getEntity(String.class));
     }
 
 }

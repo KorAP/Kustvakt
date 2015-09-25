@@ -10,7 +10,7 @@ import java.util.Arrays;
  */
 // should be a http exception that responds to a service point
 // is the extension of the notauthorized exception!
-public class WrappedException extends KorAPException {
+public class WrappedException extends KustvaktException {
 
     private WrappedException(Object userid, Integer status, String message,
             String args) {
@@ -23,7 +23,7 @@ public class WrappedException extends KorAPException {
         this.records.add(record);
     }
 
-    public WrappedException(KorAPException e, Integer status, String... args) {
+    public WrappedException(KustvaktException e, Integer status, String... args) {
         this(e.getUserid(), e.getStatusCode(), e.getMessage(), e.getEntity());
         AuditRecord record = AuditRecord
                 .serviceRecord(e.getUserid(), status, args);

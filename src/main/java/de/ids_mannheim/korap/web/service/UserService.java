@@ -20,9 +20,11 @@ import de.ids_mannheim.korap.web.KustvaktServer;
 import de.ids_mannheim.korap.web.filter.AuthFilter;
 import de.ids_mannheim.korap.web.filter.DefaultFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
-import de.ids_mannheim.korap.web.utils.FormWrapper;
+import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
+import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.slf4j.Logger;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.IOException;
@@ -60,18 +62,19 @@ public class UserService {
     @Path("register")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response signUp(
+            @Context HttpServletRequest request,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
             @Context Locale locale, MultivaluedMap form_values) {
 
-        FormWrapper wrapper = new FormWrapper(form_values);
+        FormRequestWrapper wrapper = new FormRequestWrapper(request, form_values);
 
         wrapper.put(Attributes.HOST, host);
         wrapper.put(Attributes.USER_AGENT, agent);
         UriBuilder uriBuilder;
         User user;
-        if (wrapper.get(Attributes.EMAIL) == null)
-            throw BeanConfiguration.getResponseHandler()
+        if (wrapper.getParameter(Attributes.EMAIL) == null)
+            throw KustvaktResponseHandler
                     .throwit(StatusCodes.ILLEGAL_ARGUMENT, "parameter missing",
                             "email");
 
@@ -80,10 +83,10 @@ public class UserService {
             uriBuilder.path(KustvaktServer.API_VERSION).path("user")
                     .path("confirm");
 
-            user = controller.createUserAccount(wrapper);
+            user = controller.createUserAccount(wrapper.toMap(true));
 
         }catch (KustvaktException e) {
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
         URIParam uri = user.getField(URIParam.class);
         if (uri.hasValues()) {
@@ -124,7 +127,7 @@ public class UserService {
             //                            node.path("new_password").asText());
             controller.updateAccount(user);
         }catch (KustvaktException e) {
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -135,18 +138,19 @@ public class UserService {
     public Response confirmRegistration(@QueryParam("uri") String uritoken,
             @Context Locale locale, @QueryParam("user") String username) {
         if (uritoken == null)
-            throw BeanConfiguration.getResponseHandler()
+            throw KustvaktResponseHandler
                     .throwit(StatusCodes.ILLEGAL_ARGUMENT, "parameter missing",
                             "Uri-Token");
         if (username == null)
-            throw BeanConfiguration.getResponseHandler()
+            throw KustvaktResponseHandler
                     .throwit(StatusCodes.ILLEGAL_ARGUMENT, "parameter missing",
                             "Username");
 
         try {
             controller.confirmRegistration(uritoken, username);
         }catch (KustvaktException e) {
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler
+                    .throwit(e);
         }
         return Response.ok("success").build();
     }
@@ -184,7 +188,7 @@ public class UserService {
                     .append(username);
         }catch (KustvaktException e) {
             error.error("Eoxception encountered!", e);
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
 
         ObjectNode obj = JsonUtils.createObjectNode();
@@ -215,7 +219,7 @@ public class UserService {
     @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
             PiwikFilter.class })
     public Response getStatus(@Context SecurityContext context,
-            @QueryParam("scope") String scope) {
+            @QueryParam("scopes") String scope) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         User user;
         try {
@@ -227,7 +231,7 @@ public class UserService {
             base_scope.retainAll(StringUtils.toSet(scope));
             scope = StringUtils.toString(base_scope);
         }catch (KustvaktException e) {
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok(JsonUtils.toJSON(Scopes
                 .mapOpenIDConnectScopes(scope, user.getDetails()))).build();
@@ -247,7 +251,7 @@ public class UserService {
 
         }catch (KustvaktException e) {
             error.error("Exception encountered!", e);
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok(JsonUtils.toJSON(user.getSettings().toObjectMap()))
                 .build();
@@ -266,7 +270,7 @@ public class UserService {
         try {
             settings = JsonUtils.read(values, Map.class);
         }catch (IOException e) {
-            throw BeanConfiguration.getResponseHandler()
+            throw KustvaktResponseHandler
                     .throwit(StatusCodes.REQUEST_INVALID,
                             "Could not read parameters", values);
         }
@@ -285,7 +289,7 @@ public class UserService {
                 return Response.notModified().build();
         }catch (KustvaktException e) {
             error.error("Exception encountered!", e);
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
 
         return Response.ok().build();
@@ -304,7 +308,7 @@ public class UserService {
             controller.getUserDetails(user);
         }catch (KustvaktException e) {
             error.error("Exception encountered!", e);
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
 
         return Response.ok(JsonUtils.toJSON(user.getDetails().toMap())).build();
@@ -325,7 +329,7 @@ public class UserService {
             details = JsonUtils.read(values, Map.class);
         }catch (IOException e) {
             error.error("Exception encountered!", e);
-            throw BeanConfiguration.getResponseHandler()
+            throw KustvaktResponseHandler
                     .throwit(StatusCodes.REQUEST_INVALID,
                             "Could not read parameters", values);
         }
@@ -339,7 +343,7 @@ public class UserService {
                 return Response.notModified().build();
         }catch (KustvaktException e) {
             error.error("Exception encountered!", e);
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
 
         return Response.ok().build();
@@ -394,7 +398,7 @@ public class UserService {
             //            }
         }catch (KustvaktException e) {
             error.error("Exception encountered!", e);
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok(JsonUtils.toJSON(add)).build();
     }
@@ -411,7 +415,7 @@ public class UserService {
             controller.deleteAccount(user);
         }catch (KustvaktException e) {
             error.error("Exception encountered!", e);
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -433,7 +437,7 @@ public class UserService {
             queryStr = "";
         }catch (KustvaktException e) {
             error.error("Exception encountered!", e);
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok(queryStr).build();
     }
@@ -449,7 +453,7 @@ public class UserService {
             controller.logout(context);
         }catch (KustvaktException e) {
             error.error("Logout Exception", e);
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }

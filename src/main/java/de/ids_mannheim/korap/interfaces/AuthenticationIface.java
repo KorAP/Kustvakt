@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.interfaces;
 
-import de.ids_mannheim.korap.exceptions.KorAPException;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 
@@ -8,15 +8,16 @@ import java.util.Map;
 
 public interface AuthenticationIface {
 
-    public TokenContext getUserStatus(String authToken) throws KorAPException;
+    TokenContext getUserStatus(String authToken) throws
+            KustvaktException;
 
-    public TokenContext createUserSession(User user, Map<String, Object> attr)
-            throws KorAPException;
+    TokenContext createUserSession(User user, Map<String, Object> attr)
+            throws KustvaktException;
 
-    public void removeUserSession(String token) throws KorAPException;
+    void removeUserSession(String token) throws KustvaktException;
 
-    public TokenContext refresh(TokenContext context) throws KorAPException;
+    TokenContext refresh(TokenContext context) throws KustvaktException;
 
-    public String getIdentifier();
+    String getIdentifier();
 
 }

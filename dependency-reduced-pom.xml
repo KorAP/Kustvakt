@@ -4,10 +4,34 @@
   <groupId>de.ids_mannheim.korap</groupId>
   <artifactId>Kustvakt-core</artifactId>
   <name>Kustvakt core</name>
-  <version>0.2</version>
+  <version>0.4</version>
   <description>Kustvakt core, basic rest api for testing purposes and default
         interfaces</description>
   <build>
+    <resources>
+      <resource>
+        <filtering>true</filtering>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*.prop</include>
+          <include>**/*.xml</include>
+          <include>**/*.conf</include>
+          <include>**/*.properties</include>
+        </includes>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <filtering>true</filtering>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*.prop</include>
+          <include>**/*.xml</include>
+          <include>**/*.conf</include>
+          <include>**/*.properties</include>
+        </includes>
+      </testResource>
+    </testResources>
     <plugins>
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
@@ -37,7 +61,7 @@
         <version>2.1</version>
         <executions>
           <execution>
-            <id>light</id>
+            <id>full</id>
             <phase>package</phase>
             <goals>
               <goal>shade</goal>
@@ -70,6 +94,52 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>light</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>2.1</version>
+            <executions>
+              <execution>
+                <id>light</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+                <configuration>
+                  <finalName>Kustvakt-core-${project.version}-light</finalName>
+                  <transformers>
+                    <transformer>
+                      <mainClass>de.ids_mannheim.korap.web.KustvaktBaseServer</mainClass>
+                    </transformer>
+                    <transformer>
+                      <resource>META-INF/spring.handlers</resource>
+                    </transformer>
+                    <transformer>
+                      <resource>META-INF/spring.schemas</resource>
+                    </transformer>
+                  </transformers>
+                  <filters>
+                    <filter>
+                      <artifact>*:*</artifact>
+                      <excludes>
+                        <exclude>META-INF/*.SF</exclude>
+                        <exclude>META-INF/*.DSA</exclude>
+                        <exclude>META-INF/*.RSA</exclude>
+                      </excludes>
+                    </filter>
+                  </filters>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
   <repositories>
     <repository>
       <id>codehaus-release-repo</id>
@@ -124,6 +194,12 @@
       <artifactId>junit</artifactId>
       <version>4.11</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>0.11.8</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.restfuse</groupId>

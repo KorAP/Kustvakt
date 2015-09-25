@@ -25,19 +25,13 @@ public class TokenContext implements java.security.Principal {
     // either "session_token " / "api_token
     private String tokenType;
     private String token;
-
     private boolean secureRequired;
 
     private Map<String, Object> parameters;
     private String hostAddress;
     private String userAgent;
 
-    public TokenContext(String username) {
-        this();
-        this.username = username;
-    }
-
-    private TokenContext() {
+    public TokenContext() {
         this.parameters = new HashMap<>();
         this.setUsername("");
         this.setToken("");
@@ -75,20 +69,28 @@ public class TokenContext implements java.security.Principal {
         this.expirationTime = new Date(date);
     }
 
+    //todo: complete
     public static TokenContext fromJSON(String s) {
         JsonNode node = JsonUtils.readTree(s);
-        TokenContext c = new TokenContext(
-                node.path(Attributes.USERNAME).asText());
-        c.setToken(node.path(Attributes.TOKEN).asText());
+        TokenContext c = new TokenContext();
+        if (node != null) {
+            c.setUsername(node.path(Attributes.USERNAME).asText());
+            c.setToken(node.path(Attributes.TOKEN).asText());
+        }
         return c;
     }
 
-    public static TokenContext fromOAuth(String s) {
+    public static TokenContext fromOAuth2(String s) {
         JsonNode node = JsonUtils.readTree(s);
         TokenContext c = new TokenContext();
-        c.setToken(node.path("token").asText());
-        c.setTokenType(node.path("token_type").asText());
-        c.setExpirationTime(node.path("expires_in").asLong());
+        if (node != null) {
+            c.setToken(node.path("token").asText());
+            c.setTokenType(node.path("token_type").asText());
+            c.setExpirationTime(node.path("expires_in").asLong());
+            c.addContextParameter("refresh_token",
+                    node.path("refresh_token").asText());
+
+        }
         return c;
     }
 

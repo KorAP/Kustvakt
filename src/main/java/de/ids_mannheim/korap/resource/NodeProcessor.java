@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
  * @author hanl
  * @date 19/06/2015
  */
+@Deprecated
 public abstract class NodeProcessor {
 
     public abstract JsonNode process(JsonNode node);

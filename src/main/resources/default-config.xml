@@ -64,29 +64,31 @@
     </bean>
 
     <bean id="kustvakt_db"
-          class="de.ids_mannheim.korap.ext.database.JDBCClient">
+          class="de.ids_mannheim.korap.handlers.JDBCClient">
         <constructor-arg index="0" ref="dataSource"/>
         <!-- deprecated property -->
         <property name="database" value="${jdbc.database}"/>
     </bean>
 
     <bean id="kustvakt_auditing"
-          class="de.ids_mannheim.korap.ext.database.JDBCAuditing">
+          class="de.ids_mannheim.korap.handlers.JDBCAuditing">
         <constructor-arg ref="kustvakt_db"/>
     </bean>
 
     <bean id="kustvakt_userdb"
-          class="de.ids_mannheim.korap.ext.database.EntityDao">
+          class="de.ids_mannheim.korap.handlers.EntityDao">
         <constructor-arg ref="kustvakt_db"/>
     </bean>
 
+    <!--fixme: change name according to convention -->
     <bean id="collectionProvider"
-          class="de.ids_mannheim.korap.ext.database.CollectionDao">
+          class="de.ids_mannheim.korap.handlers.CollectionDao">
         <constructor-arg ref="kustvakt_db"/>
     </bean>
 
+    <!--fixme: change name according to convention -->
     <bean id="resourceProvider"
-          class="de.ids_mannheim.korap.ext.database.ResourceDao">
+          class="de.ids_mannheim.korap.handlers.ResourceDao">
         <constructor-arg ref="kustvakt_db"/>
     </bean>
 
@@ -100,12 +102,7 @@
         <constructor-arg ref="kustvakt_config"/>
     </bean>
 
-    <bean id="resourceHandler"
-          class="de.ids_mannheim.korap.ext.security.accessControl.ResourceHandler"/>
-
-
     <!-- authentication providers to use -->
-
     <bean id="api_auth"
           class="de.ids_mannheim.korap.ext.security.authentication.APIAuthentication">
         <constructor-arg
@@ -159,14 +156,6 @@
         <!-- inject authentication providers to use -->
         <property name="providers" ref="auth_providers"/>
     </bean>
-
-    <!--
-    <util:list id="providers"
-               value-type="de.ids_mannheim.korap.ext.interfaces.ResourceOperationIface">
-        <ref bean="resourceProvider"/>
-        <ref bean="collectionProvider"/>
-    </util:list>
--->
 
     <!-- todo: if db interfaces not loaded via spring, does transaction even work then? -->
     <!-- the transactional advice (i.e. what 'happens'; see the <aop:advisor/> bean below) -->

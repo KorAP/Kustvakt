@@ -137,8 +137,8 @@ public class JWTSigner {
     }
 
     // does not care about expiration times
-    public String retrieveContent(String signedContent) throws
-            KustvaktException {
+    public String retrieveContent(String signedContent)
+            throws KustvaktException {
         SignedJWT jwt;
         try {
             jwt = SignedJWT.parse(signedContent);
@@ -155,8 +155,8 @@ public class JWTSigner {
             throws ParseException, JOSEException, KustvaktException {
         SignedJWT signedJWT = verifyToken(idtoken);
 
-        TokenContext c = new TokenContext(
-                signedJWT.getJWTClaimsSet().getSubjectClaim());
+        TokenContext c = new TokenContext();
+        c.setUsername(signedJWT.getJWTClaimsSet().getSubjectClaim());
         if (signedJWT.getJWTClaimsSet().getAudienceClaim() != null)
             c.addContextParameter(Attributes.CLIENT_ID,
                     signedJWT.getJWTClaimsSet().getAudienceClaim()[0]);

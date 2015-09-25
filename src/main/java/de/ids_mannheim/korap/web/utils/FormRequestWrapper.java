@@ -3,9 +3,7 @@ package de.ids_mannheim.korap.web.utils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.ws.rs.core.MultivaluedMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Helper class to wrapp multivaluedmap into a hashmap. Depending on the strict parameter,
@@ -57,6 +55,14 @@ public class FormRequestWrapper extends HttpServletRequestWrapper {
                 map.put(e.getKey(), e.getValue());
         }
         return map;
+    }
+
+    public void put(String key, String value) {
+        this.form.putSingle(key, value);
+    }
+
+    public void put(String key, String... values) {
+        this.form.put(key, Arrays.asList(values));
     }
 
 }

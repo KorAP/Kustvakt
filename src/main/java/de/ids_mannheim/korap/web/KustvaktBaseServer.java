@@ -28,7 +28,7 @@ public class KustvaktBaseServer {
         else
             BeanConfiguration.loadClasspathContext();
 
-        kargs.setRootClasses(
+        kargs.setRootPackages(
                 new String[] { "de.ids_mannheim.korap.web.service.light" });
         startServer(kargs);
     }
@@ -71,7 +71,7 @@ public class KustvaktBaseServer {
 
             // http://stackoverflow.com/questions/9670363/how-do-i-programmatically-configure-jersey-to-use-jackson-for-json-deserializa
             final ResourceConfig rc = new PackagesResourceConfig(
-                    kargs.rootClasses);
+                    kargs.rootPackages);
 
             // from http://stackoverflow.com/questions/7421574/embedded-jetty-with-jersey-or-resteasy
             contextHandler
@@ -106,7 +106,7 @@ public class KustvaktBaseServer {
         private String config;
         private int port;
         private SslContextFactory sslContext;
-        private String[] rootClasses;
+        private String[] rootPackages;
 
         public KustvaktArgs() {
             this.port = -1;

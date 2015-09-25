@@ -9,6 +9,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.web.utils.KorAPContext;
+import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 import javax.ws.rs.ext.Provider;
 
@@ -40,7 +41,7 @@ public class AuthFilter implements ContainerRequestFilter, ResourceFilter {
                         .getTokenStatus(authentication, host, ua);
 
             }catch (KustvaktException e) {
-                throw BeanConfiguration.getResponseHandler().throwit(e);
+                throw KustvaktResponseHandler.throwit(e);
             }
 
             if (context != null && (

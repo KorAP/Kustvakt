@@ -3,10 +3,10 @@ package de.ids_mannheim.korap.handlers;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.exceptions.dbException;
-import de.ids_mannheim.korap.ext.interfaces.ResourceOperationIface;
-import de.ids_mannheim.korap.ext.resource.KorAPResource;
-import de.ids_mannheim.korap.ext.resource.ResourceFactory;
 import de.ids_mannheim.korap.interfaces.PersistenceClient;
+import de.ids_mannheim.korap.interfaces.ResourceOperationIface;
+import de.ids_mannheim.korap.resources.KustvaktResource;
+import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.TimeUtils;
@@ -26,7 +26,7 @@ import java.util.List;
  * Created by hanl on 7/21/14.
  */
 //todo: auditing // testing
-public class ResourceDao<T extends KorAPResource>
+public class ResourceDao<T extends KustvaktResource>
         implements ResourceOperationIface<T> {
 
     private static Logger log = KustvaktLogger.initiate(ResourceDao.class);
@@ -38,7 +38,7 @@ public class ResourceDao<T extends KorAPResource>
 
     @Override
     public Class<T> getType() {
-        return (Class<T>) KorAPResource.class;
+        return (Class<T>) KustvaktResource.class;
     }
 
     @Override
@@ -71,7 +71,7 @@ public class ResourceDao<T extends KorAPResource>
     }
 
     @Override
-    public <T extends KorAPResource> T findbyId(String id, User user)
+    public <T extends KustvaktResource> T findbyId(String id, User user)
             throws KustvaktException {
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("pid", id);
@@ -86,7 +86,7 @@ public class ResourceDao<T extends KorAPResource>
         }
     }
 
-    public KorAPResource findbyPath(String path, User user)
+    public KustvaktResource findbyPath(String path, User user)
             throws KustvaktException {
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("path", path);
@@ -103,7 +103,7 @@ public class ResourceDao<T extends KorAPResource>
     }
 
     @Override
-    public <T extends KorAPResource> T findbyId(Integer id, User user)
+    public <T extends KustvaktResource> T findbyId(Integer id, User user)
             throws KustvaktException {
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", id);

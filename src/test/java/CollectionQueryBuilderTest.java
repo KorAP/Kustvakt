@@ -13,67 +13,76 @@ public class CollectionQueryBuilderTest {
     public void testsimpleAdd() {
         CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
         b.addSegment("corpusID", CollectionQueryBuilder3.EQ.EQUAL, "WPD");
-        //        System.out.println(b.toJSON());
+
+        JsonNode node = JsonUtils.readTree(b.toJSON());
+
+        assert node != null;
+        assert node.at("/collection/@type").asText().equals("koral:doc");
+        assert node.at("/collection/key").asText().equals("corpusID");
+
     }
 
     @Test
-    public void testSimpleConjunctive() {
+    public void testSimpleConjunction() {
         CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
         b.addSegment("corpusID", CollectionQueryBuilder3.EQ.EQUAL, "WPD").and()
                 .addSegment("textClass", CollectionQueryBuilder3.EQ.EQUAL,
                         "freizeit");
-        //        System.out.println(b.toJSON());
+        JsonNode node = JsonUtils.readTree(b.toJSON());
+
+        assert node != null;
+        assert node.at("/collection/@type").asText().equals("koral:docGroup");
+        assert node.at("/collection/operation").asText()
+                .equals("operation:and");
+        assert node.at("/collection/operands/0/key").asText()
+                .equals("corpusID");
+        assert node.at("/collection/operands/1/key").asText()
+                .equals("textClass");
     }
 
     @Test
-    public void testSimpleDisjunctive() {
+    public void testSimpleDisjunction() {
         CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
-        b.addSegment("corpusID", CollectionQueryBuilder3.EQ.EQUAL, "WPD").and()
+        b.addSegment("corpusID", CollectionQueryBuilder3.EQ.EQUAL, "WPD").or()
                 .addSegment("textClass", CollectionQueryBuilder3.EQ.EQUAL,
                         "freizeit");
-        //        System.out.println(b.toJSON());
+        JsonNode node = JsonUtils.readTree(b.toJSON());
+
+        assert node != null;
+        assert node.at("/collection/operation").asText().equals("operation:or");
+        assert node.at("/collection/operands/0/key").asText()
+                .equals("corpusID");
+        assert node.at("/collection/operands/1/key").asText()
+                .equals("textClass");
     }
 
     @Test
     public void testComplexSubQuery() {
-
         CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
-        b.addSegment("corpusID", CollectionQueryBuilder3.EQ.EQUAL, "ADF").and()
+        b.addSegment("corpusID", CollectionQueryBuilder3.EQ.EQUAL, "ADF").or()
                 .addSub("textClass=freizeit & corpusID=WPD");
-        //        System.out.println(b.toJSON());
-    }
 
-    @Test // basically joining two or more resource queries
-    public void testAddResourceQueryAfter() {
-        CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
-        b.addSegment("corpusID", CollectionQueryBuilder3.EQ.EQUAL, "ADF").and()
-                .addSub("textClass=freizeit & corpusID=WPD");
-        //        System.out.println(b.toJSON());
+        JsonNode node = JsonUtils.readTree(b.toJSON());
 
-        //        join.addSegment("textClass", "politik");
-    }
+        assert node != null;
+        assert node.at("/collection/operation").asText().equals("operation:or");
+        assert node.at("/collection/operands/0/key").asText()
+                .equals("corpusID");
+        assert node.at("/collection/operands/1/@type").asText()
+                .equals("koral:docGroup");
 
-    @Test // basically joining two or more resource queries
-    public void testAddResourceQueryBefore() {
-        CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
-        b.addSegment("corpusID", CollectionQueryBuilder3.EQ.EQUAL, "ADF").and()
-                .addSub("textClass!=freizeit & corpusID=WPD");
-
-        //        CollectionQueryBuilder3 join = new CollectionQueryBuilder3();
-        //        join.addRaw(b.toJSON());
-        //        join.addSegment("textClass", "politik");
-        //        System.out.println("JOINED " + join.toJSON());
     }
 
     @Test
-    public void test1() {
+    public void testAddResourceQueryAfter() {
         CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
         b.addSegment("corpusID", CollectionQueryBuilder3.EQ.EQUAL, "ADF").or()
                 .addSub("textClass=freizeit & corpusID=WPD");
 
         CollectionQueryBuilder3 c = new CollectionQueryBuilder3();
         c.setBaseQuery(b.toJSON());
-        c.addSub("textClass=wissenschaft");
+        c.addSegment("textClass", CollectionQueryBuilder3.EQ.EQUAL,
+                "wissenschaft");
 
         JsonNode node = JsonUtils.readTree(c.toJSON());
 
@@ -82,6 +91,28 @@ public class CollectionQueryBuilderTest {
                 .equals("koral:doc");
         assert node.at("/collection/operands/2/value").asText()
                 .equals("wissenschaft");
+    }
+
+    @Test
+    public void testAddComplexResourceQueryAfter() {
+        CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
+        b.addSegment("corpusID", CollectionQueryBuilder3.EQ.EQUAL, "ADF").or()
+                .addSub("textClass=freizeit & corpusID=WPD");
+
+        CollectionQueryBuilder3 c = new CollectionQueryBuilder3();
+        c.setBaseQuery(b.toJSON());
+        c.addSub("(textClass=politik & corpusID=AZPS)");
+
+        JsonNode node = JsonUtils.readTree(c.toJSON());
+
+        assert node != null;
+        assert node.at("/collection/operands/2/@type").asText()
+                .equals("koral:docGroup");
+        assert node.at("/collection/operands/2/operands/0/value").asText()
+                .equals("politik");
+        assert node.at("/collection/operands/2/operands/1/value").asText()
+                .equals("AZPS");
+
     }
 
 }

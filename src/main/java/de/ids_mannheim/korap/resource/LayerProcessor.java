@@ -10,6 +10,7 @@ import java.util.Iterator;
  * @author hanl
  * @date 19/06/2015
  */
+@Deprecated
 public class LayerProcessor extends NodeProcessor {
 
     private LayerMapper mapper;

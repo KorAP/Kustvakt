@@ -9,6 +9,9 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
 /**
+ * extends OAuthDb to allow temporary caching of tokens
+ * and authorizations (authorizations are not persisted in db)
+ *
  * @author hanl
  * @date 04/05/2015
  */
@@ -28,22 +31,26 @@ public class OAuth2Handler extends OAuthDb {
         return null;
     }
 
-    public void authorize(AuthCodeInfo code, User user) throws
-            KustvaktException {
+    public void authorize(AuthCodeInfo code, User user)
+            throws KustvaktException {
         code.setUserId(user.getId());
         cache.put(new Element(code.getCode(), code));
     }
 
-    public boolean addToken(String code, String token, int ttl)
+    public boolean addToken(String code, String token, String refresh, int ttl)
             throws KustvaktException {
         Element e = cache.get(code);
         if (e != null) {
             AuthCodeInfo info = (AuthCodeInfo) e.getObjectValue();
             cache.remove(code);
-            return super.addToken(token, info.getUserId(), info.getClientId(),
+            return super.addToken(token, refresh, info.getUserId(), info.getClientId(),
                     info.getScopes(), ttl);
         }
         return false;
+    }
+
+    public void exchangeToken(String refresh) {
+
     }
 
 }

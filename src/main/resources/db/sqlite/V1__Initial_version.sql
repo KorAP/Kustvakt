@@ -226,11 +226,17 @@ is_confidential BOOLEAN DEFAULT FALSE,
 url VARCHAR(200) UNIQUE
 );
 
+
+-- refresh token doesn't care about expiration.
+-- also narrower scopes for new access token with the refresh token are not supported
+-- otherwise i would require a comparison of all access_token to get the maximum scopes and compare to request
+
 -- status 1 = valid, 0 = revoked, -1 = disabled
 create table IF NOT EXISTS oauth2_access_token (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
 access_token VARCHAR(300),
 auth_code VARCHAR(250),
+refresh_token VARCHAR(250),
 client_id VARCHAR(100),
 user_id INTEGER,
 -- make boolean --
@@ -240,8 +246,27 @@ status INTEGER DEFAULT 1,
 scopes VARCHAR(350),
 expiration TIMESTAMP,
 FOREIGN KEY (user_id)
-REFERENCES korap_users(id)
+REFERENCES korap_users(id),
+FOREIGN KEY (client_id)
+REFERENCES oauth2_client(client_id)
 );
+
+
+-- fixme: also scopes?
+create table oauth2_refresh_token (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+client_id VARCHAR(100),
+user_id INTEGER,
+expiration TIMESTAMP,
+scopes VARCHAR(350),
+FOREIGN KEY (user_id)
+REFERENCES korap_users(id)
+ON DELETE CASCADE,
+FOREIGN KEY (client_id)
+REFERENCES oauth2_client(client_id)
+ON DELETE CASCADE
+);
+
 
 
 -- a bit confusing. 1. creator is policy creator, 2. creator is resource creator --> different implications

@@ -24,8 +24,13 @@ public class BeanConfiguration {
     public static final String KUSTVAKT_AUDITING = "kustvakt_auditing";
     public static final String KUSTVAKT_CONFIG = "kustvakt_config";
 
+    public static final String KUSTVAKT_AUTHENTICATION_MANAGER = "kustvakt_authenticationmanager";
+    public static final String KUSTVAKT_USERDB = "kustvakt_userdb";
+    public static final String KUSTVAKT_POLICIES = "kustvakt_policies";
+
     private static BeanHolderHelper beans;
 
+    //todo: allow this for external plugin systems that are not kustvakt specific
     public static void setCustomBeansHolder(BeanHolderHelper holder) {
         ApplicationContext context = beans.context;
         holder.context = context;
@@ -136,17 +141,36 @@ public class BeanConfiguration {
             return getBean(KUSTVAKT_DB);
         }
 
-        public AuthenticationManagerIface getAuthenticationManager() {
-            throw new RuntimeException("!Stub");
-        }
+        //        public AuthenticationManagerIface getAuthenticationManager() {
+        //            throw new RuntimeException("!Stub");
+        //        }
 
-        public EntityHandlerIface getUserDBHandler() {
-            throw new RuntimeException("!Stub");
-        }
+        //        public EntityHandlerIface getUserDBHandler() {
+        //            throw new RuntimeException("!Stub");
+        //        }
 
         public EncryptionIface getEncryption() {
             return getBean(KUSTVAKT_ENCRYPTION);
         }
+
+        public AuthenticationManagerIface getAuthenticationManager() {
+            return getBean(KUSTVAKT_AUTHENTICATION_MANAGER);
+        }
+
+        public EntityHandlerIface getUserDBHandler() {
+            return getBean(KUSTVAKT_USERDB);
+        }
+
+        public PolicyHandlerIface getPolicyDbProvider() {
+            return getBean(KUSTVAKT_POLICIES);
+        }
+
+        // todo: more specific --> collection provider, document provider, etc.
+        public ResourceOperationIface getResourceProvider() {
+            return getBean("resourceProvider");
+        }
+
+
 
         public void finish() {
             this.getAuditingProvider().finish();

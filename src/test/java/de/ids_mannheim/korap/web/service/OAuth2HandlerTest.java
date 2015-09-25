@@ -4,10 +4,11 @@ import de.ids_mannheim.korap.config.AuthCodeInfo;
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.ClientInfo;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.ext.config.BeanHelperExtension;
-import de.ids_mannheim.korap.ext.security.oauth2.OAuth2Handler;
+import de.ids_mannheim.korap.handlers.OAuth2Handler;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.user.*;
+import de.ids_mannheim.korap.user.KorAPUser;
+import de.ids_mannheim.korap.user.TokenContext;
+import de.ids_mannheim.korap.user.User;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -18,19 +19,17 @@ import org.junit.Test;
  * @date 13/05/2015
  */
 
-//works
 public class OAuth2HandlerTest {
 
     private static ClientInfo info;
     private static OAuth2Handler handler;
     private static EncryptionIface crypto;
-    private static final String SCOPE = "search preferences queries account";
+    private static final String SCOPES = "search preferences queries account";
     private static final KorAPUser user = User.UserFactory.getUser("test_user");
 
     @BeforeClass
     public static void setup() throws KustvaktException {
         BeanConfiguration.loadClasspathContext("classpath-config.xml");
-        BeanConfiguration.setCustomBeansHolder(new BeanHelperExtension());
         handler = new OAuth2Handler(
                 BeanConfiguration.getBeans().getPersistenceClient());
         crypto = BeanConfiguration.getBeans().getEncryption();
@@ -58,7 +57,7 @@ public class OAuth2HandlerTest {
         String auth_code = crypto.createToken();
         AuthCodeInfo codeInfo = new AuthCodeInfo(info.getClient_id(),
                 auth_code);
-        codeInfo.setScopes(SCOPE);
+        codeInfo.setScopes(SCOPES);
 
         handler.authorize(codeInfo, user);
         codeInfo = handler.getAuthorization(auth_code);
@@ -71,11 +70,12 @@ public class OAuth2HandlerTest {
         String auth_code = crypto.createToken();
         AuthCodeInfo codeInfo = new AuthCodeInfo(info.getClient_id(),
                 auth_code);
-        codeInfo.setScopes(SCOPE);
+        codeInfo.setScopes(SCOPES);
 
         handler.authorize(codeInfo, user);
         String t = crypto.createToken();
-        handler.addToken(codeInfo.getCode(), t, 7200);
+        String refresh = crypto.createToken();
+        handler.addToken(codeInfo.getCode(), t, refresh, 7200);
 
         TokenContext ctx = handler.getContext(t);
         Assert.assertNotNull("context is null", ctx);
@@ -85,7 +85,16 @@ public class OAuth2HandlerTest {
     }
 
     @Test
+    public void testTokenEndpointRedirect() {
+
+    }
+
+    @Test
     public void testStoreAccessCodeViaAuthCodeThrowsNoException() {
+        String auth_code = crypto.createToken();
+        AuthCodeInfo codeInfo = new AuthCodeInfo(info.getClient_id(),
+                auth_code);
+        codeInfo.setScopes(SCOPES);
 
     }
 
@@ -96,6 +105,17 @@ public class OAuth2HandlerTest {
 
     @Test
     public void testAccessTokenbyUserDeleteCascade() {
+
+    }
+
+    @Test
+    public void testRefreshToken() {
+
+    }
+
+    // fixme: exception thrown?!
+    @Test
+    public void testAccessTokenExpired() {
 
     }
 }

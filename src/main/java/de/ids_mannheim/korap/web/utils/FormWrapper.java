@@ -12,6 +12,7 @@ import java.util.Map;
  * @author hanl
  * @date 18/05/2015
  */
+@Deprecated
 public class FormWrapper extends HashMap<String, Object> {
 
     public FormWrapper(MultivaluedMap form, boolean strict) {

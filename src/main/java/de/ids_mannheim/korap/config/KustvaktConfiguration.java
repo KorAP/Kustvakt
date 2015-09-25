@@ -1,6 +1,8 @@
 package de.ids_mannheim.korap.config;
 
+import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
+import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.Getter;
 import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
@@ -23,21 +25,41 @@ import java.util.Properties;
 @Getter
 public class KustvaktConfiguration {
 
-    private final Logger jlog = KustvaktLogger
+    private static final Logger jlog = KustvaktLogger
             .initiate(KustvaktConfiguration.class);
     private String indexDir;
     private int port;
     // todo: make exclusive so that the containg languages can really only be used then
     private List<String> queryLanguages;
 
-    private int maxhits;
-
-    private int returnhits;
     private String serverHost;
-
-    private String host;
-
     private URL issuer;
+
+    private int maxhits;
+    private int returnhits;
+    private String keystoreLocation;
+    private String keystorePassword;
+    private Properties mailProperties;
+    private String host;
+    private String shibUserMapping;
+    private String userConfig;
+    private int inactiveTime;
+    private int loginAttemptTTL;
+    private long loginAttemptNum;
+    private boolean allowMultiLogIn;
+    private int expiration;
+    private int loadFactor;
+    private int validationStringLength;
+    private int validationEmaillength;
+    // fixme: should move to base config?!
+    private EncryptionIface.Encryption encryption;
+    private byte[] sharedSecret;
+    private String adminToken;
+    private int longTokenTTL;
+    private int tokenTTL;
+    private int shortTokenTTL;
+    private String[] rewrite_strategies;
+    private String passcodeSaltField;
 
     private String default_pos;
     private String default_lemma;
@@ -51,35 +73,71 @@ public class KustvaktConfiguration {
     /**
      * loading of the properties and mapping to parameter variables
      *
-     * @param korap
+     * @param properties
      * @return
      */
-    protected Properties load(Properties korap) {
-        String log4jconfig = korap
+    protected Properties load(Properties properties) {
+        String log4jconfig = properties
                 .getProperty("log4jconfig", "log4j.properties");
         loadLog4jLogger(log4jconfig);
-        maxhits = new Integer(korap.getProperty("maxhits", "50000"));
-        returnhits = new Integer(korap.getProperty("returnhits", "50000"));
-        indexDir = korap.getProperty("lucene.indexDir", "");
-        port = new Integer(korap.getProperty("server.port", "8080"));
+        maxhits = new Integer(properties.getProperty("maxhits", "50000"));
+        returnhits = new Integer(properties.getProperty("returnhits", "50000"));
+        indexDir = properties.getProperty("lucene.indexDir", "");
+        port = new Integer(properties.getProperty("server.port", "8080"));
         // server options
         serverHost = String
-                .valueOf(korap.getProperty("server.host", "localhost"));
-        String queries = korap.getProperty("korap.ql", "");
+                .valueOf(properties.getProperty("server.host", "localhost"));
+        String queries = properties.getProperty("korap.ql", "");
         String[] qls = queries.split(",");
         queryLanguages = new ArrayList<>();
         for (String querylang : qls)
             queryLanguages.add(querylang.trim().toUpperCase());
         //        issuer = new URL(korap.getProperty("korap.issuer", ""));
 
-        default_const = korap.getProperty("kustvakt.default.const", "mate");
-        default_dep = korap.getProperty("kustvakt.default.dep", "mate");
-        default_lemma = korap.getProperty("kustvakt.default.lemma", "tt");
-        default_pos = korap.getProperty("kustvakt.default.pos", "tt");
-        default_surface = korap
+        default_const = properties
+                .getProperty("kustvakt.default.const", "mate");
+        default_dep = properties.getProperty("kustvakt.default.dep", "mate");
+        default_lemma = properties.getProperty("kustvakt.default.lemma", "tt");
+        default_pos = properties.getProperty("kustvakt.default.pos", "tt");
+        default_surface = properties
                 .getProperty("kustvakt.default.opennlp", "opennlp");
 
-        return korap;
+        // security configuration
+        expiration = TimeUtils.convertTimeToSeconds(properties
+                .getProperty("security.absoluteTimeoutDuration", "25M"));
+        inactiveTime = TimeUtils.convertTimeToSeconds(
+                properties.getProperty("security.idleTimeoutDuration", "10M"));
+        allowMultiLogIn = Boolean
+                .valueOf(properties.getProperty("security.multipleLogIn"));
+
+        loginAttemptNum = Long.parseLong(
+                properties.getProperty("security.loginAttemptNum", "3"));
+        loginAttemptTTL = TimeUtils.convertTimeToSeconds(
+                properties.getProperty("security.authAttemptTTL", "30M"));
+
+        loadFactor = Integer.valueOf(
+                properties.getProperty("security.encryption.loadFactor", "15"));
+        validationStringLength = Integer.valueOf(properties
+                .getProperty("security.validation.stringLength", "150"));
+        validationEmaillength = Integer.valueOf(properties
+                .getProperty("security.validation.emailLength", "40"));
+        encryption = Enum.valueOf(EncryptionIface.Encryption.class,
+                properties.getProperty("security.encryption", "BCRYPT"));
+        sharedSecret = properties.getProperty("security.sharedSecret", "")
+                .getBytes();
+        adminToken = properties.getProperty("security.adminToken");
+
+        longTokenTTL = TimeUtils.convertTimeToSeconds(
+                properties.getProperty("security.longTokenTTL", "100D"));
+        tokenTTL = TimeUtils.convertTimeToSeconds(
+                properties.getProperty("security.tokenTTL", "72H"));
+        shortTokenTTL = TimeUtils.convertTimeToSeconds(
+                properties.getProperty("security.shortTokenTTL", "3H"));
+
+        passcodeSaltField = properties
+                .getProperty("security.passcode.salt", "accountCreation");
+
+        return properties;
     }
 
     /**
@@ -124,14 +182,15 @@ public class KustvaktConfiguration {
                 jlog.info(
                         "using local logging properties file ({}) to configure logging system",
                         log4jconfig);
-            }else
-                loadClassLogger();
+                return;
+            }
         }catch (Exception e) {
-            loadClassLogger();
+            // do nothing
         }
+        loadClassLogger();
     }
 
-    public void loadClassLogger() {
+    private void loadClassLogger() {
         Properties log4j = new Properties();
         jlog.info(
                 "using class path logging properties file to configure logging system");

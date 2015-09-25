@@ -18,6 +18,7 @@ import de.ids_mannheim.korap.web.KustvaktServer;
 import de.ids_mannheim.korap.web.filter.AuthFilter;
 import de.ids_mannheim.korap.web.filter.DefaultFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
+import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.slf4j.Logger;
 
 import javax.ws.rs.*;
@@ -82,6 +83,7 @@ public class AuthService {
         return Response.ok(ctx.toJSON()).build();
     }
 
+    // todo: rename scope to scopes!
     @GET
     @Path("apiToken")
     public Response requestAPIToken(@Context HttpHeaders headers,
@@ -89,29 +91,29 @@ public class AuthService {
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
             @HeaderParam("referer-url") String referer,
-            @QueryParam("scope") String scope) {
+            @QueryParam("scopes") String scopes) {
         List<String> auth = headers
                 .getRequestHeader(ContainerRequest.AUTHORIZATION);
 
         if (auth == null)
-            throw BeanConfiguration.getResponseHandler()
+            throw KustvaktResponseHandler
                     .throwit(StatusCodes.PERMISSION_DENIED);
         String[] values = BasicHttpAuth.decode(auth.get(0));
 
         // "Invalid syntax for username and password"
         if (values == null)
-            throw BeanConfiguration.getResponseHandler()
+            throw KustvaktResponseHandler
                     .throwit(StatusCodes.PERMISSION_DENIED);
 
         if (values[0].equalsIgnoreCase("null") | values[1]
                 .equalsIgnoreCase("null"))
             // is actual an invalid request
-            throw BeanConfiguration.getResponseHandler()
+            throw KustvaktResponseHandler
                     .throwit(StatusCodes.REQUEST_INVALID);
 
         Map<String, Object> attr = new HashMap<>();
-        if (scope != null && !scope.isEmpty())
-            attr.put(Attributes.SCOPES, scope);
+        if (scopes != null && !scopes.isEmpty())
+            attr.put(Attributes.SCOPES, scopes);
         attr.put(Attributes.HOST, host);
         attr.put(Attributes.USER_AGENT, agent);
         TokenContext context;
@@ -121,7 +123,7 @@ public class AuthService {
             context = controller.createTokenContext(user, attr,
                     Attributes.API_AUTHENTICATION);
         }catch (KustvaktException e) {
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
 
         return Response.ok(context.toResponse()).build();
@@ -140,7 +142,7 @@ public class AuthService {
         //            newContext = controller.refresh(ctx);
         //        }catch (KorAPException e) {
         //            KorAPLogger.ERROR_LOGGER.error("Exception encountered!", e);
-        //            throw BeanConfiguration.getResponseHandler().throwit(e);
+        //            throw KustvaktResponseHandler.throwit(e);
         //        }
         //        return Response.ok().entity(newContext.getToken()).build();
         return null;
@@ -156,7 +158,7 @@ public class AuthService {
                 .getRequestHeader(ContainerRequest.AUTHORIZATION);
 
         if (auth == null)
-            throw BeanConfiguration.getResponseHandler()
+            throw KustvaktResponseHandler
                     .throwit(StatusCodes.PERMISSION_DENIED);
 
         String[] values = BasicHttpAuth.decode(auth.get(0));
@@ -167,12 +169,12 @@ public class AuthService {
 
         // "Invalid syntax for username and password"
         if (values == null)
-            throw BeanConfiguration.getResponseHandler()
+            throw KustvaktResponseHandler
                     .throwit(StatusCodes.PERMISSION_DENIED);
 
         if (values[0].equalsIgnoreCase("null") | values[1]
                 .equalsIgnoreCase("null"))
-            throw BeanConfiguration.getResponseHandler()
+            throw KustvaktResponseHandler
                     .throwit(StatusCodes.REQUEST_INVALID);
 
         Map<String, Object> attr = new HashMap<>();
@@ -184,7 +186,7 @@ public class AuthService {
             context = controller.createTokenContext(user, attr,
                     Attributes.SESSION_AUTHENTICATION);
         }catch (KustvaktException e) {
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok().entity(context.toJSON()).build();
     }
@@ -215,7 +217,7 @@ public class AuthService {
             User user = controller.authenticate(1, null, null, attr);
             context = controller.createTokenContext(user, attr, null);
         }catch (KustvaktException e) {
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok().entity(context.toJSON()).build();
     }

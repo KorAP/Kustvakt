@@ -15,10 +15,11 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.web.KustvaktServer;
 import de.ids_mannheim.korap.web.filter.AuthFilter;
-import de.ids_mannheim.korap.web.filter.BlockFilter;
+import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DefaultFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
+import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.apache.oltu.oauth2.as.issuer.MD5Generator;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl;
@@ -75,7 +76,7 @@ public class OAuthService {
 
     @POST
     @Path("unregister")
-    @ResourceFilters({ AuthFilter.class, BlockFilter.class })
+    @ResourceFilters({ AuthFilter.class, BlockingFilter.class })
     public Response unregisterClient(@Context SecurityContext context,
             @HeaderParam("Host") String host,
             @QueryParam("client_secret") String secret,
@@ -87,14 +88,14 @@ public class OAuthService {
             this.handler.removeClient(info,
                     this.controller.getUser(ctx.getUsername()));
         }catch (KustvaktException e) {
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
 
     @POST
     @Path("register")
-    @ResourceFilters({ AuthFilter.class, BlockFilter.class })
+    @ResourceFilters({ AuthFilter.class, BlockingFilter.class })
     public Response registerClient(@Context SecurityContext context,
             @HeaderParam("Host") String host,
             @QueryParam("redirect_url") String rurl) {
@@ -102,7 +103,7 @@ public class OAuthService {
                 crypto.createToken());
         info.setUrl(host);
         if (rurl == null)
-            throw BeanConfiguration.getResponseHandler()
+            throw KustvaktResponseHandler
                     .throwit(StatusCodes.ILLEGAL_ARGUMENT, "Missing parameter!",
                             "redirect_url");
         info.setRedirect_uri(rurl);
@@ -111,17 +112,18 @@ public class OAuthService {
             this.handler.registerClient(info,
                     this.controller.getUser(ctx.getUsername()));
         }catch (KustvaktException e) {
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok(info.toJSON()).build();
     }
 
+    // todo: change parameter to scopes!
     @GET
     @Path("info")
     @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
             PiwikFilter.class })
     public Response getStatus(@Context SecurityContext context,
-            @QueryParam("scope") String scopes) {
+            @QueryParam("scopes") String scopes) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         User user;
         try {
@@ -133,7 +135,7 @@ public class OAuthService {
             base_scope.retainAll(StringUtils.toSet(scopes));
             scopes = StringUtils.toString(base_scope);
         }catch (KustvaktException e) {
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
         // json format with scope callback parameter
         return Response.ok(JsonUtils.toJSON(Scopes
@@ -142,7 +144,7 @@ public class OAuthService {
 
     @GET
     @Path("authorizations")
-    @ResourceFilters({ AuthFilter.class, BlockFilter.class })
+    @ResourceFilters({ AuthFilter.class, BlockingFilter.class })
     public Response getAuthorizations(@Context SecurityContext context,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host) {
@@ -156,18 +158,18 @@ public class OAuthService {
                 return Response.noContent().build();
             return Response.ok(JsonUtils.toJSON(auths)).build();
         }catch (KustvaktException e) {
-            throw BeanConfiguration.getResponseHandler().throwit(e);
+            throw KustvaktResponseHandler.throwit(e);
         }
     }
 
     // todo: scopes for access_token are defined here
-    // todo: if user already has an access token registered for client and application, then redirect to token endpoint to retrive that token
+    // todo: if user already has an access token registered for client and application, then redirect to token endpoint to retrieve that token
     // todo: demo account should be disabled for this function --> if authentication failed, client must redirect to login url (little login window)
     @POST
     @Path("authorize")
     @Consumes("application/x-www-form-urlencoded")
     @Produces("application/json")
-    @ResourceFilters({ BlockFilter.class })
+    @ResourceFilters({ BlockingFilter.class })
     public Response authorize(@Context HttpServletRequest request,
             @Context SecurityContext context,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
@@ -200,16 +202,12 @@ public class OAuthService {
                 user = controller.getUser(c.getUsername());
                 controller.getUserDetails(user);
             }catch (KustvaktException e) {
-                throw BeanConfiguration.getResponseHandler().throwit(e);
+                throw KustvaktResponseHandler.throwit(e);
             }
 
             // register response according to response_type
             String responseType = oauthRequest
                     .getParam(OAuth.OAUTH_RESPONSE_TYPE);
-
-            OAuthASResponse.OAuthAuthorizationResponseBuilder builder = OAuthASResponse
-                    .authorizationResponse(request,
-                            HttpServletResponse.SC_FOUND);
 
             final String authorizationCode = oauthIssuerImpl
                     .authorizationCode();
@@ -240,8 +238,12 @@ public class OAuthService {
 
             String accessToken = this.handler
                     .getToken(oauthRequest.getClientId(), user.getId());
-            //todo: test this with parameters
+
+            //todo: test correct redirect and parameters
             if (accessToken != null) {
+                // fixme: correct status code?
+                OAuthASResponse.OAuthResponseBuilder builder = OAuthASResponse
+                        .status(HttpServletResponse.SC_FOUND);
                 final OAuthResponse response = builder.location("/oauth2/token")
                         .setParam(OAuth.OAUTH_CLIENT_ID,
                                 oauthRequest.getClientId())
@@ -252,7 +254,21 @@ public class OAuthService {
                         .location(new URI(response.getLocationUri())).build();
             }
 
+            final OAuthResponse response;
+            String redirectURI = oauthRequest.getRedirectURI();
+            if (OAuthUtils.isEmpty(redirectURI)) {
+                throw new WebApplicationException(
+                        Response.status(HttpServletResponse.SC_BAD_REQUEST)
+                                .entity("OAuth callback url needs to be provided by client!!!\n")
+                                .build());
+            }
+
             if (responseType.equals(ResponseType.CODE.toString())) {
+                OAuthASResponse.OAuthAuthorizationResponseBuilder builder = OAuthASResponse
+                        .authorizationResponse(request,
+                                HttpServletResponse.SC_FOUND);
+                builder.location(redirectURI);
+
                 try {
                     AuthCodeInfo codeInfo = new AuthCodeInfo(
                             info.getClient_id(), authorizationCode);
@@ -260,32 +276,30 @@ public class OAuthService {
                             .toString(oauthRequest.getScopes(), " "));
                     this.handler.authorize(codeInfo, user);
                 }catch (KustvaktException e) {
-                    throw BeanConfiguration.getResponseHandler().throwit(e);
+                    throw KustvaktResponseHandler.throwit(e);
                 }
                 builder.setParam(OAuth.OAUTH_RESPONSE_TYPE,
                         ResponseType.CODE.toString());
                 builder.setCode(authorizationCode);
+                response = builder.buildBodyMessage();
 
             }else if (responseType.contains(ResponseType.TOKEN.toString())) {
-                try {
-                    AuthCodeInfo codeInfo = new AuthCodeInfo(
-                            info.getClient_id(), authorizationCode);
-                    codeInfo.setScopes(StringUtils
-                            .toString(oauthRequest.getScopes(), " "));
-                    this.handler.authorize(codeInfo, user);
-                }catch (KustvaktException e) {
-                    throw BeanConfiguration.getResponseHandler().throwit(e);
-                }
-
+                OAuthASResponse.OAuthTokenResponseBuilder builder = OAuthASResponse
+                        .tokenResponse(HttpServletResponse.SC_OK);
                 builder.setParam(OAuth.OAUTH_RESPONSE_TYPE,
                         ResponseType.TOKEN.toString());
-                builder.setCode(authorizationCode);
+                builder.location(redirectURI);
 
                 String token = oauthIssuerImpl.accessToken();
-                this.handler.addToken(authorizationCode, token,
+                String refresh = oauthIssuerImpl.refreshToken();
+
+                this.handler.addToken(token, refresh, user.getId(),
+                        oauthRequest.getClientId(),
+                        StringUtils.toString(oauthRequest.getScopes(), " "),
                         config.getLongTokenTTL());
                 builder.setAccessToken(token);
-                builder.setExpiresIn((long) config.getLongTokenTTL());
+                builder.setRefreshToken(refresh);
+                builder.setExpiresIn(String.valueOf(config.getLongTokenTTL()));
 
                 // skips authorization code type and returns id_token and access token directly
                 if (oauthRequest.getScopes().contains("openid")) {
@@ -295,9 +309,10 @@ public class OAuthService {
                         builder.setParam(new_context.getTokenType(),
                                 new_context.getToken());
                     }catch (KustvaktException e) {
-                        throw BeanConfiguration.getResponseHandler().throwit(e);
+                        throw KustvaktResponseHandler.throwit(e);
                     }
                 }
+                response = builder.buildBodyMessage();
             }else {
                 OAuthResponse res = OAuthASResponse
                         .errorResponse(HttpServletResponse.SC_BAD_REQUEST)
@@ -308,23 +323,22 @@ public class OAuthService {
                 return Response.status(res.getResponseStatus())
                         .entity(res.getBody()).build();
             }
-
-            String redirectURI = oauthRequest.getRedirectURI();
-
-            // enables state parameter to disable cross-site scripting attacks
-            final OAuthResponse response = builder.location(redirectURI)
-                    .buildQueryMessage();
-            if (OAuthUtils.isEmpty(redirectURI)) {
-                throw new WebApplicationException(
-                        Response.status(HttpServletResponse.SC_BAD_REQUEST)
-                                .entity("OAuth callback url needs to be provided by client!!!\n")
-                                .build());
-            }
+            //
+            //            String redirectURI = oauthRequest.getRedirectURI();
+            //
+            //            // enables state parameter to disable cross-site scripting attacks
+            //            final OAuthResponse response = builder.location(redirectURI)
+            //                    .buildQueryMessage();
+            //            if (OAuthUtils.isEmpty(redirectURI)) {
+            //                throw new WebApplicationException(
+            //                        Response.status(HttpServletResponse.SC_BAD_REQUEST)
+            //                                .entity("OAuth callback url needs to be provided by client!!!\n")
+            //                                .build());
+            //            }
 
             return Response.status(response.getResponseStatus())
                     .location(new URI(response.getLocationUri())).build();
         }catch (OAuthProblemException e) {
-            e.printStackTrace();
             final Response.ResponseBuilder responseBuilder = Response
                     .status(HttpServletResponse.SC_BAD_REQUEST);
             String redirectUri = e.getRedirectUri();
@@ -454,18 +468,20 @@ public class OAuthService {
                     }else {
                         openid_valid = codeInfo.getScopes().contains("openid");
                         String accessToken = oauthIssuerImpl.accessToken();
+                        String refreshToken = oauthIssuerImpl.refreshToken();
                         // auth code posesses the user reference. native apps access_tokens are directly associated with the user
                         this.handler
                                 .addToken(oauthRequest.getCode(), accessToken,
-                                        config.getTokenTTL());
+                                        refreshToken, config.getTokenTTL());
 
                         builder.setTokenType(TokenType.BEARER.toString());
                         builder.setExpiresIn(
                                 String.valueOf(config.getLongTokenTTL()));
                         builder.setAccessToken(accessToken);
+                        builder.setRefreshToken(refreshToken);
                     }
                 }catch (KustvaktException e) {
-                    throw BeanConfiguration.getResponseHandler().throwit(e);
+                    throw KustvaktResponseHandler.throwit(e);
                 }
                 // todo: errors for invalid scopes or different scopes then during authorization request?
                 //todo ??
@@ -492,18 +508,22 @@ public class OAuthService {
                             .authenticate(0, oauthRequest.getUsername(),
                                     oauthRequest.getPassword(), attr);
                 }catch (KustvaktException e) {
-                    throw BeanConfiguration.getResponseHandler().throwit(e);
+                    throw KustvaktResponseHandler.throwit(e);
                 }
 
                 try {
                     String accessToken = this.handler
                             .getToken(oauthRequest.getClientId(), user.getId());
                     if (accessToken == null) {
+                        String refresh = oauthIssuerImpl.refreshToken();
                         accessToken = oauthIssuerImpl.accessToken();
-                        this.handler.addToken(accessToken, user.getId(),
-                                oauthRequest.getClientId(), StringUtils
-                                        .toString(oauthRequest.getScopes(),
-                                                " "), config.getLongTokenTTL());
+                        this.handler
+                                .addToken(accessToken, refresh, user.getId(),
+                                        oauthRequest.getClientId(), StringUtils
+                                                .toString(oauthRequest
+                                                        .getScopes(), " "),
+                                        config.getLongTokenTTL());
+                        builder.setRefreshToken(refresh);
                     }
                     builder.setTokenType(TokenType.BEARER.toString());
                     builder.setExpiresIn(
@@ -511,7 +531,7 @@ public class OAuthService {
                     builder.setAccessToken(accessToken);
 
                 }catch (KustvaktException e) {
-                    throw BeanConfiguration.getResponseHandler().throwit(e);
+                    throw KustvaktResponseHandler.throwit(e);
                 }
             }
 
@@ -529,7 +549,7 @@ public class OAuthService {
                             Attributes.OPENID_AUTHENTICATION);
                     builder.setParam(c.getTokenType(), c.getToken());
                 }catch (KustvaktException e) {
-                    throw BeanConfiguration.getResponseHandler().throwit(e);
+                    throw KustvaktResponseHandler.throwit(e);
                 }
             }
 

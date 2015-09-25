@@ -8,7 +8,7 @@ import java.util.Arrays;
  * @author hanl
  * @date 08/04/2015
  */
-public class dbException extends KorAPException {
+public class dbException extends KustvaktException {
 
     private dbException(Object userid, Integer status, String message,
             String args) {
@@ -27,7 +27,7 @@ public class dbException extends KorAPException {
         this.records.add(record);
     }
 
-    public dbException(KorAPException e, Integer status, String... args) {
+    public dbException(KustvaktException e, Integer status, String... args) {
         this(e.getUserid(), e.getStatusCode(), e.getMessage(), e.getEntity());
         AuditRecord record = AuditRecord
                 .dbRecord(e.getUserid(), status, args);

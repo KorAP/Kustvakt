@@ -8,7 +8,9 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
-import de.ids_mannheim.korap.resource.RewriteProcessor;
+import de.ids_mannheim.korap.resource.rewrite.FoundryInject;
+import de.ids_mannheim.korap.resource.rewrite.PublicCollection;
+import de.ids_mannheim.korap.resource.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.web.ClientsHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
@@ -37,7 +39,7 @@ public class LightService {
 
     private SearchKrill searchKrill;
     private ClientsHandler graphDBhandler;
-    private RewriteProcessor processor;
+    private RewriteHandler processor;
     private KustvaktConfiguration config;
 
     public LightService() {
@@ -45,7 +47,9 @@ public class LightService {
         this.searchKrill = new SearchKrill(config.getIndexDir());
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
         this.graphDBhandler = new ClientsHandler(builder.build());
-        this.processor = new RewriteProcessor(this.config);
+        this.processor = new RewriteHandler();
+        this.processor.add(new FoundryInject(this.config));
+        this.processor.add(new PublicCollection());
     }
 
     /**
@@ -92,14 +96,14 @@ public class LightService {
         ss.setMeta(meta);
         if (cq != null)
             ss.setCollection(cq);
-        return Response.ok(processor.process(ss.toJSON())).build();
+        return Response.ok(processor.apply(ss.toJSON(), null)).build();
     }
 
     @POST
     @Path("search")
     public Response queryRaw(@QueryParam("engine") String engine,
             String jsonld) {
-        jsonld = processor.process(jsonld);
+        jsonld = processor.apply(jsonld, null);
         // todo: should be possible to add the meta part to the query serialization
         jlog.info("Serialized search: {}", jsonld);
 
@@ -133,7 +137,7 @@ public class LightService {
         if (cq != null)
             serializer.setCollection(cq);
 
-        String query = processor.process(serializer.toJSON());
+        String query = processor.apply(serializer.toJSON(), null);
         jlog.info("the serialized query {}", query);
 
         // This may not work with the the KoralQuery
@@ -200,7 +204,7 @@ public class LightService {
             //                meta.addEntry("itemsPerResource", 1);
             QuerySerializer s = new QuerySerializer().setQuery(query, ql, v)
                     .setMeta(meta);
-            query = processor.process(s.toJSON());
+            query = processor.apply(s.toJSON(), null);
         }
         String result;
         try {

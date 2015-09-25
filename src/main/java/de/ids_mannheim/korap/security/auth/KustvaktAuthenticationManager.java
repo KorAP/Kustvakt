@@ -111,7 +111,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
      * @return User
      * @throws KustvaktException
      */
-
     public User authenticate(int type, String username, String password,
             Map<String, Object> attributes) throws KustvaktException {
         User user;

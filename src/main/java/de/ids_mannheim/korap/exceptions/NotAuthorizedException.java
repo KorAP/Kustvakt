@@ -9,7 +9,7 @@ import lombok.Data;
 // a security table registers all these exceptions (failed authentication, failed access to a resource, etc.)
 @Data
 @Deprecated
-public class NotAuthorizedException extends BaseException {
+public class NotAuthorizedException extends KustvaktException {
 
     public NotAuthorizedException(int status) {
         super(status);

@@ -103,10 +103,12 @@ public class OAuthDb {
         return true;
     }
 
-    public boolean addToken(String token, Integer userid, String client_id,
-            String scopes, int expiration) throws KustvaktException {
+    public boolean addToken(String token, String refresh, Integer userid,
+            String client_id, String scopes, int expiration)
+            throws KustvaktException {
         MapSqlParameterSource s = new MapSqlParameterSource();
         s.addValue("token", token);
+        s.addValue("rt", refresh);
         s.addValue("ex",
                 new Timestamp(TimeUtils.plusSeconds(expiration).getMillis()));
         s.addValue("us", userid);
@@ -114,8 +116,8 @@ public class OAuthDb {
         s.addValue("st", BooleanUtils.getBoolean(true));
         s.addValue("cli", client_id);
         String sql =
-                "insert into oauth2_access_token (access_token, scopes, client_id, user_id, expiration, status) "
-                        + "values (:token, :sc, :cli, :us, :ex, :st);";
+                "insert into oauth2_access_token (access_token, refresh_token, scopes, client_id, user_id, expiration, status) "
+                        + "values (:token, :rt, :sc, :cli, :us, :ex, :st);";
         try {
             return this.jdbcTemplate.update(sql, s) == 1;
         }catch (DataAccessException e) {
@@ -151,6 +153,10 @@ public class OAuthDb {
                 "select cl.* from oauth2_client as cl where cl.client_id in (select cd.client_id from oauth2_access_token as cd "
                         + "where cd.user_id=:user) or cl.is_confidential=:conf;";
 
+        //todo: test query
+        //        "select cl.* from oauth2_client as cl inner join oauth2_access_token as cd "
+        //                + "on cd.client_id=cl.client_id where cd.user_id=:user or cl.is_confidential=:conf;"
+
         MapSqlParameterSource s = new MapSqlParameterSource();
         s.addValue("user", userid);
         s.addValue("conf", BooleanUtils.getBoolean(true));
@@ -177,8 +183,9 @@ public class OAuthDb {
 
     }
 
-    public TokenContext getContext(final String token) throws
-            KustvaktException {
+    // todo: expired token must trigger an invalid token exception to trigger a refresh token
+    public TokenContext getContext(final String token)
+            throws KustvaktException {
         String sql =
                 "select ko.username, oa.expiration, oa.scopes from oauth2_access_token as oa inner join korap_users as ko "
                         + "on ko.id=oa.user_id where oa.access_token=:token and oa.expiration > :now;";
@@ -193,8 +200,8 @@ public class OAuthDb {
                         public TokenContext mapRow(ResultSet rs, int rowNum)
                                 throws SQLException {
                             long exp = rs.getTimestamp("expiration").getTime();
-                            TokenContext c = new TokenContext(
-                                    rs.getString(Attributes.USERNAME));
+                            TokenContext c = new TokenContext();
+                            c.setUsername(rs.getString(Attributes.USERNAME));
                             c.setExpirationTime(exp);
                             c.setToken(token);
                             c.setTokenType(Attributes.OAUTH2_AUTHORIZATION);
@@ -217,8 +224,8 @@ public class OAuthDb {
     }
 
     // subsequently delete all access and auth code tokens associated!
-    public void removeClient(ClientInfo info, User user) throws
-            KustvaktException {
+    public void removeClient(ClientInfo info, User user)
+            throws KustvaktException {
         MapSqlParameterSource p = new MapSqlParameterSource();
         p.addValue("url", info.getUrl());
         p.addValue("cls", info.getClient_secret());

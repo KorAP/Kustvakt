@@ -2,7 +2,7 @@ package de.ids_mannheim.korap.interfaces.defaults;
 
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.Configurable;
-import de.ids_mannheim.korap.exceptions.KorAPException;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.user.User;
 
@@ -28,14 +28,14 @@ public class DefaultEncryption implements EncryptionIface {
     @Override
     public String produceSecureHash(String input, String salt)
             throws NoSuchAlgorithmException, UnsupportedEncodingException,
-            KorAPException {
+            KustvaktException {
         return null;
     }
 
     @Override
     public String produceSecureHash(String input)
             throws NoSuchAlgorithmException, UnsupportedEncodingException,
-            KorAPException {
+            KustvaktException {
         return null;
     }
 
@@ -81,33 +81,33 @@ public class DefaultEncryption implements EncryptionIface {
     }
 
     @Override
-    public String validateIPAddress(String ipaddress) throws KorAPException {
+    public String validateIPAddress(String ipaddress) throws KustvaktException {
         return null;
     }
 
     @Override
-    public String validateEmail(String email) throws KorAPException {
+    public String validateEmail(String email) throws KustvaktException {
         return null;
     }
 
     @Override
     public Map<String, Object> validateMap(Map<String, Object> map)
-            throws KorAPException {
+            throws KustvaktException {
         return null;
     }
 
     @Override
-    public String validateString(String input) throws KorAPException {
+    public String validateString(String input) throws KustvaktException {
         return null;
     }
 
     @Override
-    public void validate(Object instance) throws KorAPException {
+    public void validate(Object instance) throws KustvaktException {
 
     }
 
     @Override
-    public String validatePassphrase(String pw) throws KorAPException {
+    public String validatePassphrase(String pw) throws KustvaktException {
         return null;
     }
 }

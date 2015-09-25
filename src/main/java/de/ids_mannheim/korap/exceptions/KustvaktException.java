@@ -11,8 +11,6 @@ import java.util.List;
  * @author hanl
  * @date 11/12/2013
  */
-//fixme: redundant with baseexception
-@Deprecated
 @Setter
 @Getter
 public class KustvaktException extends Exception {
@@ -22,31 +20,37 @@ public class KustvaktException extends Exception {
     private Integer statusCode;
     private String entity;
 
-    public KustvaktException(Integer status) {
+    public KustvaktException(int status) {
         this.statusCode = status;
     }
 
-    public KustvaktException(Object userid, Integer status) {
+    public KustvaktException(Object userid, int status) {
         this(status);
         this.userid = String.valueOf(userid);
     }
 
-    public KustvaktException(Object userid, Integer status, String message,
+    public KustvaktException(Object userid, int status, String message,
             String entity) {
-        super(status, message, entity);
+        super(message);
+        this.statusCode = status;
+        this.entity = entity;
         this.userid = String.valueOf(userid);
     }
 
-    public KustvaktException(Integer status, String message, String entity) {
-        super(status, message, entity);
+    public KustvaktException(int status, String message, String entity) {
+        super(message);
+        this.statusCode = status;
+        this.entity = entity;
     }
 
-    public KustvaktException(Throwable cause, Integer status) {
-        super(cause, status);
+    public KustvaktException(Throwable cause, int status) {
+        super(cause);
+        this.statusCode = status;
     }
 
-    public KustvaktException(String message, Throwable cause, Integer status) {
-        super(message, cause, status);
+    public KustvaktException(String message, Throwable cause, int status) {
+        super(message, cause);
+        this.statusCode = status;
     }
 
     @Override

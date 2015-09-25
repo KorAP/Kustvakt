@@ -1,7 +1,7 @@
 package de.ids_mannheim.korap.interfaces;
 
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
-import de.ids_mannheim.korap.exceptions.KorAPException;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserDetails;
 import de.ids_mannheim.korap.user.UserSettings;
@@ -12,13 +12,13 @@ import de.ids_mannheim.korap.user.UserSettings;
  * Time: 11:04 AM
  */
 public interface EntityHandlerIface {
-    UserSettings getUserSettings(Integer userid) throws KorAPException;
+    UserSettings getUserSettings(Integer userid) throws KustvaktException;
 
-    int updateSettings(UserSettings settings) throws KorAPException;
+    int updateSettings(UserSettings settings) throws KustvaktException;
 
-    UserDetails getUserDetails(Integer userid) throws KorAPException;
+    UserDetails getUserDetails(Integer userid) throws KustvaktException;
 
-    int updateUserDetails(UserDetails details) throws KorAPException;
+    int updateUserDetails(UserDetails details) throws KustvaktException;
 
     //    List<UserQuery> getUserQueries(User user) throws KorAPException;
 
@@ -27,18 +27,18 @@ public interface EntityHandlerIface {
     //    void updateUserQueries(User user, List<UserQuery> newOnes) throws KorAPException;
 
     User getAccount(String username) throws
-            EmptyResultException, KorAPException;
+            EmptyResultException, KustvaktException;
 
-    int updateAccount(User user) throws KorAPException;
+    int updateAccount(User user) throws KustvaktException;
 
-    int createAccount(User user) throws KorAPException;
+    int createAccount(User user) throws KustvaktException;
 
-    int deleteAccount(Integer userid) throws KorAPException;
+    int deleteAccount(Integer userid) throws KustvaktException;
 
     int resetPassphrase(String username, String uriToken,
-            String passphrase) throws KorAPException;
+            String passphrase) throws KustvaktException;
 
     int activateAccount(String username, String uriToken)
-            throws KorAPException;
+            throws KustvaktException;
 
 }

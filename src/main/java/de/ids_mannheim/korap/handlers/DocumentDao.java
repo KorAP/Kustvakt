@@ -2,9 +2,9 @@ package de.ids_mannheim.korap.handlers;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.ext.interfaces.ResourceOperationIface;
-import de.ids_mannheim.korap.ext.resource.Document;
 import de.ids_mannheim.korap.interfaces.PersistenceClient;
+import de.ids_mannheim.korap.interfaces.ResourceOperationIface;
+import de.ids_mannheim.korap.resources.Document;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.BooleanUtils;
 import org.springframework.dao.DataAccessException;

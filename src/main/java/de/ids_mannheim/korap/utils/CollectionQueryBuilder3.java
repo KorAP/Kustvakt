@@ -1,9 +1,9 @@
 package de.ids_mannheim.korap.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
-
-import java.io.IOException;
-import java.util.*;
 
 /**
  * convenience builder class for collection query
@@ -13,8 +13,12 @@ import java.util.*;
  */
 public class CollectionQueryBuilder3 {
 
+    public enum EQ {
+        EQUAL, UNEQUAL
+    }
+
     private boolean verbose;
-    private List<Map> rq;
+    private JsonNode base;
     private StringBuilder builder;
 
     public CollectionQueryBuilder3() {
@@ -24,12 +28,18 @@ public class CollectionQueryBuilder3 {
     public CollectionQueryBuilder3(boolean verbose) {
         this.verbose = verbose;
         this.builder = new StringBuilder();
-        this.rq = new LinkedList<>();
+        this.base = null;
     }
 
-    public CollectionQueryBuilder3 addSegment(String field, String value) {
-        String f = field + "=" + value;
-        this.builder.append(f);
+    public CollectionQueryBuilder3 addSegment(String field, EQ eq,
+            String value) {
+        if (base == null)
+            this.builder
+                    .append(field + (eq.equals(EQ.EQUAL) ? "=" : "!=") + value);
+        else {
+            JsonNode node = Utils.buildDoc(field, value, eq);
+            appendToBaseGroup(node);
+        }
         return this;
     }
 
@@ -42,7 +52,16 @@ public class CollectionQueryBuilder3 {
     public CollectionQueryBuilder3 addSub(String query) {
         if (!query.startsWith("(") && !query.endsWith(")"))
             query = "(" + query + ")";
-        this.builder.append(query);
+
+        if (base != null) {
+            CollectionQueryProcessor tree = new CollectionQueryProcessor(
+                    this.verbose);
+            tree.process(query);
+            JsonNode map = JsonUtils
+                    .valueToTree(tree.getRequestMap().get("collection"));
+            appendToBaseGroup(map);
+        }else
+            this.builder.append(query);
         return this;
     }
 
@@ -56,33 +75,70 @@ public class CollectionQueryBuilder3 {
         return this;
     }
 
+    @Deprecated
     public CollectionQueryBuilder3 addRaw(String collection) {
-        try {
-            Map v = JsonUtils.read(collection, HashMap.class);
-            v.get("collection");
-        }catch (IOException e) {
-            throw new IllegalArgumentException("Conversion went wrong!");
-        }
         return this;
     }
 
-    public Map getRequest() {
-        //todo: adding another resource query doesnt work
+    public Object getRequest() {
+        Object request = base;
+        if (request == null) {
+            CollectionQueryProcessor tree = new CollectionQueryProcessor(
+                    this.verbose);
+            tree.process(this.builder.toString());
 
-        CollectionQueryProcessor tree = new CollectionQueryProcessor(
-                this.verbose);
-        tree.process(this.builder.toString());
-
-        Map request = tree.getRequestMap();
-        if (!this.rq.isEmpty()) {
-            List coll = (List) request.get("collection");
-            coll.addAll(this.rq);
+            request = tree.getRequestMap();
         }
         return request;
     }
 
+    /**
+     * sets base query. All consequent queries are added to the first koral:docGroup within the collection base query
+     * If no group in base query, consequent queries are skipped.
+     *
+     * @param query
+     */
+    public void setBaseQuery(String query) {
+        this.base = JsonUtils.readTree(query);
+    }
+
     public String toJSON() {
         return JsonUtils.toJSON(getRequest());
+    }
+
+
+
+    private void appendToBaseGroup(JsonNode node) {
+        if (base.at("/collection/@type").asText().equals("koral:docGroup")) {
+            ArrayNode group = (ArrayNode) base.at("/collection/operands");
+            if (node instanceof ArrayNode)
+                group.addAll((ArrayNode) node);
+            else
+                group.add(node);
+        }else
+            throw new IllegalArgumentException("No group found to add to!");
+        // fixme: if base is a doc only, this function is not supported. requirement is a koral:docGroup, since
+        // combination operator is unknown otherwise
+    }
+
+    public static class Utils {
+
+        public static JsonNode buildDoc(String key, String value, EQ eq) {
+            ObjectNode node = JsonUtils.createObjectNode();
+            node.put("@type", "koral:doc");
+            node.put("match", eq.equals(EQ.EQUAL) ? "match:eq" : "match:ne");
+            node.put("key", key);
+            node.put("value", value);
+
+            return node;
+        }
+
+        public static JsonNode buildDocGroup() {
+            ObjectNode node = JsonUtils.createObjectNode();
+
+            return node;
+        }
+
     }
 
 }

@@ -39,7 +39,8 @@ public class DefaultFilter implements ContainerRequestFilter, ResourceFilter {
 
     private TokenContext createShorterToken(String host, String agent) {
         User demo = User.UserFactory.getDemoUser();
-        TokenContext c = new TokenContext(demo.getUsername());
+        TokenContext c = new TokenContext();
+        c.setUsername(demo.getUsername());
         c.setHostAddress(host);
         c.setUserAgent(agent);
         c.setExpirationTime(TimeUtils.plusSeconds(

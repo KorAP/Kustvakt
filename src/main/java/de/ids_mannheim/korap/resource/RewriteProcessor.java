@@ -11,6 +11,7 @@ import java.util.List;
  * @author hanl
  * @date 19/06/2015
  */
+@Deprecated
 public class RewriteProcessor {
 
     private KustvaktConfiguration config;
