@@ -1,7 +1,10 @@
+package de.ids_mannheim.korap.config;
+
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.DefaultHandler;
-import de.ids_mannheim.korap.interfaces.AuditingIface;
+import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.interfaces.defaults.DefaultAuditing;
+import org.junit.After;
 import org.junit.Test;
 
 /**
@@ -10,10 +13,15 @@ import org.junit.Test;
  */
 public class ClassLoaderTest {
 
+    @After
+    public void close() {
+        BeanConfiguration.closeApplication();
+    }
+
     @Test
     public void testBeanConfigurationLoaderThrowsNoException() {
-        BeanConfiguration.loadClasspathContext("classpath-config.xml");
-        assert BeanConfiguration.getBeans() != null;
+        BeanConfiguration.loadClasspathContext("default-config.xml");
+        assert BeanConfiguration.hasContext();
     }
 
     @Test
