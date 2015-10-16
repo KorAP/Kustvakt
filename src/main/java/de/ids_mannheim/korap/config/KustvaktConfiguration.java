@@ -63,7 +63,7 @@ public class KustvaktConfiguration {
 
     private String default_pos;
     private String default_lemma;
-    private String default_surface;
+    private String default_token;
     private String default_dep;
     private String default_const;
 
@@ -99,8 +99,8 @@ public class KustvaktConfiguration {
         default_dep = properties.getProperty("kustvakt.default.dep", "mate");
         default_lemma = properties.getProperty("kustvakt.default.lemma", "tt");
         default_pos = properties.getProperty("kustvakt.default.pos", "tt");
-        default_surface = properties
-                .getProperty("kustvakt.default.opennlp", "opennlp");
+        default_token = properties
+                .getProperty("kustvakt.default.token", "opennlp");
 
         // security configuration
         expiration = TimeUtils.convertTimeToSeconds(properties

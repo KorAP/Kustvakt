@@ -4,7 +4,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.service.light.LightService;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -21,7 +21,14 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
     @BeforeClass
     public static void configure() {
         BeanConfiguration.loadClasspathContext();
-        addClass(LightService.class);
+        setPackages("de.ids_mannheim.korap.web.service.light",
+                "de.ids_mannheim.korap.web.filter",
+                "de.ids_mannheim.korap.web.utils");
+    }
+
+    @AfterClass
+    public static void close() {
+        BeanConfiguration.closeApplication();
     }
 
     @Test
@@ -37,6 +44,7 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "Sonne prox/unit=word/distance<=5 Erde")
                 .queryParam("ql", "CQL").get(ClientResponse.class);
+        System.out.println(response);
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
     }
 

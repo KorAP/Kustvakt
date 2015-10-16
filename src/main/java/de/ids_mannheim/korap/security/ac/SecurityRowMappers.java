@@ -1,10 +1,10 @@
 package de.ids_mannheim.korap.security.ac;
 
-import de.ids_mannheim.korap.ext.resource.KorAPResource;
-import de.ids_mannheim.korap.ext.resource.ResourceFactory;
-import de.ids_mannheim.korap.ext.security.types.PolicyCondition;
-import de.ids_mannheim.korap.ext.security.types.PolicyContext;
-import de.ids_mannheim.korap.ext.security.types.SecurityPolicy;
+import de.ids_mannheim.korap.resources.KustvaktResource;
+import de.ids_mannheim.korap.resources.ResourceFactory;
+import de.ids_mannheim.korap.security.PolicyCondition;
+import de.ids_mannheim.korap.security.PolicyContext;
+import de.ids_mannheim.korap.security.SecurityPolicy;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.PrefixTreeMap;
 import lombok.Data;
@@ -102,7 +102,8 @@ public class SecurityRowMappers {
             if (index == -1) {
                 if (pid == -1 && grouping.equalsIgnoreCase("self")) {
                     policy = new SecurityPolicy.OwnerPolicy(
-                            rs.getString("persistent_id"), rs.getInt("creator"));
+                            rs.getString("persistent_id"),
+                            rs.getInt("creator"));
                     policyArray[depth].add(0, policy);
                     idx[depth].add(0, pid);
                 }else {
@@ -172,7 +173,7 @@ public class SecurityRowMappers {
     }
 
     public static class HierarchicalResultExtractor
-            implements ResultSetExtractor<List<KorAPResource.Container>> {
+            implements ResultSetExtractor<List<KustvaktResource.Container>> {
 
         private boolean _withpid;
 
@@ -181,14 +182,14 @@ public class SecurityRowMappers {
         //        }
 
         // todo: in order for this to work, all parent flags need to be matched in sql!
-        public List<KorAPResource.Container> extractData(ResultSet rs)
+        public List<KustvaktResource.Container> extractData(ResultSet rs)
                 throws SQLException, DataAccessException {
             // contains the container with the highest available name_path to retrieve partial matches!
-            PrefixTreeMap<KorAPResource.Container[]> containerMap = new PrefixTreeMap<>();
+            PrefixTreeMap<KustvaktResource.Container[]> containerMap = new PrefixTreeMap<>();
             Map<Integer, SecurityPolicy> trace = new HashMap<>();
 
             while (rs.next()) {
-                KorAPResource.Container[] cursor;
+                KustvaktResource.Container[] cursor;
                 Integer pid = rs.getInt("pid");
 
                 SecurityPolicy policy = trace.get(pid);
@@ -204,20 +205,20 @@ public class SecurityRowMappers {
                     trace.put(pid, policy);
 
                     //fixme: since leaves are mentioned first, maybe retrieve
-                    SortedMap<String, KorAPResource.Container[]> submatch;
+                    SortedMap<String, KustvaktResource.Container[]> submatch;
                     if ((submatch = containerMap.getPrefixSubMap(namePath))
                             == null) {
 
-                        cursor = new KorAPResource.Container[depth + 1];
-                        cursor[depth] = new KorAPResource.Container(
+                        cursor = new KustvaktResource.Container[depth + 1];
+                        cursor[depth] = new KustvaktResource.Container(
                                 persistentId,
                                 ResourceFactory.getResource(rs.getInt("type"))
                                         .getClass());
                         containerMap.put(namePath, cursor);
                     }else {
-                        KorAPResource.Container[] values = submatch
+                        KustvaktResource.Container[] values = submatch
                                 .get(submatch.firstKey());
-                        values[depth] = new KorAPResource.Container(
+                        values[depth] = new KustvaktResource.Container(
                                 persistentId,
                                 ResourceFactory.getResource(rs.getInt("type"))
                                         .getClass());
@@ -225,9 +226,9 @@ public class SecurityRowMappers {
                 }
             }
 
-            List<KorAPResource.Container> result = new ArrayList<>();
-            for (KorAPResource.Container[] values : containerMap.values()) {
-                for (KorAPResource.Container container : values)
+            List<KustvaktResource.Container> result = new ArrayList<>();
+            for (KustvaktResource.Container[] values : containerMap.values()) {
+                for (KustvaktResource.Container container : values)
                     if (container == null)
                         containerMap.remove(values);
                 result.add(values[values.length - 1]);

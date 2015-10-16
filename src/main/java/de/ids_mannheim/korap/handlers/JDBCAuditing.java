@@ -1,8 +1,8 @@
 package de.ids_mannheim.korap.handlers;
 
 import de.ids_mannheim.korap.auditing.AuditRecord;
-import de.ids_mannheim.korap.interfaces.AuditingIface;
-import de.ids_mannheim.korap.interfaces.PersistenceClient;
+import de.ids_mannheim.korap.interfaces.db.AuditingIface;
+import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.user.User;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;

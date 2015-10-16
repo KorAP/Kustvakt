@@ -40,6 +40,11 @@ public class DefaultEncryption implements EncryptionIface {
     }
 
     @Override
+    public String hash(String text, String salt) throws Exception {
+        return null;
+    }
+
+    @Override
     public String hash(String value) {
         return null;
     }

@@ -2,8 +2,8 @@ package de.ids_mannheim.korap.handlers;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.PersistenceClient;
-import de.ids_mannheim.korap.interfaces.ResourceOperationIface;
+import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
+import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.user.User;

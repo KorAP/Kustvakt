@@ -59,7 +59,7 @@ public class LayerMapper {
                 case "lemma":
                     return config.getDefault_lemma();
                 case "surface":
-                    return config.getDefault_surface();
+                    return config.getDefault_token();
                 // refers to "structure" and is used for paragraphs or sentence boundaries
                 case "s":
                     return "base";

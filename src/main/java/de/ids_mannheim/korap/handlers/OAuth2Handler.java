@@ -2,7 +2,7 @@ package de.ids_mannheim.korap.handlers;
 
 import de.ids_mannheim.korap.config.AuthCodeInfo;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.interfaces.PersistenceClient;
+import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.user.User;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;

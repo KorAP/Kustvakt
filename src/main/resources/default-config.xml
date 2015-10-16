@@ -38,21 +38,24 @@
 
     <!-- props are injected from default-config.xml -->
     <bean id="kustvakt_config"
-          class="de.ids_mannheim.korap.ext.config.ExtConfiguration">
+          class="de.ids_mannheim.korap.config.KustvaktConfiguration">
         <property name="properties" ref="props"/>
     </bean>
 
     <bean id="dataSource"
-          class="org.springframework.jdbc.datasource.SingleConnectionDataSource"
+          class="org.apache.commons.dbcp2.BasicDataSource"
           lazy-init="true">
         <property name="driverClassName" value="${jdbc.driverClassName}"/>
         <property name="url" value="${jdbc.url}"/>
         <property name="username" value="${jdbc.username}"/>
         <property name="password" value="${jdbc.password}"/>
         <!-- relevant for single connection datasource and sqlite -->
-        <property name="suppressClose">
-            <value>true</value>
-        </property>
+        <!--<property name="suppressClose">-->
+            <!--<value>true</value>-->
+        <!--</property>-->
+        <property name="initialSize" value="1"/>
+        <property name="maxIdle" value="1"/>
+        <property name="poolPreparedStatements" value="true"/>
     </bean>
 
     <!-- to configure database for sqlite, mysql, etc. migrations -->
@@ -93,39 +96,39 @@
     </bean>
 
     <bean id="kustvakt_policies"
-          class="de.ids_mannheim.korap.ext.security.dataAccess.PolicyDao">
+          class="de.ids_mannheim.korap.security.ac.PolicyDao">
         <constructor-arg ref="kustvakt_db"/>
     </bean>
 
     <bean name="kustvakt_encryption"
-          class="de.ids_mannheim.korap.ext.security.encryption.KorAPEncryption">
+          class="de.ids_mannheim.korap.interfaces.defaults.KustvaktEncryption">
         <constructor-arg ref="kustvakt_config"/>
     </bean>
 
     <!-- authentication providers to use -->
     <bean id="api_auth"
-          class="de.ids_mannheim.korap.ext.security.authentication.APIAuthentication">
+          class="de.ids_mannheim.korap.security.auth.APIAuthentication">
         <constructor-arg
                 type="de.ids_mannheim.korap.config.KustvaktConfiguration"
                 ref="kustvakt_config"/>
     </bean>
 
     <bean id="openid_auth"
-          class="de.ids_mannheim.korap.ext.security.authentication.OpenIDconnectAuthentication">
+          class="de.ids_mannheim.korap.security.auth.OpenIDconnectAuthentication">
         <constructor-arg
                 type="de.ids_mannheim.korap.config.KustvaktConfiguration"
                 ref="kustvakt_config"/>
         <constructor-arg
-                type="de.ids_mannheim.korap.interfaces.PersistenceClient"
+                type="de.ids_mannheim.korap.interfaces.db.PersistenceClient"
                 ref="kustvakt_db"/>
     </bean>
 
     <bean id="basic_auth"
-          class="de.ids_mannheim.korap.ext.security.authentication.BasicHttpAuth"/>
+          class="de.ids_mannheim.korap.security.auth.BasicHttpAuth"/>
 
 
     <bean id="session_auth"
-          class="de.ids_mannheim.korap.ext.security.authentication.SessionAuthentication">
+          class="de.ids_mannheim.korap.security.auth.SessionAuthentication">
         <constructor-arg
                 type="de.ids_mannheim.korap.config.KustvaktConfiguration"
                 ref="kustvakt_config"/>
@@ -144,15 +147,16 @@
 
     <!-- specify type for constructor argument -->
     <bean id="kustvakt_authenticationmanager"
-          class="de.ids_mannheim.korap.ext.security.authentication.KustvaktAuthenticationManager">
+          class="de.ids_mannheim.korap.security.auth.KustvaktAuthenticationManager">
         <constructor-arg
-                type="de.ids_mannheim.korap.interfaces.EntityHandlerIface"
+                type="de.ids_mannheim.korap.interfaces.db.EntityHandlerIface"
                 ref="kustvakt_userdb"/>
         <constructor-arg type="de.ids_mannheim.korap.interfaces.EncryptionIface"
                          ref="kustvakt_encryption"/>
         <constructor-arg ref="kustvakt_config"/>
-        <constructor-arg type="de.ids_mannheim.korap.interfaces.AuditingIface"
-                         ref="kustvakt_auditing"/>
+        <constructor-arg
+                type="de.ids_mannheim.korap.interfaces.db.AuditingIface"
+                ref="kustvakt_auditing"/>
         <!-- inject authentication providers to use -->
         <property name="providers" ref="auth_providers"/>
     </bean>
@@ -174,7 +178,7 @@
         of an operation defined by the service interface -->
     <aop:config>
         <aop:pointcut id="service"
-                      expression="execution(* de.ids_mannheim.korap.interfaces.*.*(..))"/>
+                      expression="execution(* de.ids_mannheim.korap.interfaces.db.*.*(..))"/>
         <aop:advisor advice-ref="txAdvice" pointcut-ref="service"/>
     </aop:config>
 

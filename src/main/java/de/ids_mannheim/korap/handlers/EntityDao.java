@@ -6,8 +6,8 @@ import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.exceptions.dbException;
-import de.ids_mannheim.korap.interfaces.EntityHandlerIface;
-import de.ids_mannheim.korap.interfaces.PersistenceClient;
+import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
+import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.user.*;
 import de.ids_mannheim.korap.utils.BooleanUtils;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
@@ -382,7 +382,6 @@ public class EntityDao implements EntityHandlerIface {
             this.createSettings(user.getSettings());
             return r;
         }catch (DataAccessException e) {
-            e.printStackTrace();
             jlog.error("Could not create user account with username: {}",
                     user.getUsername());
             throw new dbException(user.getUsername(), "korap_users",

@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.resource.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import de.ids_mannheim.korap.config.KustvaktClassLoader;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
@@ -14,7 +15,7 @@ import java.util.Iterator;
  * @author hanl
  * @date 30/06/2015
  */
-//todo: load rewritenode and rewritequery automatically from classpath, but namespaced from package
+//todo: load rewritenode and rewritequery automatically from classpath by default, but namespaced from package
 public class RewriteHandler {
 
     private static Logger jlog = KustvaktLogger.initiate(RewriteHandler.class);
@@ -24,7 +25,7 @@ public class RewriteHandler {
     public RewriteHandler() {
         this.node_processors = new HashSet<>();
         this.query_processors = new HashSet<>();
-        // add defaults?!
+        KustvaktClassLoader.loadSubTypes(RewriteTask.RewriteNode.class);
     }
 
     public void add(RewriteTask.RewriteNode node) {

@@ -4,7 +4,7 @@ import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.NotAuthorizedException;
-import de.ids_mannheim.korap.interfaces.PolicyHandlerIface;
+import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.Permissions;
 import de.ids_mannheim.korap.security.PolicyCondition;

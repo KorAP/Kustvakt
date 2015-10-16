@@ -3,13 +3,13 @@ package de.ids_mannheim.korap.security.ac;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.exceptions.dbException;
-import de.ids_mannheim.korap.ext.interfaces.PolicyHandlerIface;
-import de.ids_mannheim.korap.ext.resource.KorAPResource;
-import de.ids_mannheim.korap.ext.resource.ResourceFactory;
-import de.ids_mannheim.korap.ext.security.types.Parameter;
-import de.ids_mannheim.korap.ext.security.types.PolicyCondition;
-import de.ids_mannheim.korap.ext.security.types.SecurityPolicy;
-import de.ids_mannheim.korap.interfaces.PersistenceClient;
+import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
+import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
+import de.ids_mannheim.korap.resources.KustvaktResource;
+import de.ids_mannheim.korap.resources.ResourceFactory;
+import de.ids_mannheim.korap.security.Parameter;
+import de.ids_mannheim.korap.security.PolicyCondition;
+import de.ids_mannheim.korap.security.SecurityPolicy;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.BooleanUtils;
@@ -330,8 +330,8 @@ public class PolicyDao implements PolicyHandlerIface {
     //todo: not working yet!
     // todo: does not concern itsself with location matching, ever!
     @Override
-    public List<KorAPResource.Container> getDescending(String path,
-            final User user, Byte b, final Class<? extends KorAPResource> clazz)
+    public List<KustvaktResource.Container> getDescending(String path,
+            final User user, Byte b, final Class<? extends KustvaktResource> clazz)
             throws KustvaktException {
         final MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("userid", user.getId());
@@ -402,8 +402,8 @@ public class PolicyDao implements PolicyHandlerIface {
     }
 
     @Override
-    public List<KorAPResource.Container> getAscending(String name, User user,
-            Byte b, Class<? extends KorAPResource> clazz)
+    public List<KustvaktResource.Container> getAscending(String name, User user,
+            Byte b, Class<? extends KustvaktResource> clazz)
             throws KustvaktException {
         final MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("userid", user.getId());
@@ -734,7 +734,7 @@ public class PolicyDao implements PolicyHandlerIface {
         source.addValue("key", param.getName());
         source.addValue("policy", param.getPolicy().getID());
         source.addValue("value", param.getValue());
-        source.addValue("flag", param.isEquality());
+        source.addValue("flag", param.isEqual());
 
         if (!parameterExists(param.getName()))
             createParameter(param.getName(), "", param.getOwner());

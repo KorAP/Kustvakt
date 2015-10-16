@@ -1,8 +1,8 @@
 package de.ids_mannheim.korap.security.ac;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.interfaces.PolicyHandlerIface;
-import de.ids_mannheim.korap.interfaces.ResourceOperationIface;
+import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
+import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.Permissions;
 import de.ids_mannheim.korap.resources.ResourceFactory;

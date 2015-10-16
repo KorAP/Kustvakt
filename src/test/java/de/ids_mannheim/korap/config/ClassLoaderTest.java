@@ -1,10 +1,10 @@
 package de.ids_mannheim.korap.config;
 
-import de.ids_mannheim.korap.config.BeanConfiguration;
-import de.ids_mannheim.korap.config.DefaultHandler;
+import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.interfaces.defaults.DefaultAuditing;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -32,10 +32,12 @@ public class ClassLoaderTest {
         assert o instanceof AuditingIface;
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testDefaultCreationThrowsException() {
         BeanConfiguration.loadClasspathContext();
-        BeanConfiguration.getBeans().getAuthenticationManager();
+        AuthenticationManagerIface iface = BeanConfiguration.getBeans()
+                .getAuthenticationManager();
+        Assert.assertNull("default should be null", iface);
     }
 
     @Test

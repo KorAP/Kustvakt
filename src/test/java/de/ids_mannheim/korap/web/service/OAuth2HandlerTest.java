@@ -29,7 +29,7 @@ public class OAuth2HandlerTest {
 
     @BeforeClass
     public static void setup() throws KustvaktException {
-        BeanConfiguration.loadClasspathContext("classpath-config.xml");
+        BeanConfiguration.loadClasspathContext("default-config.xml");
         handler = new OAuth2Handler(
                 BeanConfiguration.getBeans().getPersistenceClient());
         crypto = BeanConfiguration.getBeans().getEncryption();
@@ -46,9 +46,11 @@ public class OAuth2HandlerTest {
 
     @AfterClass
     public static void drop() throws KustvaktException {
+        assert handler != null;
         handler.removeClient(info, user);
         BeanConfiguration.getBeans().getUserDBHandler()
                 .deleteAccount(user.getId());
+        BeanConfiguration.closeApplication();
     }
 
     @Test

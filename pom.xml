@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.ids_mannheim.korap</groupId>
     <artifactId>Kustvakt-core</artifactId>
-    <version>0.4</version>
+    <version>0.5</version>
     <packaging>jar</packaging>
     <name>Kustvakt core</name>
     <description>Kustvakt core, basic rest api for testing purposes and default
@@ -92,7 +92,7 @@
         </resources>
         <testResources>
             <testResource>
-                <directory>src/main/resources</directory>
+                <directory>src/test/resources</directory>
                 <filtering>true</filtering>
                 <includes>
                     <include>**/*.prop</include>
@@ -101,12 +101,33 @@
                     <include>**/*.properties</include>
                 </includes>
             </testResource>
+            <testResource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.prop</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.conf</include>
+                    <include>**/*.properties</include>
+                    <include>**/*.sql</include>
+                </includes>
+            </testResource>
         </testResources>
         <plugins>
+            <!--<plugin>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-compiler-plugin</artifactId>-->
+            <!--<version>3.3</version>-->
+            <!--<configuration>-->
+            <!--<compilerVersion>1.7</compilerVersion>-->
+            <!--</configuration>-->
+            <!--</plugin>-->
+
             <!-- build tests jar, so extensions can use fastjerseytest class to build rest tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>2.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -120,13 +141,12 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.9</version>
-                <!-- ??? -->
                 <configuration>
                     <excludes>
                         <exclude>**/*APITest.java</exclude>
                     </excludes>
                     <includes>
-                        <include>**/TestSuite.java</include>
+                        <include>**/*.java</include>
                     </includes>
                 </configuration>
             </plugin>
@@ -243,7 +263,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>0.11.8</version>
+            <version>1.16.6</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -275,11 +295,30 @@
                 </dependency>
                 -->
 
-        <!--<dependency>-->
-        <!--<groupId>org.xerial</groupId>-->
-        <!--<artifactId>sqlite-jdbc</artifactId>-->
-        <!--<version>3.7.2</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.8.10.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.owasp.esapi</groupId>
+            <artifactId>esapi</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.3m</version>
+        </dependency>
+
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>

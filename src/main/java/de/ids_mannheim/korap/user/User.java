@@ -150,6 +150,12 @@ public abstract class User implements Serializable {
             return new KorAPUser(username);
         }
 
+        public static KorAPUser getUser(String username, String password) {
+            KorAPUser user = new KorAPUser(username);
+            user.setPassword(password);
+            return user;
+        }
+
         public static KorAPUser getAdmin() {
             return new KorAPUser(ADMINISTRATOR_ID, ADMINISTRATOR_NAME);
         }

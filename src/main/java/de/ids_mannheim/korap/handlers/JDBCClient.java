@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.handlers;
 
-import de.ids_mannheim.korap.interfaces.PersistenceClient;
+import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.utils.BooleanUtils;
 import lombok.AccessLevel;
 import lombok.Data;

@@ -49,7 +49,7 @@ public class FoundryRewriteTest {
 
         assert m.findFoundry("lemma").equals(config.getDefault_lemma());
         assert m.findFoundry("pos").equals(config.getDefault_pos());
-        assert m.findFoundry("surface").equals(config.getDefault_surface());
+        assert m.findFoundry("surface").equals(config.getDefault_token());
         assert m.findFoundry("d").equals(config.getDefault_dep());
         assert m.findFoundry("c").equals(config.getDefault_const());
     }

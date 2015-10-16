@@ -1,6 +1,9 @@
 package de.ids_mannheim.korap.config;
 
-import de.ids_mannheim.korap.interfaces.*;
+import de.ids_mannheim.korap.interfaces.AuthenticationIface;
+import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
+import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.interfaces.db.*;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
@@ -61,22 +64,23 @@ public class BeanConfiguration {
     }
 
     public static boolean hasContext() {
-        return beans != null;
+        return beans != null && beans.context != null;
     }
 
     public static void loadClasspathContext(String... files) {
-        if (beans == null) {
+        if (!hasContext()) {
             ApplicationContext context;
             if (files.length == 0)
                 context = new ClassPathXmlApplicationContext(config_file);
             else
                 context = new ClassPathXmlApplicationContext(files);
+
             BeanConfiguration.beans = new BeanHolderHelper(context);
         }
     }
 
     public static void loadFileContext(String filepath) {
-        if (beans == null) {
+        if (!hasContext()) {
             ApplicationContext context = new FileSystemXmlApplicationContext(
                     "file:" + filepath);
             BeanConfiguration.beans = new BeanHolderHelper(context);
@@ -84,7 +88,9 @@ public class BeanConfiguration {
     }
 
     public static void closeApplication() {
-        beans.finish();
+        if (hasContext())
+            beans.finish();
+        beans = null;
     }
 
     //todo: set response handler
@@ -98,13 +104,11 @@ public class BeanConfiguration {
         private ApplicationContext context = null;
         private DefaultHandler handler;
 
-        public BeanHolderHelper() {
-            this.handler = new DefaultHandler();
-        }
-
         private BeanHolderHelper(ApplicationContext context) {
-            this();
+            this.handler = new DefaultHandler();
             this.context = context;
+            // todo: better method?!
+            KustvaktResponseHandler.init(getAuditingProvider());
         }
 
         protected <T> T getBean(Class<T> clazz) {
@@ -130,7 +134,7 @@ public class BeanConfiguration {
         }
 
         public AuditingIface getAuditingProvider() {
-            return (AuditingIface) context.getBean(KUSTVAKT_AUDITING);
+            return (AuditingIface) getBean(KUSTVAKT_AUDITING);
         }
 
         public <T extends KustvaktConfiguration> T getConfiguration() {
@@ -165,14 +169,13 @@ public class BeanConfiguration {
             return getBean(KUSTVAKT_POLICIES);
         }
 
+        // todo: !!!!!!!!!!!!!!!!!!!!!!!!!!
         // todo: more specific --> collection provider, document provider, etc.
         public ResourceOperationIface getResourceProvider() {
             return getBean("resourceProvider");
         }
 
-
-
-        public void finish() {
+        private void finish() {
             this.getAuditingProvider().finish();
             context = null;
         }

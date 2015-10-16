@@ -3,7 +3,7 @@ package de.ids_mannheim.korap.web.utils;
 import de.ids_mannheim.korap.auditing.AuditRecord;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.AuditingIface;
+import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.response.Notifications;
 
 import javax.ws.rs.WebApplicationException;

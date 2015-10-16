@@ -6,6 +6,8 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.exceptions.*;
 import de.ids_mannheim.korap.interfaces.*;
+import de.ids_mannheim.korap.interfaces.db.AuditingIface;
+import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.user.*;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.StringUtils;
@@ -684,7 +686,13 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         return user.getSettings();
     }
 
-    private String cache_key(String input) {
-        return crypto.hash(KEY + "@" + input);
+    private String cache_key(String input) throws KustvaktException {
+        try {
+            return crypto.hash(KEY + "@" + input);
+        }catch (Exception e) {
+            jlog.error("illegal cache key input '{}'", input);
+            throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
+                    "missing or illegal cache key", input);
+        }
     }
 }

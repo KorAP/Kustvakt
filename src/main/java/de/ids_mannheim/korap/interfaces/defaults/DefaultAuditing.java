@@ -3,7 +3,7 @@ package de.ids_mannheim.korap.interfaces.defaults;
 import de.ids_mannheim.korap.auditing.AuditRecord;
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.Configurable;
-import de.ids_mannheim.korap.interfaces.AuditingIface;
+import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.user.User;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;

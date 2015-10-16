@@ -13,14 +13,15 @@ public class Parameter extends KustvaktResource {
 
     private String value;
     private SecurityPolicy policy;
-    private boolean equality;
+    // todo: what is this supposed to do?
+    private boolean equal;
 
-    public Parameter(String identifier, String value, boolean equality,
+    public Parameter(String identifier, String value, boolean equal,
             User user) {
         super();
         super.setName(identifier.toLowerCase());
         this.value = value;
-        this.equality = equality;
+        this.equal = equal;
         super.setOwner(user.getId());
     }
 

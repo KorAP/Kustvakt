@@ -30,7 +30,9 @@ public interface EncryptionIface {
             throws NoSuchAlgorithmException, UnsupportedEncodingException,
             KustvaktException;
 
-    public String hash(String value);
+    public String hash(String text, String salt) throws Exception;
+
+    public String hash(String text) throws Exception;
 
     /**
      * @param plain
