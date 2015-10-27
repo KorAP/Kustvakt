@@ -32,8 +32,8 @@ public class FoundryRewriteTest {
 
     @Test
     public void testSimpleFoundryAddThrowsNoError() {
-        RewriteHandler processor = new RewriteHandler();
-        processor.add(new FoundryInject(config));
+        RewriteHandler processor = new RewriteHandler(config);
+        processor.add(FoundryInject.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(simple_add_query, "poliqarp");
         String result = processor.apply(s.toJSON(), null);
@@ -57,9 +57,9 @@ public class FoundryRewriteTest {
     @Test
     public void testFoundryInjectPosNoErrors() {
         QuerySerializer s = new QuerySerializer();
-        RewriteHandler handler = new RewriteHandler();
+        RewriteHandler handler = new RewriteHandler(config);
         s.setQuery("[pos=ADJA]", "poliqarp");
-        handler.add(new FoundryInject(config));
+        assert handler.add(FoundryInject.class);
         String result = handler.apply(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
 
@@ -73,9 +73,9 @@ public class FoundryRewriteTest {
     @Test
     public void testFoundryInjectJoinedQueryNoErrors() {
         QuerySerializer s = new QuerySerializer();
-        RewriteHandler handler = new RewriteHandler();
+        RewriteHandler handler = new RewriteHandler(config);
         s.setQuery("[orth=laufe/i & base!=Lauf]", "poliqarp");
-        handler.add(new FoundryInject(config));
+        assert handler.add(FoundryInject.class);
         String result = handler.apply(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
 
@@ -90,9 +90,9 @@ public class FoundryRewriteTest {
     @Test
     public void testFoundryInjectGroupedQueryNoErrors() {
         QuerySerializer s = new QuerySerializer();
-        RewriteHandler handler = new RewriteHandler();
+        RewriteHandler handler = new RewriteHandler(config);
         s.setQuery("[(base=laufen | base=gehen) & tt/pos=VVFIN]", "poliqarp");
-        handler.add(new FoundryInject(config));
+        assert handler.add(FoundryInject.class);
         String result = handler.apply(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
 

@@ -1,6 +1,8 @@
 package de.ids_mannheim.korap.resource.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.user.User;
 
 /**
  * @author hanl
@@ -13,7 +15,8 @@ public class MetaConstraint extends RewriteTask.RewriteQuery {
     }
 
     @Override
-    public JsonNode rewrite(KoralNode node) {
+    public JsonNode rewrite(KoralNode node, KustvaktConfiguration config,
+            User user) {
         if (node.rawNode().has("meta")) {
             JsonNode meta = node.rawNode().path("meta");
             //todo: check meta parameter

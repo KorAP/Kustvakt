@@ -1,6 +1,8 @@
 package de.ids_mannheim.korap.resource.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.user.User;
 
 /**
  * #ELEM(W ANA=N)
@@ -44,12 +46,13 @@ public class TreeConstraint extends RewriteTask.RewriteQuery {
 
     private String pointer;
 
-    public TreeConstraint(String constraint_pointer) {
-        this.pointer = constraint_pointer;
+    public TreeConstraint() {
+        super();
     }
 
     @Override
-    public JsonNode rewrite(KoralNode node) {
+    public JsonNode rewrite(KoralNode node, KustvaktConfiguration config,
+            User user) {
         System.out.println("FIND PATH " + node.rawNode().findParent(pointer));
 
         return node.rawNode();

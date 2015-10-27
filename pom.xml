@@ -183,7 +183,7 @@
                                 </transformer>
                             </transformers>
                             <!-- Additional configuration. -->
-                            <!-- apparently there is a securityexception -->
+                            <!-- apparently there is a securityException -->
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>

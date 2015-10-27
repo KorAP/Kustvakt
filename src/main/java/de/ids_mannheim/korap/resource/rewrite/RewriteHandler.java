@@ -2,11 +2,14 @@ package de.ids_mannheim.korap.resource.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.config.KustvaktClassLoader;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import org.slf4j.Logger;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,19 +24,50 @@ public class RewriteHandler {
     private static Logger jlog = KustvaktLogger.initiate(RewriteHandler.class);
     private Collection<RewriteTask.RewriteNode> node_processors;
     private Collection<RewriteTask.RewriteQuery> query_processors;
+    private KustvaktConfiguration config;
 
-    public RewriteHandler() {
+    // fixme: make default constructor with configuration!
+    public RewriteHandler(KustvaktConfiguration config) {
+        this.config = config;
         this.node_processors = new HashSet<>();
         this.query_processors = new HashSet<>();
         KustvaktClassLoader.loadSubTypes(RewriteTask.RewriteNode.class);
     }
 
-    public void add(RewriteTask.RewriteNode node) {
-        this.node_processors.add(node);
+    public void add(RewriteTask.RewriteNode rewriter) {
+        this.node_processors.add(rewriter);
     }
 
-    public void add(RewriteTask.RewriteQuery node) {
-        this.query_processors.add(node);
+    public void add(RewriteTask.RewriteQuery rewriter) {
+        this.query_processors.add(rewriter);
+    }
+
+    /**
+     * expects extended RewriteNode/Query class with default config constructor
+     *
+     * @param rewriter
+     */
+    //todo: 21.10.15
+    public boolean add(Class<? extends RewriteTask> rewriter) {
+        RewriteTask task;
+        try {
+            Constructor c = rewriter.getConstructor();
+            task = (RewriteTask) c.newInstance();
+        }catch (NoSuchMethodException | InvocationTargetException
+                | IllegalAccessException | InstantiationException e) {
+            return false;
+        }
+
+        if (task instanceof RewriteTask.RewriteNode) {
+            this.node_processors.add((RewriteTask.RewriteNode) task);
+            return true;
+        }
+
+        if (task instanceof RewriteTask.RewriteQuery) {
+            this.query_processors.add((RewriteTask.RewriteQuery) task);
+            return true;
+        }
+        return false;
     }
 
     public void clear() {
@@ -72,15 +106,16 @@ public class RewriteHandler {
         return JsonUtils.toJSON(apply(JsonUtils.readTree(json), user));
     }
 
-    private static boolean processNode(JsonNode node, User user,
+    // todo: integrate notifications into system!
+    private boolean processNode(JsonNode node, User user,
             Collection<? extends RewriteTask> tasks) {
-        KoralNode knode = KoralNode.getNode(node, user);
+        KoralNode knode = KoralNode.wrapNode(node);
         for (RewriteTask task : tasks) {
             if (jlog.isDebugEnabled()) {
                 jlog.debug("running node in processor " + node);
                 jlog.debug("on processor " + task.getClass().toString());
             }
-            task.rewrite(knode);
+            task.rewrite(knode, this.config, user);
             if (knode.toRemove())
                 break;
         }

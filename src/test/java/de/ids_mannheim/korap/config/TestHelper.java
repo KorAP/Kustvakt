@@ -19,8 +19,9 @@ public class TestHelper {
     private static final String[] credentials = new String[] { "test1",
             "testPass#2015" };
 
-    public static void setup() {
-        if (BeanConfiguration.hasContext()) {
+    public static boolean setup() {
+        boolean r = BeanConfiguration.hasContext();
+        if (r) {
             EntityHandlerIface dao = BeanConfiguration.getBeans()
                     .getUserDBHandler();
 
@@ -32,8 +33,10 @@ public class TestHelper {
                 dao.createAccount(user);
             }catch (KustvaktException e) {
                 e.printStackTrace();
+                return false;
             }
         }
+        return r;
     }
 
     public static final String[] getCredentials() {

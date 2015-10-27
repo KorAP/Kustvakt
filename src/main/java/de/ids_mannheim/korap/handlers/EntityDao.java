@@ -43,8 +43,8 @@ public class EntityDao implements EntityHandlerIface {
     }
 
     @Override
-    public UserSettings getUserSettings(Integer userid) throws
-            KustvaktException {
+    public UserSettings getUserSettings(Integer userid)
+            throws KustvaktException {
         MapSqlParameterSource np = new MapSqlParameterSource();
         np.addValue("us", userid);
         final String sql =
@@ -100,8 +100,8 @@ public class EntityDao implements EntityHandlerIface {
      * @throws KustvaktException
      */
 
-    private void createSettings(UserSettings settings) throws
-            KustvaktException {
+    private void createSettings(UserSettings settings)
+            throws KustvaktException {
         final String sql =
                 "INSERT INTO user_settings (user_id, fileNameForExport,leftContextItemForExport,"
                         +
@@ -186,7 +186,7 @@ public class EntityDao implements EntityHandlerIface {
                         +
                         "email=:email, address=:address, country=:country, privateUsage=:privateUsage "
                         +
-                        "WHERE userID=:userID;";
+                        "WHERE user_id=:userID;";
         try {
             return this.jdbcTemplate
                     .update(up, new BeanPropertySqlParameterSource(details));
@@ -199,8 +199,8 @@ public class EntityDao implements EntityHandlerIface {
         }
     }
 
-    private void createUserDetails(UserDetails details) throws
-            KustvaktException {
+    private void createUserDetails(UserDetails details)
+            throws KustvaktException {
         final String up =
                 "INSERT INTO user_details (user_id, firstName, lastName, gender, phone, institution, "
                         +
@@ -223,8 +223,7 @@ public class EntityDao implements EntityHandlerIface {
 
     // usersettings are fetched plus basic account info, no details, since i rarely use them anyway!
     @Override
-    public User getAccount(String username)
-            throws KustvaktException {
+    public User getAccount(String username) throws KustvaktException {
         Map<String, String> namedParameters = Collections
                 .singletonMap("username", username);
         final String sql = "select a.* from korap_users as a where a.username=:username;";
@@ -259,6 +258,9 @@ public class EntityDao implements EntityHandlerIface {
             if (param != null) {
                 np.addValue("frag", param.getUriFragment());
                 np.addValue("exp", new Date(param.getUriExpiration()));
+            }else {
+                np.addValue("frag", null);
+                np.addValue("exp", null);
             }
             np.addValue("id", k.getId());
 

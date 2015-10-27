@@ -3,7 +3,7 @@ package de.ids_mannheim.korap.resource.rewrite;
 import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.resource.LayerMapper;
-
+import de.ids_mannheim.korap.user.User;
 
 /**
  * @author hanl
@@ -11,18 +11,16 @@ import de.ids_mannheim.korap.resource.LayerMapper;
  */
 public class FoundryInject extends RewriteTask.RewriteNode {
 
-    private KustvaktConfiguration config;
-
-    public FoundryInject(KustvaktConfiguration config) {
+    public FoundryInject() {
         super();
-        this.config = config;
     }
 
     @Override
-    public JsonNode rewrite(KoralNode node) {
+    public JsonNode rewrite(KoralNode node, KustvaktConfiguration config,
+            User user) {
         LayerMapper mapper;
-        if (node.hasUser())
-            mapper = new LayerMapper(config, node.getUser().getSettings());
+        if (user != null)
+            mapper = new LayerMapper(config, user.getSettings());
         else
             mapper = new LayerMapper(config);
 

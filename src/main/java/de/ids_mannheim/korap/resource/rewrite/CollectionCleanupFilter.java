@@ -2,6 +2,8 @@ package de.ids_mannheim.korap.resource.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 import java.util.Iterator;
@@ -10,6 +12,7 @@ import java.util.Iterator;
  * @author hanl
  * @date 28/07/2015
  */
+//todo: 21.10.15
 public class CollectionCleanupFilter extends RewriteTask.RewriteQuery {
 
     // track path to operand
@@ -17,12 +20,13 @@ public class CollectionCleanupFilter extends RewriteTask.RewriteQuery {
     private StringBuilder builder;
 
     public CollectionCleanupFilter() {
-        this.builder = new StringBuilder();
+        super();
     }
 
     @Override
-    public JsonNode rewrite(KoralNode node) {
-        if (node.rawNode().has("collection")) {
+    public JsonNode rewrite(KoralNode node, KustvaktConfiguration config,
+            User user) {
+        if (node.has("collection")) {
             JsonNode coll = node.rawNode().path("collection");
             process(coll);
         }

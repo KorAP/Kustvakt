@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Map;
 
 /**
@@ -63,8 +64,9 @@ public class RowMapperFactory {
                     rs.getTimestamp(Attributes.ACCOUNT_CREATION).getTime());
             user.setAccountLink(rs.getString(Attributes.ACCOUNTLINK));
 
+            Timestamp exp = rs.getTimestamp(Attributes.URI_EXPIRATION);
             URIParam param = new URIParam(rs.getString(Attributes.URI_FRAGMENT),
-                    rs.getDate(Attributes.URI_EXPIRATION).getTime());
+                    exp == null ? -1 : exp.getTime());
             user.addField(param);
             return user;
         }

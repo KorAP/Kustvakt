@@ -12,6 +12,7 @@ import org.junit.BeforeClass;
  * @author hanl
  * @date 03/09/2015
  */
+// todo: 20.10.15
 public class CollectionRewriteTest {
 
     private static String simple_add_query = "[pos=ADJA]";
@@ -24,10 +25,10 @@ public class CollectionRewriteTest {
         config = BeanConfiguration.getBeans().getConfiguration();
     }
 
-//    @Test
+    //    @Test
     public void testCollectionNodeRemoveCorpusIdNoErrors() {
-        RewriteHandler handler = new RewriteHandler();
-        handler.add(new CollectionConstraint());
+        RewriteHandler handler = new RewriteHandler(config);
+        handler.add(CollectionConstraint.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection("textClass=politik & corpusID=WPD");
@@ -39,8 +40,8 @@ public class CollectionRewriteTest {
 
     //@Test
     public void testCollectionNodeRemoveAllCorpusIdNoErrors() {
-        RewriteHandler handler = new RewriteHandler();
-        handler.add(new CollectionConstraint());
+        RewriteHandler handler = new RewriteHandler(config);
+        handler.add(CollectionConstraint.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection("corpusID=BRZ13 & corpusID=WPD");
@@ -53,8 +54,8 @@ public class CollectionRewriteTest {
 
     //@Test
     public void testCollectionNodeRemoveGroupedCorpusIdNoErrors() {
-        RewriteHandler handler = new RewriteHandler();
-        handler.add(new CollectionConstraint());
+        RewriteHandler handler = new RewriteHandler(config);
+        handler.add(CollectionConstraint.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection(
@@ -72,9 +73,9 @@ public class CollectionRewriteTest {
     //fixme: will probably fail when one doc groups are being refactored
     //@Test
     public void testCollectionCleanEmptyDocGroupNoErrors() {
-        RewriteHandler handler = new RewriteHandler();
-        handler.add(new CollectionConstraint());
-        handler.add(new CollectionCleanupFilter());
+        RewriteHandler handler = new RewriteHandler(config);
+        handler.add(CollectionConstraint.class);
+        handler.add(CollectionCleanupFilter.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection(
@@ -92,9 +93,9 @@ public class CollectionRewriteTest {
 
     //@Test
     public void testCollectionCleanMoveOneDocFromGroupUpNoErrors() {
-        RewriteHandler handler = new RewriteHandler();
-        handler.add(new CollectionConstraint());
-        handler.add(new CollectionCleanupFilter());
+        RewriteHandler handler = new RewriteHandler(config);
+        handler.add(CollectionConstraint.class);
+        handler.add(CollectionCleanupFilter.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection("(corpusID=BRZ13 & textClass=Wissenschaft)");
@@ -106,9 +107,9 @@ public class CollectionRewriteTest {
 
     //@Test
     public void testCollectionCleanEmptyGroupAndMoveOneFromGroupUpNoErrors() {
-        RewriteHandler handler = new RewriteHandler();
-        handler.add(new CollectionConstraint());
-        handler.add(new CollectionCleanupFilter());
+        RewriteHandler handler = new RewriteHandler(config);
+        handler.add(CollectionConstraint.class);
+        handler.add(CollectionCleanupFilter.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection(
@@ -122,9 +123,9 @@ public class CollectionRewriteTest {
 
     //@Test
     public void testCollectionRemoveAndMoveOneFromGroupUpNoErrors() {
-        RewriteHandler handler = new RewriteHandler();
-        handler.add(new CollectionConstraint());
-        handler.add(new CollectionCleanupFilter());
+        RewriteHandler handler = new RewriteHandler(config);
+        handler.add(CollectionConstraint.class);
+        handler.add(CollectionCleanupFilter.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection(

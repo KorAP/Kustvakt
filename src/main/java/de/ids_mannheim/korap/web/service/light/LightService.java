@@ -47,9 +47,9 @@ public class LightService {
         this.searchKrill = new SearchKrill(config.getIndexDir());
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
         this.graphDBhandler = new ClientsHandler(builder.build());
-        this.processor = new RewriteHandler();
-        this.processor.add(new FoundryInject(this.config));
-        this.processor.add(new PublicCollection());
+        this.processor = new RewriteHandler(config);
+        this.processor.add(FoundryInject.class);
+        this.processor.add(PublicCollection.class);
     }
 
     /**

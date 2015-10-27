@@ -3,7 +3,6 @@ package de.ids_mannheim.korap.resource.rewrite;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 import java.util.LinkedHashMap;
@@ -19,40 +18,21 @@ public abstract class KoralNode {
     private JsonNode node;
     private KoralRewriteBuilder builder;
     private boolean toRemove;
-    private final User user;
 
     private KoralNode(JsonNode node) {
-        this(node, null);
-    }
-
-    public KoralNode(JsonNode node, User user) {
         this.node = node;
         this.builder = new KoralRewriteBuilder();
         this.toRemove = false;
-        this.user = user;
     }
 
-    public boolean hasUser() {
-        return this.user != null;
-    }
-
-    public User getUser() {
-        return this.user;
-    }
-
-    public static KoralNode getNode(JsonNode node) {
+    public static KoralNode wrapNode(JsonNode node) {
         return new KoralNode(node) {
-        };
-    }
-
-    public static KoralNode getNode(JsonNode node, User user) {
-        return new KoralNode(node, user) {
         };
     }
 
     public void set(String name, Object value) {
 
-        if (this.node.isObject()) {
+        if (this.node.isObject() && this.node.path(name).isMissingNode()) {
             ObjectNode node = (ObjectNode) this.node;
             if (value instanceof String)
                 node.put(name, (String) value);
@@ -91,6 +71,16 @@ public abstract class KoralNode {
         }
     }
 
+    public boolean has(Object ident) {
+        if (ident instanceof String)
+            return this.node.has((String) ident);
+        if (ident instanceof Integer)
+            return this.node.has((int) ident);
+        return false;
+    }
+
+
+
     public JsonNode rawNode() {
         return this.node;
     }
@@ -103,6 +93,7 @@ public abstract class KoralNode {
         return this.toRemove;
     }
 
+    //todo: 21.10.15 -- redo with better return policies!
     private static class KoralRewriteBuilder {
 
         private Map<String, String> map;

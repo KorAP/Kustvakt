@@ -4,7 +4,7 @@
   <groupId>de.ids_mannheim.korap</groupId>
   <artifactId>Kustvakt-core</artifactId>
   <name>Kustvakt core</name>
-  <version>0.4</version>
+  <version>0.5</version>
   <description>Kustvakt core, basic rest api for testing purposes and default
         interfaces</description>
   <build>
@@ -23,7 +23,7 @@
     <testResources>
       <testResource>
         <filtering>true</filtering>
-        <directory>src/main/resources</directory>
+        <directory>src/test/resources</directory>
         <includes>
           <include>**/*.prop</include>
           <include>**/*.xml</include>
@@ -31,10 +31,31 @@
           <include>**/*.properties</include>
         </includes>
       </testResource>
+      <testResource>
+        <filtering>true</filtering>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*.prop</include>
+          <include>**/*.xml</include>
+          <include>**/*.conf</include>
+          <include>**/*.properties</include>
+          <include>**/*.sql</include>
+        </includes>
+      </testResource>
     </testResources>
     <plugins>
       <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.3</version>
+        <configuration>
+          <compilerVersion>1.7</compilerVersion>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+      <plugin>
         <artifactId>maven-jar-plugin</artifactId>
+        <version>2.1</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -52,7 +73,7 @@
             <exclude>**/*APITest.java</exclude>
           </excludes>
           <includes>
-            <include>**/TestSuite.java</include>
+            <include>**/*.java</include>
           </includes>
         </configuration>
       </plugin>
@@ -198,7 +219,7 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>0.11.8</version>
+      <version>1.16.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
