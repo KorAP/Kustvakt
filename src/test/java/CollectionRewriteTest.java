@@ -6,6 +6,7 @@ import de.ids_mannheim.korap.resource.rewrite.CollectionCleanupFilter;
 import de.ids_mannheim.korap.resource.rewrite.CollectionConstraint;
 import de.ids_mannheim.korap.resource.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 /**
@@ -24,6 +25,12 @@ public class CollectionRewriteTest {
         BeanConfiguration.loadClasspathContext();
         config = BeanConfiguration.getBeans().getConfiguration();
     }
+
+    @AfterClass
+    public static void close() {
+        BeanConfiguration.closeApplication();
+    }
+
 
     //    @Test
     public void testCollectionNodeRemoveCorpusIdNoErrors() {

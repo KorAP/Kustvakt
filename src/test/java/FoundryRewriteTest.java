@@ -6,6 +6,7 @@ import de.ids_mannheim.korap.resource.LayerMapper;
 import de.ids_mannheim.korap.resource.rewrite.FoundryInject;
 import de.ids_mannheim.korap.resource.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -28,6 +29,11 @@ public class FoundryRewriteTest {
     public static void init() {
         BeanConfiguration.loadClasspathContext();
         config = BeanConfiguration.getBeans().getConfiguration();
+    }
+
+    @AfterClass
+    public static void close() {
+        BeanConfiguration.closeApplication();
     }
 
     @Test
