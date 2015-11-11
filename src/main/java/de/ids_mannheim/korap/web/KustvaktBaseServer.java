@@ -14,8 +14,6 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
-import java.io.FileInputStream;
-
 /**
  * @author hanl
  * @date 01/06/2015
@@ -29,9 +27,6 @@ public class KustvaktBaseServer {
             BeanConfiguration.loadFileContext(kargs.config);
         else
             BeanConfiguration.loadClasspathContext();
-
-        BeanConfiguration.getBeans().getConfiguration().setPropertiesAsStream(
-                new FileInputStream(kargs.getProperties()));
 
         kargs.setRootPackages(
                 new String[] { "de.ids_mannheim.korap.web.service.light" });
@@ -58,9 +53,9 @@ public class KustvaktBaseServer {
                     StringBuffer b = new StringBuffer();
 
                     b.append("Parameter description: \n")
-                            .append("--config  <Path to spring configuration file> : Configuration file\n")
-                            .append("--port  <Server port> : Port under which the server is accessible \n")
-                            .append("--props  <Path to kustvakt properties> : list of configuration properties\n")
+                            .append("--config  <Path to spring configuration file> : Configuration file\n").append(
+                            "--port  <Server port> : Port under which the server is accessible \n")
+                            //                            .append("--props  <Path to kustvakt properties> : list of configuration properties\n")
                             .append("--help : This help menu\n");
                     System.out.println(b.toString());
                     System.out.println();
@@ -124,6 +119,7 @@ public class KustvaktBaseServer {
         @Getter
         private String config;
         @Getter
+        @Deprecated
         private String properties;
         private int port;
         private SslContextFactory sslContext;
@@ -134,6 +130,7 @@ public class KustvaktBaseServer {
             this.sslContext = null;
             this.debug = false;
             this.config = null;
+            this.properties = null;
         }
     }
 

@@ -10,6 +10,8 @@
                             http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
                             http://www.springframework.org/schema/tx
                             http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+
+
                             http://www.springframework.org/schema/aop
                             http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
                             http://www.springframework.org/schema/cache
@@ -20,11 +22,27 @@
                             http://www.springframework.org/schema/util/spring-util-4.0.xsd">
 
     <cache:annotation-driven/>
-    <util:properties id="props" location="classpath:kustvakt.conf"/>
+
+    <bean id="props"
+          class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="locations">
+            <array>
+                <value>classpath:kustvakt.conf</value>
+                <value>file:./config/kustvakt.conf</value>
+            </array>
+        </property>
+    </bean>
 
     <bean id="jdbc_props"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations" value="classpath:jdbc.properties"/>
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="locations">
+            <array>
+                <value>classpath:jdbc.properties</value>
+                <value>file:./config/jdbc.properties</value>
+            </array>
+        </property>
     </bean>
 
     <bean id='cacheManager'
@@ -51,7 +69,7 @@
         <property name="password" value="${jdbc.password}"/>
         <!-- relevant for single connection datasource and sqlite -->
         <!--<property name="suppressClose">-->
-            <!--<value>true</value>-->
+        <!--<value>true</value>-->
         <!--</property>-->
         <property name="initialSize" value="1"/>
         <property name="maxIdle" value="1"/>

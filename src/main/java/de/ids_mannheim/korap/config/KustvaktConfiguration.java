@@ -7,6 +7,7 @@ import lombok.Getter;
 import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +27,7 @@ import java.util.Properties;
 public class KustvaktConfiguration {
 
     private static final Logger jlog = KustvaktLogger
-            .initiate(KustvaktConfiguration.class);
+            .getLogger(KustvaktConfiguration.class);
     private String indexDir;
     private int port;
     // todo: make exclusive so that the containg languages can really only be used then
@@ -77,9 +78,11 @@ public class KustvaktConfiguration {
      * @return
      */
     protected Properties load(Properties properties) {
-        String log4jconfig = properties
-                .getProperty("log4jconfig", "log4j.properties");
-        loadLog4jLogger(log4jconfig);
+        properties.list(System.out);
+
+        // if not present, uses classpath log4j.properties
+        String log4jconfig = properties.getProperty("log4jconfig", "");
+        loadLog4jLogger();
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));
         returnhits = new Integer(properties.getProperty("returnhits", "50000"));
         indexDir = properties.getProperty("lucene.indexDir", "");
@@ -156,6 +159,7 @@ public class KustvaktConfiguration {
      */
     public void setPropertiesAsStream(InputStream stream) {
         try {
+
             Properties p = new Properties();
             p.load(stream);
             this.load(p);
@@ -172,16 +176,17 @@ public class KustvaktConfiguration {
             return Enum.valueOf(BACKENDS.class, value.toUpperCase());
     }
 
-    private void loadLog4jLogger(String log4jconfig) {
+    private void loadLog4jLogger() {
         /** loadSubTypes log4j configuration file programmatically */
         Properties log4j = new Properties();
         try {
-            if (!log4jconfig.equals("")) {
-                log4j.load(new FileInputStream(log4jconfig));
+            File f = new File("./config/log4j.properties");
+            if (f.exists()) {
+                log4j.load(new FileInputStream(f));
                 PropertyConfigurator.configure(log4j);
-                jlog.info(
+                jlog.warn(
                         "using local logging properties file ({}) to configure logging system",
-                        log4jconfig);
+                        "./config/log4j.properties");
                 return;
             }
         }catch (Exception e) {

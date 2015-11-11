@@ -8,7 +8,18 @@
                             http://www.springframework.org/schema/util/spring-util-4.0.xsd">
 
 
-    <util:properties id="props" location="classpath:kustvakt.conf"/>
+    <!--<util:properties id="props" location="classpath:kustvakt.conf"/>-->
+
+    <bean id="props"
+          class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="ignoreResourceNotFound" value="true"/>
+        <property name="locations">
+            <array>
+                <value>classpath:kustvakt.conf</value>
+                <value>file:./config/kustvakt.conf</value>
+            </array>
+        </property>
+    </bean>
 
     <bean id="kustvakt_auditing"
           class="de.ids_mannheim.korap.interfaces.defaults.DefaultAuditing">
