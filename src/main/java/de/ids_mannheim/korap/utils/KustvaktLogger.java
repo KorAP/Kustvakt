@@ -18,28 +18,27 @@ public class KustvaktLogger implements Logger {
 
     //fixme:
     public static final KustvaktLogger ERROR_LOGGER = KustvaktLogger
-            .initiate(ERROR_LOG);
+            .getLogger(ERROR_LOG);
     public static final KustvaktLogger QUERY_LOGGER = KustvaktLogger
-            .initiate("ql");
+            .getLogger("ql");
 
     @Deprecated
     public static final KustvaktLogger SECURITY_LOGGER = KustvaktLogger
-            .initiate("security");
+            .getLogger("security");
     private Logger log;
 
-    public static KustvaktLogger initiate(Class cl) {
-        KustvaktLogger l = new KustvaktLogger();
-        l.log = LoggerFactory.getLogger(cl);
+    public static KustvaktLogger getLogger(Class cl) {
+        KustvaktLogger l = new KustvaktLogger(LoggerFactory.getLogger(cl));
         return l;
     }
 
-    public static KustvaktLogger initiate(String name) {
-        KustvaktLogger l = new KustvaktLogger();
-        l.log = LoggerFactory.getLogger(name);
+    public static KustvaktLogger getLogger(String name) {
+        KustvaktLogger l = new KustvaktLogger(LoggerFactory.getLogger(name));
         return l;
     }
 
-    private KustvaktLogger() {
+    private KustvaktLogger(Logger log) {
+        this.log = log;
     }
 
     @Override
@@ -86,7 +85,7 @@ public class KustvaktLogger implements Logger {
     @Override
     public boolean isTraceEnabled(Marker marker) {
         if (DEBUG)
-            return true;
+            return this.log.isTraceEnabled();
         return false;
     }
 
