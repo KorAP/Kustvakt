@@ -78,10 +78,6 @@ public class KustvaktConfiguration {
      * @return
      */
     protected Properties load(Properties properties) {
-        properties.list(System.out);
-
-        // if not present, uses classpath log4j.properties
-        String log4jconfig = properties.getProperty("log4jconfig", "");
         loadLog4jLogger();
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));
         returnhits = new Integer(properties.getProperty("returnhits", "50000"));
