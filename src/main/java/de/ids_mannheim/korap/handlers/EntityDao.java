@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class EntityDao implements EntityHandlerIface {
 
-    private static Logger jlog = KustvaktLogger.initiate(EntityDao.class);
+    private static Logger jlog = KustvaktLogger.getLogger(EntityDao.class);
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     public EntityDao(PersistenceClient client) {

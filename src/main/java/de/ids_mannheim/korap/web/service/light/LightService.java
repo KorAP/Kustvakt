@@ -35,7 +35,7 @@ import java.util.Set;
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class LightService {
 
-    private static Logger jlog = KustvaktLogger.initiate(LightService.class);
+    private static Logger jlog = KustvaktLogger.getLogger(LightService.class);
 
     private SearchKrill searchKrill;
     private ClientsHandler graphDBhandler;
@@ -96,14 +96,14 @@ public class LightService {
         ss.setMeta(meta);
         if (cq != null)
             ss.setCollection(cq);
-        return Response.ok(processor.apply(ss.toJSON(), null)).build();
+        return Response.ok(processor.preProcess(ss.toJSON(), null)).build();
     }
 
     @POST
     @Path("search")
     public Response queryRaw(@QueryParam("engine") String engine,
             String jsonld) {
-        jsonld = processor.apply(jsonld, null);
+        jsonld = processor.preProcess(jsonld, null);
         // todo: should be possible to add the meta part to the query serialization
         jlog.info("Serialized search: {}", jsonld);
 
@@ -137,7 +137,7 @@ public class LightService {
         if (cq != null)
             serializer.setCollection(cq);
 
-        String query = processor.apply(serializer.toJSON(), null);
+        String query = processor.preProcess(serializer.toJSON(), null);
         jlog.info("the serialized query {}", query);
 
         // This may not work with the the KoralQuery
@@ -204,7 +204,7 @@ public class LightService {
             //                meta.addEntry("itemsPerResource", 1);
             QuerySerializer s = new QuerySerializer().setQuery(query, ql, v)
                     .setMeta(meta);
-            query = processor.apply(s.toJSON(), null);
+            query = processor.preProcess(s.toJSON(), null);
         }
         String result;
         try {

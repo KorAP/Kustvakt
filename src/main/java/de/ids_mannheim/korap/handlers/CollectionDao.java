@@ -25,7 +25,7 @@ import java.util.List;
 public class CollectionDao
         implements ResourceOperationIface<VirtualCollection> {
 
-    private static Logger log = KustvaktLogger.initiate(CollectionDao.class);
+    private static Logger log = KustvaktLogger.getLogger(CollectionDao.class);
     private BatchBuilder batchBuilder;
     protected final NamedParameterJdbcTemplate jdbcTemplate;
 
