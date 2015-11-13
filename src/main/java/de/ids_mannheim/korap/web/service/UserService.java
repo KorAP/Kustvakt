@@ -40,9 +40,9 @@ import java.util.*;
 public class UserService {
 
     private static Logger error = KustvaktLogger
-            .initiate(KustvaktLogger.ERROR_LOG);
+            .getLogger(KustvaktLogger.ERROR_LOG);
     private static Logger jlog = KustvaktLogger
-            .initiate(KustvaktLogger.SECURITY_LOG);
+            .getLogger(KustvaktLogger.SECURITY_LOG);
     private AuthenticationManagerIface controller;
     private ResourceHandler resourceHandler;
 

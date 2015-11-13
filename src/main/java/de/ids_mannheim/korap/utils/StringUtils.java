@@ -7,7 +7,7 @@ import java.util.*;
 
 public class StringUtils {
     private final static Logger jlog = KustvaktLogger
-            .initiate(StringUtils.class);
+            .getLogger(StringUtils.class);
 
     private static final String SLASH = "/";
     private static final String SEP = ";";

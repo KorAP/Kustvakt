@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class SessionAuthentication implements AuthenticationIface {
 
     private static Logger jlog = KustvaktLogger
-            .initiate(SessionAuthentication.class);
+            .getLogger(SessionAuthentication.class);
     private SessionFactory sessions;
     private ScheduledThreadPoolExecutor scheduled;
     private EncryptionIface crypto;

@@ -34,7 +34,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
     private static String KEY = "kustvakt:key";
     private static Logger jlog = KustvaktLogger
-            .initiate(KustvaktAuthenticationManager.class);
+            .getLogger(KustvaktAuthenticationManager.class);
     private EncryptionIface crypto;
     private EntityHandlerIface entHandler;
     private AuditingIface auditing;

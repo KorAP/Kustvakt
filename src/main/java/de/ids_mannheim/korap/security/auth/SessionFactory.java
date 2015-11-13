@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class SessionFactory implements Runnable {
 
-    private static Logger jlog = KustvaktLogger.initiate(SessionFactory.class);
+    private static Logger jlog = KustvaktLogger.getLogger(SessionFactory.class);
 
     private final ConcurrentMap<String, TokenContext> sessionsObject;
     private final ConcurrentMap<String, DateTime> timeCheck;

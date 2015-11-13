@@ -36,7 +36,7 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
     private WebResource service;
     //    private static final String SERVICE = "http://localhost:8888";
     private static final String SERVICE = "http://10.0.10.13";
-    private static Logger jlog = KustvaktLogger.initiate(PiwikFilter.class);
+    private static Logger jlog = KustvaktLogger.getLogger(PiwikFilter.class);
     public static boolean ENABLED = false;
     private Map<String, String> customVars;
     private AuthenticationManagerIface securityController;

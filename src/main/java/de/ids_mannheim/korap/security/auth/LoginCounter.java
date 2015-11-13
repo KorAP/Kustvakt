@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class LoginCounter {
 
-    private static Logger jlog = KustvaktLogger.initiate(LoginCounter.class);
+    private static Logger jlog = KustvaktLogger.getLogger(LoginCounter.class);
     private final Map<String, Long[]> failedLogins;
     private KustvaktConfiguration config;
 

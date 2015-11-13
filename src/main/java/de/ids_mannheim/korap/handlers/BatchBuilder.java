@@ -21,7 +21,7 @@ public class BatchBuilder {
     private static final int SMALL_MEDIUM_BATCH = 6;
     private static final int MEDIUM_BATCH = 8;
     private static final int LARGE_BATCH = 12;
-    private Logger log = KustvaktLogger.initiate(BatchBuilder.class);
+    private Logger log = KustvaktLogger.getLogger(BatchBuilder.class);
 
     private JdbcOperations operations;
 

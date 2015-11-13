@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 @Getter
 @Setter
 public class KorAPUser extends User {
-    private static Logger jlog = KustvaktLogger.initiate(KorAPUser.class);
+    private static Logger jlog = KustvaktLogger.getLogger(KorAPUser.class);
     private static final long serialVersionUID = -7108308497625884584L;
 
     //fixme: accountlink to shibboleth account

@@ -41,7 +41,7 @@ public class AuthService {
 
     //todo: bootstrap function to transmit certain default configuration settings and examples (example user queries,
     // default usersettings, etc.)
-    private static Logger jlog = KustvaktLogger.initiate(AuthService.class);
+    private static Logger jlog = KustvaktLogger.getLogger(AuthService.class);
 
     private AuthenticationManagerIface controller;
     //    private SendMail mail;

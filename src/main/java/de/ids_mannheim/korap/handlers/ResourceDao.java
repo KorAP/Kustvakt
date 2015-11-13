@@ -29,7 +29,7 @@ import java.util.List;
 public class ResourceDao<T extends KustvaktResource>
         implements ResourceOperationIface<T> {
 
-    private static Logger log = KustvaktLogger.initiate(ResourceDao.class);
+    private static Logger log = KustvaktLogger.getLogger(ResourceDao.class);
     protected final NamedParameterJdbcTemplate jdbcTemplate;
 
     public ResourceDao(PersistenceClient client) {
