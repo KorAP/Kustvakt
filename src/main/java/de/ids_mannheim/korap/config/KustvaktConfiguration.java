@@ -176,7 +176,7 @@ public class KustvaktConfiguration {
         /** loadSubTypes log4j configuration file programmatically */
         Properties log4j = new Properties();
         try {
-            File f = new File("./config/log4j.properties");
+            File f = new File("./log4j.properties");
             if (f.exists()) {
                 log4j.load(new FileInputStream(f));
                 PropertyConfigurator.configure(log4j);
