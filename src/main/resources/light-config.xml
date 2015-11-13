@@ -16,7 +16,7 @@
         <property name="locations">
             <array>
                 <value>classpath:kustvakt.conf</value>
-                <value>file:./config/kustvakt.conf</value>
+                <value>file:./kustvakt.conf</value>
             </array>
         </property>
     </bean>

@@ -29,7 +29,7 @@
         <property name="locations">
             <array>
                 <value>classpath:kustvakt.conf</value>
-                <value>file:./config/kustvakt.conf</value>
+                <value>file:./kustvakt.conf</value>
             </array>
         </property>
     </bean>
@@ -40,7 +40,7 @@
         <property name="locations">
             <array>
                 <value>classpath:jdbc.properties</value>
-                <value>file:./config/jdbc.properties</value>
+                <value>file:./jdbc.properties</value>
             </array>
         </property>
     </bean>
