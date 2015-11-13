@@ -8,14 +8,14 @@ import de.ids_mannheim.korap.user.User;
  * @author hanl
  * @date 04/07/2015
  */
-public class MetaConstraint extends RewriteTask.RewriteQuery {
+public class MetaConstraint implements RewriteTask.RewriteQuery {
 
     public MetaConstraint() {
         super();
     }
 
     @Override
-    public JsonNode rewrite(KoralNode node, KustvaktConfiguration config,
+    public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
             User user) {
         if (node.rawNode().has("meta")) {
             JsonNode meta = node.rawNode().path("meta");
@@ -23,5 +23,10 @@ public class MetaConstraint extends RewriteTask.RewriteQuery {
             System.out.println("HAVE TO CHECK THE META ENTRIES");
         }
         return node.rawNode();
+    }
+
+    @Override
+    public JsonNode postProcess(KoralNode node) {
+        return null;
     }
 }

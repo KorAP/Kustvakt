@@ -9,8 +9,7 @@ import de.ids_mannheim.korap.user.User;
  * @author hanl
  * @date 25/09/2015
  */
-// todo: 20.10.15
-public class IdWriter extends RewriteTask.RewriteNode {
+public class IdWriter implements RewriteTask.RewriteKoralToken {
 
     private int counter;
 
@@ -21,14 +20,18 @@ public class IdWriter extends RewriteTask.RewriteNode {
     }
 
     @Override
-    public JsonNode rewrite(KoralNode node, KustvaktConfiguration config,
+    public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
             User user) {
-        JsonNode result = node.rawNode();
-        if (result.path("@type").asText().equals("koral:token"))
-            addId(result);
-        return result;
+        if (node.get("@type").equals("koral:token")) {
+            String s = extractToken(node.rawNode());
+            if (s != null && !s.isEmpty())
+                node.put("idn", s + "_" + counter++);
+        }
+
+        return node.rawNode();
     }
 
+    @Deprecated
     private JsonNode addId(JsonNode node) {
         if (node.isObject()) {
             ObjectNode o = (ObjectNode) node;

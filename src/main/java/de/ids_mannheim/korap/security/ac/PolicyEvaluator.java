@@ -8,7 +8,9 @@ import de.ids_mannheim.korap.security.PermissionsBuffer;
 import de.ids_mannheim.korap.security.SecurityPolicy;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.KustvaktLogger;
 import edu.emory.mathcs.backport.java.util.Collections;
+import org.slf4j.Logger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +21,9 @@ import java.util.Map;
  */
 public class PolicyEvaluator {
 
+    private static final Logger jlog = KustvaktLogger
+            .getLogger(PolicyEvaluator.class);
+
     private final User user;
     private final List<SecurityPolicy>[] policies;
     private String resourceID;
@@ -26,7 +31,6 @@ public class PolicyEvaluator {
     private boolean processed;
     private int relationError = -1;
     private Map<String, Object> flags;
-
 
     public PolicyEvaluator(User user, List<SecurityPolicy>[] policies) {
         this.user = user;
@@ -50,25 +54,30 @@ public class PolicyEvaluator {
         return this.resourceID;
     }
 
-
+    // todo: test benchmarks
     private List<SecurityPolicy> evaluate(List<SecurityPolicy>[] policies,
-                                          Permissions.PERMISSIONS perm) throws NotAuthorizedException {
+            Permissions.PERMISSIONS perm) throws NotAuthorizedException {
         //fixme: what happens in case a parent relation does not allow changing a resource, but the owner of child per default
-        // receives all rights? --> test casing
-        if (isOwner()) return policies[0];
+        //todo: receives all rights? --> test casing
+        if (isOwner()) {
+            jlog.debug("Resource is owned by the user!");
+            return policies[0];
+        }
         if (!processed && policies != null) {
             for (int i = policies.length - 1; i >= 0; i--) {
                 int idx = 0;
                 if (policies[i] != null) {
                     int ow = getOwner(policies[i]);
-                    for (int internal = 0; internal < policies[i].size(); internal++) {
+                    for (int internal = 0;
+                         internal < policies[i].size(); internal++) {
                         SecurityPolicy s = policies[i].get(internal);
                         if (i == policies.length - 1) {
                             if (ow == user.getId())
                                 this.permissions.addPermission(127);
                             else if (!(s instanceof SecurityPolicy.OwnerPolicy))
-                                this.permissions.addPermission(s.getPermissionByte());
-                        } else {
+                                this.permissions
+                                        .addPermission(s.getPermissionByte());
+                        }else {
                             if (ow == user.getId())
                                 this.permissions.retain(127);
                             else if (!(s instanceof SecurityPolicy.OwnerPolicy))
@@ -79,16 +88,22 @@ public class PolicyEvaluator {
                 }
                 if (idx == 0) {
                     relationError = i;
-                    throw new NotAuthorizedException(StatusCodes.PERMISSION_DENIED, this.getResourceID());
+                    throw new NotAuthorizedException(
+                            StatusCodes.PERMISSION_DENIED,
+                            this.getResourceID());
                 }
             }
             this.processed = true;
             System.out.println("FINAL BYTE :" + this.permissions.getPbyte());
             if (this.permissions.containsPermission(perm))
                 return policies[0];
-        } else if (processed && relationError == -1
-                && this.permissions.containsPermission(perm))
+        }else if (processed && relationError == -1 && this.permissions
+                .containsPermission(perm)) {
+            jlog.debug("Done processing resource policies");
+            jlog.debug("Will return policies to security manager: "
+                    + this.policies[0]);
             return this.policies[0];
+        }
 
         return Collections.emptyList();
     }
@@ -104,25 +119,29 @@ public class PolicyEvaluator {
 
     public boolean isAllowed(Permissions.PERMISSIONS perm) {
         try {
+            System.out.println("THESE POLICIES " + this.policies[0]);
             return !evaluate(this.policies, perm).isEmpty();
-        } catch (NotAuthorizedException e) {
+        }catch (NotAuthorizedException e) {
             return false;
         }
     }
 
     public boolean isOwner() {
-        return policies != null && this.user.getId() != null && getOwner(this.policies[0]) == this.user.getId();
+        return policies != null && this.user.getId() != null
+                && getOwner(this.policies[0]) == this.user.getId();
     }
 
     private int getOwner(List<SecurityPolicy> policies) {
-        if (policies != null && policies.get(0) != null
-                && policies.get(0) instanceof SecurityPolicy.OwnerPolicy) {
+        if (policies != null && policies.get(0) != null && policies
+                .get(0) instanceof SecurityPolicy.OwnerPolicy) {
             return ((SecurityPolicy.OwnerPolicy) policies.get(0)).getOwner();
         }
         return -1;
     }
 
-    public static PolicyEvaluator setFlags(User user, KustvaktResource resource) {
+    // todo: what is this supposed to do?
+    public static PolicyEvaluator setFlags(User user,
+            KustvaktResource resource) {
         PolicyEvaluator e = new PolicyEvaluator(user, resource);
         e.setFlag("managed", resource.getOwner() == KorAPUser.ADMINISTRATOR_ID);
         e.setFlag("shared", false);

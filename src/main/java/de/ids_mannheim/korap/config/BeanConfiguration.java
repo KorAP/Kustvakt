@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,7 +21,7 @@ import java.util.Set;
  */
 public class BeanConfiguration {
 
-    private static final String config_file = "light-config.xml";
+    private static final String CONFIG_FILE = "light-config.xml";
     public static final String KUSTVAKT_DB = "kustvakt_db";
 
     public static final String KUSTVAKT_ENCRYPTION = "kustvakt_encryption";
@@ -71,12 +72,23 @@ public class BeanConfiguration {
         if (!hasContext()) {
             ApplicationContext context;
             if (files.length == 0)
-                context = new ClassPathXmlApplicationContext(config_file);
+                context = new ClassPathXmlApplicationContext(CONFIG_FILE);
             else
                 context = new ClassPathXmlApplicationContext(files);
 
             BeanConfiguration.beans = new BeanHolderHelper(context);
+            setManualBeans();
         }
+    }
+
+    private static void setManualBeans() {
+        if (getBeans().getPolicyDbProvider() != null
+                && getBeans().getEncryption() != null
+                && getBeans().getResourceProvider() != null)
+            de.ids_mannheim.korap.security.ac.SecurityManager
+                    .setProviders(getBeans().getPolicyDbProvider(),
+                            getBeans().getEncryption(),
+                            Arrays.asList(getBeans().getResourceProvider()));
     }
 
     public static void loadFileContext(String filepath) {

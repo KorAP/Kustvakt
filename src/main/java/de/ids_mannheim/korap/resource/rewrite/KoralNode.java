@@ -17,12 +17,12 @@ import java.util.Map;
 public abstract class KoralNode {
     private JsonNode node;
     private KoralRewriteBuilder builder;
-    private boolean toRemove;
+    private boolean remove;
 
     private KoralNode(JsonNode node) {
         this.node = node;
         this.builder = new KoralRewriteBuilder();
-        this.toRemove = false;
+        this.remove = false;
     }
 
     public static KoralNode wrapNode(JsonNode node) {
@@ -30,7 +30,21 @@ public abstract class KoralNode {
         };
     }
 
-    public void set(String name, Object value) {
+    public boolean setNode(Object path) {
+        JsonNode n = null;
+        if (this.node.isObject() && this.node.has((String) path))
+            n = this.node.path((String) path);
+        else if (this.node.isArray() && this.node.has((int) path))
+            n = this.node.path((int) path);
+
+        if (n != null) {
+            this.node = n;
+            return true;
+        }
+        return false;
+    }
+
+    public void put(String name, Object value) {
 
         if (this.node.isObject() && this.node.path(name).isMissingNode()) {
             ObjectNode node = (ObjectNode) this.node;
@@ -71,26 +85,30 @@ public abstract class KoralNode {
         }
     }
 
+    public String get(String name) {
+        if (this.node.isObject())
+            return this.node.path(name).asText();
+        return null;
+    }
+
     public boolean has(Object ident) {
         if (ident instanceof String)
             return this.node.has((String) ident);
-        if (ident instanceof Integer)
+        else if (ident instanceof Integer)
             return this.node.has((int) ident);
         return false;
     }
-
-
 
     public JsonNode rawNode() {
         return this.node;
     }
 
     public void removeNode() {
-        this.toRemove = true;
+        this.remove = true;
     }
 
     public boolean toRemove() {
-        return this.toRemove;
+        return this.remove;
     }
 
     //todo: 21.10.15 -- redo with better return policies!

@@ -29,7 +29,7 @@ public class UserPropertyReader extends PropertyReader {
     private EntityHandlerIface iface;
     private EncryptionIface crypto;
     private static Logger jlog = KustvaktLogger
-            .initiate(UserPropertyReader.class);
+            .getLogger(UserPropertyReader.class);
 
     public UserPropertyReader(String path) {
         this.path = path;

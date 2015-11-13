@@ -42,7 +42,7 @@ import de.ids_mannheim.korap.user.User;
  * @author hanl
  * @date 02/07/2015
  */
-public class TreeConstraint extends RewriteTask.RewriteQuery {
+public class TreeConstraint implements RewriteTask.RewriteQuery {
 
     private String pointer;
 
@@ -51,10 +51,15 @@ public class TreeConstraint extends RewriteTask.RewriteQuery {
     }
 
     @Override
-    public JsonNode rewrite(KoralNode node, KustvaktConfiguration config,
+    public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
             User user) {
         System.out.println("FIND PATH " + node.rawNode().findParent(pointer));
 
         return node.rawNode();
+    }
+
+    @Override
+    public JsonNode postProcess(KoralNode node) {
+        return null;
     }
 }

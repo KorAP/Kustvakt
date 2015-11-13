@@ -49,7 +49,7 @@ public class DocumentDao implements ResourceOperationIface<Document> {
                         public Document extractData(ResultSet rs)
                                 throws SQLException, DataAccessException {
                             Document doc = new Document(
-                                    rs.getString("persistentID"));
+                                    rs.getString("persistent_id"));
                             doc.setId(rs.getInt("id"));
                             doc.setCreated(
                                     rs.getTimestamp("created").getTime());
@@ -67,7 +67,7 @@ public class DocumentDao implements ResourceOperationIface<Document> {
     public Document findbyId(String id, User user) throws KustvaktException {
         MapSqlParameterSource s = new MapSqlParameterSource();
         s.addValue("id", id);
-        String sql = "select * from doc_store where persistentID=:id";
+        String sql = "select id, persistent_id, strftime('%s', created) as created from doc_store where persistent_id=:id";
 
         try {
             return this.jdbcTemplate
@@ -76,15 +76,15 @@ public class DocumentDao implements ResourceOperationIface<Document> {
                         public Document extractData(ResultSet rs)
                                 throws SQLException, DataAccessException {
                             Document doc = new Document(
-                                    rs.getString("persistentID"));
+                                    rs.getString("persistent_id"));
                             doc.setId(rs.getInt("id"));
-                            doc.setCreated(
-                                    rs.getTimestamp("created").getTime());
+                            doc.setCreated(rs.getLong("created"));
                             doc.setDisabled(rs.getBoolean("disabled"));
                             return doc;
                         }
                     });
         }catch (DataAccessException e) {
+            e.printStackTrace();
             throw new KustvaktException(StatusCodes.CONNECTION_ERROR);
         }
     }
@@ -101,7 +101,7 @@ public class DocumentDao implements ResourceOperationIface<Document> {
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("pid", document.getPersistentID());
         source.addValue("dis", BooleanUtils.getBoolean(document.isDisabled()));
-        final String sql = "UPDATE doc_store set disabled=:dis where persistentID=:pid;";
+        final String sql = "UPDATE doc_store set disabled=:dis where persistent_id=:pid;";
         return this.jdbcTemplate.update(sql, source);
     }
 
@@ -117,7 +117,7 @@ public class DocumentDao implements ResourceOperationIface<Document> {
         source.addValue("corpus", corpus + "%");
         source.addValue("offset", (offset * index));
         source.addValue("limit", offset);
-        final String sql = "select * from doc_store where (persistentID like :corpus) limit :offset, :limit";
+        final String sql = "select id, persistent_id, disabled, strftime('%s', created) as created from doc_store where (persistent_id like :corpus) limit :offset, :limit";
         try {
             return this.jdbcTemplate
                     .query(sql, source, new RowMapper<Document>() {
@@ -125,8 +125,9 @@ public class DocumentDao implements ResourceOperationIface<Document> {
                         public Document mapRow(ResultSet rs, int rowNum)
                                 throws SQLException {
                             Document doc = new Document(
-                                    rs.getString("persistentID"));
+                                    rs.getString("persistent_id"));
                             doc.setId(rs.getInt("id"));
+                            doc.setCreated(rs.getLong("created"));
                             doc.setDisabled(rs.getBoolean("disabled"));
                             return doc;
                         }
@@ -141,11 +142,10 @@ public class DocumentDao implements ResourceOperationIface<Document> {
         MapSqlParameterSource s = new MapSqlParameterSource();
         s.addValue("corpus", corpus + "%");
         s.addValue("dis", BooleanUtils.getBoolean(disabled));
-        String sql = "SELECT persistentID FROM doc_store WHERE (persistentID like :corpus) AND disabled=:dis;";
+        String sql = "SELECT persistent_id FROM doc_store WHERE (persistent_id like :corpus) AND disabled=:dis;";
         try {
             return this.jdbcTemplate.queryForList(sql, s, String.class);
         }catch (DataAccessException e) {
-            e.printStackTrace();
             throw new KustvaktException(StatusCodes.CONNECTION_ERROR);
         }
     }
@@ -159,10 +159,11 @@ public class DocumentDao implements ResourceOperationIface<Document> {
         s.addValue("corpus", resource.getCorpus());
         s.addValue("dis", BooleanUtils.getBoolean(resource.isDisabled()));
 
-        String sql = "INSERT INTO doc_store (persistentID, disabled) VALUES (:id, :dis)";
+        String sql = "INSERT INTO doc_store (persistent_id, disabled) VALUES (:id, :dis)";
         try {
             return this.jdbcTemplate.update(sql, s);
         }catch (DataAccessException e) {
+            e.printStackTrace();
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
                     "illegal argument given", resource.getPersistentID());
         }
@@ -172,7 +173,7 @@ public class DocumentDao implements ResourceOperationIface<Document> {
     public int deleteResource(String id, User user) throws KustvaktException {
         MapSqlParameterSource s = new MapSqlParameterSource();
         s.addValue("id", id);
-        String sql = "delete from doc_store where persistentID=:id;";
+        String sql = "delete from doc_store where persistent_id=:id;";
         try {
             return this.jdbcTemplate.update(sql, s);
         }catch (DataAccessException e) {

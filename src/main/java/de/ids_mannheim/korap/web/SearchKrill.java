@@ -22,9 +22,9 @@ import java.util.List;
  * @author Nils Diewald
  */
 public class SearchKrill {
-    private final static Logger qlog = KustvaktLogger.initiate("queryLogger");
+    private final static Logger qlog = KustvaktLogger.getLogger("queryLogger");
     private final static Logger log = KustvaktLogger
-            .initiate(SearchKrill.class);
+            .getLogger(SearchKrill.class);
     // Temporary
     String indexDir = "/data/prep_corpus/index/";
     String i = "/Users/hanl/Projects/prep_corpus";

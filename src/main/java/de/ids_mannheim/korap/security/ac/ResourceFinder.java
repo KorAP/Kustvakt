@@ -18,7 +18,8 @@ import java.util.*;
  */
 public class ResourceFinder {
 
-    private static final Logger log = KustvaktLogger.initiate(ResourceFinder.class);
+    private static final Logger log = KustvaktLogger.getLogger(
+            ResourceFinder.class);
     private static PolicyHandlerIface policydao;
 
     private List<KustvaktResource.Container> containers;

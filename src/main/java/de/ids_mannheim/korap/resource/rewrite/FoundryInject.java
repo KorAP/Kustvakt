@@ -9,14 +9,14 @@ import de.ids_mannheim.korap.user.User;
  * @author hanl
  * @date 30/06/2015
  */
-public class FoundryInject extends RewriteTask.RewriteNode {
+public class FoundryInject implements RewriteTask.RewriteNode {
 
     public FoundryInject() {
         super();
     }
 
     @Override
-    public JsonNode rewrite(KoralNode node, KustvaktConfiguration config,
+    public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
             User user) {
         LayerMapper mapper;
         if (user != null)
@@ -24,15 +24,14 @@ public class FoundryInject extends RewriteTask.RewriteNode {
         else
             mapper = new LayerMapper(config);
 
-        if (node.rawNode().path("@type").asText().equals("koral:term") && !node
-                .rawNode().has("foundry")) {
+        if (node.get("@type").equals("koral:term") && !node.has("foundry")) {
             String layer;
-            if (node.rawNode().has("layer"))
-                layer = node.rawNode().path("layer").asText();
+            if (node.has("layer"))
+                layer = node.get("layer");
             else
-                layer = node.rawNode().path("key").asText();
+                layer = node.get("key");
             String foundry = mapper.findFoundry(layer);
-            node.set("foundry", foundry);
+            node.put("foundry", foundry);
         }
         return node.rawNode();
     }

@@ -37,6 +37,7 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
                 .queryParam("q", "[base=Wort]").queryParam("ql", "poliqarp")
                 .get(ClientResponse.class);
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
+        System.out.println("RESPONSE IS " + response.getEntity(String.class));
     }
 
     @Test

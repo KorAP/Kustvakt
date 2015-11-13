@@ -42,7 +42,7 @@ public class FoundryRewriteTest {
         processor.add(FoundryInject.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(simple_add_query, "poliqarp");
-        String result = processor.apply(s.toJSON(), null);
+        String result = processor.preProcess(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
 
         assert node != null;
@@ -66,7 +66,7 @@ public class FoundryRewriteTest {
         RewriteHandler handler = new RewriteHandler(config);
         s.setQuery("[pos=ADJA]", "poliqarp");
         assert handler.add(FoundryInject.class);
-        String result = handler.apply(s.toJSON(), null);
+        String result = handler.preProcess(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
 
         assert node != null;
@@ -82,7 +82,7 @@ public class FoundryRewriteTest {
         RewriteHandler handler = new RewriteHandler(config);
         s.setQuery("[orth=laufe/i & base!=Lauf]", "poliqarp");
         assert handler.add(FoundryInject.class);
-        String result = handler.apply(s.toJSON(), null);
+        String result = handler.preProcess(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
 
         assert node != null;
@@ -99,7 +99,7 @@ public class FoundryRewriteTest {
         RewriteHandler handler = new RewriteHandler(config);
         s.setQuery("[(base=laufen | base=gehen) & tt/pos=VVFIN]", "poliqarp");
         assert handler.add(FoundryInject.class);
-        String result = handler.apply(s.toJSON(), null);
+        String result = handler.preProcess(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
 
         assert node != null;

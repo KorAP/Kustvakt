@@ -23,7 +23,7 @@ import java.util.Collection;
 @SuppressWarnings("all")
 public class ResourceHandler {
 
-    private static Logger log = KustvaktLogger.initiate(ResourceHandler.class);
+    private static Logger log = KustvaktLogger.getLogger(ResourceHandler.class);
 
     public ResourceHandler() {
     }

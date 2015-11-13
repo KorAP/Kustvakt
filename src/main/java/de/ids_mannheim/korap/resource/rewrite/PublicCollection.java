@@ -14,7 +14,8 @@ import java.util.Set;
  * @author hanl
  * @date 04/07/2015
  */
-public class PublicCollection extends RewriteTask.RewriteQuery {
+// todo: 11.11.15
+public class PublicCollection implements RewriteTask.RewriteQuery {
 
     public PublicCollection() {
         super();
@@ -22,7 +23,7 @@ public class PublicCollection extends RewriteTask.RewriteQuery {
 
     // todo: where to inject the array node into? --> super group with and relation plus subgroup with ids and or operation
     @Override
-    public JsonNode rewrite(KoralNode node, KustvaktConfiguration config,
+    public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
             User user) {
         JsonNode subnode = node.rawNode();
         if (!subnode.at("/collection").findValuesAsText("key")
@@ -47,5 +48,10 @@ public class PublicCollection extends RewriteTask.RewriteQuery {
     private JsonNode createNode(Set<String> ids) {
         JsonNode node = CollectionQueryBuilder3.Utils.buildDocGroup();
         return node;
+    }
+
+    @Override
+    public JsonNode postProcess(KoralNode node) {
+        return null;
     }
 }

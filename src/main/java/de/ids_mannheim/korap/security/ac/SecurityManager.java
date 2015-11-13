@@ -43,15 +43,21 @@ public class SecurityManager<T extends KustvaktResource> {
     private List<SecurityPolicy>[] policies;
     private User user;
 
-    private boolean wException;
+    private boolean silent;
     private PolicyEvaluator evaluator;
     private T resource;
 
     private SecurityManager(User user) {
         this.policies = new List[1];
         this.policies[0] = new ArrayList<>();
-        this.wException = true;
+        this.silent = true;
         this.user = user;
+        checkProviders();
+    }
+
+    private static void checkProviders() {
+        if (policydao == null && crypto == null && handlers == null)
+            throw new RuntimeException("providers not set!");
     }
 
     public static final void setProviders(PolicyHandlerIface policyHandler,
@@ -79,10 +85,9 @@ public class SecurityManager<T extends KustvaktResource> {
      * @throws EmptyResultException
      * @throws KustvaktException
      */
+    //todo: implement a fall back that throws an exception when the user NULL, but the resource has restrictions!
     public static SecurityManager findbyId(String id, User user, Class type,
-            Permissions.PERMISSIONS... perms)
-            throws EmptyResultException, KustvaktException,
-            NotAuthorizedException {
+            Permissions.PERMISSIONS... perms) throws KustvaktException {
         SecurityManager p = new SecurityManager(user);
         p.findPolicies(id, false, perms);
         p.resource = p.findResource(type);
@@ -90,9 +95,7 @@ public class SecurityManager<T extends KustvaktResource> {
     }
 
     public static SecurityManager findbyId(String id, User user,
-            Permissions.PERMISSIONS... perms)
-            throws NotAuthorizedException, KustvaktException,
-            EmptyResultException {
+            Permissions.PERMISSIONS... perms) throws KustvaktException {
         SecurityManager p = new SecurityManager(user);
         p.findPolicies(id, false, perms);
         p.resource = p.findResource(null);
@@ -100,9 +103,7 @@ public class SecurityManager<T extends KustvaktResource> {
     }
 
     public static SecurityManager findbyId(Integer id, User user,
-            Permissions.PERMISSIONS... perms)
-            throws EmptyResultException, KustvaktException,
-            NotAuthorizedException {
+            Permissions.PERMISSIONS... perms) throws KustvaktException {
         SecurityManager p = new SecurityManager(user);
         p.findPolicies(id, false, perms);
         p.resource = p.findResource(null);
@@ -132,7 +133,7 @@ public class SecurityManager<T extends KustvaktResource> {
      * @return
      * @throws NotAuthorizedException
      */
-    public T getResource() throws NotAuthorizedException {
+    public final T getResource() throws NotAuthorizedException {
         if (evaluator.isAllowed(Permissions.PERMISSIONS.READ)) {
             return this.resource;
         }else {
@@ -170,8 +171,8 @@ public class SecurityManager<T extends KustvaktResource> {
      * @throws KustvaktException
      */
     // todo: delete only works with find, not with init constructor!resource
-    public void deleteResource() throws NotAuthorizedException,
-            KustvaktException {
+    public void deleteResource()
+            throws NotAuthorizedException, KustvaktException {
         if (evaluator.isAllowed(Permissions.PERMISSIONS.DELETE)) {
             ResourceOperationIface iface = handlers
                     .get(this.resource.getClass());
@@ -187,11 +188,9 @@ public class SecurityManager<T extends KustvaktResource> {
                     this.evaluator.getResourceID());
     }
 
-
     // todo: type should be deprecated and return type of policies should be containers!
     private boolean findPolicies(Object id, boolean path,
-            Permissions.PERMISSIONS... perms)
-            throws NotAuthorizedException, EmptyResultException {
+            Permissions.PERMISSIONS... perms) throws EmptyResultException {
         PermissionsBuffer b = new PermissionsBuffer();
         if (perms.length == 0)
             b.addPermission(Permissions.READ);
@@ -302,7 +301,8 @@ public class SecurityManager<T extends KustvaktResource> {
                 KustvaktLogger.SECURITY_LOGGER
                         .error("No policies found for '{}' for user '{}'",
                                 resource.getPersistentID(), user.getId());
-                throw new KustvaktException(user.getId(),StatusCodes.POLICY_CREATE_ERROR,
+                throw new KustvaktException(user.getId(),
+                        StatusCodes.POLICY_CREATE_ERROR,
                         "Resource could not be registered",
                         resource.toString());
             }
@@ -368,7 +368,7 @@ public class SecurityManager<T extends KustvaktResource> {
 
         if (evaluator.isAllowed(Permissions.PERMISSIONS.CREATE_POLICY)) {
             policydao.createPolicy(policy, this.user);
-        }else if (wException) {
+        }else if (silent) {
             KustvaktLogger.SECURITY_LOGGER
                     .error("Permission Denied (CREATE_POLICY) on '{}' for user '{}'",
                             this.evaluator.getResourceID(), this.user.getId());
@@ -385,8 +385,8 @@ public class SecurityManager<T extends KustvaktResource> {
         this.policies[0].add(policy);
     }
 
-    public void deletePolicies() throws NotAuthorizedException,
-            KustvaktException {
+    public void deletePolicies()
+            throws NotAuthorizedException, KustvaktException {
         for (SecurityPolicy p : new ArrayList<>(this.policies[0]))
             deletePolicy(p);
     }
@@ -411,14 +411,14 @@ public class SecurityManager<T extends KustvaktResource> {
             KustvaktLogger.SECURITY_LOGGER
                     .error("No policies found (DELETE_POLICY) on '{}' for '{}'",
                             this.evaluator.getResourceID(), this.user.getId());
-            throw new KustvaktException(user.getId(),StatusCodes.NO_POLICIES,
+            throw new KustvaktException(user.getId(), StatusCodes.NO_POLICIES,
                     "no policy desicion possible",
                     this.evaluator.getResourceID());
         }
         if (contains(policy) && (evaluator
                 .isAllowed(Permissions.PERMISSIONS.DELETE_POLICY))) {
             policydao.deletePolicy(policy, this.user);
-        }else if (wException) {
+        }else if (silent) {
             KustvaktLogger.SECURITY_LOGGER
                     .error("Permission Denied (DELETE_POLICY) on '{}' for '{}'",
                             this.evaluator.getResourceID(), this.user.getId());
@@ -440,7 +440,7 @@ public class SecurityManager<T extends KustvaktResource> {
             KustvaktLogger.SECURITY_LOGGER
                     .error("Operation not possible (MODIFY_POLICY) on '{}' for '{}'",
                             this.evaluator.getResourceID(), this.user.getId());
-            throw new KustvaktException(user.getId(),StatusCodes.NO_POLICIES,
+            throw new KustvaktException(user.getId(), StatusCodes.NO_POLICIES,
                     "no policy desicion possible",
                     this.evaluator.getResourceID());
         }
@@ -448,7 +448,7 @@ public class SecurityManager<T extends KustvaktResource> {
         if (contains(policy) && (evaluator
                 .isAllowed(Permissions.PERMISSIONS.MODIFY_POLICY))) {
             policydao.updatePolicy(policy, this.user);
-        }else if (wException) {
+        }else if (silent) {
             KustvaktLogger.SECURITY_LOGGER
                     .error("Permission Denied (DELETE_POLICY) on '{}' for '{}'",
                             this.evaluator.getResourceID(), this.user.getId());
