@@ -16,6 +16,7 @@ import java.util.Map;
  * @author hanl
  * @date 26/06/2015
  */
+//todo: check tranferable index config path for test cases
 public class KustvaktCoreRestTest extends FastJerseyTest {
 
     @BeforeClass

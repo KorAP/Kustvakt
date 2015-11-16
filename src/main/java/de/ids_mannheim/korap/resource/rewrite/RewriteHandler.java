@@ -12,6 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * @author hanl
@@ -26,6 +27,8 @@ public class RewriteHandler {
     private Collection<RewriteTask.RewriteKoralToken> token_node_processors;
     private Collection<RewriteTask.RewriteQuery> query_processors;
 
+    private Set<Class> failed_task_registration;
+
     private KustvaktConfiguration config;
 
     // fixme: make default constructor with configuration!
@@ -34,6 +37,7 @@ public class RewriteHandler {
         this.node_processors = new HashSet<>();
         this.token_node_processors = new HashSet<>();
         this.query_processors = new HashSet<>();
+        this.failed_task_registration = new HashSet<>();
     }
 
     public boolean addProcessor(RewriteTask rewriter) {
@@ -46,10 +50,13 @@ public class RewriteHandler {
         else if (rewriter instanceof RewriteTask.RewriteBefore
                 | rewriter instanceof RewriteTask.RewriteAfter)
             return this.node_processors.add(rewriter);
-        //        else if (rewriter instanceof RewriteTask.RewriteAfter)
-        //            return this.node_post_processors
-        //                    .add((RewriteTask.RewriteAfter) rewriter);
+
+        this.failed_task_registration.add(rewriter.getClass());
         return false;
+    }
+
+    public final Collection<Class> getFailedHandlers() {
+        return this.failed_task_registration;
     }
 
     @Override
@@ -78,6 +85,7 @@ public class RewriteHandler {
             task = (RewriteTask) c.newInstance();
         }catch (NoSuchMethodException | InvocationTargetException
                 | IllegalAccessException | InstantiationException e) {
+            this.failed_task_registration.add(rewriter);
             return false;
         }
         return addProcessor(task);
@@ -111,13 +119,11 @@ public class RewriteHandler {
                         this.node_processors, post);
             }
         }else if (root.isArray()) {
-            //todo: test!
             Iterator<JsonNode> it = root.elements();
             while (it.hasNext()) {
                 JsonNode n = it.next();
-                if (process(n, user, post)) {
+                if (process(n, user, post))
                     it.remove();
-                }
             }
         }
         return false;
@@ -168,10 +174,10 @@ public class RewriteHandler {
                         .preProcess(node, this.config, user);
             if (post && task instanceof RewriteTask.RewriteAfter)
                 ((RewriteTask.RewriteAfter) task).postProcess(node);
-            if (node.toRemove())
+            if (node.isRemove())
                 break;
         }
-        return node.toRemove();
+        return node.isRemove();
     }
 
 }

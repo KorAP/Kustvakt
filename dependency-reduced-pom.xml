@@ -223,18 +223,6 @@
       <version>1.16.6</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>com.restfuse</groupId>
-      <artifactId>com.eclipsesource.restfuse</artifactId>
-      <version>1.0.0</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>jetty-j2se6</artifactId>
-          <groupId>org.mortbay.jetty</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
   </dependencies>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

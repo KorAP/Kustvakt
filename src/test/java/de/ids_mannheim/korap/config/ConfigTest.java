@@ -51,7 +51,7 @@ public class ConfigTest {
 
     @Test(expected = KustvaktException.class)
     public void testBeanOverrideInjection() throws KustvaktException {
-        BeanConfiguration.loadClasspathContext("default-config.xml");
+        BeanConfiguration.loadClasspathContext("test-config.xml");
 
         BeanConfiguration.getBeans().getConfiguration().setPropertiesAsStream(
                 ConfigTest.class.getClassLoader()

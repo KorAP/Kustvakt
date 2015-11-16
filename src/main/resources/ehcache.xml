@@ -2,6 +2,12 @@
          xsi:noNamespaceSchemaLocation='http://ehcache.org/ehcache.xsd'>
     <defaultCache eternal='true' overflowToDisk='false'/>
     <!--maxBytesLocalHeap="200M"-->
+    <cache name="documents"
+           timeToIdleSeconds="172800"
+           eternal='false'
+           memoryStoreEvictionPolicy="LRU"
+           maxEntriesLocalHeap="2000"
+           overflowToDisk='false'/>
     <cache name='users'
            timeToIdleSeconds="172800"
            eternal='false'

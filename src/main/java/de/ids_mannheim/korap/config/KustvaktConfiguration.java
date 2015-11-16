@@ -82,7 +82,7 @@ public class KustvaktConfiguration {
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));
         returnhits = new Integer(properties.getProperty("returnhits", "50000"));
         indexDir = properties.getProperty("lucene.indexDir", "");
-        port = new Integer(properties.getProperty("server.port", "8080"));
+        port = new Integer(properties.getProperty("server.port", "8095"));
         // server options
         serverHost = String
                 .valueOf(properties.getProperty("server.host", "localhost"));

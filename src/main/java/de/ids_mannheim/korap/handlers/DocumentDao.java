@@ -41,20 +41,22 @@ public class DocumentDao implements ResourceOperationIface<Document> {
     public Document findbyId(Integer id, User user) throws KustvaktException {
         MapSqlParameterSource s = new MapSqlParameterSource();
         s.addValue("id", id);
-        String sql = "select * from doc_store where id=:id";
+        String sql = "select id, persistent_id, disabled, strftime('%s', created) as created from doc_store where id=:id";
         try {
             return this.jdbcTemplate
                     .query(sql, s, new ResultSetExtractor<Document>() {
                         @Override
                         public Document extractData(ResultSet rs)
                                 throws SQLException, DataAccessException {
-                            Document doc = new Document(
-                                    rs.getString("persistent_id"));
-                            doc.setId(rs.getInt("id"));
-                            doc.setCreated(
-                                    rs.getTimestamp("created").getTime());
-                            doc.setDisabled(rs.getBoolean("disabled"));
-                            return doc;
+                            if (rs.isFirst()) {
+                                Document doc = new Document(
+                                        rs.getString("persistent_id"));
+                                doc.setId(rs.getInt("id"));
+                                doc.setCreated(rs.getLong("created"));
+                                doc.setDisabled(rs.getBoolean("disabled"));
+                                return doc;
+                            }
+                            return null;
                         }
                     });
         }catch (DataAccessException e) {
@@ -67,7 +69,7 @@ public class DocumentDao implements ResourceOperationIface<Document> {
     public Document findbyId(String id, User user) throws KustvaktException {
         MapSqlParameterSource s = new MapSqlParameterSource();
         s.addValue("id", id);
-        String sql = "select id, persistent_id, strftime('%s', created) as created from doc_store where persistent_id=:id";
+        String sql = "select id, persistent_id, disabled, strftime('%s', created) as created from doc_store where persistent_id=:id";
 
         try {
             return this.jdbcTemplate
@@ -75,16 +77,18 @@ public class DocumentDao implements ResourceOperationIface<Document> {
                         @Override
                         public Document extractData(ResultSet rs)
                                 throws SQLException, DataAccessException {
-                            Document doc = new Document(
-                                    rs.getString("persistent_id"));
-                            doc.setId(rs.getInt("id"));
-                            doc.setCreated(rs.getLong("created"));
-                            doc.setDisabled(rs.getBoolean("disabled"));
-                            return doc;
+                            if (!rs.isClosed()) {
+                                Document doc = new Document(
+                                        rs.getString("persistent_id"));
+                                doc.setId(rs.getInt("id"));
+                                doc.setCreated(rs.getLong("created"));
+                                doc.setDisabled(rs.getBoolean("disabled"));
+                                return doc;
+                            }
+                            return null;
                         }
                     });
         }catch (DataAccessException e) {
-            e.printStackTrace();
             throw new KustvaktException(StatusCodes.CONNECTION_ERROR);
         }
     }
@@ -124,12 +128,16 @@ public class DocumentDao implements ResourceOperationIface<Document> {
                         @Override
                         public Document mapRow(ResultSet rs, int rowNum)
                                 throws SQLException {
-                            Document doc = new Document(
-                                    rs.getString("persistent_id"));
-                            doc.setId(rs.getInt("id"));
-                            doc.setCreated(rs.getLong("created"));
-                            doc.setDisabled(rs.getBoolean("disabled"));
-                            return doc;
+                            // todo: test on empty/closed resultset!
+                            if (!rs.isClosed()) {
+                                Document doc = new Document(
+                                        rs.getString("persistent_id"));
+                                doc.setId(rs.getInt("id"));
+                                doc.setCreated(rs.getLong("created"));
+                                doc.setDisabled(rs.getBoolean("disabled"));
+                                return doc;
+                            }
+                            return null;
                         }
                     });
         }catch (DataAccessException e) {
@@ -163,7 +171,6 @@ public class DocumentDao implements ResourceOperationIface<Document> {
         try {
             return this.jdbcTemplate.update(sql, s);
         }catch (DataAccessException e) {
-            e.printStackTrace();
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
                     "illegal argument given", resource.getPersistentID());
         }

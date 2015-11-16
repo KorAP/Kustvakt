@@ -29,7 +29,7 @@ public class OAuth2HandlerTest {
 
     @BeforeClass
     public static void setup() throws KustvaktException {
-        BeanConfiguration.loadClasspathContext("default-config.xml");
+        BeanConfiguration.loadClasspathContext("test-config.xml");
         handler = new OAuth2Handler(
                 BeanConfiguration.getBeans().getPersistenceClient());
         crypto = BeanConfiguration.getBeans().getEncryption();

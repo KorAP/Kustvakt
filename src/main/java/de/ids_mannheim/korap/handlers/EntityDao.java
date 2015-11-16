@@ -45,6 +45,9 @@ public class EntityDao implements EntityHandlerIface {
     @Override
     public UserSettings getUserSettings(Integer userid)
             throws KustvaktException {
+//        TransactionDefinition def = new DefaultTransactionDefinition();
+//        TransactionStatus status = transactionManager.getTransaction(def);
+
         MapSqlParameterSource np = new MapSqlParameterSource();
         np.addValue("us", userid);
         final String sql =

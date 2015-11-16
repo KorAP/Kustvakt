@@ -27,7 +27,7 @@ public class CollectionRewriteTest {
 
     @BeforeClass
     public static void init() {
-        BeanConfiguration.loadClasspathContext("default-config.xml");
+        BeanConfiguration.loadClasspathContext("test-config.xml");
         config = BeanConfiguration.getBeans().getConfiguration();
     }
 

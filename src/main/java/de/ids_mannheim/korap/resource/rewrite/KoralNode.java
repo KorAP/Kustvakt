@@ -30,6 +30,7 @@ public abstract class KoralNode {
         };
     }
 
+    @Deprecated
     public boolean setNode(Object path) {
         JsonNode n = null;
         if (this.node.isObject() && this.node.has((String) path))
@@ -91,6 +92,10 @@ public abstract class KoralNode {
         return null;
     }
 
+    public JsonNode at(String name) {
+        return this.node.at(name);
+    }
+
     public boolean has(Object ident) {
         if (ident instanceof String)
             return this.node.has((String) ident);
@@ -98,6 +103,7 @@ public abstract class KoralNode {
             return this.node.has((int) ident);
         return false;
     }
+
 
     public JsonNode rawNode() {
         return this.node;
@@ -107,7 +113,7 @@ public abstract class KoralNode {
         this.remove = true;
     }
 
-    public boolean toRemove() {
+    public boolean isRemove() {
         return this.remove;
     }
 

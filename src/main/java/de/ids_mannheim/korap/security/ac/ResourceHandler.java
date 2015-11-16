@@ -58,7 +58,6 @@ public class ResourceHandler {
         } catch (EmptyResultException e) {
             throw new NotAuthorizedException(StatusCodes.PERMISSION_DENIED);
         }
-
         return p.getResource();
     }
 
