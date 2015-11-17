@@ -22,7 +22,9 @@ public interface RewriteTask {
     }
 
     /**
-     *
+     * Post processor targeted at result sets for queries
+     * {@link de.ids_mannheim.korap.resource.rewrite.RewriteTask.RewriteAfter} queries will run
+     * after {@link de.ids_mannheim.korap.resource.rewrite.RewriteTask.IterableRewriteAt} have been processed
      */
     interface RewriteAfter extends RewriteTask {
         JsonNode postProcess(KoralNode node);
@@ -31,7 +33,7 @@ public interface RewriteTask {
     /**
      * nodes subject to rewrites at fixed json pointer location.
      * Json-pointer based rewrites are processed after iterable rewrites
-     * Deletion via KoralNode not allowed.
+     * Deletion via KoralNode not allowed. Supports pre- and post-processing
      */
     interface RewriteNodeAt extends RewriteBefore, RewriteAfter {
         String at();
@@ -43,6 +45,14 @@ public interface RewriteTask {
      */
     interface IterableRewriteAt extends RewriteBefore, RewriteAfter {
         String path();
+    }
+
+    /**
+     * koral token nodes that are subject to rewrites
+     * Be aware that node rewrites are processed before query rewrites. Thus query rewrite may override previous node rewrites
+     * {@link RewriteKoralToken} rewrite DOES NOT support the deletion of the respective node
+     */
+    interface RewriteKoralToken extends RewriteBefore {
     }
 
     /**
@@ -65,11 +75,4 @@ public interface RewriteTask {
     interface RewriteNode extends RewriteBefore {
     }
 
-    /**
-     * koral token nodes that are subject to rewrites
-     * Be aware that node rewrites are processed before query rewrites. Thus query rewrite may override previous node rewrites
-     * {@link RewriteKoralToken} rewrite DOES NOT support the deletion of the respective node
-     */
-    interface RewriteKoralToken extends RewriteBefore {
-    }
 }

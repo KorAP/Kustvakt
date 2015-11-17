@@ -14,21 +14,9 @@ import java.util.Iterator;
  */
 public class CollectionCleanupFilter implements RewriteTask.RewriteNodeAt {
 
-    // track path to operand
-    @Deprecated
-    private StringBuilder builder;
-
-    public CollectionCleanupFilter() {
-        super();
-    }
-
     @Override
     public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
             User user) {
-        //        if (node.has("collection")) {
-        //            JsonNode coll = node.rawNode().path("collection");
-        //            process(coll);
-        //        }
         return process(node.rawNode());
     }
 
@@ -46,8 +34,10 @@ public class CollectionCleanupFilter implements RewriteTask.RewriteNodeAt {
                 }
 
                 int count = node.size();
+                // remove group element and replace with single doc
                 if (count == 1)
                     sub = node.path(0);
+                    // indicate empty group
                 else if (count
                         == 0) // can't do anything here -- fixme: edge case?!
                     return null;

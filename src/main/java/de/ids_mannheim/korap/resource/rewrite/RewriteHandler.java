@@ -22,7 +22,7 @@ public class RewriteHandler {
     private static Logger jlog = KustvaktLogger.getLogger(RewriteHandler.class);
     private Collection<RewriteTask.IterableRewriteAt> node_processors;
     private Collection<RewriteTask.RewriteKoralToken> token_node_processors;
-    private Collection<RewriteTask.RewriteNodeAt> query_processors;
+    private Collection<RewriteTask> query_processors;
 
     //    private Collection<RewriteTask.RewriteNode2> fixed_nodes;
     //    private Collection<RewriteTask.IterableRewrite> iterable_nodes;
@@ -44,12 +44,12 @@ public class RewriteHandler {
         if (rewriter instanceof RewriteTask.RewriteKoralToken)
             return this.token_node_processors
                     .add((RewriteTask.RewriteKoralToken) rewriter);
-        else if (rewriter instanceof RewriteTask.RewriteNodeAt)
-            return this.query_processors
-                    .add((RewriteTask.RewriteNodeAt) rewriter);
         else if (rewriter instanceof RewriteTask.IterableRewriteAt)
             return this.node_processors
                     .add((RewriteTask.IterableRewriteAt) rewriter);
+        else if (rewriter instanceof RewriteTask.RewriteBefore
+                | rewriter instanceof RewriteTask.RewriteAfter)
+            return this.query_processors.add(rewriter);
 
         this.failed_task_registration.add(rewriter.getClass());
         return false;
@@ -121,7 +121,7 @@ public class RewriteHandler {
                 }
             }else if (root.path("@type").asText().equals("koral:token")) {
                 // todo: koral:token nodes cannot be flagged for deletion --> creates the possibility for empty koral:token nodes
-                processNode(name,KoralNode.wrapNode(root), user,
+                processNode(name, KoralNode.wrapNode(root), user,
                         this.token_node_processors, post);
                 return process(name, root.path("wrap"), user, post);
             }else {
@@ -199,16 +199,22 @@ public class RewriteHandler {
     }
 
     private void processFixedNode(JsonNode node, User user,
-            Collection<RewriteTask.RewriteNodeAt> tasks, boolean post) {
-        for (RewriteTask.RewriteNodeAt task : tasks) {
+            Collection<RewriteTask> tasks, boolean post) {
+        for (RewriteTask task : tasks) {
             JsonNode next = node;
-            if ((task.at() != null && !node.at(task.at()).isMissingNode()))
-                next = node.at(task.at());
+            if (task instanceof RewriteTask.RewriteNodeAt) {
+                RewriteTask.RewriteNodeAt rwa = (RewriteTask.RewriteNodeAt) task;
+                if ((rwa.at() != null && !node.at(rwa.at()).isMissingNode()))
+                    next = node.at(rwa.at());
+            }
 
-            if (!post)
-                task.preProcess(KoralNode.wrapNode(next), this.config, user);
+            if (!post && task instanceof RewriteTask.RewriteBefore)
+                ((RewriteTask.RewriteBefore) task)
+                        .preProcess(KoralNode.wrapNode(next), this.config,
+                                user);
             else
-                task.postProcess(KoralNode.wrapNode(next));
+                ((RewriteTask.RewriteAfter) task)
+                        .postProcess(KoralNode.wrapNode(next));
         }
     }
 
