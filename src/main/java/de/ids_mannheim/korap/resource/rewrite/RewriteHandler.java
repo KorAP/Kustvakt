@@ -121,8 +121,8 @@ public class RewriteHandler {
                 }
             }else if (root.path("@type").asText().equals("koral:token")) {
                 // todo: koral:token nodes cannot be flagged for deletion --> creates the possibility for empty koral:token nodes
-                //                processIterableNode(KoralNode.wrapNode(root), user,
-                //                        this.token_node_processors, post);
+                processNode(name,KoralNode.wrapNode(root), user,
+                        this.token_node_processors, post);
                 return process(name, root.path("wrap"), user, post);
             }else {
                 return processNode(name, KoralNode.wrapNode(root), user,
@@ -139,8 +139,7 @@ public class RewriteHandler {
         return false;
     }
 
-    public JsonNode preProcess(JsonNode root, User user) {
-        boolean post = false;
+    private JsonNode process(JsonNode root, User user, boolean post) {
         Iterator<Map.Entry<String, JsonNode>> it = root.fields();
         while (it.hasNext()) {
             Map.Entry<String, JsonNode> next = it.next();
@@ -148,6 +147,10 @@ public class RewriteHandler {
         }
         processFixedNode(root, user, this.query_processors, post);
         return root;
+    }
+
+    public JsonNode preProcess(JsonNode root, User user) {
+        return process(root, user, false);
     }
 
     public String preProcess(String json, User user) {
@@ -155,14 +158,7 @@ public class RewriteHandler {
     }
 
     public JsonNode postProcess(JsonNode root, User user) {
-        boolean post = true;
-        Iterator<Map.Entry<String, JsonNode>> it = root.fields();
-        while (it.hasNext()) {
-            Map.Entry<String, JsonNode> next = it.next();
-            process(next.getKey(), next.getValue(), user, post);
-        }
-        processFixedNode(root, user, this.query_processors, post);
-        return root;
+        return process(root, user, true);
     }
 
     public String postProcess(String json, User user) {
@@ -177,8 +173,7 @@ public class RewriteHandler {
      */
     // todo: integrate notifications into system!
     private boolean processNode(String rootNode, KoralNode node, User user,
-            Collection<? extends RewriteTask.IterableRewriteAt> tasks,
-            boolean post) {
+            Collection<? extends RewriteTask> tasks, boolean post) {
         for (RewriteTask task : tasks) {
             jlog.debug("running processor on node: " + node);
             jlog.debug("on processor: " + task.getClass().toString());
@@ -206,13 +201,14 @@ public class RewriteHandler {
     private void processFixedNode(JsonNode node, User user,
             Collection<RewriteTask.RewriteNodeAt> tasks, boolean post) {
         for (RewriteTask.RewriteNodeAt task : tasks) {
-            if (!node.at(task.at()).isMissingNode()) {
-                if (!post)
-                    task.preProcess(KoralNode.wrapNode(node.at(task.at())),
-                            this.config, user);
-                else
-                    task.postProcess(KoralNode.wrapNode(node.at(task.at())));
-            }
+            JsonNode next = node;
+            if ((task.at() != null && !node.at(task.at()).isMissingNode()))
+                next = node.at(task.at());
+
+            if (!post)
+                task.preProcess(KoralNode.wrapNode(next), this.config, user);
+            else
+                task.postProcess(KoralNode.wrapNode(next));
         }
     }
 

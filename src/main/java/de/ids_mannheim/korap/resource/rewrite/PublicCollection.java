@@ -58,6 +58,6 @@ public class PublicCollection implements RewriteTask.RewriteNodeAt {
 
     @Override
     public String at() {
-        return "collection";
+        return "/collection";
     }
 }

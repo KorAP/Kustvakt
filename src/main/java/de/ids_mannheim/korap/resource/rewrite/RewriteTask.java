@@ -21,14 +21,26 @@ public interface RewriteTask {
                 User user);
     }
 
+    /**
+     *
+     */
     interface RewriteAfter extends RewriteTask {
         JsonNode postProcess(KoralNode node);
     }
 
+    /**
+     * nodes subject to rewrites at fixed json pointer location.
+     * Json-pointer based rewrites are processed after iterable rewrites
+     * Deletion via KoralNode not allowed.
+     */
     interface RewriteNodeAt extends RewriteBefore, RewriteAfter {
         String at();
     }
 
+    /**
+     * terminal object nodes that are subject to rewrites through node iteration
+     * (both object and array node iteration supported)
+     */
     interface IterableRewriteAt extends RewriteBefore, RewriteAfter {
         String path();
     }

@@ -180,7 +180,7 @@ public class KustvaktConfiguration {
             if (f.exists()) {
                 log4j.load(new FileInputStream(f));
                 PropertyConfigurator.configure(log4j);
-                jlog.warn(
+                jlog.info(
                         "using local logging properties file ({}) to configure logging system",
                         "./log4j.properties");
                 return;
