@@ -182,7 +182,7 @@ public class KustvaktConfiguration {
                 PropertyConfigurator.configure(log4j);
                 jlog.warn(
                         "using local logging properties file ({}) to configure logging system",
-                        "./config/log4j.properties");
+                        "./log4j.properties");
                 return;
             }
         }catch (Exception e) {

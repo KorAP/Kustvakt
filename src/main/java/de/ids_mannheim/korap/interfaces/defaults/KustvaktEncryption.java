@@ -5,6 +5,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.KustvaktLogger;
 import edu.emory.mathcs.backport.java.util.Collections;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
@@ -15,7 +16,6 @@ import org.owasp.esapi.Validator;
 import org.owasp.esapi.errors.ValidationException;
 import org.owasp.esapi.reference.DefaultValidator;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
@@ -31,7 +31,7 @@ import java.util.Map;
 public class KustvaktEncryption implements EncryptionIface {
 
     private static final String ALGORITHM = "SHA-256";
-    private static Logger jlog = LoggerFactory
+    private static Logger jlog = KustvaktLogger
             .getLogger(KustvaktEncryption.class);
     // todo: disable this
     private static final String PASSWORD_SALT_FIELD = "accountCreation";
@@ -307,11 +307,9 @@ public class KustvaktEncryption implements EncryptionIface {
         return safeMap;
     }
 
-
     private String validateString(String descr, String input, String type,
             int length, boolean nullable) throws KustvaktException {
-        if (jlog.isDebugEnabled())
-            jlog.debug("validating string entry '{}'", input);
+        jlog.debug("validating string entry '{}'", input);
         String s;
         try {
             s = validator.getValidInput(descr, input, type, length, nullable);

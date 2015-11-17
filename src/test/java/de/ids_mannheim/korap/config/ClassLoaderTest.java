@@ -16,7 +16,7 @@ public class ClassLoaderTest {
     @After
     public void close() {
         BeanConfiguration.closeApplication();
-    }
+    }    
 
     @Test
     public void testBeanConfigurationLoaderThrowsNoException() {

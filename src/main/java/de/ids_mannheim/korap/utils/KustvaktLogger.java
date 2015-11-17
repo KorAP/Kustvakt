@@ -28,13 +28,12 @@ public class KustvaktLogger implements Logger {
     private Logger log;
 
     public static KustvaktLogger getLogger(Class cl) {
-        KustvaktLogger l = new KustvaktLogger(LoggerFactory.getLogger(cl));
-        return l;
+        return new KustvaktLogger(LoggerFactory.getLogger(cl));
     }
 
     public static KustvaktLogger getLogger(String name) {
-        KustvaktLogger l = new KustvaktLogger(LoggerFactory.getLogger(name));
-        return l;
+        return new KustvaktLogger(LoggerFactory.getLogger(name));
+
     }
 
     private KustvaktLogger(Logger log) {
