@@ -25,12 +25,21 @@ public interface RewriteTask {
         JsonNode postProcess(KoralNode node);
     }
 
+    interface RewriteNodeAt extends RewriteBefore, RewriteAfter {
+        String at();
+    }
+
+    interface IterableRewriteAt extends RewriteBefore, RewriteAfter {
+        String path();
+    }
+
     /**
      * query rewrites get injected the entire query from root containing all child nodes
      * <p/>
      * {@link RewriteQuery} does not allow the deletion of the root node or subnode through KoralNode.
      * The {@link de.ids_mannheim.korap.resource.rewrite.RewriteHandler} will igonore respecitve invalid requests
      */
+    @Deprecated
     interface RewriteQuery extends RewriteBefore, RewriteAfter {
     }
 
@@ -40,6 +49,7 @@ public interface RewriteTask {
      * <p/>
      * {@link RewriteNode} rewrite supports the deletion of the respective node by simply setting the node invalid in KoralNode
      */
+    @Deprecated
     interface RewriteNode extends RewriteBefore {
     }
 

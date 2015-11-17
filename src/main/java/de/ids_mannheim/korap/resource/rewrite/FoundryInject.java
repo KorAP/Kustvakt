@@ -9,11 +9,8 @@ import de.ids_mannheim.korap.user.User;
  * @author hanl
  * @date 30/06/2015
  */
-public class FoundryInject implements RewriteTask.RewriteNode {
+public class FoundryInject implements RewriteTask.IterableRewriteAt {
 
-    public FoundryInject() {
-        super();
-    }
 
     @Override
     public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
@@ -34,5 +31,15 @@ public class FoundryInject implements RewriteTask.RewriteNode {
             node.put("foundry", foundry);
         }
         return node.rawNode();
+    }
+
+    @Override
+    public String path() {
+        return "query";
+    }
+
+    @Override
+    public JsonNode postProcess(KoralNode node) {
+        return null;
     }
 }

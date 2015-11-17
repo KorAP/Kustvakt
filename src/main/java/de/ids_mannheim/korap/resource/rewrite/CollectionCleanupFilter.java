@@ -12,8 +12,7 @@ import java.util.Iterator;
  * @author hanl
  * @date 28/07/2015
  */
-
-public class CollectionCleanupFilter implements RewriteTask.RewriteQuery {
+public class CollectionCleanupFilter implements RewriteTask.RewriteNodeAt {
 
     // track path to operand
     @Deprecated
@@ -26,11 +25,11 @@ public class CollectionCleanupFilter implements RewriteTask.RewriteQuery {
     @Override
     public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
             User user) {
-        if (node.has("collection")) {
-            JsonNode coll = node.rawNode().path("collection");
-            process(coll);
-        }
-        return null;
+        //        if (node.has("collection")) {
+        //            JsonNode coll = node.rawNode().path("collection");
+        //            process(coll);
+        //        }
+        return process(node.rawNode());
     }
 
     private JsonNode process(JsonNode root) {
@@ -88,5 +87,10 @@ public class CollectionCleanupFilter implements RewriteTask.RewriteQuery {
     @Override
     public JsonNode postProcess(KoralNode node) {
         return null;
+    }
+
+    @Override
+    public String at() {
+        return "/collection";
     }
 }

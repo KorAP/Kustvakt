@@ -49,4 +49,5 @@ public class IdWriter implements RewriteTask.RewriteKoralToken {
             return wrap.path("key").asText();
         return null;
     }
+
 }

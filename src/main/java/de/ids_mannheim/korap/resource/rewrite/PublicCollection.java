@@ -15,7 +15,7 @@ import java.util.Set;
  * @date 04/07/2015
  */
 // todo: 11.11.15
-public class PublicCollection implements RewriteTask.RewriteQuery {
+public class PublicCollection implements RewriteTask.RewriteNodeAt {
 
     public PublicCollection() {
         super();
@@ -26,6 +26,7 @@ public class PublicCollection implements RewriteTask.RewriteQuery {
     public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
             User user) {
         JsonNode subnode = node.rawNode();
+        // todo: test
         if (!subnode.at("/collection").findValuesAsText("key")
                 .contains("corpusID")) {
             //todo: inject public collection node
@@ -53,5 +54,10 @@ public class PublicCollection implements RewriteTask.RewriteQuery {
     @Override
     public JsonNode postProcess(KoralNode node) {
         return null;
+    }
+
+    @Override
+    public String at() {
+        return "collection";
     }
 }

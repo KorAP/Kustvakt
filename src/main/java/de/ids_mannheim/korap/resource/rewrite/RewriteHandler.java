@@ -9,10 +9,7 @@ import org.slf4j.Logger;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author hanl
@@ -23,9 +20,12 @@ import java.util.Set;
 public class RewriteHandler {
 
     private static Logger jlog = KustvaktLogger.getLogger(RewriteHandler.class);
-    private Collection<RewriteTask> node_processors;
+    private Collection<RewriteTask.IterableRewriteAt> node_processors;
     private Collection<RewriteTask.RewriteKoralToken> token_node_processors;
-    private Collection<RewriteTask.RewriteQuery> query_processors;
+    private Collection<RewriteTask.RewriteNodeAt> query_processors;
+
+    //    private Collection<RewriteTask.RewriteNode2> fixed_nodes;
+    //    private Collection<RewriteTask.IterableRewrite> iterable_nodes;
 
     private Set<Class> failed_task_registration;
 
@@ -44,14 +44,25 @@ public class RewriteHandler {
         if (rewriter instanceof RewriteTask.RewriteKoralToken)
             return this.token_node_processors
                     .add((RewriteTask.RewriteKoralToken) rewriter);
-        else if (rewriter instanceof RewriteTask.RewriteQuery)
+        else if (rewriter instanceof RewriteTask.RewriteNodeAt)
             return this.query_processors
-                    .add((RewriteTask.RewriteQuery) rewriter);
-        else if (rewriter instanceof RewriteTask.RewriteBefore
-                | rewriter instanceof RewriteTask.RewriteAfter)
-            return this.node_processors.add(rewriter);
+                    .add((RewriteTask.RewriteNodeAt) rewriter);
+        else if (rewriter instanceof RewriteTask.IterableRewriteAt)
+            return this.node_processors
+                    .add((RewriteTask.IterableRewriteAt) rewriter);
 
         this.failed_task_registration.add(rewriter.getClass());
+        return false;
+    }
+
+    public boolean addProcessor2(RewriteTask rewriteTask) {
+        //        if (rewriteTask instanceof RewriteTask.RewriteNode2)
+        //            return this.fixed_nodes.add((RewriteTask.RewriteNode2) rewriteTask);
+        //        else if (rewriteTask instanceof RewriteTask.IterableRewrite)
+        //            return this.iterable_nodes
+        //                    .add((RewriteTask.IterableRewrite) rewriteTask);
+        //        else if (rewriteTask instanceof RewriteTask.RewriteBefore)
+        // gets the entire pre processed query injected.
         return false;
     }
 
@@ -97,32 +108,31 @@ public class RewriteHandler {
         this.token_node_processors.clear();
     }
 
-    private boolean process(JsonNode root, User user, boolean post) {
+    private boolean process(String name, JsonNode root, User user,
+            boolean post) {
         if (root.isObject()) {
             if (root.has("operands")) {
                 JsonNode ops = root.at("/operands");
                 Iterator<JsonNode> it = ops.elements();
                 while (it.hasNext()) {
-                    JsonNode n = it.next();
-                    if (process(n, user, post)) {
+                    JsonNode next = it.next();
+                    if (process(name, next, user, post))
                         it.remove();
-                    }
                 }
-
             }else if (root.path("@type").asText().equals("koral:token")) {
                 // todo: koral:token nodes cannot be flagged for deletion --> creates the possibility for empty koral:token nodes
-                processNode(KoralNode.wrapNode(root), user,
-                        this.token_node_processors, post);
-                return process(root.path("wrap"), user, post);
+                //                processIterableNode(KoralNode.wrapNode(root), user,
+                //                        this.token_node_processors, post);
+                return process(name, root.path("wrap"), user, post);
             }else {
-                return processNode(KoralNode.wrapNode(root), user,
+                return processNode(name, KoralNode.wrapNode(root), user,
                         this.node_processors, post);
             }
         }else if (root.isArray()) {
             Iterator<JsonNode> it = root.elements();
             while (it.hasNext()) {
-                JsonNode n = it.next();
-                if (process(n, user, post))
+                JsonNode next = it.next();
+                if (process(name, next, user, post))
                     it.remove();
             }
         }
@@ -131,10 +141,12 @@ public class RewriteHandler {
 
     public JsonNode preProcess(JsonNode root, User user) {
         boolean post = false;
-        for (JsonNode n : root)
-            process(n, user, post);
-        processNode(KoralNode.wrapNode(root), user, this.query_processors,
-                post);
+        Iterator<Map.Entry<String, JsonNode>> it = root.fields();
+        while (it.hasNext()) {
+            Map.Entry<String, JsonNode> next = it.next();
+            process(next.getKey(), next.getValue(), user, post);
+        }
+        processFixedNode(root, user, this.query_processors, post);
         return root;
     }
 
@@ -144,10 +156,12 @@ public class RewriteHandler {
 
     public JsonNode postProcess(JsonNode root, User user) {
         boolean post = true;
-        for (JsonNode n : root)
-            process(n, user, post);
-        processNode(KoralNode.wrapNode(root), user, this.query_processors,
-                post);
+        Iterator<Map.Entry<String, JsonNode>> it = root.fields();
+        while (it.hasNext()) {
+            Map.Entry<String, JsonNode> next = it.next();
+            process(next.getKey(), next.getValue(), user, post);
+        }
+        processFixedNode(root, user, this.query_processors, post);
         return root;
     }
 
@@ -162,22 +176,44 @@ public class RewriteHandler {
      * @return boolean true if node is to be removed from parent! Only applies if parent is an array node
      */
     // todo: integrate notifications into system!
-    private boolean processNode(KoralNode node, User user,
-            Collection<? extends RewriteTask> tasks, boolean post) {
+    private boolean processNode(String rootNode, KoralNode node, User user,
+            Collection<? extends RewriteTask.IterableRewriteAt> tasks,
+            boolean post) {
         for (RewriteTask task : tasks) {
-            if (jlog.isDebugEnabled()) {
-                jlog.debug("running processor on node " + node);
-                jlog.debug("on processor " + task.getClass().toString());
+            jlog.debug("running processor on node: " + node);
+            jlog.debug("on processor: " + task.getClass().toString());
+
+            if (task instanceof RewriteTask.IterableRewriteAt) {
+                RewriteTask.IterableRewriteAt rw = (RewriteTask.IterableRewriteAt) task;
+                if (rw.path() != null && !rw.path().equals(rootNode)) {
+                    jlog.debug("skipping node: " + node);
+                    continue;
+                }
             }
-            if (task instanceof RewriteTask.RewriteBefore)
+
+            if (!post && task instanceof RewriteTask.RewriteBefore)
                 ((RewriteTask.RewriteBefore) task)
                         .preProcess(node, this.config, user);
-            if (post && task instanceof RewriteTask.RewriteAfter)
+            else if (task instanceof RewriteTask.RewriteAfter)
                 ((RewriteTask.RewriteAfter) task).postProcess(node);
+
             if (node.isRemove())
                 break;
         }
         return node.isRemove();
+    }
+
+    private void processFixedNode(JsonNode node, User user,
+            Collection<RewriteTask.RewriteNodeAt> tasks, boolean post) {
+        for (RewriteTask.RewriteNodeAt task : tasks) {
+            if (!node.at(task.at()).isMissingNode()) {
+                if (!post)
+                    task.preProcess(KoralNode.wrapNode(node.at(task.at())),
+                            this.config, user);
+                else
+                    task.postProcess(KoralNode.wrapNode(node.at(task.at())));
+            }
+        }
     }
 
 }

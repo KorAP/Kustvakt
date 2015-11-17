@@ -36,13 +36,13 @@ public class CollectionRewriteTest {
         BeanConfiguration.closeApplication();
     }
 
+    @Deprecated
     @Test
     public void test2() {
         Pattern p = Pattern.compile("([\\.\\w]+)\\((.+)\\)");
         String cl = de.ids_mannheim.korap.security.ac.SecurityManager.class
                 .getCanonicalName();
         Matcher m = p.matcher(cl);
-        System.out.println("FOUND SOMETHING?! " + m.find());
         while (m.find())
             System.out.println("group 1 " + m.group(1));
 
@@ -56,8 +56,8 @@ public class CollectionRewriteTest {
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection("textClass=politik & corpusID=WPD");
         String result = s.toJSON();
-        JsonNode node = JsonUtils.readTree(
-                handler.preProcess(result, User.UserFactory.getUser("test_user")));
+        JsonNode node = JsonUtils.readTree(handler.preProcess(result,
+                User.UserFactory.getUser("test_user")));
         assert node != null;
         assert node.at("/collection/operands").size() == 1;
     }
@@ -70,9 +70,9 @@ public class CollectionRewriteTest {
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection("corpusID=BRZ13 & corpusID=WPD");
         String result = s.toJSON();
-        JsonNode node = JsonUtils.readTree(
-                handler.preProcess(result, User.UserFactory.getUser("test_user")));
-        System.out.println("RESULTING REWR NODE " + node);
+        JsonNode node = JsonUtils.readTree(handler.preProcess(result,
+                User.UserFactory.getUser("test_user")));
+        //        System.out.println("RESULTING REWR NODE " + node);
         assert node != null;
         assert node.at("/collection/operands").size() == 0;
     }
@@ -86,10 +86,9 @@ public class CollectionRewriteTest {
         s.setCollection(
                 "(corpusID=BRZ13 & textClass=Wissenschaft) & corpusID=WPD");
         String result = s.toJSON();
-        JsonNode node = JsonUtils.readTree(
-                handler.preProcess(result, User.UserFactory.getUser("test_user")));
+        JsonNode node = JsonUtils.readTree(handler.preProcess(result,
+                User.UserFactory.getUser("test_user")));
 
-        System.out.println("COLLECTION NODE " + result);
         assert node != null;
         assert node.at("/collection/operands/0/@type").asText()
                 .equals("koral:docGroup");
@@ -108,8 +107,9 @@ public class CollectionRewriteTest {
         s.setCollection(
                 "(corpusID=BRZ13 & corpusID=WPD) & textClass=Wissenschaft & textClass=Sport");
         String result = s.toJSON();
-        JsonNode node = JsonUtils.readTree(
-                handler.preProcess(result, User.UserFactory.getUser("test_user")));
+        JsonNode node = JsonUtils.readTree(handler.preProcess(result,
+                User.UserFactory.getUser("test_user")));
+
         assert node != null;
         assert node.at("/collection/@type").asText().equals("koral:docGroup");
         assert node.at("/collection/operands").size() == 2;
@@ -128,8 +128,8 @@ public class CollectionRewriteTest {
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection("(corpusID=BRZ13 & textClass=Wissenschaft)");
         String result = s.toJSON();
-        JsonNode node = JsonUtils.readTree(
-                handler.preProcess(result, User.UserFactory.getUser("test_user")));
+        JsonNode node = JsonUtils.readTree(handler.preProcess(result,
+                User.UserFactory.getUser("test_user")));
         assert node != null;
         assert node.at("/collection/@type").asText().equals("koral:doc");
     }
@@ -144,8 +144,8 @@ public class CollectionRewriteTest {
         s.setCollection(
                 "(corpusID=BRZ13 & corpusID=WPD) & textClass=Wissenschaft");
         String result = s.toJSON();
-        JsonNode node = JsonUtils.readTree(
-                handler.preProcess(result, User.UserFactory.getUser("test_user")));
+        JsonNode node = JsonUtils.readTree(handler.preProcess(result,
+                User.UserFactory.getUser("test_user")));
 
         assert node != null;
         assert node.at("/collection/@type").asText().equals("koral:doc");
@@ -162,13 +162,15 @@ public class CollectionRewriteTest {
         s.setCollection(
                 "(docID=random & textClass=Wissenschaft) & corpusID=WPD");
         String result = s.toJSON();
-        JsonNode node = JsonUtils.readTree(
-                handler.preProcess(result, User.UserFactory.getUser("test_user")));
+        JsonNode node = JsonUtils.readTree(handler.preProcess(result,
+                User.UserFactory.getUser("test_user")));
         System.out.println("original node " + result);
         System.out.println("result node " + node);
         assert node != null;
         assert node.at("/collection/@type").asText().equals("koral:docGroup");
         assert node.at("/collection/operands").size() == 2;
+        assert node.at("/collection/operands/0/@type").asText()
+                .equals("koral:doc");
     }
 
 }

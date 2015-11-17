@@ -42,7 +42,7 @@ import de.ids_mannheim.korap.user.User;
  * @author hanl
  * @date 02/07/2015
  */
-public class TreeConstraint implements RewriteTask.RewriteQuery {
+public class TreeConstraint implements RewriteTask.RewriteNodeAt {
 
     private String pointer;
 
@@ -60,6 +60,11 @@ public class TreeConstraint implements RewriteTask.RewriteQuery {
 
     @Override
     public JsonNode postProcess(KoralNode node) {
+        return null;
+    }
+
+    @Override
+    public String at() {
         return null;
     }
 }

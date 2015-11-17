@@ -13,12 +13,11 @@ import de.ids_mannheim.korap.user.User;
  * @date 03/07/2015
  */
 // todo: test
-public class CollectionConstraint implements RewriteTask.RewriteNode {
+public class CollectionConstraint implements RewriteTask.IterableRewriteAt {
 
     @Override
     public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
             User user) {
-
         if (node.get("@type").equals("koral:doc")) {
             if (node.get("key").equals("corpusID") && !check(node, user)) {
                 node.removeNode();
@@ -52,4 +51,13 @@ public class CollectionConstraint implements RewriteTask.RewriteNode {
         return corpus != null;
     }
 
+    @Override
+    public JsonNode postProcess(KoralNode node) {
+        return null;
+    }
+
+    @Override
+    public String path() {
+        return "collection";
+    }
 }

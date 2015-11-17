@@ -18,16 +18,23 @@ public abstract class KoralNode {
     private JsonNode node;
     private KoralRewriteBuilder builder;
     private boolean remove;
+    private final String target;
 
-    private KoralNode(JsonNode node) {
+    private KoralNode(String target, JsonNode node) {
         this.node = node;
+        this.target = target;
         this.builder = new KoralRewriteBuilder();
         this.remove = false;
     }
 
     public static KoralNode wrapNode(JsonNode node) {
-        return new KoralNode(node) {
+        return new KoralNode(null, node) {
         };
+    }
+
+    @Override
+    public String toString() {
+        return this.node.toString();
     }
 
     @Deprecated
@@ -104,7 +111,6 @@ public abstract class KoralNode {
         return false;
     }
 
-
     public JsonNode rawNode() {
         return this.node;
     }
@@ -115,6 +121,10 @@ public abstract class KoralNode {
 
     public boolean isRemove() {
         return this.remove;
+    }
+
+    public final String target() {
+        return this.target;
     }
 
     //todo: 21.10.15 -- redo with better return policies!
