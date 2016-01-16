@@ -30,6 +30,10 @@ public class PolicyBuilder {
 
     public PolicyBuilder(User user) {
         this.user = user;
+
+        // fixme: other exception!?
+        if (this.user.getId() == -1)
+            throw new RuntimeException("user id must be set");
     }
 
     public PolicyBuilder setResources(KustvaktResource... targets) {
@@ -108,7 +112,7 @@ public class PolicyBuilder {
     }
 
     // for and relations there is no way of setting parameters conjoined with the policy
-    private void doIt() throws KustvaktException, NotAuthorizedException {
+    private void doIt() throws NotAuthorizedException, KustvaktException {
         if (this.resources == null)
             throw new KustvaktException(user.getId(),
                     StatusCodes.ILLEGAL_ARGUMENT, "resource must be set",
@@ -125,7 +129,8 @@ public class PolicyBuilder {
             this.rel = Relation.AND;
 
         for (int idx = 0; idx < this.resources.length; idx++) {
-            resources[idx].setParentID(parents[idx].getPersistentID());
+            if (parents[idx] != null)
+                resources[idx].setParentID(parents[idx].getPersistentID());
             SecurityManager manager = SecurityManager
                     .register(resources[idx], user);
 

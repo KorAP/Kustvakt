@@ -19,6 +19,7 @@ public class UserDetails {
     private Integer userID;
     private String firstName;
     private String lastName;
+    // todo :should be boolean or integer?!
     private String gender;
     private String phone;
     private String institution;
@@ -61,28 +62,34 @@ public class UserDetails {
         return details;
     }
 
-    public void updateDetails(Map<String, String> d) {
-        Map<String, String> detailMap = new CaseInsensitiveMap(d);
+    public void updateDetails(Map<String, Object> d) {
+        Map<String, Object> detailMap = new CaseInsensitiveMap(d);
 
         if (!detailMap.isEmpty()) {
             if (detailMap.containsKey(Attributes.FIRSTNAME))
-                this.setFirstName(detailMap.get(Attributes.FIRSTNAME));
+                this.setFirstName(
+                        String.valueOf(detailMap.get(Attributes.FIRSTNAME)));
             if (detailMap.containsKey(Attributes.LASTNAME))
-                this.setLastName(detailMap.get(Attributes.LASTNAME));
+                this.setLastName(
+                        String.valueOf(detailMap.get(Attributes.LASTNAME)));
             if (detailMap.containsKey(Attributes.PHONE))
-                this.setPhone(detailMap.get(Attributes.PHONE));
+                this.setPhone(String.valueOf(detailMap.get(Attributes.PHONE)));
             if (detailMap.containsKey(Attributes.EMAIL))
-                this.setEmail(detailMap.get(Attributes.EMAIL));
+                this.setEmail(String.valueOf(detailMap.get(Attributes.EMAIL)));
             if (detailMap.containsKey(Attributes.GENDER))
-                this.setGender(detailMap.get(Attributes.GENDER));
+                this.setGender(
+                        String.valueOf(detailMap.get(Attributes.GENDER)));
             if (detailMap.containsKey(Attributes.ADDRESS))
-                this.setAddress(detailMap.get(Attributes.ADDRESS));
+                this.setAddress(
+                        String.valueOf(detailMap.get(Attributes.ADDRESS)));
             if (detailMap.containsKey(Attributes.COUNTRY))
-                this.setCountry(detailMap.get(Attributes.COUNTRY));
+                this.setCountry(
+                        String.valueOf(detailMap.get(Attributes.COUNTRY)));
             if (detailMap.containsKey(Attributes.INSTITUTION))
-                this.setInstitution(detailMap.get(Attributes.INSTITUTION));
-            this.setPrivateUsage(
-                    Boolean.valueOf(detailMap.get(Attributes.PRIVATE_USAGE)));
+                this.setInstitution(
+                        String.valueOf(detailMap.get(Attributes.INSTITUTION)));
+            this.setPrivateUsage(Boolean.valueOf(
+                    String.valueOf(detailMap.get(Attributes.PRIVATE_USAGE))));
         }
     }
 

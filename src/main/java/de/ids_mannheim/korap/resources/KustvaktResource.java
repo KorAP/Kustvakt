@@ -54,6 +54,7 @@ public abstract class KustvaktResource {
         this.parentID = null;
     }
 
+    // todo: move creator to builder instance for policies
     public KustvaktResource(String persistentID, int creator) {
         this();
         this.owner = creator;
@@ -135,11 +136,13 @@ public abstract class KustvaktResource {
         Map m = new HashMap();
         m.put("id", persistentID);
         m.put("name", name);
-        m.put("path", path);
+        //todo: fix!
+//        m.put("path", path);
         m.put("description", description);
         m.put("created", TimeUtils.format(new DateTime(created)));
-        m.put("managed", managed);
-        m.put("shared", shared);
+        // deprecated
+//        m.put("managed", managed);
+//        m.put("shared", shared);
         return m;
     }
 
@@ -155,6 +158,7 @@ public abstract class KustvaktResource {
                 '}';
     }
 
+    //fixme: make private in respective areas
     @Getter
     public static class Container {
         private final Class type;

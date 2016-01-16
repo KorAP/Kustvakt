@@ -31,13 +31,41 @@ public class CollectionQueryBuilder3 {
         this.base = null;
     }
 
-    public CollectionQueryBuilder3 addSegment(String field, EQ eq,
-            String value) {
+//    /**
+//     * convencience method for equal field value search operation
+//     * @param field
+//     * @param value
+//     * @return
+//     */
+//    public CollectionQueryBuilder3 eq(String field, String value) {
+//        fieldValue(field, "match:eq", value);
+//        return this;
+//    }
+//
+//    /**
+//     * convencience method for unequal field value search operation
+//     * @param field
+//     * @param value
+//     * @return
+//     */
+//    public CollectionQueryBuilder3 uneq(String field, String value) {
+//        fieldValue(field, "match:ne", value);
+//        return this;
+//    }
+
+
+    /**
+     * raw method for field - value pair adding. Supports all operators (leq, geq, contains, etc.)
+     * @param field
+     * @param op
+     * @param value
+     * @return
+     */
+    public CollectionQueryBuilder3 fieldValue(String field, String op, String value) {
         if (base == null)
-            this.builder
-                    .append(field + (eq.equals(EQ.EQUAL) ? "=" : "!=") + value);
+            this.builder.append(field + op + value);
         else {
-            JsonNode node = Utils.buildDoc(field, value, eq);
+            JsonNode node = Utils.buildDoc(field, value, op);
             appendToBaseGroup(node);
         }
         return this;
@@ -49,7 +77,7 @@ public class CollectionQueryBuilder3 {
      * @param query will be parenthised in order to make sub query element
      * @return
      */
-    public CollectionQueryBuilder3 addSub(String query) {
+    public CollectionQueryBuilder3 addQuery(String query) {
         if (!query.startsWith("(") && !query.endsWith(")"))
             query = "(" + query + ")";
 
@@ -75,12 +103,7 @@ public class CollectionQueryBuilder3 {
         return this;
     }
 
-    @Deprecated
-    public CollectionQueryBuilder3 addRaw(String collection) {
-        return this;
-    }
-
-    public Object getRequest() {
+    private Object build() {
         Object request = base;
         if (request == null) {
             CollectionQueryProcessor tree = new CollectionQueryProcessor(
@@ -98,17 +121,16 @@ public class CollectionQueryBuilder3 {
      *
      * @param query
      */
-    public void setBaseQuery(String query) {
+    public CollectionQueryBuilder3 setBaseQuery(String query) {
         this.base = JsonUtils.readTree(query);
+        return this;
     }
 
     public String toJSON() {
-        return JsonUtils.toJSON(getRequest());
+        return JsonUtils.toJSON(build());
     }
 
-
-
-    private void appendToBaseGroup(JsonNode node) {
+    private CollectionQueryBuilder3 appendToBaseGroup(JsonNode node) {
         if (base.at("/collection/@type").asText().equals("koral:docGroup")) {
             ArrayNode group = (ArrayNode) base.at("/collection/operands");
             if (node instanceof ArrayNode)
@@ -119,14 +141,17 @@ public class CollectionQueryBuilder3 {
             throw new IllegalArgumentException("No group found to add to!");
         // fixme: if base is a doc only, this function is not supported. requirement is a koral:docGroup, since
         // combination operator is unknown otherwise
+        return this;
     }
+
 
     public static class Utils {
 
-        public static JsonNode buildDoc(String key, String value, EQ eq) {
+        public static JsonNode buildDoc(String key, String value, String op) {
             ObjectNode node = JsonUtils.createObjectNode();
             node.put("@type", "koral:doc");
-            node.put("match", eq.equals(EQ.EQUAL) ? "match:eq" : "match:ne");
+            // eq.equals(EQ.EQUAL) ? "match:eq" : "match:ne"
+            node.put("match", op);
             node.put("key", key);
             node.put("value", value);
 

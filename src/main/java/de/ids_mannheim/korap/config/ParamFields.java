@@ -13,7 +13,7 @@ import java.util.HashMap;
 public class ParamFields extends HashMap<String, ParamFields.Param> {
 
     public void add(Param param) {
-        this.put(Param.class.getName(), param);
+        this.put(param.getClass().getName(), param);
     }
 
     public <T extends Param> T get(Class<T> cl) {
@@ -32,7 +32,7 @@ public class ParamFields extends HashMap<String, ParamFields.Param> {
     @Getter
     public abstract static class Param {
 
-        public boolean hasValues(){
+        public boolean hasValues() {
             return false;
         }
 

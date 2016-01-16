@@ -26,8 +26,6 @@ import java.sql.Timestamp;
 import java.util.List;
 
 /**
- *
- *
  * Created by hanl on 7/14/14.
  */
 public class OAuthDb {
@@ -64,7 +62,8 @@ public class OAuthDb {
                         }
                     });
         }catch (EmptyResultDataAccessException ex) {
-            errorLogger.error("no client found", ex.fillInStackTrace());
+            errorLogger.error("'{}' client found", clientid,
+                    ex.fillInStackTrace());
             return null;
         }
     }

@@ -5,6 +5,7 @@ alter table user_settings drop column searchSettingsTab;
 alter table user_settings drop column selectedGraphType;
 alter table user_settings drop column selectedSortType;
 alter table user_settings drop column selectedViewForSearchResults;
+
 rename table udetails to user_details;
 rename table uqueries to user_queries;
 rename table korapusers to korap_users;
@@ -13,6 +14,19 @@ rename table matchInfo to match_info;
 
 alter table korap_users change column URI_PASS_Fragment uri_fragment VARCHAR(100);
 alter table korap_users change column URI_Expiration uri_expiration TIMESTAMP;
+alter table korap_users drop column URI_CONF_Fragment;
+alter table korap_users change column accountLock account_lock BOOLEAN not null default false;
+alter table korap_users change column accountCreation account_creation TIMESTAMP default CURRENT_TIMESTAMP not null;
+alter table korap_users change column accountExpiration account_expiration TIMESTAMP;
+alter table korap_users change column accountLink account_link VARCHAR(100);
+
+
+alter table shib_users change column accountCreation account_creation TIMESTAMP default CURRENT_TIMESTAMP not null;
+alter table shib_users change column accountExpiration account_expiration TIMESTAMP;
+alter table shib_users change column accountLink account_link VARCHAR(100);
+
+alter table user_details change column userID user_id INTEGER NOT NULL UNIQUE;
+
 drop view allusers;
 
 rename table r_store TO resource_store;
@@ -30,7 +44,7 @@ rename table paramMapping TO param_map;
 rename table cstorage to coll_store;
 alter table coll_store add column (
 created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-userID INTEGER);
+user_id INTEGER);
 alter table coll_store drop column refCorpus;
 
 
@@ -49,21 +63,21 @@ alter table coll_store drop column refCorpus;
 --);
 
 
-drop table doc_trace;
-
-CREATE TABLE IF NOT EXISTS doc_store (
-id VARCHAR(230) PRIMARY KEY,
-persistent_id VARCHAR(230) UNIQUE,
-created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-disabled BOOLEAN default true
-);
+--drop table doc_trace;
+--
+--CREATE TABLE IF NOT EXISTS doc_store (
+--id VARCHAR(230) PRIMARY KEY,
+--persistent_id VARCHAR(230) UNIQUE,
+--created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--disabled BOOLEAN default true
+--);
 
 
 
 rename table p_store to policy_store;
 rename table conditionDef to group_ref;
 alter table group_ref change groupRef group_id VARCHAR(100) NOT NULL;
-alter table group_ref change policyId policy_id VARCHAR(100) NOT NULL;
+alter table group_ref change policyId policy_id INTEGER;
 
 drop view p_view;
 create or replace view policy_view as

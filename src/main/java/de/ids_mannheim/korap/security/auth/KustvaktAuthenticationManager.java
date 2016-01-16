@@ -5,7 +5,9 @@ import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.exceptions.*;
-import de.ids_mannheim.korap.interfaces.*;
+import de.ids_mannheim.korap.interfaces.AuthenticationIface;
+import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
+import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.user.*;
@@ -64,7 +66,13 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             String useragent) throws KustvaktException {
         jlog.info("getting session status of token '{}'", token);
         AuthenticationIface provider = getProvider(
-                StringUtils.getTokenType(token));
+                StringUtils.getTokenType(token), null);
+
+        if (provider == null)
+            // throw exception for missing type paramter
+            throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
+                    "token type not defined or found", "token_type");
+
         TokenContext context = provider.getUserStatus(token);
         if (!matchStatus(host, useragent, context))
             provider.removeUserSession(token);
@@ -96,11 +104,16 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     }
 
     public TokenContext refresh(TokenContext context) throws KustvaktException {
-        AuthenticationIface provider = getProvider(context.getTokenType());
+        AuthenticationIface provider = getProvider(context.getTokenType(),
+                null);
+        if (provider == null) {
+
+        }
+
         try {
             provider.removeUserSession(context.getToken());
             User user = getUser(context.getUsername());
-            return provider.createUserSession(user, context.getParameters());
+            return provider.createUserSession(user, context.params());
         }catch (KustvaktException e) {
             throw new WrappedException(e, StatusCodes.LOGIN_FAILED);
         }
@@ -134,7 +147,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     @CachePut(value = "users", key = "#user.getUsername()")
     public TokenContext createTokenContext(User user, Map<String, Object> attr,
             String provider_key) throws KustvaktException {
-        AuthenticationIface provider = getProvider(provider_key);
+        AuthenticationIface provider = getProvider(provider_key,
+                Attributes.API_AUTHENTICATION);
 
         if (attr.get(Attributes.SCOPES) != null)
             this.getUserDetails(user);
@@ -180,7 +194,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     private User authenticate(String username, String password,
             Map<String, Object> attr) throws KustvaktException {
         Map<String, Object> attributes = crypto.validateMap(attr);
-        String uPassword, safeUS;
+        String safeUS;
         User unknown;
         // just to make sure that the plain password does not appear anywhere in the logs!
 
@@ -293,7 +307,12 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     public void logout(TokenContext context) throws KustvaktException {
         String key = cache_key(context.getUsername());
         try {
-            AuthenticationIface provider = getProvider(context.getTokenType());
+            AuthenticationIface provider = getProvider(context.getTokenType(),
+                    null);
+
+            if (provider == null) {
+
+            }
             provider.removeUserSession(context.getToken());
         }catch (KustvaktException e) {
             throw new WrappedException(e, StatusCodes.LOGOUT_FAILED,
@@ -438,8 +457,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
      * @throws KustvaktException
      */
     //fixme: remove clientinfo object (not needed), use json representation to get stuff
-    public User createUserAccount(Map<String, Object> attributes)
-            throws KustvaktException {
+    public User createUserAccount(Map<String, Object> attributes,
+            boolean conf_required) throws KustvaktException {
         Map<String, Object> safeMap = crypto.validateMap(attributes);
         if (safeMap.get(Attributes.USERNAME) == null || ((String) safeMap
                 .get(Attributes.USERNAME)).isEmpty())
@@ -466,11 +485,13 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         UserDetails det = UserDetails.newDetailsIterator(safeMap);
         user.setDetails(det);
         user.setSettings(new UserSettings());
-        user.setAccountLocked(true);
-        URIParam param = new URIParam(crypto.createToken(), TimeUtils
-                .plusSeconds(BeanConfiguration.getBeans().getConfiguration()
-                        .getShortTokenTTL()).getMillis());
-        user.addField(param);
+        if (conf_required) {
+            user.setAccountLocked(true);
+            URIParam param = new URIParam(crypto.createToken(), TimeUtils
+                    .plusSeconds(BeanConfiguration.getBeans().getConfiguration()
+                            .getExpiration()).getMillis());
+            user.addField(param);
+        }
         user.setPassword(hash);
         try {
             entHandler.createAccount(user);

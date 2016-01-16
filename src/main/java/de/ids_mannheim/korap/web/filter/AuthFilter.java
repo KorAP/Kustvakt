@@ -39,15 +39,17 @@ public class AuthFilter implements ContainerRequestFilter, ResourceFilter {
             try {
                 context = userController
                         .getTokenStatus(authentication, host, ua);
-
             }catch (KustvaktException e) {
                 throw KustvaktResponseHandler.throwit(e);
             }
 
+            // fixme: give reason why access is not granted?
             if (context != null && (
                     (context.isSecureRequired() && request.isSecure())
                             | !context.isSecureRequired()))
                 request.setSecurityContext(new KorAPContext(context));
+            else
+                throw KustvaktResponseHandler.throwAuthenticationException();
         }
         return request;
     }

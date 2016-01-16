@@ -55,6 +55,7 @@ public interface PolicyHandlerIface {
      * @param perm
      * @return
      */
+    // todo: refactor
     List<SecurityPolicy>[] findPolicies(String path, User user, Byte perm);
 
     /**

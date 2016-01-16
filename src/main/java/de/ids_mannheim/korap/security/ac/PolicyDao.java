@@ -213,7 +213,7 @@ public class PolicyDao implements PolicyHandlerIface {
                         +
                         "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
                         +
-                        "(select sum(distinct res.depth) from p_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id in (select g.group_id from group_users as g "
+                        "(select sum(distinct res.depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id in (select g.group_id from group_users as g "
                         +
                         "where g.user_id=:userid) or pos.group_id='self') and res.child_id=rh.child_id group by child_id);";
 
@@ -229,7 +229,7 @@ public class PolicyDao implements PolicyHandlerIface {
                     });
         }catch (DataAccessException e) {
             KustvaktLogger.SECURITY_LOGGER
-                    .error("Permission Denied for retrieval for '{}' for user '{}'",
+                    .error("Permission Denied for policy retrieval for '{}' for user '{}'",
                             target, user.getId());
             return new List[2];
         }
@@ -247,19 +247,20 @@ public class PolicyDao implements PolicyHandlerIface {
         // fixme: missing constraint of user group membership!
         String sql_new = "select pv.*, pv.perm & :perm as allowed, " +
                 "rh.depth, (select max(depth) from resource_tree " +
-                "where child_id=rh.child_id) as max_depth from p_view as pv " +
+                "where child_id=rh.child_id) as max_depth from policy_view as pv "
+                +
                 "inner join resource_tree as rh on rh.parent_id=pv.id " +
-                "where rh.child_id=(select id from resource_store where persistentID=:target) and "
+                "where rh.child_id=(select id from resource_store where persistent_id=:target) and "
                 +
                 "pv.enable <= :en and (pv.expire > :en or pv.expire is NULL) and "
                 +
-                "(pv.group_id='self' or pv.group_id in (select g.group_id from group_users as g where g.userid=:userid)) and "
+                "(pv.group_id='self' or pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid)) and "
                 +
                 "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
                 +
-                "(select sum(distinct res.depth) from p_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id in (select g.group_id from group_users "
+                "(select sum(distinct res.depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id in (select g.group_id from group_users "
                 +
-                "as g where g.userid=:userid) or pos.group_id='self') and res.child_id=rh.child_id group by child_id)";
+                "as g where g.user_id=:userid) or pos.group_id='self') and res.child_id=rh.child_id group by child_id)";
 
         try {
             return this.jdbcTemplate.query(sql_new, param,
@@ -273,7 +274,7 @@ public class PolicyDao implements PolicyHandlerIface {
                     });
         }catch (DataAccessException e) {
             KustvaktLogger.SECURITY_LOGGER
-                    .error("Permission Denied for retrieval for '{}' for user '{}'",
+                    .error("Permission Denied for policy retrieval for '{}' for user '{}'",
                             target, user.getId());
             return new List[2];
         }
@@ -290,18 +291,19 @@ public class PolicyDao implements PolicyHandlerIface {
 
         String sql_new = "select pv.*, pv.perm & :perm as allowed, " +
                 "rh.depth, (select max(depth) from resource_tree " +
-                "where child_id=rh.child_id) as max_depth from p_view as pv " +
+                "where child_id=rh.child_id) as max_depth from policy_view as pv "
+                +
                 "inner join resource_tree as rh on rh.parent_id=pv.id " +
                 "where rt.name_path regexp :path and " +
                 "pv.enable <= :en and (pv.expire > :en or pv.expire is NULL) and "
                 +
-                "(pv.group_id='self' or pv.group_id in (select g.group_id from group_users as g where g.userid=:userid)) and "
+                "(pv.group_id='self' or pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid)) and "
                 +
                 "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
                 +
-                "(select sum(distinct res.depth) from p_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id in (select g.group_id from group_users "
+                "(select sum(distinct res.depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id in (select g.group_id from group_users "
                 +
-                "as g where g.userid=:userid) or pos.group_id='self') and res.child_id=rh.child_id group by child_id)";
+                "as g where g.user_id=:userid) or pos.group_id='self') and res.child_id=rh.child_id group by child_id)";
 
         try {
             return this.jdbcTemplate.query(sql_new, param,
@@ -315,7 +317,7 @@ public class PolicyDao implements PolicyHandlerIface {
                     });
         }catch (DataAccessException e) {
             KustvaktLogger.SECURITY_LOGGER
-                    .error("Permission Denied for retrieval for '{}' for user '{}'",
+                    .error("Permission Denied for retrieval for resource id '{}' for user '{}'",
                             path, user.getId());
             return new List[2];
         }
@@ -331,7 +333,8 @@ public class PolicyDao implements PolicyHandlerIface {
     // todo: does not concern itsself with location matching, ever!
     @Override
     public List<KustvaktResource.Container> getDescending(String path,
-            final User user, Byte b, final Class<? extends KustvaktResource> clazz)
+            final User user, Byte b,
+            final Class<? extends KustvaktResource> clazz)
             throws KustvaktException {
         final MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("userid", user.getId());
@@ -343,49 +346,49 @@ public class PolicyDao implements PolicyHandlerIface {
         if (path != null && !path.isEmpty()) {
             sql = "select pv.*, pv.perm & :perm as allowed, rh.depth, rh.name_path, (select max(depth) from resource_tree \n"
                     +
-                    "where child_id=rh.child_id) as max_depth from p_view as pv "
+                    "where child_id=rh.child_id) as max_depth from policy_view as pv "
                     +
                     "inner join resource_tree as rh on rh.child_id=pv.id " +
                     "where pv.type=:type and (rh.name_path like :part) and ((pv.creator=:userid and pv.group_id='self') or "
                     +
-                    "(pv.group_id in (select g.group_id from group_users as g where g.userid=:userid) and "
+                    "(pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid) and "
                     +
                     "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
                     +
-                    "(select sum(distinct depth) from p_view as pos inner join resource_tree as res on res.parent_id=pos.id "
+                    "(select sum(distinct depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id "
                     +
-                    "where pos.group_id in (select g.group_id from group_users as g where g.userid=:userid) "
+                    "where pos.group_id in (select g.group_id from group_users as g where g.user_id=:userid) "
                     +
                     "and res.child_id=rh.child_id group by child_id))) " +
                     "group by pv.pid, pv.id having count(distinct pv.group_id) = "
                     +
-                    "((select count(co.group_id) from group_ref as co where co.policyid=pv.pid) or "
+                    "((select count(co.group_id) from group_ref as co where co.policy_id=pv.pid) or "
                     +
-                    "(select 1 from p_view as cp2 where cp2.group_id='self' and cp2.id=pv.id)) "
+                    "(select 1 from policy_view as cp2 where cp2.group_id='self' and cp2.id=pv.id)) "
                     +
                     "order by rh.depth asc, pv.id desc;";
         }else {
             sql = "select pv.*, pv.perm & :perm as allowed, rh.depth, rh.name_path, (select max(depth) from resource_tree \n"
                     +
-                    "where child_id=rh.child_id) as max_depth from p_view as pv "
+                    "where child_id=rh.child_id) as max_depth from policy_view as pv "
                     +
                     "inner join resource_tree as rh on rh.child_id=pv.id " +
                     "where pv.type=:type and ((pv.creator=:userid and pv.group_id='self') or "
                     +
-                    "(pv.group_id in (select g.group_id from group_users as g where g.userid=:userid) and "
+                    "(pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid) and "
                     +
                     "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
                     +
-                    "(select sum(distinct depth) from p_view as pos inner join resource_tree as res on res.parent_id=pos.id "
+                    "(select sum(distinct depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id "
                     +
-                    "where pos.group_id in (select g.group_id from group_users as g where g.userid=:userid) "
+                    "where pos.group_id in (select g.group_id from group_users as g where g.user_id=:userid) "
                     +
                     "and res.child_id=rh.child_id group by child_id))) " +
                     "group by pv.pid, pv.id having count(distinct pv.group_id) = "
                     +
-                    "((select count(co.group_id) from group_ref as co where co.policyid=pv.pid) or "
+                    "((select count(co.group_id) from group_ref as co where co.policy_id=pv.pid) or "
                     +
-                    "(select 1 from p_view as cp2 where cp2.group_id='self' and cp2.id=pv.id)) "
+                    "(select 1 from policy_view as cp2 where cp2.group_id='self' and cp2.id=pv.id)) "
                     +
                     "order by rh.depth asc, pv.id desc;";
         }
@@ -416,52 +419,52 @@ public class PolicyDao implements PolicyHandlerIface {
             sql = "select pv.*, pv.perm & :perm as allowed, rh.depth, rh.name_path,\n"
                     +
                     "(select max(depth) from resource_tree \n" +
-                    "where child_id=rh.child_id) as max_depth from p_view as pv\n"
+                    "where child_id=rh.child_id) as max_depth from policy_view as pv\n"
                     +
                     "inner join resource_tree as rh on rh.child_id=pv.id\n" +
                     "where pv.id in (select rt.parent_id from resource_tree as rt inner join resource_store rs on rs.id=rt.child_id\n"
                     +
                     "where rs.type=:type and rt.name_path like :part) and ((pv.creator=:userid and pv.group_id='self') or\n"
                     +
-                    "(pv.group_id in (select g.group_id from group_users as g where g.userid=:userid) and\n"
+                    "(pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid) and\n"
                     +
                     "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) =\n"
                     +
-                    "(select sum(distinct depth) from p_view as pos inner join resource_tree as res on res.parent_id=pos.id\n"
+                    "(select sum(distinct depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id\n"
                     +
-                    "where pos.group_id in (select g.group_id from group_users as g where g.userid=:userid)\n"
+                    "where pos.group_id in (select g.group_id from group_users as g where g.user_id=:userid)\n"
                     +
                     "and res.child_id=rh.child_id group by child_id)))\n" +
                     "group by pv.pid, pv.id having count(distinct pv.group_id) = \n"
                     +
                     "case when pv.creator=:userid then 1 else (select count(distinct co.group_id) "
                     +
-                    "from group_ref as co where co.policyid=pv.pid) end order by rh.depth desc, pv.id desc;";
+                    "from group_ref as co where co.policy_id=pv.pid) end order by rh.depth desc, pv.id desc;";
         }else {
             sql = "select pv.*, pv.perm & :perm as allowed, rh.depth, rh.name_path,\n"
                     +
                     "(select max(depth) from resource_tree \n" +
-                    "where child_id=rh.child_id) as max_depth from p_view as pv\n"
+                    "where child_id=rh.child_id) as max_depth from policy_view as pv\n"
                     +
                     "inner join resource_tree as rh on rh.child_id=pv.id\n" +
                     "where pv.id in (select rt.parent_id from resource_tree as rt inner join resource_store rs on rs.id=rt.child_id\n"
                     +
                     "where rs.type=:type) and ((pv.creator=:userid and pv.group_id='self') or\n"
                     +
-                    "(pv.group_id in (select g.group_id from group_users as g where g.userid=:userid) and\n"
+                    "(pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid) and\n"
                     +
                     "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) =\n"
                     +
-                    "(select sum(distinct depth) from p_view as pos inner join resource_tree as res on res.parent_id=pos.target_id\n"
+                    "(select sum(distinct depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.target_id\n"
                     +
-                    "where pos.group_id in (select g.group_id from group_users as g where g.userid=:userid)\n"
+                    "where pos.group_id in (select g.group_id from group_users as g where g.user_id=:userid)\n"
                     +
                     "and res.child_id=rh.child_id group by child_id)))\n" +
                     "group by pv.pid, pv.id having count(distinct pv.group_id) = \n"
                     +
                     "case when pv.creator=:userid then 1 else (select count(distinct co.group_id) "
                     +
-                    "from group_ref as co where co.policyid=pv.pid) end order by rh.depth desc, pv.id desc;";
+                    "from group_ref as co where co.policy_id=pv.pid) end order by rh.depth desc, pv.id desc;";
         }
         try {
             return this.jdbcTemplate.query(sql, param,
@@ -488,7 +491,7 @@ public class PolicyDao implements PolicyHandlerIface {
 
         try {
             this.jdbcTemplate
-                    .update("DELETE FROM group_ref WHERE policyid=:id", param);
+                    .update("DELETE FROM group_ref WHERE policy_id=:id", param);
             return this.jdbcTemplate
                     .update("DELETE FROM policy_store WHERE id=:id", param);
         }catch (DataAccessException e) {
@@ -580,14 +583,14 @@ public class PolicyDao implements PolicyHandlerIface {
         param.addValue("isadmin", BooleanUtils.getBoolean(owner));
         String sql;
         if (owner) {
-            sql = "SELECT COUNT(*) FROM group_users AS gu INNER JOIN groupolicy_store AS gs "
+            sql = "SELECT COUNT(*) FROM group_users AS gu INNER JOIN group_store AS gs "
                     +
-                    "ON gs.name=gu.group_id WHERE gu.userID=:userid " +
+                    "ON gs.name=gu.group_id WHERE gu.user_id=:userid " +
                     "AND gs.name=:group AND gu.admin=:isadmin;";
         }else {
-            sql = "SELECT COUNT(*) FROM group_users AS gu INNER JOIN groupolicy_store AS gs "
+            sql = "SELECT COUNT(*) FROM group_users AS gu INNER JOIN group_store AS gs "
                     +
-                    "ON gs.name=gu.group_id WHERE gu.userID=:userid " +
+                    "ON gs.name=gu.group_id WHERE gu.user_id=:userid " +
                     "AND gs.name=:group;";
         }
 
@@ -626,11 +629,12 @@ public class PolicyDao implements PolicyHandlerIface {
         }
     }
 
+    //
     @Override
     public int addToCondition(String username, PolicyCondition condition,
             boolean admin) throws KustvaktException {
         final String insert =
-                "INSERT INTO group_users (userID, group_id, admin) " +
+                "INSERT INTO group_users (user_id, group_id, admin) " +
                         "VALUES ((SELECT id FROM korap_users " +
                         "WHERE username=:username), :group, :status);";
         try {
@@ -654,7 +658,7 @@ public class PolicyDao implements PolicyHandlerIface {
      * @param admin
      * @return
      * @throws KustvaktException userID and group_id have a unique constraint,
-     *                        thus: if any of the supplied users is already a member of the group, the entire chain will be broken!
+     *                           thus: if any of the supplied users is already a member of the group, the entire chain will be broken!
      */
     //todo definitely needs rework
     //todo: test the unique index constraints!
@@ -715,7 +719,7 @@ public class PolicyDao implements PolicyHandlerIface {
         }
 
         final String del =
-                "DELETE FROM group_users WHERE group_id=:group AND userID=(SELECT id FROM "
+                "DELETE FROM group_users WHERE group_id=:group AND user_id=(SELECT id FROM "
                         + "korap_users WHERE username=:username);";
 
         try {
@@ -739,7 +743,7 @@ public class PolicyDao implements PolicyHandlerIface {
         if (!parameterExists(param.getName()))
             createParameter(param.getName(), "", param.getOwner());
         final String insert =
-                "INSERT INTO param_map (paramID, policy_id, value, flag) VALUES ((SELECT id FROM param_store "
+                "INSERT INTO param_map (param_id, policy_id, value, flag) VALUES ((SELECT id FROM param_store "
                         + "WHERE p_key=:key), (SELECT id FROM policy_store WHERE id=:policy), :value, :flag);";
         try {
             this.jdbcTemplate.update(insert, source);
@@ -762,7 +766,6 @@ public class PolicyDao implements PolicyHandlerIface {
         try {
             return this.jdbcTemplate.queryForList(sql1, source, String.class);
         }catch (DataAccessException e) {
-            e.printStackTrace();
             KustvaktLogger.SECURITY_LOGGER
                     .error("Operation (SELECT) not possible for '{}'",
                             condition.toString());

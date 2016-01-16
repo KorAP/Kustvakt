@@ -9,8 +9,8 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.resource.rewrite.FoundryInject;
-import de.ids_mannheim.korap.resource.rewrite.PublicCollection;
 import de.ids_mannheim.korap.resource.rewrite.RewriteHandler;
+import de.ids_mannheim.korap.utils.CollectionQueryBuilder3;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.web.ClientsHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
@@ -49,7 +49,6 @@ public class LightService {
         this.graphDBhandler = new ClientsHandler(builder.build());
         this.processor = new RewriteHandler(config);
         this.processor.add(FoundryInject.class);
-        this.processor.add(PublicCollection.class);
     }
 
     /**
@@ -107,7 +106,6 @@ public class LightService {
         // todo: should be possible to add the meta part to the query serialization
         jlog.info("Serialized search: {}", jsonld);
 
-        // fixme: to use the systemarchitecture pointcut thingis, searchkrill must be injected via
         String result = searchKrill.search(jsonld);
         KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
         return Response.ok(result).build();
@@ -238,11 +236,11 @@ public class LightService {
     @POST
     @Path("stats")
     public Response getStats(String json) {
-        //        CollectionQueryBuilder builder = new CollectionQueryBuilder();
-        //        builder.addResource(json);
+        CollectionQueryBuilder3 builder = new CollectionQueryBuilder3();
+        builder.addQuery(json);
 
         // todo: policy override in extension!
-        String stats = searchKrill.getStatistics(json);
+        String stats = searchKrill.getStatistics(builder.toJSON());
         if (stats.contains("-1"))
             throw KustvaktResponseHandler.throwit(StatusCodes.EMPTY_RESULTS);
 
@@ -276,4 +274,5 @@ public class LightService {
 
         return Response.ok(results).build();
     }
+
 }

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.ids_mannheim.korap</groupId>
     <artifactId>Kustvakt-core</artifactId>
-    <version>0.5</version>
+    <version>0.56</version>
     <packaging>jar</packaging>
     <name>Kustvakt core</name>
     <description>Kustvakt core, basic rest api for testing purposes and default
@@ -96,6 +96,7 @@
                 <directory>src/test/resources</directory>
                 <filtering>true</filtering>
                 <includes>
+
                     <include>**/*.prop</include>
                     <include>**/*.xml</include>
                     <include>**/*.conf</include>
@@ -305,6 +306,12 @@
         </dependency>
 
         <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.6</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
             <version>2.1.1</version>
@@ -331,7 +338,7 @@
         <dependency>
             <groupId>de.ids_mannheim.korap</groupId>
             <artifactId>Krill</artifactId>
-            <version>0.53</version>
+            <version>0.54</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.xerial</groupId>
@@ -346,10 +353,10 @@
         </dependency>
         <!-- deprecated? -->
         <!--<dependency>-->
-            <!--<groupId>com.restfuse</groupId>-->
-            <!--<artifactId>com.eclipsesource.restfuse</artifactId>-->
-            <!--<version>1.0.0</version>-->
-            <!--<scope>provided</scope>-->
+        <!--<groupId>com.restfuse</groupId>-->
+        <!--<artifactId>com.eclipsesource.restfuse</artifactId>-->
+        <!--<version>1.0.0</version>-->
+        <!--<scope>provided</scope>-->
         <!--</dependency>-->
         <!-- deprecated -->
         <!--<dependency>-->
@@ -359,9 +366,9 @@
         <!--<scope>provided</scope>-->
         <!--</dependency>-->
         <!--<dependency>-->
-            <!--<groupId>org.springframework</groupId>-->
-            <!--<artifactId>spring-core</artifactId>-->
-            <!--<version>4.0.5.RELEASE</version>-->
+        <!--<groupId>org.springframework</groupId>-->
+        <!--<artifactId>spring-core</artifactId>-->
+        <!--<version>4.0.5.RELEASE</version>-->
         <!--</dependency>-->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -432,6 +439,11 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
             <version>8.1.8.v20121106</version>
+        </dependency>
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>3.3.1</version>
         </dependency>
 
         <!--

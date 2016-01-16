@@ -26,6 +26,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,8 +46,8 @@ public class EntityDao implements EntityHandlerIface {
     @Override
     public UserSettings getUserSettings(Integer userid)
             throws KustvaktException {
-//        TransactionDefinition def = new DefaultTransactionDefinition();
-//        TransactionStatus status = transactionManager.getTransaction(def);
+        //        TransactionDefinition def = new DefaultTransactionDefinition();
+        //        TransactionStatus status = transactionManager.getTransaction(def);
 
         MapSqlParameterSource np = new MapSqlParameterSource();
         np.addValue("us", userid);
@@ -242,8 +243,6 @@ public class EntityDao implements EntityHandlerIface {
             throw new dbException(username, "korap_users",
                     StatusCodes.DB_GET_FAILED, username);
         }
-        // todo: set null!?!
-        //todo: test this
         return user;
     }
 
@@ -267,8 +266,8 @@ public class EntityDao implements EntityHandlerIface {
             }
             np.addValue("id", k.getId());
 
-            query = "UPDATE korap_users SET accountLock=:alo," +
-                    "accountLink=:ali, password=:ps," +
+            query = "UPDATE korap_users SET account_lock=:alo," +
+                    "account_link=:ali, password=:ps," +
                     "uri_fragment=:frag," +
                     "uri_expiration=:exp WHERE id=:id";
         }else if (user instanceof ShibUser) {
@@ -281,7 +280,7 @@ public class EntityDao implements EntityHandlerIface {
             np.addValue("cn", s.getCn());
             np.addValue("mail", s.getMail());
 
-            query = "UPDATE shibusers SET AccountLink=:ali" +
+            query = "UPDATE shibusers SET account_link=:ali" +
                     " eduPersonScopedAffiliation=:edu" +
                     "mail=:mail, cn=:cn WHERE id=:id";
         }else
@@ -313,35 +312,38 @@ public class EntityDao implements EntityHandlerIface {
             np.addValue("ps", k.getPassword());
             if (param != null) {
                 np.addValue("uri", param.getUriFragment());
-                np.addValue("urie", new Date(param.getUriExpiration()));
+                np.addValue("urie", param.getUriExpiration());
             }else {
                 np.addValue("uri", null);
                 np.addValue("urie", null);
             }
 
-            np.addValue("acr", k.getAccountCreation());
+            np.addValue("acr", System.currentTimeMillis());
             np.addValue("id", k.getId());
 
             if (user.getId() != -1)
-                query = "INSERT INTO korap_users (id, username, accountLock, " +
-                        "accountLink, password, uri_fragment, " +
-                        "accountCreation, " +
+                query = "INSERT INTO korap_users (id, username, account_lock, "
+                        +
+                        "account_link, password, uri_fragment, " +
+                        "account_creation, " +
                         "uri_expiration) VALUES (:id, :us, :alo, :ali, " +
                         ":ps, :uri, :acr, :urie);";
             else
-                query = "INSERT INTO korap_users (username, accountLock, " +
-                        "accountLink, password, uri_fragment, " +
-                        "accountCreation, " +
+                query = "INSERT INTO korap_users (username, account_lock, " +
+                        "account_link, password, uri_fragment, " +
+                        "account_creation, " +
                         "uri_expiration) VALUES (:us, :alo, :ali, " +
                         ":ps, :uri, :acr, :urie);";
 
             //fixme: still applicable?
         }else if (user instanceof ShibUser) {
             ShibUser s = (ShibUser) user;
-            query = "INSERT INTO shibusers (username, type, accountLink " +
-                    "eduPersonScopedAffiliation, accountCreation, cn, mail) " +
+
+            query = "INSERT INTO shibusers (username, type, account_link, account_creation "
+                    +
+                    "eduPersonScopedAffiliation, cn, mail) " +
                     "VALUES (:us, :type, :ali, " +
-                    ":edu, :acr, :cn, :mail, :logs, :logft);";
+                    ":edu, :cn, :mail, :logs, :logft);";
             np.addValue("us", s.getUsername());
             //            np.addValue("ali", s.getAccountLink());
             np.addValue("ali", null);
@@ -349,15 +351,15 @@ public class EntityDao implements EntityHandlerIface {
             np.addValue("mail", s.getMail());
             np.addValue("type", user.getType());
             np.addValue("cn", s.getCn());
-            np.addValue("acr", new Date(TimeUtils.getNow().getMillis()));
+            np.addValue("acr", System.currentTimeMillis());
 
             //todo: disable after first intro
         }else if (user instanceof DemoUser) {
-            query = "INSERT INTO korap_users (username, type, accountLock, " +
-                    "password, uri_fragment, " +
-                    "accountCreation, uri_expiration) VALUES (:us, :type, :alo, "
+            query = "INSERT INTO korap_users (username, type, account_lock, account_creation "
                     +
-                    ":ps, :uri, :acr, :urie);";
+                    "password, uri_fragment, " +
+                    "uri_expiration) VALUES (:us, :type, :alo, " +
+                    ":ps, :uri, :urie);";
 
             np.addValue("us", user.getUsername());
             np.addValue("type", user.getType());
@@ -367,7 +369,7 @@ public class EntityDao implements EntityHandlerIface {
             np.addValue("urie", new Date(0));
             np.addValue("ps", DemoUser.PASSPHRASE);
             np.addValue("uri", "");
-            np.addValue("acr", new Date(TimeUtils.getNow().getMillis()));
+            np.addValue("acr", System.currentTimeMillis());
         }else
             return -1;
 
@@ -389,6 +391,7 @@ public class EntityDao implements EntityHandlerIface {
         }catch (DataAccessException e) {
             jlog.error("Could not create user account with username: {}",
                     user.getUsername());
+            e.printStackTrace();
             throw new dbException(user.getUsername(), "korap_users",
                     StatusCodes.NAME_EXISTS, user.getUsername());
         }
@@ -448,12 +451,12 @@ public class EntityDao implements EntityHandlerIface {
     public int activateAccount(String username, String uriToken)
             throws KustvaktException {
         MapSqlParameterSource np = new MapSqlParameterSource();
-        final String query = "UPDATE korap_users SET uriFragment='', " +
-                "uri_expiration=0, accountLock=:lock WHERE uri_fragment=:uri AND username=:us AND "
+        final String query = "UPDATE korap_users SET uri_fragment='', " +
+                "uri_expiration=0, account_lock=:lock WHERE uri_fragment=:uri AND username=:us AND "
                 +
                 "uri_expiration > :now;";
         np.addValue("uri", uriToken);
-        np.addValue("now", new Date(TimeUtils.getNow().getMillis()));
+        np.addValue("now", TimeUtils.getNow().getMillis());
         np.addValue("us", username);
         np.addValue("lock", BooleanUtils.getBoolean(false));
         try {
@@ -464,6 +467,14 @@ public class EntityDao implements EntityHandlerIface {
             throw new dbException(username, "korap_users",
                     StatusCodes.DB_UPDATE_FAILED, username, uriToken);
         }
+    }
+
+    public int size() {
+        final String query = "SELECT COUNT(*) FROM korap_users;";
+        return this.jdbcTemplate
+                .queryForObject(query, new HashMap<String, Object>(),
+                        Integer.class);
+
     }
 
     //todo:

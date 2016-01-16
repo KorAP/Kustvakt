@@ -39,4 +39,6 @@ public interface ResourceOperationIface<T extends KustvaktResource> {
     //    public void deleteResource(Integer id, User user) throws KorAPException;
     int deleteResource(String id, User user) throws KustvaktException;
 
+    int deleteAll() throws KustvaktException;
+
 }

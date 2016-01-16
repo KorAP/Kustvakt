@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service;
+package de.ids_mannheim.korap.web.service.full;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -10,7 +10,6 @@ import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
-import de.ids_mannheim.korap.security.ac.ResourceHandler;
 import de.ids_mannheim.korap.user.*;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
@@ -18,16 +17,15 @@ import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.KustvaktServer;
 import de.ids_mannheim.korap.web.filter.AuthFilter;
+import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DefaultFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.slf4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -44,7 +42,6 @@ public class UserService {
     private static Logger jlog = KustvaktLogger
             .getLogger(KustvaktLogger.SECURITY_LOG);
     private AuthenticationManagerIface controller;
-    private ResourceHandler resourceHandler;
 
     private
     @Context
@@ -53,7 +50,6 @@ public class UserService {
     public UserService() {
         this.controller = BeanConfiguration.getBeans()
                 .getAuthenticationManager();
-        //        this.resourceHandler = BeanConfiguration.getResourceHandler();
     }
 
     // fixme: json contains password in clear text. Encrypt request?
@@ -62,18 +58,17 @@ public class UserService {
     @Path("register")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response signUp(
-            @Context HttpServletRequest request,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
             @Context Locale locale, MultivaluedMap form_values) {
-
-        FormRequestWrapper wrapper = new FormRequestWrapper(request, form_values);
+        Map<String, Object> wrapper = FormRequestWrapper
+                .toMap(form_values, true);
 
         wrapper.put(Attributes.HOST, host);
         wrapper.put(Attributes.USER_AGENT, agent);
         UriBuilder uriBuilder;
         User user;
-        if (wrapper.getParameter(Attributes.EMAIL) == null)
+        if (wrapper.get(Attributes.EMAIL) == null)
             throw KustvaktResponseHandler
                     .throwit(StatusCodes.ILLEGAL_ARGUMENT, "parameter missing",
                             "email");
@@ -83,7 +78,7 @@ public class UserService {
             uriBuilder.path(KustvaktServer.API_VERSION).path("user")
                     .path("confirm");
 
-            user = controller.createUserAccount(wrapper.toMap(true));
+            user = controller.createUserAccount(wrapper, true);
 
         }catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
@@ -103,7 +98,8 @@ public class UserService {
             return Response.ok(JsonUtils.toJSON(object)).build();
         }else {
             // todo: return error or warning
-            return null;
+            throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+                    "failed to validate uri paramter", "confirmation fragment");
         }
 
     }
@@ -137,11 +133,11 @@ public class UserService {
     @Produces(MediaType.TEXT_HTML)
     public Response confirmRegistration(@QueryParam("uri") String uritoken,
             @Context Locale locale, @QueryParam("user") String username) {
-        if (uritoken == null)
+        if (uritoken == null || uritoken.isEmpty())
             throw KustvaktResponseHandler
                     .throwit(StatusCodes.ILLEGAL_ARGUMENT, "parameter missing",
-                            "Uri-Token");
-        if (username == null)
+                            "uri parameter");
+        if (username == null || username.isEmpty())
             throw KustvaktResponseHandler
                     .throwit(StatusCodes.ILLEGAL_ARGUMENT, "parameter missing",
                             "Username");
@@ -149,8 +145,8 @@ public class UserService {
         try {
             controller.confirmRegistration(uritoken, username);
         }catch (KustvaktException e) {
-            throw KustvaktResponseHandler
-                    .throwit(e);
+            e.printStackTrace();
+            throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok("success").build();
     }
@@ -216,25 +212,26 @@ public class UserService {
 
     @GET
     @Path("info")
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
-            PiwikFilter.class })
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
+            BlockingFilter.class })
     public Response getStatus(@Context SecurityContext context,
-            @QueryParam("scopes") String scope) {
+            @QueryParam("scopes") String scopes) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         User user;
         try {
             user = controller.getUser(ctx.getUsername());
             controller.getUserDetails(user);
-            Set<String> base_scope = StringUtils
-                    .toSet((String) ctx.getParameters().get(Attributes.SCOPES),
-                            " ");
-            base_scope.retainAll(StringUtils.toSet(scope));
-            scope = StringUtils.toString(base_scope);
+            Set<String> base_scope = StringUtils.toSet(scopes, " ");
+            if (scopes != null)
+                base_scope.retainAll(StringUtils.toSet(scopes));
+            scopes = StringUtils.toString(base_scope);
         }catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
-        return Response.ok(JsonUtils.toJSON(Scopes
-                .mapOpenIDConnectScopes(scope, user.getDetails()))).build();
+        Map m = Scopes.mapOpenIDConnectScopes(scopes, user.getDetails());
+        m.put("scopes", scopes);
+
+        return Response.ok(JsonUtils.toJSON(m)).build();
     }
 
     @GET
@@ -264,21 +261,15 @@ public class UserService {
     @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
             PiwikFilter.class })
     public Response updateSettings(@Context SecurityContext context,
-            @Context Locale locale, String values) {
+            @Context Locale locale, MultivaluedMap<String, Object> form) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        Map<String, Object> settings;
-        try {
-            settings = JsonUtils.read(values, Map.class);
-        }catch (IOException e) {
-            throw KustvaktResponseHandler
-                    .throwit(StatusCodes.REQUEST_INVALID,
-                            "Could not read parameters", values);
-        }
+        Map<String, Object> settings = FormRequestWrapper.toMap(form, false);
 
         try {
             User user = controller.getUser(ctx.getUsername());
             UserSettings us = controller.getUserSettings(user);
-            // todo:
+            // todo: check setting only within the scope of user settings permissions; not foundry range. Latter is part of
+            // frontend which only displays available foundries and
             //            SecurityManager.findbyId(us.getDefaultConstfoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultLemmafoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultPOSfoundry(), user, Foundry.class);
@@ -320,24 +311,15 @@ public class UserService {
     @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
             PiwikFilter.class })
     public Response updateDetails(@Context SecurityContext context,
-            @Context Locale locale, String values) {
+            @Context Locale locale, MultivaluedMap form) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        System.out.println("TO BE UPDATED DATA " + values);
-        System.out.println("USER CONTEXT " + ctx);
-        Map<String, String> details;
-        try {
-            details = JsonUtils.read(values, Map.class);
-        }catch (IOException e) {
-            error.error("Exception encountered!", e);
-            throw KustvaktResponseHandler
-                    .throwit(StatusCodes.REQUEST_INVALID,
-                            "Could not read parameters", values);
-        }
+
+        Map<String, Object> wrapper = FormRequestWrapper.toMap(form, true);
 
         try {
             User user = controller.getUser(ctx.getUsername());
             UserDetails det = controller.getUserDetails(user);
-            det.updateDetails(details);
+            det.updateDetails(wrapper);
             controller.updateUserDetails(user, det);
             if (user.isDemo())
                 return Response.notModified().build();
@@ -440,21 +422,5 @@ public class UserService {
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok(queryStr).build();
-    }
-
-    @GET
-    @Path("logout")
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
-            PiwikFilter.class })
-    public Response logout(@Context SecurityContext ctx,
-            @Context Locale locale) {
-        TokenContext context = (TokenContext) ctx.getUserPrincipal();
-        try {
-            controller.logout(context);
-        }catch (KustvaktException e) {
-            error.error("Logout Exception", e);
-            throw KustvaktResponseHandler.throwit(e);
-        }
-        return Response.ok().build();
     }
 }

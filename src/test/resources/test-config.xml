@@ -99,6 +99,7 @@
         <constructor-arg ref="kustvakt_db"/>
     </bean>
 
+    <!-- deprecated : load via constructor -->
     <!--fixme: change name according to convention -->
     <bean id="collectionProvider"
           class="de.ids_mannheim.korap.handlers.CollectionDao">

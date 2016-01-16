@@ -105,7 +105,7 @@ public abstract class User implements Serializable {
 
     public Map toCache() {
         Map map = new HashMap();
-        map.put(Attributes.UID, this.id);
+        map.put(Attributes.ID, this.id);
         map.put(Attributes.USERNAME, this.username);
         map.put(Attributes.ACCOUNT_CREATION,
                 TimeUtils.format(new DateTime(this.accountCreation)));
@@ -185,21 +185,26 @@ public abstract class User implements Serializable {
                     0 :
                     (int) map.get(Attributes.TYPE);
             User user;
-            DateTime dateTime = DateTime
-                    .parse((String) map.get(Attributes.ACCOUNT_CREATION));
+            long created = -1;
+            if (map.get(Attributes.ACCOUNT_CREATION) != null)
+                created = DateTime
+                        .parse((String) map.get(Attributes.ACCOUNT_CREATION))
+                        .getMillis();
             switch (type) {
                 case 0:
                     user = UserFactory
                             .getUser((String) map.get(Attributes.USERNAME));
-                    user.setId((Integer) map.get(Attributes.UID));
+                    user.setId((Integer) map.get(Attributes.ID));
                     user.setAccountLocked(
-                            (Boolean) map.get(Attributes.ACCOUNTLOCK));
-                    user.setAccountCreation(dateTime.getMillis());
+                            map.get(Attributes.ACCOUNTLOCK) == null ?
+                                    false :
+                                    (Boolean) map.get(Attributes.ACCOUNTLOCK));
+                    user.setAccountCreation(created);
                     break;
                 default:
                     user = UserFactory
-                            .getDemoUser((Integer) map.get(Attributes.UID));
-                    user.setAccountCreation(dateTime.getMillis());
+                            .getDemoUser((Integer) map.get(Attributes.ID));
+                    user.setAccountCreation(created);
             }
             return user;
         }

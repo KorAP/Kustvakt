@@ -60,13 +60,12 @@ public class RowMapperFactory {
             user.setPassword(rs.getString(Attributes.PASSWORD));
             user.setId(rs.getInt(Attributes.ID));
             user.setAccountLocked(rs.getBoolean(Attributes.ACCOUNTLOCK));
-            user.setAccountCreation(
-                    rs.getTimestamp(Attributes.ACCOUNT_CREATION).getTime());
+            user.setAccountCreation(rs.getLong(Attributes.ACCOUNT_CREATION));
             user.setAccountLink(rs.getString(Attributes.ACCOUNTLINK));
+            long l = rs.getLong(Attributes.URI_EXPIRATION);
 
-            Timestamp exp = rs.getTimestamp(Attributes.URI_EXPIRATION);
             URIParam param = new URIParam(rs.getString(Attributes.URI_FRAGMENT),
-                    exp == null ? -1 : exp.getTime());
+                    l == 0 ? -1 : new Timestamp(l).getTime());
             user.addField(param);
             return user;
         }
@@ -127,11 +126,11 @@ public class RowMapperFactory {
                 throws SQLException {
             VirtualCollection c = ResourceFactory
                     .getCollection(rs.getInt("id"), false);
-            c.setPersistentID(rs.getString("persistentId"));
+            c.setPersistentID(rs.getString("persistent_id"));
             c.setCreated(rs.getTimestamp("created").getTime());
             c.setName(rs.getString("name"));
             c.setDescription(rs.getString("description"));
-            c.setOwner(rs.getInt("userId"));
+            c.setOwner(rs.getInt("user_id"));
             c.setQuery(rs.getString("query"));
             c.checkNull();
             return c;

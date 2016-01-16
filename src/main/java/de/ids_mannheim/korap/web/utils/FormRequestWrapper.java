@@ -3,7 +3,9 @@ package de.ids_mannheim.korap.web.utils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.ws.rs.core.MultivaluedMap;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Helper class to wrapp multivaluedmap into a hashmap. Depending on the strict parameter,
@@ -14,7 +16,7 @@ import java.util.*;
  */
 public class FormRequestWrapper extends HttpServletRequestWrapper {
 
-    private MultivaluedMap<String, String> form;
+    private MultivaluedMap<String, Object> form;
 
     /**
      * Constructs a request object wrapping the given request.
@@ -23,7 +25,7 @@ public class FormRequestWrapper extends HttpServletRequestWrapper {
      * @throws IllegalArgumentException if the request is null
      */
     public FormRequestWrapper(HttpServletRequest request,
-            MultivaluedMap<String, String> form) {
+            MultivaluedMap<String, Object> form) {
         super(request);
         this.form = form;
     }
@@ -32,7 +34,7 @@ public class FormRequestWrapper extends HttpServletRequestWrapper {
     public String getParameter(String name) {
         String value = super.getParameter(name);
         if (value == null)
-            value = form.getFirst(name);
+            value = String.valueOf(form.getFirst(name));
         return value;
     }
 
@@ -46,13 +48,22 @@ public class FormRequestWrapper extends HttpServletRequestWrapper {
         return values;
     }
 
-    public HashMap<String, Object> toMap(boolean strict) {
+    public Map<String, Object> singleValueMap() {
+        return toMap(this.form, false);
+    }
+
+    /**
+     * @param strict returns only values with size equal to one. If false pairs key to first value
+     *               in value list and returns the result
+     * @return key/value map
+     */
+    public static Map<String, Object> toMap(MultivaluedMap<String, Object> form,
+            boolean strict) {
         HashMap<String, Object> map = new HashMap<>();
-        for (Map.Entry<String, List<String>> e : form.entrySet()) {
-            if (e.getValue().size() == 1)
-                map.put(e.getKey(), e.getValue().get(0));
-            else if (!strict)
-                map.put(e.getKey(), e.getValue());
+        for (String key : form.keySet()) {
+            if (strict && form.get(key).size() > 1)
+                continue;
+            map.put(key, form.getFirst(key));
         }
         return map;
     }
@@ -62,7 +73,7 @@ public class FormRequestWrapper extends HttpServletRequestWrapper {
     }
 
     public void put(String key, String... values) {
-        this.form.put(key, Arrays.asList(values));
+        this.form.put(key, Arrays.<Object>asList(values));
     }
 
 }

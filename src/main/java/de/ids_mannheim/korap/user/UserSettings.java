@@ -293,7 +293,8 @@ public class UserSettings {
         this.setRightContextSize(200);
         this.setRightContextSizeForExport(100);
         // persistent id for wikipedia!
-        this.setSelectedCollection(
+        // fixme: deprecation warning!
+         this.setSelectedCollection(
                 "ZGU0ZTllNTFkYzc3M2VhZmViYzdkYWE2ODI5NDc3NTk4NGQ1YThhOTMwOTNhOWYxNWMwN2M3Y2YyZmE3N2RlNQ==");
         this.setQueryLanguage("COSMAS2");
         this.setPageLength(25);

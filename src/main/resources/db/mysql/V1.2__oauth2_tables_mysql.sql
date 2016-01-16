@@ -1,6 +1,6 @@
 
 -- oauth2 db tables
-create table oauth2_client (
+create table if not exists oauth2_client (
 client_id VARCHAR(100) UNIQUE PRIMARY KEY,
 client_secret VARCHAR(200),
 redirect_uri VARCHAR(250),
@@ -11,7 +11,7 @@ url VARCHAR(200) UNIQUE
 
 
 -- status 1 = valid, 0 = revoked, -1 = disabled
-create table oauth2_access_token (
+create table if not exists oauth2_access_token (
 id INTEGER PRIMARY KEY AUTO_INCREMENT,
 access_token VARCHAR(300),
 auth_code VARCHAR(250),
@@ -33,7 +33,7 @@ ON DELETE CASCADE
 
 
 -- also scopes?
-create table oauth2_refresh_token (
+create table if not exists oauth2_refresh_token (
 id INTEGER PRIMARY KEY AUTO_INCREMENT,
 client_id VARCHAR(100),
 user_id INTEGER,

@@ -20,7 +20,7 @@ public class IdRewriteTest {
     }
 
     @AfterClass
-    public static void drop() {
+    public static void close() {
         BeanConfiguration.closeApplication();
     }
 

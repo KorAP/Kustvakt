@@ -18,6 +18,12 @@ public class ConfigTest {
         BeanConfiguration.closeApplication();
     }
 
+
+    @Test
+    public void create() {
+        BeanConfiguration.loadClasspathContext("test-config.xml");
+    }
+
     @Test
     public void testServiceVersion() {
         String v = ServiceVersion.getAPIVersion();

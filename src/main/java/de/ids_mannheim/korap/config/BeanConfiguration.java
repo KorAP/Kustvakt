@@ -35,6 +35,7 @@ public class BeanConfiguration {
     private static BeanHolderHelper beans;
 
     //todo: allow this for external plugin systems that are not kustvakt specific
+    @Deprecated
     public static void setCustomBeansHolder(BeanHolderHelper holder) {
         ApplicationContext context = beans.context;
         holder.context = context;
@@ -69,16 +70,18 @@ public class BeanConfiguration {
     }
 
     public static void loadClasspathContext(String... files) {
-        if (!hasContext()) {
-            ApplicationContext context;
-            if (files.length == 0)
-                context = new ClassPathXmlApplicationContext(CONFIG_FILE);
-            else
-                context = new ClassPathXmlApplicationContext(files);
+        if (hasContext())
+            closeApplication();
 
-            BeanConfiguration.beans = new BeanHolderHelper(context);
-            setManualBeans();
-        }
+        ApplicationContext context;
+        if (files.length == 0)
+            context = new ClassPathXmlApplicationContext(CONFIG_FILE);
+        else
+            context = new ClassPathXmlApplicationContext(files);
+
+        BeanConfiguration.beans = new BeanHolderHelper(context);
+        setManualBeans();
+
     }
 
     private static void setManualBeans() {

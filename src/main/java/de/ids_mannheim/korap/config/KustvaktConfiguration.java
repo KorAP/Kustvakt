@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.config;
 
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.Getter;
@@ -11,10 +12,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * if configuration class is extended, loadSubTypes method should be overriden
@@ -25,6 +25,19 @@ import java.util.Properties;
 
 @Getter
 public class KustvaktConfiguration {
+
+    public static final Map<String, Object> KUSTVAKT_USER = new HashMap<>();
+
+    static {
+        KUSTVAKT_USER.put(Attributes.ID, 1);
+        KUSTVAKT_USER.put(Attributes.USERNAME, "kustvakt");
+        KUSTVAKT_USER.put(Attributes.PASSWORD, "kustvakt2015");
+        KUSTVAKT_USER.put(Attributes.EMAIL, "kustvakt@ids-mannheim.de");
+        KUSTVAKT_USER.put(Attributes.COUNTRY, "Germany");
+        KUSTVAKT_USER.put(Attributes.FIRSTNAME, "Kustvakt");
+        KUSTVAKT_USER.put(Attributes.LASTNAME, "KorAP");
+        KUSTVAKT_USER.put(Attributes.INSTITUTION, "IDS Mannheim");
+    }
 
     private static final Logger jlog = KustvaktLogger
             .getLogger(KustvaktConfiguration.class);
@@ -77,11 +90,23 @@ public class KustvaktConfiguration {
      * @param properties
      * @return
      */
-    protected Properties load(Properties properties) {
-        loadLog4jLogger();
+    protected Properties load(Properties properties)
+            throws MalformedURLException {
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));
         returnhits = new Integer(properties.getProperty("returnhits", "50000"));
         indexDir = properties.getProperty("lucene.indexDir", "");
+        //        URL url = KustvaktConfiguration.class.getClassLoader()
+        //                .getResource(idir);
+        //        System.out.println("LOADING FILE FROM CLASSPATH? " + url);
+        //        if (!new File(idir).exists() && url != null) {
+        //            indexDir = url.getFile();
+        //        }else
+        //            indexDir = idir;
+        //
+        //        System.out.println(
+        //                "---------------------------------------------------------------");
+        //        System.out.println("INDEX DIR IS: " + indexDir);
+        //        System.out.println("FILE EXISTS? " + new File(indexDir).exists());
         port = new Integer(properties.getProperty("server.port", "8095"));
         // server options
         serverHost = String
@@ -91,7 +116,11 @@ public class KustvaktConfiguration {
         queryLanguages = new ArrayList<>();
         for (String querylang : qls)
             queryLanguages.add(querylang.trim().toUpperCase());
-        //        issuer = new URL(korap.getProperty("korap.issuer", ""));
+        String is = properties.getProperty("kustvakt.security.jwt.issuer", "");
+
+        if (!is.startsWith("http"))
+            is = "http://" + is;
+        issuer = new URL(is);
 
         default_const = properties
                 .getProperty("kustvakt.default.const", "mate");
@@ -144,7 +173,7 @@ public class KustvaktConfiguration {
      *
      * @param props
      */
-    public void setProperties(Properties props) {
+    public void setProperties(Properties props) throws MalformedURLException {
         this.load(props);
     }
 
@@ -172,11 +201,12 @@ public class KustvaktConfiguration {
             return Enum.valueOf(BACKENDS.class, value.toUpperCase());
     }
 
-    private void loadLog4jLogger() {
+    public static void loadLog4jLogger() {
         /** loadSubTypes log4j configuration file programmatically */
         Properties log4j = new Properties();
         try {
-            File f = new File("./log4j.properties");
+            File f = new File(System.getProperty("user.dir"),
+                    "log4j.properties");
             if (f.exists()) {
                 log4j.load(new FileInputStream(f));
                 PropertyConfigurator.configure(log4j);
@@ -191,7 +221,7 @@ public class KustvaktConfiguration {
         loadClassLogger();
     }
 
-    private void loadClassLogger() {
+    private static void loadClassLogger() {
         Properties log4j = new Properties();
         jlog.info(
                 "using class path logging properties file to configure logging system");

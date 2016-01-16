@@ -95,7 +95,7 @@ public class SecurityRowMappers {
             }
 
             Integer pid = rs.getInt("pid");
-            String grouping = rs.getString("group_ref");
+            String grouping = rs.getString("group_id");
             Integer index = idx[depth].indexOf(pid);
 
             SecurityPolicy policy;
@@ -121,7 +121,7 @@ public class SecurityRowMappers {
             }else
                 policy = policyArray[depth].get(index);
 
-            PolicyCondition c = new PolicyCondition(rs.getString("group_ref"));
+            PolicyCondition c = new PolicyCondition(rs.getString("group_id"));
             if (!policy.contains(c))
                 policy.addCondition(c);
         }
@@ -208,7 +208,7 @@ public class SecurityRowMappers {
                     SortedMap<String, KustvaktResource.Container[]> submatch;
                     if ((submatch = containerMap.getPrefixSubMap(namePath))
                             == null) {
-
+                        //create container for last child node
                         cursor = new KustvaktResource.Container[depth + 1];
                         cursor[depth] = new KustvaktResource.Container(
                                 persistentId,

@@ -28,6 +28,8 @@ public class Attributes {
     public static final String TYPE = "type";
 
     public static final String ID = "ID";
+    @Deprecated
+    //refactor
     public static final String UID = "accountID";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
@@ -39,9 +41,10 @@ public class Attributes {
     public static final String EMAIL = "email";
     public static final String ADDRESS = "address";
     public static final String COUNTRY = "country";
-    public static final String ACCOUNT_CREATION = "accountCreation";
-    public static final String ACCOUNTLOCK = "accountLock";
-    public static final String ACCOUNTLINK = "accountLink";
+    // deprcated, use created
+    public static final String ACCOUNT_CREATION = "account_creation";
+    public static final String ACCOUNTLOCK = "account_lock";
+    public static final String ACCOUNTLINK = "account_link";
     public static final String URI = "uri";
     public static final String URI_FRAGMENT = "uri_fragment";
     public static final String URI_EXPIRATION = "uri_expiration";
@@ -139,6 +142,19 @@ public class Attributes {
     public static final String EXPORT = "export";
     public static final String TIME_SPANS = "spans";
     public static final String RANGE = "range";
+
+    public static final String GROUP_ID = "group_id";
+    public static final String CREATED = "created";
+    public static final String CREATOR = "creator";
+    public static final String ENABLED = "enabled";
+    public static final String EXPIRE = "expired";
+    public static final String TARGET_ID = "target_id";
+    public static final String IP_RANG = "ip_range";
+    public static final String PERSISTENT_ID = "persistent_id";
+    public static final String DISABLED = "disabled";
+    public static final String USER_ID = "user_id";
+    public static final String PARENT_ID = "parent_id";
+//    public static final String
 
 }
 

@@ -6,9 +6,9 @@ package de.ids_mannheim.korap.resources;
  */
 public class Permissions {
 
-   public static enum PERMISSIONS {
+    public enum PERMISSIONS {
         //fixme: add read_policy permission to allow read policy permissions
-        READ, WRITE, DELETE, READ_POLICY, CREATE_POLICY, MODIFY_POLICY, DELETE_POLICY
+        READ, WRITE, DELETE, READ_POLICY, CREATE_POLICY, MODIFY_POLICY, DELETE_POLICY, ALL
     }
 
     public static final byte READ = 1;
@@ -18,7 +18,7 @@ public class Permissions {
     public static final byte CREATE_POLICY = 16;
     public static final byte MODIFY_POLICY = 32;
     public static final byte DELETE_POLICY = 64;
-
+    public static final byte ALL = 127;
 
     public static Byte getByte(PERMISSIONS perm) {
         switch (perm) {
@@ -36,10 +36,11 @@ public class Permissions {
                 return MODIFY_POLICY;
             case CREATE_POLICY:
                 return CREATE_POLICY;
+            case ALL:
+                return ALL;
             default:
                 return 0;
         }
     }
-
 
 }

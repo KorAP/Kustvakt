@@ -47,6 +47,7 @@ public class SecurityManager<T extends KustvaktResource> {
     private PolicyEvaluator evaluator;
     private T resource;
 
+    //todo: use simple user id if possible! --> or if not check that user has valid integer id (or use username as fallback instead)
     private SecurityManager(User user) {
         this.policies = new List[1];
         this.policies[0] = new ArrayList<>();
@@ -61,7 +62,7 @@ public class SecurityManager<T extends KustvaktResource> {
     }
 
     public static final void setProviders(PolicyHandlerIface policyHandler,
-            EncryptionIface crypto, List<ResourceOperationIface> ifaces) {
+            EncryptionIface crypto, Collection<ResourceOperationIface> ifaces) {
         SecurityManager.policydao = policyHandler;
         SecurityManager.crypto = crypto;
         SecurityManager.handlers = new HashMap<>();
@@ -170,7 +171,7 @@ public class SecurityManager<T extends KustvaktResource> {
      * @throws NotAuthorizedException
      * @throws KustvaktException
      */
-    // todo: delete only works with find, not with init constructor!resource
+    // todo: delete only works with find, not with init constructor!
     public void deleteResource()
             throws NotAuthorizedException, KustvaktException {
         if (evaluator.isAllowed(Permissions.PERMISSIONS.DELETE)) {
@@ -182,7 +183,9 @@ public class SecurityManager<T extends KustvaktResource> {
                 handlers.get(KustvaktResource.class)
                         .deleteResource(this.evaluator.getResourceID(),
                                 this.user);
-            //            this.policydao.deleteResourcePolicies(this.evaluator.getResourceID(), this.user);
+            this.policydao
+                    .deleteResourcePolicies(this.evaluator.getResourceID(),
+                            this.user);
         }else
             throw new NotAuthorizedException(StatusCodes.PERMISSION_DENIED,
                     this.evaluator.getResourceID());
@@ -205,6 +208,9 @@ public class SecurityManager<T extends KustvaktResource> {
         if (id instanceof Integer)
             this.policies = policydao
                     .getPolicies((Integer) id, this.user, b.getPbyte());
+        //        System.out.println("-------------------------------");
+        //        System.out.println("LENGTH OF POLICY ARRAY " + this.policies.length);
+        //        System.out.println("POLICY AT 0 " + this.policies[0]);
         this.evaluator = new PolicyEvaluator(this.user, this.policies);
 
         if (this.policies == null) {
@@ -216,6 +222,7 @@ public class SecurityManager<T extends KustvaktResource> {
         return true;
     }
 
+    // todo:  security log shows id 'null' --> better way?
     private T findResource(Class type)
             throws NotAuthorizedException, KustvaktException {
         if (!evaluator.isAllowed()) {
@@ -231,6 +238,7 @@ public class SecurityManager<T extends KustvaktResource> {
             iface = handlers.get(KustvaktResource.class);
         T resource = (T) iface
                 .findbyId(this.evaluator.getResourceID(), this.user);
+        // todo: fix this
         resource.setManaged(this.evaluator.isManaged());
         resource.setShared(this.evaluator.isShared());
         return resource;
@@ -252,13 +260,7 @@ public class SecurityManager<T extends KustvaktResource> {
                     // this is mostly for convenvience and database consistency, since a request query would result in not authorized, based on missing parent relation dependencies
                     // --> in order not to have a resource owner that is denied access due to missing parent relation dependency
                     SecurityManager.findbyId(resource.getParentID(), user,
-                            Permissions.PERMISSIONS.CREATE_POLICY,
-                            Permissions.PERMISSIONS.MODIFY_POLICY,
-                            Permissions.PERMISSIONS.DELETE_POLICY,
-                            Permissions.PERMISSIONS.READ_POLICY,
-                            Permissions.PERMISSIONS.READ,
-                            Permissions.PERMISSIONS.WRITE,
-                            Permissions.PERMISSIONS.DELETE);
+                            Permissions.PERMISSIONS.ALL);
                 }catch (EmptyResultException e) {
                     KustvaktLogger.SECURITY_LOGGER
                             .error("No policies found for parent '{}' for user '{}'",
@@ -278,7 +280,7 @@ public class SecurityManager<T extends KustvaktResource> {
                 resource.setOwner(user.getId());
 
                 KustvaktLogger.SECURITY_LOGGER
-                        .trace("Creating Access Control structure for resource '"
+                        .info("Creating Access Control structure for resource '"
                                 + resource.getPersistentID() + "@" + resource
                                 .getId() + "'");
                 // storing resource is called twice. first when this is register and later in idsbootstrap to create cstorage entry. how to unify this?
@@ -293,13 +295,14 @@ public class SecurityManager<T extends KustvaktResource> {
             }
             p.resource = resource;
             try {
-                p.findPolicies(resource.getId(), false,
+                // todo: which is better? Integer id or String persistentID?
+                p.findPolicies(resource.getPersistentID(), false,
                         Permissions.PERMISSIONS.CREATE_POLICY,
                         Permissions.PERMISSIONS.READ_POLICY,
                         Permissions.PERMISSIONS.MODIFY_POLICY);
             }catch (EmptyResultException e) {
                 KustvaktLogger.SECURITY_LOGGER
-                        .error("No policies found for '{}' for user '{}'",
+                        .error("No policies found for '{}' for user '{}'. Resource could not be registered!",
                                 resource.getPersistentID(), user.getId());
                 throw new KustvaktException(user.getId(),
                         StatusCodes.POLICY_CREATE_ERROR,

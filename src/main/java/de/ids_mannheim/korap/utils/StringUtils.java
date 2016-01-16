@@ -31,9 +31,11 @@ public class StringUtils {
 
     public static Set<String> toSet(String values, String sep) {
         Set<String> set = new HashSet<>();
-        StringTokenizer tokenizer = new StringTokenizer(values, sep);
-        while (tokenizer.hasMoreTokens())
-            set.add(tokenizer.nextToken());
+        if (values != null && !values.isEmpty()) {
+            StringTokenizer tokenizer = new StringTokenizer(values, sep);
+            while (tokenizer.hasMoreTokens())
+                set.add(tokenizer.nextToken());
+        }
         return set;
     }
 
@@ -135,8 +137,11 @@ public class StringUtils {
     }
 
     public static String getTokenType(String token) {
-        return token.substring(0, token.lastIndexOf(" ")).replaceAll("\\s", "")
-                .toLowerCase();
+        if (token.contains(" "))
+            return token.substring(0, token.lastIndexOf(" "))
+                    .replaceAll("\\s", "").toLowerCase();
+        else
+            return null;
     }
 
     public static boolean isInteger(String value) {

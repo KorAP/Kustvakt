@@ -367,17 +367,18 @@ public class KustvaktEncryption implements EncryptionIface {
     @Override
     public String validatePassphrase(String pw) throws KustvaktException {
         String safe_string = validateString(pw);
-        String pw_conf;
-        try {
-            pw_conf = validator
-                    .getValidInput("User Password", safe_string, "Password", 20,
-                            false);
-        }catch (ValidationException e) {
-            jlog.error("password value did not validate", e.getMessage());
-            throw new KustvaktException(StatusCodes.PARAMETER_VALIDATION_ERROR,
-                    "password did not validate", "password");
-        }
-        return pw_conf;
+        return safe_string;
+//        String pw_conf;
+//        try {
+//            pw_conf = validator
+//                    .getValidInput("User Password", safe_string, "Password", 20,
+//                            false);
+//        }catch (ValidationException e) {
+//            jlog.error("password value did not validate", e.getMessage());
+//            throw new KustvaktException(StatusCodes.PARAMETER_VALIDATION_ERROR,
+//                    "password did not validate", "password");
+//        }
+//        return pw_conf;
     }
 
     //FIXME: currently all sets are skipped during validation (since users should not be allowed to edit those sets anyway,

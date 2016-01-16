@@ -65,7 +65,7 @@ public class ResourceFactory {
 //            else if (value == UserQuery.class && type.equalsIgnoreCase("query"))
 //                return (Class<T>) UserQuery.class;
             else if (value.getSimpleName().equalsIgnoreCase(type.trim())) {
-                return value; // do nothing
+                return value;
             }
         }
         return null;
@@ -95,9 +95,8 @@ public class ResourceFactory {
 
     public static VirtualCollection createCollection(String name, String query,
             Integer owner) {
-        VirtualCollection v = new VirtualCollection();
+        VirtualCollection v = new VirtualCollection(query);
         v.setName(name);
-        v.setQuery(query);
         v.setOwner(owner);
         return v;
     }

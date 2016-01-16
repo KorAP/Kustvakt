@@ -7,9 +7,10 @@ import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.ResourceFactory;
+import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
-import de.ids_mannheim.korap.utils.TimeUtils;
+import de.ids_mannheim.korap.utils.SqlBuilder;
 import org.slf4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -18,8 +19,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -124,11 +125,18 @@ public class ResourceDao<T extends KustvaktResource>
         KeyHolder holder = new GeneratedKeyHolder();
         // parent_id necessary so trigger can be used for tree insert!
         final String sql, parid;
+        SqlBuilder b = new SqlBuilder("resource_store");
+        b.insert(Attributes.NAME, Attributes.PARENT_ID,
+                Attributes.PERSISTENT_ID, Attributes.DESCRIPTION,
+                Attributes.CREATOR, Attributes.TYPE, Attributes.CREATED);
+        b.params(":name, :parent, :pid, :desc, :ow, :type, :created");
+
         if (resource.getParentID() == null) {
             sql = "INSERT INTO resource_store (name, parent_id, persistent_id, description, creator, type, created) "
                     + "VALUES (:name, :parent, :pid, :desc, :ow, :type, :created);";
             parid = null;
         }else {
+            // fixme: use trigger for consistency check!
             sql = "INSERT INTO resource_store (name, parent_id, persistent_id, description, creator, type, created) "
                     + "select :name, id, :pid, :desc, :ow, :type, :created from resource_store where persistent_id=:parent;";
             parid = resource.getParentID();
@@ -141,8 +149,7 @@ public class ResourceDao<T extends KustvaktResource>
         source.addValue("desc", resource.getDescription());
         source.addValue("type",
                 ResourceFactory.getResourceMapping(resource.getClass()));
-        source.addValue("created",
-                new Timestamp(TimeUtils.getNow().getMillis()));
+        source.addValue("created", System.currentTimeMillis());
         try {
             this.jdbcTemplate
                     .update(sql, source, holder, new String[] { "id" });
@@ -164,9 +171,18 @@ public class ResourceDao<T extends KustvaktResource>
         try {
             return this.jdbcTemplate.update(sql, source);
         }catch (DataAccessException e) {
-            e.printStackTrace();
             throw new dbException(user.getId(), "resource_store",
                     StatusCodes.DB_DELETE_FAILED, id);
+        }
+    }
+
+    @Override
+    public int deleteAll() throws KustvaktException {
+        final String sql = "DELETE FROM resource_store;";
+        try {
+            return this.jdbcTemplate.update(sql, new HashMap<String, Object>());
+        }catch (DataAccessException e) {
+            throw new KustvaktException(StatusCodes.CONNECTION_ERROR);
         }
     }
 }

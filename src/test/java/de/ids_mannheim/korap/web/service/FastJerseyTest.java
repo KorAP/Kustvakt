@@ -25,7 +25,7 @@ import java.net.URI;
  */
 public abstract class FastJerseyTest {
 
-    protected static String API_VERSION = "v0.1";
+    private final static String API_VERSION = "v0.1";
 
     private static DefaultResourceConfig resourceConfig = new DefaultResourceConfig();
 
@@ -46,6 +46,10 @@ public abstract class FastJerseyTest {
 
     public static void addSingleton(Object resourceSingleton) {
         resourceConfig.getSingletons().add(resourceSingleton);
+    }
+
+    public String getAPIVersion() {
+        return API_VERSION;
     }
 
     public static <T> void addProviderForContext(Class<T> contextClass,

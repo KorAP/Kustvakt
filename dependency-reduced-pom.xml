@@ -4,7 +4,7 @@
   <groupId>de.ids_mannheim.korap</groupId>
   <artifactId>Kustvakt-core</artifactId>
   <name>Kustvakt core</name>
-  <version>0.5</version>
+  <version>0.56</version>
   <description>Kustvakt core, basic rest api for testing purposes and default
         interfaces</description>
   <build>

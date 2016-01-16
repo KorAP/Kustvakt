@@ -1,6 +1,5 @@
 package de.ids_mannheim.korap.utils;
 
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -12,7 +11,7 @@ public class PrefixTreeMap<V> extends TreeMap<String, V> {
 
 
     public SortedMap<String, V> getPrefixSubMap(String prefix) {
-        if (prefix.length() > 0) {
+        if (prefix != null && prefix.length() > 0) {
             SortedMap d = this.subMap(prefix, getEnd(prefix));
             if (d.isEmpty())
                 return null;

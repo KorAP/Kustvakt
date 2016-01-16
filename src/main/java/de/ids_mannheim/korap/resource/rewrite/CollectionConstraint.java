@@ -33,7 +33,7 @@ public class CollectionConstraint implements RewriteTask.IterableRewriteAt {
      * @return boolean if true access granted
      */
     private boolean check(KoralNode node, User user) {
-        // todo: can be used to circumvent access control!
+        // todo: can be used to circumvent access control if public filter not applied
         if (user == null)
             return true;
 
@@ -44,10 +44,8 @@ public class CollectionConstraint implements RewriteTask.IterableRewriteAt {
                     .findbyId(id, user, Corpus.class);
             corpus = m.getResource();
         }catch (RuntimeException | KustvaktException e) {
-            e.printStackTrace();
             return false;
         }
-
         return corpus != null;
     }
 

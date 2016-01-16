@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service;
+package de.ids_mannheim.korap.web.service.full;
 
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ResourceFilters;
@@ -117,27 +117,25 @@ public class OAuthService {
         return Response.ok(info.toJSON()).build();
     }
 
-    // todo: change parameter to scopes!
     @GET
     @Path("info")
     @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
             PiwikFilter.class })
     public Response getStatus(@Context SecurityContext context,
-            @QueryParam("scopes") String scopes) {
+            @QueryParam("scope") String scopes) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         User user;
         try {
             user = this.controller.getUser(ctx.getUsername());
             this.controller.getUserDetails(user);
-            Set<String> base_scope = StringUtils
-                    .toSet((String) ctx.getParameters().get(Attributes.SCOPES),
-                            " ");
+            Set<String> base_scope = StringUtils.toSet(scopes, " ");
             base_scope.retainAll(StringUtils.toSet(scopes));
             scopes = StringUtils.toString(base_scope);
         }catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
         // json format with scope callback parameter
+        // todo: add other scopes as well!
         return Response.ok(JsonUtils.toJSON(Scopes
                 .mapOpenIDConnectScopes(scopes, user.getDetails()))).build();
     }
@@ -174,7 +172,7 @@ public class OAuthService {
             @Context SecurityContext context,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
-            MultivaluedMap<String, String> form)
+            MultivaluedMap<String, Object> form)
             throws OAuthSystemException, URISyntaxException {
         // user needs to be authenticated to this service!
         TokenContext c = (TokenContext) context.getUserPrincipal();

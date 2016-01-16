@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.config;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import de.ids_mannheim.korap.utils.JsonUtils;
 import lombok.Data;
 
 /**
@@ -25,6 +27,16 @@ public class ClientInfo {
     }
 
     public String toJSON() {
+        ObjectNode node = JsonUtils.createObjectNode();
+        node.put("client_id", client_id);
+        node.put("client_secret", client_secret);
+        node.put("application_name", application_name);
+        node.put("url", url);
+        node.put("redirect_uri", redirect_uri);
+        return JsonUtils.toJSON(node);
+    }
+
+    public String toString() {
         return "client_id: " + client_id + "\n" +
                 "application_name: " + application_name + "\n" +
                 "url: " + url + "\n" +

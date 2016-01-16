@@ -30,6 +30,7 @@ public class PolicyEvaluator {
     private PermissionsBuffer permissions;
     private boolean processed;
     private int relationError = -1;
+    @Deprecated
     private Map<String, Object> flags;
 
     public PolicyEvaluator(User user, List<SecurityPolicy>[] policies) {
@@ -59,6 +60,7 @@ public class PolicyEvaluator {
             Permissions.PERMISSIONS perm) throws NotAuthorizedException {
         //fixme: what happens in case a parent relation does not allow changing a resource, but the owner of child per default
         //todo: receives all rights? --> test casing
+        jlog.error("IS USER RESOURCE OWNER? " + isOwner());
         if (isOwner()) {
             jlog.debug("Resource is owned by the user!");
             return policies[0];
@@ -86,6 +88,7 @@ public class PolicyEvaluator {
                         idx++;
                     }
                 }
+                // fixme: what is that?
                 if (idx == 0) {
                     relationError = i;
                     throw new NotAuthorizedException(
@@ -119,8 +122,8 @@ public class PolicyEvaluator {
 
     public boolean isAllowed(Permissions.PERMISSIONS perm) {
         try {
-            System.out.println("THESE POLICIES " + this.policies[0]);
-            return !evaluate(this.policies, perm).isEmpty();
+            List s = evaluate(this.policies, perm);
+            return s != null && !s.isEmpty();
         }catch (NotAuthorizedException e) {
             return false;
         }
@@ -140,6 +143,7 @@ public class PolicyEvaluator {
     }
 
     // todo: what is this supposed to do?
+    @Deprecated
     public static PolicyEvaluator setFlags(User user,
             KustvaktResource resource) {
         PolicyEvaluator e = new PolicyEvaluator(user, resource);

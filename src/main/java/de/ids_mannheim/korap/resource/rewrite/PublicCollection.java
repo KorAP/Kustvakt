@@ -14,14 +14,13 @@ import java.util.Set;
  * @author hanl
  * @date 04/07/2015
  */
-// todo: 11.11.15
 public class PublicCollection implements RewriteTask.RewriteNodeAt {
 
     public PublicCollection() {
         super();
     }
 
-    // todo: where to inject the array node into? --> super group with and relation plus subgroup with ids and or operation
+    // todo: where to inject the array node into? --> super group with and relation plus subgroup with ids and or operator
     @Override
     public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
             User user) {

@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service;
+package de.ids_mannheim.korap.web.service.full;
 
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ResourceFilters;
@@ -72,6 +72,8 @@ public class AuthService {
         return Response.ok(JsonUtils.toJSON(m)).build();
     }
 
+
+    // fixme: moved to user
     @GET
     @Path("status")
     @ResourceFilters({ AuthFilter.class, DefaultFilter.class })
@@ -83,7 +85,6 @@ public class AuthService {
         return Response.ok(ctx.toJSON()).build();
     }
 
-    // todo: rename scope to scopes!
     @GET
     @Path("apiToken")
     public Response requestAPIToken(@Context HttpHeaders headers,
@@ -91,7 +92,7 @@ public class AuthService {
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
             @HeaderParam("referer-url") String referer,
-            @QueryParam("scopes") String scopes) {
+            @QueryParam("scope") String scopes) {
         List<String> auth = headers
                 .getRequestHeader(ContainerRequest.AUTHORIZATION);
 
@@ -221,4 +222,22 @@ public class AuthService {
         }
         return Response.ok().entity(context.toJSON()).build();
     }
+
+    //fixme: moved from userservice
+    @GET
+    @Path("logout")
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
+            PiwikFilter.class })
+    public Response logout(@Context SecurityContext ctx,
+            @Context Locale locale) {
+        TokenContext context = (TokenContext) ctx.getUserPrincipal();
+        try {
+            controller.logout(context);
+        }catch (KustvaktException e) {
+            jlog.error("Logout Exception", e);
+            throw KustvaktResponseHandler.throwit(e);
+        }
+        return Response.ok().build();
+    }
+
 }

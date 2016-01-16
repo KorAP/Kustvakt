@@ -24,9 +24,6 @@ public class RewriteHandler {
     private Collection<RewriteTask.RewriteKoralToken> token_node_processors;
     private Collection<RewriteTask> query_processors;
 
-    //    private Collection<RewriteTask.RewriteNode2> fixed_nodes;
-    //    private Collection<RewriteTask.IterableRewrite> iterable_nodes;
-
     private Set<Class> failed_task_registration;
 
     private KustvaktConfiguration config;
@@ -53,21 +50,6 @@ public class RewriteHandler {
 
         this.failed_task_registration.add(rewriter.getClass());
         return false;
-    }
-
-    public boolean addProcessor2(RewriteTask rewriteTask) {
-        //        if (rewriteTask instanceof RewriteTask.RewriteNode2)
-        //            return this.fixed_nodes.add((RewriteTask.RewriteNode2) rewriteTask);
-        //        else if (rewriteTask instanceof RewriteTask.IterableRewrite)
-        //            return this.iterable_nodes
-        //                    .add((RewriteTask.IterableRewrite) rewriteTask);
-        //        else if (rewriteTask instanceof RewriteTask.RewriteBefore)
-        // gets the entire pre processed query injected.
-        return false;
-    }
-
-    public final Collection<Class> getFailedHandlers() {
-        return this.failed_task_registration;
     }
 
     @Override

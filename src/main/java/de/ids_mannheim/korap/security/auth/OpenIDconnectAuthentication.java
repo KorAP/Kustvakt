@@ -49,7 +49,7 @@ public class OpenIDconnectAuthentication implements AuthenticationIface {
         String cl_secret = (String) attr.get(Attributes.CLIENT_SECRET);
         if (cl_secret == null)
             throw new KustvaktException(StatusCodes.REQUEST_INVALID);
-
+        attr.remove(cl_secret);
         JWTSigner signer = new JWTSigner(cl_secret.getBytes(),
                 config.getIssuer(), config.getTokenTTL());
         TokenContext c = new TokenContext();

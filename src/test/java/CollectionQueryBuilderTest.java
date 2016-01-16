@@ -1,4 +1,5 @@
 import com.fasterxml.jackson.databind.JsonNode;
+import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.CollectionQueryBuilder3;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import org.junit.Test;
@@ -12,7 +13,7 @@ public class CollectionQueryBuilderTest {
     @Test
     public void testsimpleAdd() {
         CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
-        b.addSegment("corpusID", CollectionQueryBuilder3.EQ.EQUAL, "WPD");
+        b.addQuery("corpusID=WPD");
 
         JsonNode node = JsonUtils.readTree(b.toJSON());
 
@@ -25,9 +26,7 @@ public class CollectionQueryBuilderTest {
     @Test
     public void testSimpleConjunction() {
         CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
-        b.addSegment("corpusID", CollectionQueryBuilder3.EQ.EQUAL, "WPD").and()
-                .addSegment("textClass", CollectionQueryBuilder3.EQ.EQUAL,
-                        "freizeit");
+        b.addQuery("corpusID=WPD & textClass=freizeit");
         JsonNode node = JsonUtils.readTree(b.toJSON());
 
         assert node != null;
@@ -43,10 +42,11 @@ public class CollectionQueryBuilderTest {
     @Test
     public void testSimpleDisjunction() {
         CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
-        b.addSegment("corpusID", CollectionQueryBuilder3.EQ.EQUAL, "WPD").or()
-                .addSegment("textClass", CollectionQueryBuilder3.EQ.EQUAL,
-                        "freizeit");
+        b.addQuery("corpusID=WPD | textClass=freizeit");
         JsonNode node = JsonUtils.readTree(b.toJSON());
+
+        System.out.println("_____________________________________________");
+        System.out.println(node);
 
         assert node != null;
         assert node.at("/collection/operation").asText().equals("operation:or");
@@ -59,11 +59,13 @@ public class CollectionQueryBuilderTest {
     @Test
     public void testComplexSubQuery() {
         CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
-        b.addSegment("corpusID", CollectionQueryBuilder3.EQ.EQUAL, "ADF").or()
-                .addSub("textClass=freizeit & corpusID=WPD");
-
+        b.addQuery(
+                "(corpusID=WPD) | (textClass=freizeit & corpusID=WPD)");
         JsonNode node = JsonUtils.readTree(b.toJSON());
 
+        System.out.println(
+                "_____________________________________________ COMPLEX");
+        System.out.println(node);
         assert node != null;
         assert node.at("/collection/operation").asText().equals("operation:or");
         assert node.at("/collection/operands/0/key").asText()
@@ -76,13 +78,11 @@ public class CollectionQueryBuilderTest {
     @Test
     public void testAddResourceQueryAfter() {
         CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
-        b.addSegment("corpusID", CollectionQueryBuilder3.EQ.EQUAL, "ADF").or()
-                .addSub("textClass=freizeit & corpusID=WPD");
+        b.addQuery("(corpusID=ADF) | (textClass=freizeit & corpusID=WPD)");
 
         CollectionQueryBuilder3 c = new CollectionQueryBuilder3();
         c.setBaseQuery(b.toJSON());
-        c.addSegment("textClass", CollectionQueryBuilder3.EQ.EQUAL,
-                "wissenschaft");
+        c.addQuery("textClass=wissenschaft");
 
         JsonNode node = JsonUtils.readTree(c.toJSON());
 
@@ -96,12 +96,11 @@ public class CollectionQueryBuilderTest {
     @Test
     public void testAddComplexResourceQueryAfter() {
         CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
-        b.addSegment("corpusID", CollectionQueryBuilder3.EQ.EQUAL, "ADF").or()
-                .addSub("textClass=freizeit & corpusID=WPD");
+        b.addQuery("(corpusID=ADF) | (textClass=freizeit & corpusID=WPD)");
 
         CollectionQueryBuilder3 c = new CollectionQueryBuilder3();
         c.setBaseQuery(b.toJSON());
-        c.addSub("(textClass=politik & corpusID=AZPS)");
+        c.addQuery("(textClass=politik & corpusID=AZPS)");
 
         JsonNode node = JsonUtils.readTree(c.toJSON());
 
@@ -112,6 +111,23 @@ public class CollectionQueryBuilderTest {
                 .equals("politik");
         assert node.at("/collection/operands/2/operands/1/value").asText()
                 .equals("AZPS");
+
+    }
+
+    @Test
+    public void buildQuery() {
+        String query = "[base=Haus]";
+        QuerySerializer s = new QuerySerializer();
+        s.setQuery(query, "poliqarp");
+        CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
+        b.addQuery("corpusID=WPD");
+        s.setCollection("corpusID=WPD");
+
+        System.out.println("QUERY " + s.toJSON());
+    }
+
+    @Test
+    public void testBaseQueryBuild() {
 
     }
 

@@ -1,137 +1,137 @@
+--
+---- rename all columns in new way!
+--CREATE TABLE IF NOT EXISTS korapusers (
+--    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+--    username VARCHAR(100) NOT NULL UNIQUE,
+--    password VARCHAR(100) NOT NULL,
+--    accountLock boolean NOT NULL,
+--    accountCreation TIMESTAMP NOT NULL,
+--    type INTEGER DEFAULT 0,
+--    URI_PASS_Fragment VARCHAR(100),
+--    URI_CONF_Fragment VARCHAR(100),
+--    URI_Expiration TIMESTAMP,
+--    loginSuccess INTEGER,
+--    loginFailed INTEGER,
+--    accountExpiration TIMESTAMP NOT NULL,
+--    accountLink VARCHAR(100)
+--);
+--
+--CREATE TABLE IF NOT EXISTS shibusers (
+--    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+--    username VARCHAR(100) NOT NULL UNIQUE,
+--    accountCreation TIMESTAMP NOT NULL,
+--    type INTEGER DEFAULT 1,
+--    loginSuccess INTEGER,
+--    loginFailed INTEGER,
+--    accountExpiration TIMESTAMP NOT NULL,
+--    accountLink VARCHAR(100)
+--);
+--
+--CREATE TABLE IF NOT EXISTS udetails (
+--    Id INTEGER PRIMARY KEY AUTO_INCREMENT,
+--    userID INTEGER NOT NULL UNIQUE,
+--    firstName VARCHAR(100),
+--    lastName VARCHAR(100),
+--    gender VARCHAR(100),
+--    phone VARCHAR(100),
+--    institution VARCHAR(100),
+--    email VARCHAR(100),
+--    address VARCHAR(100),
+--    country VARCHAR(100),
+--    privateUsage BOOLEAN,
+--    foreign key (userID)
+--    references korapusers (id)
+--    on delete cascade
+--);
+--
+--CREATE TABLE IF NOT EXISTS usettings (
+--    Id INTEGER PRIMARY KEY AUTO_INCREMENT,
+--    userID INTEGER NOT NULL UNIQUE,
+--    fileNameForExport VARCHAR(100),
+--    itemForSimpleAnnotation INTEGER,
+--    leftContextItemForExport VARCHAR(100),
+--    leftContextSizeForExport INTEGER,
+--    locale VARCHAR(100),
+--    leftContextItem VARCHAR(100),
+--    leftContextSize INTEGER,
+--    rightContextItem VARCHAR(100),
+--    rightContextItemForExport VARCHAR(100),
+--    rightContextSize INTEGER,
+--    rightContextSizeForExport INTEGER,
+--    selectedCollection VARCHAR(100),
+--    queryLanguage VARCHAR(100),
+--    pageLength INTEGER,
+--    metadataQueryExpertModus BOOLEAN,
+--    searchSettingsTab INTEGER,
+--    selectedGraphType INTEGER,
+--    selectedSortType VARCHAR(100),
+--    selectedViewForSearchResults VARCHAR(100),
+--    POSFoundry VARCHAR(100),
+--    lemmaFoundry VARCHAR(100),
+--    constFoundry VARCHAR(100),
+--    relFoundry VARCHAR(100),
+--    collectData BOOLEAN,
+--    foreign key (userID)
+--    references korapusers (id)
+--    on delete cascade
+--);
+--
+--CREATE OR REPLACE VIEW allusers AS
+--    SELECT
+--        id,
+--        username,
+--        password,
+--        accountLock,
+--        accountCreation,
+--        type,
+--        URI_PASS_Fragment,
+--        URI_CONF_Fragment,
+--        URI_Expiration,
+--        loginSuccess,
+--        loginFailed,
+--        accountExpiration,
+--        accountLink
+--    from
+--        korapusers
+--    UNION ALL SELECT
+--        id,
+--        username,
+--        NULL as password,
+--        NULL as accountLock,
+--        accountCreation,
+--        type,
+--        NULL as URI_PASS_Fragment,
+--        NULL as URI_CONF_Fragment,
+--        NULL as URI_Expiration,
+--        loginSuccess,
+--        loginFailed,
+--        accountExpiration,
+--        accountLink
+--    from
+--        shibusers;
 
--- rename all columns in new way!
-CREATE TABLE IF NOT EXISTS korapusers (
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(100) NOT NULL,
-    accountLock boolean NOT NULL,
-    accountCreation TIMESTAMP NOT NULL,
-    type INTEGER DEFAULT 0,
-    URI_PASS_Fragment VARCHAR(100),
-    URI_CONF_Fragment VARCHAR(100),
-    URI_Expiration TIMESTAMP,
-    loginSuccess INTEGER,
-    loginFailed INTEGER,
-    accountExpiration TIMESTAMP NOT NULL,
-    accountLink VARCHAR(100)
-);
-
-CREATE TABLE IF NOT EXISTS shibusers (
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(100) NOT NULL UNIQUE,
-    accountCreation TIMESTAMP NOT NULL,
-    type INTEGER DEFAULT 1,
-    loginSuccess INTEGER,
-    loginFailed INTEGER,
-    accountExpiration TIMESTAMP NOT NULL,
-    accountLink VARCHAR(100)
-);
-
-CREATE TABLE IF NOT EXISTS udetails (
-    Id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    userID INTEGER NOT NULL UNIQUE,
-    firstName VARCHAR(100),
-    lastName VARCHAR(100),
-    gender VARCHAR(100),
-    phone VARCHAR(100),
-    institution VARCHAR(100),
-    email VARCHAR(100),
-    address VARCHAR(100),
-    country VARCHAR(100),
-    privateUsage BOOLEAN,
-    foreign key (userID)
-    references korapusers (id)
-    on delete cascade
-);
-
-CREATE TABLE IF NOT EXISTS usettings (
-    Id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    userID INTEGER NOT NULL UNIQUE,
-    fileNameForExport VARCHAR(100),
-    itemForSimpleAnnotation INTEGER,
-    leftContextItemForExport VARCHAR(100),
-    leftContextSizeForExport INTEGER,
-    locale VARCHAR(100),
-    leftContextItem VARCHAR(100),
-    leftContextSize INTEGER,
-    rightContextItem VARCHAR(100),
-    rightContextItemForExport VARCHAR(100),
-    rightContextSize INTEGER,
-    rightContextSizeForExport INTEGER,
-    selectedCollection VARCHAR(100),
-    queryLanguage VARCHAR(100),
-    pageLength INTEGER,
-    metadataQueryExpertModus BOOLEAN,
-    searchSettingsTab INTEGER,
-    selectedGraphType INTEGER,
-    selectedSortType VARCHAR(100),
-    selectedViewForSearchResults VARCHAR(100),
-    POSFoundry VARCHAR(100),
-    lemmaFoundry VARCHAR(100),
-    constFoundry VARCHAR(100),
-    relFoundry VARCHAR(100),
-    collectData BOOLEAN,
-    foreign key (userID)
-    references korapusers (id)
-    on delete cascade
-);
-
-CREATE OR REPLACE VIEW allusers AS
-    SELECT 
-        id,
-        username,
-        password,
-        accountLock,
-        accountCreation,
-        type,
-        URI_PASS_Fragment,
-        URI_CONF_Fragment,
-        URI_Expiration,
-        loginSuccess,
-        loginFailed,
-        accountExpiration,
-        accountLink
-    from
-        korapusers 
-    UNION ALL SELECT 
-        id,
-        username,
-        NULL as password,
-        NULL as accountLock,
-        accountCreation,
-        type,
-        NULL as URI_PASS_Fragment,
-        NULL as URI_CONF_Fragment,
-        NULL as URI_Expiration,
-        loginSuccess,
-        loginFailed,
-        accountExpiration,
-        accountLink
-    from
-        shibusers;
-
--- why unsigned?
-CREATE TABLE IF NOT EXISTS r_store (
-id INTEGER PRIMARY KEY AUTO_INCREMENT,
-persistent_id VARCHAR(100) NOT NULL UNIQUE,
-name VARCHAR(100),
-description VARCHAR(300),
-parent_id Integer unsigned null,
-created timestamp default current_timestamp,
-type INTEGER NOT NULL,
-creator INTEGER NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS uqueries (
-    id INTEGER PRIMARY KEY,
-    queryLanguage VARCHAR(100),
-    name VARCHAR(100),
-    query VARCHAR(200),
-    description VARCHAR(150),
-    foreign key (id)
-    references r_store(id)
-    on delete cascade
-);
+---- why unsigned?
+--CREATE TABLE IF NOT EXISTS r_store (
+--id INTEGER PRIMARY KEY AUTO_INCREMENT,
+--persistent_id VARCHAR(100) NOT NULL UNIQUE,
+--name VARCHAR(100),
+--description VARCHAR(300),
+--parent_id Integer unsigned null,
+--created timestamp default current_timestamp,
+--type INTEGER NOT NULL,
+--creator INTEGER NOT NULL
+--);
+--
+--CREATE TABLE IF NOT EXISTS uqueries (
+--    id INTEGER PRIMARY KEY,
+--    queryLanguage VARCHAR(100),
+--    name VARCHAR(100),
+--    query VARCHAR(200),
+--    description VARCHAR(150),
+--    foreign key (id)
+--    references r_store(id)
+--    on delete cascade
+--);
 
 CREATE TABLE IF NOT EXISTS r_tree (
 parent_id INTEGER,
@@ -152,6 +152,7 @@ CREATE TABLE IF NOT EXISTS cstorage (
     id INTEGER,
     refCorpus VARCHAR(100),
     query VARCHAR(500),
+    -- is foreign key constraint valid after refactoring?
     foreign key (id) references r_store(id)
     on delete cascade);
 
@@ -189,13 +190,12 @@ CREATE TABLE IF NOT EXISTS securityRecords (
 );
 
 
-CREATE TABLE IF NOT EXISTS doc_trace (
-id VARCHAR(200) PRIMARY KEY,
-resource INTEGER,
-created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-foreign key (resource)
-references r_store(id)
-);
+--CREATE TABLE IF NOT EXISTS doc_store (
+--    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+--    persistent_id VARCHAR(100) UNIQUE,
+--    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    disabled BOOLEAN default true
+--);
 
 -- last_modified timestamp ON UPDATE CURRENT_TIMESTAMP,
 CREATE TABLE IF NOT EXISTS p_store (
@@ -206,7 +206,7 @@ CREATE TABLE IF NOT EXISTS p_store (
     posix SMALLINT NOT NULL,
     expire TIMESTAMP NULL,
     enable TIMESTAMP NULL,
-    iprange varchar(200)
+    iprange VARCHAR(200)
 );
 
 CREATE TABLE IF NOT EXISTS conditionDef (

@@ -88,7 +88,8 @@ public class VirtualCollection extends KustvaktResource {
     public Map toMap() {
         Map res = super.toMap();
         res.put("query", JsonUtils.readTree(query));
-        res.put("statistics", stats);
+        if (stats != null && !stats.isEmpty())
+            res.put("statistics", stats);
         return res;
     }
 

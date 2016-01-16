@@ -2,23 +2,23 @@ CREATE TABLE IF NOT EXISTS korap_users (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
 username VARCHAR(150) NOT NULL UNIQUE,
 password VARCHAR(100) NOT NULL,
-accountLock boolean NOT NULL,
-accountCreation TIMESTAMP NOT NULL,
+account_lock boolean NOT NULL,
+account_creation BIGINT NOT NULL,
 -- deprecate this
 type INTEGER DEFAULT 0,
 uri_fragment VARCHAR(100),
-uri_expiration TIMESTAMP,
-accountLink VARCHAR(100)
+uri_expiration BIGINT,
+account_link VARCHAR(100)
 );
 
 CREATE TABLE IF NOT EXISTS shib_users (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
 username VARCHAR(150) NOT NULL UNIQUE,
-accountCreation TIMESTAMP NOT NULL,
+account_creation BIGINT,
 type INTEGER DEFAULT 1,
 loginSuccess INTEGER,
 loginFailed INTEGER,
-accountLink VARCHAR(100)
+account_link VARCHAR(100)
 );
 
 CREATE TABLE IF NOT EXISTS user_details (
@@ -83,7 +83,7 @@ persistent_id VARCHAR(150) UNIQUE,
 name VARCHAR(150),
 description VARCHAR(200),
 query VARCHAR(500),
-created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+created BIGINT NOT NULL,
 user_id INTEGER,
 foreign key(user_id)
 references korap_users(id)
@@ -98,7 +98,7 @@ aud_user VARCHAR(100),
 aud_location VARCHAR(100),
 aud_field_1 VARCHAR(400),
 aud_args VARCHAR(400),
-aud_timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+aud_timestamp BIGINT,
 aud_status VARCHAR(100)
 );
 
@@ -113,20 +113,20 @@ matchInfo VARCHAR(100)
 CREATE TABLE IF NOT EXISTS policy_store (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
 target_id BIGINT NOT NULL,
-created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+created BIGINT NOT NULL,
 creator INTEGER NOT NULL,
 posix SMALLINT NOT NULL,
-expire timestamp,
-enable timestamp NOT NULL,
+expire BIGINT,
+enable BIGINT NOT NULL,
 iprange varchar(200)
 );
 
 -- send disabled documents per corpus to backend, so they can be excluded from searching!
 CREATE TABLE IF NOT EXISTS doc_store (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
-persistent_id VARCHAR(265) UNIQUE,
-created DATE DEFAULT CURRENT_TIMESTAMP,
-disabled BOOLEAN default true
+persistent_id VARCHAR(100) UNIQUE,
+created BIGINT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+disabled BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE IF NOT EXISTS group_ref (
@@ -244,7 +244,7 @@ status INTEGER DEFAULT 1,
 -- in case of code authorization, should match auth code scopes!
 -- use scopes for levelaccess descriptor level[rw],level[r]
 scopes VARCHAR(350),
-expiration TIMESTAMP,
+expiration BIGINT NOT NULL,
 FOREIGN KEY (user_id)
 REFERENCES korap_users(id),
 FOREIGN KEY (client_id)
@@ -257,7 +257,7 @@ create table oauth2_refresh_token (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
 client_id VARCHAR(100),
 user_id INTEGER,
-expiration TIMESTAMP,
+expiration BIGINT NOT NULL,
 scopes VARCHAR(350),
 FOREIGN KEY (user_id)
 REFERENCES korap_users(id)
@@ -324,10 +324,10 @@ CREATE TRIGGER IF NOT EXISTS insert_data
 AFTER INSERT ON resource_store
 FOR EACH ROW BEGIN
 INSERT INTO resource_tree (parent_id, child_id, depth, name_path)
-VALUES (NEW.id, NEW.id, 0, NEW.name);
+VALUES (NEW.id, NEW.id, 0, NEW.persistent_id);
 
 INSERT INTO resource_tree (parent_id, child_id, depth, name_path)
-SELECT parent_id, NEW.id, depth + 1, name_path || "/" ||  NEW.name FROM resource_tree
+SELECT parent_id, NEW.id, depth + 1, name_path || "/" ||  NEW.persistent_id FROM resource_tree
 WHERE child_id = NEW.parent_id;
 END;
 

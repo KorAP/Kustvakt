@@ -30,14 +30,13 @@ public class Corpus extends KustvaktResource {
 
     public Corpus(String pers_id, int creator) {
         super(pers_id, creator);
-        // deprecated
-        this.setName(pers_id);
     }
 
     @Override
     public Map toMap() {
         Map res = super.toMap();
-        res.put("statistics", stats);
+        if (stats != null && !stats.isEmpty())
+            res.put("statistics", stats);
         return res;
     }
 }

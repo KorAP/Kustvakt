@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -47,7 +48,7 @@ public class CollectionDao
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", id);
         source.addValue("user", user.getId());
-        final String sql = "select * from coll_store where persistentID=:id and userID=:user;";
+        final String sql = "select * from coll_store where persistent_id=:id and user_id=:user;";
         try {
             return (T) this.jdbcTemplate.queryForObject(sql, source,
                     new RowMapperFactory.CollectionMapper());
@@ -78,12 +79,12 @@ public class CollectionDao
         np.addValue("qy", resource.getQuery());
         np.addValue("name", resource.getName());
         np.addValue("desc", resource.getDescription());
-        final String sql = "UPDATE coll_store SET query=:qy, name=:name, description=:desc WHERE persistentID=:id;";
+        final String sql = "UPDATE coll_store SET query=:qy, name=:name, description=:desc WHERE persistent_id=:id;";
         try {
             return this.jdbcTemplate.update(sql, np);
         }catch (DataAccessException e) {
             log.error("Exception during database update for id '" + resource
-                    .getId() + "'", e);
+                    .getPersistentID() + "'", e);
             throw new KustvaktException(e, StatusCodes.CONNECTION_ERROR);
         }
     }
@@ -92,7 +93,7 @@ public class CollectionDao
             throws KustvaktException {
         MapSqlParameterSource[] sources = new MapSqlParameterSource[resources
                 .size()];
-        final String sql = "UPDATE coll_store SET query=:qy, name=:name, description=:desc WHERE persistentID=:id;";
+        final String sql = "UPDATE coll_store SET query=:qy, name=:name, description=:desc WHERE persistent_id=:id;";
         int i = 0;
         for (VirtualCollection c : resources) {
             MapSqlParameterSource np = new MapSqlParameterSource();
@@ -120,15 +121,16 @@ public class CollectionDao
             np.addValue("name", resource.getName());
             np.addValue("desc", resource.getDescription());
             np.addValue("us", user.getId());
+            np.addValue("cr", System.currentTimeMillis());
 
             final String sql =
-                    "INSERT INTO coll_store (persistentID, name, description, userID, query) "
-                            + "VALUES (:pid, :name, :desc, :us, :query);";
+                    "INSERT INTO coll_store (persistent_id, name, description, user_id, query, created) "
+                            + "VALUES (:pid, :name, :desc, :us, :query, :cr);";
             try {
                 return this.jdbcTemplate.update(sql, np);
             }catch (DataAccessException e) {
                 log.error("Exception during database store for id '" + resource
-                        .getId() + "'", e);
+                        .getPersistentID() + "'", e);
                 throw new KustvaktException(e, StatusCodes.CONNECTION_ERROR);
             }
         }else
@@ -137,18 +139,28 @@ public class CollectionDao
     }
 
     public int deleteResource(String id, User user) throws KustvaktException {
-        //todo: foreign key and on delete cascade does not work currently!
+        //todo: foreign key and on delete cascade does not work properly!
         MapSqlParameterSource np = new MapSqlParameterSource();
         np.addValue("id", id);
         np.addValue("user", user.getId());
-        //        final String sql = "DELETE FROM coll_store cs inner join r_store rs on rs.id=cs.id WHERE rs.persistentID=:id;";
-        final String sql = "DELETE FROM coll_store where persistentID=:id and user=:user;";
+        //        final String sql = "DELETE FROM coll_store cs inner join r_store rs on rs.id=cs.id WHERE rs.persistent_id=:id;";
+        final String sql = "DELETE FROM coll_store where persistent_id=:id and user_id=:user;";
         try {
             return this.jdbcTemplate.update(sql, np);
         }catch (DataAccessException e) {
             log.error("Exception during database delete for id '" + id + "'",
                     e);
             throw new KustvaktException(e, StatusCodes.CONNECTION_ERROR);
+        }
+    }
+
+    @Override
+    public int deleteAll() throws KustvaktException {
+        final String sql = "DELETE FROM coll_store;";
+        try {
+            return this.jdbcTemplate.update(sql, new HashMap<String, Object>());
+        }catch (DataAccessException e) {
+            throw new KustvaktException(StatusCodes.CONNECTION_ERROR);
         }
     }
 

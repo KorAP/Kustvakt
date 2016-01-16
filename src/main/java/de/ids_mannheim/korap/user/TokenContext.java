@@ -3,7 +3,9 @@ package de.ids_mannheim.korap.user;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import org.joda.time.DateTime;
 
 import java.util.Date;
@@ -27,6 +29,7 @@ public class TokenContext implements java.security.Principal {
     private String token;
     private boolean secureRequired;
 
+    @Getter(AccessLevel.PRIVATE)
     private Map<String, Object> parameters;
     private String hostAddress;
     private String userAgent;
@@ -46,6 +49,10 @@ public class TokenContext implements java.security.Principal {
                 new DateTime(expirationTime).toString());
         m.put(Attributes.TOKEN, this.token);
         return m;
+    }
+
+    public Map<String, Object> params() {
+        return new HashMap<>(parameters);
     }
 
     public boolean match(TokenContext other) {
