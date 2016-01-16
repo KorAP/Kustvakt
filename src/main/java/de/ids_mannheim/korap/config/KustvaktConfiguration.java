@@ -92,6 +92,7 @@ public class KustvaktConfiguration {
      */
     protected Properties load(Properties properties)
             throws MalformedURLException {
+        properties.list(System.out);
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));
         returnhits = new Integer(properties.getProperty("returnhits", "50000"));
         indexDir = properties.getProperty("lucene.indexDir", "");

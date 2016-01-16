@@ -96,7 +96,6 @@
                 <directory>src/test/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-
                     <include>**/*.prop</include>
                     <include>**/*.xml</include>
                     <include>**/*.conf</include>
@@ -107,11 +106,11 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>**/*.prop</include>
-                    <include>**/*.xml</include>
-                    <include>**/*.conf</include>
+                    <!--<include>**/*.prop</include>-->
+                    <!--<include>**/*.xml</include>-->
+                    <!--<include>**/*.conf</include>-->
                     <include>**/*.properties</include>
-                    <include>**/*.sql</include>
+                    <!--<include>**/*.sql</include>-->
                 </includes>
             </testResource>
         </testResources>

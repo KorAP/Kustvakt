@@ -117,7 +117,7 @@ public class JWTSigner {
         return signContent(username, "", "", ttl);
     }
 
-    private SignedJWT verifyToken(String token) throws KustvaktException {
+    public SignedJWT verifyToken(String token) throws KustvaktException {
         SignedJWT client;
         try {
             client = SignedJWT.parse(token);

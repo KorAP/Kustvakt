@@ -77,12 +77,14 @@ public class KustvaktResourceServiceTest extends FastJerseyTest {
                 .get(ClientResponse.class);
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
         node = JsonUtils.readTree(response.getEntity(String.class));
-        System.out.println("STATS RESULT: ");
-        System.out.println(node);
+        assert node != null;
+        int docs = node.path("documents").asInt();
+        assert docs > 0 && docs < 15;
     }
 
     @Test
     public void testResourceStore() {
 
     }
+
 }

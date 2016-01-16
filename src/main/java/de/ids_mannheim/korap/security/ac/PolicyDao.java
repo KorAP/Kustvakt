@@ -16,6 +16,7 @@ import de.ids_mannheim.korap.utils.BooleanUtils;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
+import org.slf4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -36,6 +37,9 @@ import java.util.List;
  */
 // todo: transactions and exception management
 public class PolicyDao implements PolicyHandlerIface {
+
+    private static final Logger jlog = KustvaktLogger
+            .getLogger(PolicyDao.class);
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -90,9 +94,8 @@ public class PolicyDao implements PolicyHandlerIface {
             this.mapConstraints(policy);
             return policy.getID();
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Operation (INSERT) not possible for '{}' for user '{}'",
-                            policy.toString(), user.getId());
+            jlog.error("Operation (INSERT) not possible for '{}' for user '{}'",
+                    policy.toString(), user.getId());
             throw new dbException(user.getId(), "policy_store",
                     StatusCodes.DB_INSERT_FAILED, policy.toString());
         }
@@ -141,9 +144,9 @@ public class PolicyDao implements PolicyHandlerIface {
             }
             policy.clear();
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Operation (MAPPING POLICY CONDITIONS) not possible for '{}' for user '{}'",
-                            policy.toString(), policy.getCreator());
+            jlog.error(
+                    "Operation (MAPPING POLICY CONDITIONS) not possible for '{}' for user '{}'",
+                    policy.toString(), policy.getCreator());
             // throwing an error here is not recommended
             //            throw new dbException(policy.getCreator(), "policy_store",
             //                    StatusCodes.DB_INSERT_FAILED, policy.toString());
@@ -181,9 +184,9 @@ public class PolicyDao implements PolicyHandlerIface {
                     this.addToCondition(Arrays.asList(user.getUsername()), cond,
                             admin);
             }catch (DataAccessException e) {
-                KustvaktLogger.SECURITY_LOGGER
-                        .error("Operation (SELECT) not possible for '{}' for user '{}'",
-                                policy.getTarget(), user.getId());
+                jlog.error(
+                        "Operation (SELECT) not possible for '{}' for user '{}'",
+                        policy.getTarget(), user.getId());
                 throw new dbException(user.getId(), "policy_store",
                         StatusCodes.DB_GET_FAILED, policy.toString());
             }
@@ -228,9 +231,9 @@ public class PolicyDao implements PolicyHandlerIface {
                         }
                     });
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Permission Denied for policy retrieval for '{}' for user '{}'",
-                            target, user.getId());
+            jlog.error(
+                    "Permission Denied for policy retrieval for '{}' for user '{}'",
+                    target, user.getId());
             return new List[2];
         }
     }
@@ -273,9 +276,9 @@ public class PolicyDao implements PolicyHandlerIface {
                         }
                     });
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Permission Denied for policy retrieval for '{}' for user '{}'",
-                            target, user.getId());
+            jlog.error(
+                    "Permission Denied for policy retrieval for '{}' for user '{}'",
+                    target, user.getId());
             return new List[2];
         }
     }
@@ -316,9 +319,9 @@ public class PolicyDao implements PolicyHandlerIface {
                         }
                     });
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Permission Denied for retrieval for resource id '{}' for user '{}'",
-                            path, user.getId());
+            jlog.error(
+                    "Permission Denied for retrieval for resource id '{}' for user '{}'",
+                    path, user.getId());
             return new List[2];
         }
     }
@@ -396,9 +399,9 @@ public class PolicyDao implements PolicyHandlerIface {
             return this.jdbcTemplate.query(sql, param,
                     new SecurityRowMappers.HierarchicalResultExtractor());
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Permission Denied for retrieval for path '{}' for user '{}'",
-                            path, user.getId());
+            jlog.error(
+                    "Permission Denied for retrieval for path '{}' for user '{}'",
+                    path, user.getId());
             throw new dbException(user.getId(), "policy_store",
                     StatusCodes.DB_GET_FAILED, path, clazz.toString());
         }
@@ -470,9 +473,9 @@ public class PolicyDao implements PolicyHandlerIface {
             return this.jdbcTemplate.query(sql, param,
                     new SecurityRowMappers.HierarchicalResultExtractor());
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Permission Denied for retrieval for path '{}' for user '{}'",
-                            name, user.getId());
+            jlog.error(
+                    "Permission Denied for retrieval for path '{}' for user '{}'",
+                    name, user.getId());
             throw new dbException(user.getId(), "policy_store",
                     StatusCodes.DB_GET_FAILED, name, clazz.toString());
         }
@@ -495,9 +498,8 @@ public class PolicyDao implements PolicyHandlerIface {
             return this.jdbcTemplate
                     .update("DELETE FROM policy_store WHERE id=:id", param);
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Operation (DELETE) not possible for '{}' for user '{}'",
-                            policy.toString(), user.getId());
+            jlog.error("Operation (DELETE) not possible for '{}' for user '{}'",
+                    policy.toString(), user.getId());
             throw new dbException(user.getId(), "policy_store, group_ref",
                     StatusCodes.DB_DELETE_FAILED, policy.toString());
         }
@@ -512,9 +514,8 @@ public class PolicyDao implements PolicyHandlerIface {
         try {
             this.jdbcTemplate.update(sql, param);
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Operation (DELETE) not possible for '{}' for user '{}'",
-                            id, user.getId());
+            jlog.error("Operation (DELETE) not possible for '{}' for user '{}'",
+                    id, user.getId());
             throw new dbException(user.getId(), "policy_store",
                     StatusCodes.DB_DELETE_FAILED, id);
         }
@@ -536,9 +537,8 @@ public class PolicyDao implements PolicyHandlerIface {
             this.mapConstraints(policy);
             return result;
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Operation (UPDATE) not possible for '{}' for user '{}'",
-                            policy.toString(), user.getId());
+            jlog.error("Operation (UPDATE) not possible for '{}' for user '{}'",
+                    policy.toString(), user.getId());
             throw new dbException(user.getId(), "policy_store",
                     StatusCodes.DB_UPDATE_FAILED, policy.toString());
         }
@@ -557,9 +557,8 @@ public class PolicyDao implements PolicyHandlerIface {
         try {
             return this.jdbcTemplate.queryForObject(sql1, param, Integer.class);
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Operation (SELECT) not possible for '{}' for user '{}'",
-                            policy.getTarget(), user.getId());
+            jlog.error("Operation (SELECT) not possible for '{}' for user '{}'",
+                    policy.getTarget(), user.getId());
             throw new dbException(user.getId(), "policy_store",
                     StatusCodes.DB_GET_FAILED, policy.toString());
         }
@@ -597,9 +596,8 @@ public class PolicyDao implements PolicyHandlerIface {
         try {
             return this.jdbcTemplate.queryForObject(sql, param, Integer.class);
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Operation (SELECT) not possible for '{}' for user '{}'",
-                            group, user.getId());
+            jlog.error("Operation (SELECT) not possible for '{}' for user '{}'",
+                    group, user.getId());
             throw new dbException(user.getId(), "policy_store",
                     StatusCodes.DB_GET_FAILED, group);
         }
@@ -621,9 +619,8 @@ public class PolicyDao implements PolicyHandlerIface {
                             + "VALUES (:name, :sy, :ex, :com);", param, key);
             return key.getKey().intValue();
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Operation (INSERT) not possible for '{}'",
-                            condition.toString());
+            jlog.error("Operation (INSERT) not possible for '{}'",
+                    condition.toString());
             throw new dbException(user.getId(), "group_store",
                     StatusCodes.DB_INSERT_FAILED, condition.toString());
         }
@@ -644,9 +641,8 @@ public class PolicyDao implements PolicyHandlerIface {
             param.addValue("status", BooleanUtils.getBoolean(admin));
             return this.jdbcTemplate.update(insert, param);
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Operation (INSERT) not possible for '{}' for user '{}'",
-                            condition.toString(), username);
+            jlog.error("Operation (INSERT) not possible for '{}' for user '{}'",
+                    condition.toString(), username);
             throw new dbException(null, "group_store",
                     StatusCodes.DB_INSERT_FAILED, condition.toString());
         }
@@ -698,9 +694,8 @@ public class PolicyDao implements PolicyHandlerIface {
             //fixme: problem - unique constraints throws exception. skip that user entry?!
             return this.jdbcTemplate.batchUpdate(insert, sources);
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Operation (INSERT) not possible for '{}' for user '{}'",
-                            condition.toString(), usernames);
+            jlog.error("Operation (INSERT) not possible for '{}' for user '{}'",
+                    condition.toString(), usernames);
             throw new KustvaktException(e, StatusCodes.CONNECTION_ERROR);
         }
     }
@@ -725,9 +720,8 @@ public class PolicyDao implements PolicyHandlerIface {
         try {
             this.jdbcTemplate.batchUpdate(del, sources);
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Operation (DELETE) not possible for '{}' for user '{}'",
-                            condition.toString(), usernames);
+            jlog.error("Operation (DELETE) not possible for '{}' for user '{}'",
+                    condition.toString(), usernames);
             throw new KustvaktException(e, StatusCodes.CONNECTION_ERROR);
         }
     }
@@ -748,9 +742,8 @@ public class PolicyDao implements PolicyHandlerIface {
         try {
             this.jdbcTemplate.update(insert, source);
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Operation (INSERT) not possible for '{}",
-                            param.toString());
+            jlog.error("Operation (INSERT) not possible for '{}",
+                    param.toString());
             throw new KustvaktException(e, StatusCodes.CONNECTION_ERROR);
         }
     }
@@ -766,9 +759,8 @@ public class PolicyDao implements PolicyHandlerIface {
         try {
             return this.jdbcTemplate.queryForList(sql1, source, String.class);
         }catch (DataAccessException e) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Operation (SELECT) not possible for '{}'",
-                            condition.toString());
+            jlog.error("Operation (SELECT) not possible for '{}'",
+                    condition.toString());
             throw new KustvaktException(StatusCodes.CONNECTION_ERROR);
         }
     }

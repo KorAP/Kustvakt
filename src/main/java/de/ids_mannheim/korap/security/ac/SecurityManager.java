@@ -16,7 +16,6 @@ import de.ids_mannheim.korap.security.SecurityPolicy;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -32,10 +31,12 @@ import java.util.*;
 @SuppressWarnings("all")
 public class SecurityManager<T extends KustvaktResource> {
 
-    private static final Logger secLogger = LoggerFactory
-            .getLogger(KustvaktLogger.SECURITY_LOG);
-    private static final Logger errorLogger = LoggerFactory
-            .getLogger(KustvaktLogger.ERROR_LOG);
+    //    private static final Logger errorLogger = LoggerFactory
+    //            .getLogger(KustvaktLogger.ERROR_LOG);
+
+    private static final Logger jlog = KustvaktLogger
+            .getLogger(SecurityManager.class);
+
     private static PolicyHandlerIface policydao;
     private static Map<Class<? extends KustvaktResource>, ResourceOperationIface> handlers;
     private static EncryptionIface crypto;
@@ -66,7 +67,7 @@ public class SecurityManager<T extends KustvaktResource> {
         SecurityManager.policydao = policyHandler;
         SecurityManager.crypto = crypto;
         SecurityManager.handlers = new HashMap<>();
-        secLogger.info("Registering handlers: {}", Arrays.asList(ifaces));
+        jlog.info("Registering handlers: {}", Arrays.asList(ifaces));
         for (ResourceOperationIface iface : ifaces)
             handlers.put(iface.getType(), iface);
     }
@@ -138,10 +139,8 @@ public class SecurityManager<T extends KustvaktResource> {
         if (evaluator.isAllowed(Permissions.PERMISSIONS.READ)) {
             return this.resource;
         }else {
-            secLogger
-                    .error("Reading the resource '{}' is not allowed for user '{}'",
-                            this.resource.getPersistentID(),
-                            this.user.getUsername());
+            jlog.error("Reading the resource '{}' is not allowed for user '{}'",
+                    this.resource.getPersistentID(), this.user.getUsername());
             throw new NotAuthorizedException(StatusCodes.PERMISSION_DENIED,
                     evaluator.getResourceID());
         }
@@ -157,10 +156,9 @@ public class SecurityManager<T extends KustvaktResource> {
                 handlers.get(KustvaktResource.class)
                         .updateResource(resource, this.user);
         }else {
-            secLogger
-                    .error("Updating the resource '{}' is not allowed for user '{}'",
-                            this.resource.getPersistentID(),
-                            this.user.getUsername());
+            jlog.error(
+                    "Updating the resource '{}' is not allowed for user '{}'",
+                    this.resource.getPersistentID(), this.user.getUsername());
             throw new NotAuthorizedException(StatusCodes.PERMISSION_DENIED,
                     this.evaluator.getResourceID());
         }
@@ -214,9 +212,8 @@ public class SecurityManager<T extends KustvaktResource> {
         this.evaluator = new PolicyEvaluator(this.user, this.policies);
 
         if (this.policies == null) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("No policies found for resource id '{}' for user '{}'",
-                            id, user.getId());
+            jlog.error("No policies found for resource id '{}' for user '{}'",
+                    id, user.getId());
             throw new EmptyResultException(String.valueOf(id));
         }
         return true;
@@ -226,9 +223,8 @@ public class SecurityManager<T extends KustvaktResource> {
     private T findResource(Class type)
             throws NotAuthorizedException, KustvaktException {
         if (!evaluator.isAllowed()) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Permission denied for resource id '{}' for user '{}'",
-                            this.evaluator.getResourceID(), user.getId());
+            jlog.error("Permission denied for resource id '{}' for user '{}'",
+                    this.evaluator.getResourceID(), user.getId());
             throw new NotAuthorizedException(StatusCodes.PERMISSION_DENIED,
                     this.evaluator.getResourceID());
         }
@@ -262,9 +258,9 @@ public class SecurityManager<T extends KustvaktResource> {
                     SecurityManager.findbyId(resource.getParentID(), user,
                             Permissions.PERMISSIONS.ALL);
                 }catch (EmptyResultException e) {
-                    KustvaktLogger.SECURITY_LOGGER
-                            .error("No policies found for parent '{}' for user '{}'",
-                                    resource.getParentID(), user.getId());
+                    jlog.error(
+                            "No policies found for parent '{}' for user '{}'",
+                            resource.getParentID(), user.getId());
                     throw new KustvaktException(StatusCodes.EMPTY_RESULTS);
                 }
             }
@@ -279,10 +275,9 @@ public class SecurityManager<T extends KustvaktResource> {
             if (newid | !p.checkResource(resource.getPersistentID(), user)) {
                 resource.setOwner(user.getId());
 
-                KustvaktLogger.SECURITY_LOGGER
-                        .info("Creating Access Control structure for resource '"
-                                + resource.getPersistentID() + "@" + resource
-                                .getId() + "'");
+                jlog.info("Creating Access Control structure for resource '"
+                        + resource.getPersistentID() + "@" + resource.getId()
+                        + "'");
                 // storing resource is called twice. first when this is register and later in idsbootstrap to create cstorage entry. how to unify this?
                 ResourceOperationIface iface = p.handlers
                         .get(resource.getClass());
@@ -301,9 +296,9 @@ public class SecurityManager<T extends KustvaktResource> {
                         Permissions.PERMISSIONS.READ_POLICY,
                         Permissions.PERMISSIONS.MODIFY_POLICY);
             }catch (EmptyResultException e) {
-                KustvaktLogger.SECURITY_LOGGER
-                        .error("No policies found for '{}' for user '{}'. Resource could not be registered!",
-                                resource.getPersistentID(), user.getId());
+                jlog.error(
+                        "No policies found for '{}' for user '{}'. Resource could not be registered!",
+                        resource.getPersistentID(), user.getId());
                 throw new KustvaktException(user.getId(),
                         StatusCodes.POLICY_CREATE_ERROR,
                         "Resource could not be registered",
@@ -349,17 +344,15 @@ public class SecurityManager<T extends KustvaktResource> {
     public void addPolicy(SecurityPolicy policy, Parameter... params)
             throws KustvaktException, NotAuthorizedException {
         if (policy.getConditions().isEmpty()) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("No conditions set for '{}' for user '{}'",
-                            policy.toString(), this.user.getId());
+            jlog.error("No conditions set for '{}' for user '{}'",
+                    policy.toString(), this.user.getId());
             throw new NotAuthorizedException(StatusCodes.ILLEGAL_ARGUMENT,
                     policy.getTarget());
         }
 
         if (this.policies[0] == null) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("No policies found for '{}' for user '{}'",
-                            this.evaluator.getResourceID(), this.user.getId());
+            jlog.error("No policies found for '{}' for user '{}'",
+                    this.evaluator.getResourceID(), this.user.getId());
             throw new NotAuthorizedException(StatusCodes.UNSUPPORTED_OPERATION,
                     policy.getTarget());
         }
@@ -372,9 +365,9 @@ public class SecurityManager<T extends KustvaktResource> {
         if (evaluator.isAllowed(Permissions.PERMISSIONS.CREATE_POLICY)) {
             policydao.createPolicy(policy, this.user);
         }else if (silent) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Permission Denied (CREATE_POLICY) on '{}' for user '{}'",
-                            this.evaluator.getResourceID(), this.user.getId());
+            jlog.error(
+                    "Permission Denied (CREATE_POLICY) on '{}' for user '{}'",
+                    this.evaluator.getResourceID(), this.user.getId());
             throw new NotAuthorizedException(StatusCodes.PERMISSION_DENIED,
                     policy.getTarget());
         }
@@ -411,9 +404,8 @@ public class SecurityManager<T extends KustvaktResource> {
                     this.evaluator.getResourceID());
 
         if (this.policies[0] == null) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("No policies found (DELETE_POLICY) on '{}' for '{}'",
-                            this.evaluator.getResourceID(), this.user.getId());
+            jlog.error("No policies found (DELETE_POLICY) on '{}' for '{}'",
+                    this.evaluator.getResourceID(), this.user.getId());
             throw new KustvaktException(user.getId(), StatusCodes.NO_POLICIES,
                     "no policy desicion possible",
                     this.evaluator.getResourceID());
@@ -422,9 +414,8 @@ public class SecurityManager<T extends KustvaktResource> {
                 .isAllowed(Permissions.PERMISSIONS.DELETE_POLICY))) {
             policydao.deletePolicy(policy, this.user);
         }else if (silent) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Permission Denied (DELETE_POLICY) on '{}' for '{}'",
-                            this.evaluator.getResourceID(), this.user.getId());
+            jlog.error("Permission Denied (DELETE_POLICY) on '{}' for '{}'",
+                    this.evaluator.getResourceID(), this.user.getId());
             throw new NotAuthorizedException(StatusCodes.PERMISSION_DENIED,
                     "no policy desicion possible",
                     this.evaluator.getResourceID());
@@ -440,9 +431,9 @@ public class SecurityManager<T extends KustvaktResource> {
             throw new NotAuthorizedException(StatusCodes.ILLEGAL_ARGUMENT);
 
         if (this.policies[0] == null) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Operation not possible (MODIFY_POLICY) on '{}' for '{}'",
-                            this.evaluator.getResourceID(), this.user.getId());
+            jlog.error(
+                    "Operation not possible (MODIFY_POLICY) on '{}' for '{}'",
+                    this.evaluator.getResourceID(), this.user.getId());
             throw new KustvaktException(user.getId(), StatusCodes.NO_POLICIES,
                     "no policy desicion possible",
                     this.evaluator.getResourceID());
@@ -452,9 +443,8 @@ public class SecurityManager<T extends KustvaktResource> {
                 .isAllowed(Permissions.PERMISSIONS.MODIFY_POLICY))) {
             policydao.updatePolicy(policy, this.user);
         }else if (silent) {
-            KustvaktLogger.SECURITY_LOGGER
-                    .error("Permission Denied (DELETE_POLICY) on '{}' for '{}'",
-                            this.evaluator.getResourceID(), this.user.getId());
+            jlog.error("Permission Denied (DELETE_POLICY) on '{}' for '{}'",
+                    this.evaluator.getResourceID(), this.user.getId());
             throw new NotAuthorizedException(StatusCodes.PERMISSION_DENIED,
                     this.evaluator.getResourceID());
         }

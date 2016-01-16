@@ -44,7 +44,7 @@ public class ConfigTest {
 
         BeanConfiguration.getBeans().getConfiguration().setPropertiesAsStream(
                 ConfigTest.class.getClassLoader()
-                        .getResourceAsStream("kustvakt_test.conf"));
+                        .getResourceAsStream("kustvakt.conf"));
 
         Assert.assertEquals("token layer does not match", "tt",
                 BeanConfiguration.getBeans().getConfiguration()
@@ -61,7 +61,7 @@ public class ConfigTest {
 
         BeanConfiguration.getBeans().getConfiguration().setPropertiesAsStream(
                 ConfigTest.class.getClassLoader()
-                        .getResourceAsStream("kustvakt_test.conf"));
+                        .getResourceAsStream("kustvakt.conf"));
 
         String v = "testmail@ids-mannheim.de";
         BeanConfiguration.getBeans().getEncryption().validateEmail(v);
