@@ -27,7 +27,7 @@ public class OAuth2EndpointTest extends FastJerseyTest {
 
     @BeforeClass
     public static void configure() {
-        BeanConfiguration.loadClasspathContext("test-config.xml");
+        BeanConfiguration.loadClasspathContext("default-config.xml");
         setPackages("de.ids_mannheim.korap.web.service",
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");

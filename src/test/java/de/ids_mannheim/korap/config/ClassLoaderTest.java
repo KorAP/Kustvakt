@@ -20,7 +20,7 @@ public class ClassLoaderTest {
 
     @Test
     public void testBeanConfigurationLoaderThrowsNoException() {
-        BeanConfiguration.loadClasspathContext("test-config.xml");
+        BeanConfiguration.loadClasspathContext("default-config.xml");
         assert BeanConfiguration.hasContext();
     }
 

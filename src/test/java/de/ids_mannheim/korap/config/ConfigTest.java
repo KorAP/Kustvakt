@@ -21,7 +21,7 @@ public class ConfigTest {
 
     @Test
     public void create() {
-        BeanConfiguration.loadClasspathContext("test-config.xml");
+        BeanConfiguration.loadClasspathContext("default-config.xml");
     }
 
     @Test
@@ -50,20 +50,20 @@ public class ConfigTest {
                 BeanConfiguration.getBeans().getConfiguration()
                         .getDefault_token());
         Assert.assertEquals("token expiration does not match",
-                TimeUtils.convertTimeToSeconds("230D"),
+                TimeUtils.convertTimeToSeconds("1D"),
                 BeanConfiguration.getBeans().getConfiguration()
                         .getLongTokenTTL());
     }
 
     @Test(expected = KustvaktException.class)
     public void testBeanOverrideInjection() throws KustvaktException {
-        BeanConfiguration.loadClasspathContext("test-config.xml");
+        BeanConfiguration.loadClasspathContext("default-config.xml");
 
         BeanConfiguration.getBeans().getConfiguration().setPropertiesAsStream(
                 ConfigTest.class.getClassLoader()
                         .getResourceAsStream("kustvakt.conf"));
 
-        String v = "testmail@ids-mannheim.de";
+        String v = "testmail_&234@ids-mannheim.de";
         BeanConfiguration.getBeans().getEncryption().validateEmail(v);
     }
 }
