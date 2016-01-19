@@ -2,11 +2,12 @@ package de.ids_mannheim.korap.utils;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class StringUtils {
-    private final static Logger jlog = KustvaktLogger
+    private final static Logger jlog = LoggerFactory
             .getLogger(StringUtils.class);
 
     private static final String SLASH = "/";

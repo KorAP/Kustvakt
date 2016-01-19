@@ -11,7 +11,6 @@ import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.user.*;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import net.sf.ehcache.Cache;
@@ -19,6 +18,7 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CachePut;
 
 import java.io.UnsupportedEncodingException;
@@ -35,7 +35,7 @@ import java.util.Map;
 public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
     private static String KEY = "kustvakt:key";
-    private static Logger jlog = KustvaktLogger
+    private static Logger jlog = LoggerFactory
             .getLogger(KustvaktAuthenticationManager.class);
     private EncryptionIface crypto;
     private EntityHandlerIface entHandler;
@@ -252,9 +252,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                     jlog.debug("Account is not yet activated for user '{}'",
                             user.getUsername());
                     if (TimeUtils.getNow().isAfter(param.getUriExpiration())) {
-                        KustvaktLogger.ERROR_LOGGER
-                                .error("URI token is expired. Deleting account for user {}",
-                                        user.getUsername());
+                        jlog.error(
+                                "URI token is expired. Deleting account for user {}",
+                                user.getUsername());
                         deleteAccount(user);
                         throw new WrappedException(
                                 new KustvaktException(unknown.getId(),
@@ -268,9 +268,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                                     StatusCodes.UNCONFIRMED_ACCOUNT),
                             StatusCodes.LOGIN_FAILED, username);
                 }
-                KustvaktLogger.ERROR_LOGGER
-                        .error("ACCESS DENIED: account not active for '{}'",
-                                unknown.getUsername());
+                jlog.error("ACCESS DENIED: account not active for '{}'",
+                        unknown.getUsername());
                 throw new WrappedException(
                         new KustvaktException(unknown.getId(),
                                 StatusCodes.ACCOUNT_DEACTIVATED),
@@ -297,7 +296,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             return null;
 
         }catch (KustvaktException e) {
-            KustvaktLogger.ERROR_LOGGER.error("KorAPException", e);
+            jlog.error("KorAPException", e);
             throw new KustvaktException(username, StatusCodes.ILLEGAL_ARGUMENT,
                     "username invalid", username);
         }
@@ -329,8 +328,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             try {
                 this.lockAccount(user);
             }catch (KustvaktException e) {
-                KustvaktLogger.ERROR_LOGGER
-                        .error("user account could not be locked!", e);
+                jlog.error("user account could not be locked!", e);
                 throw new WrappedException(e,
                         StatusCodes.UPDATE_ACCOUNT_FAILED);
             }
@@ -390,7 +388,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             safeUser = crypto.validateString(username);
             safePass = crypto.validatePassphrase(newPassphrase);
         }catch (KustvaktException e) {
-            KustvaktLogger.ERROR_LOGGER.error("Error", e);
+            jlog.error("Error", e);
             throw new WrappedException(new KustvaktException(username,
                     StatusCodes.ILLEGAL_ARGUMENT, "password invalid",
                     newPassphrase), StatusCodes.PASSWORD_RESET_FAILED, username,
@@ -400,7 +398,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         try {
             safePass = crypto.produceSecureHash(safePass);
         }catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            KustvaktLogger.ERROR_LOGGER.error("Encoding/Algorithm Error", e);
+            jlog.error("Encoding/Algorithm Error", e);
             throw new WrappedException(new KustvaktException(username,
                     StatusCodes.ILLEGAL_ARGUMENT, "password invalid",
                     newPassphrase), StatusCodes.PASSWORD_RESET_FAILED, username,
@@ -424,7 +422,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         try {
             safeUser = crypto.validateString(username);
         }catch (KustvaktException e) {
-            KustvaktLogger.ERROR_LOGGER.error("error", e);
+            jlog.error("error", e);
             throw new WrappedException(e,
                     StatusCodes.ACCOUNT_CONFIRMATION_FAILED, username,
                     uriFragment);
@@ -476,7 +474,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         try {
             hash = crypto.produceSecureHash(safePass);
         }catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
-            KustvaktLogger.ERROR_LOGGER.error("Encryption error", e);
+            jlog.error("Encryption error", e);
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);
         }
 
@@ -579,7 +577,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             try {
                 result = entHandler.updateAccount(user) > 0;
             }catch (KustvaktException e) {
-                KustvaktLogger.ERROR_LOGGER.error("Error ", e);
+                jlog.error("Error ", e);
                 throw new WrappedException(e,
                         StatusCodes.UPDATE_ACCOUNT_FAILED);
             }
@@ -601,7 +599,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             try {
                 result = entHandler.deleteAccount(user.getId()) > 0;
             }catch (KustvaktException e) {
-                KustvaktLogger.ERROR_LOGGER.error("Error ", e);
+                jlog.error("Error ", e);
                 throw new WrappedException(e,
                         StatusCodes.DELETE_ACCOUNT_FAILED);
             }
@@ -648,7 +646,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         try {
             entHandler.updateAccount(user);
         }catch (KustvaktException e) {
-            KustvaktLogger.ERROR_LOGGER.error("Error ", e);
+            jlog.error("Error ", e);
             throw new WrappedException(e, StatusCodes.PASSWORD_RESET_FAILED);
         }
         return new Object[] { uritoken,
@@ -664,7 +662,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             try {
                 entHandler.updateSettings(settings);
             }catch (KustvaktException e) {
-                KustvaktLogger.ERROR_LOGGER.error("Error ", e);
+                jlog.error("Error ", e);
                 throw new WrappedException(e,
                         StatusCodes.UPDATE_ACCOUNT_FAILED);
             }
@@ -680,7 +678,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             try {
                 entHandler.updateUserDetails(details);
             }catch (KustvaktException e) {
-                KustvaktLogger.ERROR_LOGGER.error("Error ", e);
+                jlog.error("Error ", e);
                 throw new WrappedException(e,
                         StatusCodes.UPDATE_ACCOUNT_FAILED);
             }

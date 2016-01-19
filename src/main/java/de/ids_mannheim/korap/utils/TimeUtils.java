@@ -6,6 +6,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -25,7 +26,7 @@ public class TimeUtils {
 
     private static DecimalFormat df = new DecimalFormat("#.#############");
     private static final DateTimeZone dtz = DateTimeZone.forID("Europe/Berlin");
-    private static Logger jlog = KustvaktLogger.getLogger(TimeUtils.class);
+    private static Logger jlog = LoggerFactory.getLogger(TimeUtils.class);
 
     public static int convertTimeToSeconds(String expirationVal) {
         expirationVal = expirationVal.trim();

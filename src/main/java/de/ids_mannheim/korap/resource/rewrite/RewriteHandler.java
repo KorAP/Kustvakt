@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -19,7 +19,7 @@ import java.util.*;
 //todo: load rewritenode and rewritequery automatically from classpath by default, but namespaced from package
 public class RewriteHandler {
 
-    private static Logger jlog = KustvaktLogger.getLogger(RewriteHandler.class);
+    private static Logger jlog = LoggerFactory.getLogger(RewriteHandler.class);
     private Collection<RewriteTask.IterableRewriteAt> node_processors;
     private Collection<RewriteTask.RewriteKoralToken> token_node_processors;
     private Collection<RewriteTask> query_processors;

@@ -9,7 +9,6 @@ import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.BooleanUtils;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import edu.emory.mathcs.backport.java.util.Collections;
 import org.slf4j.Logger;
@@ -30,8 +29,7 @@ import java.util.List;
  */
 public class OAuthDb {
 
-    private static final Logger errorLogger = LoggerFactory
-            .getLogger(KustvaktLogger.ERROR_LOG);
+    private static final Logger jlog = LoggerFactory.getLogger(OAuthDb.class);
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     public OAuthDb(PersistenceClient client) {
@@ -62,8 +60,7 @@ public class OAuthDb {
                         }
                     });
         }catch (EmptyResultDataAccessException ex) {
-            errorLogger.error("'{}' client found", clientid,
-                    ex.fillInStackTrace());
+            jlog.error("'{}' client found", clientid, ex.fillInStackTrace());
             return null;
         }
     }
@@ -76,8 +73,7 @@ public class OAuthDb {
         try {
             return this.jdbcTemplate.update(sql, s) == 1;
         }catch (DataAccessException e) {
-            errorLogger
-                    .error("token could not be revoked", e.fillInStackTrace());
+            jlog.error("token could not be revoked", e.fillInStackTrace());
             return false;
         }
     }
@@ -95,9 +91,8 @@ public class OAuthDb {
         try {
             this.jdbcTemplate.update(tokens, source);
         }catch (DataAccessException e) {
-            errorLogger
-                    .error("authorization could not be revoked for user '{}'",
-                            user.getUsername());
+            jlog.error("authorization could not be revoked for user '{}'",
+                    user.getUsername());
             return false;
         }
         //fixme: if int row not updated, false!!
@@ -123,9 +118,8 @@ public class OAuthDb {
             return this.jdbcTemplate.update(sql, s) == 1;
         }catch (DataAccessException e) {
             e.printStackTrace();
-            errorLogger
-                    .error("token '{}' could not be added for user '{}'", token,
-                            userid);
+            jlog.error("token '{}' could not be added for user '{}'", token,
+                    userid);
             return false;
         }
     }
@@ -141,10 +135,10 @@ public class OAuthDb {
         try {
             return this.jdbcTemplate.queryForObject(sql, s, String.class);
         }catch (EmptyResultDataAccessException ex) {
-            errorLogger.error("no token found for user '{}'", userid);
+            jlog.error("no token found for user '{}'", userid);
             return null;
         }catch (DataAccessException ex) {
-            errorLogger.error("token retrieval failed for user '{}'", userid);
+            jlog.error("token retrieval failed for user '{}'", userid);
             return null;
         }
     }
@@ -178,7 +172,7 @@ public class OAuthDb {
                 }
             });
         }catch (DataAccessException e) {
-            errorLogger.error("Data access error", e);
+            jlog.error("Data access error", e);
             return Collections.emptyList();
         }
 
@@ -213,11 +207,11 @@ public class OAuthDb {
                     });
             return context;
         }catch (EmptyResultDataAccessException ee) {
-            errorLogger.error("no context found for token '{}'", token);
+            jlog.error("no context found for token '{}'", token);
             revokeToken(token);
             throw new KustvaktException(StatusCodes.EXPIRED, "token", token);
         }catch (DataAccessException e) {
-            errorLogger.error("token context retrieval failed for '{}'", token);
+            jlog.error("token context retrieval failed for '{}'", token);
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
                     "invalid token", token);
         }
@@ -238,8 +232,7 @@ public class OAuthDb {
             this.jdbcTemplate.update(sql, p);
         }catch (DataAccessException e) {
             e.printStackTrace();
-            errorLogger
-                    .error("removing client '{}' failed", info.getClient_id());
+            jlog.error("removing client '{}' failed", info.getClient_id());
             throw new dbException(new KustvaktException(user.getId(),
                     StatusCodes.ILLEGAL_ARGUMENT, "arguments given not valid",
                     info.toJSON()), StatusCodes.CLIENT_REMOVAL_FAILURE,
@@ -264,8 +257,7 @@ public class OAuthDb {
             this.jdbcTemplate.update(sql, p);
         }catch (DataAccessException e) {
             e.printStackTrace();
-            errorLogger.error("registering client '{}' failed",
-                    info.getClient_id());
+            jlog.error("registering client '{}' failed", info.getClient_id());
             throw new dbException(new KustvaktException(user.getId(),
                     StatusCodes.ILLEGAL_ARGUMENT, "arguments given not valid",
                     info.toJSON()), StatusCodes.CLIENT_REGISTRATION_FAILURE,

@@ -5,10 +5,10 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.user.DemoUser;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.utils.ConcurrentMultiMap;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class SessionFactory implements Runnable {
 
-    private static Logger jlog = KustvaktLogger.getLogger(SessionFactory.class);
+    private static Logger jlog = LoggerFactory.getLogger(SessionFactory.class);
 
     private final ConcurrentMap<String, TokenContext> sessionsObject;
     private final ConcurrentMap<String, DateTime> timeCheck;

@@ -16,9 +16,9 @@ import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserSettings;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import net.minidev.json.JSONArray;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
@@ -36,7 +36,7 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
     private WebResource service;
     //    private static final String SERVICE = "http://localhost:8888";
     private static final String SERVICE = "http://10.0.10.13";
-    private static Logger jlog = KustvaktLogger.getLogger(PiwikFilter.class);
+    private static Logger jlog = LoggerFactory.getLogger(PiwikFilter.class);
     public static boolean ENABLED = false;
     private Map<String, String> customVars;
     private AuthenticationManagerIface securityController;

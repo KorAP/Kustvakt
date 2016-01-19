@@ -17,6 +17,7 @@ import de.ids_mannheim.korap.web.SearchKrill;
 import de.ids_mannheim.korap.web.TRACE;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -35,7 +36,7 @@ import java.util.Set;
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class LightService {
 
-    private static Logger jlog = KustvaktLogger.getLogger(LightService.class);
+    private static Logger jlog = LoggerFactory.getLogger(LightService.class);
 
     private SearchKrill searchKrill;
     private ClientsHandler graphDBhandler;

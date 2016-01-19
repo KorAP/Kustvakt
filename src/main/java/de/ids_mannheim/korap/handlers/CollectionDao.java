@@ -7,8 +7,8 @@ import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -26,7 +26,7 @@ import java.util.List;
 public class CollectionDao
         implements ResourceOperationIface<VirtualCollection> {
 
-    private static Logger log = KustvaktLogger.getLogger(CollectionDao.class);
+    private static Logger log = LoggerFactory.getLogger(CollectionDao.class);
     private BatchBuilder batchBuilder;
     protected final NamedParameterJdbcTemplate jdbcTemplate;
 

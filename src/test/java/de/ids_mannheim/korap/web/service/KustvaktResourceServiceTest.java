@@ -56,6 +56,7 @@ public class KustvaktResourceServiceTest extends FastJerseyTest {
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
 
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        System.out.println("COLLECTIONS " + node);
         assert node.size() > 0;
     }
 
@@ -79,6 +80,7 @@ public class KustvaktResourceServiceTest extends FastJerseyTest {
         node = JsonUtils.readTree(response.getEntity(String.class));
         assert node != null;
         int docs = node.path("documents").asInt();
+        System.out.println("THE FINAL NODE : " + node);
         assert docs > 0 && docs < 15;
     }
 

@@ -10,6 +10,7 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserDetails;
 import de.ids_mannheim.korap.user.UserSettings;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -28,7 +29,7 @@ public class UserPropertyReader extends PropertyReader {
     private String path;
     private EntityHandlerIface iface;
     private EncryptionIface crypto;
-    private static Logger jlog = KustvaktLogger
+    private static Logger jlog = LoggerFactory
             .getLogger(UserPropertyReader.class);
 
     public UserPropertyReader(String path) {

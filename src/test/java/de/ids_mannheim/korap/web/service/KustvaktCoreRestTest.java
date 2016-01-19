@@ -46,8 +46,8 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("search").queryParam("q", "[base=Wort]")
                 .queryParam("ql", "poliqarp").get(ClientResponse.class);
-        System.out.println("_______________________________________________");
-        System.out.println(response.getEntity(String.class));
+//        System.out.println("_______________________________________________");
+//        System.out.println(response.getEntity(String.class));
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
     }
 
@@ -58,8 +58,8 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
 
         ClientResponse response = resource().path(getAPIVersion())
                 .path("search").post(ClientResponse.class, s.toJSON());
-        System.out.println("_______________________________________________ RAW");
-        System.out.println(response.getEntity(String.class));
+//        System.out.println("_______________________________________________ RAW");
+//        System.out.println(response.getEntity(String.class));
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
     }
 
@@ -88,9 +88,9 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
                 .post(ClientResponse.class, "creationDate in 1787");
         String ent = response.getEntity(String.class);
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
-        System.out
-                .println("___________________________________________________");
-        System.out.println("STATS ENTITY " + ent);
+//        System.out
+//                .println("___________________________________________________");
+//        System.out.println("STATS ENTITY " + ent);
     }
 
     //    @Test

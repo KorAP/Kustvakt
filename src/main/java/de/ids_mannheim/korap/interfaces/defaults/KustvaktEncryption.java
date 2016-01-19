@@ -5,7 +5,6 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import edu.emory.mathcs.backport.java.util.Collections;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
@@ -16,6 +15,7 @@ import org.owasp.esapi.Validator;
 import org.owasp.esapi.errors.ValidationException;
 import org.owasp.esapi.reference.DefaultValidator;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
@@ -31,7 +31,7 @@ import java.util.Map;
 public class KustvaktEncryption implements EncryptionIface {
 
     private static final String ALGORITHM = "SHA-256";
-    private static Logger jlog = KustvaktLogger
+    private static Logger jlog = LoggerFactory
             .getLogger(KustvaktEncryption.class);
     // todo: disable this
     private static final String PASSWORD_SALT_FIELD = "accountCreation";
@@ -368,17 +368,17 @@ public class KustvaktEncryption implements EncryptionIface {
     public String validatePassphrase(String pw) throws KustvaktException {
         String safe_string = validateString(pw);
         return safe_string;
-//        String pw_conf;
-//        try {
-//            pw_conf = validator
-//                    .getValidInput("User Password", safe_string, "Password", 20,
-//                            false);
-//        }catch (ValidationException e) {
-//            jlog.error("password value did not validate", e.getMessage());
-//            throw new KustvaktException(StatusCodes.PARAMETER_VALIDATION_ERROR,
-//                    "password did not validate", "password");
-//        }
-//        return pw_conf;
+        //        String pw_conf;
+        //        try {
+        //            pw_conf = validator
+        //                    .getValidInput("User Password", safe_string, "Password", 20,
+        //                            false);
+        //        }catch (ValidationException e) {
+        //            jlog.error("password value did not validate", e.getMessage());
+        //            throw new KustvaktException(StatusCodes.PARAMETER_VALIDATION_ERROR,
+        //                    "password did not validate", "password");
+        //        }
+        //        return pw_conf;
     }
 
     //FIXME: currently all sets are skipped during validation (since users should not be allowed to edit those sets anyway,

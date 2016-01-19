@@ -31,22 +31,10 @@ public class ConfigTest {
     }
 
     @Test
-    public void testPropertiesOverride() {
+    public void testProperties() {
         BeanConfiguration.loadClasspathContext();
 
         Assert.assertEquals("token layer does not match", "opennlp",
-                BeanConfiguration.getBeans().getConfiguration()
-                        .getDefault_token());
-        Assert.assertEquals("token expiration does not match",
-                TimeUtils.convertTimeToSeconds("150D"),
-                BeanConfiguration.getBeans().getConfiguration()
-                        .getLongTokenTTL());
-
-        BeanConfiguration.getBeans().getConfiguration().setPropertiesAsStream(
-                ConfigTest.class.getClassLoader()
-                        .getResourceAsStream("kustvakt.conf"));
-
-        Assert.assertEquals("token layer does not match", "tt",
                 BeanConfiguration.getBeans().getConfiguration()
                         .getDefault_token());
         Assert.assertEquals("token expiration does not match",

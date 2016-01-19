@@ -8,10 +8,10 @@ import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.Permissions;
 import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
@@ -23,7 +23,7 @@ import java.util.Collection;
 @SuppressWarnings("all")
 public class ResourceHandler {
 
-    private static Logger log = KustvaktLogger.getLogger(ResourceHandler.class);
+    private static Logger jlog = LoggerFactory.getLogger(ResourceHandler.class);
 
     public ResourceHandler() {
     }

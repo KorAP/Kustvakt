@@ -13,10 +13,10 @@ import de.ids_mannheim.korap.security.SecurityPolicy;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.BooleanUtils;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -38,8 +38,7 @@ import java.util.List;
 // todo: transactions and exception management
 public class PolicyDao implements PolicyHandlerIface {
 
-    private static final Logger jlog = KustvaktLogger
-            .getLogger(PolicyDao.class);
+    private static final Logger jlog = LoggerFactory.getLogger(PolicyDao.class);
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 

@@ -1,9 +1,9 @@
 package de.ids_mannheim.korap.security.auth;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class LoginCounter {
 
-    private static Logger jlog = KustvaktLogger.getLogger(LoginCounter.class);
+    private static Logger jlog = LoggerFactory.getLogger(LoginCounter.class);
     private final Map<String, Long[]> failedLogins;
     private KustvaktConfiguration config;
 

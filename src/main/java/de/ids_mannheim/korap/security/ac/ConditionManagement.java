@@ -9,7 +9,6 @@ import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.Permissions;
 import de.ids_mannheim.korap.security.PolicyCondition;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,10 +20,8 @@ import java.util.*;
  */
 public class ConditionManagement {
 
-    private static final Logger errorLogger = LoggerFactory
-            .getLogger(KustvaktLogger.ERROR_LOG);
-    private static final Logger secErrorLogger = LoggerFactory
-            .getLogger(KustvaktLogger.SECURITY_LOG);
+    private static final Logger jlog = LoggerFactory
+            .getLogger(ConditionManagement.class);
     private User user;
     private PolicyHandlerIface policydao;
 
@@ -50,7 +47,7 @@ public class ConditionManagement {
                 == 1) {
             policydao.addToCondition(usernames, condition, admin);
         }else
-            secErrorLogger.error("Users could not be added to condition '{}'",
+            jlog.error("Users could not be added to condition '{}'",
                     condition.getSpecifier());
     }
 

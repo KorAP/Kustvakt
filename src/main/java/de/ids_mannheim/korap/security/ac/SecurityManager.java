@@ -14,8 +14,8 @@ import de.ids_mannheim.korap.security.PermissionsBuffer;
 import de.ids_mannheim.korap.security.PolicyCondition;
 import de.ids_mannheim.korap.security.SecurityPolicy;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -32,9 +32,9 @@ import java.util.*;
 public class SecurityManager<T extends KustvaktResource> {
 
     //    private static final Logger errorLogger = LoggerFactory
-    //            .getLogger(KustvaktLogger.ERROR_LOG);
+    //            .getLogger(LoggerFactory.ERROR_LOG);
 
-    private static final Logger jlog = KustvaktLogger
+    private static final Logger jlog = LoggerFactory
             .getLogger(SecurityManager.class);
 
     private static PolicyHandlerIface policydao;

@@ -9,6 +9,8 @@ import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import org.apache.lucene.store.MMapDirectory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.file.Paths;
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +23,7 @@ import java.util.List;
  */
 public class SearchKrill {
     private final static Logger qlog = KustvaktLogger.getLogger("queryLogger");
-    private final static Logger log = KustvaktLogger
+    private final static Logger log = LoggerFactory
             .getLogger(SearchKrill.class);
     // Temporary
     String indexDir = "/data/prep_corpus/index/";

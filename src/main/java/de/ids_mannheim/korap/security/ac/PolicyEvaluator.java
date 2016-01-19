@@ -8,9 +8,9 @@ import de.ids_mannheim.korap.security.PermissionsBuffer;
 import de.ids_mannheim.korap.security.SecurityPolicy;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import edu.emory.mathcs.backport.java.util.Collections;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class PolicyEvaluator {
 
-    private static final Logger jlog = KustvaktLogger
+    private static final Logger jlog = LoggerFactory
             .getLogger(PolicyEvaluator.class);
 
     private final User user;

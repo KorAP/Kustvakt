@@ -36,11 +36,7 @@
         <filtering>true</filtering>
         <directory>src/main/resources</directory>
         <includes>
-          <include>**/*.prop</include>
-          <include>**/*.xml</include>
-          <include>**/*.conf</include>
           <include>**/*.properties</include>
-          <include>**/*.sql</include>
         </includes>
       </testResource>
     </testResources>

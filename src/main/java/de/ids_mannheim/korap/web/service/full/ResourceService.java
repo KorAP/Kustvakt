@@ -33,6 +33,7 @@ import de.ids_mannheim.korap.web.filter.DefaultFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -47,8 +48,7 @@ import java.util.*;
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ResourceService {
 
-    private static Logger jlog = KustvaktLogger
-            .getLogger(ResourceService.class);
+    private static Logger jlog = LoggerFactory.getLogger(ResourceService.class);
 
     private SearchKrill searchKrill;
     private ResourceHandler resourceHandler;

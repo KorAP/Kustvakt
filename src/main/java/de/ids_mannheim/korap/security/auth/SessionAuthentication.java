@@ -8,10 +8,10 @@ import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class SessionAuthentication implements AuthenticationIface {
 
-    private static Logger jlog = KustvaktLogger
+    private static Logger jlog = LoggerFactory
             .getLogger(SessionAuthentication.class);
     private SessionFactory sessions;
     private ScheduledThreadPoolExecutor scheduled;

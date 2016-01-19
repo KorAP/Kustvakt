@@ -10,9 +10,9 @@ import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.user.*;
 import de.ids_mannheim.korap.utils.BooleanUtils;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public class EntityDao implements EntityHandlerIface {
 
-    private static Logger jlog = KustvaktLogger.getLogger(EntityDao.class);
+    private static Logger jlog = LoggerFactory.getLogger(EntityDao.class);
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     public EntityDao(PersistenceClient client) {

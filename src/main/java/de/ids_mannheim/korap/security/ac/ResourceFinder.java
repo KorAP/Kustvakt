@@ -8,8 +8,8 @@ import de.ids_mannheim.korap.resources.Permissions;
 import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.security.PermissionsBuffer;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -18,7 +18,7 @@ import java.util.*;
  */
 public class ResourceFinder {
 
-    private static final Logger log = KustvaktLogger
+    private static final Logger jlog = LoggerFactory
             .getLogger(ResourceFinder.class);
     private static PolicyHandlerIface policydao;
 
@@ -107,15 +107,16 @@ public class ResourceFinder {
                 try {
                     T resource = (T) iface
                             .findbyId(c.getPersistentID(), this.user);
-                    PolicyEvaluator e = PolicyEvaluator
-                            .setFlags(user, resource);
-                    resource.setManaged(e.getFlag("managed", false));
-                    resources.add(resource);
+                    if (resource != null) {
+                        PolicyEvaluator e = PolicyEvaluator
+                                .setFlags(user, resource);
+                        resource.setManaged(e.getFlag("managed", false));
+                        resources.add(resource);
+                    }
                 }catch (KustvaktException e) {
                     // don't handle connection error or no handler registered!
-                    KustvaktLogger.ERROR_LOGGER
-                            .error("Error while retrieving containers '{}' ",
-                                    this.containers);
+                    jlog.error("Error while retrieving containers '{}' ",
+                            this.containers);
                     return Collections.emptySet();
                 }
             }

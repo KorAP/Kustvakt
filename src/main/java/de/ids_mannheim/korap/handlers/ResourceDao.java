@@ -9,9 +9,9 @@ import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.SqlBuilder;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -30,7 +30,7 @@ import java.util.List;
 public class ResourceDao<T extends KustvaktResource>
         implements ResourceOperationIface<T> {
 
-    private static Logger log = KustvaktLogger.getLogger(ResourceDao.class);
+    private static Logger log = LoggerFactory.getLogger(ResourceDao.class);
     protected final NamedParameterJdbcTemplate jdbcTemplate;
 
     public ResourceDao(PersistenceClient client) {

@@ -2,11 +2,11 @@ package de.ids_mannheim.korap.config;
 
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.user.Attributes;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.Getter;
 import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,7 +39,7 @@ public class KustvaktConfiguration {
         KUSTVAKT_USER.put(Attributes.INSTITUTION, "IDS Mannheim");
     }
 
-    private static final Logger jlog = KustvaktLogger
+    private static final Logger jlog = LoggerFactory
             .getLogger(KustvaktConfiguration.class);
     private String indexDir;
     private int port;
@@ -92,7 +92,6 @@ public class KustvaktConfiguration {
      */
     protected Properties load(Properties properties)
             throws MalformedURLException {
-        properties.list(System.out);
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));
         returnhits = new Integer(properties.getProperty("returnhits", "50000"));
         indexDir = properties.getProperty("lucene.indexDir", "");

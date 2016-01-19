@@ -9,6 +9,7 @@ import org.slf4j.Marker;
  * @date 28/03/2014
  */
 
+@Deprecated
 public class KustvaktLogger implements Logger {
     // debugging flag, info, warn, error will always be logged though!
     public static boolean DEBUG = false;
