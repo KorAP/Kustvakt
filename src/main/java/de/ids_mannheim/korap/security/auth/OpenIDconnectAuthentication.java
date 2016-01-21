@@ -44,9 +44,9 @@ public class OpenIDconnectAuthentication implements AuthenticationIface {
     }
 
     @Override
-    public TokenContext createUserSession(User user, Map<String, Object> attr)
+    public TokenContext createUserSession(User user, Map<String, String> attr)
             throws KustvaktException {
-        String cl_secret = (String) attr.get(Attributes.CLIENT_SECRET);
+        String cl_secret = attr.get(Attributes.CLIENT_SECRET);
         if (cl_secret == null)
             throw new KustvaktException(StatusCodes.REQUEST_INVALID);
         attr.remove(cl_secret);

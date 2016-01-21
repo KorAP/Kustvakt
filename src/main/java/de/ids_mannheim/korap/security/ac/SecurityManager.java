@@ -277,7 +277,7 @@ public class SecurityManager<T extends KustvaktResource> {
 
                 jlog.info("Creating Access Control structure for resource '"
                         + resource.getPersistentID() + "@" + resource.getId()
-                        + "'");
+                        + "', name: " + resource.getName());
                 // storing resource is called twice. first when this is register and later in idsbootstrap to create cstorage entry. how to unify this?
                 ResourceOperationIface iface = p.handlers
                         .get(resource.getClass());
@@ -379,6 +379,11 @@ public class SecurityManager<T extends KustvaktResource> {
             }
         }
         this.policies[0].add(policy);
+        try {
+            Thread.sleep(5);
+        }catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void deletePolicies()

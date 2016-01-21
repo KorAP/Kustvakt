@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class FormRequestWrapper extends HttpServletRequestWrapper {
 
-    private MultivaluedMap<String, Object> form;
+    private MultivaluedMap<String, String> form;
 
     /**
      * Constructs a request object wrapping the given request.
@@ -25,7 +25,7 @@ public class FormRequestWrapper extends HttpServletRequestWrapper {
      * @throws IllegalArgumentException if the request is null
      */
     public FormRequestWrapper(HttpServletRequest request,
-            MultivaluedMap<String, Object> form) {
+            MultivaluedMap<String, String> form) {
         super(request);
         this.form = form;
     }
@@ -48,7 +48,7 @@ public class FormRequestWrapper extends HttpServletRequestWrapper {
         return values;
     }
 
-    public Map<String, Object> singleValueMap() {
+    public Map<String, String> singleValueMap() {
         return toMap(this.form, false);
     }
 
@@ -57,13 +57,14 @@ public class FormRequestWrapper extends HttpServletRequestWrapper {
      *               in value list and returns the result
      * @return key/value map
      */
-    public static Map<String, Object> toMap(MultivaluedMap<String, Object> form,
+    public static Map<String, String> toMap(MultivaluedMap<String, String> form,
             boolean strict) {
-        HashMap<String, Object> map = new HashMap<>();
+        HashMap<String, String> map = new HashMap<>();
         for (String key : form.keySet()) {
             if (strict && form.get(key).size() > 1)
                 continue;
             map.put(key, form.getFirst(key));
+
         }
         return map;
     }
@@ -73,7 +74,7 @@ public class FormRequestWrapper extends HttpServletRequestWrapper {
     }
 
     public void put(String key, String... values) {
-        this.form.put(key, Arrays.<Object>asList(values));
+        this.form.put(key, Arrays.<String>asList(values));
     }
 
 }

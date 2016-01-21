@@ -47,16 +47,18 @@ public class JDBCClient extends PersistenceClient<NamedParameterJdbcTemplate> {
 
     @Override
     public boolean checkDatabase() {
+        int size;
         NamedParameterJdbcTemplate tmp = this.getSource();
         try {
-            // todo: use a table that doesnt change!!!!!
-            tmp.queryForObject("select count(id) from korap_users limit 1;",
+            // uses flyway schema table to determine of schema was applied succesfully
+            size = tmp.queryForObject(
+                    "select count(*) from schema_version limit 10;",
                     new HashMap<String, Object>(), Integer.class);
         }catch (Exception e) {
             System.out.println("No database schema found!");
             return false;
         }
-        return true;
+        return size > 0;
     }
 
     @Override

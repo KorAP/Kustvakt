@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.config;
 
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.UserDetails;
+import de.ids_mannheim.korap.utils.JsonUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,13 +30,12 @@ public class Scopes {
     private static final Enum[] SERVICE_DEFAULTS = { Scope.account,
             Scope.preferences, Scope.search, Scope.queries };
 
-    public static Map<String, Object> getProfileScopes(
-            Map<String, Object> values) {
-        Map<String, Object> r = new HashMap<>();
+    public static Scopes getProfileScopes(Map<String, Object> values) {
+        Scopes r = new Scopes();
         for (String key : profile) {
             Object v = values.get(key);
             if (v != null)
-                r.put(key, v);
+                r._values.put(key, v);
         }
         return r;
     }
@@ -47,26 +47,44 @@ public class Scopes {
      * @return
      */
     //todo: test
-    public static Enum[] mapScopes(String scopes) {
+    public static Scope[] mapScopes(String scopes) {
         List<Enum> s = new ArrayList<>();
         for (String value : scopes.split(" "))
             s.add(Scope.valueOf(value.toLowerCase()));
-        return (Enum[]) s.toArray(new Enum[s.size()]);
+        return s.toArray(new Scope[s.size()]);
     }
 
-    public static Map<String, Object> mapOpenIDConnectScopes(String scopes,
-            UserDetails details) {
-        Map<String, Object> m = new HashMap<>();
+    public static Scopes mapScopes(String scopes, UserDetails details) {
+        Scopes m = new Scopes();
+        Map<String, Object> det = details.toMap();
         if (scopes != null && !scopes.isEmpty()) {
-            scopes = scopes.toLowerCase();
-            if (scopes.contains(Scope.email.toString()))
-                m.put(Attributes.EMAIL, details.getEmail());
+            Scope[] scopearr = mapScopes(scopes);
+            for (Scope s : scopearr) {
+                Object v = det.get(s.toString());
+                if (v != null)
+                    m._values.put(s.toString(), v);
+            }
             if (scopes.contains(Scope.profile.toString()))
-                m.putAll(Scopes.getProfileScopes(details.toMap()));
+                m._values.putAll(Scopes.getProfileScopes(det)._values);
+            m._values.put(Attributes.SCOPES, scopes);
         }
         return m;
     }
 
+    private Map<String, Object> _values;
 
+    private Scopes() {
+        this._values = new HashMap<>();
+    }
+
+    public String toEntity() {
+        if (this._values.isEmpty())
+            return "";
+        return JsonUtils.toJSON(this._values);
+    }
+
+    public Map<String, Object> toMap() {
+        return new HashMap<>(this._values);
+    }
 
 }

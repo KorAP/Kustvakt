@@ -68,7 +68,7 @@ public interface EncryptionIface {
 
     public String validateEmail(String email) throws KustvaktException;
 
-    public Map<String, Object> validateMap(Map<String, Object> map)
+    public Map<String, String> validateMap(Map<String, String> map)
             throws KustvaktException;
 
     public String validateString(String input) throws KustvaktException;

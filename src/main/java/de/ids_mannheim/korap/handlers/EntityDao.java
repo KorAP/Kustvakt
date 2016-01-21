@@ -93,9 +93,8 @@ public class EntityDao implements EntityHandlerIface {
         }catch (DataAccessException e) {
             jlog.error("Could not update user settings for user: " + settings
                     .getUserID(), e);
-            throw new dbException(settings.getUserID(), "userSettings",
+            throw new dbException(settings.getUserID(), "user_settings",
                     StatusCodes.DB_UPDATE_FAILED, settings.toString());
-            //            throw new KorAPException(e, StatusCodes.CONNECTION_ERROR);
         }
     }
 

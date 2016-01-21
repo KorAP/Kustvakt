@@ -3,10 +3,10 @@ package de.ids_mannheim.korap.web.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
 import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.KustvaktBaseServer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class KustvaktResourceServiceTest extends FastJerseyTest {
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");
 
-        KustvaktBaseServer.runPreStart();
+        TestHelper.runBootInterfaces();
     }
 
     @AfterClass

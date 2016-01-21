@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.security.auth;
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.Scopes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
@@ -73,13 +74,14 @@ public class BasicHttpAuth implements AuthenticationIface {
 
     // not supported!
     @Override
-    public TokenContext createUserSession(User user, Map<String, Object> attr)
+    public TokenContext createUserSession(User user, Map<String, String> attr)
             throws KustvaktException {
         return null;
     }
 
     @Override
     public void removeUserSession(String token) throws KustvaktException {
+        throw new KustvaktException(StatusCodes.NOT_SUPPORTED);
     }
 
     @Override

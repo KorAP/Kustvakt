@@ -6,8 +6,10 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import org.joda.time.DateTime;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +19,7 @@ import java.util.Map;
  * @date 27/01/2014
  */
 @Data
-public class TokenContext implements java.security.Principal {
+public class TokenContext implements java.security.Principal, Serializable {
 
     /**
      * session relevant data. Are never persisted into a database
@@ -30,7 +32,8 @@ public class TokenContext implements java.security.Principal {
     private boolean secureRequired;
 
     @Getter(AccessLevel.PRIVATE)
-    private Map<String, Object> parameters;
+    @Setter(AccessLevel.PRIVATE)
+    private Map<String, String> parameters;
     private String hostAddress;
     private String userAgent;
 
@@ -51,7 +54,7 @@ public class TokenContext implements java.security.Principal {
         return m;
     }
 
-    public Map<String, Object> params() {
+    public Map<String, String> params() {
         return new HashMap<>(parameters);
     }
 
@@ -66,6 +69,11 @@ public class TokenContext implements java.security.Principal {
 
     public void addContextParameter(String key, String value) {
         this.parameters.put(key, value);
+    }
+
+    public void addParams(Map<String, Object> map) {
+        for (Map.Entry<String, Object> e : map.entrySet())
+            this.parameters.put(e.getKey(), String.valueOf(e.getValue()));
     }
 
     public void removeContextParameter(String key) {

@@ -686,6 +686,7 @@ public class PolicyDao implements PolicyHandlerIface {
                 // that as checkup (may also be manageable via triggers)
                 //                if (this.jdbcTemplate
                 //                        .queryForObject(select, param, Integer.class) == 0)
+                System.out.println("PARAMETER MAP " + param.getValues());
                 sources[idx] = param;
             }
 
@@ -694,8 +695,11 @@ public class PolicyDao implements PolicyHandlerIface {
             return this.jdbcTemplate.batchUpdate(insert, sources);
         }catch (DataAccessException e) {
             jlog.error("Operation (INSERT) not possible for '{}' for user '{}'",
-                    condition.toString(), usernames);
-            throw new KustvaktException(e, StatusCodes.CONNECTION_ERROR);
+                    condition.toString(), usernames, e);
+            throw new KustvaktException(
+                    "Operation (INSERT) not possible for '" + condition
+                            .toString() + "' for user '" + usernames + "'", e,
+                    StatusCodes.CONNECTION_ERROR);
         }
     }
 

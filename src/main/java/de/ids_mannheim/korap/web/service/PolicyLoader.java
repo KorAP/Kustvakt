@@ -26,35 +26,37 @@ public class PolicyLoader implements BootupInterface {
 
     @Override
     public void load() throws KustvaktException {
-        PersistenceClient cl = BeanConfiguration.getBeans()
-                .getPersistenceClient();
-        Set<ResourceOperationIface> ifaces = new HashSet<>();
-        ifaces.add(new ResourceDao(cl));
-        ifaces.add(new CollectionDao(cl));
+        if (BeanConfiguration.hasContext()) {
+            PersistenceClient cl = BeanConfiguration.getBeans()
+                    .getPersistenceClient();
+            Set<ResourceOperationIface> ifaces = new HashSet<>();
+            ifaces.add(new ResourceDao(cl));
+            ifaces.add(new CollectionDao(cl));
 
-        SecurityManager.setProviders(new PolicyDao(cl),
-                BeanConfiguration.getBeans().getEncryption(), ifaces);
-        ResourceFinder.setProviders(new PolicyDao(cl));
+            SecurityManager.setProviders(new PolicyDao(cl),
+                    BeanConfiguration.getBeans().getEncryption(), ifaces);
+            ResourceFinder.setProviders(new PolicyDao(cl));
 
-        User user = User.UserFactory
-                .toUser(KustvaktConfiguration.KUSTVAKT_USER);
-        PolicyBuilder builder = new PolicyBuilder(user);
-        builder.addCondition("public");
-        builder.setResources(new Corpus("GOE", user.getId()));
-        builder.setPermissions(Permissions.PERMISSIONS.ALL);
-        builder.create();
+            User user = User.UserFactory
+                    .toUser(KustvaktConfiguration.KUSTVAKT_USER);
+            PolicyBuilder builder = new PolicyBuilder(user);
+            builder.addCondition("public");
+            builder.setResources(new Corpus("GOE", user.getId()));
+            builder.setPermissions(Permissions.PERMISSIONS.ALL);
+            builder.create();
 
-        // redundant if user is the user who created the condition for the resource
-        //        try {
-        //            ConditionManagement cm = new ConditionManagement(user);
-        ////            cm.addUser(user.getUsername(), new PolicyCondition("public"), true);
-        //        }catch (KustvaktException e) {
-        //            e.printStackTrace();
-        //        }
+            // redundant if user is the user who created the condition for the resource
+            //        try {
+            //            ConditionManagement cm = new ConditionManagement(user);
+            ////            cm.addUser(user.getUsername(), new PolicyCondition("public"), true);
+            //        }catch (KustvaktException e) {
+            //            e.printStackTrace();
+            //        }
+        }
     }
 
     @Override
     public int position() {
-        return -1;
+        return 1;
     }
 }

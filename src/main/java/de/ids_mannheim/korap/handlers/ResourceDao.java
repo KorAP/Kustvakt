@@ -185,4 +185,9 @@ public class ResourceDao<T extends KustvaktResource>
             throw new KustvaktException(StatusCodes.CONNECTION_ERROR);
         }
     }
+
+    @Override
+    public int size() throws KustvaktException {
+        return -1;
+    }
 }

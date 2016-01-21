@@ -43,7 +43,7 @@ public abstract class PersistenceClient<SOURCE> {
         this.schema = schema;
     }
 
-    public abstract boolean checkDatabase() throws Exception;
+    public abstract boolean checkDatabase();
 
     public abstract void createDatabase() throws IOException;
 

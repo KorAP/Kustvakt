@@ -96,7 +96,7 @@ public class DefaultEncryption implements EncryptionIface {
     }
 
     @Override
-    public Map<String, Object> validateMap(Map<String, Object> map)
+    public Map<String, String> validateMap(Map<String, String> map)
             throws KustvaktException {
         return null;
     }

@@ -43,18 +43,18 @@ public abstract class AuthenticationManagerIface {
     public abstract User getUser(String username) throws KustvaktException;
 
     public abstract User authenticate(int type, String username,
-            String password, Map<String, Object> attributes)
+            String password, Map<String, String> attributes)
             throws KustvaktException;
 
     public abstract TokenContext createTokenContext(User user,
-            Map<String, Object> attr, String provider_key)
+            Map<String, String> attr, String provider_key)
             throws KustvaktException;
 
     public abstract void logout(TokenContext context) throws KustvaktException;
 
     public abstract void lockAccount(User user) throws KustvaktException;
 
-    public abstract User createUserAccount(Map<String, Object> attributes,
+    public abstract User createUserAccount(Map<String, String> attributes,
             boolean conf_required) throws KustvaktException;
 
     public abstract boolean updateAccount(User user) throws KustvaktException;

@@ -40,29 +40,29 @@ public class UserDetails {
         setPrivateUsage(true);
     }
 
-    public static UserDetails newDetailsIterator(Map<String, Object> d) {
+    public static UserDetails newDetailsIterator(Map<String, String> d) {
         UserDetails details = new UserDetails();
-        Map<String, Object> detailMap = new CaseInsensitiveMap(d);
+        Map<String, String> detailMap = new CaseInsensitiveMap(d);
 
         if (!detailMap.isEmpty()) {
-            details.setFirstName((String) detailMap.get(Attributes.FIRSTNAME));
-            details.setLastName((String) detailMap.get(Attributes.LASTNAME));
-            details.setPhone((String) detailMap.get(Attributes.PHONE));
-            details.setEmail((String) detailMap.get(Attributes.EMAIL));
-            details.setGender((String) detailMap.get(Attributes.GENDER));
-            details.setAddress((String) detailMap.get(Attributes.ADDRESS));
-            details.setCountry((String) detailMap.get(Attributes.COUNTRY));
-            details.setInstitution(
-                    (String) detailMap.get(Attributes.INSTITUTION));
+            details.setFirstName(detailMap.get(Attributes.FIRSTNAME));
+            details.setLastName(detailMap.get(Attributes.LASTNAME));
+            details.setPhone(detailMap.get(Attributes.PHONE));
+            details.setEmail(detailMap.get(Attributes.EMAIL));
+            details.setGender(detailMap.get(Attributes.GENDER));
+            details.setAddress(detailMap.get(Attributes.ADDRESS));
+            details.setCountry(detailMap.get(Attributes.COUNTRY));
+            details.setInstitution(detailMap.get(Attributes.INSTITUTION));
             details.setPrivateUsage(
                     detailMap.get(Attributes.PRIVATE_USAGE) == null ?
                             true :
-                            (Boolean) detailMap.get(Attributes.PRIVATE_USAGE));
+                            Boolean.valueOf(
+                                    detailMap.get(Attributes.PRIVATE_USAGE)));
         }
         return details;
     }
 
-    public void updateDetails(Map<String, Object> d) {
+    public void updateDetails(Map<String, String> d) {
         Map<String, Object> detailMap = new CaseInsensitiveMap(d);
 
         if (!detailMap.isEmpty()) {

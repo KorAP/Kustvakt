@@ -164,6 +164,18 @@ public class CollectionDao
         }
     }
 
+    @Override
+    public int size() throws KustvaktException {
+        final String sql = "select count(*) from coll_store;";
+        try {
+            return this.jdbcTemplate
+                    .queryForObject(sql, new HashMap<String, Object>(),
+                            Integer.class);
+        }catch (DataAccessException e) {
+            throw new KustvaktException(StatusCodes.CONNECTION_ERROR);
+        }
+    }
+
     //todo: adjust to resource id input (batch operation!)
     // fixme: test
     public List<VirtualCollection> getResources(Collection<Object> resources,

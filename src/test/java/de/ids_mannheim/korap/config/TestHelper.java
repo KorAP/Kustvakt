@@ -5,6 +5,7 @@ import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.web.service.BootupInterface;
 import org.junit.Assert;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -19,12 +20,12 @@ import java.util.*;
  * @author hanl
  * @date 16/10/2015
  */
-public class UserTestHelper {
+public class TestHelper {
 
     private static final String[] credentials = new String[] { "test1",
             "testPass2015" };
 
-    public static boolean setup() {
+    public static boolean setupUser() {
         boolean r = BeanConfiguration.hasContext();
         if (r) {
             EntityHandlerIface dao = BeanConfiguration.getBeans()
@@ -46,7 +47,7 @@ public class UserTestHelper {
         return r;
     }
 
-    public static boolean drop() {
+    public static boolean dropUser() {
         boolean r = BeanConfiguration.hasContext();
         if (r) {
             EntityHandlerIface dao = BeanConfiguration.getBeans()
@@ -61,7 +62,7 @@ public class UserTestHelper {
         return r;
     }
 
-    public static boolean truncateAll() {
+    public static boolean truncateAllUsers() {
         boolean r = BeanConfiguration.hasContext();
         if (r) {
             String sql = "SELECT Concat('TRUNCATE TABLE ', TABLE_NAME) FROM INFORMATION_SCHEMA.TABLES";
@@ -85,11 +86,46 @@ public class UserTestHelper {
         return r;
     }
 
-    public static final String[] getCredentials() {
+    public static final String[] getUserCredentials() {
         return Arrays.copyOf(credentials, 2);
     }
 
-    private UserTestHelper() {
+
+    public static void runBootInterfaces() {
+        Set<Class<? extends BootupInterface>> set = KustvaktClassLoader
+                .loadSubTypes(BootupInterface.class);
+
+        List<BootupInterface> list = new ArrayList<>(set.size());
+
+        PersistenceClient client = BeanConfiguration.getBeans()
+                .getPersistenceClient();
+        if (client.checkDatabase()) {
+            for (Class cl : set) {
+                BootupInterface iface;
+                try {
+                    iface = (BootupInterface) cl.newInstance();
+                    if (iface.position() == -1 | iface.position() > set.size())
+                        list.add(iface);
+                    else
+                        list.add(0, iface);
+                }catch (InstantiationException | IllegalAccessException e) {
+                    continue;
+                }
+            }
+            System.out.println("Found boot loading interfaces: " + list);
+            for (BootupInterface iface : list) {
+                try {
+                    iface.load();
+                }catch (KustvaktException e) {
+                    // don't do anything!
+                }
+            }
+        }
+    }
+
+
+
+    private TestHelper() {
     }
 
 }

@@ -1,11 +1,18 @@
 package de.ids_mannheim.korap.config;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.handlers.CollectionDao;
+import de.ids_mannheim.korap.resources.VirtualCollection;
+import de.ids_mannheim.korap.security.ac.ResourceFinder;
+import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.ServiceVersion;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Set;
 
 /**
  * @author hanl
@@ -18,10 +25,33 @@ public class ConfigTest {
         BeanConfiguration.closeApplication();
     }
 
-
-    @Test
+    @Before
     public void create() {
         BeanConfiguration.loadClasspathContext("default-config.xml");
+        //        PersistenceClient cl = BeanConfiguration.getBeans()
+        //                .getPersistenceClient();
+        //        Set<ResourceOperationIface> ifaces = new HashSet<>();
+        //        ifaces.add(new ResourceDao(cl));
+        //        ifaces.add(new CollectionDao(cl));
+        //
+        //        SecurityManager.setProviders(new PolicyDao(cl),
+        //                BeanConfiguration.getBeans().getEncryption(), ifaces);
+        //        ResourceFinder.setProviders(new PolicyDao(cl));
+        TestHelper.runBootInterfaces();
+    }
+
+    @Test
+    public void testCollectionLoader() throws KustvaktException {
+        CollectionDao dao = new CollectionDao(
+                BeanConfiguration.getBeans().getPersistenceClient());
+        int size = dao.size();
+        Assert.assertNotEquals("Is not supposed to be zero", size, 0);
+        Assert.assertEquals("wrong size", size, 3);
+
+        Set<VirtualCollection> set = ResourceFinder.search(User.UserFactory
+                        .toUser(KustvaktConfiguration.KUSTVAKT_USER),
+                VirtualCollection.class);
+        System.out.println("RESULTING SET: " + set);
     }
 
     @Test

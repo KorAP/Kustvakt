@@ -3,7 +3,7 @@ package de.ids_mannheim.korap.web.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
 import de.ids_mannheim.korap.config.BeanConfiguration;
-import de.ids_mannheim.korap.config.UserTestHelper;
+import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -21,7 +21,7 @@ public class OAuth2EndpointTest extends FastJerseyTest {
 
     @AfterClass
     public static void close() {
-        UserTestHelper.drop();
+        TestHelper.dropUser();
         BeanConfiguration.closeApplication();
     }
 
@@ -32,8 +32,8 @@ public class OAuth2EndpointTest extends FastJerseyTest {
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");
 
-        UserTestHelper.setup();
-        credentials = UserTestHelper.getCredentials();
+        TestHelper.setupUser();
+        credentials = TestHelper.getUserCredentials();
     }
 
 //    @Test

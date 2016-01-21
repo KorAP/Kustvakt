@@ -72,7 +72,6 @@ public class AuthService {
         return Response.ok(JsonUtils.toJSON(m)).build();
     }
 
-
     // fixme: moved to user
     @GET
     @Path("status")
@@ -109,10 +108,9 @@ public class AuthService {
         if (values[0].equalsIgnoreCase("null") | values[1]
                 .equalsIgnoreCase("null"))
             // is actual an invalid request
-            throw KustvaktResponseHandler
-                    .throwit(StatusCodes.REQUEST_INVALID);
+            throw KustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
 
-        Map<String, Object> attr = new HashMap<>();
+        Map<String, String> attr = new HashMap<>();
         if (scopes != null && !scopes.isEmpty())
             attr.put(Attributes.SCOPES, scopes);
         attr.put(Attributes.HOST, host);
@@ -175,10 +173,9 @@ public class AuthService {
 
         if (values[0].equalsIgnoreCase("null") | values[1]
                 .equalsIgnoreCase("null"))
-            throw KustvaktResponseHandler
-                    .throwit(StatusCodes.REQUEST_INVALID);
+            throw KustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
 
-        Map<String, Object> attr = new HashMap<>();
+        Map<String, String> attr = new HashMap<>();
         attr.put(Attributes.HOST, host);
         attr.put(Attributes.USER_AGENT, agent);
         TokenContext context;
@@ -207,7 +204,7 @@ public class AuthService {
         // the shibfilter decrypted the values
         // define default provider for returned access token strategy?!
 
-        Map<String, Object> attr = new HashMap<>();
+        Map<String, String> attr = new HashMap<>();
         attr.put(Attributes.HOST, host);
         attr.put(Attributes.USER_AGENT, agent);
 

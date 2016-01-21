@@ -196,29 +196,43 @@ public class UserSettings {
     }
 
     public void updateStringSettings(Map<String, String> m) {
-        this.setFileNameForExport(m.get(Attributes.FILENAME_FOR_EXPORT));
+        if (m.get(Attributes.FILENAME_FOR_EXPORT) != null)
+            this.setFileNameForExport(m.get(Attributes.FILENAME_FOR_EXPORT));
         //        this.setItemForSimpleAnnotation(
         //                Integer.valueOf(m.get(Attributes.ITEM_FOR_SIMPLE_ANNOTATION)));
-        this.setLeftContextItemForExport(
-                m.get(Attributes.LEFT_CONTEXT_ITEM_FOR_EXPORT));
-        this.setLeftContextSizeForExport(Integer.valueOf(
-                m.get(Attributes.LEFT_CONTEXT_SIZE_FOR_EXPORT)));
-        this.setLocale(m.get(Attributes.LOCALE));
-        this.setLeftContextItem(m.get(Attributes.LEFT_CONTEXT_ITEM));
-        this.setLeftContextSize(
-                Integer.valueOf(m.get(Attributes.LEFT_CONTEXT_SIZE)));
-        this.setRightContextItem(m.get(Attributes.RIGHT_CONTEXT_ITEM));
-        this.setRightContextItemForExport(
-                m.get(Attributes.RIGHT_CONTEXT_ITEM_FOR_EXPORT));
-        this.setRightContextSize(
-                Integer.valueOf(m.get(Attributes.RIGHT_CONTEXT_SIZE)));
-        this.setRightContextSizeForExport(Integer.valueOf(
-                m.get(Attributes.RIGHT_CONTEXT_SIZE_FOR_EXPORT)));
-        this.setSelectedCollection(m.get(Attributes.SELECTED_COLLECTION));
-        this.setQueryLanguage(m.get(Attributes.QUERY_LANGUAGE));
-        this.setPageLength(Integer.valueOf(m.get(Attributes.PAGE_LENGTH)));
-        this.setMetadataQueryExpertModus(
-                Boolean.valueOf(m.get(Attributes.METADATA_QUERY_EXPERT_MODUS)));
+        if (m.get(Attributes.LEFT_CONTEXT_ITEM_FOR_EXPORT) != null)
+            this.setLeftContextItemForExport(
+                    m.get(Attributes.LEFT_CONTEXT_ITEM_FOR_EXPORT));
+        if (m.get(Attributes.LEFT_CONTEXT_SIZE_FOR_EXPORT) != null)
+            this.setLeftContextSizeForExport(Integer.valueOf(
+                    m.get(Attributes.LEFT_CONTEXT_SIZE_FOR_EXPORT)));
+        if (m.get(Attributes.LOCALE) != null)
+            this.setLocale(m.get(Attributes.LOCALE));
+        if (m.get(Attributes.LEFT_CONTEXT_ITEM) != null)
+            this.setLeftContextItem(m.get(Attributes.LEFT_CONTEXT_ITEM));
+        if (m.get(Attributes.LEFT_CONTEXT_SIZE) != null)
+            this.setLeftContextSize(
+                    Integer.valueOf(m.get(Attributes.LEFT_CONTEXT_SIZE)));
+        if (m.get(Attributes.RIGHT_CONTEXT_ITEM) != null)
+            this.setRightContextItem(m.get(Attributes.RIGHT_CONTEXT_ITEM));
+        if (m.get(Attributes.RIGHT_CONTEXT_ITEM_FOR_EXPORT) != null)
+            this.setRightContextItemForExport(
+                    m.get(Attributes.RIGHT_CONTEXT_ITEM_FOR_EXPORT));
+        if (m.get(Attributes.RIGHT_CONTEXT_SIZE) != null)
+            this.setRightContextSize(
+                    Integer.valueOf(m.get(Attributes.RIGHT_CONTEXT_SIZE)));
+        if (m.get(Attributes.RIGHT_CONTEXT_SIZE_FOR_EXPORT) != null)
+            this.setRightContextSizeForExport(Integer.valueOf(
+                    m.get(Attributes.RIGHT_CONTEXT_SIZE_FOR_EXPORT)));
+        if (m.get(Attributes.SELECTED_COLLECTION) != null)
+            this.setSelectedCollection(m.get(Attributes.SELECTED_COLLECTION));
+        if (m.get(Attributes.QUERY_LANGUAGE) != null)
+            this.setQueryLanguage(m.get(Attributes.QUERY_LANGUAGE));
+        if (m.get(Attributes.PAGE_LENGTH) != null)
+            this.setPageLength(Integer.valueOf(m.get(Attributes.PAGE_LENGTH)));
+        if (m.get(Attributes.METADATA_QUERY_EXPERT_MODUS) != null)
+            this.setMetadataQueryExpertModus(Boolean.valueOf(
+                    m.get(Attributes.METADATA_QUERY_EXPERT_MODUS)));
         //        this.setSearchSettingsTab(
         //                Integer.valueOf(m.get(Attributes.SEARCH_SETTINGS_TAB)));
         //        this.setSelectedGraphType(
@@ -226,57 +240,85 @@ public class UserSettings {
         //        this.setSelectedSortType(m.get(Attributes.SELECTED_SORT_TYPE));
         //        this.setSelectedViewForSearchResults(
         //                m.get(Attributes.SELECTED_VIEW_FOR_SEARCH_RESULTS));
-
-        this.setCollectData(
-                Boolean.valueOf(m.get(Attributes.COLLECT_AUDITING_DATA)));
-        this.setDefaultPOSfoundry(m.get(Attributes.DEFAULT_POS_FOUNDRY));
-        this.setDefaultLemmafoundry(m.get(Attributes.DEFAULT_LEMMA_FOUNDRY));
-        this.setDefaultConstfoundry(m.get(Attributes.DEFAULT_CONST_FOUNDRY));
-        this.setDefaultRelfoundry(m.get(Attributes.DEFAULT_REL_FOUNDRY));
+        if (m.get(Attributes.COLLECT_AUDITING_DATA) != null)
+            this.setCollectData(
+                    Boolean.valueOf(m.get(Attributes.COLLECT_AUDITING_DATA)));
+        if (m.get(Attributes.DEFAULT_POS_FOUNDRY) != null)
+            this.setDefaultPOSfoundry(m.get(Attributes.DEFAULT_POS_FOUNDRY));
+        if (m.get(Attributes.DEFAULT_LEMMA_FOUNDRY) != null)
+            this.setDefaultLemmafoundry(
+                    m.get(Attributes.DEFAULT_LEMMA_FOUNDRY));
+        if (m.get(Attributes.DEFAULT_CONST_FOUNDRY) != null)
+            this.setDefaultConstfoundry(
+                    m.get(Attributes.DEFAULT_CONST_FOUNDRY));
+        if (m.get(Attributes.DEFAULT_REL_FOUNDRY) != null)
+            this.setDefaultRelfoundry(m.get(Attributes.DEFAULT_REL_FOUNDRY));
     }
 
     public void updateObjectSettings(Map<String, Object> m) {
-        this.setFileNameForExport(
-                (String) m.get(Attributes.FILENAME_FOR_EXPORT));
+        if (m.get(Attributes.FILENAME_FOR_EXPORT) != null)
+            this.setFileNameForExport(
+                    (String) m.get(Attributes.FILENAME_FOR_EXPORT));
         //        this.setItemForSimpleAnnotation(
-        //                (Integer) m.get(Attributes.ITEM_FOR_SIMPLE_ANNOTATION));
-        this.setLeftContextItemForExport(
-                (String) m.get(Attributes.LEFT_CONTEXT_ITEM_FOR_EXPORT));
-        this.setLeftContextSizeForExport(
-                (Integer) m.get(Attributes.LEFT_CONTEXT_SIZE_FOR_EXPORT));
-        this.setLocale((String) m.get(Attributes.LOCALE));
-        this.setLeftContextItem((String) m.get(Attributes.LEFT_CONTEXT_ITEM));
-        this.setLeftContextSize((Integer) m.get(Attributes.LEFT_CONTEXT_SIZE));
-        this.setRightContextItem((String) m.get(Attributes.RIGHT_CONTEXT_ITEM));
-        this.setRightContextItemForExport(
-                (String) m.get(Attributes.RIGHT_CONTEXT_ITEM_FOR_EXPORT));
-        this.setRightContextSize(
-                (Integer) m.get(Attributes.RIGHT_CONTEXT_SIZE));
-        this.setRightContextSizeForExport(
-                (Integer) m.get(Attributes.RIGHT_CONTEXT_SIZE_FOR_EXPORT));
-        this.setSelectedCollection(
-                (String) m.get(Attributes.SELECTED_COLLECTION));
-        this.setQueryLanguage((String) m.get(Attributes.QUERY_LANGUAGE));
-        this.setPageLength((Integer) m.get(Attributes.PAGE_LENGTH));
-        this.setMetadataQueryExpertModus(
-                (Boolean) m.get(Attributes.METADATA_QUERY_EXPERT_MODUS));
+        //                Integer.valueOf(m.get(Attributes.ITEM_FOR_SIMPLE_ANNOTATION)));
+        if (m.get(Attributes.LEFT_CONTEXT_ITEM_FOR_EXPORT) != null)
+            this.setLeftContextItemForExport(
+                    (String) m.get(Attributes.LEFT_CONTEXT_ITEM_FOR_EXPORT));
+        if (m.get(Attributes.LEFT_CONTEXT_SIZE_FOR_EXPORT) != null)
+            this.setLeftContextSizeForExport(Integer.valueOf(
+                    (Integer) m.get(Attributes.LEFT_CONTEXT_SIZE_FOR_EXPORT)));
+        if (m.get(Attributes.LOCALE) != null)
+            this.setLocale((String) m.get(Attributes.LOCALE));
+        if (m.get(Attributes.LEFT_CONTEXT_ITEM) != null)
+            this.setLeftContextItem(
+                    (String) m.get(Attributes.LEFT_CONTEXT_ITEM));
+        if (m.get(Attributes.LEFT_CONTEXT_SIZE) != null)
+            this.setLeftContextSize(Integer.valueOf(
+                    (Integer) m.get(Attributes.LEFT_CONTEXT_SIZE)));
+        if (m.get(Attributes.RIGHT_CONTEXT_ITEM) != null)
+            this.setRightContextItem(
+                    (String) m.get(Attributes.RIGHT_CONTEXT_ITEM));
+        if (m.get(Attributes.RIGHT_CONTEXT_ITEM_FOR_EXPORT) != null)
+            this.setRightContextItemForExport(
+                    (String) m.get(Attributes.RIGHT_CONTEXT_ITEM_FOR_EXPORT));
+        if (m.get(Attributes.RIGHT_CONTEXT_SIZE) != null)
+            this.setRightContextSize(Integer.valueOf(
+                    (Integer) m.get(Attributes.RIGHT_CONTEXT_SIZE)));
+        if (m.get(Attributes.RIGHT_CONTEXT_SIZE_FOR_EXPORT) != null)
+            this.setRightContextSizeForExport(Integer.valueOf(
+                    (Integer) m.get(Attributes.RIGHT_CONTEXT_SIZE_FOR_EXPORT)));
+        if (m.get(Attributes.SELECTED_COLLECTION) != null)
+            this.setSelectedCollection(
+                    (String) m.get(Attributes.SELECTED_COLLECTION));
+        if (m.get(Attributes.QUERY_LANGUAGE) != null)
+            this.setQueryLanguage((String) m.get(Attributes.QUERY_LANGUAGE));
+        if (m.get(Attributes.PAGE_LENGTH) != null)
+            this.setPageLength((Integer) m.get(Attributes.PAGE_LENGTH));
+        if (m.get(Attributes.METADATA_QUERY_EXPERT_MODUS) != null)
+            this.setMetadataQueryExpertModus(Boolean.valueOf(
+                    (Boolean) m.get(Attributes.METADATA_QUERY_EXPERT_MODUS)));
         //        this.setSearchSettingsTab(
-        //                (Integer) m.get(Attributes.SEARCH_SETTINGS_TAB));
+        //                Integer.valueOf(m.get(Attributes.SEARCH_SETTINGS_TAB)));
         //        this.setSelectedGraphType(
-        //                (Integer) m.get(Attributes.SELECTED_GRAPH_TYPE));
-        //        this.setSelectedSortType((String) m.get(Attributes.SELECTED_SORT_TYPE));
+        //                Integer.valueOf(m.get(Attributes.SELECTED_GRAPH_TYPE)));
+        //        this.setSelectedSortType(m.get(Attributes.SELECTED_SORT_TYPE));
         //        this.setSelectedViewForSearchResults(
-        //                (String) m.get(Attributes.SELECTED_VIEW_FOR_SEARCH_RESULTS));
-
-        this.setCollectData((Boolean) m.get(Attributes.COLLECT_AUDITING_DATA));
-        this.setDefaultPOSfoundry(
-                (String) m.get(Attributes.DEFAULT_POS_FOUNDRY));
-        this.setDefaultLemmafoundry(
-                (String) m.get(Attributes.DEFAULT_LEMMA_FOUNDRY));
-        this.setDefaultConstfoundry(
-                (String) m.get(Attributes.DEFAULT_CONST_FOUNDRY));
-        this.setDefaultRelfoundry(
-                (String) m.get(Attributes.DEFAULT_REL_FOUNDRY));
+        //                m.get(Attributes.SELECTED_VIEW_FOR_SEARCH_RESULTS));
+        if (m.get(Attributes.COLLECT_AUDITING_DATA) != null)
+            this.setCollectData(
+                    (Boolean) m.get(Attributes.COLLECT_AUDITING_DATA));
+        if (m.get(Attributes.DEFAULT_POS_FOUNDRY) != null)
+            this.setDefaultPOSfoundry(
+                    (String) m.get(Attributes.DEFAULT_POS_FOUNDRY));
+        if (m.get(Attributes.DEFAULT_LEMMA_FOUNDRY) != null)
+            this.setDefaultLemmafoundry(
+                    (String) m.get(Attributes.DEFAULT_LEMMA_FOUNDRY));
+        if (m.get(Attributes.DEFAULT_CONST_FOUNDRY) != null)
+            this.setDefaultConstfoundry(
+                    (String) m.get(Attributes.DEFAULT_CONST_FOUNDRY));
+        if (m.get(Attributes.DEFAULT_REL_FOUNDRY) != null)
+            this.setDefaultRelfoundry(
+                    (String) m.get(Attributes.DEFAULT_REL_FOUNDRY));
     }
 
     //loadSubTypes from configuration?
@@ -294,7 +336,7 @@ public class UserSettings {
         this.setRightContextSizeForExport(100);
         // persistent id for wikipedia!
         // fixme: deprecation warning!
-         this.setSelectedCollection(
+        this.setSelectedCollection(
                 "ZGU0ZTllNTFkYzc3M2VhZmViYzdkYWE2ODI5NDc3NTk4NGQ1YThhOTMwOTNhOWYxNWMwN2M3Y2YyZmE3N2RlNQ==");
         this.setQueryLanguage("COSMAS2");
         this.setPageLength(25);

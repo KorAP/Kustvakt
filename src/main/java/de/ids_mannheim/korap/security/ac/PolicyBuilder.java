@@ -11,6 +11,8 @@ import de.ids_mannheim.korap.security.PolicyContext;
 import de.ids_mannheim.korap.security.SecurityPolicy;
 import de.ids_mannheim.korap.user.User;
 
+import java.util.Arrays;
+
 /**
  * @author hanl
  * @date 14/04/2014
@@ -128,26 +130,21 @@ public class PolicyBuilder {
         if (this.rel == null)
             this.rel = Relation.AND;
 
+        System.out.println("CREATING RESOURCES " + Arrays.asList(resources));
+        System.out.println("RESOURCES LENGTH " + resources.length);
         for (int idx = 0; idx < this.resources.length; idx++) {
-            if (parents[idx] != null)
-                resources[idx].setParentID(parents[idx].getPersistentID());
-            SecurityManager manager = SecurityManager
-                    .register(resources[idx], user);
+            try {
+                System.out.println("ITERATING OVER ARRAY " + idx);
+                if (parents[idx] != null)
+                    resources[idx].setParentID(parents[idx].getPersistentID());
+                System.out.println("RUNNING REGISTERING SERVICE ON RESOURCE "
+                        + resources[idx]);
+                SecurityManager manager = SecurityManager
+                        .register(resources[idx], user);
 
-            if (rel.equals(Relation.AND)) {
-                SecurityPolicy policy = new SecurityPolicy()
-                        .setConditions(this.conditions)
-                        .setTarget(resources[idx]).addPermission(permissions)
-                        .setCreator(this.user.getId());
-
-                if (this.context != null)
-                    policy.setContext(this.context);
-
-                manager.addPolicy(policy);
-
-            }else if (rel.equals(Relation.OR)) {
-                for (PolicyCondition c : this.conditions) {
-                    SecurityPolicy policy = new SecurityPolicy().addCondition(c)
+                if (rel.equals(Relation.AND)) {
+                    SecurityPolicy policy = new SecurityPolicy()
+                            .setConditions(this.conditions)
                             .setTarget(resources[idx])
                             .addPermission(permissions)
                             .setCreator(this.user.getId());
@@ -155,18 +152,35 @@ public class PolicyBuilder {
                     if (this.context != null)
                         policy.setContext(this.context);
 
-                    //                    if (this.settings != null) {
-                    //                        ParameterSettingsHandler settings = this.settings
-                    //                                .get(c.getSpecifier());
-                    //                        if (settings != null) {
-                    //                            // fixme: context setting overlap!
-                    //                            policy.setContext(settings.getContext());
-                    //                            manager.addPolicy(policy, settings.getParameters());
-                    //                            continue;
-                    //                        }
-                    //                    }
                     manager.addPolicy(policy);
+
+                }else if (rel.equals(Relation.OR)) {
+                    for (PolicyCondition c : this.conditions) {
+                        SecurityPolicy policy = new SecurityPolicy()
+                                .addCondition(c).setTarget(resources[idx])
+                                .addPermission(permissions)
+                                .setCreator(this.user.getId());
+
+                        if (this.context != null)
+                            policy.setContext(this.context);
+
+                        //todo: ???
+                        //                    if (this.settings != null) {
+                        //                        ParameterSettingsHandler settings = this.settings
+                        //                                .get(c.getSpecifier());
+                        //                        if (settings != null) {
+                        //                            // fixme: context setting overlap!
+                        //                            policy.setContext(settings.getContext());
+                        //                            manager.addPolicy(policy, settings.getParameters());
+                        //                            continue;
+                        //                        }
+                        //                    }
+                        manager.addPolicy(policy);
+                    }
                 }
+            }catch (KustvaktException e) {
+                System.out.println("IF ERROR, LET OTHER RESOURCES RUN ANYWAY!");
+                e.printStackTrace();
             }
         }
     }

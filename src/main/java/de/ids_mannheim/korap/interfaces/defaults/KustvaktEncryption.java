@@ -25,7 +25,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class KustvaktEncryption implements EncryptionIface {
@@ -280,27 +279,27 @@ public class KustvaktEncryption implements EncryptionIface {
     }
 
     @Override
-    public Map<String, Object> validateMap(Map<String, Object> map)
+    public Map<String, String> validateMap(Map<String, String> map)
             throws KustvaktException {
-        Map<String, Object> safeMap = new HashMap<>();
+        Map<String, String> safeMap = new HashMap<>();
         if (map != null) {
-            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                Object value = null;
-                if (entry.getValue() instanceof String) {
-                    value = validateString((String) entry.getValue());
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                //                String value = null;
+                //                if (entry.getValue() instanceof String) {
+                String value = validateString(entry.getValue());
 
-                }else if (entry.getValue() instanceof List) {
-                    List list = (List) entry.getValue();
-                    for (Object v : list) {
-                        if (v instanceof String)
-                            validateString((String) v);
-                    }
-
-                    if (((List) entry.getValue()).size() == 1)
-                        value = list.get(0);
-                    else
-                        value = list;
-                }
+                //                }else if (entry.getValue() instanceof List) {
+                //                    List list = (List) entry.getValue();
+                //                    for (Object v : list) {
+                //                        if (v instanceof String)
+                //                            validateString((String) v);
+                //                    }
+                //
+                //                    if (((List) entry.getValue()).size() == 1)
+                //                        value = list.get(0);
+                //                    else
+                //                        value = list;
+                //                }
                 safeMap.put(entry.getKey(), value);
             }
         }

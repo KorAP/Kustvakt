@@ -74,8 +74,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                     "token type not defined or found", "token_type");
 
         TokenContext context = provider.getUserStatus(token);
-        if (!matchStatus(host, useragent, context))
-            provider.removeUserSession(token);
+        //        if (!matchStatus(host, useragent, context))
+        //            provider.removeUserSession(token);
         return context;
     }
 
@@ -127,7 +127,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
      * @throws KustvaktException
      */
     public User authenticate(int type, String username, String password,
-            Map<String, Object> attributes) throws KustvaktException {
+            Map<String, String> attributes) throws KustvaktException {
         User user;
         switch (type) {
             case 1:
@@ -145,7 +145,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     }
 
     @CachePut(value = "users", key = "#user.getUsername()")
-    public TokenContext createTokenContext(User user, Map<String, Object> attr,
+    public TokenContext createTokenContext(User user, Map<String, String> attr,
             String provider_key) throws KustvaktException {
         AuthenticationIface provider = getProvider(provider_key,
                 Attributes.API_AUTHENTICATION);
@@ -156,12 +156,13 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         TokenContext context = provider.createUserSession(user, attr);
         if (context == null)
             throw new KustvaktException(StatusCodes.NOT_SUPPORTED);
-        context.setUserAgent((String) attr.get(Attributes.USER_AGENT));
+        context.setUserAgent(attr.get(Attributes.USER_AGENT));
         context.setHostAddress(Attributes.HOST);
         return context;
     }
 
     //todo: test
+    @Deprecated
     private boolean matchStatus(String host, String useragent,
             TokenContext context) {
         if (host.equals(context.getHostAddress())) {
@@ -171,7 +172,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         return false;
     }
 
-    private User authenticateShib(Map<String, Object> attributes)
+    private User authenticateShib(Map<String, String> attributes)
             throws KustvaktException {
         // todo use persistent id, since eppn is not unique
         String eppn = (String) attributes.get(Attributes.EPPN);
@@ -192,8 +193,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
     //todo: what if attributes null?
     private User authenticate(String username, String password,
-            Map<String, Object> attr) throws KustvaktException {
-        Map<String, Object> attributes = crypto.validateMap(attr);
+            Map<String, String> attr) throws KustvaktException {
+        Map<String, String> attributes = crypto.validateMap(attr);
         String safeUS;
         User unknown;
         // just to make sure that the plain password does not appear anywhere in the logs!
@@ -310,7 +311,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                     null);
 
             if (provider == null) {
-
+                //todo:
+                return;
             }
             provider.removeUserSession(context.getToken());
         }catch (KustvaktException e) {
@@ -455,9 +457,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
      * @throws KustvaktException
      */
     //fixme: remove clientinfo object (not needed), use json representation to get stuff
-    public User createUserAccount(Map<String, Object> attributes,
+    public User createUserAccount(Map<String, String> attributes,
             boolean conf_required) throws KustvaktException {
-        Map<String, Object> safeMap = crypto.validateMap(attributes);
+        Map<String, String> safeMap = crypto.validateMap(attributes);
         if (safeMap.get(Attributes.USERNAME) == null || ((String) safeMap
                 .get(Attributes.USERNAME)).isEmpty())
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
@@ -504,11 +506,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     }
 
     //todo:
-    private ShibUser createShibbUserAccount(Map<String, Object> attributes)
+    private ShibUser createShibbUserAccount(Map<String, String> attributes)
             throws KustvaktException {
         jlog.debug("creating shibboleth user account for user attr: {}",
                 attributes);
-        Map<String, Object> safeMap = crypto.validateMap(attributes);
+        Map<String, String> safeMap = crypto.validateMap(attributes);
 
         //todo eppn non-unique.join with idp or use persistent_id as username identifier
         ShibUser user = User.UserFactory
@@ -517,7 +519,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                         (String) safeMap.get(Attributes.CN));
         user.setAffiliation((String) safeMap.get(Attributes.EDU_AFFIL));
         UserDetails det = UserDetails
-                .newDetailsIterator(new HashMap<String, Object>());
+                .newDetailsIterator(new HashMap<String, String>());
         user.setDetails(det);
         user.setSettings(new UserSettings());
         user.setAccountCreation(TimeUtils.getNow().getMillis());

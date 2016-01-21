@@ -137,7 +137,7 @@ public class OAuthService {
         // json format with scope callback parameter
         // todo: add other scopes as well!
         return Response.ok(JsonUtils.toJSON(Scopes
-                .mapOpenIDConnectScopes(scopes, user.getDetails()))).build();
+                .mapScopes(scopes, user.getDetails()))).build();
     }
 
     @GET
@@ -172,7 +172,7 @@ public class OAuthService {
             @Context SecurityContext context,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
-            MultivaluedMap<String, Object> form)
+            MultivaluedMap<String, String> form)
             throws OAuthSystemException, URISyntaxException {
         // user needs to be authenticated to this service!
         TokenContext c = (TokenContext) context.getUserPrincipal();
@@ -184,7 +184,7 @@ public class OAuthService {
                     new MD5Generator());
             User user;
 
-            Map<String, Object> attr = new HashMap<>();
+            Map<String, String> attr = new HashMap<>();
             attr.put(Attributes.HOST, host);
             attr.put(Attributes.USER_AGENT, agent);
             attr.put(Attributes.USERNAME, c.getUsername());
@@ -436,7 +436,7 @@ public class OAuthService {
                         .entity(res.getBody()).build();
             }
 
-            Map<String, Object> attr = new HashMap<>();
+            Map<String, String> attr = new HashMap<>();
             attr.put(Attributes.HOST, host);
             attr.put(Attributes.USER_AGENT, agent);
             attr.put(Attributes.SCOPES,

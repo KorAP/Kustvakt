@@ -2,6 +2,8 @@
          xsi:noNamespaceSchemaLocation='http://ehcache.org/ehcache.xsd'>
     <defaultCache eternal='true' overflowToDisk='false'/>
     <!--maxBytesLocalHeap="200M"-->
+    <diskStore path="./cache_store"/>
+
     <cache name="documents"
            timeToIdleSeconds="172800"
            eternal='false'
@@ -16,10 +18,19 @@
            overflowToDisk='false'/>
     <cache name='id_tokens'
            timeToIdleSeconds="172800"
-           eternal='false'
+           eternal='true'
+           maxElementsOnDisk="10000000"
            memoryStoreEvictionPolicy="LRU"
            maxEntriesLocalHeap="50"
-           overflowToDisk='false'/>
+           overflowToDisk='true'/>
+    <cache name='id_tokens_inv'
+           timeToIdleSeconds="322800"
+           eternal='true'
+           maxElementsOnDisk="10000000"
+           memoryStoreEvictionPolicy="LRU"
+           maxEntriesLocalHeap="50"
+           overflowToDisk='true'/>
+
     <cache name='auth_codes'
            timeToIdleSeconds="600"
            eternal='false'

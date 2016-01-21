@@ -20,51 +20,52 @@ public class CollectionLoader implements BootupInterface {
 
     @Override
     public void load() throws KustvaktException {
-        int uid = (Integer) KustvaktConfiguration.KUSTVAKT_USER
-                .get(Attributes.ID);
+        if (BeanConfiguration.hasContext()) {
+            CollectionDao dao = new CollectionDao(
+                    BeanConfiguration.getBeans().getPersistenceClient());
 
-        User user = User.UserFactory
-                .toUser(KustvaktConfiguration.KUSTVAKT_USER);
+            int uid = Integer.valueOf(
+                    KustvaktConfiguration.KUSTVAKT_USER.get(Attributes.ID));
 
-        //todo: load default collections!
-        CollectionQueryBuilder3 bui = new CollectionQueryBuilder3();
-        bui.addQuery("creationDate since 1775");
+            User user = User.UserFactory
+                    .toUser(KustvaktConfiguration.KUSTVAKT_USER);
 
-        VirtualCollection c1 = ResourceFactory
-                .createCollection("Weimarer Werke", bui.toJSON(), uid);
-        c1.setDescription("Goethe-Werke in Weimar (seit 1775)");
+            //todo: load default collections!
+            CollectionQueryBuilder3 bui = new CollectionQueryBuilder3();
+            bui.addQuery("creationDate since 1775");
 
-        bui = new CollectionQueryBuilder3();
-        bui.addQuery("textType = Aphorismus");
+            VirtualCollection c1 = ResourceFactory
+                    .createCollection("Weimarer Werke", bui.toJSON(), uid);
+            c1.setDescription("Goethe-Werke in Weimar (seit 1775)");
 
-        VirtualCollection c2 = ResourceFactory
-                .createCollection("Aphorismen", bui.toJSON(), uid);
-        c2.setDescription("Aphorismentexte Goethes");
+            bui = new CollectionQueryBuilder3();
+            bui.addQuery("textType = Aphorismus");
 
-        bui = new CollectionQueryBuilder3();
-        bui.addQuery("title ~ \"Werther\"");
+            VirtualCollection c2 = ResourceFactory
+                    .createCollection("Aphorismen", bui.toJSON(), uid);
+            c2.setDescription("Aphorismentexte Goethes");
 
-        VirtualCollection c3 = ResourceFactory
-                .createCollection("Werther", bui.toJSON(), uid);
-        c3.setDescription("Goethe - Die Leiden des jungen Werther");
+            bui = new CollectionQueryBuilder3();
+            bui.addQuery("title ~ \"Werther\"");
 
-        CollectionDao dao = new CollectionDao(
-                BeanConfiguration.getBeans().getPersistenceClient());
+            VirtualCollection c3 = ResourceFactory
+                    .createCollection("Werther", bui.toJSON(), uid);
+            c3.setDescription("Goethe - Die Leiden des jungen Werther");
 
-        dao.storeResource(c1, user);
-        dao.storeResource(c2, user);
-        dao.storeResource(c3, user);
+            dao.storeResource(c1, user);
+            dao.storeResource(c2, user);
+            dao.storeResource(c3, user);
 
-        PolicyBuilder b = new PolicyBuilder(user);
-        b.setPermissions(Permissions.PERMISSIONS.ALL);
-        b.setResources(c1, c2, c3);
-        b.setConditions("public");
-        b.create();
-
+            PolicyBuilder b = new PolicyBuilder(user);
+            b.setPermissions(Permissions.PERMISSIONS.ALL);
+            b.setResources(c1, c2, c3);
+            b.setConditions("public");
+            b.create();
+        }
     }
 
     @Override
     public int position() {
-        return 1;
+        return -1;
     }
 }

@@ -76,7 +76,7 @@ public class UserPropertyReader extends PropertyReader {
             user.setPassword(pass);
         }else {
             user = User.UserFactory.getUser(username);
-            Map<String, Object> vals = new HashMap<>();
+            Map<String, String> vals = new HashMap<>();
             for (Map.Entry e : p.entrySet()) {
                 String key = e.getKey().toString().split("\\.", 2)[1];
                 vals.put(key, e.getValue().toString());

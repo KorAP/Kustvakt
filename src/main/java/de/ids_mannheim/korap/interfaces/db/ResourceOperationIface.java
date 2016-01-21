@@ -41,4 +41,6 @@ public interface ResourceOperationIface<T extends KustvaktResource> {
 
     int deleteAll() throws KustvaktException;
 
+    int size() throws KustvaktException;
+
 }

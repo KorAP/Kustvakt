@@ -12,7 +12,6 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.*;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.KustvaktServer;
@@ -23,6 +22,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -37,10 +37,9 @@ import java.util.*;
 @ResourceFilters({ PiwikFilter.class })
 public class UserService {
 
-    private static Logger error = KustvaktLogger
-            .getLogger(KustvaktLogger.ERROR_LOG);
-    private static Logger jlog = KustvaktLogger
-            .getLogger(KustvaktLogger.SECURITY_LOG);
+    private static Logger jlog = LoggerFactory.getLogger(UserService.class);
+    //    private static Logger jlog = KustvaktLogger
+    //            .getLogger(KustvaktLogger.SECURITY_LOG);
     private AuthenticationManagerIface controller;
 
     private
@@ -60,8 +59,8 @@ public class UserService {
     public Response signUp(
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
-            @Context Locale locale, MultivaluedMap form_values) {
-        Map<String, Object> wrapper = FormRequestWrapper
+            @Context Locale locale, MultivaluedMap<String, String> form_values) {
+        Map<String, String> wrapper = FormRequestWrapper
                 .toMap(form_values, true);
 
         wrapper.put(Attributes.HOST, host);
@@ -183,7 +182,7 @@ public class UserService {
             builder.append(Attributes.QUERY_PARAM_USER).append("=")
                     .append(username);
         }catch (KustvaktException e) {
-            error.error("Eoxception encountered!", e);
+            jlog.error("Eoxception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
 
@@ -204,7 +203,7 @@ public class UserService {
         try {
             controller.resetPassword(uri, username, passphrase);
         }catch (KustvaktException e) {
-            error.error("Exception encountered!", e);
+            jlog.error("Exception encountered!", e);
             return Response.notModified().build();
         }
         return Response.ok().build();
@@ -228,10 +227,8 @@ public class UserService {
         }catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
-        Map m = Scopes.mapOpenIDConnectScopes(scopes, user.getDetails());
-        m.put("scopes", scopes);
-
-        return Response.ok(JsonUtils.toJSON(m)).build();
+        Scopes m = Scopes.mapScopes(scopes, user.getDetails());
+        return Response.ok(m.toEntity()).build();
     }
 
     @GET
@@ -247,7 +244,7 @@ public class UserService {
             controller.getUserSettings(user);
 
         }catch (KustvaktException e) {
-            error.error("Exception encountered!", e);
+            jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok(JsonUtils.toJSON(user.getSettings().toObjectMap()))
@@ -261,9 +258,9 @@ public class UserService {
     @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
             PiwikFilter.class })
     public Response updateSettings(@Context SecurityContext context,
-            @Context Locale locale, MultivaluedMap<String, Object> form) {
+            @Context Locale locale, MultivaluedMap<String, String> form) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        Map<String, Object> settings = FormRequestWrapper.toMap(form, false);
+        Map<String, String> settings = FormRequestWrapper.toMap(form, false);
 
         try {
             User user = controller.getUser(ctx.getUsername());
@@ -274,12 +271,13 @@ public class UserService {
             //            SecurityManager.findbyId(us.getDefaultLemmafoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultPOSfoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultRelfoundry(), user, Foundry.class);
-            us.updateObjectSettings(settings);
+            us.updateStringSettings(settings);
+
             controller.updateUserSettings(user, us);
             if (user.isDemo())
                 return Response.notModified().build();
         }catch (KustvaktException e) {
-            error.error("Exception encountered!", e);
+            jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
 
@@ -298,7 +296,7 @@ public class UserService {
             user = controller.getUser(ctx.getUsername());
             controller.getUserDetails(user);
         }catch (KustvaktException e) {
-            error.error("Exception encountered!", e);
+            jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
 
@@ -314,7 +312,7 @@ public class UserService {
             @Context Locale locale, MultivaluedMap form) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
 
-        Map<String, Object> wrapper = FormRequestWrapper.toMap(form, true);
+        Map<String, String> wrapper = FormRequestWrapper.toMap(form, true);
 
         try {
             User user = controller.getUser(ctx.getUsername());
@@ -324,7 +322,7 @@ public class UserService {
             if (user.isDemo())
                 return Response.notModified().build();
         }catch (KustvaktException e) {
-            error.error("Exception encountered!", e);
+            jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
 
@@ -379,7 +377,7 @@ public class UserService {
             //                        resources.toArray(new UserQuery[resources.size()]));
             //            }
         }catch (KustvaktException e) {
-            error.error("Exception encountered!", e);
+            jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok(JsonUtils.toJSON(add)).build();
@@ -396,7 +394,7 @@ public class UserService {
                 return Response.notModified().build();
             controller.deleteAccount(user);
         }catch (KustvaktException e) {
-            error.error("Exception encountered!", e);
+            jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
@@ -418,7 +416,7 @@ public class UserService {
             //todo:
             queryStr = "";
         }catch (KustvaktException e) {
-            error.error("Exception encountered!", e);
+            jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok(queryStr).build();

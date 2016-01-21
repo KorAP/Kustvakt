@@ -48,6 +48,8 @@ public class SqlBuilder {
     }
 
     public SqlBuilder params(String... values) {
+        if (values.length != fields.length)
+            return this;
         if (this.buffer.lastIndexOf("INSERT INTO") != -1) {
             this.buffer.append(" (");
             for (int i = 0; i < this.fields.length; i++) {

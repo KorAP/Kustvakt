@@ -41,28 +41,25 @@ public class JWTSigner {
         this(secret, new URL(issuer), 72 * 60 * 60);
     }
 
-    public SignedJWT createJWT(User user, Map<String, Object> attr) {
+    public SignedJWT createJWT(User user, Map<String, String> attr) {
         return signContent(user, attr, defaultttl);
     }
 
-    public SignedJWT signContent(User user, Map<String, Object> attr, int ttl) {
+    public SignedJWT signContent(User user, Map<String, String> attr, int ttl) {
         String scopes;
 
         JWTClaimsSet cs = new JWTClaimsSet();
         cs.setIssuerClaim(this.issuer.toString());
 
-        if ((scopes = (String) attr.get(Attributes.SCOPES)) != null) {
-            Map<String, Object> claims = Scopes
-                    .mapOpenIDConnectScopes(scopes, user.getDetails());
-            cs.setCustomClaims(claims);
-            cs.setCustomClaim(Attributes.SCOPES,
-                    ((String) attr.get(Attributes.SCOPES)).toLowerCase());
+        if ((scopes = attr.get(Attributes.SCOPES)) != null) {
+            Scopes claims = Scopes.mapScopes(scopes, user.getDetails());
+            cs.setCustomClaims(claims.toMap());
         }
 
         cs.setSubjectClaim(user.getUsername());
         if (attr.get(Attributes.CLIENT_ID) != null)
             cs.setAudienceClaim(
-                    new String[] { (String) attr.get(Attributes.CLIENT_ID) });
+                    new String[] { attr.get(Attributes.CLIENT_ID) });
         cs.setExpirationTimeClaim(
                 TimeUtils.getNow().plusSeconds(ttl).getMillis());
         SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256),
@@ -163,7 +160,7 @@ public class JWTSigner {
         c.setExpirationTime(
                 signedJWT.getJWTClaimsSet().getExpirationTimeClaim());
         c.setToken(idtoken);
-        c.setParameters(signedJWT.getJWTClaimsSet().getCustomClaims());
+        c.addParams(signedJWT.getJWTClaimsSet().getCustomClaims());
         return c;
     }
 
