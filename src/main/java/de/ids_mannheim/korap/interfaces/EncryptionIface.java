@@ -64,17 +64,12 @@ public interface EncryptionIface {
 
     public String encodeBase();
 
-    public String validateIPAddress(String ipaddress) throws KustvaktException;
+    public Map validateMap(Map map) throws KustvaktException;
 
-    public String validateEmail(String email) throws KustvaktException;
-
-    public Map<String, String> validateMap(Map<String, String> map)
+    public String validateEntry(String input, String type)
             throws KustvaktException;
 
-    public String validateString(String input) throws KustvaktException;
 
-    public void validate(Object instance) throws KustvaktException;
-
-    public String validatePassphrase(String pw) throws KustvaktException;
+//    public void validate(Object instance) throws KustvaktException;
 
 }

@@ -19,6 +19,16 @@ import java.util.Map;
 @Setter
 public class UserSettings {
 
+    // todo: use simple map for settings, not all the parameter
+    //todo: --> use sqlbuilder to update settings
+
+
+    private Map<String, Object> values;
+    // those are the only important parameters!!
+//    private Integer id;
+//    private Integer userID;
+
+
     private Integer id;
     private Integer userID;
     private String fileNameForExport;
@@ -65,6 +75,7 @@ public class UserSettings {
         setupDefaultSettings();
     }
 
+    @Deprecated
     public static UserSettings fromObjectMap(Map<String, Object> m) {
         UserSettings s = new UserSettings();
         s.setFileNameForExport((String) m.get(Attributes.FILENAME_FOR_EXPORT));
@@ -108,6 +119,7 @@ public class UserSettings {
         return s;
     }
 
+    @Deprecated
     public static UserSettings fromMap(Map<String, String> m) {
         UserSettings s = new UserSettings();
         s.setFileNameForExport(m.get(Attributes.FILENAME_FOR_EXPORT));
@@ -195,6 +207,7 @@ public class UserSettings {
         return s;
     }
 
+    @Deprecated
     public void updateStringSettings(Map<String, String> m) {
         if (m.get(Attributes.FILENAME_FOR_EXPORT) != null)
             this.setFileNameForExport(m.get(Attributes.FILENAME_FOR_EXPORT));
@@ -255,6 +268,7 @@ public class UserSettings {
             this.setDefaultRelfoundry(m.get(Attributes.DEFAULT_REL_FOUNDRY));
     }
 
+    @Deprecated
     public void updateObjectSettings(Map<String, Object> m) {
         if (m.get(Attributes.FILENAME_FOR_EXPORT) != null)
             this.setFileNameForExport(

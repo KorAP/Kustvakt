@@ -59,7 +59,8 @@ public class UserService {
     public Response signUp(
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
-            @Context Locale locale, MultivaluedMap<String, String> form_values) {
+            @Context Locale locale,
+            MultivaluedMap<String, String> form_values) {
         Map<String, String> wrapper = FormRequestWrapper
                 .toMap(form_values, true);
 
@@ -103,7 +104,7 @@ public class UserService {
 
     }
 
-    //todo: password update in special function?
+    //todo: password update in special function? --> password reset only!
     @POST
     @Path("update")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -120,7 +121,7 @@ public class UserService {
             //            user = controller
             //                    .checkPasswordAllowance(ident, values.getPassword(),
             //                            node.path("new_password").asText());
-            controller.updateAccount(user);
+            //            controller.updateAccount(user);
         }catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
@@ -247,8 +248,10 @@ public class UserService {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
-        return Response.ok(JsonUtils.toJSON(user.getSettings().toObjectMap()))
-                .build();
+
+        Map m = user.getSettings().toObjectMap();
+        m.put(Attributes.USERNAME, ctx.getUsername());
+        return Response.ok(JsonUtils.toJSON(m)).build();
     }
 
     // todo: test
@@ -300,7 +303,9 @@ public class UserService {
             throw KustvaktResponseHandler.throwit(e);
         }
 
-        return Response.ok(JsonUtils.toJSON(user.getDetails().toMap())).build();
+        Map m = user.getDetails().toMap();
+        m.put(Attributes.USERNAME, ctx.getUsername());
+        return Response.ok(JsonUtils.toJSON(m)).build();
     }
 
     @POST

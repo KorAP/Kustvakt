@@ -4,7 +4,9 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.web.utils.KustvaktMap;
 import edu.emory.mathcs.backport.java.util.Collections;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
@@ -25,6 +27,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class KustvaktEncryption implements EncryptionIface {
@@ -278,37 +281,46 @@ public class KustvaktEncryption implements EncryptionIface {
         return null;
     }
 
+    // todo: where applied?
     @Override
-    public Map<String, String> validateMap(Map<String, String> map)
-            throws KustvaktException {
-        Map<String, String> safeMap = new HashMap<>();
-        if (map != null) {
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                //                String value = null;
-                //                if (entry.getValue() instanceof String) {
-                String value = validateString(entry.getValue());
+    public Map validateMap(Map map) throws KustvaktException {
+        Map<String, Object> safeMap = new HashMap<>();
+        KustvaktMap kmap = new KustvaktMap(map);
 
-                //                }else if (entry.getValue() instanceof List) {
-                //                    List list = (List) entry.getValue();
-                //                    for (Object v : list) {
-                //                        if (v instanceof String)
-                //                            validateString((String) v);
-                //                    }
-                //
-                //                    if (((List) entry.getValue()).size() == 1)
-                //                        value = list.get(0);
-                //                    else
-                //                        value = list;
-                //                }
-                safeMap.put(entry.getKey(), value);
+        if (map != null) {
+            if (!kmap.isGeneric()) {
+                for (String key : kmap.keySet()) {
+                    String value = validateEntry(kmap.get(key), key);
+                    safeMap.put(key, value);
+                }
+            }else {
+                for (String key : kmap.keySet()) {
+                    Object value = kmap.getRaw(key);
+                    if (value instanceof String) {
+                        value = validateEntry((String) value, key);
+
+                    }else if (value instanceof List) {
+                        List list = (List) value;
+                        for (Object v : list) {
+                            if (v instanceof String)
+                                validateEntry((String) v, key);
+                        }
+
+                        if (list.size() == 1)
+                            value = list.get(0);
+                        else
+                            value = list;
+                    }
+                    safeMap.put(key, value);
+                }
             }
         }
         return safeMap;
     }
 
+    @Deprecated
     private String validateString(String descr, String input, String type,
             int length, boolean nullable) throws KustvaktException {
-        jlog.debug("validating string entry '{}'", input);
         String s;
         try {
             s = validator.getValidInput(descr, input, type, length, nullable);
@@ -323,29 +335,49 @@ public class KustvaktEncryption implements EncryptionIface {
     }
 
     @Override
-    public String validateString(String input) throws KustvaktException {
-        if (input.contains("@")) {
-            return validateEmail(input);
-        }else
-            return validateString("Safe String", input, "SafeString",
+    public String validateEntry(String input, String type)
+            throws KustvaktException {
+        try {
+            if (type != null) {
+                type = type.toLowerCase();
+                if (type.equals(Attributes.EMAIL)) {
+                    jlog.debug("validating email entry '{}'", input.hashCode());
+                    return validator.getValidInput("Email", input, "email",
+                            config.getValidationEmaillength(), false);
+                }else if (type.equals(Attributes.USERNAME)) {
+                    jlog.debug("validating username entry '{}'",
+                            input.hashCode());
+                    return validator
+                            .getValidInput("Username", input, "username",
+                                    config.getValidationEmaillength(), false);
+                }else if (type.equals(Attributes.IP_RANG)) {
+                    jlog.debug("validating ip address entry '{}'",
+                            input.hashCode());
+                    return validator
+                            .getValidInput("IP Address", input, "ipaddress",
+                                    config.getValidationStringLength(),
+                                    nullable);
+                }else if (type.equals(Attributes.PASSWORD)) {
+                    jlog.debug("validating password entry '{}'",
+                            input.hashCode());
+                    return validator
+                            .getValidInput("Password", input, "password",
+                                    config.getValidationStringLength(),
+                                    nullable);
+                }
+            }
+            jlog.debug("validating string entry '{}'", input.hashCode());
+            return validator.getValidInput("Safe String", input, "SafeString",
                     config.getValidationStringLength(), nullable);
+        }catch (ValidationException ex) {
+            jlog.error("Validation failed! Value '{}' with type '{}'",
+                    new Object[] { input, type, ex.getMessage() });
+            throw new KustvaktException(StatusCodes.PARAMETER_VALIDATION_ERROR,
+                    "invalid value of type " + type, input);
+        }
     }
 
-    @Override
-    public String validateEmail(String email) throws KustvaktException {
-        jlog.debug("validating email entry '{}'", email);
-        return validateString("Email", email, "Email",
-                config.getValidationEmaillength(), nullable);
-    }
 
-    @Override
-    public String validateIPAddress(String ipaddress) throws KustvaktException {
-        jlog.debug("validating IP address entry '{}'", ipaddress);
-        return validateString("IP Address", ipaddress, "IPAddress",
-                config.getValidationStringLength(), nullable);
-    }
-
-    @Override
     public void validate(Object instance) throws KustvaktException {
         if (instance == null)
             return;
@@ -362,26 +394,9 @@ public class KustvaktEncryption implements EncryptionIface {
         }
     }
 
-    //fixme: fix validation algorithm
-    @Override
-    public String validatePassphrase(String pw) throws KustvaktException {
-        String safe_string = validateString(pw);
-        return safe_string;
-        //        String pw_conf;
-        //        try {
-        //            pw_conf = validator
-        //                    .getValidInput("User Password", safe_string, "Password", 20,
-        //                            false);
-        //        }catch (ValidationException e) {
-        //            jlog.error("password value did not validate", e.getMessage());
-        //            throw new KustvaktException(StatusCodes.PARAMETER_VALIDATION_ERROR,
-        //                    "password did not validate", "password");
-        //        }
-        //        return pw_conf;
-    }
-
     //FIXME: currently all sets are skipped during validation (since users should not be allowed to edit those sets anyway,
     //I think we will be safe here
+    @Deprecated
     private void validateStringField(Field[] fields, Object instance)
             throws KustvaktException, IllegalAccessException {
         for (Field field : fields) {

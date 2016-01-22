@@ -26,10 +26,10 @@ import java.util.*;
 @Getter
 public class KustvaktConfiguration {
 
-    public static final Map<String, String> KUSTVAKT_USER = new HashMap<>();
+    public static final Map<String, Object> KUSTVAKT_USER = new HashMap<>();
 
     static {
-        KUSTVAKT_USER.put(Attributes.ID, "1");
+        KUSTVAKT_USER.put(Attributes.ID, 1);
         KUSTVAKT_USER.put(Attributes.USERNAME, "kustvakt");
         KUSTVAKT_USER.put(Attributes.PASSWORD, "kustvakt2015");
         KUSTVAKT_USER.put(Attributes.EMAIL, "kustvakt@ids-mannheim.de");

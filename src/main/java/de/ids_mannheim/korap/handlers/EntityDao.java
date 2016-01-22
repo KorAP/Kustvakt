@@ -176,7 +176,6 @@ public class EntityDao implements EntityHandlerIface {
                     e);
             throw new dbException(userid, "userDetails",
                     StatusCodes.DB_GET_FAILED, userid.toString());
-            //            throw new KorAPException(e, StatusCodes.CONNECTION_ERROR);
         }
     }
 
@@ -196,7 +195,6 @@ public class EntityDao implements EntityHandlerIface {
         }catch (DataAccessException e) {
             jlog.error("Could not retrieve user details for user: " + details
                     .getUserID(), e);
-            //            throw new KorAPException(e, StatusCodes.CONNECTION_ERROR);
             throw new dbException(details.getUserID(), "userDetails",
                     StatusCodes.DB_UPDATE_FAILED, details.toString());
         }

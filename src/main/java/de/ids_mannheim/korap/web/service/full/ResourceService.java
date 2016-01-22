@@ -652,7 +652,7 @@ public class ResourceService {
         id = StringUtils.decodeHTML(id);
 
         Class sl = ResourceFactory.getResourceClass(type);
-        if (!sl.equals(VirtualCollection.class) & !sl.equals(Corpus.class))
+        if (!VirtualCollection.class.equals(sl) & !Corpus.class.equals(sl))
             throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     "Requested Resource type not supported", type);
 
@@ -675,10 +675,9 @@ public class ResourceService {
             }
 
             // rewrite process
-            String qstr = this.processor.preProcess(query.toJSON(), user);
+            String qstr = processor.preProcess(query.toJSON(), user);
             return Response.ok(searchKrill.getStatistics(qstr)).build();
         }catch (KustvaktException e) {
-            e.printStackTrace();
             throw KustvaktResponseHandler.throwit(e);
         }
     }

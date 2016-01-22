@@ -24,8 +24,8 @@ public class CollectionLoader implements BootupInterface {
             CollectionDao dao = new CollectionDao(
                     BeanConfiguration.getBeans().getPersistenceClient());
 
-            int uid = Integer.valueOf(
-                    KustvaktConfiguration.KUSTVAKT_USER.get(Attributes.ID));
+            int uid = (Integer) KustvaktConfiguration.KUSTVAKT_USER
+                    .get(Attributes.ID);
 
             User user = User.UserFactory
                     .toUser(KustvaktConfiguration.KUSTVAKT_USER);
@@ -51,10 +51,6 @@ public class CollectionLoader implements BootupInterface {
             VirtualCollection c3 = ResourceFactory
                     .createCollection("Werther", bui.toJSON(), uid);
             c3.setDescription("Goethe - Die Leiden des jungen Werther");
-
-            dao.storeResource(c1, user);
-            dao.storeResource(c2, user);
-            dao.storeResource(c3, user);
 
             PolicyBuilder b = new PolicyBuilder(user);
             b.setPermissions(Permissions.PERMISSIONS.ALL);

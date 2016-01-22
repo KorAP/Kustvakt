@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.config.ParamFields;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
+import de.ids_mannheim.korap.web.utils.KustvaktMap;
 import lombok.Data;
 import org.joda.time.DateTime;
 
@@ -180,30 +181,31 @@ public abstract class User implements Serializable {
             return u;
         }
 
-        public static User toUser(Map map) {
+        public static User toUser(Map<String, Object> map) {
+            KustvaktMap kmap = new KustvaktMap(map);
             int type = map.get(Attributes.TYPE) == null ?
                     0 :
-                    (int) map.get(Attributes.TYPE);
+                    (Integer) kmap.get(Attributes.TYPE, Integer.class);
             User user;
             long created = -1;
             if (map.get(Attributes.ACCOUNT_CREATION) != null)
-                created = DateTime
-                        .parse((String) map.get(Attributes.ACCOUNT_CREATION))
+                created = DateTime.parse(kmap.get(Attributes.ACCOUNT_CREATION))
                         .getMillis();
             switch (type) {
                 case 0:
-                    user = UserFactory
-                            .getUser((String) map.get(Attributes.USERNAME));
-                    user.setId((Integer) map.get(Attributes.ID));
+                    user = UserFactory.getUser(kmap.get(Attributes.USERNAME));
+                    user.setId(
+                            (Integer) kmap.get(Attributes.ID, Integer.class));
                     user.setAccountLocked(
                             map.get(Attributes.ACCOUNTLOCK) == null ?
                                     false :
-                                    (Boolean) map.get(Attributes.ACCOUNTLOCK));
+                                    (Boolean) kmap.get(Attributes.ACCOUNTLOCK,
+                                            Boolean.class));
                     user.setAccountCreation(created);
                     break;
                 default:
-                    user = UserFactory
-                            .getDemoUser((Integer) map.get(Attributes.ID));
+                    user = UserFactory.getDemoUser(
+                            (Integer) kmap.get(Attributes.ID, Integer.class));
                     user.setAccountCreation(created);
             }
             return user;

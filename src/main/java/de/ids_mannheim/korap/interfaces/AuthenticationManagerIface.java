@@ -54,10 +54,10 @@ public abstract class AuthenticationManagerIface {
 
     public abstract void lockAccount(User user) throws KustvaktException;
 
-    public abstract User createUserAccount(Map<String, String> attributes,
-            boolean conf_required) throws KustvaktException;
+    public abstract User createUserAccount(Map attributes,
+            boolean confirmation_required) throws KustvaktException;
 
-    public abstract boolean updateAccount(User user) throws KustvaktException;
+//    public abstract boolean updateAccount(User user) throws KustvaktException;
 
     public abstract boolean deleteAccount(User user) throws KustvaktException;
 

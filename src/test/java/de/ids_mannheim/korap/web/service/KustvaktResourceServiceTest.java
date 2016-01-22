@@ -23,7 +23,6 @@ public class KustvaktResourceServiceTest extends FastJerseyTest {
         setPackages("de.ids_mannheim.korap.web.service.full",
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");
-
         TestHelper.runBootInterfaces();
     }
 
@@ -70,12 +69,15 @@ public class KustvaktResourceServiceTest extends FastJerseyTest {
 
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         assert node != null;
+        System.out.println("JSON NODE RESULT " + node);
         String id = node.path(0).path("id").asText();
 
         response = resource().path(getAPIVersion()).path("collection").path(id)
                 .path("stats").header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
+        System.out.println("----------------------------- testStats 2");
+        System.out.println(response.getEntity(String.class));
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
         node = JsonUtils.readTree(response.getEntity(String.class));
         assert node != null;

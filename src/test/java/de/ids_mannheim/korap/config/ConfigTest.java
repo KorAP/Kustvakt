@@ -4,6 +4,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.CollectionDao;
 import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.security.ac.ResourceFinder;
+import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.ServiceVersion;
 import de.ids_mannheim.korap.utils.TimeUtils;
@@ -82,7 +83,8 @@ public class ConfigTest {
                         .getResourceAsStream("kustvakt.conf"));
 
         String v = "testmail_&234@ids-mannheim.de";
-        BeanConfiguration.getBeans().getEncryption().validateEmail(v);
+        BeanConfiguration.getBeans().getEncryption()
+                .validateEntry(v, Attributes.EMAIL);
     }
 }
 

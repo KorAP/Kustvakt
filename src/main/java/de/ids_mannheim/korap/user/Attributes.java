@@ -41,6 +41,7 @@ public class Attributes {
     public static final String EMAIL = "email";
     public static final String ADDRESS = "address";
     public static final String COUNTRY = "country";
+    public static final String IPADDRESS = "ipaddress";
     // deprcated, use created
     public static final String ACCOUNT_CREATION = "account_creation";
     public static final String ACCOUNTLOCK = "account_lock";

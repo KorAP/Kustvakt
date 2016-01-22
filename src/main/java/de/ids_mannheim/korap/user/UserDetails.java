@@ -12,6 +12,7 @@ import java.util.Map;
  * Time: 10:32 AM
  */
 
+// todo: set certain fields required!
 @Data
 public class UserDetails {
 
@@ -26,6 +27,7 @@ public class UserDetails {
     private String email;
     private String address;
     private String country;
+    @Deprecated
     private boolean privateUsage;
 
     public UserDetails() {

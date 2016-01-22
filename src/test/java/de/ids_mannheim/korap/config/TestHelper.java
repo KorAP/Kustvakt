@@ -41,6 +41,9 @@ public class TestHelper {
                         .createUserAccount(m, false);
             }catch (KustvaktException e) {
                 // do nothing
+                System.out.println("THE EXCEPTION...");
+                e.printStackTrace();
+                Assert.assertNull("Test user could not be set up", true);
                 return false;
             }
         }
@@ -90,7 +93,6 @@ public class TestHelper {
         return Arrays.copyOf(credentials, 2);
     }
 
-
     public static void runBootInterfaces() {
         Set<Class<? extends BootupInterface>> set = KustvaktClassLoader
                 .loadSubTypes(BootupInterface.class);
@@ -122,8 +124,6 @@ public class TestHelper {
             }
         }
     }
-
-
 
     private TestHelper() {
     }

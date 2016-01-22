@@ -47,7 +47,6 @@ public class StatusCodes {
     public static final Integer CLIENT_REMOVAL_FAILURE = 215;
     public static final Integer CLIENT_AUTHORIZATION_FAILURE = 216;
 
-
     /**
      * 500 status codes for access control related components (also policy rewrite)
      */
@@ -66,6 +65,7 @@ public class StatusCodes {
     public static final Integer MISSING_POLICY_TARGET = 412;
     public static final Integer MISSING_POLICY_CONDITIONS = 413;
     public static final Integer MISSING_POLICY_PERMISSION = 414;
+    public static final Integer RESOURCE_NOT_FOUND = 415;
 
     // todo: extend according to policy rewrite possible!
     // policy errors

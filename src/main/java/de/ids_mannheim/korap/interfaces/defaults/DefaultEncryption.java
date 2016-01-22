@@ -86,33 +86,14 @@ public class DefaultEncryption implements EncryptionIface {
     }
 
     @Override
-    public String validateIPAddress(String ipaddress) throws KustvaktException {
+    public Map validateMap(Map map) throws KustvaktException {
         return null;
     }
 
     @Override
-    public String validateEmail(String email) throws KustvaktException {
-        return null;
-    }
-
-    @Override
-    public Map<String, String> validateMap(Map<String, String> map)
+    public String validateEntry(String input, String type)
             throws KustvaktException {
-        return null;
+        return input;
     }
 
-    @Override
-    public String validateString(String input) throws KustvaktException {
-        return null;
-    }
-
-    @Override
-    public void validate(Object instance) throws KustvaktException {
-
-    }
-
-    @Override
-    public String validatePassphrase(String pw) throws KustvaktException {
-        return null;
-    }
 }

@@ -1,7 +1,6 @@
 package de.ids_mannheim.korap.security.auth;
 
 import de.ids_mannheim.korap.auditing.AuditRecord;
-import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.exceptions.*;
@@ -13,6 +12,7 @@ import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.user.*;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
+import de.ids_mannheim.korap.web.utils.KustvaktMap;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -40,6 +40,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     private EncryptionIface crypto;
     private EntityHandlerIface entHandler;
     private AuditingIface auditing;
+    private KustvaktConfiguration config;
     private final LoginCounter counter;
     private Cache user_cache;
 
@@ -47,6 +48,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             EncryptionIface crypto, KustvaktConfiguration config,
             AuditingIface auditer) {
         this.entHandler = userdb;
+        this.config = config;
         this.crypto = crypto;
         this.auditing = auditer;
         this.counter = new LoginCounter(config);
@@ -181,7 +183,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             throw new KustvaktException(StatusCodes.REQUEST_INVALID);
 
         if (!attributes.containsKey(Attributes.EMAIL)
-                && crypto.validateEmail(eppn) != null)
+                && crypto.validateEntry(eppn, Attributes.EMAIL) != null)
             attributes.put(Attributes.EMAIL, eppn);
 
         // fixme?!
@@ -200,7 +202,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         // just to make sure that the plain password does not appear anywhere in the logs!
 
         try {
-            safeUS = crypto.validateString(username);
+            safeUS = crypto.validateEntry(username, Attributes.USERNAME);
         }catch (KustvaktException e) {
             throw new WrappedException(e, StatusCodes.LOGIN_FAILED, username);
         }
@@ -223,8 +225,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                         attributes.toString());
             }
         }
-        jlog.trace("Authentication: found user under name " + unknown
-                .getUsername());
+        jlog.trace("Authentication: found username " + unknown.getUsername());
         if (unknown instanceof KorAPUser) {
             if (password == null || password.isEmpty())
                 throw new WrappedException(
@@ -387,8 +388,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         String safeUser, safePass;
 
         try {
-            safeUser = crypto.validateString(username);
-            safePass = crypto.validatePassphrase(newPassphrase);
+            safeUser = crypto.validateEntry(username, Attributes.USERNAME);
+            safePass = crypto.validateEntry(newPassphrase, Attributes.PASSWORD);
         }catch (KustvaktException e) {
             jlog.error("Error", e);
             throw new WrappedException(new KustvaktException(username,
@@ -422,7 +423,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             throws KustvaktException {
         String safeUser;
         try {
-            safeUser = crypto.validateString(username);
+            safeUser = crypto.validateEntry(username, Attributes.USERNAME);
         }catch (KustvaktException e) {
             jlog.error("error", e);
             throw new WrappedException(e,
@@ -457,8 +458,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
      * @throws KustvaktException
      */
     //fixme: remove clientinfo object (not needed), use json representation to get stuff
-    public User createUserAccount(Map<String, String> attributes,
-            boolean conf_required) throws KustvaktException {
+    public User createUserAccount(Map attributes, boolean confirmation_required)
+            throws KustvaktException {
+        KustvaktMap kmap = new KustvaktMap(attributes);
+
         Map<String, String> safeMap = crypto.validateMap(attributes);
         if (safeMap.get(Attributes.USERNAME) == null || ((String) safeMap
                 .get(Attributes.USERNAME)).isEmpty())
@@ -470,8 +473,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                     StatusCodes.ILLEGAL_ARGUMENT, "password must be set",
                     "password");
 
-        String safePass = crypto
-                .validatePassphrase((String) safeMap.get(Attributes.PASSWORD));
+        String username = crypto.validateEntry(safeMap.get(Attributes.USERNAME),
+                Attributes.USERNAME);
+        String safePass = crypto.validateEntry(safeMap.get(Attributes.PASSWORD),
+                Attributes.PASSWORD);
         String hash;
         try {
             hash = crypto.produceSecureHash(safePass);
@@ -480,16 +485,14 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);
         }
 
-        KorAPUser user = User.UserFactory
-                .getUser((String) safeMap.get(Attributes.USERNAME));
+        KorAPUser user = User.UserFactory.getUser(username);
         UserDetails det = UserDetails.newDetailsIterator(safeMap);
         user.setDetails(det);
         user.setSettings(new UserSettings());
-        if (conf_required) {
+        if (confirmation_required) {
             user.setAccountLocked(true);
-            URIParam param = new URIParam(crypto.createToken(), TimeUtils
-                    .plusSeconds(BeanConfiguration.getBeans().getConfiguration()
-                            .getExpiration()).getMillis());
+            URIParam param = new URIParam(crypto.createToken(),
+                    TimeUtils.plusSeconds(config.getExpiration()).getMillis());
             user.addField(param);
         }
         user.setPassword(hash);
@@ -566,7 +569,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         //        }
     }
 
-    @Override
     public boolean updateAccount(User user) throws KustvaktException {
         boolean result;
         String key = cache_key(user.getUsername());
@@ -575,7 +577,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                     StatusCodes.REQUEST_INVALID,
                     "account not updateable for demo user", user.getUsername());
         else {
-            crypto.validate(user);
+            //            crypto.validate(user);
             try {
                 result = entHandler.updateAccount(user) > 0;
             }catch (KustvaktException e) {
@@ -617,7 +619,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     public Object[] validateResetPasswordRequest(String username, String email)
             throws KustvaktException {
         String mail, uritoken;
-        mail = crypto.validateEmail(email);
+        mail = crypto.validateEntry(email, Attributes.EMAIL);
         User ident;
         try {
             ident = entHandler.getAccount(username);
@@ -660,7 +662,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         if (user instanceof DemoUser)
             return;
         else {
-            crypto.validate(settings);
+            Map map = crypto.validateMap(settings.toObjectMap());
+            settings = UserSettings.fromObjectMap(map);
             try {
                 entHandler.updateSettings(settings);
             }catch (KustvaktException e) {
@@ -676,9 +679,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         if (user instanceof DemoUser)
             return;
         else {
-            crypto.validate(details);
+            Map map = crypto.validateMap(details.toMap());
+
             try {
-                entHandler.updateUserDetails(details);
+                entHandler
+                        .updateUserDetails(UserDetails.newDetailsIterator(map));
             }catch (KustvaktException e) {
                 jlog.error("Error ", e);
                 throw new WrappedException(e,
