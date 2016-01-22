@@ -320,7 +320,7 @@ begin delete from groupolicy_store where name=OLD.group_id; end;
     -- 1. CONCAT(NEW.name,"/")
     -- 2. CONCAT(name_path, NEW.name, "/")
 
-CREATE TRIGGER IF NOT EXISTS insert_data
+CREATE TRIGGER IF NOT EXISTS insert_resource_tree_data
 AFTER INSERT ON resource_store
 FOR EACH ROW BEGIN
 INSERT INTO resource_tree (parent_id, child_id, depth, name_path)
@@ -330,6 +330,7 @@ INSERT INTO resource_tree (parent_id, child_id, depth, name_path)
 SELECT parent_id, NEW.id, depth + 1, name_path || "/" ||  NEW.persistent_id FROM resource_tree
 WHERE child_id = NEW.parent_id;
 END;
+
 
 create trigger if not exists delete_policy after delete on resource_store
 begin delete from policy_store where target_id=OLD.id; end;
