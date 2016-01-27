@@ -657,6 +657,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                 new DateTime(param.getUriExpiration()) };
     }
 
+    @Deprecated
     public void updateUserSettings(User user, UserSettings settings)
             throws KustvaktException {
         if (user instanceof DemoUser)
@@ -674,6 +675,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         }
     }
 
+    @Deprecated
     public void updateUserDetails(User user, UserDetails details)
             throws KustvaktException {
         if (user instanceof DemoUser)
@@ -692,8 +694,26 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         }
     }
 
+    public <T extends Userdata> T getUserData(User user, Class<T> clazz) {
+        UserDataDbIface<T> dao = UserdataFactory.getInstance(clazz);
+        return dao.get(user);
+    }
+
+    //todo: cache userdata outside of the user object!
+    public void updateUserData(User user, Userdata data) {
+        UserDataDbIface dao = UserdataFactory.getInstance(data.getClass());
+        dao.update(data);
+    }
+
+    // todo: use getuserdata for that!
+    @Deprecated
     public UserDetails getUserDetails(User user) throws KustvaktException {
         try {
+            for (Userdata data : user.getUserdata()) {
+                if (data instanceof Userdetails2) {
+
+                }
+            }
             if (user.getDetails() == null)
                 user.setDetails(entHandler.getUserDetails(user.getId()));
         }catch (KustvaktException e) {
@@ -702,6 +722,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         return user.getDetails();
     }
 
+    @Deprecated
     public UserSettings getUserSettings(User user) throws KustvaktException {
         try {
             if (user.getSettings() == null)

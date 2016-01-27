@@ -24,6 +24,11 @@ public class UserDetailsDao implements UserDataDbIface<Userdetails2> {
     }
 
     @Override
+    public Class<Userdetails2> getType() {
+        return Userdetails2.class;
+    }
+
+    @Override
     public int store(Userdetails2 data) {
         String sql = "INSERT INTO user_details2 (user_id, data) VALUES (:userid, :data);";
         MapSqlParameterSource source = new MapSqlParameterSource();

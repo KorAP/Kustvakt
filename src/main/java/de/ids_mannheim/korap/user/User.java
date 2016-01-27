@@ -30,6 +30,8 @@ public abstract class User implements Serializable {
     private UserDetails details;
     private List<UserQuery> queries;
 
+    private List<? extends Userdata> userdata;
+
     protected User() {
         this.fields = new ParamFields();
         this.accountCreation = TimeUtils.getNow().getMillis();
@@ -58,35 +60,38 @@ public abstract class User implements Serializable {
 
     //todo: repair transfer
     public void transfer(User user) {
-        this.setSettings(user.getSettings());
-        this.setDetails(user.getDetails());
+        //        this.setSettings(user.getSettings());
+        //        this.setDetails(user.getDetails());
         //        this.setQueries(user.getQueries());
         if (this instanceof KorAPUser) {
-            this.getSettings().setUserID(this.id);
-            this.getDetails().setUserID(this.id);
+
+            //            this.getSettings().setUserID(this.id);
+            //            this.getDetails().setUserID(this.id);
             //            for (UserQuery q : this.getQueries())
             //                q.setOwner(this.accountID);
         }
     }
 
+    @Deprecated
     public void setDetails(UserDetails details) {
         if (details != null)
             details.setUserID(this.id);
-        this.details = details;
+        //        this.details = details;
     }
 
+    @Deprecated
     public void setSettings(UserSettings settings) {
         if (settings != null)
             settings.setUserID(this.id);
-        this.settings = settings;
+        //        this.settings = settings;
     }
 
     public void setId(Integer id) {
         this.id = id;
-        if (this.settings != null)
-            this.settings.setUserID(this.id);
-        if (this.details != null)
-            this.details.setUserID(this.id);
+        //        if (this.settings != null)
+        //            this.settings.setUserID(this.id);
+        //        if (this.details != null)
+        //            this.details.setUserID(this.id);
     }
 
     public Map<String, Object> toMap() {
@@ -95,13 +100,9 @@ public abstract class User implements Serializable {
         //TimeUtils.format(new DateTime(this.accountCreation))
         map.put(Attributes.ACCOUNT_CREATION, this.accountCreation);
 
-        if (this.getDetails() != null)
-            map.putAll(this.getDetails().toMap());
+        //        if (this.getDetails() != null)
+        //            map.putAll(this.getDetails().toMap());
         return map;
-    }
-
-    public String toJson() {
-        return JsonUtils.toJSON(this.toMap());
     }
 
     public Map toCache() {
