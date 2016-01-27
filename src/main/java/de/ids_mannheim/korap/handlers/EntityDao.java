@@ -67,6 +67,7 @@ public class EntityDao implements EntityHandlerIface {
         }
     }
 
+    //todo: uniqueness constraints on usersettings and details (every user only one entry for data and settings)
     @Override
     public int updateSettings(UserSettings settings) throws KustvaktException {
         final String sql =
