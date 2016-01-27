@@ -27,6 +27,7 @@ public abstract class User implements Serializable {
     private int type;
     private ParamFields fields;
     private UserSettings settings;
+    //todo: remove!
     private UserDetails details;
     private List<UserQuery> queries;
 
