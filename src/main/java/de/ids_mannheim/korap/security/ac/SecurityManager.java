@@ -73,8 +73,8 @@ public class SecurityManager<T extends KustvaktResource> {
     }
 
     @Deprecated
-    public static final void setProvgiders(PolicyHandlerIface policyHandler,
-            EncryptionIface crypto, Collection<ResourceOperationIface> ifaces) {
+    public static final void setProviders(PolicyHandlerIface policyHandler,
+            EncryptionIface crypto, gCollection<ResourceOperationIface> ifaces) {
         SecurityManager.policydao = policyHandler;
         SecurityManager.crypto = crypto;
         SecurityManager.handlers = new HashMap<>();
