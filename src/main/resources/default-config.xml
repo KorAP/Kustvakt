@@ -104,10 +104,10 @@
     </bean>
 
     <!--fixme: change name according to convention -->
-    <bean id="collectionProvider"
-          class="de.ids_mannheim.korap.handlers.CollectionDao">
-        <constructor-arg ref="kustvakt_db"/>
-    </bean>
+    <!--<bean id="collectionProvider"-->
+          <!--class="de.ids_mannheim.korap.handlers.CollectionDao">-->
+        <!--<constructor-arg ref="kustvakt_db"/>-->
+    <!--</bean>-->
 
     <!--fixme: change name according to convention -->
     <bean id="resourceProvider"

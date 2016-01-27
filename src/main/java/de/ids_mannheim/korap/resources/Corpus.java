@@ -14,14 +14,12 @@ import java.util.Map;
 @Setter
 public class Corpus extends KustvaktResource {
 
+    // todo: can be deprecated since resource offers data field here!
+    @Deprecated
     private Map stats;
 
     public Corpus() {
         super();
-    }
-
-    public Corpus(Integer id, long created, int creator) {
-        super(id, creator, created);
     }
 
     public Corpus(Integer id, int creator) {

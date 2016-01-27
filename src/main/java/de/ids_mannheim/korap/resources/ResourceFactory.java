@@ -18,7 +18,7 @@ public class ResourceFactory {
         subTypes.add(FOUNDRY, Foundry.class);
         subTypes.add(LAYER, Layer.class);
         subTypes.add(VIRTUALCOLLECTION, VirtualCollection.class);
-//        subTypes.add(USERQUERY, UserQuery.class);
+        //        subTypes.add(USERQUERY, UserQuery.class);
     }
 
     public static KustvaktResource getResource(
@@ -54,16 +54,15 @@ public class ResourceFactory {
         return null;
     }
 
-
     public static <T extends KustvaktResource> Class<T> getResourceClass(
             String type) {
         for (Class value : subTypes) {
             if (value == VirtualCollection.class && type
                     .equalsIgnoreCase("collection"))
                 return (Class<T>) VirtualCollection.class;
-                    //todo
-//            else if (value == UserQuery.class && type.equalsIgnoreCase("query"))
-//                return (Class<T>) UserQuery.class;
+                //todo
+                //            else if (value == UserQuery.class && type.equalsIgnoreCase("query"))
+                //                return (Class<T>) UserQuery.class;
             else if (value.getSimpleName().equalsIgnoreCase(type.trim())) {
                 return value;
             }
@@ -73,11 +72,9 @@ public class ResourceFactory {
     // all deprecated!
 
     public static VirtualCollection getCachedCollection(String query) {
-        VirtualCollection v = new VirtualCollection();
-        v.setQuery(query);
+        VirtualCollection v = new VirtualCollection(query);
         v.setName("");
         v.setDescription("");
-        v.setPersistentID(v.createID());
         return v;
     }
 
@@ -101,11 +98,11 @@ public class ResourceFactory {
         return v;
     }
 
-    public static VirtualCollection createCollection(String name, String query,
-            long time, Integer owner) {
-        VirtualCollection v = new VirtualCollection(0, owner, time);
+    public static VirtualCollection createCollection(String name,
+            Integer owner) {
+        VirtualCollection v = new VirtualCollection();
+        v.setOwner(owner);
         v.setName(name);
-        v.setQuery(query);
         return v;
     }
 
@@ -120,13 +117,11 @@ public class ResourceFactory {
 
     public static VirtualCollection createContainer(String name,
             String description, String query, Integer owner) {
-        VirtualCollection v = new VirtualCollection();
+        VirtualCollection v = new VirtualCollection(query);
         v.setName(name);
         v.setDescription(description);
-        v.setQuery(query);
         v.setOwner(owner);
         v.setManaged(true);
-        v.setPersistentID(v.createID());
         return v;
     }
 

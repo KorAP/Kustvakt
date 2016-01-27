@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.security.ac;
 
+import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
@@ -32,10 +33,15 @@ public class ResourceFinder {
     }
 
     private static void checkProviders() {
+        if (BeanConfiguration.hasContext() && policydao == null) {
+            ResourceFinder.policydao = BeanConfiguration.getBeans()
+                    .getPolicyDbProvider();
+        }
         if (policydao == null)
             throw new RuntimeException("provider not set!");
     }
 
+    @Deprecated
     public static void setProviders(PolicyHandlerIface policyHandler) {
         ResourceFinder.policydao = policyHandler;
     }

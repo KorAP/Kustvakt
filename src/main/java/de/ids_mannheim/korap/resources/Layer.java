@@ -10,9 +10,6 @@ public class Layer extends KustvaktResource {
         super();
     }
 
-    public Layer(Integer id, int creator, long created) {
-        super(id, creator, created);
-    }
 
     public Layer(Integer id, int creator) {
         super(id, creator);

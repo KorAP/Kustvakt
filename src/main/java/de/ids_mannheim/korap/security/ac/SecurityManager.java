@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.security.ac;
 
+import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.NotAuthorizedException;
@@ -31,13 +32,11 @@ import java.util.*;
 @SuppressWarnings("all")
 public class SecurityManager<T extends KustvaktResource> {
 
-    //    private static final Logger errorLogger = LoggerFactory
-    //            .getLogger(LoggerFactory.ERROR_LOG);
-
     private static final Logger jlog = LoggerFactory
             .getLogger(SecurityManager.class);
 
     private static PolicyHandlerIface policydao;
+    @Deprecated
     private static Map<Class<? extends KustvaktResource>, ResourceOperationIface> handlers;
     private static EncryptionIface crypto;
 
@@ -58,11 +57,23 @@ public class SecurityManager<T extends KustvaktResource> {
     }
 
     private static void checkProviders() {
-        if (policydao == null && crypto == null && handlers == null)
+        if (BeanConfiguration.hasContext() && (policydao == null
+                | crypto == null)) {
+            SecurityManager.policydao = BeanConfiguration.getBeans()
+                    .getPolicyDbProvider();
+            SecurityManager.crypto = BeanConfiguration.getBeans()
+                    .getEncryption();
+            SecurityManager.handlers = new HashMap<>();
+            ResourceOperationIface rprovider = BeanConfiguration.getBeans()
+                    .getResourceProvider();
+            SecurityManager.handlers.put(rprovider.getType(), rprovider);
+        }
+        if (policydao == null && crypto == null)
             throw new RuntimeException("providers not set!");
     }
 
-    public static final void setProviders(PolicyHandlerIface policyHandler,
+    @Deprecated
+    public static final void setProvgiders(PolicyHandlerIface policyHandler,
             EncryptionIface crypto, Collection<ResourceOperationIface> ifaces) {
         SecurityManager.policydao = policyHandler;
         SecurityManager.crypto = crypto;
@@ -72,6 +83,7 @@ public class SecurityManager<T extends KustvaktResource> {
             handlers.put(iface.getType(), iface);
     }
 
+    @Deprecated
     public static Map<Class<? extends KustvaktResource>, ResourceOperationIface> getHandlers() {
         return handlers;
     }

@@ -1,6 +1,5 @@
 package de.ids_mannheim.korap.resources;
 
-import de.ids_mannheim.korap.utils.JsonUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -11,19 +10,16 @@ import java.util.Map;
 @Setter
 public class VirtualCollection extends KustvaktResource {
 
-    private String query;
+    //    private String query;
     // use ehcache instead and only save persisted values in the database
     //    @Deprecated
     //    private boolean cache = false;
+    @Deprecated
     private Map stats;
 
     protected VirtualCollection() {
         super();
         this.setPersistentID(this.createID());
-    }
-
-    protected VirtualCollection(Integer id, int creator, long created) {
-        super(id, creator, created);
     }
 
     public VirtualCollection(Integer id, int creator) {
@@ -36,14 +32,15 @@ public class VirtualCollection extends KustvaktResource {
 
     public VirtualCollection(String query) {
         this();
-        this.setQuery(query);
+        this.setFields(query);
         this.setPersistentID(this.createID());
     }
 
+    // todo: redo!
     @Override
     protected String createID() {
-        if (this.query != null) {
-            String s = this.getQuery();
+        if (this.getData() != null) {
+            String s = this.getData();
             return DigestUtils.sha1Hex(s);
         }
         return super.createID();
@@ -55,10 +52,9 @@ public class VirtualCollection extends KustvaktResource {
         if (resource == null | !(resource instanceof VirtualCollection))
             return;
         VirtualCollection other = (VirtualCollection) resource;
-        this.setStats(
-                this.getStats() == null ? other.getStats() : this.getStats());
-        this.setQuery(
-                this.getQuery() == null ? other.getQuery() : this.getQuery());
+        this.setFields(this.getFields() == null ?
+                other.getFields() :
+                this.getFields());
     }
 
     @Override
@@ -67,7 +63,6 @@ public class VirtualCollection extends KustvaktResource {
         super.checkNull();
         this.setDescription(
                 this.getDescription() == null ? "" : this.getDescription());
-        this.setQuery(this.query == null ? "" : this.getQuery());
     }
 
     @Override
@@ -79,18 +74,17 @@ public class VirtualCollection extends KustvaktResource {
                 ", path=" + this.getPath() +
                 ", owner=" + this.getOwner() +
                 ", name='" + this.getName() + '\'' +
-                ", query='" + query + '\'' +
-                ", stats='" + stats + '\'' +
+                ", data='" + this.getData() + '\'' +
                 '}';
     }
 
-    @Override
-    public Map toMap() {
-        Map res = super.toMap();
-        res.put("query", JsonUtils.readTree(query));
-        if (stats != null && !stats.isEmpty())
-            res.put("statistics", stats);
-        return res;
-    }
+    //    @Override
+    //    public Map toMap() {
+    //        Map res = super.toMap();
+    //        res.put("query", JsonUtils.readTree());
+    //        if (stats != null && !stats.isEmpty())
+    //            res.put("statistics", stats);
+    //        return res;
+    //    }
 
 }

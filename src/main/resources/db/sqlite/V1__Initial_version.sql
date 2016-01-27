@@ -192,8 +192,9 @@ id INTEGER PRIMARY KEY AUTOINCREMENT,
 persistent_id VARCHAR(100) NOT NULL UNIQUE,
 name VARCHAR(100),
 description VARCHAR(300),
-parent_id Integer unsigned null,
-created timestamp default current_timestamp,
+parent_id INTEGER unsigned null,
+created TIMESTAMP default current_timestamp,
+data BLOB,
 type INTEGER NOT NULL,
 creator INTEGER NOT NULL
 );

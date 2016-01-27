@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -22,6 +23,11 @@ public class KustvaktException extends Exception {
 
     public KustvaktException(int status) {
         this.statusCode = status;
+    }
+
+    public KustvaktException(int status, String... args) {
+        this.statusCode = status;
+        this.entity = Arrays.asList(args).toString();
     }
 
     public KustvaktException(Object userid, int status) {

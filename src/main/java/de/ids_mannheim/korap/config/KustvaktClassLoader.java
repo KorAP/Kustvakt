@@ -38,6 +38,7 @@ public class KustvaktClassLoader {
         return reflections.getTypesAnnotatedWith(annotation);
     }
 
+    @Deprecated
     public static void registerResourceClasses() {
         PersistenceClient cl = BeanConfiguration.getBeans()
                 .getPersistenceClient();

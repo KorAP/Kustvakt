@@ -108,6 +108,8 @@ public class RowMapperFactory {
                 r.setId(rs.getInt("id"));
                 r.setOwner(rs.getInt("creator"));
                 r.setName(rs.getString("name"));
+
+                r.setFields(rs.getString("data"));
                 r.setDescription(rs.getString("description"));
                 r.setCreated(rs.getTimestamp("created").getTime());
                 r.setPath(rs.getString("name_path"));
@@ -115,6 +117,7 @@ public class RowMapperFactory {
             }
             return r;
         }
+
     }
 
     // todo: ??!
@@ -131,7 +134,7 @@ public class RowMapperFactory {
             c.setName(rs.getString("name"));
             c.setDescription(rs.getString("description"));
             c.setOwner(rs.getInt("user_id"));
-            c.setQuery(rs.getString("query"));
+            c.setFields(rs.getString("data"));
             c.checkNull();
             return c;
         }

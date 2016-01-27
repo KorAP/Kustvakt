@@ -22,6 +22,7 @@ import java.util.List;
  * @date 11/01/2014
  */
 
+@Deprecated
 //todo?! cache with ehcache and put token/sentence/paragraph numbers into cache
 public class CollectionDao
         implements ResourceOperationIface<VirtualCollection> {
@@ -76,7 +77,7 @@ public class CollectionDao
             throws KustvaktException {
         MapSqlParameterSource np = new MapSqlParameterSource();
         np.addValue("id", resource.getPersistentID());
-        np.addValue("qy", resource.getQuery());
+        np.addValue("qy", resource.getData());
         np.addValue("name", resource.getName());
         np.addValue("desc", resource.getDescription());
         final String sql = "UPDATE coll_store SET query=:qy, name=:name, description=:desc WHERE persistent_id=:id;";
@@ -98,7 +99,7 @@ public class CollectionDao
         for (VirtualCollection c : resources) {
             MapSqlParameterSource np = new MapSqlParameterSource();
             np.addValue("id", c.getPersistentID());
-            np.addValue("qy", c.getQuery());
+            np.addValue("qy", c.getData());
             np.addValue("name", c.getName());
             np.addValue("desc", c.getDescription());
             sources[i++] = np;
@@ -114,9 +115,9 @@ public class CollectionDao
     @Override
     public int storeResource(VirtualCollection resource, User user)
             throws KustvaktException {
-        if (resource.getQuery().length() > 3) {
+        if (resource.getData() != null) {
             MapSqlParameterSource np = new MapSqlParameterSource();
-            np.addValue("query", resource.getQuery());
+            np.addValue("query", resource.getData());
             np.addValue("pid", resource.getPersistentID());
             np.addValue("name", resource.getName());
             np.addValue("desc", resource.getDescription());
@@ -135,7 +136,7 @@ public class CollectionDao
             }
         }else
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
-                    "invalid query parameter", resource.getQuery());
+                    "invalid query parameter", (String) resource.getData());
     }
 
     public int deleteResource(String id, User user) throws KustvaktException {

@@ -1,7 +1,9 @@
 package de.ids_mannheim.korap.resources;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.joda.time.DateTime;
@@ -21,6 +23,7 @@ public abstract class KustvaktResource {
     private String persistentID;
     private String name;
     private String description;
+    // todo: manage creator over policies!
     @JsonIgnore
     private Integer owner;
     protected long created;
@@ -32,19 +35,15 @@ public abstract class KustvaktResource {
     // parents persistentid
     private String parentID;
 
-    //    private static RandomStringUtils utils = new RandomStringUtils();
+    @Getter(AccessLevel.PROTECTED)
+    private Map<String, Object> fields;
 
+    // todo: redo constructors
     protected KustvaktResource() {
         this.created = TimeUtils.getNow().getMillis();
         this.id = -1;
         this.parentID = null;
-    }
-
-    public KustvaktResource(Integer id, int creator, long created) {
-        this.created = created;
-        this.owner = creator;
-        this.id = id;
-        this.parentID = null;
+        this.fields = new HashMap<>();
     }
 
     public KustvaktResource(Integer id, int creator) {
@@ -52,6 +51,7 @@ public abstract class KustvaktResource {
         this.id = id;
         this.owner = creator;
         this.parentID = null;
+        this.fields = new HashMap<>();
     }
 
     // todo: move creator to builder instance for policies
@@ -59,6 +59,41 @@ public abstract class KustvaktResource {
         this();
         this.owner = creator;
         this.persistentID = persistentID;
+    }
+
+    //    public void setData(int type, Object data) {
+    //        this.data = new Object[2];
+    //        this.data[0] = type;
+    //        this.data[1] = data;
+    //    }
+
+    //    public int getDataType() {
+    //        return this.data != null ? (int) this.data[0] : -1;
+    //    }
+
+    public void addField(String key, Object value) {
+        this.fields.put(key, value);
+    }
+
+    public void setFields(Map<String, Object> fields) {
+        this.fields = fields;
+    }
+
+    public void setFields(String fields) {
+        Map s = JsonUtils.readSimple(fields, Map.class);
+        if (s == null)
+            throw new RuntimeException(
+                    "Fields could not be read for resource '" + persistentID
+                            + "'!");
+        this.fields = s;
+    }
+
+    public Object getField(String key) {
+        return this.fields.get(key);
+    }
+
+    public String getData() {
+        return JsonUtils.toJSON(this.fields);
     }
 
     @Override
@@ -137,12 +172,13 @@ public abstract class KustvaktResource {
         m.put("id", persistentID);
         m.put("name", name);
         //todo: fix!
-//        m.put("path", path);
+        //        m.put("path", path);
         m.put("description", description);
         m.put("created", TimeUtils.format(new DateTime(created)));
+        m.put("data", getData());
         // deprecated
-//        m.put("managed", managed);
-//        m.put("shared", shared);
+        //        m.put("managed", managed);
+        //        m.put("shared", shared);
         return m;
     }
 

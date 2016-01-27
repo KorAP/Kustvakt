@@ -3,7 +3,6 @@ package de.ids_mannheim.korap.web.service;
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.handlers.CollectionDao;
 import de.ids_mannheim.korap.resources.Permissions;
 import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.resources.VirtualCollection;
@@ -21,9 +20,6 @@ public class CollectionLoader implements BootupInterface {
     @Override
     public void load() throws KustvaktException {
         if (BeanConfiguration.hasContext()) {
-            CollectionDao dao = new CollectionDao(
-                    BeanConfiguration.getBeans().getPersistenceClient());
-
             int uid = (Integer) KustvaktConfiguration.KUSTVAKT_USER
                     .get(Attributes.ID);
 

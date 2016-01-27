@@ -80,10 +80,10 @@ public class BeanConfiguration {
             context = new ClassPathXmlApplicationContext(files);
 
         BeanConfiguration.beans = new BeanHolderHelper(context);
-        setManualBeans();
 
     }
 
+    @Deprecated
     private static void setManualBeans() {
         if (getBeans().getPolicyDbProvider() != null
                 && getBeans().getEncryption() != null

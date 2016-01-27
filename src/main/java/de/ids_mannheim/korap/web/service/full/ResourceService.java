@@ -163,7 +163,7 @@ public class ResourceService {
         CollectionQueryBuilder3 query = new CollectionQueryBuilder3();
         if (cl_type.equals(VirtualCollection.class)) {
             VirtualCollection c = (VirtualCollection) resource;
-            query.setBaseQuery(c.getQuery());
+            query.setBaseQuery((String) c.getData());
         }else if (cl_type.equals(Corpus.class)) {
             Corpus c = (Corpus) resource;
             query.addQuery("corpusID=" + c.getPersistentID());
@@ -379,7 +379,7 @@ public class ResourceService {
                         ResourceFactory.getResourceClass(type));
 
             if (resource instanceof VirtualCollection)
-                cquery.addQuery(((VirtualCollection) resource).getQuery());
+                cquery.addQuery((String) resource.getData());
             else if (resource instanceof Corpus)
                 cquery.addQuery("corpusID=" + resource.getPersistentID());
 
@@ -557,7 +557,7 @@ public class ResourceService {
                             ResourceFactory.getResourceClass(type));
 
                 if (resource instanceof VirtualCollection)
-                    builder.addQuery(((VirtualCollection) resource).getQuery());
+                    builder.setBaseQuery((String) resource.getData());
                 else if (resource instanceof Corpus)
                     builder.addQuery("corpusID=" + resource.getPersistentID());
                 else
@@ -669,7 +669,7 @@ public class ResourceService {
             //todo ?!
             CollectionQueryBuilder3 query = new CollectionQueryBuilder3();
             if (resource instanceof VirtualCollection) {
-                query.setBaseQuery(((VirtualCollection) resource).getQuery());
+                query.setBaseQuery((String) resource.getData());
             }else if (resource instanceof Corpus) {
                 query.addQuery("corpusID=" + resource.getName());
             }
@@ -706,8 +706,9 @@ public class ResourceService {
                 .getCache(cache.getId(), VirtualCollection.class);
         if (tmp == null) {
             CollectionQueryBuilder3 cquery = new CollectionQueryBuilder3()
-                    .setBaseQuery(cache.getQuery());
-            String query = this.processor.preProcess(cache.getQuery(), user);
+                    .setBaseQuery((String) cache.getData());
+            String query = this.processor
+                    .preProcess((String) cache.getData(), user);
             String stats = searchKrill.getStatistics(query);
             cache.setStats(JsonUtils.readSimple(stats, Map.class));
             resourceHandler.cache(cache);
@@ -783,8 +784,8 @@ public class ResourceService {
             String base;
             if (reference != null && !reference.equals("null")) {
                 try {
-                    base = resourceHandler.findbyStrId(reference, user,
-                            VirtualCollection.class).getQuery();
+                    base = (String) resourceHandler.findbyStrId(reference, user,
+                            VirtualCollection.class).getData();
                 }catch (KustvaktException e) {
                     throw KustvaktResponseHandler.throwit(e);
                 }
@@ -863,12 +864,14 @@ public class ResourceService {
                 .equals(ResourceFactory.getResourceClass(type))) {
 
             VirtualCollection cachetmp, collection;
+            // todo: ??
             Object read = JsonUtils.readTree(query);
             CollectionQueryBuilder3 cquery = new CollectionQueryBuilder3();
             if (reference != null && !reference.equals("null")) {
                 try {
-                    cquery.addQuery(resourceHandler.findbyStrId(reference, user,
-                            VirtualCollection.class).getQuery());
+                    cquery.addQuery(
+                            (String) resourceHandler.findbyStrId(reference, user,
+                                    VirtualCollection.class).getData());
                 }catch (KustvaktException e) {
                     throw KustvaktResponseHandler.throwit(e);
                 }

@@ -54,7 +54,8 @@ public class ResourceDao<T extends KustvaktResource>
         source.addValue("id", resource.getPersistentID());
         source.addValue("name", resource.getName());
         source.addValue("desc", resource.getDescription());
-        final String sql = "UPDATE resource_store set name=:name, description=:desc where persistent_id=:id;";
+        source.addValue("data", resource.getData());
+        final String sql = "UPDATE resource_store set name=:name, data=:data, description=:desc where persistent_id=:id;";
         try {
             return this.jdbcTemplate.update(sql, source);
         }catch (DataAccessException e) {
@@ -115,6 +116,7 @@ public class ResourceDao<T extends KustvaktResource>
             return (T) this.jdbcTemplate.queryForObject(sql, source,
                     new RowMapperFactory.ResourceMapper());
         }catch (DataAccessException e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -129,16 +131,17 @@ public class ResourceDao<T extends KustvaktResource>
         b.insert(Attributes.NAME, Attributes.PARENT_ID,
                 Attributes.PERSISTENT_ID, Attributes.DESCRIPTION,
                 Attributes.CREATOR, Attributes.TYPE, Attributes.CREATED);
-        b.params(":name, :parent, :pid, :desc, :ow, :type, :created");
+        b.params(
+                ":name, :parent, :pid, :desc, :ow, :type, :created, :dtype, :data");
 
         if (resource.getParentID() == null) {
-            sql = "INSERT INTO resource_store (name, parent_id, persistent_id, description, creator, type, created) "
-                    + "VALUES (:name, :parent, :pid, :desc, :ow, :type, :created);";
+            sql = "INSERT INTO resource_store (name, parent_id, persistent_id, description, creator, type, created, data) "
+                    + "VALUES (:name, :parent, :pid, :desc, :ow, :type, :created, :data);";
             parid = null;
         }else {
             // fixme: use trigger for consistency check!
-            sql = "INSERT INTO resource_store (name, parent_id, persistent_id, description, creator, type, created) "
-                    + "select :name, id, :pid, :desc, :ow, :type, :created from resource_store where persistent_id=:parent;";
+            sql = "INSERT INTO resource_store (name, parent_id, persistent_id, description, creator, type, created, data) "
+                    + "select :name, id, :pid, :desc, :ow, :type, :created, :data from resource_store where persistent_id=:parent;";
             parid = resource.getParentID();
         }
 
@@ -150,6 +153,8 @@ public class ResourceDao<T extends KustvaktResource>
         source.addValue("type",
                 ResourceFactory.getResourceMapping(resource.getClass()));
         source.addValue("created", System.currentTimeMillis());
+        source.addValue("data", resource.getData());
+
         try {
             this.jdbcTemplate
                     .update(sql, source, holder, new String[] { "id" });
@@ -188,6 +193,13 @@ public class ResourceDao<T extends KustvaktResource>
 
     @Override
     public int size() throws KustvaktException {
-        return -1;
+        final String sql = "SELECT COUNT(*) FROM resource_store;";
+        try {
+            return this.jdbcTemplate
+                    .queryForObject(sql, new HashMap<String, Object>(),
+                            Integer.class);
+        }catch (DataAccessException e) {
+            return -1;
+        }
     }
 }
