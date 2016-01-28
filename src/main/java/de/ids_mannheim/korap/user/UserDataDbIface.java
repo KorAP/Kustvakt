@@ -6,8 +6,6 @@ package de.ids_mannheim.korap.user;
  */
 public interface UserDataDbIface<T extends Userdata> {
 
-    public Class<? extends Userdata> getType();
-
     public int store(T data);
 
     public int update(T data);

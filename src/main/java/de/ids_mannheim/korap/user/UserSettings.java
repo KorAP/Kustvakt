@@ -15,6 +15,7 @@ import java.util.Map;
  * Time: 10:26 AM
  */
 
+@Deprecated
 @Getter
 @Setter
 public class UserSettings {

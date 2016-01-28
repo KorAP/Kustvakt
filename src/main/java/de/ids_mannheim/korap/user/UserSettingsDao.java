@@ -13,18 +13,17 @@ import java.util.HashMap;
 
 /**
  * @author hanl
- * @date 27/01/2016
+ * @date 28/01/2016
  */
-public class UserDetailsDao implements UserDataDbIface<Userdetails2> {
+public class UserSettingsDao implements UserDataDbIface<UserSettings2> {
 
-    private NamedParameterJdbcTemplate jdbcTemplate;
+    NamedParameterJdbcTemplate jdbcTemplate;
 
-    public UserDetailsDao(PersistenceClient client) {
+    public UserSettingsDao(PersistenceClient client) {
         this.jdbcTemplate = (NamedParameterJdbcTemplate) client.getSource();
     }
-
     @Override
-    public int store(Userdetails2 data) {
+    public int store(UserSettings2 data) {
         String sql = "INSERT INTO user_details2 (user_id, data) VALUES (:userid, :data);";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", data.getUserID());
@@ -43,7 +42,7 @@ public class UserDetailsDao implements UserDataDbIface<Userdetails2> {
     }
 
     @Override
-    public int update(Userdetails2 data) {
+    public int update(UserSettings2 data) {
         String sql = "UPDATE user_details2 SET data = :data WHERE user_id=:userid;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", data.getUserID());
@@ -57,19 +56,19 @@ public class UserDetailsDao implements UserDataDbIface<Userdetails2> {
     }
 
     @Override
-    public Userdetails2 get(Integer id) {
+    public UserSettings2 get(Integer id) {
         String sql = "SELECT * FROM user_details2 WHERE id=:id;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", id);
 
         try {
             return this.jdbcTemplate
-                    .queryForObject(sql, source, new RowMapper<Userdetails2>() {
+                    .queryForObject(sql, source, new RowMapper<UserSettings2>() {
 
                         @Override
-                        public Userdetails2 mapRow(ResultSet rs, int rowNum)
+                        public UserSettings2 mapRow(ResultSet rs, int rowNum)
                                 throws SQLException {
-                            Userdetails2 details = new Userdetails2(
+                            UserSettings2 details = new UserSettings2(
                                     rs.getInt("user_id"));
                             details.setId(rs.getInt("id"));
                             details.setData(rs.getString("data"));
@@ -83,19 +82,19 @@ public class UserDetailsDao implements UserDataDbIface<Userdetails2> {
     }
 
     @Override
-    public Userdetails2 get(User user) {
+    public UserSettings2 get(User user) {
         String sql = "SELECT * FROM user_details2 WHERE user_id=:userid;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", user.getId());
 
         try {
             return this.jdbcTemplate
-                    .queryForObject(sql, source, new RowMapper<Userdetails2>() {
+                    .queryForObject(sql, source, new RowMapper<UserSettings2>() {
 
                         @Override
-                        public Userdetails2 mapRow(ResultSet rs, int rowNum)
+                        public UserSettings2 mapRow(ResultSet rs, int rowNum)
                                 throws SQLException {
-                            Userdetails2 details = new Userdetails2(
+                            UserSettings2 details = new UserSettings2(
                                     rs.getInt("user_id"));
                             details.setId(rs.getInt("id"));
                             details.setData(rs.getString("data"));
@@ -110,7 +109,7 @@ public class UserDetailsDao implements UserDataDbIface<Userdetails2> {
     }
 
     @Override
-    public int delete(Userdetails2 data) {
+    public int delete(UserSettings2 data) {
         String sql = "DELETE FROM user_details2 WHERE id=:id";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", data.getId());

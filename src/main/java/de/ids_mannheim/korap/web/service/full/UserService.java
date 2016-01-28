@@ -220,8 +220,7 @@ public class UserService {
         User user;
         try {
             user = controller.getUser(ctx.getUsername());
-            Userdata data = controller
-                    .getUserData(user, Userdetails2.class);
+            Userdata data = controller.getUserData(user, Userdetails2.class);
             user.addUserData(data);
 
             Set<String> base_scope = StringUtils.toSet(scopes, " ");
@@ -242,19 +241,17 @@ public class UserService {
     public Response getUserSettings(@Context SecurityContext context,
             @Context Locale locale) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        User user;
+        String result;
         try {
-            user = controller.getUser(ctx.getUsername());
-            controller.getUserSettings(user);
-
+            User user = controller.getUser(ctx.getUsername());
+            Userdata data = controller.getUserData(user, UserSettings2.class);
+            data.addField(Attributes.USERNAME, ctx.getUsername());
+            result = data.data();
         }catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
-
-        Map m = user.getSettings().toObjectMap();
-        m.put(Attributes.USERNAME, ctx.getUsername());
-        return Response.ok(JsonUtils.toJSON(m)).build();
+        return Response.ok(result).build();
     }
 
     // todo: test
@@ -270,18 +267,21 @@ public class UserService {
 
         try {
             User user = controller.getUser(ctx.getUsername());
-            UserSettings us = controller.getUserSettings(user);
+            if (user.isDemo())
+                return Response.notModified().build();
+
+            Userdata data = controller.getUserData(user, UserSettings2.class);
             // todo: check setting only within the scope of user settings permissions; not foundry range. Latter is part of
             // frontend which only displays available foundries and
             //            SecurityManager.findbyId(us.getDefaultConstfoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultLemmafoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultPOSfoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultRelfoundry(), user, Foundry.class);
-            us.updateStringSettings(settings);
+            Userdata new_data = new UserSettings2(user.getId());
+            new_data.setData(JsonUtils.toJSON(settings));
+            data.update(new_data);
 
-            controller.updateUserSettings(user, us);
-            if (user.isDemo())
-                return Response.notModified().build();
+            controller.updateUserData(data);
         }catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
@@ -300,8 +300,7 @@ public class UserService {
         User user;
         try {
             user = controller.getUser(ctx.getUsername());
-            Userdata data = controller
-                    .getUserData(user, Userdetails2.class);
+            Userdata data = controller.getUserData(user, Userdetails2.class);
             user.addUserData(data);
 
         }catch (KustvaktException e) {
@@ -327,11 +326,15 @@ public class UserService {
 
         try {
             User user = controller.getUser(ctx.getUsername());
-            UserDetails det = controller.getUserDetails(user);
-            det.updateDetails(wrapper);
-            controller.updateUserDetails(user, det);
             if (user.isDemo())
                 return Response.notModified().build();
+
+            Userdetails2 new_data = new Userdetails2(user.getId());
+            new_data.setData(JsonUtils.toJSON(wrapper));
+
+            Userdetails2 det = controller.getUserData(user, Userdetails2.class);
+            det.update(new_data);
+            controller.updateUserData(det);
         }catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);

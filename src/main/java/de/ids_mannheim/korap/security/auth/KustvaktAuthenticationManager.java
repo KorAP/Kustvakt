@@ -708,8 +708,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         dao.update(data);
     }
 
-    // todo: use getuserdata for that!
-    @Deprecated
     public UserDetails getUserDetails(User user) throws KustvaktException {
         try {
             for (Userdata data : user.getUserdata()) {
@@ -725,7 +723,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         return user.getDetails();
     }
 
-    @Deprecated
     public UserSettings getUserSettings(User user) throws KustvaktException {
         try {
             if (user.getSettings() == null)

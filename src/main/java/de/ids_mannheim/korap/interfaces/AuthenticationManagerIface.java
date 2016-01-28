@@ -63,15 +63,19 @@ public abstract class AuthenticationManagerIface {
 
     public abstract void updateUserData(Userdata data) throws KustvaktException;
 
+    @Deprecated
     public abstract UserDetails getUserDetails(User user)
             throws KustvaktException;
 
+    @Deprecated
     public abstract UserSettings getUserSettings(User user)
             throws KustvaktException;
 
+    @Deprecated
     public abstract void updateUserDetails(User user, UserDetails details)
             throws KustvaktException;
 
+    @Deprecated
     public abstract void updateUserSettings(User user, UserSettings settings)
             throws KustvaktException;
 
