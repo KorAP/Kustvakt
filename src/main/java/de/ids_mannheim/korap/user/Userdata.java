@@ -57,7 +57,17 @@ public abstract class Userdata {
     }
 
     public boolean isValid() {
-        return this.missing(this.fields).isEmpty() && this.userID != -1;
+        //        return this.missing(this.fields).isEmpty() && this.userID != -1;
+        return validationReturn().length == 0;
+    }
+
+    public String[] validationReturn() {
+        StringBuilder b = new StringBuilder();
+        Set<String> m = missing(this.fields);
+        for (String k : m) {
+            b.append(k).append(";");
+        }
+        return b.toString().split(";");
     }
 
     public Set<String> keys() {
@@ -74,6 +84,17 @@ public abstract class Userdata {
             this.fields.putAll(m);
     }
 
+    public void update(Userdata other) {
+        if (other != null && this.getClass().equals(other.getClass())) {
+            if (!other.isValid()) {
+                throw new RuntimeException(
+                        "User data object not valid. Missing fields: "
+                                + missing(this.fields));
+            }
+            this.fields.putAll(other.fields);
+        }
+    }
+
     public String data() {
         return JsonUtils.toJSON(this.fields);
     }
@@ -83,6 +104,5 @@ public abstract class Userdata {
     }
 
     public abstract String[] requiredFields();
-
 
 }

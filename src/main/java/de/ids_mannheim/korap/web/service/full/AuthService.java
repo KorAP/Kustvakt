@@ -7,10 +7,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
-import de.ids_mannheim.korap.user.Attributes;
-import de.ids_mannheim.korap.user.TokenContext;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.UserSettings;
+import de.ids_mannheim.korap.user.*;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.ServiceVersion;
@@ -118,7 +115,9 @@ public class AuthService {
         TokenContext context;
         try {
             User user = controller.authenticate(0, values[0], values[1], attr);
-            this.controller.getUserDetails(user);
+            Userdata data = this.controller
+                    .getUserData(user, Userdetails2.class);
+            user.addUserData(data);
             context = controller.createTokenContext(user, attr,
                     Attributes.API_AUTHENTICATION);
         }catch (KustvaktException e) {

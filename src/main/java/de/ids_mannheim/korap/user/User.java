@@ -31,7 +31,7 @@ public abstract class User implements Serializable {
     private UserDetails details;
     private List<UserQuery> queries;
 
-    private List<? extends Userdata> userdata;
+    private List<Userdata> userdata;
 
     protected User() {
         this.fields = new ParamFields();
@@ -70,6 +70,17 @@ public abstract class User implements Serializable {
             //            this.getDetails().setUserID(this.id);
             //            for (UserQuery q : this.getQueries())
             //                q.setOwner(this.accountID);
+        }
+    }
+
+    public void addUserData(Userdata data) {
+        if (data != null) {
+            for (Userdata d : this.userdata) {
+                // already has an object of that type!
+                if (d.getClass().equals(data.getClass()))
+                    return;
+            }
+            userdata.add(data);
         }
     }
 

@@ -1,10 +1,7 @@
 package de.ids_mannheim.korap.interfaces;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.user.TokenContext;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.UserDetails;
-import de.ids_mannheim.korap.user.UserSettings;
+import de.ids_mannheim.korap.user.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,9 +54,14 @@ public abstract class AuthenticationManagerIface {
     public abstract User createUserAccount(Map attributes,
             boolean confirmation_required) throws KustvaktException;
 
-//    public abstract boolean updateAccount(User user) throws KustvaktException;
+    //    public abstract boolean updateAccount(User user) throws KustvaktException;
 
     public abstract boolean deleteAccount(User user) throws KustvaktException;
+
+    public abstract <T extends Userdata> T getUserData(User user,
+            Class<T> clazz) throws KustvaktException;
+
+    public abstract void updateUserData(Userdata data) throws KustvaktException;
 
     public abstract UserDetails getUserDetails(User user)
             throws KustvaktException;

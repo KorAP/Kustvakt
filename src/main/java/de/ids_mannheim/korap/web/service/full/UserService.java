@@ -220,7 +220,10 @@ public class UserService {
         User user;
         try {
             user = controller.getUser(ctx.getUsername());
-            controller.getUserDetails(user);
+            Userdata data = controller
+                    .getUserData(user, Userdetails2.class);
+            user.addUserData(data);
+
             Set<String> base_scope = StringUtils.toSet(scopes, " ");
             if (scopes != null)
                 base_scope.retainAll(StringUtils.toSet(scopes));
@@ -297,7 +300,10 @@ public class UserService {
         User user;
         try {
             user = controller.getUser(ctx.getUsername());
-            controller.getUserDetails(user);
+            Userdata data = controller
+                    .getUserData(user, Userdetails2.class);
+            user.addUserData(data);
+
         }catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);

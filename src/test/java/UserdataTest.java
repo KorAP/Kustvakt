@@ -59,6 +59,18 @@ public class UserdataTest {
     }
 
     @Test
+    public void testDataValidation() {
+        Userdata data = new Userdetails2(1);
+        data.addField(Attributes.COUNTRY, "Germany");
+
+        String[] req = data.requiredFields();
+        String[] r = data.validationReturn();
+        assert r.length > 0;
+        assert r.length == req.length;
+        assert !data.isValid();
+    }
+
+    @Test
     public void testUserdatafactory() {
         UserDataDbIface dao = UserdataFactory
                 .getDaoInstance(Userdetails2.class);

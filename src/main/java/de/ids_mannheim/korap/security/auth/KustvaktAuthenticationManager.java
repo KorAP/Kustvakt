@@ -146,6 +146,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         return user;
     }
 
+    // todo: dont use annotations for caching
     @CachePut(value = "users", key = "#user.getUsername()")
     public TokenContext createTokenContext(User user, Map<String, String> attr,
             String provider_key) throws KustvaktException {
@@ -153,7 +154,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                 Attributes.API_AUTHENTICATION);
 
         if (attr.get(Attributes.SCOPES) != null)
-            this.getUserDetails(user);
+            this.getUserData(user, Userdetails2.class);
 
         TokenContext context = provider.createUserSession(user, attr);
         if (context == null)
@@ -634,7 +635,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                     username), StatusCodes.PASSWORD_RESET_FAILED, username);
         }
 
-        getUserDetails(ident);
+        this.getUserData(ident, Userdetails2.class);
         KorAPUser user = (KorAPUser) ident;
         if (!mail.equals(user.getDetails().getEmail()))
             //            throw new NotAuthorizedException(StatusCodes.ILLEGAL_ARGUMENT,
@@ -694,12 +695,14 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         }
     }
 
+    @Override
     public <T extends Userdata> T getUserData(User user, Class<T> clazz) {
         UserDataDbIface<T> dao = UserdataFactory.getDaoInstance(clazz);
         return dao.get(user);
     }
 
     //todo: cache userdata outside of the user object!
+    @Override
     public void updateUserData(Userdata data) {
         UserDataDbIface dao = UserdataFactory.getDaoInstance(data.getClass());
         dao.update(data);
