@@ -1,9 +1,9 @@
 import de.ids_mannheim.korap.config.BeanConfiguration;
-import de.ids_mannheim.korap.user.KorAPUser;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.UserDetailsDao;
-import de.ids_mannheim.korap.user.Userdetails2;
-import org.junit.*;
+import de.ids_mannheim.korap.user.*;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * @author hanl
@@ -56,6 +56,23 @@ public class UserdataTest {
         d = dao.get(user);
         assert d != null;
         assert "value is a value".equals(d.get("key_1"));
+    }
+
+    @Test
+    public void testUserdatafactory() {
+        UserDataDbIface dao = UserdataFactory
+                .getDaoInstance(Userdetails2.class);
+        assert UserDetailsDao.class.equals(dao.getClass());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testUserdatafactoryError() {
+        UserdataFactory.getDaoInstance(new Userdata(1) {
+            @Override
+            public String[] requiredFields() {
+                return new String[0];
+            }
+        }.getClass());
     }
 
 }

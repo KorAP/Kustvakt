@@ -39,10 +39,11 @@ public class UserdataFactory {
         return null;
     }
 
-    public static UserDataDbIface getInstance(Class<? extends Userdata> data) {
+    public static UserDataDbIface getDaoInstance(
+            Class<? extends Userdata> data) {
         if (instances.get(data) == null) {
             Class<? extends UserDataDbIface> cl = getClass(data);
-            if (BeanConfiguration.hasContext()) {
+            if (BeanConfiguration.hasContext() && cl != null) {
                 try {
                     Constructor c = cl.getConstructor(PersistenceClient.class);
                     UserDataDbIface iface = (UserDataDbIface) c.newInstance(
@@ -53,10 +54,10 @@ public class UserdataFactory {
                 }catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
                     return null;
                 }
-
             }
+            throw new RuntimeException(
+                    "No database class found for type " + data.getSimpleName());
         }else
             return instances.get(data);
-        return null;
     }
 }

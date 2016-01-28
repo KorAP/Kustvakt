@@ -695,13 +695,13 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     }
 
     public <T extends Userdata> T getUserData(User user, Class<T> clazz) {
-        UserDataDbIface<T> dao = UserdataFactory.getInstance(clazz);
+        UserDataDbIface<T> dao = UserdataFactory.getDaoInstance(clazz);
         return dao.get(user);
     }
 
     //todo: cache userdata outside of the user object!
-    public void updateUserData(User user, Userdata data) {
-        UserDataDbIface dao = UserdataFactory.getInstance(data.getClass());
+    public void updateUserData(Userdata data) {
+        UserDataDbIface dao = UserdataFactory.getDaoInstance(data.getClass());
         dao.update(data);
     }
 

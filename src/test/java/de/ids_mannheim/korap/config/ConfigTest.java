@@ -6,8 +6,6 @@ import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.security.ac.ResourceFinder;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.UserdataFactory;
-import de.ids_mannheim.korap.user.Userdetails2;
 import de.ids_mannheim.korap.utils.ServiceVersion;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import org.junit.After;
@@ -77,11 +75,6 @@ public class ConfigTest {
         String v = "testmail_&234@ids-mannheim.de";
         BeanConfiguration.getBeans().getEncryption()
                 .validateEntry(v, Attributes.EMAIL);
-    }
-
-    @Test
-    public void testTypeReference() {
-        UserdataFactory.getInstance(Userdetails2.class);
     }
 }
 
