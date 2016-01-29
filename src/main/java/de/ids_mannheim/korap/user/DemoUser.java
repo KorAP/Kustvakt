@@ -19,7 +19,7 @@ public class DemoUser extends User implements Serializable {
         this.setDetails(new UserDetails());
         this.setSettings(new UserSettings());
         this.setAccountCreation(ACCOUNT_CREATED);
-        this.setQueries(UserQuery.demoUserQueries());
+//        this.setQueries(UserQuery.demoUserQueries());
     }
 
     protected User clone() {

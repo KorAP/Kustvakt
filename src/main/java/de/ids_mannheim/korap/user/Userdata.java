@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.user;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -58,16 +59,29 @@ public abstract class Userdata {
 
     public boolean isValid() {
         //        return this.missing(this.fields).isEmpty() && this.userID != -1;
-        return validationReturn().length == 0;
+        return missing().length == 0;
     }
 
-    public String[] validationReturn() {
+    public String[] missing() {
         StringBuilder b = new StringBuilder();
         Set<String> m = missing(this.fields);
+
+        if (m.isEmpty())
+            return new String[0];
+
         for (String k : m) {
             b.append(k).append(";");
         }
         return b.toString().split(";");
+    }
+
+    public void checkRequired() throws KustvaktException {
+        if (!isValid()) {
+            String[] fields = missing();
+            throw new KustvaktException(StatusCodes.MISSING_ARGUMENTS,
+                    "User data object not valid. Missing fields: " + Arrays
+                            .asList(fields));
+        }
     }
 
     public Set<String> keys() {
@@ -78,6 +92,10 @@ public abstract class Userdata {
         return this.fields.values();
     }
 
+    public Map<String, Object> fields() {
+        return new HashMap<>(this.fields);
+    }
+
     public void setData(String data) {
         Map m = JsonUtils.readSimple(data, Map.class);
         if (m != null)
@@ -85,14 +103,8 @@ public abstract class Userdata {
     }
 
     public void update(Userdata other) {
-        if (other != null && this.getClass().equals(other.getClass())) {
-            if (!other.isValid()) {
-                throw new RuntimeException(
-                        "User data object not valid. Missing fields: "
-                                + missing(this.fields));
-            }
+        if (other != null && this.getClass().equals(other.getClass()))
             this.fields.putAll(other.fields);
-        }
     }
 
     public String data() {
@@ -103,6 +115,20 @@ public abstract class Userdata {
         this.fields.put(key, value);
     }
 
+    public void validate(EncryptionIface crypto) throws KustvaktException {
+        this.fields = crypto.validateMap(this.fields);
+    }
+
+    public void readDefaults(Map<String, Object> map) {
+        for (String k : defaultFields()) {
+            Object o = map.get(k);
+            if (o != null)
+                this.fields.put(k, o);
+        }
+    }
+
     public abstract String[] requiredFields();
+
+    public abstract String[] defaultFields();
 
 }

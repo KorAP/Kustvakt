@@ -58,7 +58,7 @@ public class APIAuthentication implements AuthenticationIface {
     }
 
     @Override
-    public TokenContext createUserSession(User user, Map<String, String> attr)
+    public TokenContext createUserSession(User user, Map<String, Object> attr)
             throws KustvaktException {
         TokenContext c = new TokenContext();
         c.setUsername(user.getUsername());

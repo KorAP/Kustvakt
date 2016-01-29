@@ -74,7 +74,7 @@ public class BasicHttpAuth implements AuthenticationIface {
 
     // not supported!
     @Override
-    public TokenContext createUserSession(User user, Map<String, String> attr)
+    public TokenContext createUserSession(User user, Map<String, Object> attr)
             throws KustvaktException {
         return null;
     }

@@ -16,8 +16,9 @@ public class FoundryInject implements RewriteTask.IterableRewriteAt {
     public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
             User user) {
         LayerMapper mapper;
+        // inject user settings from cache!
         if (user != null)
-            mapper = new LayerMapper(config, user.getSettings());
+            mapper = new LayerMapper(config, null);
         else
             mapper = new LayerMapper(config);
 

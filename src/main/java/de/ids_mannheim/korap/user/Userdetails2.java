@@ -17,4 +17,11 @@ public class Userdetails2 extends Userdata {
                 Attributes.LASTNAME, Attributes.FIRSTNAME };
     }
 
+    @Override
+    public String[] defaultFields() {
+        return new String[] { Attributes.EMAIL, Attributes.ADDRESS,
+                Attributes.LASTNAME, Attributes.FIRSTNAME, Attributes.PHONE,
+                Attributes.COUNTRY, Attributes.INSTITUTION, Attributes.GENDER };
+    }
+
 }

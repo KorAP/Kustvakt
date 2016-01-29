@@ -107,7 +107,7 @@ public class AuthService {
             // is actual an invalid request
             throw KustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
 
-        Map<String, String> attr = new HashMap<>();
+        Map<String, Object> attr = new HashMap<>();
         if (scopes != null && !scopes.isEmpty())
             attr.put(Attributes.SCOPES, scopes);
         attr.put(Attributes.HOST, host);
@@ -117,7 +117,8 @@ public class AuthService {
             User user = controller.authenticate(0, values[0], values[1], attr);
             Userdata data = this.controller
                     .getUserData(user, Userdetails2.class);
-            user.addUserData(data);
+            // todo: is this necessary?
+//            attr.putAll(data.fields());
             context = controller.createTokenContext(user, attr,
                     Attributes.API_AUTHENTICATION);
         }catch (KustvaktException e) {
@@ -174,7 +175,7 @@ public class AuthService {
                 .equalsIgnoreCase("null"))
             throw KustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
 
-        Map<String, String> attr = new HashMap<>();
+        Map<String, Object> attr = new HashMap<>();
         attr.put(Attributes.HOST, host);
         attr.put(Attributes.USER_AGENT, agent);
         TokenContext context;
@@ -203,7 +204,7 @@ public class AuthService {
         // the shibfilter decrypted the values
         // define default provider for returned access token strategy?!
 
-        Map<String, String> attr = new HashMap<>();
+        Map<String, Object> attr = new HashMap<>();
         attr.put(Attributes.HOST, host);
         attr.put(Attributes.USER_AGENT, agent);
 

@@ -33,6 +33,10 @@ public class TestHelper {
             Map m = new HashMap<>();
             m.put(Attributes.USERNAME, credentials[0]);
             m.put(Attributes.PASSWORD, credentials[1]);
+            m.put(Attributes.FIRSTNAME, "test");
+            m.put(Attributes.LASTNAME, "user");
+            m.put(Attributes.EMAIL, "test@ids-mannheim.de");
+            m.put(Attributes.ADDRESS, "Mannheim");
 
             Assert.assertNotNull("userdatabase handler must not be null", dao);
 

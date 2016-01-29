@@ -56,7 +56,7 @@ public class SessionAuthentication implements AuthenticationIface {
     }
 
     @Override
-    public TokenContext createUserSession(User user, Map attr)
+    public TokenContext createUserSession(User user, Map<String, Object> attr)
             throws KustvaktException {
         DateTime now = TimeUtils.getNow();
         DateTime ex = TimeUtils

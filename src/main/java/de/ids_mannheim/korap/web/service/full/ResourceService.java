@@ -669,7 +669,7 @@ public class ResourceService {
             //todo ?!
             CollectionQueryBuilder3 query = new CollectionQueryBuilder3();
             if (resource instanceof VirtualCollection) {
-                query.setBaseQuery((String) resource.getData());
+                query.setBaseQuery(resource.getData());
             }else if (resource instanceof Corpus) {
                 query.addQuery("corpusID=" + resource.getName());
             }

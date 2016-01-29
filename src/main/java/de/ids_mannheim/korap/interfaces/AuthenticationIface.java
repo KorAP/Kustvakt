@@ -11,7 +11,7 @@ public interface AuthenticationIface {
     TokenContext getUserStatus(String authToken) throws
             KustvaktException;
 
-    TokenContext createUserSession(User user, Map<String, String> attr)
+    TokenContext createUserSession(User user, Map<String, Object> attr)
             throws KustvaktException;
 
     void removeUserSession(String token) throws KustvaktException;

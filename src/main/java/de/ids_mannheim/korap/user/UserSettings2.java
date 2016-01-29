@@ -15,4 +15,9 @@ public class UserSettings2 extends Userdata {
     public String[] requiredFields() {
         return new String[0];
     }
+
+    @Override
+    public String[] defaultFields() {
+        return new String[0];
+    }
 }

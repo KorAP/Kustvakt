@@ -56,7 +56,7 @@ public class StatusCodes {
     public static final Integer UNSUPPORTED_CORPUS = 404;
     public static final Integer UNSUPPORTED_LAYER = 405;
     // make a distinction between no and invalid vc?
-    public static final Integer UNSUPPORTED_VIRTUALCOLLECTION = 406;
+    public static final Integer UNSUPPORTED_COLLECTION = 406;
     public static final Integer CORPUS_REWRITE = 407;
     public static final Integer FOUNDRY_REWRITE = 408;
     public static final Integer FOUNDRY_INJECTION = 409;

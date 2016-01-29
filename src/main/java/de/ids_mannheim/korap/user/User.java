@@ -5,10 +5,14 @@ import de.ids_mannheim.korap.config.ParamFields;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.utils.KustvaktMap;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,9 +30,15 @@ public abstract class User implements Serializable {
     private boolean isAccountLocked;
     private int type;
     private ParamFields fields;
+    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PRIVATE)
     private UserSettings settings;
     //todo: remove!
+    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PRIVATE)
     private UserDetails details;
+    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PRIVATE)
     private List<UserQuery> queries;
 
     private List<Userdata> userdata;
@@ -39,6 +49,7 @@ public abstract class User implements Serializable {
         this.isAccountLocked = false;
         this.username = "";
         this.id = -1;
+        this.userdata = new ArrayList<>();
     }
 
     protected User(int type) {

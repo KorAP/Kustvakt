@@ -8,23 +8,22 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.exceptions.dbException;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
-import de.ids_mannheim.korap.user.*;
+import de.ids_mannheim.korap.user.DemoUser;
+import de.ids_mannheim.korap.user.KorAPUser;
+import de.ids_mannheim.korap.user.ShibUser;
+import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.BooleanUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -41,186 +40,6 @@ public class EntityDao implements EntityHandlerIface {
 
     public EntityDao(PersistenceClient client) {
         this.jdbcTemplate = (NamedParameterJdbcTemplate) client.getSource();
-    }
-
-    @Override
-    public UserSettings getUserSettings(Integer userid)
-            throws KustvaktException {
-        //        TransactionDefinition def = new DefaultTransactionDefinition();
-        //        TransactionStatus status = transactionManager.getTransaction(def);
-
-        MapSqlParameterSource np = new MapSqlParameterSource();
-        np.addValue("us", userid);
-        final String sql =
-                "SELECT user.* FROM user_settings as user inner join korap_users as a "
-                        + "on a.id=user.user_id WHERE user.user_id=:us";
-        try {
-            Map s = this.jdbcTemplate.queryForMap(sql, np);
-            return UserSettings.fromObjectMap(s);
-        }catch (EmptyResultDataAccessException ex) {
-            return new UserSettings();
-        }catch (DataAccessException e) {
-            jlog.error("Could not retrieve user settings for user: " + userid,
-                    e);
-            throw new dbException(userid, "user_settings",
-                    StatusCodes.DB_GET_FAILED, userid.toString());
-        }
-    }
-
-    //todo: uniqueness constraints on usersettings and details (every user only one entry for data and settings)
-    @Override
-    public int updateSettings(UserSettings settings) throws KustvaktException {
-        final String sql =
-                "UPDATE user_settings SET fileNameForExport=:fileNameForExport,"
-                        +
-                        "leftContextItemForExport=:leftContextItemForExport," +
-                        "leftContextSizeForExport=:leftContextSizeForExport,locale=:locale,leftContextItem=:leftContextItem,"
-                        +
-                        "leftContextSize=:leftContextSize," +
-                        "rightContextItem=:rightContextItem,rightContextItemForExport=:rightContextItemForExport,"
-                        +
-                        "rightContextSize=:rightContextSize," +
-                        "POSFoundry=:defaultPOSfoundry, lemmaFoundry=:defaultLemmafoundry, constFoundry=:defaultConstfoundry, "
-                        +
-                        "relFoundry=:defaultRelfoundry, " +
-                        "rightContextSizeForExport=:rightContextSizeForExport,selectedCollection=:selectedCollection,queryLanguage=:queryLanguage,"
-                        +
-                        "pageLength=:pageLength,metadataQueryExpertModus=:metadataQueryExpertModus,collectData=:collectData "
-                        +
-                        "WHERE user_id=:userID";
-        try {
-            return this.jdbcTemplate
-                    .update(sql, new BeanPropertySqlParameterSource(settings));
-        }catch (DataAccessException e) {
-            jlog.error("Could not update user settings for user: " + settings
-                    .getUserID(), e);
-            throw new dbException(settings.getUserID(), "user_settings",
-                    StatusCodes.DB_UPDATE_FAILED, settings.toString());
-        }
-    }
-
-    /**
-     * @param settings
-     * @throws KustvaktException
-     */
-
-    private void createSettings(UserSettings settings)
-            throws KustvaktException {
-        final String sql =
-                "INSERT INTO user_settings (user_id, fileNameForExport,leftContextItemForExport,"
-                        +
-                        "leftContextSizeForExport,locale,leftContextItem,leftContextSize,"
-                        +
-                        "rightContextItem,rightContextItemForExport,rightContextSize,"
-                        +
-                        "rightContextSizeForExport,selectedCollection,queryLanguage,"
-                        +
-                        "pageLength,metadataQueryExpertModus, POSFoundry, lemmaFoundry, constFoundry, relFoundry, collectData) "
-                        +
-                        "VALUES (:userID, :fileNameForExport, :leftContextItemForExport, "
-                        +
-                        ":leftContextSizeForExport, :locale, :leftContextItem, :leftContextSize, "
-                        +
-                        ":rightContextItem,:rightContextItemForExport, :rightContextSize, "
-                        +
-                        ":rightContextSizeForExport, :selectedCollection, :queryLanguage, "
-                        +
-                        ":pageLength, :metadataQueryExpertModus, :defaultPOSfoundry, "
-                        +
-                        ":defaultLemmafoundry, :defaultConstfoundry, :defaultRelfoundry, :collectData);";
-
-        try {
-            if (settings == null)
-                throw new KustvaktException(StatusCodes.MISSING_ARGUMENTS,
-                        "no settings provided", "user settings");
-            this.jdbcTemplate
-                    .update(sql, new BeanPropertySqlParameterSource(settings));
-        }catch (DataAccessException e) {
-            jlog.error("Could not create user settings for user: " + settings
-                    .getUserID(), e);
-            throw new dbException(settings.getUserID(), "userSettings",
-                    StatusCodes.DB_INSERT_FAILED, settings.toString());
-        }
-    }
-
-    @Override
-    public UserDetails getUserDetails(Integer userid) throws KustvaktException {
-        final String sql = "SELECT us.* FROM user_details as us inner join korap_users as ku on ku.id=us.user_id WHERE us.user_id=:user";
-        MapSqlParameterSource np = new MapSqlParameterSource();
-        np.addValue("user", userid);
-
-        try {
-            return this.jdbcTemplate
-                    .queryForObject(sql, np, new RowMapper<UserDetails>() {
-                        @Override
-                        public UserDetails mapRow(ResultSet rs, int i)
-                                throws SQLException {
-                            UserDetails d = new UserDetails();
-                            d.setUserID(rs.getInt("user_id"));
-                            d.setAddress(rs.getString("address"));
-                            d.setCountry(rs.getString("country"));
-                            d.setEmail(rs.getString("email"));
-                            d.setFirstName(rs.getString("firstName"));
-                            d.setLastName(rs.getString("lastName"));
-                            d.setGender(rs.getString("gender"));
-                            d.setInstitution(rs.getString("institution"));
-                            d.setPhone(rs.getString("phone"));
-                            d.setPrivateUsage(rs.getBoolean("privateUsage"));
-                            return d;
-                        }
-                    });
-        }catch (EmptyResultDataAccessException ex) {
-            //todo: create audit record?
-            return null;
-        }catch (DataAccessException e) {
-            jlog.error("Could not retrieve user details for user: " + userid,
-                    e);
-            throw new dbException(userid, "userDetails",
-                    StatusCodes.DB_GET_FAILED, userid.toString());
-        }
-    }
-
-    @Override
-    public int updateUserDetails(UserDetails details) throws KustvaktException {
-        final String up =
-                "UPDATE user_details SET firstName=:firstName, lastName=:lastName, "
-                        +
-                        "gender=:gender, phone=:phone, institution=:institution, "
-                        +
-                        "email=:email, address=:address, country=:country, privateUsage=:privateUsage "
-                        +
-                        "WHERE user_id=:userID;";
-        try {
-            return this.jdbcTemplate
-                    .update(up, new BeanPropertySqlParameterSource(details));
-        }catch (DataAccessException e) {
-            jlog.error("Could not retrieve user details for user: " + details
-                    .getUserID(), e);
-            throw new dbException(details.getUserID(), "userDetails",
-                    StatusCodes.DB_UPDATE_FAILED, details.toString());
-        }
-    }
-
-    private void createUserDetails(UserDetails details)
-            throws KustvaktException {
-        final String up =
-                "INSERT INTO user_details (user_id, firstName, lastName, gender, phone, institution, "
-                        +
-                        "email, address, country, privateUsage) VALUES (:userID, :firstName, :lastName, :gender, "
-                        +
-                        ":phone, :institution, :email, :address, :country, :privateUsage);";
-        try {
-            if (details == null)
-                throw new KustvaktException(StatusCodes.MISSING_ARGUMENTS,
-                        "no details provided", "user details");
-            this.jdbcTemplate
-                    .update(up, new BeanPropertySqlParameterSource(details));
-        }catch (DataAccessException e) {
-            jlog.error("Could not create user details for user: " + details
-                    .getUserID(), e);
-            throw new dbException(details.getUserID(), "userDetails",
-                    StatusCodes.DB_INSERT_FAILED, details.toString());
-        }
     }
 
     // usersettings are fetched plus basic account info, no details, since i rarely use them anyway!
@@ -377,14 +196,6 @@ public class EntityDao implements EntityHandlerIface {
             int r = this.jdbcTemplate
                     .update(query, np, holder, new String[] { "id" });
             user.setId(holder.getKey().intValue());
-
-            if (user.getDetails() == null)
-                user.setDetails(new UserDetails());
-            if (user.getSettings() == null)
-                user.setSettings(new UserSettings());
-
-            this.createUserDetails(user.getDetails());
-            this.createSettings(user.getSettings());
             return r;
         }catch (DataAccessException e) {
             jlog.error("Could not create user account with username: {}",

@@ -283,7 +283,7 @@ public class KustvaktEncryption implements EncryptionIface {
 
     // todo: where applied?
     @Override
-    public Map validateMap(Map map) throws KustvaktException {
+    public Map<String, Object> validateMap(Map<String, Object> map) throws KustvaktException {
         Map<String, Object> safeMap = new HashMap<>();
         KustvaktMap kmap = new KustvaktMap(map);
 

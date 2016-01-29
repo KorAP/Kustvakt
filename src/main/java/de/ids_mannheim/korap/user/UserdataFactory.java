@@ -2,6 +2,8 @@ package de.ids_mannheim.korap.user;
 
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.KustvaktClassLoader;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 
 import java.lang.reflect.Constructor;
@@ -40,7 +42,7 @@ public class UserdataFactory {
     }
 
     public static UserDataDbIface getDaoInstance(
-            Class<? extends Userdata> data) {
+            Class<? extends Userdata> data) throws KustvaktException {
         if (instances.get(data) == null) {
             Class<? extends UserDataDbIface> cl = getClass(data);
             if (BeanConfiguration.hasContext() && cl != null) {
@@ -55,7 +57,7 @@ public class UserdataFactory {
                     return null;
                 }
             }
-            throw new RuntimeException(
+            throw new KustvaktException(StatusCodes.NOT_SUPPORTED,
                     "No database class found for type " + data.getSimpleName());
         }else
             return instances.get(data);

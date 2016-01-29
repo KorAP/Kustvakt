@@ -33,7 +33,7 @@ public class TokenContext implements java.security.Principal, Serializable {
 
     @Getter(AccessLevel.PRIVATE)
     @Setter(AccessLevel.PRIVATE)
-    private Map<String, String> parameters;
+    private Map<String, Object> parameters;
     private String hostAddress;
     private String userAgent;
 
@@ -54,7 +54,7 @@ public class TokenContext implements java.security.Principal, Serializable {
         return m;
     }
 
-    public Map<String, String> params() {
+    public Map<String, Object> params() {
         return new HashMap<>(parameters);
     }
 

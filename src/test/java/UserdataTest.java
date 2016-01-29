@@ -1,4 +1,5 @@
 import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.*;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -64,24 +65,41 @@ public class UserdataTest {
         data.addField(Attributes.COUNTRY, "Germany");
 
         String[] req = data.requiredFields();
-        String[] r = data.validationReturn();
+        String[] r = data.missing();
         assert r.length > 0;
         assert r.length == req.length;
         assert !data.isValid();
     }
 
     @Test
-    public void testUserdatafactory() {
+    public void testSettingsValidation() {
+        Userdata data = new UserSettings2(1);
+        data.addField(Attributes.FILE_FORMAT_FOR_EXPORT, "export");
+
+        String[] req = data.requiredFields();
+        String[] r = data.missing();
+        assert r.length == 0;
+        assert r.length == req.length;
+        assert data.isValid();
+    }
+
+    @Test
+    public void testUserdatafactory() throws KustvaktException {
         UserDataDbIface dao = UserdataFactory
                 .getDaoInstance(Userdetails2.class);
         assert UserDetailsDao.class.equals(dao.getClass());
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testUserdatafactoryError() {
+    @Test(expected = KustvaktException.class)
+    public void testUserdatafactoryError() throws KustvaktException {
         UserdataFactory.getDaoInstance(new Userdata(1) {
             @Override
             public String[] requiredFields() {
+                return new String[0];
+            }
+
+            @Override
+            public String[] defaultFields() {
                 return new String[0];
             }
         }.getClass());
