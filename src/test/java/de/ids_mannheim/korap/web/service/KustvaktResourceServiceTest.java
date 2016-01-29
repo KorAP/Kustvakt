@@ -55,7 +55,7 @@ public class KustvaktResourceServiceTest extends FastJerseyTest {
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
 
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
-        System.out.println("COLLECTIONS " + node);
+
         assert node.size() > 0;
     }
 
@@ -69,20 +69,22 @@ public class KustvaktResourceServiceTest extends FastJerseyTest {
 
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         assert node != null;
-        System.out.println("JSON NODE RESULT " + node);
+
+        System.out.println("-------------------------------");
+        System.out.println("NODE COLLECTIONS" + node);
         String id = node.path(0).path("id").asText();
 
         response = resource().path(getAPIVersion()).path("collection").path(id)
                 .path("stats").header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
-        System.out.println("----------------------------- testStats 2");
-        System.out.println(response.getEntity(String.class));
+
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
         node = JsonUtils.readTree(response.getEntity(String.class));
         assert node != null;
         int docs = node.path("documents").asInt();
-        System.out.println("THE FINAL NODE : " + node);
+        System.out.println("-------------------------------");
+        System.out.println("NODE " + node);
         assert docs > 0 && docs < 15;
     }
 

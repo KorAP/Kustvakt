@@ -1,7 +1,6 @@
 package de.ids_mannheim.korap.config;
 
 import de.ids_mannheim.korap.user.Attributes;
-import de.ids_mannheim.korap.user.UserDetails;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 import java.util.ArrayList;
@@ -54,18 +53,17 @@ public class Scopes {
         return s.toArray(new Scope[s.size()]);
     }
 
-    public static Scopes mapScopes(String scopes, UserDetails details) {
+    public static Scopes mapScopes(String scopes, Map<String, Object> details) {
         Scopes m = new Scopes();
-        Map<String, Object> det = details.toMap();
         if (scopes != null && !scopes.isEmpty()) {
             Scope[] scopearr = mapScopes(scopes);
             for (Scope s : scopearr) {
-                Object v = det.get(s.toString());
+                Object v = details.get(s.toString());
                 if (v != null)
                     m._values.put(s.toString(), v);
             }
             if (scopes.contains(Scope.profile.toString()))
-                m._values.putAll(Scopes.getProfileScopes(det)._values);
+                m._values.putAll(Scopes.getProfileScopes(details)._values);
             m._values.put(Attributes.SCOPES, scopes);
         }
         return m;

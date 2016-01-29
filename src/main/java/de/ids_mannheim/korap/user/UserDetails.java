@@ -13,6 +13,7 @@ import java.util.Map;
  */
 
 // todo: set certain fields required!
+@Deprecated
 @Data
 public class UserDetails {
 

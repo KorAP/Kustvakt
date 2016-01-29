@@ -11,6 +11,8 @@ import java.util.List;
 // todo: user instance only required for auditing pointcut operations
 public interface ResourceOperationIface<T extends KustvaktResource> {
 
+    // todo: remove and use type reference!
+    @Deprecated
     Class<T> getType();
 
     <T extends KustvaktResource> T findbyId(String id, User user)

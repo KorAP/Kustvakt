@@ -65,6 +65,18 @@ references korap_users (id)
 on delete cascade
 );
 
+CREATE TABLE IF NOT EXISTS user_details2 (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+user_id INTEGER UNIQUE NOT NULL,
+data BLOB NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS user_settings2 (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+user_id INTEGER UNIQUE NOT NULL,
+data BLOB NOT NULL
+);
+
 
 CREATE TABLE IF NOT EXISTS user_queries (
 id INTEGER PRIMARY KEY,

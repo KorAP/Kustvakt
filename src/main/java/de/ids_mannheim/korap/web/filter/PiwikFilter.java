@@ -13,9 +13,7 @@ import com.sun.jersey.spi.container.ResourceFilter;
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
-import de.ids_mannheim.korap.user.TokenContext;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.UserSettings;
+import de.ids_mannheim.korap.user.*;
 import net.minidev.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,11 +37,10 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
     private static Logger jlog = LoggerFactory.getLogger(PiwikFilter.class);
     public static boolean ENABLED = false;
     private Map<String, String> customVars;
-    private AuthenticationManagerIface securityController;
+    private AuthenticationManagerIface controller;
 
     public PiwikFilter() {
-        securityController = BeanConfiguration.getBeans()
-                .getAuthenticationManager();
+        controller = BeanConfiguration.getBeans().getAuthenticationManager();
         ClientConfig config = new DefaultClientConfig();
         Client client = Client.create(config);
         if (jlog.isDebugEnabled())
@@ -69,8 +66,8 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
         if (request.getAcceptableLanguages() != null)
             l = request.getAcceptableLanguages().get(0);
         try {
-            service.path("piwik/piwik.php")
-                    .queryParam("idsite", "2").queryParam("rec", "1")
+            service.path("piwik/piwik.php").queryParam("idsite", "2")
+                    .queryParam("rec", "1")
                     //todo check for empty container
                     .queryParam("_cvar", translateCustomData())
                     .queryParam("cip", request.getHeaderValue("Host"))
@@ -116,10 +113,10 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
                 TokenContext context = (TokenContext) request
                         .getUserPrincipal();
                 // since this is cached, not very expensive!
-                User user = securityController.getUser(context.getUsername());
-                UserSettings settiings = securityController
-                        .getUserSettings(user);
-                if (settiings.isCollectData())
+                User user = controller.getUser(context.getUsername());
+                Userdata data = controller
+                        .getUserData(user, UserSettings2.class);
+                if ((Boolean) data.get(Attributes.COLLECT_AUDITING_DATA))
                     customVars.put("username", context.getUsername());
             }catch (KustvaktException | UnsupportedOperationException e) {
                 //do nothing

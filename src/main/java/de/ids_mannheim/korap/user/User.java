@@ -5,10 +5,14 @@ import de.ids_mannheim.korap.config.ParamFields;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.utils.KustvaktMap;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,9 +30,18 @@ public abstract class User implements Serializable {
     private boolean isAccountLocked;
     private int type;
     private ParamFields fields;
+    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PRIVATE)
     private UserSettings settings;
+    //todo: remove!
+    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PRIVATE)
     private UserDetails details;
+    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PRIVATE)
     private List<UserQuery> queries;
+
+    private List<Userdata> userdata;
 
     protected User() {
         this.fields = new ParamFields();
@@ -36,6 +49,7 @@ public abstract class User implements Serializable {
         this.isAccountLocked = false;
         this.username = "";
         this.id = -1;
+        this.userdata = new ArrayList<>();
     }
 
     protected User(int type) {
@@ -58,35 +72,49 @@ public abstract class User implements Serializable {
 
     //todo: repair transfer
     public void transfer(User user) {
-        this.setSettings(user.getSettings());
-        this.setDetails(user.getDetails());
+        //        this.setSettings(user.getSettings());
+        //        this.setDetails(user.getDetails());
         //        this.setQueries(user.getQueries());
         if (this instanceof KorAPUser) {
-            this.getSettings().setUserID(this.id);
-            this.getDetails().setUserID(this.id);
+
+            //            this.getSettings().setUserID(this.id);
+            //            this.getDetails().setUserID(this.id);
             //            for (UserQuery q : this.getQueries())
             //                q.setOwner(this.accountID);
         }
     }
 
+    public void addUserData(Userdata data) {
+        if (data != null) {
+            for (Userdata d : this.userdata) {
+                // already has an object of that type!
+                if (d.getClass().equals(data.getClass()))
+                    return;
+            }
+            userdata.add(data);
+        }
+    }
+
+    @Deprecated
     public void setDetails(UserDetails details) {
         if (details != null)
             details.setUserID(this.id);
-        this.details = details;
+        //        this.details = details;
     }
 
+    @Deprecated
     public void setSettings(UserSettings settings) {
         if (settings != null)
             settings.setUserID(this.id);
-        this.settings = settings;
+        //        this.settings = settings;
     }
 
     public void setId(Integer id) {
         this.id = id;
-        if (this.settings != null)
-            this.settings.setUserID(this.id);
-        if (this.details != null)
-            this.details.setUserID(this.id);
+        //        if (this.settings != null)
+        //            this.settings.setUserID(this.id);
+        //        if (this.details != null)
+        //            this.details.setUserID(this.id);
     }
 
     public Map<String, Object> toMap() {
@@ -95,13 +123,9 @@ public abstract class User implements Serializable {
         //TimeUtils.format(new DateTime(this.accountCreation))
         map.put(Attributes.ACCOUNT_CREATION, this.accountCreation);
 
-        if (this.getDetails() != null)
-            map.putAll(this.getDetails().toMap());
+        //        if (this.getDetails() != null)
+        //            map.putAll(this.getDetails().toMap());
         return map;
-    }
-
-    public String toJson() {
-        return JsonUtils.toJSON(this.toMap());
     }
 
     public Map toCache() {

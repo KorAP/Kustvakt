@@ -8,9 +8,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.handlers.OAuth2Handler;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.user.Attributes;
-import de.ids_mannheim.korap.user.TokenContext;
-import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.user.*;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.web.KustvaktServer;
@@ -124,10 +122,12 @@ public class OAuthService {
     public Response getStatus(@Context SecurityContext context,
             @QueryParam("scope") String scopes) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        User user;
+        Map<String, Object> details;
         try {
-            user = this.controller.getUser(ctx.getUsername());
-            this.controller.getUserDetails(user);
+            User user = this.controller.getUser(ctx.getUsername());
+            Userdata data = this.controller
+                    .getUserData(user, Userdetails2.class);
+            details = data.fields();
             Set<String> base_scope = StringUtils.toSet(scopes, " ");
             base_scope.retainAll(StringUtils.toSet(scopes));
             scopes = StringUtils.toString(base_scope);
@@ -136,8 +136,8 @@ public class OAuthService {
         }
         // json format with scope callback parameter
         // todo: add other scopes as well!
-        return Response.ok(JsonUtils.toJSON(Scopes
-                .mapScopes(scopes, user.getDetails()))).build();
+        return Response.ok(JsonUtils
+                .toJSON(Scopes.mapScopes(scopes, details))).build();
     }
 
     @GET
@@ -172,7 +172,7 @@ public class OAuthService {
             @Context SecurityContext context,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
-            MultivaluedMap<String, String> form)
+            MultivaluedMap<String, Object> form)
             throws OAuthSystemException, URISyntaxException {
         // user needs to be authenticated to this service!
         TokenContext c = (TokenContext) context.getUserPrincipal();
@@ -184,7 +184,7 @@ public class OAuthService {
                     new MD5Generator());
             User user;
 
-            Map<String, String> attr = new HashMap<>();
+            Map<String, Object> attr = new HashMap<>();
             attr.put(Attributes.HOST, host);
             attr.put(Attributes.USER_AGENT, agent);
             attr.put(Attributes.USERNAME, c.getUsername());
@@ -198,7 +198,9 @@ public class OAuthService {
 
             try {
                 user = controller.getUser(c.getUsername());
-                controller.getUserDetails(user);
+                Userdata data = controller
+                        .getUserData(user, Userdetails2.class);
+                user.addUserData(data);
             }catch (KustvaktException e) {
                 throw KustvaktResponseHandler.throwit(e);
             }
@@ -436,7 +438,7 @@ public class OAuthService {
                         .entity(res.getBody()).build();
             }
 
-            Map<String, String> attr = new HashMap<>();
+            Map<String, Object> attr = new HashMap<>();
             attr.put(Attributes.HOST, host);
             attr.put(Attributes.USER_AGENT, agent);
             attr.put(Attributes.SCOPES,
@@ -540,7 +542,10 @@ public class OAuthService {
                         user = controller
                                 .authenticate(0, oauthRequest.getUsername(),
                                         oauthRequest.getPassword(), attr);
-                    controller.getUserDetails(user);
+                    Userdata data = controller
+                            .getUserData(user, Userdetails2.class);
+                    user.addUserData(data);
+
                     attr.put(Attributes.CLIENT_SECRET,
                             oauthRequest.getClientSecret());
                     TokenContext c = controller.createTokenContext(user, attr,

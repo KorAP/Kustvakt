@@ -12,7 +12,6 @@ import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.user.*;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
-import de.ids_mannheim.korap.web.utils.KustvaktMap;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -109,7 +108,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         AuthenticationIface provider = getProvider(context.getTokenType(),
                 null);
         if (provider == null) {
-
+            //todo:
         }
 
         try {
@@ -128,8 +127,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
      * @return User
      * @throws KustvaktException
      */
+    @Override
     public User authenticate(int type, String username, String password,
-            Map<String, String> attributes) throws KustvaktException {
+            Map<String, Object> attributes) throws KustvaktException {
         User user;
         switch (type) {
             case 1:
@@ -146,19 +146,21 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         return user;
     }
 
+    // todo: dont use annotations for caching
+    @Override
     @CachePut(value = "users", key = "#user.getUsername()")
-    public TokenContext createTokenContext(User user, Map<String, String> attr,
+    public TokenContext createTokenContext(User user, Map<String, Object> attr,
             String provider_key) throws KustvaktException {
         AuthenticationIface provider = getProvider(provider_key,
                 Attributes.API_AUTHENTICATION);
 
         if (attr.get(Attributes.SCOPES) != null)
-            this.getUserDetails(user);
+            this.getUserData(user, Userdetails2.class);
 
         TokenContext context = provider.createUserSession(user, attr);
         if (context == null)
             throw new KustvaktException(StatusCodes.NOT_SUPPORTED);
-        context.setUserAgent(attr.get(Attributes.USER_AGENT));
+        context.setUserAgent((String) attr.get(Attributes.USER_AGENT));
         context.setHostAddress(Attributes.HOST);
         return context;
     }
@@ -174,7 +176,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         return false;
     }
 
-    private User authenticateShib(Map<String, String> attributes)
+    private User authenticateShib(Map<String, Object> attributes)
             throws KustvaktException {
         // todo use persistent id, since eppn is not unique
         String eppn = (String) attributes.get(Attributes.EPPN);
@@ -195,8 +197,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
     //todo: what if attributes null?
     private User authenticate(String username, String password,
-            Map<String, String> attr) throws KustvaktException {
-        Map<String, String> attributes = crypto.validateMap(attr);
+            Map<String, Object> attr) throws KustvaktException {
+        Map<String, Object> attributes = crypto.validateMap(attr);
         String safeUS;
         User unknown;
         // just to make sure that the plain password does not appear anywhere in the logs!
@@ -213,8 +215,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         else {
             try {
                 unknown = entHandler.getAccount(safeUS);
-                unknown.setSettings(
-                        entHandler.getUserSettings(unknown.getId()));
             }catch (EmptyResultException e) {
                 // mask exception to disable user guessing in possible attacks
                 throw new WrappedException(new KustvaktException(username,
@@ -458,11 +458,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
      * @throws KustvaktException
      */
     //fixme: remove clientinfo object (not needed), use json representation to get stuff
-    public User createUserAccount(Map attributes, boolean confirmation_required)
-            throws KustvaktException {
-        KustvaktMap kmap = new KustvaktMap(attributes);
-
-        Map<String, String> safeMap = crypto.validateMap(attributes);
+    public User createUserAccount(Map<String, Object> attributes,
+            boolean confirmation_required) throws KustvaktException {
+        Map<String, Object> safeMap = crypto.validateMap(attributes);
         if (safeMap.get(Attributes.USERNAME) == null || ((String) safeMap
                 .get(Attributes.USERNAME)).isEmpty())
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
@@ -473,10 +471,12 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                     StatusCodes.ILLEGAL_ARGUMENT, "password must be set",
                     "password");
 
-        String username = crypto.validateEntry(safeMap.get(Attributes.USERNAME),
-                Attributes.USERNAME);
-        String safePass = crypto.validateEntry(safeMap.get(Attributes.PASSWORD),
-                Attributes.PASSWORD);
+        String username = crypto
+                .validateEntry((String) safeMap.get(Attributes.USERNAME),
+                        Attributes.USERNAME);
+        String safePass = crypto
+                .validateEntry((String) safeMap.get(Attributes.PASSWORD),
+                        Attributes.PASSWORD);
         String hash;
         try {
             hash = crypto.produceSecureHash(safePass);
@@ -486,9 +486,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         }
 
         KorAPUser user = User.UserFactory.getUser(username);
-        UserDetails det = UserDetails.newDetailsIterator(safeMap);
-        user.setDetails(det);
-        user.setSettings(new UserSettings());
         if (confirmation_required) {
             user.setAccountLocked(true);
             URIParam param = new URIParam(crypto.createToken(),
@@ -498,6 +495,16 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         user.setPassword(hash);
         try {
             entHandler.createAccount(user);
+            Userdetails2 details = new Userdetails2(user.getId());
+            details.readDefaults(safeMap);
+            details.checkRequired();
+
+            UserSettings2 settings = new UserSettings2(user.getId());
+            settings.readDefaults(safeMap);
+            settings.checkRequired();
+
+            UserdataFactory.getDaoInstance(Userdetails2.class).store(details);
+            UserdataFactory.getDaoInstance(UserSettings2.class).store(settings);
         }catch (KustvaktException e) {
             throw new WrappedException(e, StatusCodes.CREATE_ACCOUNT_FAILED,
                     user.toString());
@@ -509,11 +516,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     }
 
     //todo:
-    private ShibUser createShibbUserAccount(Map<String, String> attributes)
+    private ShibUser createShibbUserAccount(Map<String, Object> attributes)
             throws KustvaktException {
         jlog.debug("creating shibboleth user account for user attr: {}",
                 attributes);
-        Map<String, String> safeMap = crypto.validateMap(attributes);
+        Map<String, Object> safeMap = crypto.validateMap(attributes);
 
         //todo eppn non-unique.join with idp or use persistent_id as username identifier
         ShibUser user = User.UserFactory
@@ -634,9 +641,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                     username), StatusCodes.PASSWORD_RESET_FAILED, username);
         }
 
-        getUserDetails(ident);
+        Userdata data = this.getUserData(ident, Userdetails2.class);
         KorAPUser user = (KorAPUser) ident;
-        if (!mail.equals(user.getDetails().getEmail()))
+
+        if (!mail.equals(data.get(Attributes.EMAIL)))
             //            throw new NotAuthorizedException(StatusCodes.ILLEGAL_ARGUMENT,
             //                    "invalid parameter: email", "email");
             throw new WrappedException(new KustvaktException(user.getId(),
@@ -657,60 +665,52 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                 new DateTime(param.getUriExpiration()) };
     }
 
-    public void updateUserSettings(User user, UserSettings settings)
-            throws KustvaktException {
-        if (user instanceof DemoUser)
-            return;
-        else {
-            Map map = crypto.validateMap(settings.toObjectMap());
-            settings = UserSettings.fromObjectMap(map);
-            try {
-                entHandler.updateSettings(settings);
-            }catch (KustvaktException e) {
-                jlog.error("Error ", e);
-                throw new WrappedException(e,
-                        StatusCodes.UPDATE_ACCOUNT_FAILED);
-            }
-        }
-    }
+    @Override
+    public <T extends Userdata> T getUserData(User user, Class<T> clazz)
+            throws WrappedException {
 
-    public void updateUserDetails(User user, UserDetails details)
-            throws KustvaktException {
-        if (user instanceof DemoUser)
-            return;
-        else {
-            Map map = crypto.validateMap(details.toMap());
-
-            try {
-                entHandler
-                        .updateUserDetails(UserDetails.newDetailsIterator(map));
-            }catch (KustvaktException e) {
-                jlog.error("Error ", e);
-                throw new WrappedException(e,
-                        StatusCodes.UPDATE_ACCOUNT_FAILED);
-            }
-        }
-    }
-
-    public UserDetails getUserDetails(User user) throws KustvaktException {
         try {
-            if (user.getDetails() == null)
-                user.setDetails(entHandler.getUserDetails(user.getId()));
+            UserDataDbIface<T> dao = UserdataFactory.getDaoInstance(clazz);
+            return dao.get(user);
         }catch (KustvaktException e) {
+            jlog.error("Error ", e);
             throw new WrappedException(e, StatusCodes.GET_ACCOUNT_FAILED);
         }
-        return user.getDetails();
     }
 
-    public UserSettings getUserSettings(User user) throws KustvaktException {
+    //todo: cache userdata outside of the user object!
+    @Override
+    public void updateUserData(Userdata data) throws WrappedException {
         try {
-            if (user.getSettings() == null)
-                user.setSettings(entHandler.getUserSettings(user.getId()));
+            data.validate(this.crypto);
+            UserDataDbIface dao = UserdataFactory
+                    .getDaoInstance(data.getClass());
+            dao.update(data);
         }catch (KustvaktException e) {
-            throw new WrappedException(e, StatusCodes.GET_ACCOUNT_FAILED);
+            jlog.error("Error ", e);
+            throw new WrappedException(e, StatusCodes.UPDATE_ACCOUNT_FAILED);
         }
-        return user.getSettings();
     }
+
+    //    public UserDetails getUserDetails(User user) throws KustvaktException {
+    //        try {
+    //            if (user.getDetails() == null)
+    //                user.setDetails(entHandler.getUserDetails(user.getId()));
+    //        }catch (KustvaktException e) {
+    //            throw new WrappedException(e, StatusCodes.GET_ACCOUNT_FAILED);
+    //        }
+    //        return user.getDetails();
+    //    }
+    //
+    //    public UserSettings getUserSettings(User user) throws KustvaktException {
+    //        try {
+    //            if (user.getSettings() == null)
+    //                user.setSettings(entHandler.getUserSettings(user.getId()));
+    //        }catch (KustvaktException e) {
+    //            throw new WrappedException(e, StatusCodes.GET_ACCOUNT_FAILED);
+    //        }
+    //        return user.getSettings();
+    //    }
 
     private String cache_key(String input) throws KustvaktException {
         try {

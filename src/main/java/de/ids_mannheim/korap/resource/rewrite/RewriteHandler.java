@@ -122,6 +122,7 @@ public class RewriteHandler {
     }
 
     private JsonNode process(JsonNode root, User user, boolean post) {
+        jlog.debug("Running rewrite process on query {}", root);
         Iterator<Map.Entry<String, JsonNode>> it = root.fields();
         while (it.hasNext()) {
             Map.Entry<String, JsonNode> next = it.next();

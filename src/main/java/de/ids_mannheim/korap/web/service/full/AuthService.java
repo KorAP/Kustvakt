@@ -7,10 +7,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
-import de.ids_mannheim.korap.user.Attributes;
-import de.ids_mannheim.korap.user.TokenContext;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.UserSettings;
+import de.ids_mannheim.korap.user.*;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.ServiceVersion;
@@ -110,7 +107,7 @@ public class AuthService {
             // is actual an invalid request
             throw KustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
 
-        Map<String, String> attr = new HashMap<>();
+        Map<String, Object> attr = new HashMap<>();
         if (scopes != null && !scopes.isEmpty())
             attr.put(Attributes.SCOPES, scopes);
         attr.put(Attributes.HOST, host);
@@ -118,7 +115,10 @@ public class AuthService {
         TokenContext context;
         try {
             User user = controller.authenticate(0, values[0], values[1], attr);
-            this.controller.getUserDetails(user);
+            Userdata data = this.controller
+                    .getUserData(user, Userdetails2.class);
+            // todo: is this necessary?
+//            attr.putAll(data.fields());
             context = controller.createTokenContext(user, attr,
                     Attributes.API_AUTHENTICATION);
         }catch (KustvaktException e) {
@@ -175,7 +175,7 @@ public class AuthService {
                 .equalsIgnoreCase("null"))
             throw KustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
 
-        Map<String, String> attr = new HashMap<>();
+        Map<String, Object> attr = new HashMap<>();
         attr.put(Attributes.HOST, host);
         attr.put(Attributes.USER_AGENT, agent);
         TokenContext context;
@@ -204,7 +204,7 @@ public class AuthService {
         // the shibfilter decrypted the values
         // define default provider for returned access token strategy?!
 
-        Map<String, String> attr = new HashMap<>();
+        Map<String, Object> attr = new HashMap<>();
         attr.put(Attributes.HOST, host);
         attr.put(Attributes.USER_AGENT, agent);
 

@@ -59,27 +59,20 @@ public class UserService {
     public Response signUp(
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
-            @Context Locale locale,
-            MultivaluedMap<String, String> form_values) {
-        Map<String, String> wrapper = FormRequestWrapper
+            @Context Locale locale, MultivaluedMap form_values) {
+        Map<String, Object> wrapper = FormRequestWrapper
                 .toMap(form_values, true);
 
         wrapper.put(Attributes.HOST, host);
         wrapper.put(Attributes.USER_AGENT, agent);
         UriBuilder uriBuilder;
         User user;
-        if (wrapper.get(Attributes.EMAIL) == null)
-            throw KustvaktResponseHandler
-                    .throwit(StatusCodes.ILLEGAL_ARGUMENT, "parameter missing",
-                            "email");
-
         try {
             uriBuilder = info.getBaseUriBuilder();
             uriBuilder.path(KustvaktServer.API_VERSION).path("user")
                     .path("confirm");
 
             user = controller.createUserAccount(wrapper, true);
-
         }catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
@@ -217,18 +210,19 @@ public class UserService {
     public Response getStatus(@Context SecurityContext context,
             @QueryParam("scopes") String scopes) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        User user;
+        Scopes m;
         try {
-            user = controller.getUser(ctx.getUsername());
-            controller.getUserDetails(user);
+            User user = controller.getUser(ctx.getUsername());
+            Userdata data = controller.getUserData(user, Userdetails2.class);
+
             Set<String> base_scope = StringUtils.toSet(scopes, " ");
             if (scopes != null)
                 base_scope.retainAll(StringUtils.toSet(scopes));
             scopes = StringUtils.toString(base_scope);
+            m = Scopes.mapScopes(scopes, data.fields());
         }catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
-        Scopes m = Scopes.mapScopes(scopes, user.getDetails());
         return Response.ok(m.toEntity()).build();
     }
 
@@ -239,19 +233,17 @@ public class UserService {
     public Response getUserSettings(@Context SecurityContext context,
             @Context Locale locale) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        User user;
+        String result;
         try {
-            user = controller.getUser(ctx.getUsername());
-            controller.getUserSettings(user);
-
+            User user = controller.getUser(ctx.getUsername());
+            Userdata data = controller.getUserData(user, UserSettings2.class);
+            data.addField(Attributes.USERNAME, ctx.getUsername());
+            result = data.data();
         }catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
-
-        Map m = user.getSettings().toObjectMap();
-        m.put(Attributes.USERNAME, ctx.getUsername());
-        return Response.ok(JsonUtils.toJSON(m)).build();
+        return Response.ok(result).build();
     }
 
     // todo: test
@@ -261,24 +253,27 @@ public class UserService {
     @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
             PiwikFilter.class })
     public Response updateSettings(@Context SecurityContext context,
-            @Context Locale locale, MultivaluedMap<String, String> form) {
+            @Context Locale locale, MultivaluedMap form) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        Map<String, String> settings = FormRequestWrapper.toMap(form, false);
+        Map<String, Object> settings = FormRequestWrapper.toMap(form, false);
 
         try {
             User user = controller.getUser(ctx.getUsername());
-            UserSettings us = controller.getUserSettings(user);
+            if (user.isDemo())
+                return Response.notModified().build();
+
+            Userdata data = controller.getUserData(user, UserSettings2.class);
             // todo: check setting only within the scope of user settings permissions; not foundry range. Latter is part of
             // frontend which only displays available foundries and
             //            SecurityManager.findbyId(us.getDefaultConstfoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultLemmafoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultPOSfoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultRelfoundry(), user, Foundry.class);
-            us.updateStringSettings(settings);
+            Userdata new_data = new UserSettings2(user.getId());
+            new_data.setData(JsonUtils.toJSON(settings));
+            data.update(new_data);
 
-            controller.updateUserSettings(user, us);
-            if (user.isDemo())
-                return Response.notModified().build();
+            controller.updateUserData(data);
         }catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
@@ -294,18 +289,17 @@ public class UserService {
     public Response getDetails(@Context SecurityContext context,
             @Context Locale locale) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        User user;
+        String result;
         try {
-            user = controller.getUser(ctx.getUsername());
-            controller.getUserDetails(user);
+            User user = controller.getUser(ctx.getUsername());
+            Userdata data = controller.getUserData(user, Userdetails2.class);
+            data.addField(Attributes.USERNAME, ctx.getUsername());
+            result = data.data();
         }catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
-
-        Map m = user.getDetails().toMap();
-        m.put(Attributes.USERNAME, ctx.getUsername());
-        return Response.ok(JsonUtils.toJSON(m)).build();
+        return Response.ok(result).build();
     }
 
     @POST
@@ -317,15 +311,19 @@ public class UserService {
             @Context Locale locale, MultivaluedMap form) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
 
-        Map<String, String> wrapper = FormRequestWrapper.toMap(form, true);
+        Map<String, Object> wrapper = FormRequestWrapper.toMap(form, true);
 
         try {
             User user = controller.getUser(ctx.getUsername());
-            UserDetails det = controller.getUserDetails(user);
-            det.updateDetails(wrapper);
-            controller.updateUserDetails(user, det);
             if (user.isDemo())
                 return Response.notModified().build();
+
+            Userdetails2 new_data = new Userdetails2(user.getId());
+            new_data.setData(JsonUtils.toJSON(wrapper));
+
+            Userdetails2 det = controller.getUserData(user, Userdetails2.class);
+            det.update(new_data);
+            controller.updateUserData(det);
         }catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
