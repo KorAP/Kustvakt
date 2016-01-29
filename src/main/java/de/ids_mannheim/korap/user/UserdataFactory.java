@@ -5,6 +5,7 @@ import de.ids_mannheim.korap.config.KustvaktClassLoader;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
+import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

@@ -1,6 +1,9 @@
-package de.ids_mannheim.korap.user;
+package de.ids_mannheim.korap.handlers;
 
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
+import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
+import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.user.UserSettings2;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
