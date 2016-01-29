@@ -3,7 +3,7 @@ package de.ids_mannheim.korap.handlers;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.Userdetails2;
+import de.ids_mannheim.korap.user.UserDetails;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -18,7 +18,7 @@ import java.util.HashMap;
  * @author hanl
  * @date 27/01/2016
  */
-public class UserDetailsDao implements UserDataDbIface<Userdetails2> {
+public class UserDetailsDao implements UserDataDbIface<UserDetails> {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -27,7 +27,7 @@ public class UserDetailsDao implements UserDataDbIface<Userdetails2> {
     }
 
     @Override
-    public int store(Userdetails2 data) {
+    public int store(UserDetails data) {
         String sql = "INSERT INTO user_details2 (user_id, data) VALUES (:userid, :data);";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", data.getUserID());
@@ -46,7 +46,7 @@ public class UserDetailsDao implements UserDataDbIface<Userdetails2> {
     }
 
     @Override
-    public int update(Userdetails2 data) {
+    public int update(UserDetails data) {
         String sql = "UPDATE user_details2 SET data = :data WHERE user_id=:userid;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", data.getUserID());
@@ -60,19 +60,19 @@ public class UserDetailsDao implements UserDataDbIface<Userdetails2> {
     }
 
     @Override
-    public Userdetails2 get(Integer id) {
+    public UserDetails get(Integer id) {
         String sql = "SELECT * FROM user_details2 WHERE id=:id;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", id);
 
         try {
             return this.jdbcTemplate
-                    .queryForObject(sql, source, new RowMapper<Userdetails2>() {
+                    .queryForObject(sql, source, new RowMapper<UserDetails>() {
 
                         @Override
-                        public Userdetails2 mapRow(ResultSet rs, int rowNum)
+                        public UserDetails mapRow(ResultSet rs, int rowNum)
                                 throws SQLException {
-                            Userdetails2 details = new Userdetails2(
+                            UserDetails details = new UserDetails(
                                     rs.getInt("user_id"));
                             details.setId(rs.getInt("id"));
                             details.setData(rs.getString("data"));
@@ -86,19 +86,19 @@ public class UserDetailsDao implements UserDataDbIface<Userdetails2> {
     }
 
     @Override
-    public Userdetails2 get(User user) {
+    public UserDetails get(User user) {
         String sql = "SELECT * FROM user_details2 WHERE user_id=:userid;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", user.getId());
 
         try {
             return this.jdbcTemplate
-                    .queryForObject(sql, source, new RowMapper<Userdetails2>() {
+                    .queryForObject(sql, source, new RowMapper<UserDetails>() {
 
                         @Override
-                        public Userdetails2 mapRow(ResultSet rs, int rowNum)
+                        public UserDetails mapRow(ResultSet rs, int rowNum)
                                 throws SQLException {
-                            Userdetails2 details = new Userdetails2(
+                            UserDetails details = new UserDetails(
                                     rs.getInt("user_id"));
                             details.setId(rs.getInt("id"));
                             details.setData(rs.getString("data"));
@@ -113,7 +113,7 @@ public class UserDetailsDao implements UserDataDbIface<Userdetails2> {
     }
 
     @Override
-    public int delete(Userdetails2 data) {
+    public int delete(UserDetails data) {
         String sql = "DELETE FROM user_details2 WHERE id=:id";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", data.getId());

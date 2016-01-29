@@ -213,7 +213,7 @@ public class UserService {
         Scopes m;
         try {
             User user = controller.getUser(ctx.getUsername());
-            Userdata data = controller.getUserData(user, Userdetails2.class);
+            Userdata data = controller.getUserData(user, UserDetails.class);
 
             Set<String> base_scope = StringUtils.toSet(scopes, " ");
             if (scopes != null)
@@ -236,7 +236,7 @@ public class UserService {
         String result;
         try {
             User user = controller.getUser(ctx.getUsername());
-            Userdata data = controller.getUserData(user, UserSettings2.class);
+            Userdata data = controller.getUserData(user, UserSettings.class);
             data.addField(Attributes.USERNAME, ctx.getUsername());
             result = data.data();
         }catch (KustvaktException e) {
@@ -262,14 +262,14 @@ public class UserService {
             if (user.isDemo())
                 return Response.notModified().build();
 
-            Userdata data = controller.getUserData(user, UserSettings2.class);
+            Userdata data = controller.getUserData(user, UserSettings.class);
             // todo: check setting only within the scope of user settings permissions; not foundry range. Latter is part of
             // frontend which only displays available foundries and
             //            SecurityManager.findbyId(us.getDefaultConstfoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultLemmafoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultPOSfoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultRelfoundry(), user, Foundry.class);
-            Userdata new_data = new UserSettings2(user.getId());
+            Userdata new_data = new UserSettings(user.getId());
             new_data.setData(JsonUtils.toJSON(settings));
             data.update(new_data);
 
@@ -292,7 +292,7 @@ public class UserService {
         String result;
         try {
             User user = controller.getUser(ctx.getUsername());
-            Userdata data = controller.getUserData(user, Userdetails2.class);
+            Userdata data = controller.getUserData(user, UserDetails.class);
             data.addField(Attributes.USERNAME, ctx.getUsername());
             result = data.data();
         }catch (KustvaktException e) {
@@ -318,10 +318,10 @@ public class UserService {
             if (user.isDemo())
                 return Response.notModified().build();
 
-            Userdetails2 new_data = new Userdetails2(user.getId());
+            UserDetails new_data = new UserDetails(user.getId());
             new_data.setData(JsonUtils.toJSON(wrapper));
 
-            Userdetails2 det = controller.getUserData(user, Userdetails2.class);
+            UserDetails det = controller.getUserData(user, UserDetails.class);
             det.update(new_data);
             controller.updateUserData(det);
         }catch (KustvaktException e) {

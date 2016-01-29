@@ -3,7 +3,7 @@ package de.ids_mannheim.korap.handlers;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.UserSettings2;
+import de.ids_mannheim.korap.user.UserSettings;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -18,7 +18,7 @@ import java.util.HashMap;
  * @author hanl
  * @date 28/01/2016
  */
-public class UserSettingsDao implements UserDataDbIface<UserSettings2> {
+public class UserSettingsDao implements UserDataDbIface<UserSettings> {
 
     NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -26,7 +26,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings2> {
         this.jdbcTemplate = (NamedParameterJdbcTemplate) client.getSource();
     }
     @Override
-    public int store(UserSettings2 data) {
+    public int store(UserSettings data) {
         String sql = "INSERT INTO user_settings2 (user_id, data) VALUES (:userid, :data);";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", data.getUserID());
@@ -45,7 +45,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings2> {
     }
 
     @Override
-    public int update(UserSettings2 data) {
+    public int update(UserSettings data) {
         String sql = "UPDATE user_settings2 SET data = :data WHERE user_id=:userid;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", data.getUserID());
@@ -59,19 +59,19 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings2> {
     }
 
     @Override
-    public UserSettings2 get(Integer id) {
+    public UserSettings get(Integer id) {
         String sql = "SELECT * FROM user_settings2 WHERE id=:id;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", id);
 
         try {
             return this.jdbcTemplate
-                    .queryForObject(sql, source, new RowMapper<UserSettings2>() {
+                    .queryForObject(sql, source, new RowMapper<UserSettings>() {
 
                         @Override
-                        public UserSettings2 mapRow(ResultSet rs, int rowNum)
+                        public UserSettings mapRow(ResultSet rs, int rowNum)
                                 throws SQLException {
-                            UserSettings2 details = new UserSettings2(
+                            UserSettings details = new UserSettings(
                                     rs.getInt("user_id"));
                             details.setId(rs.getInt("id"));
                             details.setData(rs.getString("data"));
@@ -85,19 +85,19 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings2> {
     }
 
     @Override
-    public UserSettings2 get(User user) {
+    public UserSettings get(User user) {
         String sql = "SELECT * FROM user_settings2 WHERE user_id=:userid;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", user.getId());
 
         try {
             return this.jdbcTemplate
-                    .queryForObject(sql, source, new RowMapper<UserSettings2>() {
+                    .queryForObject(sql, source, new RowMapper<UserSettings>() {
 
                         @Override
-                        public UserSettings2 mapRow(ResultSet rs, int rowNum)
+                        public UserSettings mapRow(ResultSet rs, int rowNum)
                                 throws SQLException {
-                            UserSettings2 details = new UserSettings2(
+                            UserSettings details = new UserSettings(
                                     rs.getInt("user_id"));
                             details.setId(rs.getInt("id"));
                             details.setData(rs.getString("data"));
@@ -112,7 +112,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings2> {
     }
 
     @Override
-    public int delete(UserSettings2 data) {
+    public int delete(UserSettings data) {
         String sql = "DELETE FROM user_settings2 WHERE id=:id";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", data.getId());

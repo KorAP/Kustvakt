@@ -5,9 +5,9 @@ package de.ids_mannheim.korap.user;
  * @date 22/01/2016
  * persistence issue with query request
  */
-public class Userdetails2 extends Userdata {
+public class UserDetails extends Userdata {
 
-    public Userdetails2(Integer userid) {
+    public UserDetails(Integer userid) {
         super(userid);
     }
 

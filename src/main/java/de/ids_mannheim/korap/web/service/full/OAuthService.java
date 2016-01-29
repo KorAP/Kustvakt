@@ -126,7 +126,7 @@ public class OAuthService {
         try {
             User user = this.controller.getUser(ctx.getUsername());
             Userdata data = this.controller
-                    .getUserData(user, Userdetails2.class);
+                    .getUserData(user, UserDetails.class);
             details = data.fields();
             Set<String> base_scope = StringUtils.toSet(scopes, " ");
             base_scope.retainAll(StringUtils.toSet(scopes));
@@ -199,7 +199,7 @@ public class OAuthService {
             try {
                 user = controller.getUser(c.getUsername());
                 Userdata data = controller
-                        .getUserData(user, Userdetails2.class);
+                        .getUserData(user, UserDetails.class);
                 user.addUserData(data);
             }catch (KustvaktException e) {
                 throw KustvaktResponseHandler.throwit(e);
@@ -543,7 +543,7 @@ public class OAuthService {
                                 .authenticate(0, oauthRequest.getUsername(),
                                         oauthRequest.getPassword(), attr);
                     Userdata data = controller
-                            .getUserData(user, Userdetails2.class);
+                            .getUserData(user, UserDetails.class);
                     user.addUserData(data);
 
                     attr.put(Attributes.CLIENT_SECRET,

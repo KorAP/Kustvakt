@@ -4,10 +4,10 @@ package de.ids_mannheim.korap.user;
  * @author hanl
  * @date 28/01/2016
  */
-public class UserSettings2 extends Userdata {
+public class UserSettings extends Userdata {
 
 
-    public UserSettings2(Integer userid) {
+    public UserSettings(Integer userid) {
         super(userid);
     }
 

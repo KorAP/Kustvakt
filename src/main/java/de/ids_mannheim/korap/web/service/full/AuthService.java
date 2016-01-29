@@ -116,7 +116,7 @@ public class AuthService {
         try {
             User user = controller.authenticate(0, values[0], values[1], attr);
             Userdata data = this.controller
-                    .getUserData(user, Userdetails2.class);
+                    .getUserData(user, UserDetails.class);
             // todo: is this necessary?
 //            attr.putAll(data.fields());
             context = controller.createTokenContext(user, attr,

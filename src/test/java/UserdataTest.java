@@ -37,7 +37,7 @@ public class UserdataTest {
         user.setId(1);
         UserDetailsDao dao = new UserDetailsDao(
                 BeanConfiguration.getBeans().getPersistenceClient());
-        Userdetails2 d = new Userdetails2(1);
+        UserDetails d = new UserDetails(1);
         d.addField("key_1", "value is a value");
         assert dao.store(d) != -1;
     }
@@ -48,7 +48,7 @@ public class UserdataTest {
         user.setId(1);
         UserDetailsDao dao = new UserDetailsDao(
                 BeanConfiguration.getBeans().getPersistenceClient());
-        Userdetails2 d = new Userdetails2(1);
+        UserDetails d = new UserDetails(1);
         d.addField("key_1", "value is a value");
         assert dao.store(d) != -1;
 
@@ -63,7 +63,7 @@ public class UserdataTest {
 
     @Test
     public void testDataValidation() {
-        Userdata data = new Userdetails2(1);
+        Userdata data = new UserDetails(1);
         data.addField(Attributes.COUNTRY, "Germany");
 
         String[] req = data.requiredFields();
@@ -75,7 +75,7 @@ public class UserdataTest {
 
     @Test
     public void testSettingsValidation() {
-        Userdata data = new UserSettings2(1);
+        Userdata data = new UserSettings(1);
         data.addField(Attributes.FILE_FORMAT_FOR_EXPORT, "export");
 
         String[] req = data.requiredFields();
@@ -88,7 +88,7 @@ public class UserdataTest {
     @Test
     public void testUserdatafactory() throws KustvaktException {
         UserDataDbIface dao = UserdataFactory
-                .getDaoInstance(Userdetails2.class);
+                .getDaoInstance(UserDetails.class);
         assert UserDetailsDao.class.equals(dao.getClass());
     }
 

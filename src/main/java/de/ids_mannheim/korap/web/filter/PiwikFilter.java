@@ -115,7 +115,7 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
                 // since this is cached, not very expensive!
                 User user = controller.getUser(context.getUsername());
                 Userdata data = controller
-                        .getUserData(user, UserSettings2.class);
+                        .getUserData(user, UserSettings.class);
                 if ((Boolean) data.get(Attributes.COLLECT_AUDITING_DATA))
                     customVars.put("username", context.getUsername());
             }catch (KustvaktException | UnsupportedOperationException e) {

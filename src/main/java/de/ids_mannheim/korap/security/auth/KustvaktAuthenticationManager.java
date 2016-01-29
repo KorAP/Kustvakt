@@ -156,7 +156,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                 Attributes.API_AUTHENTICATION);
 
         if (attr.get(Attributes.SCOPES) != null)
-            this.getUserData(user, Userdetails2.class);
+            this.getUserData(user, UserDetails.class);
 
         TokenContext context = provider.createUserSession(user, attr);
         if (context == null)
@@ -496,16 +496,16 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         user.setPassword(hash);
         try {
             entHandler.createAccount(user);
-            Userdetails2 details = new Userdetails2(user.getId());
+            UserDetails details = new UserDetails(user.getId());
             details.readDefaults(safeMap);
             details.checkRequired();
 
-            UserSettings2 settings = new UserSettings2(user.getId());
+            UserSettings settings = new UserSettings(user.getId());
             settings.readDefaults(safeMap);
             settings.checkRequired();
 
-            UserdataFactory.getDaoInstance(Userdetails2.class).store(details);
-            UserdataFactory.getDaoInstance(UserSettings2.class).store(settings);
+            UserdataFactory.getDaoInstance(UserDetails.class).store(details);
+            UserdataFactory.getDaoInstance(UserSettings.class).store(settings);
         }catch (KustvaktException e) {
             throw new WrappedException(e, StatusCodes.CREATE_ACCOUNT_FAILED,
                     user.toString());
@@ -642,7 +642,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                     username), StatusCodes.PASSWORD_RESET_FAILED, username);
         }
 
-        Userdata data = this.getUserData(ident, Userdetails2.class);
+        Userdata data = this.getUserData(ident, UserDetails.class);
         KorAPUser user = (KorAPUser) ident;
 
         if (!mail.equals(data.get(Attributes.EMAIL)))
