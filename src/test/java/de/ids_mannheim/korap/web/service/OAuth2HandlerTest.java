@@ -3,10 +3,10 @@ package de.ids_mannheim.korap.web.service;
 import de.ids_mannheim.korap.config.AuthCodeInfo;
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.ClientInfo;
+import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.OAuth2Handler;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import org.junit.AfterClass;
@@ -25,7 +25,7 @@ public class OAuth2HandlerTest {
     private static OAuth2Handler handler;
     private static EncryptionIface crypto;
     private static final String SCOPES = "search preferences queries account";
-    private static final KorAPUser user = User.UserFactory.getUser("test_user");
+    private static User user;
 
     @BeforeClass
     public static void setup() throws KustvaktException {
@@ -39,8 +39,8 @@ public class OAuth2HandlerTest {
         info.setUrl("http://localhost:8080/api/v0.1");
         info.setRedirect_uri("testwebsite/login");
 
-        user.setPassword("testPassword123");
-        BeanConfiguration.getBeans().getUserDBHandler().createAccount(user);
+        TestHelper.setupUser();
+        user = TestHelper.getUser();
         handler.registerClient(info, user);
     }
 
@@ -48,8 +48,7 @@ public class OAuth2HandlerTest {
     public static void drop() throws KustvaktException {
         assert handler != null;
         handler.removeClient(info, user);
-        BeanConfiguration.getBeans().getUserDBHandler()
-                .deleteAccount(user.getId());
+        TestHelper.dropUser();
         BeanConfiguration.closeApplication();
     }
 

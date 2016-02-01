@@ -27,7 +27,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
     }
     @Override
     public int store(UserSettings data) {
-        String sql = "INSERT INTO user_settings2 (user_id, data) VALUES (:userid, :data);";
+        String sql = "INSERT INTO user_settings (user_id, data) VALUES (:userid, :data);";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", data.getUserID());
         source.addValue("data", data.data());
@@ -46,7 +46,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
 
     @Override
     public int update(UserSettings data) {
-        String sql = "UPDATE user_settings2 SET data = :data WHERE user_id=:userid;";
+        String sql = "UPDATE user_settings SET data = :data WHERE user_id=:userid;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", data.getUserID());
         source.addValue("data", data.data());
@@ -60,7 +60,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
 
     @Override
     public UserSettings get(Integer id) {
-        String sql = "SELECT * FROM user_settings2 WHERE id=:id;";
+        String sql = "SELECT * FROM user_settings WHERE id=:id;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", id);
 
@@ -86,7 +86,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
 
     @Override
     public UserSettings get(User user) {
-        String sql = "SELECT * FROM user_settings2 WHERE user_id=:userid;";
+        String sql = "SELECT * FROM user_settings WHERE user_id=:userid;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", user.getId());
 
@@ -113,7 +113,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
 
     @Override
     public int delete(UserSettings data) {
-        String sql = "DELETE FROM user_settings2 WHERE id=:id";
+        String sql = "DELETE FROM user_settings WHERE id=:id";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", data.getId());
         try {
@@ -125,7 +125,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
 
     @Override
     public int deleteAll() {
-        String sql = "DELETE FROM user_settings2;";
+        String sql = "DELETE FROM user_settings;";
         try {
             return this.jdbcTemplate.update(sql, new HashMap<String, Object>());
         }catch (DataAccessException e) {

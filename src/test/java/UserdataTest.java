@@ -1,6 +1,7 @@
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.UserDetailsDao;
+import de.ids_mannheim.korap.handlers.UserSettingsDao;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.user.*;
 import org.junit.AfterClass;
@@ -28,7 +29,10 @@ public class UserdataTest {
     public void clear() {
         UserDetailsDao dao = new UserDetailsDao(
                 BeanConfiguration.getBeans().getPersistenceClient());
+        UserSettingsDao sdao = new UserSettingsDao(
+                BeanConfiguration.getBeans().getPersistenceClient());
         assert dao.deleteAll() != -1;
+        assert sdao.deleteAll() != -1;
     }
 
     @Test
@@ -87,8 +91,7 @@ public class UserdataTest {
 
     @Test
     public void testUserdatafactory() throws KustvaktException {
-        UserDataDbIface dao = UserdataFactory
-                .getDaoInstance(UserDetails.class);
+        UserDataDbIface dao = UserdataFactory.getDaoInstance(UserDetails.class);
         assert UserDetailsDao.class.equals(dao.getClass());
     }
 

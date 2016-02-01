@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.resource;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.UserSettings;
 
 /**
@@ -32,15 +33,20 @@ public class LayerMapper {
     //todo: make mapping configurable!
     public String findFoundry(String layer) {
         if (settings != null) {
+
             switch (translateLayer(layer.toLowerCase().trim())) {
                 case "d":
-                    return settings.getDefaultRelfoundry();
+                    return (String) settings
+                            .get(Attributes.DEFAULT_REL_FOUNDRY);
                 case "c":
-                    return settings.getDefaultConstfoundry();
+                    return (String) settings
+                            .get(Attributes.DEFAULT_CONST_FOUNDRY);
                 case "pos":
-                    return settings.getDefaultPOSfoundry();
+                    return (String) settings
+                            .get(Attributes.DEFAULT_POS_FOUNDRY);
                 case "lemma":
-                    return settings.getDefaultLemmafoundry();
+                    return (String) settings
+                            .get(Attributes.DEFAULT_LEMMA_FOUNDRY);
                 case "surface":
                     return "opennlp";
                 default:

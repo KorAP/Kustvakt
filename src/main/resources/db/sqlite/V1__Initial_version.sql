@@ -23,55 +23,11 @@ account_link VARCHAR(100)
 
 CREATE TABLE IF NOT EXISTS user_details (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
-user_id INTEGER NOT NULL,
-firstName VARCHAR(100),
-lastName VARCHAR(100),
-gender VARCHAR(100),
-phone VARCHAR(100),
-institution VARCHAR(100),
-email VARCHAR(100),
-address VARCHAR(100),
-country VARCHAR(100),
-privateUsage BOOLEAN,
-foreign key (user_id)
-references korap_users (id)
-on delete cascade
-);
-
-CREATE TABLE IF NOT EXISTS user_settings (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-user_id INTEGER NOT NULL,
-fileNameForExport VARCHAR(100),
-leftContextItemForExport VARCHAR(100),
-leftContextSizeForExport INTEGER,
-locale VARCHAR(100),
-leftContextItem VARCHAR(100),
-leftContextSize INTEGER,
-rightContextItem VARCHAR(100),
-rightContextItemForExport VARCHAR(100),
-rightContextSize INTEGER,
-rightContextSizeForExport INTEGER,
-selectedCollection VARCHAR(100),
-queryLanguage VARCHAR(100),
-pageLength INTEGER,
-metadataQueryExpertModus BOOLEAN,
-POSFoundry VARCHAR(100),
-lemmaFoundry VARCHAR(100),
-constFoundry VARCHAR(100),
-relFoundry VARCHAR(100),
-collectData BOOLEAN,
-foreign key (user_id)
-references korap_users (id)
-on delete cascade
-);
-
-CREATE TABLE IF NOT EXISTS user_details2 (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
 user_id INTEGER UNIQUE NOT NULL,
 data BLOB NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS user_settings2 (
+CREATE TABLE IF NOT EXISTS user_settings (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
 user_id INTEGER UNIQUE NOT NULL,
 data BLOB NOT NULL

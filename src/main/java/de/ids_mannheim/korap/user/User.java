@@ -70,20 +70,6 @@ public abstract class User implements Serializable {
         return this.fields.get(cl);
     }
 
-    //todo: repair transfer
-    public void transfer(User user) {
-        //        this.setSettings(user.getSettings());
-        //        this.setDetails(user.getDetails());
-        //        this.setQueries(user.getQueries());
-        if (this instanceof KorAPUser) {
-
-            //            this.getSettings().setUserID(this.id);
-            //            this.getDetails().setUserID(this.id);
-            //            for (UserQuery q : this.getQueries())
-            //                q.setOwner(this.accountID);
-        }
-    }
-
     public void addUserData(Userdata data) {
         if (data != null) {
             for (Userdata d : this.userdata) {
@@ -93,20 +79,6 @@ public abstract class User implements Serializable {
             }
             userdata.add(data);
         }
-    }
-
-    @Deprecated
-    public void setDetails(UserDetails details) {
-        if (details != null)
-            details.setUserID(this.id);
-        //        this.details = details;
-    }
-
-    @Deprecated
-    public void setSettings(UserSettings settings) {
-        if (settings != null)
-            settings.setUserID(this.id);
-        //        this.settings = settings;
     }
 
     public void setId(Integer id) {

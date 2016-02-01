@@ -23,10 +23,6 @@ public class FileAuditingTest {
     @AfterClass
     public static void finish() {
         BeanConfiguration.closeApplication();
-//        File f = new File("logs/default_audit.log");
-//        System.out.println("------------------------------------------------------");
-//        System.out.println("FILE LENGTH "+f.length());
-//        assert f.length() > 0;
     }
 
     @Test

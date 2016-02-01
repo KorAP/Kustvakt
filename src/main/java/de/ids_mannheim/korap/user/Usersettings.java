@@ -16,6 +16,8 @@ public class UserSettings extends Userdata {
         return new String[0];
     }
 
+
+    //todo: define default fields and values --> so they can never be null!
     @Override
     public String[] defaultFields() {
         return new String[0];

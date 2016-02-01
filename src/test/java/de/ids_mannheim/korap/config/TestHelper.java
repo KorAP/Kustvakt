@@ -54,6 +54,17 @@ public class TestHelper {
         return r;
     }
 
+    public static User getUser() {
+        if (BeanConfiguration.hasContext()) {
+            try {
+                return BeanConfiguration.getBeans().getUserDBHandler()
+                        .getAccount(credentials[0]);
+            }catch (KustvaktException e) {
+            }
+        }
+        throw new RuntimeException("User could not be retrieved!");
+    }
+
     public static boolean dropUser() {
         boolean r = BeanConfiguration.hasContext();
         if (r) {
@@ -126,7 +137,8 @@ public class TestHelper {
                     // don't do anything!
                 }
             }
-        }
+        }else
+            throw new RuntimeException("Client not setup properly!");
     }
 
     private TestHelper() {

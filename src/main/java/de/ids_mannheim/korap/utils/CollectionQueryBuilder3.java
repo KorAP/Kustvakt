@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
 
+import java.util.Map;
+
 /**
  * convenience builder class for collection query
  *
@@ -31,37 +33,38 @@ public class CollectionQueryBuilder3 {
         this.base = null;
     }
 
-//    /**
-//     * convencience method for equal field value search operation
-//     * @param field
-//     * @param value
-//     * @return
-//     */
-//    public CollectionQueryBuilder3 eq(String field, String value) {
-//        fieldValue(field, "match:eq", value);
-//        return this;
-//    }
-//
-//    /**
-//     * convencience method for unequal field value search operation
-//     * @param field
-//     * @param value
-//     * @return
-//     */
-//    public CollectionQueryBuilder3 uneq(String field, String value) {
-//        fieldValue(field, "match:ne", value);
-//        return this;
-//    }
-
+    //    /**
+    //     * convencience method for equal field value search operation
+    //     * @param field
+    //     * @param value
+    //     * @return
+    //     */
+    //    public CollectionQueryBuilder3 eq(String field, String value) {
+    //        fieldValue(field, "match:eq", value);
+    //        return this;
+    //    }
+    //
+    //    /**
+    //     * convencience method for unequal field value search operation
+    //     * @param field
+    //     * @param value
+    //     * @return
+    //     */
+    //    public CollectionQueryBuilder3 uneq(String field, String value) {
+    //        fieldValue(field, "match:ne", value);
+    //        return this;
+    //    }
 
     /**
      * raw method for field - value pair adding. Supports all operators (leq, geq, contains, etc.)
+     *
      * @param field
      * @param op
      * @param value
      * @return
      */
-    public CollectionQueryBuilder3 fieldValue(String field, String op, String value) {
+    public CollectionQueryBuilder3 fieldValue(String field, String op,
+            String value) {
         if (base == null)
             this.builder.append(field + op + value);
         else {
@@ -109,8 +112,10 @@ public class CollectionQueryBuilder3 {
             CollectionQueryProcessor tree = new CollectionQueryProcessor(
                     this.verbose);
             tree.process(this.builder.toString());
-
-            request = tree.getRequestMap();
+            Map r = tree.getRequestMap();
+            r.remove("query");
+            r.remove("meta");
+            request = r;
         }
         return request;
     }
@@ -143,7 +148,6 @@ public class CollectionQueryBuilder3 {
         // combination operator is unknown otherwise
         return this;
     }
-
 
     public static class Utils {
 

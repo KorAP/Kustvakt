@@ -23,7 +23,6 @@ import org.springframework.cache.annotation.CachePut;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -529,12 +528,20 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                         (String) safeMap.get(Attributes.MAIL),
                         (String) safeMap.get(Attributes.CN));
         user.setAffiliation((String) safeMap.get(Attributes.EDU_AFFIL));
-        UserDetails det = UserDetails
-                .newDetailsIterator(new HashMap<String, String>());
-        user.setDetails(det);
-        user.setSettings(new UserSettings());
         user.setAccountCreation(TimeUtils.getNow().getMillis());
         entHandler.createAccount(user);
+
+        UserDetails d = new UserDetails(user.getId());
+        d.readDefaults(attributes);
+        d.checkRequired();
+
+        UserdataFactory.getDaoInstance(d.getClass()).store(d);
+
+        UserSettings s = new UserSettings(user.getId());
+        s.readDefaults(attributes);
+        s.checkRequired();
+        UserdataFactory.getDaoInstance(s.getClass()).store(s);
+
         return user;
     }
 

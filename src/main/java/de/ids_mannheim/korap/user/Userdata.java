@@ -119,12 +119,13 @@ public abstract class Userdata {
         this.fields = crypto.validateMap(this.fields);
     }
 
-    public void readDefaults(Map<String, Object> map) {
+    public void readDefaults(Map<String, Object> map) throws KustvaktException {
         for (String k : defaultFields()) {
             Object o = map.get(k);
             if (o != null)
                 this.fields.put(k, o);
         }
+        this.checkRequired();
     }
 
     public abstract String[] requiredFields();

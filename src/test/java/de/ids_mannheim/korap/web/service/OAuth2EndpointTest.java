@@ -9,18 +9,21 @@ import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * @author hanl
  * @date 23/09/2015
  */
-// todo: needs servlet container test server!
+// todo: in combination with other tests, causes failures!
 public class OAuth2EndpointTest extends FastJerseyTest {
 
     private static String[] credentials;
 
     @AfterClass
     public static void close() {
+        System.out.println("RUNNING AFTER CLASS SHUTDOWN");
         TestHelper.dropUser();
         BeanConfiguration.closeApplication();
     }
@@ -36,7 +39,13 @@ public class OAuth2EndpointTest extends FastJerseyTest {
         credentials = TestHelper.getUserCredentials();
     }
 
-//    @Test
+    @Test
+    public void init() {
+
+    }
+
+    @Test
+    @Ignore
     public void testAuthorizeClient() {
         ClientResponse response = resource().path("v0.1").path("oauth2")
                 .path("register")
@@ -46,7 +55,8 @@ public class OAuth2EndpointTest extends FastJerseyTest {
         assert response.getStatus() == ClientResponse.Status.OK.getStatusCode();
     }
 
-//    @Test
+    @Test
+    @Ignore
     public void testRevokeClient() {
         ClientResponse response = resource().path("v0.1").path("oauth2")
                 .path("register")
@@ -58,7 +68,8 @@ public class OAuth2EndpointTest extends FastJerseyTest {
 
     }
 
-//    @Test
+    @Test
+    @Ignore
     public void authenticate() {
         String enc = BasicHttpAuth.encode(credentials[0], credentials[1]);
         ClientResponse response = resource().path("v0.1").path("oauth2")
@@ -79,7 +90,7 @@ public class OAuth2EndpointTest extends FastJerseyTest {
                 .queryParam("client_secret", cl_s)
                 .queryParam("response_type", "code")
                 .queryParam("redirect_uri", "korap.ids-mannheim.de/redirect")
-//                .header(Attributes.AUTHORIZATION, enc)
+                //                .header(Attributes.AUTHORIZATION, enc)
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .post(ClientResponse.class);
 

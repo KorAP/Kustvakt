@@ -56,12 +56,13 @@ public class AuthService {
      *
      * @return String
      */
+    @Deprecated
     @GET
     @Path("bootstrap")
     @Produces(MediaType.APPLICATION_JSON)
     public Response bootstrap() {
         Map m = new HashMap();
-        m.put("settings", new UserSettings().toObjectMap());
+//        m.put("settings", new UserSettings().toObjectMap());
         m.put("ql", BeanConfiguration.getBeans().getConfiguration()
                 .getQueryLanguages());
         m.put("SortTypes", null); // types of sorting that are supported!

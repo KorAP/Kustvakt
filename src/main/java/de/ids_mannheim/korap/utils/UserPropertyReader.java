@@ -5,10 +5,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
-import de.ids_mannheim.korap.user.KorAPUser;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.UserDetails;
-import de.ids_mannheim.korap.user.UserSettings;
+import de.ids_mannheim.korap.user.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,9 +71,10 @@ public class UserPropertyReader extends PropertyReader {
                 throw new KustvaktException(StatusCodes.REQUEST_INVALID);
             }
             user.setPassword(pass);
+            iface.createAccount(user);
         }else {
             user = User.UserFactory.getUser(username);
-            Map<String, String> vals = new HashMap<>();
+            Map<String, Object> vals = new HashMap<>();
             for (Map.Entry e : p.entrySet()) {
                 String key = e.getKey().toString().split("\\.", 2)[1];
                 vals.put(key, e.getValue().toString());
@@ -97,14 +95,20 @@ public class UserPropertyReader extends PropertyReader {
             user.setAccountCreation(TimeUtils.getNow().getMillis());
 
             //todo: make sure uri is set to 0, so sql queries work with the null value
-//            user.setURIExpiration(0L);
+            //            user.setURIExpiration(0L);
+            iface.createAccount(user);
+            UserDetails det = new UserDetails(user.getId());
+            det.readDefaults(vals);
+            det.validate(crypto);
+            UserdataFactory.getDaoInstance(det.getClass()).store(det);
 
-            UserDetails det = UserDetails.newDetailsIterator(vals);
+            Userdata set = new UserSettings(user.getId());
+            set.readDefaults(vals);
+            set.validate(crypto);
+            UserdataFactory.getDaoInstance(set.getClass()).store(set);
 
-            user.setDetails(det);
-            user.setSettings(new UserSettings());
         }
-        iface.createAccount(user);
+
         jlog.info("successfully created account for user {}",
                 user.getUsername());
         return user;
