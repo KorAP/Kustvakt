@@ -12,7 +12,7 @@ public class EmptyResultException extends KustvaktException {
     }
 
     public EmptyResultException(String entity) {
-        super(StatusCodes.EMPTY_RESULTS, "", entity);
+        super(StatusCodes.EMPTY_RESULTS, "No entity found for id", entity);
     }
 
 }

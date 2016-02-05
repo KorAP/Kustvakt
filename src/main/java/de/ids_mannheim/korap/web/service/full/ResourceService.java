@@ -29,6 +29,7 @@ import de.ids_mannheim.korap.web.KustvaktServer;
 import de.ids_mannheim.korap.web.SearchKrill;
 import de.ids_mannheim.korap.web.TRACE;
 import de.ids_mannheim.korap.web.filter.AuthFilter;
+import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DefaultFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
@@ -44,7 +45,8 @@ import java.util.*;
  * @date 29/01/2014
  */
 @Path(KustvaktServer.API_VERSION + "/")
-@ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class })
+@ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
+        BlockingFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ResourceService {
 
@@ -869,8 +871,8 @@ public class ResourceService {
             CollectionQueryBuilder3 cquery = new CollectionQueryBuilder3();
             if (reference != null && !reference.equals("null")) {
                 try {
-                    cquery.addQuery(
-                            (String) resourceHandler.findbyStrId(reference, user,
+                    cquery.addQuery((String) resourceHandler
+                            .findbyStrId(reference, user,
                                     VirtualCollection.class).getData());
                 }catch (KustvaktException e) {
                     throw KustvaktResponseHandler.throwit(e);

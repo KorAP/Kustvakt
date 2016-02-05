@@ -59,7 +59,7 @@ public class UserdataFactory {
                 }
             }
             throw new KustvaktException(StatusCodes.NOT_SUPPORTED,
-                    "No database class found for type " + data.getSimpleName());
+                    "No database handler found for type " + data.getSimpleName());
         }else
             return instances.get(data);
     }

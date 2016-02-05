@@ -5,8 +5,8 @@ CREATE TABLE IF NOT EXISTS policy_store (
     created TIMESTAMP,
     creator INTEGER NOT NULL,
     posix SMALLINT NOT NULL,
-    expire TIMESTAMP NULL,
-    enable TIMESTAMP NULL,
+    expire BIGINT NULL,
+    enable BIGINT NULL,
     iprange VARCHAR(200)
 );
 

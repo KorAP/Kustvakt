@@ -109,6 +109,12 @@ public class TokenContext implements java.security.Principal, Serializable {
         return c;
     }
 
+    public boolean isValid() {
+        return (this.username != null && !this.username.isEmpty()) && (
+                this.token != null && !this.token.isEmpty()) && (
+                this.tokenType != null && !this.tokenType.isEmpty());
+    }
+
     public String getToken() {
         return token;
     }

@@ -4,7 +4,7 @@
   <groupId>de.ids_mannheim.korap</groupId>
   <artifactId>Kustvakt-core</artifactId>
   <name>Kustvakt core</name>
-  <version>0.56</version>
+  <version>0.58</version>
   <description>Kustvakt core, basic rest api for testing purposes and default
         interfaces</description>
   <build>
@@ -70,7 +70,7 @@
             <exclude>**/*APITest.java</exclude>
           </excludes>
           <includes>
-            <include>**/*.java</include>
+            <include>de.ids_mannheim.korap.**/*.java</include>
           </includes>
         </configuration>
       </plugin>

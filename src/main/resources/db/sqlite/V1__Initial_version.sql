@@ -45,19 +45,6 @@ references resource_store (id)
 on delete cascade
 );
 
-CREATE TABLE IF NOT EXISTS coll_store (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-persistent_id VARCHAR(150) UNIQUE,
-name VARCHAR(150),
-description VARCHAR(200),
-query VARCHAR(500),
-created BIGINT NOT NULL,
-user_id INTEGER,
-foreign key(user_id)
-references korap_users(id)
-on delete cascade
-);
-
 CREATE TABLE IF NOT EXISTS audit_records (
 aud_id INTEGER PRIMARY KEY AUTOINCREMENT,
 aud_category VARCHAR(100),
@@ -161,7 +148,7 @@ persistent_id VARCHAR(100) NOT NULL UNIQUE,
 name VARCHAR(100),
 description VARCHAR(300),
 parent_id INTEGER unsigned null,
-created TIMESTAMP default current_timestamp,
+created BIGINT null,
 data BLOB,
 type INTEGER NOT NULL,
 creator INTEGER NOT NULL

@@ -39,7 +39,7 @@ public class OAuth2HandlerTest {
         info.setUrl("http://localhost:8080/api/v0.1");
         info.setRedirect_uri("testwebsite/login");
 
-        TestHelper.setupUser();
+        TestHelper.setupAccount();
         user = TestHelper.getUser();
         handler.registerClient(info, user);
     }

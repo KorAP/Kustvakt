@@ -111,7 +111,7 @@ public class RowMapperFactory {
 
                 r.setFields(rs.getString("data"));
                 r.setDescription(rs.getString("description"));
-                r.setCreated(rs.getTimestamp("created").getTime());
+                r.setCreated(rs.getLong("created"));
                 r.setPath(rs.getString("name_path"));
                 r.setPersistentID(rs.getString("persistent_id"));
             }

@@ -89,14 +89,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             Map map = (Map) e.getObjectValue();
             user = User.UserFactory.toUser(map);
         }else {
-            try {
-                user = entHandler.getAccount(username);
-                user_cache.put(new Element(key, user.toCache()));
-                // todo: not valid. for the duration of the session, the host should not change!
-            }catch (EmptyResultException e1) {
-                // do nothing
-                return null;
-            }
+            user = entHandler.getAccount(username);
+            user_cache.put(new Element(key, user.toCache()));
+            // todo: not valid. for the duration of the session, the host should not change!
         }
         //todo:
         //        user.addField(Attributes.HOST, context.getHostAddress());
@@ -486,8 +481,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         }
 
         KorAPUser user = User.UserFactory.getUser(username);
+        user.setAccountLocked(confirmation_required);
+
         if (confirmation_required) {
-            user.setAccountLocked(true);
             URIParam param = new URIParam(crypto.createToken(),
                     TimeUtils.plusSeconds(config.getExpiration()).getMillis());
             user.addField(param);
@@ -679,7 +675,12 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
         try {
             UserDataDbIface<T> dao = UserdataFactory.getDaoInstance(clazz);
-            return dao.get(user);
+            T data = dao.get(user);
+            if (data == null)
+                throw new WrappedException(user.getId(),
+                        StatusCodes.EMPTY_RESULTS, clazz.getSimpleName());
+
+            return data;
         }catch (KustvaktException e) {
             jlog.error("Error ", e);
             throw new WrappedException(e, StatusCodes.GET_ACCOUNT_FAILED);

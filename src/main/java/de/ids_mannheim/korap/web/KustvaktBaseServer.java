@@ -4,6 +4,7 @@ import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.KustvaktCacheManager;
 import de.ids_mannheim.korap.config.KustvaktClassLoader;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -38,6 +39,8 @@ public class KustvaktBaseServer {
             BeanConfiguration.loadFileContext(kargs.config);
         else
             BeanConfiguration.loadClasspathContext();
+
+        KustvaktCacheManager.init();
 
         kargs.setRootPackages(
                 new String[] { "de.ids_mannheim.korap.web.service.light" });
@@ -107,6 +110,7 @@ public class KustvaktBaseServer {
                     iface.load();
                 }catch (KustvaktException e) {
                     // don't do anything!
+                    System.out.println("An error occurred! " + e);
                 }
             }
         }

@@ -602,10 +602,9 @@ public class PolicyDao implements PolicyHandlerIface {
         }
     }
 
-    private Integer createCondition(PolicyCondition condition, User user)
+    private void createCondition(PolicyCondition condition, User user)
             throws KustvaktException {
         MapSqlParameterSource param = new MapSqlParameterSource();
-        KeyHolder key = new GeneratedKeyHolder();
         param.addValue("name", condition.getSpecifier());
         param.addValue("ex", condition.getFlags().get(Attributes.EXPORT));
         param.addValue("qo", condition.getFlags().get(Attributes.QUERY_ONLY));
@@ -615,8 +614,7 @@ public class PolicyDao implements PolicyHandlerIface {
         try {
             this.jdbcTemplate
                     .update("INSERT INTO group_store (name, sym_use, export, commercial) "
-                            + "VALUES (:name, :sy, :ex, :com);", param, key);
-            return key.getKey().intValue();
+                            + "VALUES (:name, :sy, :ex, :com);", param);
         }catch (DataAccessException e) {
             jlog.error("Operation (INSERT) not possible for '{}'",
                     condition.toString());

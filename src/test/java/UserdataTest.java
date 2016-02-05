@@ -1,5 +1,6 @@
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.dbException;
 import de.ids_mannheim.korap.handlers.UserDetailsDao;
 import de.ids_mannheim.korap.handlers.UserSettingsDao;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
@@ -47,7 +48,7 @@ public class UserdataTest {
     }
 
     @Test
-    public void testDataGet() {
+    public void testDataGet() throws dbException {
         User user = new KorAPUser();
         user.setId(1);
         UserDetailsDao dao = new UserDetailsDao(

@@ -101,8 +101,8 @@ public class UserService {
     @POST
     @Path("update")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
-            PiwikFilter.class })
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
+            BlockingFilter.class })
     public Response updateAccount(@Context SecurityContext ctx, String json) {
         TokenContext context = (TokenContext) ctx.getUserPrincipal();
         try {
@@ -206,7 +206,7 @@ public class UserService {
     @GET
     @Path("info")
     @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
-            BlockingFilter.class })
+            BlockingFilter.class, BlockingFilter.class })
     public Response getStatus(@Context SecurityContext context,
             @QueryParam("scopes") String scopes) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
@@ -228,8 +228,8 @@ public class UserService {
 
     @GET
     @Path("settings")
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
-            PiwikFilter.class })
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
+            BlockingFilter.class })
     public Response getUserSettings(@Context SecurityContext context,
             @Context Locale locale) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
@@ -250,8 +250,8 @@ public class UserService {
     @POST
     @Path("settings")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
-            PiwikFilter.class })
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
+            BlockingFilter.class })
     public Response updateSettings(@Context SecurityContext context,
             @Context Locale locale, MultivaluedMap form) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
@@ -284,8 +284,8 @@ public class UserService {
 
     @GET
     @Path("details")
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
-            PiwikFilter.class })
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
+            BlockingFilter.class })
     public Response getDetails(@Context SecurityContext context,
             @Context Locale locale) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
@@ -299,14 +299,15 @@ public class UserService {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
-        return Response.ok(result).build();
+//        return Response.ok(result).build();
+        return null;
     }
 
     @POST
     @Path("details")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
-            PiwikFilter.class })
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
+            BlockingFilter.class })
     public Response updateDetails(@Context SecurityContext context,
             @Context Locale locale, MultivaluedMap form) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
@@ -336,8 +337,8 @@ public class UserService {
     @POST
     @Path("queries")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
-            PiwikFilter.class })
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
+            BlockingFilter.class })
     public Response updateQueries(@Context SecurityContext context,
             String json) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
@@ -387,8 +388,8 @@ public class UserService {
     }
 
     @DELETE
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
-            PiwikFilter.class })
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
+            BlockingFilter.class })
     public Response deleteUser(@Context SecurityContext context) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         try {
@@ -405,8 +406,8 @@ public class UserService {
 
     @GET
     @Path("queries")
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
-            PiwikFilter.class })
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
+            BlockingFilter.class })
     public Response getQueries(@Context SecurityContext context,
             @Context Locale locale) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();

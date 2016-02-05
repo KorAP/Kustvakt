@@ -23,53 +23,17 @@ CREATE TABLE IF NOT EXISTS shib_users (
     account_link VARCHAR(100)
 );
 
+
 CREATE TABLE IF NOT EXISTS user_details (
-    Id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    user_id INTEGER NOT NULL UNIQUE,
-    firstName VARCHAR(100),
-    lastName VARCHAR(100),
-    gender VARCHAR(100),
-    phone VARCHAR(100),
-    institution VARCHAR(100),
-    email VARCHAR(100),
-    address VARCHAR(100),
-    country VARCHAR(100),
-    privateUsage BOOLEAN,
-    foreign key (user_id)
-    references korap_users (id)
-    on delete cascade
+id INTEGER PRIMARY KEY AUTO_INCREMENT,
+user_id INTEGER UNIQUE NOT NULL,
+data BLOB NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_settings (
-    Id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    user_id INTEGER NOT NULL UNIQUE,
-    fileNameForExport VARCHAR(100),
-    itemForSimpleAnnotation INTEGER,
-    leftContextItemForExport VARCHAR(100),
-    leftContextSizeForExport INTEGER,
-    locale VARCHAR(100),
-    leftContextItem VARCHAR(100),
-    leftContextSize INTEGER,
-    rightContextItem VARCHAR(100),
-    rightContextItemForExport VARCHAR(100),
-    rightContextSize INTEGER,
-    rightContextSizeForExport INTEGER,
-    selectedCollection VARCHAR(100),
-    queryLanguage VARCHAR(100),
-    pageLength INTEGER,
-    metadataQueryExpertModus BOOLEAN,
-    searchSettingsTab INTEGER,
-    selectedGraphType INTEGER,
-    selectedSortType VARCHAR(100),
-    selectedViewForSearchResults VARCHAR(100),
-    POSFoundry VARCHAR(100),
-    lemmaFoundry VARCHAR(100),
-    constFoundry VARCHAR(100),
-    relFoundry VARCHAR(100),
-    collectData BOOLEAN,
-    foreign key (user_id)
-    references korap_users (id)
-    on delete cascade
+id INTEGER PRIMARY KEY AUTO_INCREMENT,
+user_id INTEGER UNIQUE NOT NULL,
+data BLOB NOT NULL
 );
 
 -- deprecated

@@ -1,10 +1,13 @@
 package de.ids_mannheim.korap.handlers;
 
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.exceptions.dbException;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserSettings;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -25,6 +28,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
     public UserSettingsDao(PersistenceClient client) {
         this.jdbcTemplate = (NamedParameterJdbcTemplate) client.getSource();
     }
+
     @Override
     public int store(UserSettings data) {
         String sql = "INSERT INTO user_settings (user_id, data) VALUES (:userid, :data);";
@@ -59,7 +63,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
     }
 
     @Override
-    public UserSettings get(Integer id) {
+    public UserSettings get(Integer id) throws dbException {
         String sql = "SELECT * FROM user_settings WHERE id=:id;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", id);
@@ -79,13 +83,16 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
                         }
                     });
 
-        }catch (DataAccessException e) {
+        }catch (EmptyResultDataAccessException ex) {
             return null;
+        }catch (DataAccessException e) {
+            throw new dbException(-1, "userSettings",
+                    StatusCodes.REQUEST_INVALID, String.valueOf(id));
         }
     }
 
     @Override
-    public UserSettings get(User user) {
+    public UserSettings get(User user) throws dbException {
         String sql = "SELECT * FROM user_settings WHERE user_id=:userid;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", user.getId());
@@ -105,9 +112,11 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
                         }
                     });
 
-        }catch (DataAccessException e) {
-            e.printStackTrace();
+        }catch (EmptyResultDataAccessException ex) {
             return null;
+        }catch (DataAccessException e) {
+            throw new dbException(-1, "userSettings",
+                    StatusCodes.REQUEST_INVALID);
         }
     }
 

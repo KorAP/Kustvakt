@@ -11,8 +11,6 @@ import de.ids_mannheim.korap.security.PolicyContext;
 import de.ids_mannheim.korap.security.SecurityPolicy;
 import de.ids_mannheim.korap.user.User;
 
-import java.util.Arrays;
-
 /**
  * @author hanl
  * @date 14/04/2014
@@ -130,15 +128,10 @@ public class PolicyBuilder {
         if (this.rel == null)
             this.rel = Relation.AND;
 
-        System.out.println("CREATING RESOURCES " + Arrays.asList(resources));
-        System.out.println("RESOURCES LENGTH " + resources.length);
         for (int idx = 0; idx < this.resources.length; idx++) {
             try {
-                System.out.println("ITERATING OVER ARRAY " + idx);
                 if (parents[idx] != null)
                     resources[idx].setParentID(parents[idx].getPersistentID());
-                System.out.println("RUNNING REGISTERING SERVICE ON RESOURCE "
-                        + resources[idx]);
                 SecurityManager manager = SecurityManager
                         .register(resources[idx], user);
 

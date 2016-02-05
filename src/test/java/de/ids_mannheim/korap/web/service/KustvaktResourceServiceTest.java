@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.TestHelper;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -27,7 +28,8 @@ public class KustvaktResourceServiceTest extends FastJerseyTest {
     }
 
     @AfterClass
-    public static void close() {
+    public static void close() throws KustvaktException {
+        BeanConfiguration.getBeans().getResourceProvider().deleteAll();
         BeanConfiguration.closeApplication();
     }
 

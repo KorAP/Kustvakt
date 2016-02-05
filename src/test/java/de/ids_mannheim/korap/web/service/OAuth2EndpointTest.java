@@ -35,7 +35,7 @@ public class OAuth2EndpointTest extends FastJerseyTest {
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");
 
-        TestHelper.setupUser();
+        TestHelper.setupAccount();
         credentials = TestHelper.getUserCredentials();
     }
 

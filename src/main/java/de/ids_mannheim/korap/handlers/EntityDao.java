@@ -53,6 +53,7 @@ public class EntityDao implements EntityHandlerIface {
             user = this.jdbcTemplate.queryForObject(sql, namedParameters,
                     new RowMapperFactory.UserMapper());
         }catch (EmptyResultDataAccessException ae) {
+            ae.printStackTrace();
             jlog.error("No user found for name '{}'", username);
             throw new EmptyResultException(username);
         }catch (DataAccessException e) {
@@ -73,20 +74,21 @@ public class EntityDao implements EntityHandlerIface {
             np.addValue("alo", k.isAccountLocked());
             if (k.getPassword() != null)
                 np.addValue("ps", k.getPassword());
-            URIParam param = k.getField(URIParam.class);
-            if (param != null) {
-                np.addValue("frag", param.getUriFragment());
-                np.addValue("exp", new Date(param.getUriExpiration()));
-            }else {
-                np.addValue("frag", null);
-                np.addValue("exp", null);
-            }
+            //            URIParam param = k.getField(URIParam.class);
+            //            if (param != null) {
+            //                np.addValue("frag", param.getUriFragment());
+            //                np.addValue("exp", new Date(param.getUriExpiration()));
+            //            }else {
+            //                np.addValue("frag", null);
+            //                np.addValue("exp", null);
+            //            }
             np.addValue("id", k.getId());
 
             query = "UPDATE korap_users SET account_lock=:alo," +
-                    "account_link=:ali, password=:ps," +
-                    "uri_fragment=:frag," +
-                    "uri_expiration=:exp WHERE id=:id";
+                    "account_link=:ali, password=:ps "
+                    //                    "uri_fragment=:frag," +
+                    //                    "uri_expiration=:exp "
+                    + "WHERE id=:id";
         }else if (user instanceof ShibUser) {
             ShibUser s = (ShibUser) user;
             //todo:
@@ -138,6 +140,7 @@ public class EntityDao implements EntityHandlerIface {
             np.addValue("acr", System.currentTimeMillis());
             np.addValue("id", k.getId());
 
+            System.out.println("query map " + np.getValues());
             if (user.getId() != -1)
                 query = "INSERT INTO korap_users (id, username, account_lock, "
                         +
@@ -278,6 +281,7 @@ public class EntityDao implements EntityHandlerIface {
         }
     }
 
+    @Override
     public int size() {
         final String query = "SELECT COUNT(*) FROM korap_users;";
         return this.jdbcTemplate

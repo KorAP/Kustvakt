@@ -50,15 +50,16 @@ public class BasicHttpAuth implements AuthenticationIface {
         EncryptionIface crypto = BeanConfiguration.getBeans().getEncryption();
         EntityHandlerIface dao = BeanConfiguration.getBeans()
                 .getUserDBHandler();
-        TokenContext c = new TokenContext();
         String[] values = decode(authToken);
         if (values != null) {
+            TokenContext c = new TokenContext();
             User user = dao.getAccount(values[0]);
             if (user instanceof KorAPUser) {
                 boolean check = crypto
                         .checkHash(values[1], ((KorAPUser) user).getPassword());
+
                 if (!check)
-                    return c;
+                    return null;
             }
             c.setUsername(values[0]);
             c.setTokenType(Attributes.BASIC_AUTHENTICATION);
@@ -68,8 +69,9 @@ public class BasicHttpAuth implements AuthenticationIface {
             //            fixme: you can make queries, but user sensitive data is off limits?!
             c.addContextParameter(Attributes.SCOPES,
                     Scopes.Scope.search.toString());
+            return c;
         }
-        return c;
+        return null;
     }
 
     // not supported!

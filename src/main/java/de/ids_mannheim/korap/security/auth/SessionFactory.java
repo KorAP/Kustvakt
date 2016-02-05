@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author hanl
  */
+//todo: use simple ehcache!
 public class SessionFactory implements Runnable {
 
     private static Logger jlog = LoggerFactory.getLogger(SessionFactory.class);
@@ -48,10 +49,8 @@ public class SessionFactory implements Runnable {
     public boolean hasSession(TokenContext context) {
         if (context.getUsername().equalsIgnoreCase(DemoUser.DEMOUSER_NAME))
             return false;
-        if (loggedInRecord.containsKey(context.getUsername()) && !loggedInRecord
-                .get(context.getUsername()).isEmpty())
-            return true;
-        return false;
+        return loggedInRecord.containsKey(context.getUsername())
+                && !loggedInRecord.get(context.getUsername()).isEmpty();
     }
 
     @Cacheable("session")
@@ -118,8 +117,9 @@ public class SessionFactory implements Runnable {
      */
     private boolean isUserSessionValid(String token) {
         if (timeCheck.containsKey(token)) {
-            if (TimeUtils.plusSeconds(timeCheck.get(token).getMillis(),
-                    inactive).isAfterNow()) {
+            if (TimeUtils
+                    .plusSeconds(timeCheck.get(token).getMillis(), inactive)
+                    .isAfterNow()) {
                 jlog.debug("user has session");
                 return true;
             }else
@@ -144,19 +144,10 @@ public class SessionFactory implements Runnable {
                 removeSession(entry.getKey());
             }
         }
+        // fixme: not doing anything!
         if (inactive.size() > 0)
             jlog.debug("removing inactive user session for users '{}' ",
                     inactive);
-
-        //        keys:
-        //        for (String key : failedLogins.getKeySet()) {
-        //            DateTime d = new DateTime(failedLogins.get(key).get(1));
-        //            if (d.isBeforeNow()) {
-        //                failedLogins.remove(key);
-        //                jlog.info("removed failed login counts due to expiration for user {}", key);
-        //                continue keys;
-        //            }
-        //        }
     }
 
     /**
@@ -165,7 +156,7 @@ public class SessionFactory implements Runnable {
     @Override
     public void run() {
         timeoutMaintenance();
-        jlog.debug("logged users: {}", loggedInRecord.toString());
-
+        if (loggedInRecord.size() > 0)
+            jlog.debug("logged users: {}", loggedInRecord.toString());
     }
 }

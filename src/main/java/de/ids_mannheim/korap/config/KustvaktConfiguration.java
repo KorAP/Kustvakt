@@ -34,6 +34,7 @@ public class KustvaktConfiguration {
         KUSTVAKT_USER.put(Attributes.PASSWORD, "kustvakt2015");
         KUSTVAKT_USER.put(Attributes.EMAIL, "kustvakt@ids-mannheim.de");
         KUSTVAKT_USER.put(Attributes.COUNTRY, "Germany");
+        KUSTVAKT_USER.put(Attributes.ADDRESS, "Mannheim");
         KUSTVAKT_USER.put(Attributes.FIRSTNAME, "Kustvakt");
         KUSTVAKT_USER.put(Attributes.LASTNAME, "KorAP");
         KUSTVAKT_USER.put(Attributes.INSTITUTION, "IDS Mannheim");

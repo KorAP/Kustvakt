@@ -5,7 +5,8 @@ persistent_id VARCHAR(100) NOT NULL UNIQUE,
 name VARCHAR(100),
 description VARCHAR(300),
 parent_id Integer unsigned null,
-created BIGINT NOT NULL,
+created BIGINT null,
+data BLOB,
 type INTEGER NOT NULL,
 creator INTEGER NOT NULL
 );
@@ -24,7 +25,7 @@ references resource_store (id)
 on delete cascade
 );
 
-
+-- deprecated
 CREATE TABLE IF NOT EXISTS user_queries (
     id INTEGER PRIMARY KEY,
     queryLanguage VARCHAR(100),

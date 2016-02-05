@@ -1,10 +1,13 @@
 package de.ids_mannheim.korap.handlers;
 
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.exceptions.dbException;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserDetails;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -60,7 +63,7 @@ public class UserDetailsDao implements UserDataDbIface<UserDetails> {
     }
 
     @Override
-    public UserDetails get(Integer id) {
+    public UserDetails get(Integer id) throws dbException {
         String sql = "SELECT * FROM user_details WHERE id=:id;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", id);
@@ -80,13 +83,16 @@ public class UserDetailsDao implements UserDataDbIface<UserDetails> {
                         }
                     });
 
-        }catch (DataAccessException e) {
+        }catch (EmptyResultDataAccessException ex) {
             return null;
+        }catch (DataAccessException e) {
+            throw new dbException(-1, "userDetails",
+                    StatusCodes.REQUEST_INVALID, String.valueOf(id));
         }
     }
 
     @Override
-    public UserDetails get(User user) {
+    public UserDetails get(User user) throws dbException {
         String sql = "SELECT * FROM user_details WHERE user_id=:userid;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", user.getId());
@@ -105,10 +111,11 @@ public class UserDetailsDao implements UserDataDbIface<UserDetails> {
                             return details;
                         }
                     });
-
-        }catch (DataAccessException e) {
-            e.printStackTrace();
+        }catch (EmptyResultDataAccessException ex) {
             return null;
+        }catch (DataAccessException e) {
+            throw new dbException(user.getId(), "userDetails",
+                    StatusCodes.REQUEST_INVALID);
         }
     }
 

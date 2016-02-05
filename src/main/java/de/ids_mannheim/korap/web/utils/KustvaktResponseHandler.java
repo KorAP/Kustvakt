@@ -32,19 +32,19 @@ public class KustvaktResponseHandler {
     }
 
     public static WebApplicationException throwit(KustvaktException e) {
-        return new WebApplicationException(
-                Response.status(Response.Status.BAD_REQUEST)
-                        .entity(buildNotification(e)).build());
+        Response s = Response.status(getStatus(e.getStatusCode()))
+                .entity(buildNotification(e)).build();
+        return new WebApplicationException(s);
     }
 
     public static WebApplicationException throwit(int code) {
-        return new WebApplicationException(Response.status(Response.Status.OK)
+        return new WebApplicationException(Response.status(getStatus(code))
                 .entity(buildNotification(code, "", "")).build());
     }
 
     public static WebApplicationException throwit(int code, String message,
             String entity) {
-        return new WebApplicationException(Response.status(Response.Status.OK)
+        return new WebApplicationException(Response.status(getStatus(code))
                 .entity(buildNotification(code, message, entity)).build());
     }
 
@@ -62,12 +62,24 @@ public class KustvaktResponseHandler {
     }
 
     public static WebApplicationException throwAuthenticationException() {
-        KustvaktException e = new KustvaktException(
-                StatusCodes.BAD_CREDENTIALS);
         return new WebApplicationException(
                 Response.status(Response.Status.UNAUTHORIZED)
                         .header(HttpHeaders.WWW_AUTHENTICATE,
                                 "Basic realm=Kustvakt Authentication Service")
-                        .entity(buildNotification(e)).build());
+                        .entity(buildNotification(StatusCodes.BAD_CREDENTIALS,
+                                "Unauthorized access", "")).build());
+    }
+
+    private static Response.Status getStatus(int code) {
+        Response.Status status = Response.Status.BAD_REQUEST;
+        switch (code) {
+            case StatusCodes.EMPTY_RESULTS:
+                status = Response.Status.NO_CONTENT;
+                break;
+            case StatusCodes.ILLEGAL_ARGUMENT:
+                status = Response.Status.NOT_ACCEPTABLE;
+                break;
+        }
+        return status;
     }
 }

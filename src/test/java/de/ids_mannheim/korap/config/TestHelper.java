@@ -10,6 +10,8 @@ import org.junit.Assert;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -25,9 +27,9 @@ public class TestHelper {
     private static final String[] credentials = new String[] { "test1",
             "testPass2015" };
 
-    public static boolean setupUser() {
+    public static boolean setupAccount() {
         boolean r = BeanConfiguration.hasContext();
-        if (r) {
+        if (r && BeanConfiguration.getBeans().getUserDBHandler().size() == 0) {
             EntityHandlerIface dao = BeanConfiguration.getBeans()
                     .getUserDBHandler();
             Map m = new HashMap<>();
@@ -45,8 +47,37 @@ public class TestHelper {
                         .createUserAccount(m, false);
             }catch (KustvaktException e) {
                 // do nothing
-                System.out.println("THE EXCEPTION...");
-                e.printStackTrace();
+                Assert.assertNull("Test user could not be set up", true);
+                return false;
+            }
+        }
+        return r;
+    }
+
+    public static boolean setupSimpleAccount() {
+        boolean r = BeanConfiguration.hasContext();
+        if (r && BeanConfiguration.getBeans().getUserDBHandler().size() == 0) {
+            EntityHandlerIface dao = BeanConfiguration.getBeans()
+                    .getUserDBHandler();
+            Map m = new HashMap<>();
+            m.put(Attributes.USERNAME, credentials[0]);
+
+            try {
+                String hash = BeanConfiguration.getBeans().getEncryption()
+                        .produceSecureHash(credentials[1]);
+                m.put(Attributes.PASSWORD, hash);
+            }catch (NoSuchAlgorithmException | UnsupportedEncodingException | KustvaktException e) {
+
+            }
+            Assert.assertNotNull("userdatabase handler must not be null", dao);
+
+            try {
+                int i = dao.createAccount(User.UserFactory.toKorAPUser(m));
+                assert BeanConfiguration.getBeans().getUserDBHandler()
+                        .getAccount(credentials[0]) != null;
+                assert i == 1;
+            }catch (KustvaktException e) {
+                // do nothing
                 Assert.assertNull("Test user could not be set up", true);
                 return false;
             }
@@ -80,7 +111,18 @@ public class TestHelper {
         return r;
     }
 
-    public static boolean truncateAllUsers() {
+    public static void drop() {
+        if (BeanConfiguration.hasContext()) {
+            PersistenceClient cl = BeanConfiguration.getBeans()
+                    .getPersistenceClient();
+            String sql = "drop database " + cl.getDatabase() + ";";
+            NamedParameterJdbcTemplate jdbc = (NamedParameterJdbcTemplate) cl
+                    .getSource();
+            jdbc.update(sql, new HashMap<String, Object>());
+        }
+    }
+
+    public static boolean truncateAll() {
         boolean r = BeanConfiguration.hasContext();
         if (r) {
             String sql = "SELECT Concat('TRUNCATE TABLE ', TABLE_NAME) FROM INFORMATION_SCHEMA.TABLES";

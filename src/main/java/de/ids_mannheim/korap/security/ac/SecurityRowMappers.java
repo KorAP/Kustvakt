@@ -14,7 +14,6 @@ import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -34,12 +33,12 @@ public class SecurityRowMappers {
 
             PolicyContext context = new PolicyContext();
             context.setIPMask(rs.getString("iprange"));
-            Timestamp date = rs.getTimestamp("enable");
-            Timestamp date2 = rs.getTimestamp("expire");
-            if (date != null)
-                context.setEnableTime(date.getTime());
-            if (date2 != null)
-                context.setExpirationTime(date2.getTime());
+            long enable = rs.getLong("enable");
+            long expire = rs.getLong("expire");
+            if (enable != -1)
+                context.setEnableTime(enable);
+            if (expire != -1)
+                context.setExpirationTime(expire);
             //            context.addFlag("export", rs.getBoolean("export"));
             //            context.addFlag("sym_use", rs.getInt("sym_use"));
             p.setContext(context);

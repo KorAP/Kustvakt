@@ -116,7 +116,9 @@ public class ResourceDao<T extends KustvaktResource>
             return (T) this.jdbcTemplate.queryForObject(sql, source,
                     new RowMapperFactory.ResourceMapper());
         }catch (DataAccessException e) {
-            e.printStackTrace();
+            if (e instanceof IncorrectResultSizeDataAccessException)
+                throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
+                        "invalid request id given!", String.valueOf(id));
             return null;
         }
     }

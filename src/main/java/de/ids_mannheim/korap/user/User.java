@@ -177,6 +177,24 @@ public abstract class User implements Serializable {
             return u;
         }
 
+        public static KorAPUser toKorAPUser(Map<String, Object> map) {
+            KorAPUser user = UserFactory
+                    .getUser((String) map.get(Attributes.USERNAME));
+            user.setPassword((String) map.get(Attributes.PASSWORD));
+            int id = map.get(Attributes.ID) == null ?
+                    -1 :
+                    (int) map.get(Attributes.ID);
+            if (id != -1)
+                user.setId(id);
+            long cr = map.get(Attributes.ACCOUNT_CREATION) == null ?
+                    -1 :
+                    (long) map.get(Attributes.ACCOUNT_CREATION);
+            if (cr != -1)
+                user.setAccountCreation(
+                        (Long) map.get(Attributes.ACCOUNT_CREATION));
+            return user;
+        }
+
         public static User toUser(Map<String, Object> map) {
             KustvaktMap kmap = new KustvaktMap(map);
             int type = map.get(Attributes.TYPE) == null ?
@@ -184,14 +202,19 @@ public abstract class User implements Serializable {
                     (Integer) kmap.get(Attributes.TYPE, Integer.class);
             User user;
             long created = -1;
+            int id = kmap.get(Attributes.ID, Integer.class) == null ?
+                    -1 :
+                    (Integer) kmap.get(Attributes.ID, Integer.class);
+
             if (map.get(Attributes.ACCOUNT_CREATION) != null)
                 created = DateTime.parse(kmap.get(Attributes.ACCOUNT_CREATION))
                         .getMillis();
             switch (type) {
                 case 0:
                     user = UserFactory.getUser(kmap.get(Attributes.USERNAME));
-                    user.setId(
-                            (Integer) kmap.get(Attributes.ID, Integer.class));
+                    if (id != -1)
+                        user.setId((Integer) kmap
+                                .get(Attributes.ID, Integer.class));
                     user.setAccountLocked(
                             map.get(Attributes.ACCOUNTLOCK) == null ?
                                     false :
@@ -200,8 +223,7 @@ public abstract class User implements Serializable {
                     user.setAccountCreation(created);
                     break;
                 default:
-                    user = UserFactory.getDemoUser(
-                            (Integer) kmap.get(Attributes.ID, Integer.class));
+                    user = UserFactory.getDemoUser();
                     user.setAccountCreation(created);
             }
             return user;
