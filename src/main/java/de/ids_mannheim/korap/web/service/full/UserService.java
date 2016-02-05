@@ -299,8 +299,7 @@ public class UserService {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
-//        return Response.ok(result).build();
-        return null;
+        return Response.ok(result).build();
     }
 
     @POST

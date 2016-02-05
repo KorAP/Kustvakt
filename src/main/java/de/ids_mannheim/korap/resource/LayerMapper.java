@@ -33,7 +33,6 @@ public class LayerMapper {
     //todo: make mapping configurable!
     public String findFoundry(String layer) {
         if (settings != null) {
-
             switch (translateLayer(layer.toLowerCase().trim())) {
                 case "d":
                     return (String) settings

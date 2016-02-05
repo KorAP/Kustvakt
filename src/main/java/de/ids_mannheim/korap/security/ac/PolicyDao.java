@@ -623,7 +623,7 @@ public class PolicyDao implements PolicyHandlerIface {
         }
     }
 
-    //
+    //todo: check for unique constraint exception and exclude from throw!
     @Override
     public int addToCondition(String username, PolicyCondition condition,
             boolean admin) throws KustvaktException {
