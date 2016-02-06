@@ -502,6 +502,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             UserdataFactory.getDaoInstance(UserDetails.class).store(details);
             UserdataFactory.getDaoInstance(UserSettings.class).store(settings);
         }catch (KustvaktException e) {
+            e.printStackTrace();
             throw new WrappedException(e, StatusCodes.CREATE_ACCOUNT_FAILED,
                     user.toString());
         }

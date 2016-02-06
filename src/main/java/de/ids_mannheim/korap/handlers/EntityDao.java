@@ -53,7 +53,6 @@ public class EntityDao implements EntityHandlerIface {
             user = this.jdbcTemplate.queryForObject(sql, namedParameters,
                     new RowMapperFactory.UserMapper());
         }catch (EmptyResultDataAccessException ae) {
-            ae.printStackTrace();
             jlog.error("No user found for name '{}'", username);
             throw new EmptyResultException(username);
         }catch (DataAccessException e) {

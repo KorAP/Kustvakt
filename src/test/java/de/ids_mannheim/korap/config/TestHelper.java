@@ -47,6 +47,7 @@ public class TestHelper {
                         .createUserAccount(m, false);
             }catch (KustvaktException e) {
                 // do nothing
+                e.printStackTrace();
                 Assert.assertNull("Test user could not be set up", true);
                 return false;
             }
@@ -54,17 +55,17 @@ public class TestHelper {
         return r;
     }
 
-    public static boolean setupSimpleAccount() {
+    public static boolean setupSimpleAccount(String username, String password) {
         boolean r = BeanConfiguration.hasContext();
         if (r && BeanConfiguration.getBeans().getUserDBHandler().size() == 0) {
             EntityHandlerIface dao = BeanConfiguration.getBeans()
                     .getUserDBHandler();
             Map m = new HashMap<>();
-            m.put(Attributes.USERNAME, credentials[0]);
+            m.put(Attributes.USERNAME, username);
 
             try {
                 String hash = BeanConfiguration.getBeans().getEncryption()
-                        .produceSecureHash(credentials[1]);
+                        .produceSecureHash(password);
                 m.put(Attributes.PASSWORD, hash);
             }catch (NoSuchAlgorithmException | UnsupportedEncodingException | KustvaktException e) {
 
@@ -96,19 +97,25 @@ public class TestHelper {
         throw new RuntimeException("User could not be retrieved!");
     }
 
-    public static boolean dropUser() {
-        boolean r = BeanConfiguration.hasContext();
-        if (r) {
-            EntityHandlerIface dao = BeanConfiguration.getBeans()
-                    .getUserDBHandler();
-            try {
-                User us = dao.getAccount(credentials[0]);
-                dao.deleteAccount(us.getId());
-            }catch (KustvaktException e) {
-                // do nothing
-            }
+    public static boolean dropUser(String... usernames) {
+        if (usernames == null || usernames.length == 0)
+            usernames = new String[] { credentials[0] };
+        if (BeanConfiguration.hasContext()) {
+            for (String name : usernames)
+                remove(name);
         }
-        return r;
+        return BeanConfiguration.hasContext();
+    }
+
+    private static void remove(String username) {
+        EntityHandlerIface dao = BeanConfiguration.getBeans()
+                .getUserDBHandler();
+        try {
+            User us = dao.getAccount(username);
+            dao.deleteAccount(us.getId());
+        }catch (KustvaktException e) {
+            // do nothing
+        }
     }
 
     public static void drop() {
