@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service;
+package de.ids_mannheim.korap.web.service.full;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
@@ -7,6 +7,7 @@ import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.service.FastJerseyTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -31,7 +32,7 @@ public class OAuth2EndpointTest extends FastJerseyTest {
     @BeforeClass
     public static void configure() {
         BeanConfiguration.loadClasspathContext("default-config.xml");
-        setPackages("de.ids_mannheim.korap.web.service",
+        FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service",
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");
 

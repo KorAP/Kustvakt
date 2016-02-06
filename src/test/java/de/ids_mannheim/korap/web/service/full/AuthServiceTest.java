@@ -1,4 +1,6 @@
-package de.ids_mannheim.korap.web.service;
+package de.ids_mannheim.korap.web.service.full;
+
+import de.ids_mannheim.korap.web.service.FastJerseyTest;
 
 /**
  * @author hanl

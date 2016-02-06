@@ -1,10 +1,11 @@
-package de.ids_mannheim.korap.web.service;
+package de.ids_mannheim.korap.web.service.full;
 
 import com.sun.jersey.api.client.ClientResponse;
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.service.FastJerseyTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -22,7 +23,7 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
     @BeforeClass
     public static void configure() {
         BeanConfiguration.loadClasspathContext();
-        setPackages("de.ids_mannheim.korap.web.service.light",
+        FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.light",
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");
     }
@@ -45,8 +46,8 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("search").queryParam("q", "[base=Wort]")
                 .queryParam("ql", "poliqarp").get(ClientResponse.class);
-//        System.out.println("_______________________________________________");
-//        System.out.println(response.getEntity(String.class));
+        //        System.out.println("_______________________________________________");
+        //        System.out.println(response.getEntity(String.class));
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
     }
 
@@ -57,14 +58,14 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
 
         ClientResponse response = resource().path(getAPIVersion())
                 .path("search").post(ClientResponse.class, s.toJSON());
-//        System.out.println("_______________________________________________ RAW");
-//        System.out.println(response.getEntity(String.class));
+        //        System.out.println("_______________________________________________ RAW");
+        //        System.out.println(response.getEntity(String.class));
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
     }
 
     // in case no index is there, this will throw an error
-    @Ignore
     @Test
+    @Ignore
     public void testGetMatchInfoThrowsNoException() {
         ClientResponse response = resource().path(getAPIVersion())
                 .get(ClientResponse.class);
@@ -88,9 +89,9 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
                 .post(ClientResponse.class, "creationDate in 1787");
         String ent = response.getEntity(String.class);
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
-//        System.out
-//                .println("___________________________________________________");
-//        System.out.println("STATS ENTITY " + ent);
+        //        System.out
+        //                .println("___________________________________________________");
+        //        System.out.println("STATS ENTITY " + ent);
     }
 
     //    @Test
