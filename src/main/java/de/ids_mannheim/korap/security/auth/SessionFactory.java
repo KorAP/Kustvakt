@@ -133,12 +133,12 @@ public class SessionFactory implements Runnable {
      * TODO: persist userdata to database when session times out!
      */
     private void timeoutMaintenance() {
-        jlog.debug("running session cleanup thread");
+        jlog.trace("running session cleanup thread");
         Set<String> inactive = new HashSet<>();
         for (Entry<String, DateTime> entry : timeCheck.entrySet()) {
             if (!isUserSessionValid(entry.getKey())) {
                 TokenContext user = sessionsObject.get(entry.getKey());
-                jlog.debug("removing user session for user {}",
+                jlog.trace("removing user session for user {}",
                         user.getUsername());
                 inactive.add(user.getUsername());
                 removeSession(entry.getKey());
@@ -146,7 +146,7 @@ public class SessionFactory implements Runnable {
         }
         // fixme: not doing anything!
         if (inactive.size() > 0)
-            jlog.debug("removing inactive user session for users '{}' ",
+            jlog.trace("removing inactive user session for users '{}' ",
                     inactive);
     }
 

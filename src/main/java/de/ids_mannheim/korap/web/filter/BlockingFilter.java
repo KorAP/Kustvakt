@@ -19,10 +19,11 @@ public class BlockingFilter implements ContainerRequestFilter, ResourceFilter {
 
     @Override
     public ContainerRequest filter(ContainerRequest request) {
-        String authentication = request
-                .getHeaderValue(ContainerRequest.AUTHORIZATION);
-        if (authentication == null || authentication.isEmpty())
+        try {
+            request.getUserPrincipal();
+        }catch (UnsupportedOperationException e) {
             throw KustvaktResponseHandler.throwAuthenticationException();
+        }
         return request;
     }
 

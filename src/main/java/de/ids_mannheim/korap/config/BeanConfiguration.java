@@ -10,7 +10,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -81,17 +80,6 @@ public class BeanConfiguration {
 
         BeanConfiguration.beans = new BeanHolderHelper(context);
 
-    }
-
-    @Deprecated
-    private static void setManualBeans() {
-        if (getBeans().getPolicyDbProvider() != null
-                && getBeans().getEncryption() != null
-                && getBeans().getResourceProvider() != null)
-            de.ids_mannheim.korap.security.ac.SecurityManager
-                    .setProviders(getBeans().getPolicyDbProvider(),
-                            getBeans().getEncryption(),
-                            Arrays.asList(getBeans().getResourceProvider()));
     }
 
     public static void loadFileContext(String filepath) {

@@ -41,11 +41,6 @@ public class ResourceFinder {
             throw new RuntimeException("provider not set!");
     }
 
-    @Deprecated
-    public static void setProviders(PolicyHandlerIface policyHandler) {
-        ResourceFinder.policydao = policyHandler;
-    }
-
     public static <T extends KustvaktResource> Set<T> search(String path,
             boolean asParent, User user, Class<T> clazz,
             Permissions.PERMISSIONS... perms) throws KustvaktException {
@@ -104,12 +99,8 @@ public class ResourceFinder {
         Set<T> resources = new HashSet<>();
         if (this.containers != null) {
             for (KustvaktResource.Container c : this.containers) {
-                ResourceOperationIface<T> iface = SecurityManager.getHandlers()
-                        .get(c.getType());
-                if (iface == null)
-                    iface = SecurityManager.getHandlers()
-                            .get(KustvaktResource.class);
-
+                ResourceOperationIface<T> iface = BeanConfiguration.getBeans()
+                        .getResourceProvider();
                 try {
                     T resource = (T) iface
                             .findbyId(c.getPersistentID(), this.user);

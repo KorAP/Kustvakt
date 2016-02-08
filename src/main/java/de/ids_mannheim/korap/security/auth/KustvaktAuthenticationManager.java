@@ -65,7 +65,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
      */
     public TokenContext getTokenStatus(String token, String host,
             String useragent) throws KustvaktException {
-        jlog.info("getting session status of token '{}'", token);
+        jlog.info("getting session status of token type '{}'",
+                token.split(" ")[0]);
         AuthenticationIface provider = getProvider(
                 StringUtils.getTokenType(token), null);
 

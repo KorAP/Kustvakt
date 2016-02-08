@@ -31,9 +31,14 @@ public class DefaultFilter implements ContainerRequestFilter, ResourceFilter {
                 .getHeaderValue(ContainerRequest.AUTHORIZATION);
 
         // means that this is the public service
-        if (authentication == null)
-            request.setSecurityContext(
-                    new KorAPContext(createShorterToken(host, ua)));
+        if (authentication == null || authentication.isEmpty()) {
+            try {
+                request.getUserPrincipal();
+            }catch (UnsupportedOperationException e) {
+                request.setSecurityContext(
+                        new KorAPContext(createShorterToken(host, ua)));
+            }
+        }
         return request;
     }
 

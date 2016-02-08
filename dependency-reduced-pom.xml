@@ -70,7 +70,7 @@
             <exclude>**/*APITest.java</exclude>
           </excludes>
           <includes>
-            <include>de.ids_mannheim.korap.**/*.java</include>
+            <include>de/ids_mannheim/korap/**/*.java</include>
           </includes>
         </configuration>
       </plugin>

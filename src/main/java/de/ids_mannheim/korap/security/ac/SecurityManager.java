@@ -83,11 +83,6 @@ public class SecurityManager<T extends KustvaktResource> {
             handlers.put(iface.getType(), iface);
     }
 
-    @Deprecated
-    public static Map<Class<? extends KustvaktResource>, ResourceOperationIface> getHandlers() {
-        return handlers;
-    }
-
     /**
      * only allowed if the resource is uniquely identifiable by the name, if not, use path or id!
      * Shortcut so resource values do not need to be retrieved afterwards!
