@@ -167,6 +167,10 @@ public abstract class User implements Serializable {
             return demo;
         }
 
+        public static boolean isDemo(String username) {
+            return new DemoUser().getUsername().equalsIgnoreCase(username);
+        }
+
         public static ShibUser getShibInstance(String eduPersonID, String mail,
                 String cn) {
             ShibUser u = new ShibUser(eduPersonID);

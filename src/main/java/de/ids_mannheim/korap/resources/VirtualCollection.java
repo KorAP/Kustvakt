@@ -2,7 +2,6 @@ package de.ids_mannheim.korap.resources;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.Map;
 
@@ -17,33 +16,16 @@ public class VirtualCollection extends KustvaktResource {
     @Deprecated
     private Map stats;
 
-    protected VirtualCollection() {
+    public VirtualCollection() {
         super();
-        this.setPersistentID(this.createID());
     }
 
-    public VirtualCollection(Integer id, int creator) {
-        super(id, creator);
+    public VirtualCollection(Integer id) {
+        super(id);
     }
 
-    public VirtualCollection(String persistentID, int creator) {
-        super(persistentID, creator);
-    }
-
-    public VirtualCollection(String query) {
-        this();
-        this.setFields(query);
-        this.setPersistentID(this.createID());
-    }
-
-    // todo: redo!
-    @Override
-    protected String createID() {
-        if (this.getData() != null) {
-            String s = this.getData();
-            return DigestUtils.sha1Hex(s);
-        }
-        return super.createID();
+    public VirtualCollection(String persistentID) {
+        super(persistentID);
     }
 
     @Override
@@ -60,9 +42,9 @@ public class VirtualCollection extends KustvaktResource {
     @Override
     @SuppressWarnings("unchecked")
     public void checkNull() {
-        super.checkNull();
         this.setDescription(
                 this.getDescription() == null ? "" : this.getDescription());
+        super.checkNull();
     }
 
     @Override
@@ -72,7 +54,6 @@ public class VirtualCollection extends KustvaktResource {
                 ", persistentID='" + this.getPersistentID() + '\'' +
                 ", created=" + created +
                 ", path=" + this.getPath() +
-                ", owner=" + this.getOwner() +
                 ", name='" + this.getName() + '\'' +
                 ", data='" + this.getData() + '\'' +
                 '}';

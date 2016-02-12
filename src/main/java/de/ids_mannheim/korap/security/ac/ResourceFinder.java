@@ -8,6 +8,8 @@ import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.Permissions;
 import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.security.PermissionsBuffer;
+import de.ids_mannheim.korap.security.PolicyCondition;
+import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,11 @@ public class ResourceFinder {
     private ResourceFinder(User user) {
         this.containers = new ArrayList<>();
         this.user = user;
+        checkProviders();
+    }
+
+    private ResourceFinder() {
+        this.containers = new ArrayList<>();
         checkProviders();
     }
 
@@ -73,6 +80,18 @@ public class ResourceFinder {
                 Permissions.PERMISSIONS.READ);
     }
 
+    public static <T extends KustvaktResource> Set<T> searchPublic(
+            Class<T> clazz) {
+        List[] list = policydao
+                .getPolicies(new PolicyCondition(Attributes.PUBLIC_GROUP),
+                        Permissions.READ);
+        System.out.println("_____________________");
+        System.out.println("list 1 " + list[0]);
+        System.out.println("list 1 " + list[1]);
+        return new HashSet<>();
+
+    }
+
     // todo: should this be working?
     public static <T extends KustvaktResource> Set<T> search(User user,
             Class<T> clazz) throws KustvaktException {
@@ -107,7 +126,7 @@ public class ResourceFinder {
                     if (resource != null) {
                         PolicyEvaluator e = PolicyEvaluator
                                 .setFlags(user, resource);
-                        resource.setManaged(e.getFlag("managed", false));
+                        //                        resource.setManaged(e.getFlag("managed", false));
                         resources.add(resource);
                     }
                 }catch (KustvaktException e) {

@@ -35,11 +35,6 @@ public class DocumentDao implements ResourceOperationIface<Document> {
     }
 
     @Override
-    public Class<Document> getType() {
-        return Document.class;
-    }
-
-    @Override
     public Document findbyId(Integer id, User user) throws KustvaktException {
         MapSqlParameterSource s = new MapSqlParameterSource();
         s.addValue("id", id);
@@ -224,7 +219,12 @@ public class DocumentDao implements ResourceOperationIface<Document> {
     }
 
     @Override
-    public int size() throws KustvaktException {
+    public int size() {
         return -1;
+    }
+
+    @Override
+    public Class<Document> type() {
+        return Document.class;
     }
 }

@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.interfaces.db;
 
+import de.ids_mannheim.korap.config.KustvaktBaseDaoInterface;
+import de.ids_mannheim.korap.config.KustvaktTypeInterface;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.user.User;
@@ -9,11 +11,8 @@ import java.util.List;
 
 // todo: for transaction to work this should go into core module!?!
 // todo: user instance only required for auditing pointcut operations
-public interface ResourceOperationIface<T extends KustvaktResource> {
-
-    // todo: remove and use type reference!
-    @Deprecated
-    Class<T> getType();
+public interface ResourceOperationIface<T extends KustvaktResource>
+        extends KustvaktTypeInterface<T>, KustvaktBaseDaoInterface {
 
     <T extends KustvaktResource> T findbyId(String id, User user)
             throws KustvaktException;
@@ -42,7 +41,4 @@ public interface ResourceOperationIface<T extends KustvaktResource> {
     int deleteResource(String id, User user) throws KustvaktException;
 
     int deleteAll() throws KustvaktException;
-
-    int size() throws KustvaktException;
-
 }

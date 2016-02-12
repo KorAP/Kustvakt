@@ -38,7 +38,7 @@ public class ResourceDao<T extends KustvaktResource>
     }
 
     @Override
-    public Class<T> getType() {
+    public Class<T> type() {
         return (Class<T>) KustvaktResource.class;
     }
 
@@ -150,7 +150,7 @@ public class ResourceDao<T extends KustvaktResource>
         source.addValue("name", resource.getName());
         source.addValue("pid", resource.getPersistentID());
         source.addValue("parent", parid);
-        source.addValue("ow", resource.getOwner());
+        source.addValue("ow", user.getId());
         source.addValue("desc", resource.getDescription());
         source.addValue("type",
                 ResourceFactory.getResourceMapping(resource.getClass()));
@@ -194,14 +194,14 @@ public class ResourceDao<T extends KustvaktResource>
     }
 
     @Override
-    public int size() throws KustvaktException {
+    public int size() {
         final String sql = "SELECT COUNT(*) FROM resource_store;";
         try {
             return this.jdbcTemplate
                     .queryForObject(sql, new HashMap<String, Object>(),
                             Integer.class);
         }catch (DataAccessException e) {
-            return -1;
+            return 0;
         }
     }
 }

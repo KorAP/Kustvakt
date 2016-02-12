@@ -147,8 +147,8 @@ public class PolicyEvaluator {
     public static PolicyEvaluator setFlags(User user,
             KustvaktResource resource) {
         PolicyEvaluator e = new PolicyEvaluator(user, resource);
-        e.setFlag("managed", resource.getOwner() == KorAPUser.ADMINISTRATOR_ID);
-        e.setFlag("shared", false);
+//        e.setFlag("managed", resource.getOwner() == KorAPUser.ADMINISTRATOR_ID);
+//        e.setFlag("shared", false);
         return e;
     }
 

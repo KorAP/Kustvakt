@@ -22,12 +22,12 @@ public class Corpus extends KustvaktResource {
         super();
     }
 
-    public Corpus(Integer id, int creator) {
-        super(id, creator);
+    public Corpus(String pers) {
+        super(pers);
     }
 
-    public Corpus(String pers_id, int creator) {
-        super(pers_id, creator);
+    public Corpus(Integer id) {
+        super(id);
     }
 
     @Override

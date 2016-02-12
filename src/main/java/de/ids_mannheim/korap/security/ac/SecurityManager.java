@@ -66,7 +66,7 @@ public class SecurityManager<T extends KustvaktResource> {
             SecurityManager.handlers = new HashMap<>();
             ResourceOperationIface rprovider = BeanConfiguration.getBeans()
                     .getResourceProvider();
-            SecurityManager.handlers.put(rprovider.getType(), rprovider);
+            SecurityManager.handlers.put(rprovider.type(), rprovider);
         }
         if (policydao == null && crypto == null)
             throw new RuntimeException("providers not set!");
@@ -79,8 +79,8 @@ public class SecurityManager<T extends KustvaktResource> {
         SecurityManager.crypto = crypto;
         SecurityManager.handlers = new HashMap<>();
         jlog.info("Registering handlers: {}", Arrays.asList(ifaces));
-        for (ResourceOperationIface iface : ifaces)
-            handlers.put(iface.getType(), iface);
+        //        for (ResourceOperationIface iface : ifaces)
+        //            handlers.put(iface.getType(), iface);
     }
 
     /**
@@ -213,9 +213,9 @@ public class SecurityManager<T extends KustvaktResource> {
         if (id instanceof Integer)
             this.policies = policydao
                     .getPolicies((Integer) id, this.user, b.getPbyte());
-        //        System.out.println("-------------------------------");
-        //        System.out.println("LENGTH OF POLICY ARRAY " + this.policies.length);
-        //        System.out.println("POLICY AT 0 " + this.policies[0]);
+//        System.out.println("-------------------------------");
+//        System.out.println("LENGTH OF POLICY ARRAY " + this.policies.length);
+//        System.out.println("POLICY AT 0 " + this.policies[0]);
         this.evaluator = new PolicyEvaluator(this.user, this.policies);
 
         if (this.policies == null) {
@@ -275,12 +275,13 @@ public class SecurityManager<T extends KustvaktResource> {
             // create persistent identifier for the resource
             if (resource.getPersistentID() == null || resource.getPersistentID()
                     .isEmpty()) {
+                // todo: use resource data!
                 resource.setPersistentID(p.crypto.createID());
                 newid = true;
             }
 
             if (newid | !p.checkResource(resource.getPersistentID(), user)) {
-                resource.setOwner(user.getId());
+                //                resource.setOwner(user.getId());
 
                 jlog.info("Creating Access Control structure for resource '"
                         + resource.getPersistentID() + "@" + resource.getId()

@@ -4,7 +4,6 @@ import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.resources.Permissions;
-import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.security.ac.PolicyBuilder;
 import de.ids_mannheim.korap.user.Attributes;
@@ -20,9 +19,6 @@ public class CollectionLoader implements BootupInterface {
     @Override
     public void load() throws KustvaktException {
         if (BeanConfiguration.hasContext()) {
-            int uid = (Integer) KustvaktConfiguration.KUSTVAKT_USER
-                    .get(Attributes.ID);
-
             User user = User.UserFactory
                     .toUser(KustvaktConfiguration.KUSTVAKT_USER);
 
@@ -30,22 +26,26 @@ public class CollectionLoader implements BootupInterface {
             CollectionQueryBuilder3 bui = new CollectionQueryBuilder3();
             bui.addQuery("creationDate since 1775");
 
-            VirtualCollection c1 = ResourceFactory
-                    .createCollection("Weimarer Werke", bui.toJSON(), uid);
+            VirtualCollection c1 = new VirtualCollection();
+            c1.setName("Weimarer Werke");
+            c1.addField(Attributes.QUERY, bui.toJSON());
+
             c1.setDescription("Goethe-Werke in Weimar (seit 1775)");
 
             bui = new CollectionQueryBuilder3();
             bui.addQuery("textType = Aphorismus");
 
-            VirtualCollection c2 = ResourceFactory
-                    .createCollection("Aphorismen", bui.toJSON(), uid);
+            VirtualCollection c2 = new VirtualCollection();
+            c2.setName("Aphorismen");
+            c2.addField(Attributes.QUERY, bui.toJSON());
             c2.setDescription("Aphorismentexte Goethes");
 
             bui = new CollectionQueryBuilder3();
             bui.addQuery("title ~ \"Werther\"");
 
-            VirtualCollection c3 = ResourceFactory
-                    .createCollection("Werther", bui.toJSON(), uid);
+            VirtualCollection c3 = new VirtualCollection();
+            c3.setName("Werther");
+            c3.addField(Attributes.QUERY, bui.toJSON());
             c3.setDescription("Goethe - Die Leiden des jungen Werther");
 
             PolicyBuilder b = new PolicyBuilder(user);
@@ -53,6 +53,10 @@ public class CollectionLoader implements BootupInterface {
             b.setResources(c1, c2, c3);
             b.setConditions("public");
             b.create();
+
+//            ConditionManagement c = new ConditionManagement(user);
+//            c.addUser(User.UserFactory.getDemoUser().getUsername(),
+//                    new PolicyCondition("public"), false);
         }
     }
 

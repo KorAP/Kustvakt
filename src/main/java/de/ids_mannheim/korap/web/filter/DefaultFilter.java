@@ -13,6 +13,7 @@ import de.ids_mannheim.korap.web.utils.KorAPContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
+import java.security.Principal;
 
 /**
  * Created by hanl on 7/15/14.
@@ -32,12 +33,16 @@ public class DefaultFilter implements ContainerRequestFilter, ResourceFilter {
 
         // means that this is the public service
         if (authentication == null || authentication.isEmpty()) {
+            Principal pr = null;
             try {
-                request.getUserPrincipal();
+                pr = request.getUserPrincipal();
             }catch (UnsupportedOperationException e) {
+                // do nothing
+            }
+            if (pr == null)
                 request.setSecurityContext(
                         new KorAPContext(createShorterToken(host, ua)));
-            }
+
         }
         return request;
     }

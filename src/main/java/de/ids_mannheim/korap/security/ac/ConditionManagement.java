@@ -47,8 +47,8 @@ public class ConditionManagement {
                 == 1) {
             policydao.addToCondition(usernames, condition, admin);
         }else
-            jlog.error("Users could not be added to condition '{}'",
-                    condition.getSpecifier());
+            jlog.error("Users '{}' could not be added to condition '{}'",
+                    usernames, condition.getSpecifier());
     }
 
     public void addUser(String username, PolicyCondition condition,

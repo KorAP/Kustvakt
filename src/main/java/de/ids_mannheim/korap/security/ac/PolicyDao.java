@@ -29,6 +29,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -128,6 +129,7 @@ public class PolicyDao implements PolicyHandlerIface {
                 this.jdbcTemplate.batchUpdate(remove, sources_removed);
             }
 
+            // todo: naming convention!
             if (!policy.getAdded().isEmpty()) {
                 idx = 0;
                 MapSqlParameterSource[] sources = new MapSqlParameterSource[policy
@@ -226,13 +228,54 @@ public class PolicyDao implements PolicyHandlerIface {
                         @Override
                         public List<SecurityPolicy>[] extractData(ResultSet rs)
                                 throws SQLException, DataAccessException {
-                            return SecurityRowMappers.mapping(rs, user);
+                            return SecurityRowMappers.mapping(rs);
                         }
                     });
         }catch (DataAccessException e) {
             jlog.error(
                     "Permission Denied for policy retrieval for '{}' for user '{}'",
                     target, user.getId());
+            return new List[2];
+        }
+    }
+
+    @Override
+    public List<SecurityPolicy>[] getPolicies(PolicyCondition condition,
+            Byte perm) {
+        MapSqlParameterSource param = new MapSqlParameterSource();
+        param.addValue("cond", condition.getSpecifier());
+        param.addValue("perm", perm);
+        param.addValue("en", new Timestamp(TimeUtils.getNow().getMillis()));
+
+        String sql_new = "select pv.*, pv.perm & :perm as allowed, " +
+                "rh.depth, (select max(depth) from resource_tree " +
+                "where child_id=rh.child_id) as max_depth from policy_view as pv "
+                +
+                "inner join resource_tree as rh on rh.parent_id=pv.id " +
+                "where " +
+                "pv.enable <= :en and (pv.expire > :en or pv.expire is NULL) and "
+                +
+                "(pv.group_id='self' or pv.group_id=:cond) and " +
+                "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
+                +
+                "(select sum(distinct res.depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id=:cond)"
+                +
+                " or pos.group_id='self') and res.child_id=rh.child_id group by child_id)";
+
+        try {
+            return this.jdbcTemplate.query(sql_new, param,
+                    new ResultSetExtractor<List<SecurityPolicy>[]>() {
+
+                        @Override
+                        public List<SecurityPolicy>[] extractData(ResultSet rs)
+                                throws SQLException, DataAccessException {
+                            return SecurityRowMappers.mapping(rs);
+                        }
+                    });
+        }catch (DataAccessException e) {
+            e.printStackTrace();
+            jlog.error("Permission Denied for policy retrieval for '{}'",
+                    condition.getSpecifier());
             return new List[2];
         }
     }
@@ -246,7 +289,6 @@ public class PolicyDao implements PolicyHandlerIface {
         param.addValue("perm", perm);
         param.addValue("en", new Timestamp(TimeUtils.getNow().getMillis()));
 
-        // fixme: missing constraint of user group membership!
         String sql_new = "select pv.*, pv.perm & :perm as allowed, " +
                 "rh.depth, (select max(depth) from resource_tree " +
                 "where child_id=rh.child_id) as max_depth from policy_view as pv "
@@ -271,7 +313,7 @@ public class PolicyDao implements PolicyHandlerIface {
                         @Override
                         public List<SecurityPolicy>[] extractData(ResultSet rs)
                                 throws SQLException, DataAccessException {
-                            return SecurityRowMappers.mapping(rs, user);
+                            return SecurityRowMappers.mapping(rs);
                         }
                     });
         }catch (DataAccessException e) {
@@ -314,7 +356,7 @@ public class PolicyDao implements PolicyHandlerIface {
                         @Override
                         public List<SecurityPolicy>[] extractData(ResultSet rs)
                                 throws SQLException, DataAccessException {
-                            return SecurityRowMappers.mapping(rs, user);
+                            return SecurityRowMappers.mapping(rs);
                         }
                     });
         }catch (DataAccessException e) {
@@ -505,13 +547,13 @@ public class PolicyDao implements PolicyHandlerIface {
     }
 
     @Override
-    public void deleteResourcePolicies(String id, User user)
+    public int deleteResourcePolicies(String id, User user)
             throws KustvaktException {
         MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("id", id);
-        String sql = "DELETE FROM policy_store WHERE target_id=:id;";
+        String sql = "DELETE FROM policy_store WHERE target_id in (SELECT id FROM resource_store WHERE persistent_id=:id);";
         try {
-            this.jdbcTemplate.update(sql, param);
+            return this.jdbcTemplate.update(sql, param);
         }catch (DataAccessException e) {
             jlog.error("Operation (DELETE) not possible for '{}' for user '{}'",
                     id, user.getId());
@@ -638,10 +680,16 @@ public class PolicyDao implements PolicyHandlerIface {
             param.addValue("status", BooleanUtils.getBoolean(admin));
             return this.jdbcTemplate.update(insert, param);
         }catch (DataAccessException e) {
-            jlog.error("Operation (INSERT) not possible for '{}' for user '{}'",
-                    condition.toString(), username);
-            throw new dbException(null, "group_store",
-                    StatusCodes.DB_INSERT_FAILED, condition.toString());
+            //todo: test with mysql
+            if (!e.getMessage().toLowerCase()
+                    .contains("UNIQUE".toLowerCase())) {
+                jlog.error(
+                        "Operation (INSERT) not possible for '{}' for user '{}'",
+                        condition.toString(), username);
+                throw new dbException(null, "group_store",
+                        StatusCodes.DB_INSERT_FAILED, condition.toString());
+            }
+            return 0;
         }
     }
 
@@ -661,7 +709,7 @@ public class PolicyDao implements PolicyHandlerIface {
         MapSqlParameterSource[] sources = new MapSqlParameterSource[usernames
                 .size()];
 
-        //        todo: use unique index for that! problematic though --> why?
+        //        todo: use unique index for that! problematic though --> why? no special exception?
         //        final String select = "select count(id) from group_users where userID=" +
         //                "(select id from korap_users where username=:username) " +
         //                "AND group_id=:group;";
@@ -673,6 +721,7 @@ public class PolicyDao implements PolicyHandlerIface {
                         "WHERE username=:username), :group, :status);";
         try {
             for (int idx = 0; idx < usernames.size(); idx++) {
+                //todo: dont do that here
                 if (usernames.get(idx) == null || usernames.get(idx).isEmpty())
                     throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);
 
@@ -684,7 +733,6 @@ public class PolicyDao implements PolicyHandlerIface {
                 // that as checkup (may also be manageable via triggers)
                 //                if (this.jdbcTemplate
                 //                        .queryForObject(select, param, Integer.class) == 0)
-                System.out.println("PARAMETER MAP " + param.getValues());
                 sources[idx] = param;
             }
 
@@ -692,12 +740,16 @@ public class PolicyDao implements PolicyHandlerIface {
             //fixme: problem - unique constraints throws exception. skip that user entry?!
             return this.jdbcTemplate.batchUpdate(insert, sources);
         }catch (DataAccessException e) {
-            jlog.error("Operation (INSERT) not possible for '{}' for user '{}'",
-                    condition.toString(), usernames, e);
-            throw new KustvaktException(
-                    "Operation (INSERT) not possible for '" + condition
-                            .toString() + "' for user '" + usernames + "'", e,
-                    StatusCodes.CONNECTION_ERROR);
+            if (!e.getCause().toString().contains("UNIQUE")) {
+                jlog.error(
+                        "Operation (INSERT) not possible for '{}' for user '{}'",
+                        condition.toString(), usernames, e);
+                throw new KustvaktException(
+                        "Operation (INSERT) not possible for '" + condition
+                                .toString() + "' for user '" + usernames + "'",
+                        e, StatusCodes.CONNECTION_ERROR);
+            }
+            return null;
         }
     }
 
@@ -728,20 +780,21 @@ public class PolicyDao implements PolicyHandlerIface {
     }
 
     @Override
-    public void createParamBinding(Parameter param) throws KustvaktException {
+    public int createParamBinding(Parameter param) throws KustvaktException {
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("key", param.getName());
         source.addValue("policy", param.getPolicy().getID());
         source.addValue("value", param.getValue());
         source.addValue("flag", param.isEqual());
 
-        if (!parameterExists(param.getName()))
-            createParameter(param.getName(), "", param.getOwner());
+        //todo:
+        //        if (!parameterExists(param.getName()))
+        //            createParameter(param.getName(), "", param.getOwner());
         final String insert =
                 "INSERT INTO param_map (param_id, policy_id, value, flag) VALUES ((SELECT id FROM param_store "
                         + "WHERE p_key=:key), (SELECT id FROM policy_store WHERE id=:policy), :value, :flag);";
         try {
-            this.jdbcTemplate.update(insert, source);
+            return this.jdbcTemplate.update(insert, source);
         }catch (DataAccessException e) {
             jlog.error("Operation (INSERT) not possible for '{}",
                     param.toString());
@@ -789,15 +842,27 @@ public class PolicyDao implements PolicyHandlerIface {
     }
 
     @Override
-    public void removeParamBinding(SecurityPolicy policy)
+    public int removeParamBinding(SecurityPolicy policy)
             throws KustvaktException {
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", policy.getID());
         final String sql = "DELETE FROM param_map WHERE policy_id=:id";
         try {
-            this.jdbcTemplate.update(sql, source);
+            return this.jdbcTemplate.update(sql, source);
         }catch (DataAccessException e) {
             throw new KustvaktException(e, StatusCodes.CONNECTION_ERROR);
+        }
+    }
+
+    @Override
+    public int size() {
+        String sql = "SELECT COUNT(*) FROM policy_view;";
+        try {
+            return this.jdbcTemplate
+                    .queryForObject(sql, new HashMap<String, Object>(),
+                            Integer.class);
+        }catch (DataAccessException e) {
+            return 0;
         }
     }
 

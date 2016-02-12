@@ -5,7 +5,6 @@ import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.security.PolicyCondition;
 import de.ids_mannheim.korap.security.PolicyContext;
 import de.ids_mannheim.korap.security.SecurityPolicy;
-import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.PrefixTreeMap;
 import lombok.Data;
 import org.springframework.dao.DataAccessException;
@@ -71,7 +70,7 @@ public class SecurityRowMappers {
         }
     }
 
-    public static List<SecurityPolicy>[] mapping(ResultSet rs, User user)
+    public static List<SecurityPolicy>[] mapping(ResultSet rs)
             throws SQLException {
         List<SecurityPolicy>[] policyArray = null;
         List<Integer>[] idx = null;

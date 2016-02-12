@@ -1,9 +1,9 @@
+package de.ids_mannheim.korap.handlers;
+
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.handlers.ResourceDao;
 import de.ids_mannheim.korap.resources.KustvaktResource;
-import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.user.User;
 import org.junit.After;
@@ -25,7 +25,7 @@ public class ResourceDaoTest {
 
     @AfterClass
     public static void drop() {
-//        TestHelper.dropUser();
+        //        TestHelper.dropUser();
         BeanConfiguration.closeApplication();
     }
 
@@ -39,7 +39,7 @@ public class ResourceDaoTest {
     public void createCollection() throws KustvaktException {
         ResourceDao dao = new ResourceDao(
                 BeanConfiguration.getBeans().getPersistenceClient());
-        VirtualCollection c = ResourceFactory.createCollection("testColl", 1);
+        VirtualCollection c = new VirtualCollection("testColl");
         c.addField("key_1", "this is a test");
         c.addField("key_2", 2);
 
@@ -59,7 +59,7 @@ public class ResourceDaoTest {
     public void ResourceDataUpdate() throws KustvaktException {
         ResourceDao dao = new ResourceDao(
                 BeanConfiguration.getBeans().getPersistenceClient());
-        VirtualCollection c = ResourceFactory.createCollection("testColl", 1);
+        VirtualCollection c = new VirtualCollection("testColl");
         c.addField("key_1", "this is a test");
         c.addField("key_2", 2);
 

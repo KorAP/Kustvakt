@@ -10,25 +10,24 @@ public class Layer extends KustvaktResource {
         super();
     }
 
-
     public Layer(Integer id, int creator) {
-        super(id, creator);
+        super(id);
     }
 
     // layer name must not be unique!
-    public Layer(Integer id, String name, int creator) {
-        super(id, creator);
+    public Layer(Integer id, String name) {
+        super(id);
         this.setName(name);
     }
 
-    public Layer(String persistentID, String name, int creator) {
-        super(persistentID, creator);
+    public Layer(String persistentID, String name) {
+        super(persistentID);
         this.setPersistentID(persistentID);
         this.setName(name);
     }
 
-    public Layer(String persistentID, int creator) {
-        super(persistentID, creator);
+    public Layer(String persistentID) {
+        super(persistentID);
     }
 
 }

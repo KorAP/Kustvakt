@@ -1,8 +1,10 @@
 package de.ids_mannheim.korap.config;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.handlers.ResourceDao;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
+import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.web.service.BootupInterface;
@@ -29,7 +31,8 @@ public class TestHelper {
 
     public static boolean setupAccount() {
         boolean r = BeanConfiguration.hasContext();
-        if (r && BeanConfiguration.getBeans().getUserDBHandler().size() == 0) {
+        if (r && ((KustvaktBaseDaoInterface) BeanConfiguration.getBeans()
+                .getUserDBHandler()).size() == 0) {
             EntityHandlerIface dao = BeanConfiguration.getBeans()
                     .getUserDBHandler();
             Map m = new HashMap<>();
@@ -57,7 +60,8 @@ public class TestHelper {
 
     public static boolean setupSimpleAccount(String username, String password) {
         boolean r = BeanConfiguration.hasContext();
-        if (r && BeanConfiguration.getBeans().getUserDBHandler().size() == 0) {
+        if (r && ((KustvaktBaseDaoInterface) BeanConfiguration.getBeans()
+                .getUserDBHandler()).size() == 0) {
             EntityHandlerIface dao = BeanConfiguration.getBeans()
                     .getUserDBHandler();
             Map m = new HashMap<>();
@@ -184,10 +188,34 @@ public class TestHelper {
                     iface.load();
                 }catch (KustvaktException e) {
                     // don't do anything!
+                    System.out.println(
+                            "Loader instance failed ... exiting programme!");
+                    System.exit(-1);
                 }
             }
         }else
             throw new RuntimeException("Client not setup properly!");
+    }
+
+    public static void setupResource(KustvaktResource resource, User user)
+            throws KustvaktException {
+        ResourceDao dao = new ResourceDao(
+                BeanConfiguration.getBeans().getPersistenceClient());
+        dao.storeResource(resource, user);
+    }
+
+    public static KustvaktResource getResource(String name)
+            throws KustvaktException {
+        ResourceDao dao = new ResourceDao(
+                BeanConfiguration.getBeans().getPersistenceClient());
+        return dao.findbyId(name, getUser());
+    }
+
+    public static void dropResource(String name) throws KustvaktException {
+        ResourceDao dao = new ResourceDao(
+                BeanConfiguration.getBeans().getPersistenceClient());
+        dao.deleteResource(name, null);
+
     }
 
     private TestHelper() {

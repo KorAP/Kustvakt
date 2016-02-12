@@ -52,7 +52,7 @@ public class JDBCClient extends PersistenceClient<NamedParameterJdbcTemplate> {
         try {
             // uses flyway schema table to determine of schema was applied succesfully
             size = tmp.queryForObject(
-                    "select count(*) from schema_version limit 10;",
+                    "select count(*) from schema_version limit 5;",
                     new HashMap<String, Object>(), Integer.class);
         }catch (Exception e) {
             System.out.println("No database schema found!");

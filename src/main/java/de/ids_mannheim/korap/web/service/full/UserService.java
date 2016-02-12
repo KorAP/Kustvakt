@@ -206,7 +206,7 @@ public class UserService {
     @GET
     @Path("info")
     @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
-            BlockingFilter.class, BlockingFilter.class })
+            BlockingFilter.class })
     public Response getStatus(@Context SecurityContext context,
             @QueryParam("scopes") String scopes) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();

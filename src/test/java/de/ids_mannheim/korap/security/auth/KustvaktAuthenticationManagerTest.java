@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.security.auth;
 
 import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.KustvaktBaseDaoInterface;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -47,7 +48,7 @@ public class KustvaktAuthenticationManagerTest {
         EntityHandlerIface dao = BeanConfiguration.getBeans()
                 .getUserDBHandler();
 
-        assert dao.size() > 0;
+        assert ((KustvaktBaseDaoInterface) dao).size() > 0;
         User check = dao.getAccount(user.getUsername());
         assert check != null;
     }

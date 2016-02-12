@@ -54,7 +54,7 @@ public class KustvaktResponseHandler {
                 e.getEntity());
     }
 
-    private static String buildNotification(int code, String message,
+    public static String buildNotification(int code, String message,
             String entity) {
         Notifications notif = new Notifications();
         notif.addError(code, message, entity);
@@ -78,6 +78,9 @@ public class KustvaktResponseHandler {
                 break;
             case StatusCodes.ILLEGAL_ARGUMENT:
                 status = Response.Status.NOT_ACCEPTABLE;
+                break;
+            case StatusCodes.STATUS_OK:
+                status = Response.Status.OK;
                 break;
         }
         return status;

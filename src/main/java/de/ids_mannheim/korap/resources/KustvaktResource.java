@@ -24,8 +24,10 @@ public abstract class KustvaktResource {
     private String name;
     private String description;
     // todo: manage creator over policies!
-    @JsonIgnore
-    private Integer owner;
+
+    //    @JsonIgnore
+    //    @Deprecated
+    //    private Integer owner;
     protected long created;
     @Deprecated
     private boolean managed;
@@ -38,26 +40,23 @@ public abstract class KustvaktResource {
     @Getter(AccessLevel.PROTECTED)
     private Map<String, Object> fields;
 
-    // todo: redo constructors
-    protected KustvaktResource() {
+    public KustvaktResource() {
         this.created = TimeUtils.getNow().getMillis();
         this.id = -1;
         this.parentID = null;
         this.fields = new HashMap<>();
     }
 
-    public KustvaktResource(Integer id, int creator) {
+    public KustvaktResource(Integer id) {
         this.created = TimeUtils.getNow().getMillis();
         this.id = id;
-        this.owner = creator;
         this.parentID = null;
         this.fields = new HashMap<>();
     }
 
     // todo: move creator to builder instance for policies
-    public KustvaktResource(String persistentID, int creator) {
+    public KustvaktResource(String persistentID) {
         this();
-        this.owner = creator;
         this.persistentID = persistentID;
     }
 
@@ -136,11 +135,11 @@ public abstract class KustvaktResource {
                 this.getCreated() :
                 other.getCreated());
         this.setPath(this.getPath() == null ? other.getPath() : this.getPath());
-        this.setOwner(
-                this.getOwner() == null ? other.getOwner() : this.getOwner());
-        this.setManaged(
-                !this.isManaged() ? other.isManaged() : this.isManaged());
-        this.setShared(!this.isShared() ? other.isShared() : this.isShared());
+        //        this.setOwner(
+        //                this.getOwner() == null ? other.getOwner() : this.getOwner());
+        //        this.setManaged(
+        //                !this.isManaged() ? other.isManaged() : this.isManaged());
+        //        this.setShared(!this.isShared() ? other.isShared() : this.isShared());
     }
 
     /**
@@ -154,11 +153,6 @@ public abstract class KustvaktResource {
                 TimeUtils.getNow().getMillis() :
                 this.getCreated());
         setName(this.getName() == null ? "" : this.getName());
-    }
-
-    protected String createID() {
-        //        return utils.randomAlphanumeric(10);
-        return "";
     }
 
     /**
@@ -190,7 +184,6 @@ public abstract class KustvaktResource {
                 ", name='" + name + '\'' +
                 ", created=" + created +
                 ", path=" + path +
-                ", owner=" + owner +
                 '}';
     }
 
@@ -198,20 +191,17 @@ public abstract class KustvaktResource {
     @Getter
     public static class Container {
         private final Class type;
-        //        private final Integer id;
         private final String persistentID;
         private final boolean set;
 
         public Container(String persistentID, Class type) {
             this.type = type;
-            //            this.id = id;
             this.set = true;
             this.persistentID = persistentID;
         }
 
         public Container(Class type) {
             this.type = type;
-            //            this.id = id;
             this.set = true;
             this.persistentID = null;
         }
@@ -219,7 +209,6 @@ public abstract class KustvaktResource {
         public Container() {
             this.set = false;
             this.type = null;
-            //            this.id = null;
             this.persistentID = null;
         }
 

@@ -21,7 +21,7 @@ public class PolicyLoader implements BootupInterface {
                     .toUser(KustvaktConfiguration.KUSTVAKT_USER);
             PolicyBuilder builder = new PolicyBuilder(user);
             builder.addCondition("public");
-            builder.setResources(new Corpus("GOE", user.getId()));
+            builder.setResources(new Corpus("GOE"));
             builder.setPermissions(Permissions.PERMISSIONS.ALL);
             builder.create();
 

@@ -8,6 +8,7 @@ import lombok.Getter;
  * @author hanl@ids-mannheim.de
  * @date 09/11/13
  */
+//todo:
 @Getter
 public class Parameter extends KustvaktResource {
 
@@ -22,7 +23,6 @@ public class Parameter extends KustvaktResource {
         super.setName(identifier.toLowerCase());
         this.value = value;
         this.equal = equal;
-        super.setOwner(user.getId());
     }
 
     @Override

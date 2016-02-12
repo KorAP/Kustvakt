@@ -86,6 +86,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         String key = cache_key(username);
         Element e = user_cache.get(key);
 
+        if (User.UserFactory.isDemo(username))
+            return User.UserFactory.getDemoUser();
+
         if (e != null) {
             Map map = (Map) e.getObjectValue();
             user = User.UserFactory.toUser(map);
@@ -491,6 +494,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         }
         user.setPassword(hash);
         try {
+            jlog.info("Creating new user account for user {}",
+                    user.getUsername());
             entHandler.createAccount(user);
             UserDetails details = new UserDetails(user.getId());
             details.readDefaults(safeMap);

@@ -4,7 +4,6 @@ import de.ids_mannheim.korap.auditing.AuditRecord;
 import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.ResourceFactory;
-import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.ShibUser;
@@ -106,7 +105,6 @@ public class RowMapperFactory {
             KustvaktResource r = ResourceFactory.getResource(rs.getInt("type"));
             if (r != null) {
                 r.setId(rs.getInt("id"));
-                r.setOwner(rs.getInt("creator"));
                 r.setName(rs.getString("name"));
 
                 r.setFields(rs.getString("data"));
@@ -119,25 +117,4 @@ public class RowMapperFactory {
         }
 
     }
-
-    // todo: ??!
-    public static class CollectionMapper
-            implements RowMapper<VirtualCollection> {
-
-        @Override
-        public VirtualCollection mapRow(ResultSet rs, int i)
-                throws SQLException {
-            VirtualCollection c = ResourceFactory
-                    .getCollection(rs.getInt("id"), false);
-            c.setPersistentID(rs.getString("persistent_id"));
-            c.setCreated(rs.getTimestamp("created").getTime());
-            c.setName(rs.getString("name"));
-            c.setDescription(rs.getString("description"));
-            c.setOwner(rs.getInt("user_id"));
-            c.setFields(rs.getString("data"));
-            c.checkNull();
-            return c;
-        }
-    }
-
 }

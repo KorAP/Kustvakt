@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.handlers;
 
+import de.ids_mannheim.korap.config.KustvaktBaseDaoInterface;
 import de.ids_mannheim.korap.config.ParamFields;
 import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
@@ -8,7 +9,6 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.exceptions.dbException;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
-import de.ids_mannheim.korap.user.DemoUser;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.ShibUser;
 import de.ids_mannheim.korap.user.User;
@@ -33,7 +33,7 @@ import java.util.Map;
  * @author hanl
  * @date 13/01/2014
  */
-public class EntityDao implements EntityHandlerIface {
+public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
 
     private static Logger jlog = LoggerFactory.getLogger(EntityDao.class);
     private NamedParameterJdbcTemplate jdbcTemplate;
@@ -164,7 +164,6 @@ public class EntityDao implements EntityHandlerIface {
                     "VALUES (:us, :type, :ali, " +
                     ":edu, :cn, :mail, :logs, :logft);";
             np.addValue("us", s.getUsername());
-            //            np.addValue("ali", s.getAccountLink());
             np.addValue("ali", null);
             np.addValue("edu", s.getAffiliation());
             np.addValue("mail", s.getMail());
@@ -172,23 +171,16 @@ public class EntityDao implements EntityHandlerIface {
             np.addValue("cn", s.getCn());
             np.addValue("acr", System.currentTimeMillis());
 
-            //todo: disable after first intro
-        }else if (user instanceof DemoUser) {
-            query = "INSERT INTO korap_users (username, type, account_lock, account_creation "
-                    +
-                    "password, uri_fragment, " +
-                    "uri_expiration) VALUES (:us, :type, :alo, " +
-                    ":ps, :uri, :urie);";
-
-            np.addValue("us", user.getUsername());
-            np.addValue("type", user.getType());
-            //            np.addValue("ali", user.getAccountLink());
-            np.addValue("ali", null);
-            np.addValue("alo", user.isAccountLocked());
-            np.addValue("urie", new Date(0));
-            np.addValue("ps", DemoUser.PASSPHRASE);
-            np.addValue("uri", "");
-            np.addValue("acr", System.currentTimeMillis());
+            //todo: deprecate
+            //        }else if (user instanceof DemoUser) {
+            //            query = "INSERT INTO korap_users (id, username, type, account_lock, account_creation) VALUES "
+            //                    + "(:id, :us, :type, :alo);";
+            //
+            //            np.addValue("id", user.getId());
+            //            np.addValue("us", user.getUsername());
+            //            np.addValue("type", user.getType());
+            //            np.addValue("alo", user.isAccountLocked());
+            //            np.addValue("acr", System.currentTimeMillis());
         }else
             return -1;
 
@@ -202,7 +194,6 @@ public class EntityDao implements EntityHandlerIface {
         }catch (DataAccessException e) {
             jlog.error("Could not create user account with username: {}",
                     user.getUsername());
-            e.printStackTrace();
             throw new dbException(user.getUsername(), "korap_users",
                     StatusCodes.NAME_EXISTS, user.getUsername());
         }
@@ -286,7 +277,6 @@ public class EntityDao implements EntityHandlerIface {
         return this.jdbcTemplate
                 .queryForObject(query, new HashMap<String, Object>(),
                         Integer.class);
-
     }
 
     //todo:

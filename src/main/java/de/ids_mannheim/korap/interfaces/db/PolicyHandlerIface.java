@@ -34,6 +34,8 @@ public interface PolicyHandlerIface {
      */
     List<SecurityPolicy>[] getPolicies(Integer target, User user, Byte perm);
 
+    List<SecurityPolicy>[] getPolicies(PolicyCondition condition, Byte perm);
+
     /**
      * @param policy
      * @return
@@ -86,8 +88,7 @@ public interface PolicyHandlerIface {
      * @param id
      * @param user
      */
-    //todo: test
-    void deleteResourcePolicies(String id, User user) throws KustvaktException;
+    int deleteResourcePolicies(String id, User user) throws KustvaktException;
 
     /**
      * @param policy
@@ -157,7 +158,7 @@ public interface PolicyHandlerIface {
      * @param param
      * @throws KustvaktException
      */
-    void createParamBinding(Parameter param) throws KustvaktException;
+    int createParamBinding(Parameter param) throws KustvaktException;
 
     /**
      * @param condition
@@ -171,6 +172,8 @@ public interface PolicyHandlerIface {
      * @param policy
      * @throws KustvaktException
      */
-    void removeParamBinding(SecurityPolicy policy) throws KustvaktException;
+    int removeParamBinding(SecurityPolicy policy) throws KustvaktException;
+
+    int size();
 
 }

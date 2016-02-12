@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.resources;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,6 +56,12 @@ public class ResourceFactory {
         return null;
     }
 
+    public static <T extends KustvaktResource> T createID(T resource) {
+        if (resource.getData() != null && !resource.getData().isEmpty())
+            resource.setPersistentID(DigestUtils.sha1Hex(resource.getData()));
+        return resource;
+    }
+
     public static <T extends KustvaktResource> Class<T> getResourceClass(
             String type) {
         for (Class value : subTypes) {
@@ -79,53 +87,50 @@ public class ResourceFactory {
     }
 
     public static VirtualCollection getPermanentCollection(
-            VirtualCollection mergable, String corpusName, String description,
-            Integer owner) {
+            VirtualCollection mergable, String corpusName, String description) {
         VirtualCollection v = new VirtualCollection();
         v.merge(mergable);
-        v.setPersistentID(v.createID());
         v.setName(corpusName);
         v.setDescription(description);
-        v.setOwner(owner);
-        return v;
+        return createID(v);
     }
 
-    public static VirtualCollection createCollection(String name, String query,
-            Integer owner) {
-        VirtualCollection v = new VirtualCollection(query);
-        v.setName(name);
-        v.setOwner(owner);
-        return v;
-    }
+    //    public static VirtualCollection createCollection(String name, String query,
+    //            Integer owner) {
+    //        VirtualCollection v = new VirtualCollection(query);
+    //        v.setName(name);
+    //        v.setOwner(owner);
+    //        return v;
+    //    }
+    //
+    //    public static VirtualCollection createCollection(String name,
+    //            Integer owner) {
+    //        VirtualCollection v = new VirtualCollection();
+    //        v.setOwner(owner);
+    //        v.setName(name);
+    //        return v;
+    //    }
+    //
+    //    public static VirtualCollection getCollection(Integer collectionID,
+    //            boolean cache) {
+    //        VirtualCollection v = new VirtualCollection();
+    //        v.setId(collectionID);
+    //        v.setDescription("");
+    //        v.setName("");
+    //        return v;
+    //    }
+    //
+    //    public static VirtualCollection createContainer(String name,
+    //            String description, String query, Integer owner) {
+    //        VirtualCollection v = new VirtualCollection(query);
+    //        v.setName(name);
+    //        v.setDescription(description);
+    //        v.setOwner(owner);
+    //        v.setManaged(true);
+    //        return v;
+    //    }
 
-    public static VirtualCollection createCollection(String name,
-            Integer owner) {
-        VirtualCollection v = new VirtualCollection();
-        v.setOwner(owner);
-        v.setName(name);
-        return v;
-    }
-
-    public static VirtualCollection getCollection(Integer collectionID,
-            boolean cache) {
-        VirtualCollection v = new VirtualCollection();
-        v.setId(collectionID);
-        v.setDescription("");
-        v.setName("");
-        return v;
-    }
-
-    public static VirtualCollection createContainer(String name,
-            String description, String query, Integer owner) {
-        VirtualCollection v = new VirtualCollection(query);
-        v.setName(name);
-        v.setDescription(description);
-        v.setOwner(owner);
-        v.setManaged(true);
-        return v;
-    }
-
-    public static VirtualCollection getIDContainer(Integer id, Integer owner) {
-        return new VirtualCollection(id, owner);
+    public static VirtualCollection getIDContainer(Integer id) {
+        return new VirtualCollection(id);
     }
 }

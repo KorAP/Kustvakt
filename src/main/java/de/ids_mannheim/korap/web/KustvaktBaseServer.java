@@ -166,6 +166,7 @@ public class KustvaktBaseServer {
 
     }
 
+
     @Setter
     public static class KustvaktArgs {
 
@@ -188,6 +189,6 @@ public class KustvaktBaseServer {
             this.properties = null;
             this.init = false;
         }
-    }
 
+    }
 }

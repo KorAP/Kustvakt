@@ -13,6 +13,8 @@ public class Attributes {
     public static final String CLIENT_SECRET = "client_secret";
     public static final String SCOPES = "scopes";
 
+    public static final String PUBLIC_GROUP = "public";
+
     public static final String SERVICE_ACCESS = "service_access";
     public static final String USER = "KorapUser";
     public static final String SHIBUSER = "ShibUser";
@@ -155,7 +157,7 @@ public class Attributes {
     public static final String DISABLED = "disabled";
     public static final String USER_ID = "user_id";
     public static final String PARENT_ID = "parent_id";
-//    public static final String
+    //    public static final String
 
 }
 

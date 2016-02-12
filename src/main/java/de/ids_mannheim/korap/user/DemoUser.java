@@ -12,11 +12,11 @@ public class DemoUser extends User implements Serializable {
     public static final String DEMOUSER_NAME = "demo";
     public static final Integer DEMOUSER_ID = 1654234534;
     private static final long ACCOUNT_CREATED = 1377102171202L;
-    public static final String PASSPHRASE = "$2a$15$rGPvLWm5JJ1iYj0V61e5guYIGmSo.rjdBkAVIU1vWS/xdybmABxRa";
+    public static final String PASSPHRASE = "demo";
 
-    // todo: test functionality!
     protected DemoUser() {
         super(DEMOUSER_NAME, 2);
+        this.setId(-1);
         this.setAccountCreation(ACCOUNT_CREATED);
     }
 

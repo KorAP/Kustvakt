@@ -25,6 +25,4 @@ public interface EntityHandlerIface {
 
     int activateAccount(String username, String uriToken)
             throws KustvaktException;
-
-    int size();
 }

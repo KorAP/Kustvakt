@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS korap_users (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
 username VARCHAR(150) NOT NULL UNIQUE,
-password VARCHAR(100) NOT NULL,
+password VARCHAR(100),
 account_lock boolean NOT NULL,
 account_creation BIGINT NOT NULL,
 -- deprecate this
@@ -308,7 +308,7 @@ end;
 
 -- indices
 -- test unique index constraints
-create index group_index on group_users(user_id);
+create index group_index on group_users(user_id, group_id);
 create index policy_index on group_ref(policy_id);
 create index policy_target on policy_store(target_id);
 create unique index r_tree_index on resource_tree (parent_id, depth, child_id);

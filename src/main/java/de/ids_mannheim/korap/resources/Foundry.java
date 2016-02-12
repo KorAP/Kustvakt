@@ -10,13 +10,12 @@ public class Foundry extends KustvaktResource {
         super();
     }
 
-    public Foundry(Integer id, int creator) {
-        super(id, creator);
+    public Foundry(Integer id) {
+        super(id);
     }
 
-    public Foundry(String persistentID, int creator) {
-        super(persistentID, creator);
-        this.setName(persistentID);
+    public Foundry(String persistentID) {
+        super(persistentID);
     }
 
 }

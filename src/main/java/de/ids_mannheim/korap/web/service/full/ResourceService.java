@@ -275,7 +275,7 @@ public class ResourceService {
     //    }
     @POST
     @Path("colloc")
-    public Response getCollocatioBase(@QueryParam("q") String query) {
+    public Response getCollocationBase(@QueryParam("q") String query) {
         String result;
         try {
             result = graphDBhandler.getResponse("distCollo", "q", query);
@@ -814,8 +814,7 @@ public class ResourceService {
 
             if (!cache) {
                 collection = ResourceFactory
-                        .getPermanentCollection(cachetmp, name, description,
-                                user.getId());
+                        .getPermanentCollection(cachetmp, name, description);
                 vals = collection.toMap();
                 try {
                     resourceHandler.storeResources(user, collection);
@@ -902,8 +901,7 @@ public class ResourceService {
 
             if (!cache && !user.isDemo()) {
                 collection = ResourceFactory
-                        .getPermanentCollection(cachetmp, name, description,
-                                user.getId());
+                        .getPermanentCollection(cachetmp, name, description);
                 vals = collection.toMap();
                 try {
                     resourceHandler.storeResources(user, collection);
