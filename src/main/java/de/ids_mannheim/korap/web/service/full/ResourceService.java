@@ -986,7 +986,7 @@ public class ResourceService {
             for (String spl : new ArrayList<>(foundries)) {
                 try {
                     de.ids_mannheim.korap.security.ac.SecurityManager manager = SecurityManager
-                            .init(spl, user, Permissions.PERMISSIONS.READ);
+                            .init(spl, user, Permissions.Permission.READ);
                     if (!manager.isAllowed())
                         continue;
 

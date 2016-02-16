@@ -1,6 +1,5 @@
 package de.ids_mannheim.korap.config;
 
-import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import org.reflections.Reflections;
 
 import java.lang.annotation.Annotation;
@@ -36,10 +35,9 @@ public class KustvaktClassLoader {
         return reflections.getTypesAnnotatedWith(annotation);
     }
 
-    public static Class<? extends UserDataDbIface> getClass(Class type,
-            Class iface) {
-        Set<Class<?>> c = KustvaktClassLoader.loadSubTypes(iface);
-        for (Class o : c) {
+    public static <T> Class<? extends T> getTypeClass(Class type, Class<T> iface) {
+        Set<Class<? extends T>> c = KustvaktClassLoader.loadSubTypes(iface);
+        for (Class<? extends T> o : c) {
             Type ctype = o.getGenericInterfaces()[0];
             if (ctype instanceof ParameterizedType) {
                 ParameterizedType ptype = (ParameterizedType) ctype;

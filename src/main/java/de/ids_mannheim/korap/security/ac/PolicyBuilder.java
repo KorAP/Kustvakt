@@ -1,11 +1,11 @@
 package de.ids_mannheim.korap.security.ac;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.NotAuthorizedException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.Permissions;
 import de.ids_mannheim.korap.resources.Relation;
+import de.ids_mannheim.korap.response.Notifications;
 import de.ids_mannheim.korap.security.PolicyCondition;
 import de.ids_mannheim.korap.security.PolicyContext;
 import de.ids_mannheim.korap.security.SecurityPolicy;
@@ -19,10 +19,11 @@ import de.ids_mannheim.korap.user.User;
 // todo: also be able to create or edit relations
 public class PolicyBuilder {
 
+    private Notifications notifications;
     private User user;
     private KustvaktResource[] resources;
     private KustvaktResource[] parents;
-    private Permissions.PERMISSIONS[] permissions;
+    private Permissions.Permission[] permissions;
     private PolicyCondition[] conditions;
     //    private Map<String, ParameterSettingsHandler> settings;
     private Relation rel = null;
@@ -30,10 +31,10 @@ public class PolicyBuilder {
 
     public PolicyBuilder(User user) {
         this.user = user;
-
+        this.notifications = new Notifications();
         // fixme: other exception!?
         if (this.user.getId() == -1)
-            throw new RuntimeException("user id must be set");
+            throw new RuntimeException("user id must be a valid interger id");
     }
 
     public PolicyBuilder setResources(KustvaktResource... targets) {
@@ -77,7 +78,7 @@ public class PolicyBuilder {
     }
 
     public PolicyBuilder setPermissions(
-            Permissions.PERMISSIONS... permissions) {
+            Permissions.Permission... permissions) {
         this.permissions = permissions;
         return this;
     }
@@ -107,12 +108,12 @@ public class PolicyBuilder {
         return setConditions(condition);
     }
 
-    public void create() throws NotAuthorizedException, KustvaktException {
-        this.doIt();
+    public String create() throws KustvaktException {
+        return this.doIt();
     }
 
     // for and relations there is no way of setting parameters conjoined with the policy
-    private void doIt() throws NotAuthorizedException, KustvaktException {
+    private String doIt() throws KustvaktException {
         if (this.resources == null)
             throw new KustvaktException(user.getId(),
                     StatusCodes.ILLEGAL_ARGUMENT, "resource must be set",
@@ -172,9 +173,10 @@ public class PolicyBuilder {
                     }
                 }
             }catch (KustvaktException e) {
-                System.out.println("IF ERROR, LET OTHER RESOURCES RUN ANYWAY!");
-                e.printStackTrace();
+                this.notifications.addError(e.getStatusCode(), e.getMessage(),
+                        resources[idx].getPersistentID());
             }
         }
+        return notifications.toJsonString();
     }
 }

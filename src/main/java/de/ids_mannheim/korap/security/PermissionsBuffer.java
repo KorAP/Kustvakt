@@ -33,7 +33,7 @@ public class PermissionsBuffer {
         this.bytes = bytes;
     }
 
-    public boolean containsPermission(Permissions.PERMISSIONS p) {
+    public boolean containsPermission(Permissions.Permission p) {
         return containsPByte(Permissions.getByte(p));
     }
 
@@ -57,17 +57,16 @@ public class PermissionsBuffer {
         bytes = b.array();
     }
 
-    public void addPermissions(Permissions.PERMISSIONS... perm) {
+    public void addPermissions(Permissions.Permission... perm) {
         if (perm.length > 0) {
-            for (Permissions.PERMISSIONS p : perm)
-                addPermission(Permissions.getByte(p));
+            for (Permissions.Permission p : perm)
+                addPermission(p.toByte());
         }
     }
 
-    public void removePermission(Permissions.PERMISSIONS perm) {
-        this.removePermission(Permissions.getByte(perm));
+    public void removePermission(Permissions.Permission perm) {
+        this.removePermission(perm.toByte());
     }
-
 
     public int removePermission(int b) {
         if ((bytes[1] & b) != 0)
@@ -100,7 +99,7 @@ public class PermissionsBuffer {
     }
 
     public boolean leftShift(byte perm) {
-//        return pbyte & (perm << 1);
+        //        return pbyte & (perm << 1);
         System.out.println("pbyte is: " + bytes[1]);
         System.out.println("bitswise operation, left shift " + (perm << 1));
         return false;
@@ -126,23 +125,26 @@ public class PermissionsBuffer {
         return this.bytes[1];
     }
 
-    public Set<Permissions.PERMISSIONS> getPermissions() {
-        Set<Permissions.PERMISSIONS> pe = new HashSet<>();
-        if (containsPByte(Permissions.READ))
-            pe.add(Permissions.PERMISSIONS.READ);
-        if (containsPByte(Permissions.WRITE))
-            pe.add(Permissions.PERMISSIONS.WRITE);
-        if (containsPByte(Permissions.DELETE))
-            pe.add(Permissions.PERMISSIONS.DELETE);
-        if (containsPByte(Permissions.CREATE_POLICY))
-            pe.add(Permissions.PERMISSIONS.CREATE_POLICY);
-        if (containsPByte(Permissions.MODIFY_POLICY))
-            pe.add(Permissions.PERMISSIONS.MODIFY_POLICY);
-        if (containsPByte(Permissions.DELETE_POLICY))
-            pe.add(Permissions.PERMISSIONS.DELETE_POLICY);
+    public Set<Permissions.Permission> getPermissions() {
+        Set<Permissions.Permission> pe = new HashSet<>();
+        for (Permissions.Permission p : Permissions.Permission.values()) {
+            if (containsPByte(p.toByte()))
+                pe.add(p);
+        }
+        //        if (containsPByte(Permissions.READ))
+        //            pe.add(Permissions.Permission.READ);
+        //        if (containsPByte(Permissions.WRITE))
+        //            pe.add(Permissions.Permission.WRITE);
+        //        if (containsPByte(Permissions.DELETE))
+        //            pe.add(Permissions.Permission.DELETE);
+        //        if (containsPByte(Permissions.CREATE_POLICY))
+        //            pe.add(Permissions.Permission.CREATE_POLICY);
+        //        if (containsPByte(Permissions.MODIFY_POLICY))
+        //            pe.add(Permissions.Permission.MODIFY_POLICY);
+        //        if (containsPByte(Permissions.DELETE_POLICY))
+        //            pe.add(Permissions.Permission.DELETE_POLICY);
         return pe;
     }
-
 
     public byte getOverride() {
         return this.bytes[0];
@@ -151,10 +153,11 @@ public class PermissionsBuffer {
     public String toBinary() {
         StringBuilder sb = new StringBuilder(bytes.length * Byte.SIZE);
         for (int i = 0; i < Byte.SIZE * bytes.length; i++) {
-            sb.append((bytes[i / Byte.SIZE] << i % Byte.SIZE & 0x80) == 0 ? '0' : '1');
+            sb.append((bytes[i / Byte.SIZE] << i % Byte.SIZE & 0x80) == 0 ?
+                    '0' :
+                    '1');
         }
         return sb.toString();
     }
-
 
 }

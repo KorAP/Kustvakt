@@ -104,7 +104,7 @@ public class ResourceHandler {
         for (T resource : resources) {
             SecurityManager policies;
             try {
-                policies = SecurityManager.init(resource.getPersistentID(), user, Permissions.PERMISSIONS.WRITE);
+                policies = SecurityManager.init(resource.getPersistentID(), user, Permissions.Permission.WRITE);
             } catch (EmptyResultException e) {
                 return;
             }
@@ -125,7 +125,7 @@ public class ResourceHandler {
             SecurityManager policies;
             try {
                 policies = SecurityManager.init(id, user,
-                        Permissions.PERMISSIONS.DELETE);
+                        Permissions.Permission.DELETE);
             } catch (EmptyResultException e) {
                 return;
             }
@@ -139,7 +139,7 @@ public class ResourceHandler {
             SecurityManager policies;
             try {
                 policies = SecurityManager.findbyId(r.getPersistentID(), user, r.getClass(),
-                        Permissions.PERMISSIONS.DELETE);
+                        Permissions.Permission.DELETE);
             } catch (EmptyResultException e) {
                 return;
             }
@@ -154,7 +154,7 @@ public class ResourceHandler {
             SecurityManager policies;
             try {
                 policies = SecurityManager.findbyId(id, user,
-                        Permissions.PERMISSIONS.DELETE);
+                        Permissions.Permission.DELETE);
             } catch (EmptyResultException e) {
                 return;
             }

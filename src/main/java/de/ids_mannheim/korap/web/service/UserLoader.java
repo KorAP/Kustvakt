@@ -4,7 +4,6 @@ import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
-import de.ids_mannheim.korap.user.User;
 
 /**
  * @author hanl
@@ -16,16 +15,13 @@ public class UserLoader implements BootupInterface {
         if (BeanConfiguration.hasContext()) {
             AuthenticationManagerIface manager = BeanConfiguration.getBeans()
                     .getAuthenticationManager();
-
-            BeanConfiguration.getBeans().getUserDBHandler()
-                    .createAccount(User.UserFactory.getDemoUser());
             manager.createUserAccount(KustvaktConfiguration.KUSTVAKT_USER,
                     false);
         }
     }
 
     @Override
-    public int position() {
-        return 0;
+    public Class<? extends BootupInterface>[] getDependencies() {
+        return new Class[0];
     }
 }

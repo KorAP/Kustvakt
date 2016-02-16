@@ -6,7 +6,6 @@ import de.ids_mannheim.korap.security.Parameter;
 import de.ids_mannheim.korap.security.PolicyCondition;
 import de.ids_mannheim.korap.security.SecurityPolicy;
 import de.ids_mannheim.korap.user.User;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,8 +14,6 @@ import java.util.List;
  * Date: 10/31/13
  * Time: 3:01 PM
  */
-// todo: this still applicable?
-@Transactional
 public interface PolicyHandlerIface {
 
     /**
@@ -34,7 +31,8 @@ public interface PolicyHandlerIface {
      */
     List<SecurityPolicy>[] getPolicies(Integer target, User user, Byte perm);
 
-    List<SecurityPolicy>[] getPolicies(PolicyCondition condition, Byte perm);
+    List<SecurityPolicy> getPolicies(PolicyCondition condition,
+            Class<? extends KustvaktResource> clazz, Byte perm);
 
     /**
      * @param policy

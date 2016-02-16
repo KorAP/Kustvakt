@@ -22,21 +22,13 @@ public class PolicyLoader implements BootupInterface {
             PolicyBuilder builder = new PolicyBuilder(user);
             builder.addCondition("public");
             builder.setResources(new Corpus("GOE"));
-            builder.setPermissions(Permissions.PERMISSIONS.ALL);
+            builder.setPermissions(Permissions.Permission.READ);
             builder.create();
-
-            // redundant if user is the user who created the condition for the resource
-            //        try {
-            //            ConditionManagement cm = new ConditionManagement(user);
-            ////            cm.addUser(user.getUsername(), new PolicyCondition("public"), true);
-            //        }catch (KustvaktException e) {
-            //            e.printStackTrace();
-            //        }
         }
     }
 
     @Override
-    public int position() {
-        return 1;
+    public Class<? extends BootupInterface>[] getDependencies() {
+        return new Class[] { UserLoader.class };
     }
 }

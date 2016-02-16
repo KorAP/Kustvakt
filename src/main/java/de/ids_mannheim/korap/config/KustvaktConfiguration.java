@@ -95,6 +95,7 @@ public class KustvaktConfiguration {
             throws MalformedURLException {
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));
         returnhits = new Integer(properties.getProperty("returnhits", "50000"));
+        //todo: refactor to krill.indexDir
         indexDir = properties.getProperty("lucene.indexDir", "");
         //        URL url = KustvaktConfiguration.class.getClassLoader()
         //                .getResource(idir);

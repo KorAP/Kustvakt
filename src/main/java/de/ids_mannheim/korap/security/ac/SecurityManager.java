@@ -10,6 +10,7 @@ import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.Permissions;
+import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.security.Parameter;
 import de.ids_mannheim.korap.security.PermissionsBuffer;
 import de.ids_mannheim.korap.security.PolicyCondition;
@@ -96,7 +97,7 @@ public class SecurityManager<T extends KustvaktResource> {
      */
     //todo: implement a fall back that throws an exception when the user NULL, but the resource has restrictions!
     public static SecurityManager findbyId(String id, User user, Class type,
-            Permissions.PERMISSIONS... perms) throws KustvaktException {
+            Permissions.Permission... perms) throws KustvaktException {
         SecurityManager p = new SecurityManager(user);
         p.findPolicies(id, false, perms);
         p.resource = p.findResource(type);
@@ -104,7 +105,7 @@ public class SecurityManager<T extends KustvaktResource> {
     }
 
     public static SecurityManager findbyId(String id, User user,
-            Permissions.PERMISSIONS... perms) throws KustvaktException {
+            Permissions.Permission... perms) throws KustvaktException {
         SecurityManager p = new SecurityManager(user);
         p.findPolicies(id, false, perms);
         p.resource = p.findResource(null);
@@ -112,7 +113,7 @@ public class SecurityManager<T extends KustvaktResource> {
     }
 
     public static SecurityManager findbyId(Integer id, User user,
-            Permissions.PERMISSIONS... perms) throws KustvaktException {
+            Permissions.Permission... perms) throws KustvaktException {
         SecurityManager p = new SecurityManager(user);
         p.findPolicies(id, false, perms);
         p.resource = p.findResource(null);
@@ -120,7 +121,7 @@ public class SecurityManager<T extends KustvaktResource> {
     }
 
     public static SecurityManager findbyPath(String path, User user,
-            Permissions.PERMISSIONS... perms)
+            Permissions.Permission... perms)
             throws NotAuthorizedException, EmptyResultException {
         SecurityManager manager = new SecurityManager(user);
         manager.findPolicies(path, true, perms);
@@ -129,7 +130,7 @@ public class SecurityManager<T extends KustvaktResource> {
     }
 
     public static SecurityManager init(String id, User user,
-            Permissions.PERMISSIONS... perms)
+            Permissions.Permission... perms)
             throws NotAuthorizedException, EmptyResultException {
         SecurityManager p = new SecurityManager(user);
         p.findPolicies(id, false, perms);
@@ -143,7 +144,7 @@ public class SecurityManager<T extends KustvaktResource> {
      * @throws NotAuthorizedException
      */
     public final T getResource() throws NotAuthorizedException {
-        if (evaluator.isAllowed(Permissions.PERMISSIONS.READ)) {
+        if (evaluator.isAllowed(Permissions.Permission.READ)) {
             return this.resource;
         }else {
             jlog.error("Reading the resource '{}' is not allowed for user '{}'",
@@ -155,7 +156,7 @@ public class SecurityManager<T extends KustvaktResource> {
 
     public void updateResource(T resource)
             throws NotAuthorizedException, KustvaktException {
-        if (evaluator.isAllowed(Permissions.PERMISSIONS.WRITE)) {
+        if (evaluator.isAllowed(Permissions.Permission.WRITE)) {
             ResourceOperationIface iface = handlers.get(resource.getClass());
             if (iface != null)
                 iface.updateResource(resource, this.user);
@@ -179,7 +180,7 @@ public class SecurityManager<T extends KustvaktResource> {
     // todo: delete only works with find, not with init constructor!
     public void deleteResource()
             throws NotAuthorizedException, KustvaktException {
-        if (evaluator.isAllowed(Permissions.PERMISSIONS.DELETE)) {
+        if (evaluator.isAllowed(Permissions.Permission.DELETE)) {
             ResourceOperationIface iface = handlers
                     .get(this.resource.getClass());
             if (iface != null)
@@ -198,10 +199,10 @@ public class SecurityManager<T extends KustvaktResource> {
 
     // todo: type should be deprecated and return type of policies should be containers!
     private boolean findPolicies(Object id, boolean path,
-            Permissions.PERMISSIONS... perms) throws EmptyResultException {
+            Permissions.Permission... perms) throws EmptyResultException {
         PermissionsBuffer b = new PermissionsBuffer();
         if (perms.length == 0)
-            b.addPermission(Permissions.READ);
+            b.addPermission(Permissions.Permission.READ.toByte());
         else
             b.addPermissions(perms);
         if (id instanceof String && !path)
@@ -213,9 +214,9 @@ public class SecurityManager<T extends KustvaktResource> {
         if (id instanceof Integer)
             this.policies = policydao
                     .getPolicies((Integer) id, this.user, b.getPbyte());
-//        System.out.println("-------------------------------");
-//        System.out.println("LENGTH OF POLICY ARRAY " + this.policies.length);
-//        System.out.println("POLICY AT 0 " + this.policies[0]);
+        //        System.out.println("-------------------------------");
+        //        System.out.println("LENGTH OF POLICY ARRAY " + this.policies.length);
+        //        System.out.println("POLICY AT 0 " + this.policies[0]);
         this.evaluator = new PolicyEvaluator(this.user, this.policies);
 
         if (this.policies == null) {
@@ -263,7 +264,7 @@ public class SecurityManager<T extends KustvaktResource> {
                     // this is mostly for convenvience and database consistency, since a request query would result in not authorized, based on missing parent relation dependencies
                     // --> in order not to have a resource owner that is denied access due to missing parent relation dependency
                     SecurityManager.findbyId(resource.getParentID(), user,
-                            Permissions.PERMISSIONS.ALL);
+                            Permissions.Permission.ALL);
                 }catch (EmptyResultException e) {
                     jlog.error(
                             "No policies found for parent '{}' for user '{}'",
@@ -275,8 +276,7 @@ public class SecurityManager<T extends KustvaktResource> {
             // create persistent identifier for the resource
             if (resource.getPersistentID() == null || resource.getPersistentID()
                     .isEmpty()) {
-                // todo: use resource data!
-                resource.setPersistentID(p.crypto.createID());
+                ResourceFactory.createID(resource);
                 newid = true;
             }
 
@@ -300,9 +300,9 @@ public class SecurityManager<T extends KustvaktResource> {
             try {
                 // todo: which is better? Integer id or String persistentID?
                 p.findPolicies(resource.getPersistentID(), false,
-                        Permissions.PERMISSIONS.CREATE_POLICY,
-                        Permissions.PERMISSIONS.READ_POLICY,
-                        Permissions.PERMISSIONS.MODIFY_POLICY);
+                        Permissions.Permission.CREATE_POLICY,
+                        Permissions.Permission.READ_POLICY,
+                        Permissions.Permission.MODIFY_POLICY);
             }catch (EmptyResultException e) {
                 jlog.error(
                         "No policies found for '{}' for user '{}'. Resource could not be registered!",
@@ -332,7 +332,7 @@ public class SecurityManager<T extends KustvaktResource> {
     }
 
     // fixme: make protected
-    public PolicyCondition getExtensional(Permissions.PERMISSIONS... pps) {
+    public PolicyCondition getExtensional(Permissions.Permission... pps) {
         for (SecurityPolicy p : this.policies[0]) {
             if (p.equalsPermission(pps)) {
                 for (PolicyCondition c : p.getConditions()) {
@@ -370,7 +370,7 @@ public class SecurityManager<T extends KustvaktResource> {
             return;
         }
 
-        if (evaluator.isAllowed(Permissions.PERMISSIONS.CREATE_POLICY)) {
+        if (evaluator.isAllowed(Permissions.Permission.CREATE_POLICY)) {
             policydao.createPolicy(policy, this.user);
         }else if (silent) {
             jlog.error(
@@ -424,7 +424,7 @@ public class SecurityManager<T extends KustvaktResource> {
                     this.evaluator.getResourceID());
         }
         if (contains(policy) && (evaluator
-                .isAllowed(Permissions.PERMISSIONS.DELETE_POLICY))) {
+                .isAllowed(Permissions.Permission.DELETE_POLICY))) {
             policydao.deletePolicy(policy, this.user);
         }else if (silent) {
             jlog.error("Permission Denied (DELETE_POLICY) on '{}' for '{}'",
@@ -453,7 +453,7 @@ public class SecurityManager<T extends KustvaktResource> {
         }
 
         if (contains(policy) && (evaluator
-                .isAllowed(Permissions.PERMISSIONS.MODIFY_POLICY))) {
+                .isAllowed(Permissions.Permission.MODIFY_POLICY))) {
             policydao.updatePolicy(policy, this.user);
         }else if (silent) {
             jlog.error("Permission Denied (DELETE_POLICY) on '{}' for '{}'",
@@ -474,7 +474,7 @@ public class SecurityManager<T extends KustvaktResource> {
         return evaluator.isAllowed();
     }
 
-    public boolean isAllowed(Permissions.PERMISSIONS... perm) {
+    public boolean isAllowed(Permissions.Permission... perm) {
         return evaluator.isAllowed();
     }
 

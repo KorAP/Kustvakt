@@ -9,6 +9,7 @@ import de.ids_mannheim.korap.resources.Permissions;
 import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.security.PermissionsBuffer;
 import de.ids_mannheim.korap.security.PolicyCondition;
+import de.ids_mannheim.korap.security.SecurityPolicy;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.User;
 import org.slf4j.Logger;
@@ -24,14 +25,14 @@ public class ResourceFinder {
     private static final Logger jlog = LoggerFactory
             .getLogger(ResourceFinder.class);
     private static PolicyHandlerIface policydao;
+    private static ResourceOperationIface resourcedao;
 
     private List<KustvaktResource.Container> containers;
     private User user;
 
     private ResourceFinder(User user) {
-        this.containers = new ArrayList<>();
+        this();
         this.user = user;
-        checkProviders();
     }
 
     private ResourceFinder() {
@@ -43,25 +44,27 @@ public class ResourceFinder {
         if (BeanConfiguration.hasContext() && policydao == null) {
             ResourceFinder.policydao = BeanConfiguration.getBeans()
                     .getPolicyDbProvider();
+            ResourceFinder.resourcedao = BeanConfiguration.getBeans()
+                    .getResourceProvider();
         }
-        if (policydao == null)
+        if (policydao == null | resourcedao == null)
             throw new RuntimeException("provider not set!");
     }
 
     public static <T extends KustvaktResource> Set<T> search(String path,
             boolean asParent, User user, Class<T> clazz,
-            Permissions.PERMISSIONS... perms) throws KustvaktException {
+            Permissions.Permission... perms) throws KustvaktException {
         ResourceFinder cat = init(path, asParent, user, clazz, perms);
         return cat.getResources();
     }
 
     private static <T extends KustvaktResource> ResourceFinder init(String path,
             boolean asParent, User user, Class<T> clazz,
-            Permissions.PERMISSIONS... perms) throws KustvaktException {
+            Permissions.Permission... perms) throws KustvaktException {
         ResourceFinder cat = new ResourceFinder(user);
         PermissionsBuffer buffer = new PermissionsBuffer();
         if (perms.length == 0)
-            buffer.addPermissions(Permissions.PERMISSIONS.READ);
+            buffer.addPermissions(Permissions.Permission.READ);
         buffer.addPermissions(perms);
         cat.retrievePolicies(path, buffer.getPbyte(), clazz, asParent);
         return cat;
@@ -70,32 +73,34 @@ public class ResourceFinder {
     //todo: needs to be much faster!
     public static <T extends KustvaktResource> ResourceFinder init(User user,
             Class<T> clazz) throws KustvaktException {
-        return init(null, true, user, clazz, Permissions.PERMISSIONS.READ);
+        return init(null, true, user, clazz, Permissions.Permission.READ);
     }
 
     public static <T extends KustvaktResource> Set<T> search(String name,
             boolean asParent, User user, String type) throws KustvaktException {
         return (Set<T>) search(name, asParent, user,
                 ResourceFactory.getResourceClass(type),
-                Permissions.PERMISSIONS.READ);
+                Permissions.Permission.READ);
     }
 
     public static <T extends KustvaktResource> Set<T> searchPublic(
-            Class<T> clazz) {
-        List[] list = policydao
+            Class<T> clazz) throws KustvaktException {
+        checkProviders();
+        Set<T> sets = new HashSet<>();
+        List<SecurityPolicy> policies = policydao
                 .getPolicies(new PolicyCondition(Attributes.PUBLIC_GROUP),
-                        Permissions.READ);
-        System.out.println("_____________________");
-        System.out.println("list 1 " + list[0]);
-        System.out.println("list 1 " + list[1]);
-        return new HashSet<>();
+                        clazz, Permissions.READ);
 
+        for (SecurityPolicy policy : policies)
+            sets.add((T) resourcedao.findbyId(policy.getTarget(),
+                    User.UserFactory.getDemoUser()));
+        return sets;
     }
 
     // todo: should this be working?
     public static <T extends KustvaktResource> Set<T> search(User user,
             Class<T> clazz) throws KustvaktException {
-        return search(null, true, user, clazz, Permissions.PERMISSIONS.READ);
+        return search(null, true, user, clazz, Permissions.Permission.READ);
     }
 
     private void retrievePolicies(String path, Byte b, Class type,

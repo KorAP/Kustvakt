@@ -8,7 +8,6 @@ import de.ids_mannheim.korap.config.KustvaktCacheManager;
 import de.ids_mannheim.korap.config.KustvaktClassLoader;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.web.service.BootupInterface;
 import lombok.Getter;
 import lombok.Setter;
@@ -88,30 +87,34 @@ public class KustvaktBaseServer {
                 .loadSubTypes(BootupInterface.class);
 
         List<BootupInterface> list = new ArrayList<>(set.size());
-
-        PersistenceClient client = BeanConfiguration.getBeans()
-                .getPersistenceClient();
-        if (client.checkDatabase()) {
-            for (Class cl : set) {
-                BootupInterface iface;
-                try {
-                    iface = (BootupInterface) cl.newInstance();
-                    if (iface.position() == -1 | iface.position() > set.size())
-                        list.add(iface);
-                    else
-                        list.add(0, iface);
-                }catch (InstantiationException | IllegalAccessException e) {
-                    continue;
-                }
+        for (Class cl : set) {
+            BootupInterface iface;
+            try {
+                iface = (BootupInterface) cl.newInstance();
+                list.add(iface);
+            }catch (InstantiationException | IllegalAccessException e) {
+                continue;
             }
-            System.out.println("Found boot loading interfaces: " + list);
-            for (BootupInterface iface : list) {
+        }
+        System.out.println("Found boot loading interfaces: " + list);
+        int track = list.size();
+        while (!list.isEmpty()) {
+            System.out.println("ITERATING LIST IS " + list);
+            for (BootupInterface iface : new ArrayList<>(list)) {
                 try {
                     iface.load();
                 }catch (KustvaktException e) {
                     // don't do anything!
-                    System.out.println("An error occurred! " + e);
+                    System.out.println(
+                            "An error occurred in class " + iface.getClass()
+                                    .getSimpleName() + "!\n" + e);
+                    continue;
                 }
+                list.remove(iface);
+            }
+            if (track == list.size()) {
+                System.out.println("Some or all bootup classes raised errors");
+                break;
             }
         }
     }
@@ -165,7 +168,6 @@ public class KustvaktBaseServer {
         }
 
     }
-
 
     @Setter
     public static class KustvaktArgs {

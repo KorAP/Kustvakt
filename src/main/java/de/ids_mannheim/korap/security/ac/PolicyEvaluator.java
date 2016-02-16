@@ -57,7 +57,7 @@ public class PolicyEvaluator {
 
     // todo: test benchmarks
     private List<SecurityPolicy> evaluate(List<SecurityPolicy>[] policies,
-            Permissions.PERMISSIONS perm) throws NotAuthorizedException {
+            Permissions.Permission perm) throws NotAuthorizedException {
         //fixme: what happens in case a parent relation does not allow changing a resource, but the owner of child per default
         //todo: receives all rights? --> test casing
         jlog.error("IS USER RESOURCE OWNER? " + isOwner());
@@ -117,10 +117,10 @@ public class PolicyEvaluator {
      * @return
      */
     public boolean isAllowed() {
-        return isAllowed(Permissions.PERMISSIONS.READ);
+        return isAllowed(Permissions.Permission.READ);
     }
 
-    public boolean isAllowed(Permissions.PERMISSIONS perm) {
+    public boolean isAllowed(Permissions.Permission perm) {
         try {
             List s = evaluate(this.policies, perm);
             return s != null && !s.isEmpty();

@@ -36,6 +36,7 @@ public class TestHelper {
             EntityHandlerIface dao = BeanConfiguration.getBeans()
                     .getUserDBHandler();
             Map m = new HashMap<>();
+            m.put(Attributes.ID, 2);
             m.put(Attributes.USERNAME, credentials[0]);
             m.put(Attributes.PASSWORD, credentials[1]);
             m.put(Attributes.FIRSTNAME, "test");
@@ -96,6 +97,7 @@ public class TestHelper {
                 return BeanConfiguration.getBeans().getUserDBHandler()
                         .getAccount(credentials[0]);
             }catch (KustvaktException e) {
+                e.printStackTrace();
             }
         }
         throw new RuntimeException("User could not be retrieved!");
@@ -166,35 +168,45 @@ public class TestHelper {
                 .loadSubTypes(BootupInterface.class);
 
         List<BootupInterface> list = new ArrayList<>(set.size());
-
-        PersistenceClient client = BeanConfiguration.getBeans()
-                .getPersistenceClient();
-        if (client.checkDatabase()) {
-            for (Class cl : set) {
-                BootupInterface iface;
-                try {
-                    iface = (BootupInterface) cl.newInstance();
-                    if (iface.position() == -1 | iface.position() > set.size())
-                        list.add(iface);
-                    else
-                        list.add(0, iface);
-                }catch (InstantiationException | IllegalAccessException e) {
-                    continue;
-                }
+        for (Class cl : set) {
+            BootupInterface iface;
+            try {
+                iface = (BootupInterface) cl.newInstance();
+                list.add(iface);
+            }catch (InstantiationException | IllegalAccessException e) {
+                // do nothing
             }
-            System.out.println("Found boot loading interfaces: " + list);
-            for (BootupInterface iface : list) {
+        }
+        System.out.println("Found boot loading interfaces: " + list);
+        int i = 0;
+        while (!set.isEmpty()) {
+            out_loop:
+            for (BootupInterface iface : new ArrayList<>(list)) {
                 try {
+                    System.out.println(
+                            "Running boot instructions from class " + iface
+                                    .getClass().getSimpleName());
+                    for (Class cl : iface.getDependencies()) {
+                        if (set.contains(cl))
+                            continue out_loop;
+                    }
                     iface.load();
+                    set.remove(iface.getClass());
+                    list.remove(iface);
                 }catch (KustvaktException e) {
                     // don't do anything!
                     System.out.println(
-                            "Loader instance failed ... exiting programme!");
-                    System.exit(-1);
+                            "An error occurred in class " + iface.getClass()
+                                    .getSimpleName() + "!\n" + e);
                 }
             }
-        }else
-            throw new RuntimeException("Client not setup properly!");
+            i++;
+            if (i == set.size() * 2) {
+                System.out.println(
+                        "Could not run startup scripts. Exiting programme!");
+                System.exit(-1);
+            }
+        }
     }
 
     public static void setupResource(KustvaktResource resource, User user)

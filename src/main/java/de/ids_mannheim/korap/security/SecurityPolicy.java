@@ -86,8 +86,8 @@ public class SecurityPolicy {
 
     // todo ???????
     @Deprecated
-    public SecurityPolicy setOverride(Permissions.PERMISSIONS... perms) {
-        for (Permissions.PERMISSIONS p : perms)
+    public SecurityPolicy setOverride(Permissions.Permission... perms) {
+        for (Permissions.Permission p : perms)
             this.permissions.addOverride(Permissions.getByte(p));
         return this;
     }
@@ -151,7 +151,11 @@ public class SecurityPolicy {
     }
 
     public SecurityPolicy removeCondition(PolicyCondition constraint) {
-        this.removedidx.add(this.conditions.indexOf(constraint));
+        int idx = this.conditions.indexOf(constraint);
+        if (this.addedidx.contains(idx))
+            this.addedidx.remove(idx);
+        else
+            this.removedidx.add(this.conditions.indexOf(constraint));
         return this;
     }
 
@@ -181,7 +185,7 @@ public class SecurityPolicy {
         this.addedidx.clear();
     }
 
-    public boolean hasPermission(Permissions.PERMISSIONS perm) {
+    public boolean hasPermission(Permissions.Permission perm) {
         return permissions != null && permissions.containsPermission(perm);
     }
 
@@ -191,19 +195,19 @@ public class SecurityPolicy {
      * @param perms
      * @return
      */
-    public SecurityPolicy addPermission(Permissions.PERMISSIONS... perms) {
+    public SecurityPolicy addPermission(Permissions.Permission... perms) {
         permissions.addPermissions(perms);
         return this;
     }
 
-    public boolean equalsPermission(Permissions.PERMISSIONS... perms) {
+    public boolean equalsPermission(Permissions.Permission... perms) {
         PermissionsBuffer b = new PermissionsBuffer();
         b.addPermissions(perms);
         return permissions != null && permissions.getPbyte()
                 .equals(b.getPbyte());
     }
 
-    public void removePermission(Permissions.PERMISSIONS perm) {
+    public void removePermission(Permissions.Permission perm) {
         if (permissions != null)
             permissions.removePermission(perm);
     }
@@ -223,7 +227,7 @@ public class SecurityPolicy {
         return sb.toString();
     }
 
-    public Set<Permissions.PERMISSIONS> getPermissions() {
+    public Set<Permissions.Permission> getPermissions() {
         return permissions.getPermissions();
     }
 

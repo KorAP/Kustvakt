@@ -80,7 +80,7 @@ public class ConditionManagement {
 
     @Deprecated
     public void addUser(KustvaktResource resource, String user,
-            Permissions.PERMISSIONS... pps)
+            Permissions.Permission... pps)
             throws NotAuthorizedException, KustvaktException,
             EmptyResultException {
         addUser(resource, Arrays.asList(user), pps);
@@ -88,7 +88,7 @@ public class ConditionManagement {
 
     @Deprecated
     public void addUser(KustvaktResource resource, List<String> users,
-            Permissions.PERMISSIONS... pps)
+            Permissions.Permission... pps)
             throws NotAuthorizedException, KustvaktException,
             EmptyResultException {
         SecurityManager policies = SecurityManager

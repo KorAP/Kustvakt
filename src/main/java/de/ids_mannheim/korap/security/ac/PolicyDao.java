@@ -15,6 +15,7 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.BooleanUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
+import edu.emory.mathcs.backport.java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -228,7 +229,7 @@ public class PolicyDao implements PolicyHandlerIface {
                         @Override
                         public List<SecurityPolicy>[] extractData(ResultSet rs)
                                 throws SQLException, DataAccessException {
-                            return SecurityRowMappers.mapping(rs);
+                            return SecurityRowMappers.mapResourcePolicies(rs);
                         }
                     });
         }catch (DataAccessException e) {
@@ -239,12 +240,14 @@ public class PolicyDao implements PolicyHandlerIface {
         }
     }
 
+    // without root policies, since these are policies from different resources!
     @Override
-    public List<SecurityPolicy>[] getPolicies(PolicyCondition condition,
-            Byte perm) {
+    public List<SecurityPolicy> getPolicies(PolicyCondition condition,
+            Class<? extends KustvaktResource> clazz, Byte perm) {
         MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("cond", condition.getSpecifier());
         param.addValue("perm", perm);
+        param.addValue("type", ResourceFactory.getResourceMapping(clazz));
         param.addValue("en", new Timestamp(TimeUtils.getNow().getMillis()));
 
         String sql_new = "select pv.*, pv.perm & :perm as allowed, " +
@@ -255,28 +258,28 @@ public class PolicyDao implements PolicyHandlerIface {
                 "where " +
                 "pv.enable <= :en and (pv.expire > :en or pv.expire is NULL) and "
                 +
-                "(pv.group_id='self' or pv.group_id=:cond) and " +
+                "pv.group_id=:cond and pv.type=:type and " +
                 "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
                 +
                 "(select sum(distinct res.depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id=:cond)"
                 +
-                " or pos.group_id='self') and res.child_id=rh.child_id group by child_id)";
+                " and res.child_id=rh.child_id group by child_id)";
 
         try {
             return this.jdbcTemplate.query(sql_new, param,
-                    new ResultSetExtractor<List<SecurityPolicy>[]>() {
+                    new ResultSetExtractor<List<SecurityPolicy>>() {
 
                         @Override
-                        public List<SecurityPolicy>[] extractData(ResultSet rs)
+                        public List<SecurityPolicy> extractData(ResultSet rs)
                                 throws SQLException, DataAccessException {
-                            return SecurityRowMappers.mapping(rs);
+                            return SecurityRowMappers.mapConditionPolicies(rs);
                         }
                     });
         }catch (DataAccessException e) {
             e.printStackTrace();
             jlog.error("Permission Denied for policy retrieval for '{}'",
                     condition.getSpecifier());
-            return new List[2];
+            return Collections.emptyList();
         }
     }
 
@@ -313,7 +316,7 @@ public class PolicyDao implements PolicyHandlerIface {
                         @Override
                         public List<SecurityPolicy>[] extractData(ResultSet rs)
                                 throws SQLException, DataAccessException {
-                            return SecurityRowMappers.mapping(rs);
+                            return SecurityRowMappers.mapResourcePolicies(rs);
                         }
                     });
         }catch (DataAccessException e) {
@@ -356,7 +359,7 @@ public class PolicyDao implements PolicyHandlerIface {
                         @Override
                         public List<SecurityPolicy>[] extractData(ResultSet rs)
                                 throws SQLException, DataAccessException {
-                            return SecurityRowMappers.mapping(rs);
+                            return SecurityRowMappers.mapResourcePolicies(rs);
                         }
                     });
         }catch (DataAccessException e) {

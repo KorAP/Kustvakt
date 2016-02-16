@@ -34,6 +34,7 @@ public class UserLoaderTest {
         try {
             l.load();
         }catch (KustvaktException e) {
+            e.printStackTrace();
             error = true;
         }
         assert !error;

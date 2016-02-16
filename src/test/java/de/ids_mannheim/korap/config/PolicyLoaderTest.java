@@ -27,7 +27,7 @@ public class PolicyLoaderTest {
     }
 
     @Test
-    public void testUserLoader() {
+    public void testPolicyLoader() {
         boolean error = false;
         UserLoader u = new UserLoader();
         CollectionLoader c = new CollectionLoader();

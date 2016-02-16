@@ -70,7 +70,7 @@ public class SecurityRowMappers {
         }
     }
 
-    public static List<SecurityPolicy>[] mapping(ResultSet rs)
+    public static List<SecurityPolicy>[] mapResourcePolicies(ResultSet rs)
             throws SQLException {
         List<SecurityPolicy>[] policyArray = null;
         List<Integer>[] idx = null;
@@ -126,6 +126,27 @@ public class SecurityRowMappers {
         return policyArray;
     }
 
+    public static List<SecurityPolicy> mapConditionPolicies(ResultSet rs)
+            throws SQLException {
+        Map<Integer, SecurityPolicy> policyMap = new HashMap<>();
+        while (rs.next()) {
+            if (rs.getInt("allowed") == 0)
+                continue;
+
+            Integer pid = rs.getInt("pid");
+            SecurityPolicy policy;
+            if ((policy = policyMap.get(pid)) == null) {
+                policy = new SecurityRowMappers.PolicyRowMapper().mapRow(rs, 0);
+                policyMap.put(pid, policy);
+            }
+            PolicyCondition c = new PolicyCondition(rs.getString("group_id"));
+
+            if (!policy.contains(c))
+                policy.addCondition(c);
+        }
+        return new ArrayList<>(policyMap.values());
+    }
+
     @Deprecated
     public static List<SecurityPolicy>[] map(ResultSet rs) throws SQLException {
         Map<Integer, SecurityPolicy>[] policyArray = null;
@@ -148,7 +169,7 @@ public class SecurityRowMappers {
                 policy = new SecurityRowMappers.PolicyRowMapper().mapRow(rs, 0);
                 cursor.put(pid, policy);
             }
-            PolicyCondition c = new PolicyCondition(rs.getString("group_ref"));
+            PolicyCondition c = new PolicyCondition(rs.getString("group_id"));
 
             if (!policy.contains(c))
                 policy.addCondition(c);

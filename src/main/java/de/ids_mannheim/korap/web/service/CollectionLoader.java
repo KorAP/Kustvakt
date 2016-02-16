@@ -3,12 +3,14 @@ package de.ids_mannheim.korap.web.service;
 import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.resources.Permissions;
 import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.security.ac.PolicyBuilder;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.CollectionQueryBuilder3;
+import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
  * @author hanl
@@ -49,19 +51,19 @@ public class CollectionLoader implements BootupInterface {
             c3.setDescription("Goethe - Die Leiden des jungen Werther");
 
             PolicyBuilder b = new PolicyBuilder(user);
-            b.setPermissions(Permissions.PERMISSIONS.ALL);
+            b.setPermissions(Permissions.Permission.READ);
             b.setResources(c1, c2, c3);
             b.setConditions("public");
-            b.create();
+            String result = b.create();
 
-//            ConditionManagement c = new ConditionManagement(user);
-//            c.addUser(User.UserFactory.getDemoUser().getUsername(),
-//                    new PolicyCondition("public"), false);
+            if (JsonUtils.readTree(result).size() > 0)
+                throw new KustvaktException(StatusCodes.REQUEST_INVALID,
+                        "creating collections caused errors", result);
         }
     }
 
     @Override
-    public int position() {
-        return -1;
+    public Class<? extends BootupInterface>[] getDependencies() {
+        return new Class[] { UserLoader.class };
     }
 }
