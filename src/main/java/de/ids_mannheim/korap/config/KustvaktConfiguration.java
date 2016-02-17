@@ -96,7 +96,7 @@ public class KustvaktConfiguration {
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));
         returnhits = new Integer(properties.getProperty("returnhits", "50000"));
         //todo: refactor to krill.indexDir
-        indexDir = properties.getProperty("lucene.indexDir", "");
+        indexDir = properties.getProperty("krill.indexDir", "");
         //        URL url = KustvaktConfiguration.class.getClassLoader()
         //                .getResource(idir);
         //        System.out.println("LOADING FILE FROM CLASSPATH? " + url);
