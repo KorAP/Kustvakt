@@ -43,6 +43,9 @@ public class TestHelper {
             m.put(Attributes.LASTNAME, "user");
             m.put(Attributes.EMAIL, "test@ids-mannheim.de");
             m.put(Attributes.ADDRESS, "Mannheim");
+            m.put(Attributes.DEFAULT_LEMMA_FOUNDRY, "test_l");
+            m.put(Attributes.DEFAULT_POS_FOUNDRY, "test_p");
+            m.put(Attributes.DEFAULT_CONST_FOUNDRY, "test_const");
 
             Assert.assertNotNull("userdatabase handler must not be null", dao);
 

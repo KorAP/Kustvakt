@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.resource.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User;
 
 /**
@@ -18,7 +19,7 @@ public interface RewriteTask {
          * @return
          */
         JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
-                User user);
+                User user) throws KustvaktException;
     }
 
     /**
@@ -27,7 +28,7 @@ public interface RewriteTask {
      * after {@link de.ids_mannheim.korap.resource.rewrite.RewriteTask.IterableRewriteAt} have been processed
      */
     interface RewriteAfter extends RewriteTask {
-        JsonNode postProcess(KoralNode node);
+        JsonNode postProcess(KoralNode node) throws KustvaktException;
     }
 
     /**

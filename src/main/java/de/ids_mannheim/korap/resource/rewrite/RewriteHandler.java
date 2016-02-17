@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.resource.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import org.slf4j.Logger;
@@ -167,13 +168,19 @@ public class RewriteHandler {
                     continue;
                 }
             }
-
-            if (!post && task instanceof RewriteTask.RewriteBefore)
-                ((RewriteTask.RewriteBefore) task)
-                        .preProcess(node, this.config, user);
-            else if (task instanceof RewriteTask.RewriteAfter)
-                ((RewriteTask.RewriteAfter) task).postProcess(node);
-
+            try {
+                if (!post && task instanceof RewriteTask.RewriteBefore) {
+                    ((RewriteTask.RewriteBefore) task)
+                            .preProcess(node, this.config, user);
+                }else if (task instanceof RewriteTask.RewriteAfter) {
+                    ((RewriteTask.RewriteAfter) task).postProcess(node);
+                }
+            }catch (KustvaktException e) {
+                jlog.error("Error in rewrite processor {} for node {}",
+                        task.getClass().getSimpleName(),
+                        node.rawNode().toString());
+                e.printStackTrace();
+            }
             if (node.isRemove())
                 break;
         }
@@ -189,14 +196,19 @@ public class RewriteHandler {
                 if ((rwa.at() != null && !node.at(rwa.at()).isMissingNode()))
                     next = node.at(rwa.at());
             }
-
-            if (!post && task instanceof RewriteTask.RewriteBefore)
-                ((RewriteTask.RewriteBefore) task)
-                        .preProcess(KoralNode.wrapNode(next), this.config,
-                                user);
-            else
-                ((RewriteTask.RewriteAfter) task)
-                        .postProcess(KoralNode.wrapNode(next));
+            try {
+                if (!post && task instanceof RewriteTask.RewriteBefore)
+                    ((RewriteTask.RewriteBefore) task)
+                            .preProcess(KoralNode.wrapNode(next), this.config,
+                                    user);
+                else
+                    ((RewriteTask.RewriteAfter) task)
+                            .postProcess(KoralNode.wrapNode(next));
+            }catch (KustvaktException e) {
+                jlog.error("Error in rewrite processor {} for node {}",
+                        task.getClass().getSimpleName(), node.toString());
+                e.printStackTrace();
+            }
         }
     }
 
