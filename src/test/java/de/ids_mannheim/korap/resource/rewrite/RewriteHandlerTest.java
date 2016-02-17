@@ -6,6 +6,7 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -21,7 +22,7 @@ public class RewriteHandlerTest {
         TestHelper.setupAccount();
     }
 
-    //    @AfterClass
+    @AfterClass
     public static void close() {
         TestHelper.dropUser();
         BeanConfiguration.closeApplication();
@@ -30,7 +31,7 @@ public class RewriteHandlerTest {
     @Test
     public void initHandler() {
         RewriteHandler handler = new RewriteHandler(null);
-        handler.add(FoundryInject.class);
+        assert handler.add(FoundryInject.class);
     }
 
     @Test

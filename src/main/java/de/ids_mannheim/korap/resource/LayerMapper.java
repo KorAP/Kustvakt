@@ -2,7 +2,7 @@ package de.ids_mannheim.korap.resource;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.user.Attributes;
-import de.ids_mannheim.korap.user.UserSettings;
+import de.ids_mannheim.korap.user.Userdata;
 
 /**
  * @author hanl
@@ -10,10 +10,10 @@ import de.ids_mannheim.korap.user.UserSettings;
  */
 public class LayerMapper {
 
-    private UserSettings settings;
+    private Userdata settings;
     private KustvaktConfiguration config;
 
-    public LayerMapper(KustvaktConfiguration config, UserSettings settings) {
+    public LayerMapper(KustvaktConfiguration config, Userdata settings) {
         this.settings = settings;
         this.config = config;
     }

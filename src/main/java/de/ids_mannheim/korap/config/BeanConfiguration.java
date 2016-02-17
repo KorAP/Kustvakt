@@ -26,6 +26,8 @@ public class BeanConfiguration {
     public static final String KUSTVAKT_ENCRYPTION = "kustvakt_encryption";
     public static final String KUSTVAKT_AUDITING = "kustvakt_auditing";
     public static final String KUSTVAKT_CONFIG = "kustvakt_config";
+    public static final String KUSTVAKT_USERSETTINGS = "kustvakt_usersettings";
+    public static final String KUSTVAKT_USERDETAILS = "kustvakt_userdetails";
 
     public static final String KUSTVAKT_AUTHENTICATION_MANAGER = "kustvakt_authenticationmanager";
     public static final String KUSTVAKT_USERDB = "kustvakt_userdb";
@@ -148,13 +150,13 @@ public class BeanConfiguration {
             return getBean(KUSTVAKT_DB);
         }
 
-        //        public AuthenticationManagerIface getAuthenticationManager() {
-        //            throw new RuntimeException("!Stub");
-        //        }
+        public UserDataDbIface getUserDetailsDao() {
+            return getBean(KUSTVAKT_USERDETAILS);
+        }
 
-        //        public EntityHandlerIface getUserDBHandler() {
-        //            throw new RuntimeException("!Stub");
-        //        }
+        public UserDataDbIface getUserSettingsDao() {
+            return getBean(KUSTVAKT_USERSETTINGS);
+        }
 
         public EncryptionIface getEncryption() {
             return getBean(KUSTVAKT_ENCRYPTION);

@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:p="http://www.springframework.org/schema/p"
        xmlns:util="http://www.springframework.org/schema/util"
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns="http://www.springframework.org/schema/beans"
-       xmlns:cache="http://www.springframework.org/schema/cache"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                             http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
                             http://www.springframework.org/schema/tx
                             http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
                             http://www.springframework.org/schema/aop
                             http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
-                            http://www.springframework.org/schema/cache
-                            http://www.springframework.org/schema/cache/spring-cache-4.0.xsd
+
+
                             http://www.springframework.org/schema/util
                             http://www.springframework.org/schema/util/spring-util-4.0.xsd">
 
@@ -42,13 +40,13 @@
     </bean>
 
     <!--<bean id='cacheManager'-->
-          <!--class='org.springframework.cache.ehcache.EhCacheCacheManager'-->
-          <!--p:cacheManager-ref='ehcache'/>-->
+    <!--class='org.springframework.cache.ehcache.EhCacheCacheManager'-->
+    <!--p:cacheManager-ref='ehcache'/>-->
 
     <!--<bean id='ehcache'-->
-          <!--class='org.springframework.cache.ehcache.EhCacheManagerFactoryBean'-->
-          <!--p:configLocation='classpath:ehcache.xml'-->
-          <!--p:shared='true'/>-->
+    <!--class='org.springframework.cache.ehcache.EhCacheManagerFactoryBean'-->
+    <!--p:configLocation='classpath:ehcache.xml'-->
+    <!--p:shared='true'/>-->
 
     <!-- props are injected from default-config.xml -->
     <bean id="kustvakt_config"
@@ -89,6 +87,16 @@
         <property name="database" value="${jdbc.database}"/>
     </bean>
 
+    <bean id="kustvakt_userdetails"
+          class="de.ids_mannheim.korap.handlers.UserDetailsDao">
+        <constructor-arg ref="kustvakt_db"/>
+    </bean>
+
+    <bean id="kustvakt_usersettings"
+          class="de.ids_mannheim.korap.handlers.UserSettingsDao">
+        <constructor-arg ref="kustvakt_db"/>
+    </bean>
+
     <bean id="kustvakt_auditing"
           class="de.ids_mannheim.korap.handlers.JDBCAuditing">
         <constructor-arg ref="kustvakt_db"/>
@@ -101,8 +109,8 @@
 
     <!--fixme: change name according to convention -->
     <!--<bean id="collectionProvider"-->
-          <!--class="de.ids_mannheim.korap.handlers.CollectionDao">-->
-        <!--<constructor-arg ref="kustvakt_db"/>-->
+    <!--class="de.ids_mannheim.korap.handlers.CollectionDao">-->
+    <!--<constructor-arg ref="kustvakt_db"/>-->
     <!--</bean>-->
 
     <!--fixme: change name according to convention -->

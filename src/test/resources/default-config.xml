@@ -93,6 +93,16 @@
         <property name="database" value="${jdbc.database}"/>
     </bean>
 
+    <bean id="kustvakt_userdetails"
+          class="de.ids_mannheim.korap.handlers.UserDetailsDao">
+        <constructor-arg ref="kustvakt_db"/>
+    </bean>
+
+    <bean id="kustvakt_usersettings"
+          class="de.ids_mannheim.korap.handlers.UserSettingsDao">
+        <constructor-arg ref="kustvakt_db"/>
+    </bean>
+
     <bean id="kustvakt_auditing"
           class="de.ids_mannheim.korap.handlers.JDBCAuditing">
         <constructor-arg ref="kustvakt_db"/>
