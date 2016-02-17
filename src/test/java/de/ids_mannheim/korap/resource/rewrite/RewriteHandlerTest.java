@@ -1,5 +1,6 @@
+package de.ids_mannheim.korap.resource.rewrite;
+
 import de.ids_mannheim.korap.config.BeanConfiguration;
-import de.ids_mannheim.korap.resource.rewrite.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

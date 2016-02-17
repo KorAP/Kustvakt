@@ -4,13 +4,10 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.utils.ServiceVersion;
 import de.ids_mannheim.korap.utils.TimeUtils;
-import de.ids_mannheim.korap.web.Arg;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Set;
 
 /**
  * @author hanl
@@ -60,22 +57,22 @@ public class ConfigTest {
                 .validateEntry(v, Attributes.EMAIL);
     }
 
-    @Test
-    public void testArgLoader() {
-        String[] args = new String[] { "--port", "8080", "--config",
-                "local.conf", "--init" };
-        Set<Arg> s = Arg.loadArgs(args);
-        assert s.size() == 3;
-
-        for (Arg arg : s) {
-            if (arg instanceof Arg.PortArg)
-                assert ((Arg.PortArg) arg).getValue() == 8080;
-            if (arg instanceof Arg.ConfigArg)
-                assert ((Arg.ConfigArg) arg).getValue().equals("local.conf");
-            if (arg instanceof Arg.InitArg)
-                assert ((Arg.InitArg) arg).getValue();
-        }
-    }
+    //    @Test
+    //    public void testArgLoader() {
+    //        String[] args = new String[] { "--port", "8080", "--config",
+    //                "local.conf", "--init" };
+    //        Set<Arg> s = Arg.loadArgs(args);
+    //        assert s.size() == 3;
+    //
+    //        for (Arg arg : s) {
+    //            if (arg instanceof Arg.PortArg)
+    //                assert ((Arg.PortArg) arg).getValue() == 8080;
+    //            if (arg instanceof Arg.ConfigArg)
+    //                assert ((Arg.ConfigArg) arg).getValue().equals("local.conf");
+    //            if (arg instanceof Arg.InitArg)
+    //                assert ((Arg.InitArg) arg).getValue();
+    //        }
+    //    }
 
 }
 

@@ -28,7 +28,6 @@ public class RewriteHandler {
 
     private KustvaktConfiguration config;
 
-    // fixme: make default constructor with configuration!
     public RewriteHandler(KustvaktConfiguration config) {
         this.config = config;
         this.node_processors = new HashSet<>();

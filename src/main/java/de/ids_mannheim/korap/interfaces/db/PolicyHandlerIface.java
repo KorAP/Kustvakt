@@ -31,8 +31,7 @@ public interface PolicyHandlerIface {
      */
     List<SecurityPolicy>[] getPolicies(Integer target, User user, Byte perm);
 
-    List<SecurityPolicy> getPolicies(PolicyCondition condition,
-            Class<? extends KustvaktResource> clazz, Byte perm);
+    List<SecurityPolicy> getPolicies(PolicyCondition condition,Class<? extends KustvaktResource> clazz, Byte perm);
 
     /**
      * @param policy

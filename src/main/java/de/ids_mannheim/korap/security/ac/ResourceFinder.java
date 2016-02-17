@@ -89,7 +89,7 @@ public class ResourceFinder {
         Set<T> sets = new HashSet<>();
         List<SecurityPolicy> policies = policydao
                 .getPolicies(new PolicyCondition(Attributes.PUBLIC_GROUP),
-                        clazz, Permissions.READ);
+                        clazz, Permissions.Permission.READ.toByte());
 
         for (SecurityPolicy policy : policies)
             sets.add((T) resourcedao.findbyId(policy.getTarget(),

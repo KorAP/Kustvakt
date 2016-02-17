@@ -258,7 +258,7 @@ public class PolicyDao implements PolicyHandlerIface {
                 "where " +
                 "pv.enable <= :en and (pv.expire > :en or pv.expire is NULL) and "
                 +
-                "pv.group_id=:cond and pv.type=:type and " +
+                "pv.group_id=:cond and pv.typeand " +
                 "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
                 +
                 "(select sum(distinct res.depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id=:cond)"
