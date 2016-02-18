@@ -203,22 +203,6 @@
             </plugin>
         </plugins>
     </build>
-    <repositories>
-        <repository>
-            <id>codehaus-release-repo</id>
-            <name>Codehaus Release Repo</name>
-            <url>http://repository.codehaus.org</url>
-        </repository>
-        <repository>
-            <id>central</id>
-            <url>http://repo1.maven.org/maven2/</url>
-        </repository>
-        <repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-            <snapshots/>
-        </repository>
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>com.sun.jersey</groupId>
