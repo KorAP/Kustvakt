@@ -22,6 +22,7 @@ public class SecurityPolicy {
     // a settingattribute id for instance,
     // which specifies the attribute to be protected by this policy
     private String target;
+    // todo: change to set!
     private List<PolicyCondition> conditions;
     private Set<Integer> removedidx;
     private Set<Integer> addedidx;
@@ -86,9 +87,9 @@ public class SecurityPolicy {
 
     // todo ???????
     @Deprecated
-    public SecurityPolicy setOverride(Permissions.Permission... perms) {
+    private SecurityPolicy setOverride(Permissions.Permission... perms) {
         for (Permissions.Permission p : perms)
-            this.permissions.addOverride(Permissions.getByte(p));
+            this.permissions.addOverride(p.toByte());
         return this;
     }
 
@@ -155,11 +156,16 @@ public class SecurityPolicy {
         if (this.addedidx.contains(idx))
             this.addedidx.remove(idx);
         else
-            this.removedidx.add(this.conditions.indexOf(constraint));
+            this.removedidx.add(idx);
         return this;
     }
 
     public SecurityPolicy addCondition(PolicyCondition constraint) {
+        this.conditions.add(constraint);
+        return this;
+    }
+
+    public SecurityPolicy addNewCondition(PolicyCondition constraint) {
         if (this.conditions.add(constraint))
             this.addedidx.add(this.conditions.indexOf(constraint));
         return this;

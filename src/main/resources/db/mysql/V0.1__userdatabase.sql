@@ -1,3 +1,4 @@
+
 -- rename all columns in new way!
 CREATE TABLE IF NOT EXISTS korap_users (
     id INTEGER PRIMARY KEY AUTO_INCREMENT,

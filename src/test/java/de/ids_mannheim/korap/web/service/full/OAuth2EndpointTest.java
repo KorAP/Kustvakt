@@ -2,13 +2,12 @@ package de.ids_mannheim.korap.web.service.full;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
-import de.ids_mannheim.korap.config.BeanConfiguration;
 import de.ids_mannheim.korap.config.TestHelper;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -20,29 +19,21 @@ import org.junit.Test;
 // todo: in combination with other tests, causes failures!
 public class OAuth2EndpointTest extends FastJerseyTest {
 
-    private static String[] credentials;
-
-    @AfterClass
-    public static void close() {
-        System.out.println("RUNNING AFTER CLASS SHUTDOWN");
-        TestHelper.dropUser();
-        BeanConfiguration.closeApplication();
-    }
-
     @BeforeClass
-    public static void configure() {
-        BeanConfiguration.loadClasspathContext("default-config.xml");
+    public static void configure() throws Exception {
         FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service",
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");
-
-        TestHelper.setupAccount();
-        credentials = TestHelper.getUserCredentials();
     }
 
     @Test
     public void init() {
 
+    }
+
+    @Override
+    public void initMethod() throws KustvaktException {
+        helper().setupAccount();
     }
 
     @Test
@@ -72,7 +63,8 @@ public class OAuth2EndpointTest extends FastJerseyTest {
     @Test
     @Ignore
     public void authenticate() {
-        String enc = BasicHttpAuth.encode(credentials[0], credentials[1]);
+        String[] cred = TestHelper.getUserCredentials();
+        String enc = BasicHttpAuth.encode(cred[0], cred[1]);
         ClientResponse response = resource().path("v0.1").path("oauth2")
                 .path("register")
                 .queryParam("redirect_url", "korap.ids-mannheim.de/redirect")

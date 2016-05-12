@@ -1,7 +1,7 @@
 package de.ids_mannheim.korap.interfaces.defaults;
 
 import de.ids_mannheim.korap.auditing.AuditRecord;
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.Configurable;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.user.User;
@@ -18,7 +18,7 @@ import java.util.List;
  * @author hanl
  * @date 05/06/2015
  */
-@Configurable(BeanConfiguration.KUSTVAKT_AUDITING)
+@Configurable(ContextHolder.KUSTVAKT_AUDITING)
 public class DefaultAuditing extends AuditingIface {
 
     private FileOutputStream stream;

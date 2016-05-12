@@ -9,7 +9,7 @@ public abstract class PersistenceClient<SOURCE> {
 
     private SOURCE source;
     private TYPE type;
-    @Deprecated
+
     protected String database;
     private InputStream schema;
 

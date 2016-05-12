@@ -83,8 +83,7 @@ public class DocumentDao implements ResourceOperationIface<Document> {
                                 doc = new Document(
                                         rs.getString("persistent_id"));
                                 doc.setId(rs.getInt("id"));
-                                doc.setCreated(
-                                        rs.getTimestamp("created").getTime());
+                                doc.setCreated(rs.getLong("created"));
                                 doc.setDisabled(rs.getBoolean("disabled"));
                             }
 
@@ -94,6 +93,7 @@ public class DocumentDao implements ResourceOperationIface<Document> {
         }catch (EmptyResultDataAccessException em) {
             return null;
         }catch (DataAccessException e) {
+            e.printStackTrace();
             throw new KustvaktException(StatusCodes.CONNECTION_ERROR);
         }
     }
@@ -209,18 +209,18 @@ public class DocumentDao implements ResourceOperationIface<Document> {
     }
 
     @Override
-    public int deleteAll() throws KustvaktException {
+    public int size() {
+        return -1;
+    }
+
+    @Override
+    public int truncate() {
         String sql = "delete from doc_store;";
         try {
             return this.jdbcTemplate.update(sql, new HashMap<String, Object>());
         }catch (DataAccessException e) {
-            throw new KustvaktException(StatusCodes.CONNECTION_ERROR);
+            return -1;
         }
-    }
-
-    @Override
-    public int size() {
-        return -1;
     }
 
     @Override

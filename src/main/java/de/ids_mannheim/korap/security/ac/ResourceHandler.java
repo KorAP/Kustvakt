@@ -20,6 +20,8 @@ import java.util.Collection;
  * @date 23/03/2014
  */
 
+//todo: use interface (maybe a cachable interface?) and bean instanceing
+// todo: if cachable, data integrity needs to be checked! either remove caching or check integrity!
 @SuppressWarnings("all")
 public class ResourceHandler {
 
@@ -56,7 +58,7 @@ public class ResourceHandler {
         try {
             p = SecurityManager.findbyId(id, user);
         } catch (EmptyResultException e) {
-            throw new NotAuthorizedException(StatusCodes.PERMISSION_DENIED);
+            throw new NotAuthorizedException(StatusCodes.EMPTY_RESULTS, String.valueOf(id));
         }
         return p.getResource();
     }
@@ -64,22 +66,17 @@ public class ResourceHandler {
     public <T extends KustvaktResource> T findbyStrId(String persistent_id,
             User user, String type)
             throws KustvaktException, NotAuthorizedException {
-        T cache = (T) getCache(persistent_id, ResourceFactory
-                .getResourceClass(type));
-        if (cache != null)
-            return cache;
-        else
-            return (T) findbyStrId(persistent_id, user,
-                    ResourceFactory.getResourceClass(type));
+        return (T) findbyStrId(persistent_id, user,
+                ResourceFactory.getResourceClass(type));
     }
 
     public <T extends KustvaktResource> T findbyStrId(String persistent_id,
             User user, Class<T> type)
             throws KustvaktException, NotAuthorizedException {
-        T cache = (T) getCache(persistent_id, type);
-        if (cache != null)
-            return cache;
-        else {
+        //T cache = (T) getCache(persistent_id, type);
+        //if (cache != null)
+        //    return cache;
+        //else {
             SecurityManager<T> p;
             try {
                 p = SecurityManager.findbyId(persistent_id, user, type);
@@ -87,7 +84,7 @@ public class ResourceHandler {
                 throw new NotAuthorizedException(StatusCodes.EMPTY_RESULTS, persistent_id);
             }
             return p.getResource();
-        }
+        //}
     }
 
     public <T extends KustvaktResource> Collection<T> findbyPath(String path, Class type, User user)
@@ -136,14 +133,14 @@ public class ResourceHandler {
     public <T extends KustvaktResource> void deleteResources(User user, T... resources)
             throws KustvaktException, NotAuthorizedException {
         for (T r : resources) {
-            SecurityManager policies;
+            SecurityManager manager;
             try {
-                policies = SecurityManager.findbyId(r.getPersistentID(), user, r.getClass(),
+                manager = SecurityManager.findbyId(r.getPersistentID(), user, r.getClass(),
                         Permissions.Permission.DELETE);
             } catch (EmptyResultException e) {
                 return;
             }
-            policies.deleteResource();
+            manager.deleteResource();
         }
     }
 

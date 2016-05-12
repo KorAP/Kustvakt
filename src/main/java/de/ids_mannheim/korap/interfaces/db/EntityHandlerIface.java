@@ -20,6 +20,8 @@ public interface EntityHandlerIface {
 
     int deleteAccount(Integer userid) throws KustvaktException;
 
+    int truncate() throws KustvaktException;
+
     int resetPassphrase(String username, String uriToken, String passphrase)
             throws KustvaktException;
 

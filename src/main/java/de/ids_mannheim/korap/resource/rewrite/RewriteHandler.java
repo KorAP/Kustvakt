@@ -1,6 +1,8 @@
 package de.ids_mannheim.korap.resource.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import de.ids_mannheim.korap.config.BeanInjectable;
+import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User;
@@ -18,7 +20,7 @@ import java.util.*;
  */
 // todo: do post processing!
 //todo: load rewritenode and rewritequery automatically from classpath by default, but namespaced from package
-public class RewriteHandler {
+public class RewriteHandler implements BeanInjectable {
 
     private static Logger jlog = LoggerFactory.getLogger(RewriteHandler.class);
     private Collection<RewriteTask.IterableRewriteAt> node_processors;
@@ -26,15 +28,33 @@ public class RewriteHandler {
     private Collection<RewriteTask> query_processors;
 
     private Set<Class> failed_task_registration;
-
     private KustvaktConfiguration config;
+    private ContextHolder beans;
 
     public RewriteHandler(KustvaktConfiguration config) {
+        this();
         this.config = config;
+    }
+
+    public RewriteHandler() {
         this.node_processors = new HashSet<>();
         this.token_node_processors = new HashSet<>();
         this.query_processors = new HashSet<>();
         this.failed_task_registration = new HashSet<>();
+        this.beans = null;
+    }
+
+
+    public void defaultRewriteConstraints() {
+        this.add(FoundryInject.class);
+        this.add(PublicCollection.class);
+        this.add(IdWriter.class);
+        this.add(DocMatchRewrite.class);
+        this.add(CollectionCleanupFilter.class);
+    }
+
+    public Set getFailedProcessors() {
+        return this.failed_task_registration;
     }
 
     public boolean addProcessor(RewriteTask rewriter) {
@@ -123,12 +143,14 @@ public class RewriteHandler {
 
     private JsonNode process(JsonNode root, User user, boolean post) {
         jlog.debug("Running rewrite process on query {}", root);
-        Iterator<Map.Entry<String, JsonNode>> it = root.fields();
-        while (it.hasNext()) {
-            Map.Entry<String, JsonNode> next = it.next();
-            process(next.getKey(), next.getValue(), user, post);
+        if (root!= null) {
+            Iterator<Map.Entry<String, JsonNode>> it = root.fields();
+            while (it.hasNext()) {
+                Map.Entry<String, JsonNode> next = it.next();
+                process(next.getKey(), next.getValue(), user, post);
+            }
+            processFixedNode(root, user, this.query_processors, post);
         }
-        processFixedNode(root, user, this.query_processors, post);
         return root;
     }
 
@@ -157,9 +179,16 @@ public class RewriteHandler {
     // todo: integrate notifications into system!
     private boolean processNode(String rootNode, KoralNode node, User user,
             Collection<? extends RewriteTask> tasks, boolean post) {
+        if (this.config == null)
+            throw new RuntimeException(
+                    "KustvaktConfiguration must be set!");
+
         for (RewriteTask task : tasks) {
             jlog.debug("running processor on node: " + node);
             jlog.debug("on processor: " + task.getClass().toString());
+
+            if (this.beans != null && task instanceof BeanInjectable)
+                ((BeanInjectable) task).insertBeans(this.beans);
 
             if (task instanceof RewriteTask.IterableRewriteAt) {
                 RewriteTask.IterableRewriteAt rw = (RewriteTask.IterableRewriteAt) task;
@@ -212,4 +241,9 @@ public class RewriteHandler {
         }
     }
 
+    @Override
+    public <T extends ContextHolder> void insertBeans(T beans) {
+        this.beans = beans;
+        this.config = beans.getConfiguration();
+    }
 }

@@ -151,7 +151,7 @@ public class PolicyBuilder {
                 }else if (rel.equals(Relation.OR)) {
                     for (PolicyCondition c : this.conditions) {
                         SecurityPolicy policy = new SecurityPolicy()
-                                .addCondition(c).setTarget(resources[idx])
+                                .addNewCondition(c).setTarget(resources[idx])
                                 .addPermission(permissions)
                                 .setCreator(this.user.getId());
 

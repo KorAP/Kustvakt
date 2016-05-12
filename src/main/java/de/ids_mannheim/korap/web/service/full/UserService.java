@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ResourceFilters;
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.Scopes;
 import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -38,8 +38,6 @@ import java.util.*;
 public class UserService {
 
     private static Logger jlog = LoggerFactory.getLogger(UserService.class);
-    //    private static Logger jlog = KustvaktLogger
-    //            .getLogger(KustvaktLogger.SECURITY_LOG);
     private AuthenticationManagerIface controller;
 
     private
@@ -47,7 +45,7 @@ public class UserService {
     UriInfo info;
 
     public UserService() {
-        this.controller = BeanConfiguration.getBeans()
+        this.controller = BeansFactory.getKustvaktContext()
                 .getAuthenticationManager();
     }
 
@@ -237,7 +235,7 @@ public class UserService {
         try {
             User user = controller.getUser(ctx.getUsername());
             Userdata data = controller.getUserData(user, UserSettings.class);
-            data.addField(Attributes.USERNAME, ctx.getUsername());
+            data.setField(Attributes.USERNAME, ctx.getUsername());
             result = data.data();
         }catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
@@ -259,7 +257,7 @@ public class UserService {
 
         try {
             User user = controller.getUser(ctx.getUsername());
-            if (user.isDemo())
+            if (User.UserFactory.isDemo(ctx.getUsername()))
                 return Response.notModified().build();
 
             Userdata data = controller.getUserData(user, UserSettings.class);
@@ -293,7 +291,7 @@ public class UserService {
         try {
             User user = controller.getUser(ctx.getUsername());
             Userdata data = controller.getUserData(user, UserDetails.class);
-            data.addField(Attributes.USERNAME, ctx.getUsername());
+            data.setField(Attributes.USERNAME, ctx.getUsername());
             result = data.data();
         }catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
@@ -315,7 +313,7 @@ public class UserService {
 
         try {
             User user = controller.getUser(ctx.getUsername());
-            if (user.isDemo())
+            if (User.UserFactory.isDemo(ctx.getUsername()))
                 return Response.notModified().build();
 
             UserDetails new_data = new UserDetails(user.getId());
@@ -393,7 +391,7 @@ public class UserService {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         try {
             User user = controller.getUser(ctx.getUsername());
-            if (user.isDemo())
+            if (User.UserFactory.isDemo(ctx.getUsername()))
                 return Response.notModified().build();
             controller.deleteAccount(user);
         }catch (KustvaktException e) {

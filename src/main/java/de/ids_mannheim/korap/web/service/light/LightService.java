@@ -1,7 +1,7 @@
 package de.ids_mannheim.korap.web.service.light;
 
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.QueryBuilderUtil;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -44,12 +44,13 @@ public class LightService {
     private KustvaktConfiguration config;
 
     public LightService() {
-        this.config = BeanConfiguration.getBeans().getConfiguration();
+        this.config = BeansFactory.getKustvaktContext().getConfiguration();
         this.searchKrill = new SearchKrill(config.getIndexDir());
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
         this.graphDBhandler = new ClientsHandler(builder.build());
-        this.processor = new RewriteHandler(config);
+        this.processor = new RewriteHandler();
         this.processor.add(FoundryInject.class);
+        this.processor.insertBeans(BeansFactory.getKustvaktContext());
     }
 
     /**
@@ -83,7 +84,8 @@ public class LightService {
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
             @QueryParam("page") Integer startPage,
-            @QueryParam("ref") String reference, @QueryParam("cq") String cq) {
+                               // fixme: remove cq from light service
+            @QueryParam("cq") String cq) {
         QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
 
         MetaQueryBuilder meta = new MetaQueryBuilder();
@@ -122,6 +124,7 @@ public class LightService {
             @QueryParam("offset") Integer pageIndex,
             @QueryParam("page") Integer pageInteger,
             @QueryParam("fields") Set<String> fields,
+                                    // fixme: remove cq value from lightservice
             @QueryParam("cq") String cq, @QueryParam("engine") String engine) {
         KustvaktConfiguration.BACKENDS eng = this.config.chooseBackend(engine);
 
@@ -148,6 +151,7 @@ public class LightService {
                     String.valueOf(meta.getSpanContext().getLeft_size()));
             map.add("rctxs",
                     String.valueOf(meta.getSpanContext().getRight_size()));
+
             try {
                 result = this.graphDBhandler.getResponse(map, "distKwic");
             }catch (KustvaktException e) {

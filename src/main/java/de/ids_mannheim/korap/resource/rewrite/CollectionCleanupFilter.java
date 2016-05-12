@@ -2,6 +2,8 @@ package de.ids_mannheim.korap.resource.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import de.ids_mannheim.korap.config.BeanInjectable;
+import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -12,7 +14,8 @@ import java.util.Iterator;
  * @author hanl
  * @date 28/07/2015
  */
-public class CollectionCleanupFilter implements RewriteTask.RewriteNodeAt {
+public class CollectionCleanupFilter
+        implements RewriteTask.RewriteNodeAt {
 
     @Override
     public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
@@ -43,6 +46,7 @@ public class CollectionCleanupFilter implements RewriteTask.RewriteNodeAt {
                     return null;
             }
 
+            // what happens to array nodes?
             if (!root.equals(sub)) {
                 if (sub.isObject()) {
                     ObjectNode ob = (ObjectNode) root;

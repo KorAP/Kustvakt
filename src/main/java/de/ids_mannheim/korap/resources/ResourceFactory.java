@@ -28,7 +28,7 @@ public class ResourceFactory {
         try {
             return (KustvaktResource) clazz.newInstance();
         }catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+            // do nothing
         }
         return null;
     }

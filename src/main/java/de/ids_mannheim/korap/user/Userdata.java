@@ -57,8 +57,11 @@ public abstract class Userdata {
         return this.fields.get(key);
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isValid() {
-        //        return this.missing(this.fields).isEmpty() && this.userID != -1;
         return missing().length == 0;
     }
 
@@ -111,7 +114,7 @@ public abstract class Userdata {
         return JsonUtils.toJSON(this.fields);
     }
 
-    public void addField(String key, Object value) {
+    public void setField(String key, Object value) {
         this.fields.put(key, value);
     }
 

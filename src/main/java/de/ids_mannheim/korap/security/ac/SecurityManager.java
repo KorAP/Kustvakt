@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.security.ac;
 
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.ContextHolder;
+import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.NotAuthorizedException;
@@ -54,20 +55,20 @@ public class SecurityManager<T extends KustvaktResource> {
         this.policies[0] = new ArrayList<>();
         this.silent = true;
         this.user = user;
-        checkProviders();
+        overrideProviders(null);
     }
 
-    private static void checkProviders() {
-        if (BeanConfiguration.hasContext() && (policydao == null
-                | crypto == null)) {
-            SecurityManager.policydao = BeanConfiguration.getBeans()
-                    .getPolicyDbProvider();
-            SecurityManager.crypto = BeanConfiguration.getBeans()
-                    .getEncryption();
+    public static void overrideProviders(ContextHolder beans) {
+        if (beans == null)
+            beans = BeansFactory.getKustvaktContext();
+        if (policydao == null | crypto == null) {
+            SecurityManager.policydao = beans.getPolicyDbProvider();
+            SecurityManager.crypto = beans.getEncryption();
             SecurityManager.handlers = new HashMap<>();
-            ResourceOperationIface rprovider = BeanConfiguration.getBeans()
+            Collection<ResourceOperationIface> providers = beans
                     .getResourceProvider();
-            SecurityManager.handlers.put(rprovider.type(), rprovider);
+            for (ResourceOperationIface op : providers)
+                SecurityManager.handlers.put(op.type(), op);
         }
         if (policydao == null && crypto == null)
             throw new RuntimeException("providers not set!");
@@ -214,9 +215,6 @@ public class SecurityManager<T extends KustvaktResource> {
         if (id instanceof Integer)
             this.policies = policydao
                     .getPolicies((Integer) id, this.user, b.getPbyte());
-        //        System.out.println("-------------------------------");
-        //        System.out.println("LENGTH OF POLICY ARRAY " + this.policies.length);
-        //        System.out.println("POLICY AT 0 " + this.policies[0]);
         this.evaluator = new PolicyEvaluator(this.user, this.policies);
 
         if (this.policies == null) {
@@ -242,7 +240,8 @@ public class SecurityManager<T extends KustvaktResource> {
             iface = handlers.get(KustvaktResource.class);
         T resource = (T) iface
                 .findbyId(this.evaluator.getResourceID(), this.user);
-        // todo: fix this
+        // fixme: this
+        // fixme: deprecated!
         resource.setManaged(this.evaluator.isManaged());
         resource.setShared(this.evaluator.isShared());
         return resource;
@@ -257,7 +256,7 @@ public class SecurityManager<T extends KustvaktResource> {
     public static SecurityManager register(KustvaktResource resource, User user)
             throws KustvaktException, NotAuthorizedException {
         SecurityManager p = new SecurityManager(user);
-        if (!user.isDemo()) {
+        if (!User.UserFactory.isDemo(user.getUsername())) {
             if (resource.getParentID() != null) {
                 try {
                     // the owner has all rights per default, in order to be able derivate from a parent resource, he needs all permissions as well
@@ -408,6 +407,7 @@ public class SecurityManager<T extends KustvaktResource> {
         }
     }
 
+    // todo:
     public void deletePolicy(SecurityPolicy policy)
             throws KustvaktException, NotAuthorizedException {
         // todo: get rid of this: use sql to match policy id and target according to evaluator!
@@ -492,5 +492,4 @@ public class SecurityManager<T extends KustvaktResource> {
             return false;
         }
     }
-
 }

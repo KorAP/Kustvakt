@@ -34,7 +34,7 @@ public class PermissionsBuffer {
     }
 
     public boolean containsPermission(Permissions.Permission p) {
-        return containsPByte(Permissions.getByte(p));
+        return containsPByte(p.toByte());
     }
 
     public boolean containsPByte(byte perm) {
@@ -44,7 +44,7 @@ public class PermissionsBuffer {
     public int addPermission(int b) {
         short r = (short) (bytes[1] & b);
         if ((bytes[1] & b) != b)
-            bytes[1] += (b - r);
+            bytes[1] += b;
         else
             return -1;
         return 0;
@@ -121,6 +121,10 @@ public class PermissionsBuffer {
         return b.getShort();
     }
 
+    public byte[] getByteArray() {
+        return bytes;
+    }
+
     public Byte getPbyte() {
         return this.bytes[1];
     }
@@ -131,18 +135,6 @@ public class PermissionsBuffer {
             if (containsPByte(p.toByte()))
                 pe.add(p);
         }
-        //        if (containsPByte(Permissions.READ))
-        //            pe.add(Permissions.Permission.READ);
-        //        if (containsPByte(Permissions.WRITE))
-        //            pe.add(Permissions.Permission.WRITE);
-        //        if (containsPByte(Permissions.DELETE))
-        //            pe.add(Permissions.Permission.DELETE);
-        //        if (containsPByte(Permissions.CREATE_POLICY))
-        //            pe.add(Permissions.Permission.CREATE_POLICY);
-        //        if (containsPByte(Permissions.MODIFY_POLICY))
-        //            pe.add(Permissions.Permission.MODIFY_POLICY);
-        //        if (containsPByte(Permissions.DELETE_POLICY))
-        //            pe.add(Permissions.Permission.DELETE_POLICY);
         return pe;
     }
 

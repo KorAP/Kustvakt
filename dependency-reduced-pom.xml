@@ -4,7 +4,7 @@
   <groupId>de.ids_mannheim.korap</groupId>
   <artifactId>Kustvakt-core</artifactId>
   <name>Kustvakt core</name>
-  <version>0.58</version>
+  <version>0.59</version>
   <description>Kustvakt core, basic rest api for testing purposes and default
         interfaces</description>
   <build>
@@ -13,7 +13,7 @@
         <filtering>true</filtering>
         <directory>src/main/resources</directory>
         <includes>
-          <include>**/*.prop</include>
+          <include>**/*.info</include>
           <include>**/*.xml</include>
           <include>**/*.conf</include>
           <include>**/*.properties</include>
@@ -64,10 +64,14 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.9</version>
+        <version>2.19.1</version>
         <configuration>
+          <reuseForks>false</reuseForks>
+          <forkCount>1</forkCount>
+          <threadCount>10</threadCount>
           <excludes>
             <exclude>**/*APITest.java</exclude>
+            <exclude>de/ids_mannheim/korap/suites/*.java</exclude>
           </excludes>
           <includes>
             <include>de/ids_mannheim/korap/**/*.java</include>
@@ -128,7 +132,7 @@
                   <goal>shade</goal>
                 </goals>
                 <configuration>
-                  <finalName>Kustvakt-core-${project.version}-light</finalName>
+                  <finalName>Kustvakt-core-0.59-light</finalName>
                   <transformers>
                     <transformer>
                       <mainClass>de.ids_mannheim.korap.web.KustvaktBaseServer</mainClass>
@@ -158,22 +162,6 @@
       </build>
     </profile>
   </profiles>
-  <repositories>
-    <repository>
-      <id>codehaus-release-repo</id>
-      <name>Codehaus Release Repo</name>
-      <url>http://repository.codehaus.org</url>
-    </repository>
-    <repository>
-      <id>central</id>
-      <url>http://repo1.maven.org/maven2/</url>
-    </repository>
-    <repository>
-      <snapshots />
-      <id>sonatype</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-    </repository>
-  </repositories>
   <dependencies>
     <dependency>
       <groupId>com.sun.jersey.jersey-test-framework</groupId>
@@ -184,6 +172,10 @@
         <exclusion>
           <artifactId>javax.servlet-api</artifactId>
           <groupId>javax.servlet</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jersey-servlet</artifactId>
+          <groupId>com.sun.jersey</groupId>
         </exclusion>
         <exclusion>
           <artifactId>jersey-client</artifactId>

@@ -20,6 +20,7 @@ public interface RewriteTask {
          */
         JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
                 User user) throws KustvaktException;
+
     }
 
     /**

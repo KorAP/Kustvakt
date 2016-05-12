@@ -17,17 +17,15 @@ public class KustvaktCacheManager {
 
     public static void init() {
         if (!loaded) {
-            System.out.println("LOADING EHCACHE CONFIG FROM FILE");
             InputStream in = null;
             try {
                 in = new FileInputStream(new File("./ehcache.xml"));
             }catch (FileNotFoundException e) {
-                e.printStackTrace();
+                // do nothing
             }
 
             if (in == null) {
-                System.out.println("LOADING EHCACHE FROM CLASSPATH");
-                in = KustvaktCacheManager.class
+                in = KustvaktCacheManager.class.getClassLoader()
                         .getResourceAsStream("ehcache.xml");
             }
             CacheManager.newInstance(in);

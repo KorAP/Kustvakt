@@ -4,7 +4,7 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.TimeUtils;
@@ -54,7 +54,7 @@ public class DefaultFilter implements ContainerRequestFilter, ResourceFilter {
         c.setHostAddress(host);
         c.setUserAgent(agent);
         c.setExpirationTime(TimeUtils.plusSeconds(
-                BeanConfiguration.getBeans().getConfiguration()
+                BeansFactory.getKustvaktContext().getConfiguration()
                         .getShortTokenTTL()).getMillis());
         return c;
     }

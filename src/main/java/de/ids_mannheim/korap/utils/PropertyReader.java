@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.utils;
 
+import de.ids_mannheim.korap.config.BeanInjectable;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,7 +14,6 @@ import java.util.Properties;
  * @date 27/09/2014
  */
 public abstract class PropertyReader {
-
 
     protected Map<String, Properties> read(String path) throws IOException {
         Map<String, Properties> res = new HashMap<>();
@@ -29,7 +30,6 @@ public abstract class PropertyReader {
         }
         return res;
     }
-
 
     public abstract void load();
 

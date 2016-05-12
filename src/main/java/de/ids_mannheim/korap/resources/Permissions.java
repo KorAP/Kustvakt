@@ -10,23 +10,22 @@ public class Permissions {
 
         //fixme: add read_policy permission to allow read policy permissions
         READ(Permissions.READ),
-
         WRITE(Permissions.WRITE),
+        DELETE(Permissions.DELETE),
 
-        DELETE(Permissions.READ),
         READ_POLICY(Permissions.READ_POLICY),
         CREATE_POLICY(Permissions.CREATE_POLICY),
         MODIFY_POLICY(Permissions.MODIFY_POLICY),
         DELETE_POLICY(Permissions.DELETE_POLICY),
         ALL(Permissions.ALL);
 
-        private final Byte b;
+        private final byte b;
 
-        Permission(Byte b) {
+        Permission(byte b) {
             this.b = b;
         }
 
-        public Byte toByte() {
+        public byte toByte() {
             return this.b;
         }
     }
@@ -39,29 +38,5 @@ public class Permissions {
     private static final byte MODIFY_POLICY = 32;
     private static final byte DELETE_POLICY = 64;
     private static final byte ALL = 127;
-
-    @Deprecated
-    public static Byte getByte(Permission perm) {
-        switch (perm) {
-            case READ:
-                return READ;
-            case WRITE:
-                return WRITE;
-            case DELETE:
-                return DELETE;
-            case READ_POLICY:
-                return READ_POLICY;
-            case DELETE_POLICY:
-                return DELETE_POLICY;
-            case MODIFY_POLICY:
-                return MODIFY_POLICY;
-            case CREATE_POLICY:
-                return CREATE_POLICY;
-            case ALL:
-                return ALL;
-            default:
-                return 0;
-        }
-    }
 
 }

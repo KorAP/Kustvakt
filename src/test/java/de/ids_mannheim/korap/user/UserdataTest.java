@@ -1,115 +1,120 @@
 package de.ids_mannheim.korap.user;
 
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.BeanConfigTest;
+import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.dbException;
 import de.ids_mannheim.korap.handlers.UserDetailsDao;
 import de.ids_mannheim.korap.handlers.UserSettingsDao;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * @author hanl
  * @date 27/01/2016
  */
-public class UserdataTest {
-
-    @BeforeClass
-    public static void init() {
-        BeanConfiguration.loadClasspathContext("default-config.xml");
-    }
-
-    @AfterClass
-    public static void drop() {
-        BeanConfiguration.closeApplication();
-    }
+public class UserdataTest extends BeanConfigTest {
 
     @Before
     public void clear() {
         UserDetailsDao dao = new UserDetailsDao(
-                BeanConfiguration.getBeans().getPersistenceClient());
+                helper().getContext().getPersistenceClient());
         UserSettingsDao sdao = new UserSettingsDao(
-                BeanConfiguration.getBeans().getPersistenceClient());
-        assert dao.deleteAll() != -1;
-        assert sdao.deleteAll() != -1;
+                helper().getContext().getPersistenceClient());
+        assertNotEquals(-1, dao.deleteAll());
+        assertNotEquals(-1, sdao.deleteAll());
     }
 
     @Test
     public void testDataStore() {
+        String val = "value1;value_data";
         User user = new KorAPUser();
         user.setId(1);
         UserDetailsDao dao = new UserDetailsDao(
-                BeanConfiguration.getBeans().getPersistenceClient());
+                helper().getContext().getPersistenceClient());
         UserDetails d = new UserDetails(1);
-        d.addField("key_1", "value is a value");
-        assert dao.store(d) != -1;
+        d.setField("key_1", val);
+        assertNotEquals(-1, dao.store(d));
     }
 
     @Test
     public void testDataGet() throws dbException {
+        String val = "value1;value_data";
         User user = new KorAPUser();
         user.setId(1);
         UserDetailsDao dao = new UserDetailsDao(
-                BeanConfiguration.getBeans().getPersistenceClient());
+                helper().getContext().getPersistenceClient());
         UserDetails d = new UserDetails(1);
-        d.addField("key_1", "value is a value");
-        assert dao.store(d) != -1;
+        d.setField("key_1", val);
+        assertNotEquals(-1, dao.store(d));
 
         d = dao.get(d.getId());
-        assert d != null;
-        assert "value is a value".equals(d.get("key_1"));
+        assertNotNull(d);
+        assertEquals(val, d.get("key_1"));
 
         d = dao.get(user);
-        assert d != null;
-        assert "value is a value".equals(d.get("key_1"));
+        assertNotNull(d);
+        assertEquals(val, d.get("key_1"));
     }
 
     @Test
     public void testDataValidation() {
         Userdata data = new UserDetails(1);
-        data.addField(Attributes.COUNTRY, "Germany");
+        data.setField(Attributes.COUNTRY, "Germany");
 
         String[] req = data.requiredFields();
         String[] r = data.missing();
-        assert r.length > 0;
-        assert r.length == req.length;
-        assert !data.isValid();
+        assertNotEquals(0, r.length);
+        assertEquals(req.length, r.length);
+        assertFalse(data.isValid());
     }
 
     @Test
     public void testSettingsValidation() {
         Userdata data = new UserSettings(1);
-        data.addField(Attributes.FILE_FORMAT_FOR_EXPORT, "export");
+        data.setField(Attributes.FILE_FORMAT_FOR_EXPORT, "export");
 
         String[] req = data.requiredFields();
         String[] r = data.missing();
-        assert r.length == 0;
-        assert r.length == req.length;
-        assert data.isValid();
+        assertEquals(0, r.length);
+        assertEquals(req.length, r.length);
+        assertTrue(data.isValid());
     }
 
     @Test
     public void testUserdatafactory() throws KustvaktException {
-        UserDataDbIface dao = UserdataFactory.getDaoInstance(UserDetails.class);
-        assert UserDetailsDao.class.equals(dao.getClass());
+        UserDataDbIface dao = BeansFactory.getTypeFactory()
+                .getTypedBean(helper().getContext().getUserDataDaos(), UserDetails.class);
+        assertNotNull(dao);
+        assertEquals(UserDetailsDao.class, dao.getClass());
+
+        dao = BeansFactory.getTypeFactory()
+                .getTypedBean(helper().getContext().getUserDataDaos(), UserSettings.class);
+        assertNotNull(dao);
+        assertEquals(UserSettingsDao.class, dao.getClass());
+
     }
 
-    @Test(expected = KustvaktException.class)
+    @Test(expected = RuntimeException.class)
     public void testUserdatafactoryError() throws KustvaktException {
-        UserdataFactory.getDaoInstance(new Userdata(1) {
-            @Override
-            public String[] requiredFields() {
-                return new String[0];
-            }
+        BeansFactory.getTypeFactory()
+                .getTypedBean(helper().getContext().getUserDataDaos(), new Userdata(1) {
+                    @Override
+                    public String[] requiredFields() {
+                        return new String[0];
+                    }
 
-            @Override
-            public String[] defaultFields() {
-                return new String[0];
-            }
-        }.getClass());
+                    @Override
+                    public String[] defaultFields() {
+                        return new String[0];
+                    }
+                }.getClass());
     }
 
+    @Override
+    public void initMethod() throws KustvaktException {
+    }
 }

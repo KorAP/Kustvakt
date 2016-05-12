@@ -42,10 +42,26 @@ public class ResourceDao<T extends KustvaktResource>
         return (Class<T>) KustvaktResource.class;
     }
 
+    // todo: testing
     @Override
     public List<T> getResources(Collection<Object> ids, User user)
             throws KustvaktException {
-        return null;
+        String sql =
+                "SELECT rs.*, rt.name_path FROM resource_store as rs inner join resource_tree as rt"
+                        + " on rs.id=rt.child_id WHERE rs.id IN (:ids);";
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("ids", ids);
+        try {
+            return (List<T>) this.jdbcTemplate.query(sql, parameters,
+                    new RowMapperFactory.ResourceMapper());
+        }catch (DataAccessException e) {
+            log.error(
+                    "Exception during database retrieval for ids '" + ids + "'",
+                    e);
+            throw new dbException(user.getId(), "resource_store",
+                    StatusCodes.DB_GET_FAILED, ids.toString());
+        }
+
     }
 
     @Override
@@ -184,16 +200,6 @@ public class ResourceDao<T extends KustvaktResource>
     }
 
     @Override
-    public int deleteAll() throws KustvaktException {
-        final String sql = "DELETE FROM resource_store;";
-        try {
-            return this.jdbcTemplate.update(sql, new HashMap<String, Object>());
-        }catch (DataAccessException e) {
-            throw new KustvaktException(StatusCodes.CONNECTION_ERROR);
-        }
-    }
-
-    @Override
     public int size() {
         final String sql = "SELECT COUNT(*) FROM resource_store;";
         try {
@@ -202,6 +208,16 @@ public class ResourceDao<T extends KustvaktResource>
                             Integer.class);
         }catch (DataAccessException e) {
             return 0;
+        }
+    }
+
+    @Override
+    public int truncate() {
+        final String sql = "DELETE FROM resource_store;";
+        try {
+            return this.jdbcTemplate.update(sql, new HashMap<String, Object>());
+        }catch (DataAccessException e) {
+            return -1;
         }
     }
 }

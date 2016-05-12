@@ -3,12 +3,12 @@ package de.ids_mannheim.korap.web;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.KustvaktCacheManager;
 import de.ids_mannheim.korap.config.KustvaktClassLoader;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.web.service.BootupInterface;
+import de.ids_mannheim.korap.web.service.BootableBeanInterface;
 import lombok.Getter;
 import lombok.Setter;
 import org.eclipse.jetty.server.Connector;
@@ -35,9 +35,9 @@ public class KustvaktBaseServer {
         KustvaktArgs kargs = server.readAttributes(args);
 
         if (kargs.config != null)
-            BeanConfiguration.loadFileContext(kargs.config);
+            BeansFactory.loadFileContext(kargs.config);
         else
-            BeanConfiguration.loadClasspathContext();
+            BeansFactory.loadClasspathContext();
 
         KustvaktCacheManager.init();
 
@@ -60,9 +60,6 @@ public class KustvaktBaseServer {
                 case "--port":
                     kargs.setPort(Integer.valueOf(args[i + 1]));
                     break;
-                case "--props":
-                    kargs.setProperties(args[+1]);
-                    break;
                 case "--help":
                     StringBuffer b = new StringBuffer();
 
@@ -83,14 +80,14 @@ public class KustvaktBaseServer {
     }
 
     public void runPreStart() {
-        Set<Class<? extends BootupInterface>> set = KustvaktClassLoader
-                .loadSubTypes(BootupInterface.class);
+        Set<Class<? extends BootableBeanInterface>> set = KustvaktClassLoader
+                .loadSubTypes(BootableBeanInterface.class);
 
-        List<BootupInterface> list = new ArrayList<>(set.size());
+        List<BootableBeanInterface> list = new ArrayList<>(set.size());
         for (Class cl : set) {
-            BootupInterface iface;
+            BootableBeanInterface iface;
             try {
-                iface = (BootupInterface) cl.newInstance();
+                iface = (BootableBeanInterface) cl.newInstance();
                 list.add(iface);
             }catch (InstantiationException | IllegalAccessException e) {
                 continue;
@@ -99,10 +96,9 @@ public class KustvaktBaseServer {
         System.out.println("Found boot loading interfaces: " + list);
         int track = list.size();
         while (!list.isEmpty()) {
-            System.out.println("ITERATING LIST IS " + list);
-            for (BootupInterface iface : new ArrayList<>(list)) {
+            for (BootableBeanInterface iface : new ArrayList<>(list)) {
                 try {
-                    iface.load();
+                    iface.load(BeansFactory.getKustvaktContext());
                 }catch (KustvaktException e) {
                     // don't do anything!
                     System.out.println(
@@ -124,8 +120,7 @@ public class KustvaktBaseServer {
             runPreStart();
 
         if (kargs.port == -1)
-            kargs.setPort(
-                    BeanConfiguration.getBeans().getConfiguration().getPort());
+            kargs.setPort(BeansFactory.getKustvaktContext().getConfiguration().getPort());
 
         System.out.println(
                 "Starting Kustvakt Service on port '" + kargs.port + "'");
@@ -175,9 +170,6 @@ public class KustvaktBaseServer {
         private boolean debug;
         @Getter
         private String config;
-        @Getter
-        @Deprecated
-        private String properties;
         private int port;
         private SslContextFactory sslContext;
         private String[] rootPackages;
@@ -188,7 +180,6 @@ public class KustvaktBaseServer {
             this.sslContext = null;
             this.debug = false;
             this.config = null;
-            this.properties = null;
             this.init = false;
         }
 

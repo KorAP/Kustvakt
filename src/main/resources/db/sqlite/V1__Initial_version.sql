@@ -24,13 +24,19 @@ account_link VARCHAR(100)
 CREATE TABLE IF NOT EXISTS user_details (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
 user_id INTEGER UNIQUE NOT NULL,
-data BLOB NOT NULL
+data BLOB NOT NULL,
+foreign key (user_id)
+references korap_users (id)
+on delete cascade
 );
 
 CREATE TABLE IF NOT EXISTS user_settings (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
 user_id INTEGER UNIQUE NOT NULL,
-data BLOB NOT NULL
+data BLOB NOT NULL,
+foreign key (user_id)
+references korap_users (id)
+on delete cascade
 );
 
 
@@ -262,8 +268,8 @@ union all select
 
 -- deletes a group if the group has no longer members!
 create trigger if not exists group_ref_del after delete on group_ref
-when (select count(*) from group_ref where groupId=OLD.group_id) = 0
-begin delete from groupolicy_store where name=OLD.group_id; end;
+when (select count(*) from group_ref where group_id=OLD.group_id) = 0
+begin delete from group_store where name=OLD.group_id; end;
 
     -- create trigger relCr after insert on resource_store
     -- when (select count(*) from r_tree where parent_id==NEW.id and

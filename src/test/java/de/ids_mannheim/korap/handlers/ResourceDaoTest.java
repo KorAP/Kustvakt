@@ -1,45 +1,81 @@
 package de.ids_mannheim.korap.handlers;
 
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.BeanConfigTest;
+import de.ids_mannheim.korap.config.KustvaktClassLoader;
 import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.user.User;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * @author hanl
  * @date 26/01/2016
  */
-public class ResourceDaoTest {
+public class ResourceDaoTest extends BeanConfigTest {
 
-    @BeforeClass
-    public static void init() {
-        BeanConfiguration.loadClasspathContext("default-config.xml");
-        TestHelper.setupAccount();
+    private static List<Integer> ids = new ArrayList<>();
+
+    @Override
+    public void initMethod() {
+        helper().setupAccount();
+
+        List classes = new ArrayList<>(
+                KustvaktClassLoader.loadSubTypes(KustvaktResource.class));
+        int size = classes.size();
+        for (int i = 0; i < size; i++) {
+            Class s = (Class) classes.get(i < classes.size() ? i : 0);
+            try {
+                KustvaktResource r = (KustvaktResource) s.newInstance();
+                r.setName("resource_" + i);
+                r.setPersistentID(r.getName());
+                int id = helper().setupResource(r);
+                ids.add(id);
+                assertNotEquals(0,
+                        new ResourceDao<>(helper().getContext().getPersistenceClient())
+                                .size());
+            }catch (InstantiationException e) {
+                if (i < classes.size())
+                    classes.remove(i);
+            }catch (KustvaktException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    @AfterClass
-    public static void drop() {
-        //        TestHelper.dropUser();
-        BeanConfiguration.closeApplication();
+    @Test
+    public void testBatchGetResources() throws KustvaktException {
+        ResourceDao dao = new ResourceDao(helper().getContext().getPersistenceClient());
+        assertNotEquals(0, dao.size());
+        Collection res = dao.getResources(ids, User.UserFactory.getDemoUser());
+        assertEquals(ids.size(), res.size());
     }
 
-    @After
-    public void clear() throws KustvaktException {
-        new ResourceDao<>(BeanConfiguration.getBeans().getPersistenceClient())
-                .deleteAll();
+    @Test
+    public void testGetResource() throws KustvaktException {
+        ResourceDao dao = new ResourceDao(helper().getContext().getPersistenceClient());
+        assertEquals("sqlite",
+                helper().getContext().getPersistenceClient().getDatabase());
+
+        assertNotEquals(0, dao.size());
+        KustvaktResource res = dao
+                .findbyId(ids.get(0), User.UserFactory.getDemoUser());
+        assertNotNull(res);
     }
 
     @Test
     public void createCollection() throws KustvaktException {
-        ResourceDao dao = new ResourceDao(
-                BeanConfiguration.getBeans().getPersistenceClient());
-        VirtualCollection c = new VirtualCollection("testColl");
+        ResourceDao dao = new ResourceDao(helper().getContext().getPersistenceClient());
+        VirtualCollection c = new VirtualCollection("testColl1");
         c.addField("key_1", "this is a test");
         c.addField("key_2", 2);
 
@@ -49,17 +85,16 @@ public class ResourceDaoTest {
         int id = dao.storeResource(c, user);
 
         KustvaktResource r = dao.findbyId(id, user);
-        assert dao.size() > 0;
-        assert r != null;
-        assert r.getField("key_1") instanceof String;
-        assert r.getField("key_2") instanceof Integer;
+        assertNotEquals(dao.size(),0);
+        assertNotNull(r);
+        assertEquals(r.getField("key_1") instanceof String,true);
+        assertEquals(r.getField("key_2") instanceof Integer,true);
     }
 
     @Test
     public void ResourceDataUpdate() throws KustvaktException {
-        ResourceDao dao = new ResourceDao(
-                BeanConfiguration.getBeans().getPersistenceClient());
-        VirtualCollection c = new VirtualCollection("testColl");
+        ResourceDao dao = new ResourceDao(helper().getContext().getPersistenceClient());
+        VirtualCollection c = new VirtualCollection("testColl2");
         c.addField("key_1", "this is a test");
         c.addField("key_2", 2);
 

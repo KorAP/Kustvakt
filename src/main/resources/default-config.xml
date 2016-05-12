@@ -76,7 +76,7 @@
     <bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
         <property name="baselineOnMigrate" value="false"/>
         <property name="locations"
-                  value="classpath:${jdbc.schemaPath}"/>
+                  value="${jdbc.schemaPath}"/>
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
@@ -161,12 +161,32 @@
                 ref="kustvakt_encryption"/>
     </bean>
 
-    <util:list id="auth_providers"
+    <util:list id="kustvakt_authproviders"
                value-type="de.ids_mannheim.korap.interfaces.AuthenticationIface">
         <ref bean="basic_auth"/>
         <ref bean="session_auth"/>
         <ref bean="api_auth"/>
         <ref bean="openid_auth"/>
+    </util:list>
+
+
+    <bean id="userdata_details"
+          class="de.ids_mannheim.korap.handlers.UserDetailsDao">
+        <constructor-arg
+                type="de.ids_mannheim.korap.interfaces.db.PersistenceClient"
+                ref="kustvakt_db"/>
+    </bean>
+    <bean id="userdata_settings"
+          class="de.ids_mannheim.korap.handlers.UserDetailsDao">
+        <constructor-arg
+                type="de.ids_mannheim.korap.interfaces.db.PersistenceClient"
+                ref="kustvakt_db"/>
+    </bean>
+
+    <util:list id="kustvakt_userdata"
+               value-type="de.ids_mannheim.korap.interfaces.db.UserdataDbIface">
+        <ref bean="userdata_details"/>
+        <ref bean="userdata_settings"/>
     </util:list>
 
     <!-- specify type for constructor argument -->
@@ -181,8 +201,9 @@
         <constructor-arg
                 type="de.ids_mannheim.korap.interfaces.db.AuditingIface"
                 ref="kustvakt_auditing"/>
+        <constructor-arg ref="kustvakt_userdata"/>
         <!-- inject authentication providers to use -->
-        <property name="providers" ref="auth_providers"/>
+        <property name="providers" ref="kustvakt_authproviders"/>
     </bean>
 
     <!-- todo: if db interfaces not loaded via spring, does transaction even work then? -->

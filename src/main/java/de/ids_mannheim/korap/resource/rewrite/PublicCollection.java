@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.resource.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import de.ids_mannheim.korap.config.BeanInjectable;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.resources.Corpus;
@@ -14,7 +15,8 @@ import java.util.Set;
  * @author hanl
  * @date 04/07/2015
  */
-public class PublicCollection implements RewriteTask.RewriteNodeAt {
+public class PublicCollection
+        implements RewriteTask.RewriteNodeAt {
 
     public PublicCollection() {
         super();
@@ -59,4 +61,5 @@ public class PublicCollection implements RewriteTask.RewriteNodeAt {
     public String at() {
         return "/collection";
     }
+
 }

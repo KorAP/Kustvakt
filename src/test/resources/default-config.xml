@@ -40,7 +40,7 @@
         <property name="locations">
             <array>
                 <value>classpath:jdbc.properties</value>
-                <value>file:./jdbc.properties</value>
+                <value>file:./jdbc_tests.properties</value>
             </array>
         </property>
     </bean>
@@ -62,13 +62,17 @@
 
     <!--class="org.apache.commons.dbcp2.BasicDataSource"-->
     <!-- org.springframework.jdbc.datasource.SingleConnectionDataSource -->
+    <!-- org.springframework.jdbc.datasource.DriverManagerDataSource -->
     <bean id="dataSource"
           class="org.springframework.jdbc.datasource.SingleConnectionDataSource"
-          lazy-init="true">
-        <property name="driverClassName" value="${jdbc.driverClassName}"/>
-        <property name="url" value="${jdbc.url}"/>
-        <property name="username" value="${jdbc.username}"/>
-        <property name="password" value="${jdbc.password}"/>
+          lazy-init="false">
+        <property name="driverClassName" value="org.sqlite.JDBC"/>
+        <property name="url" value="jdbc:sqlite:tmp_new.sqlite"/>
+        <!--<property name="initialSize" value="1" />-->
+        <!--<property name="maxTotal" value="1" />-->
+        <!--<property name="maxIdle" value="1" />-->
+        <!--<property name="username" value="${jdbc.username}"/>-->
+        <!--<property name="password" value="${jdbc.password}"/>-->
         <!-- relevant for single connection datasource and sqlite -->
         <property name="suppressClose">
             <value>true</value>
@@ -82,15 +86,14 @@
     <bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
         <property name="baselineOnMigrate" value="false"/>
         <property name="locations"
-                  value="classpath:${jdbc.schemaPath}"/>
+                  value="classpath:db.sqlite"/>
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
     <bean id="kustvakt_db"
           class="de.ids_mannheim.korap.handlers.JDBCClient">
         <constructor-arg index="0" ref="dataSource"/>
-        <!-- deprecated property -->
-        <property name="database" value="${jdbc.database}"/>
+        <property name="database" value="jdbc:sqlite::memory:"/>
     </bean>
 
     <bean id="kustvakt_userdetails"
@@ -114,8 +117,8 @@
     </bean>
 
     <!--<bean id="collectionProvider"-->
-          <!--class="de.ids_mannheim.korap.handlers.CollectionDao">-->
-        <!--<constructor-arg ref="kustvakt_db"/>-->
+    <!--class="de.ids_mannheim.korap.handlers.CollectionDao">-->
+    <!--<constructor-arg ref="kustvakt_db"/>-->
     <!--</bean>-->
 
     <!--fixme: change name according to convention -->
@@ -166,13 +169,33 @@
                 ref="kustvakt_encryption"/>
     </bean>
 
-    <util:list id="auth_providers"
+    <util:list id="kustvakt_authproviders"
                value-type="de.ids_mannheim.korap.interfaces.AuthenticationIface">
         <ref bean="basic_auth"/>
         <ref bean="session_auth"/>
         <ref bean="api_auth"/>
         <ref bean="openid_auth"/>
     </util:list>
+
+    <bean id="userdata_details"
+          class="de.ids_mannheim.korap.handlers.UserDetailsDao">
+        <constructor-arg
+                type="de.ids_mannheim.korap.interfaces.db.PersistenceClient"
+                ref="kustvakt_db"/>
+    </bean>
+    <bean id="userdata_settings"
+          class="de.ids_mannheim.korap.handlers.UserDetailsDao">
+        <constructor-arg
+                type="de.ids_mannheim.korap.interfaces.db.PersistenceClient"
+                ref="kustvakt_db"/>
+    </bean>
+
+    <util:list id="kustvakt_userdata"
+               value-type="de.ids_mannheim.korap.interfaces.db.UserdataDbIface">
+        <ref bean="userdata_details"/>
+        <ref bean="userdata_settings"/>
+    </util:list>
+
 
     <!-- specify type for constructor argument -->
     <bean id="kustvakt_authenticationmanager"
@@ -186,8 +209,9 @@
         <constructor-arg
                 type="de.ids_mannheim.korap.interfaces.db.AuditingIface"
                 ref="kustvakt_auditing"/>
+        <constructor-arg ref="kustvakt_userdata"/>
         <!-- inject authentication providers to use -->
-        <property name="providers" ref="auth_providers"/>
+        <property name="providers" ref="kustvakt_authproviders"/>
     </bean>
 
     <!-- todo: if db interfaces not loaded via spring, does transaction even work then? -->

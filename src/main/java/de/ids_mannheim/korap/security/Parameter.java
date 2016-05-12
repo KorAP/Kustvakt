@@ -6,9 +6,8 @@ import lombok.Getter;
 
 /**
  * @author hanl@ids-mannheim.de
- * @date 09/11/13
+ * @date 09/11/14
  */
-//todo:
 @Getter
 public class Parameter extends KustvaktResource {
 

@@ -123,10 +123,6 @@ public abstract class User implements Serializable {
         return true;
     }
 
-    public boolean isDemo() {
-        return this.getUsername().equalsIgnoreCase(DemoUser.DEMOUSER_NAME);
-    }
-
     public boolean isAdmin() {
         return this.getUsername().equals(ADMINISTRATOR_ID);
     }

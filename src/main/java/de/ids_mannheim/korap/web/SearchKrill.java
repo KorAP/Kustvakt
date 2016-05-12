@@ -45,7 +45,7 @@ public class SearchKrill {
                 if (!f.exists()) {
                     KustvaktLogger.ERROR_LOGGER.error("Index not found!");
                     System.exit(-1);
-                };
+                }
                 this.index = new KrillIndex(new MMapDirectory(Paths.get(path)));
             };
         } catch (IOException e) {

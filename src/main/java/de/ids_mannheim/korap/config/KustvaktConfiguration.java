@@ -29,7 +29,7 @@ public class KustvaktConfiguration {
     public static final Map<String, Object> KUSTVAKT_USER = new HashMap<>();
 
     static {
-        KUSTVAKT_USER.put(Attributes.ID, 1);
+        KUSTVAKT_USER.put(Attributes.ID, 1000);
         KUSTVAKT_USER.put(Attributes.USERNAME, "kustvakt");
         KUSTVAKT_USER.put(Attributes.PASSWORD, "kustvakt2015");
         KUSTVAKT_USER.put(Attributes.EMAIL, "kustvakt@ids-mannheim.de");
@@ -95,20 +95,7 @@ public class KustvaktConfiguration {
             throws MalformedURLException {
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));
         returnhits = new Integer(properties.getProperty("returnhits", "50000"));
-        //todo: refactor to krill.indexDir
         indexDir = properties.getProperty("krill.indexDir", "");
-        //        URL url = KustvaktConfiguration.class.getClassLoader()
-        //                .getResource(idir);
-        //        System.out.println("LOADING FILE FROM CLASSPATH? " + url);
-        //        if (!new File(idir).exists() && url != null) {
-        //            indexDir = url.getFile();
-        //        }else
-        //            indexDir = idir;
-        //
-        //        System.out.println(
-        //                "---------------------------------------------------------------");
-        //        System.out.println("INDEX DIR IS: " + indexDir);
-        //        System.out.println("FILE EXISTS? " + new File(indexDir).exists());
         port = new Integer(properties.getProperty("server.port", "8095"));
         // server options
         serverHost = String

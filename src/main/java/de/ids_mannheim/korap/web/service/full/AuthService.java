@@ -2,7 +2,7 @@ package de.ids_mannheim.korap.web.service.full;
 
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ResourceFilters;
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
@@ -10,7 +10,7 @@ import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.user.*;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
-import de.ids_mannheim.korap.utils.ServiceVersion;
+import de.ids_mannheim.korap.utils.ServiceInfo;
 import de.ids_mannheim.korap.web.KustvaktServer;
 import de.ids_mannheim.korap.web.filter.AuthFilter;
 import de.ids_mannheim.korap.web.filter.DefaultFilter;
@@ -44,7 +44,7 @@ public class AuthService {
     //    private SendMail mail;
 
     public AuthService() {
-        this.controller = BeanConfiguration.getBeans()
+        this.controller = BeansFactory.getKustvaktContext()
                 .getAuthenticationManager();
         //todo: replace with real property values
         //        this.mail = new SendMail(ExtConfiguration.getMailProperties());
@@ -63,10 +63,10 @@ public class AuthService {
     public Response bootstrap() {
         Map m = new HashMap();
 //        m.put("settings", new UserSettings().toObjectMap());
-        m.put("ql", BeanConfiguration.getBeans().getConfiguration()
+        m.put("ql", BeansFactory.getKustvaktContext().getConfiguration()
                 .getQueryLanguages());
         m.put("SortTypes", null); // types of sorting that are supported!
-        m.put("version", ServiceVersion.getAPIVersion());
+        m.put("version", ServiceInfo.getInfo().getVersion());
         return Response.ok(JsonUtils.toJSON(m)).build();
     }
 

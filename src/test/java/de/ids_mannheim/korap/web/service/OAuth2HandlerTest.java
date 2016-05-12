@@ -1,15 +1,14 @@
 package de.ids_mannheim.korap.web.service;
 
 import de.ids_mannheim.korap.config.AuthCodeInfo;
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.ClientInfo;
-import de.ids_mannheim.korap.config.TestHelper;
+import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.OAuth2Handler;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.user.TokenContext;
-import de.ids_mannheim.korap.user.User;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -19,48 +18,50 @@ import org.junit.Test;
  * @date 13/05/2015
  */
 
-public class OAuth2HandlerTest {
+public class OAuth2HandlerTest extends BeanConfigTest {
 
     private static ClientInfo info;
-    private static OAuth2Handler handler;
-    private static EncryptionIface crypto;
+
     private static final String SCOPES = "search preferences queries account";
-    private static User user;
 
     @BeforeClass
-    public static void setup() throws KustvaktException {
-        BeanConfiguration.loadClasspathContext("default-config.xml");
-        handler = new OAuth2Handler(
-                BeanConfiguration.getBeans().getPersistenceClient());
-        crypto = BeanConfiguration.getBeans().getEncryption();
-        info = new ClientInfo(crypto.createID(), crypto.createToken());
-        info.setConfidential(true);
-        //todo: support for subdomains?!
-        info.setUrl("http://localhost:8080/api/v0.1");
-        info.setRedirect_uri("testwebsite/login");
-
-        TestHelper.setupAccount();
-        user = TestHelper.getUser();
-        handler.registerClient(info, user);
+    public static void setup() throws Exception {
+        //        BeanConfiguration.loadClasspathContext("default-config.xml");
+        //        handler = new OAuth2Handler(
+        //                BeanConfiguration.getKustvaktContext().getPersistenceClient());
+        //        crypto = BeanConfiguration.getKustvaktContext().getEncryption();
+//        info = new ClientInfo(crypto.createID(), crypto.createToken());
+        //        info.setConfidential(true);
+        //        //todo: support for subdomains?!
+        //        info.setUrl("http://localhost:8080/api/v0.1");
+        //        info.setRedirect_uri("testwebsite/login");
+        //
+        //        helper = TestHelper.newInstance();
+        //        helper.setupAccount();
+        //        PersistenceClient cl = helper.getBean(ContextHolder.KUSTVAKT_DB);
+        //        handler = new OAuth2Handler(cl);
+        //        handler.registerClient(info, helper.getUser());
+        //        crypto = helper.getBean(ContextHolder.KUSTVAKT_ENCRYPTION);
     }
 
-    @AfterClass
-    public static void drop() throws KustvaktException {
-        assert handler != null;
-        handler.removeClient(info, user);
-        TestHelper.dropUser();
-        BeanConfiguration.closeApplication();
-    }
+    //    @AfterClass
+    //    public static void drop() throws KustvaktException {
+    //        assert handler != null;
+    //        handler.removeClient(info, helper().getUser());
+    //        helper().dropUser();
+    //        BeansFactory.closeApplication();
+    //    }
 
     @Test
     public void testStoreAuthorizationCodeThrowsNoException()
             throws KustvaktException {
-        String auth_code = crypto.createToken();
+        String auth_code = helper().getContext().getEncryption().createToken();
         AuthCodeInfo codeInfo = new AuthCodeInfo(info.getClient_id(),
                 auth_code);
         codeInfo.setScopes(SCOPES);
 
-        handler.authorize(codeInfo, user);
+        OAuth2Handler handler = new OAuth2Handler(helper().getContext().getPersistenceClient());
+        handler.authorize(codeInfo, helper().getUser());
         codeInfo = handler.getAuthorization(auth_code);
         Assert.assertNotNull("client is null!", codeInfo);
     }
@@ -68,14 +69,15 @@ public class OAuth2HandlerTest {
     @Test
     public void testAuthorizationCodeRemoveThrowsNoException()
             throws KustvaktException {
-        String auth_code = crypto.createToken();
+        String auth_code = helper().getContext().getEncryption().createToken();
         AuthCodeInfo codeInfo = new AuthCodeInfo(info.getClient_id(),
                 auth_code);
         codeInfo.setScopes(SCOPES);
 
-        handler.authorize(codeInfo, user);
-        String t = crypto.createToken();
-        String refresh = crypto.createToken();
+        OAuth2Handler handler = new OAuth2Handler(helper().getContext().getPersistenceClient());
+        handler.authorize(codeInfo, helper().getUser());
+        String t = helper().getContext().getEncryption().createToken();
+        String refresh = helper().getContext().getEncryption().createToken();
         handler.addToken(codeInfo.getCode(), t, refresh, 7200);
 
         TokenContext ctx = handler.getContext(t);
@@ -92,7 +94,7 @@ public class OAuth2HandlerTest {
 
     @Test
     public void testStoreAccessCodeViaAuthCodeThrowsNoException() {
-        String auth_code = crypto.createToken();
+        String auth_code = helper().getContext().getEncryption().createToken();
         AuthCodeInfo codeInfo = new AuthCodeInfo(info.getClient_id(),
                 auth_code);
         codeInfo.setScopes(SCOPES);
@@ -118,5 +120,20 @@ public class OAuth2HandlerTest {
     @Test
     public void testAccessTokenExpired() {
 
+    }
+
+    @Override
+    public void initMethod() throws KustvaktException {
+        helper().setupAccount();
+
+        EncryptionIface crypto = helper().getContext().getEncryption();
+        info = new ClientInfo(crypto.createID(), crypto.createToken());
+        info.setConfidential(true);
+        //todo: support for subdomains?!
+        info.setUrl("http://localhost:8080/api/v0.1");
+        info.setRedirect_uri("testwebsite/login");
+        PersistenceClient cl = helper().getBean(ContextHolder.KUSTVAKT_DB);
+        OAuth2Handler handler = new OAuth2Handler(cl);
+        handler.registerClient(info, helper().getUser());
     }
 }

@@ -65,11 +65,11 @@ public class OAuthService {
 
     public OAuthService() {
         this.handler = new OAuth2Handler(
-                BeanConfiguration.getBeans().getPersistenceClient());
-        this.controller = BeanConfiguration.getBeans()
+                BeansFactory.getKustvaktContext().getPersistenceClient());
+        this.controller = BeansFactory.getKustvaktContext()
                 .getAuthenticationManager();
-        this.crypto = BeanConfiguration.getBeans().getEncryption();
-        this.config = BeanConfiguration.getBeans().getConfiguration();
+        this.crypto = BeansFactory.getKustvaktContext().getEncryption();
+        this.config = BeansFactory.getKustvaktContext().getConfiguration();
     }
 
     @POST

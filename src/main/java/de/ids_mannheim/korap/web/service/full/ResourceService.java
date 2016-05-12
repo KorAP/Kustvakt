@@ -3,7 +3,7 @@ package de.ids_mannheim.korap.web.service.full;//package de.ids_mannheim.korap.e
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.spi.container.ResourceFilters;
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -12,8 +12,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
-import de.ids_mannheim.korap.resource.rewrite.FoundryInject;
-import de.ids_mannheim.korap.resource.rewrite.RewriteHandler;
+import de.ids_mannheim.korap.resource.rewrite.*;
 import de.ids_mannheim.korap.resources.*;
 import de.ids_mannheim.korap.security.ac.ResourceFinder;
 import de.ids_mannheim.korap.security.ac.ResourceHandler;
@@ -60,17 +59,18 @@ public class ResourceService {
     private RewriteHandler processor;
 
     public ResourceService() {
-        this.controller = BeanConfiguration.getBeans()
+        this.controller = BeansFactory.getKustvaktContext()
                 .getAuthenticationManager();
-        this.config = BeanConfiguration.getBeans().getConfiguration();
+        this.config = BeansFactory.getKustvaktContext().getConfiguration();
         this.resourceHandler = new ResourceHandler();
         this.searchKrill = new SearchKrill(config.getIndexDir());
 
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
         this.graphDBhandler = new ClientsHandler(builder.build());
 
-        this.processor = new RewriteHandler(config);
-        this.processor.add(FoundryInject.class);
+        this.processor = new RewriteHandler();
+        this.processor.defaultRewriteConstraints();
+        this.processor.insertBeans(BeansFactory.getKustvaktContext());
     }
 
     /**
@@ -304,10 +304,20 @@ public class ResourceService {
         TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
         QuerySerializer ss;
         CollectionQueryBuilder3 cquery = new CollectionQueryBuilder3();
+        if (cq != null)
+            cquery.setBaseQuery(cq);
+
         User user;
         try {
             user = controller.getUser(ctx.getUsername());
-            Set<Corpus> resources = ResourceFinder.search(user, Corpus.class);
+            Set<Corpus> resources = new HashSet<>();
+
+            if (User.UserFactory.isDemo(ctx.getUsername()))
+                resources = ResourceFinder.searchPublic(Corpus.class);
+            else
+                resources = ResourceFinder.search(user, Corpus.class);
+            System.out.println("RESOURCES FOUND "+ resources);
+
             for (KustvaktResource corpus : resources)
                 cquery.addQuery("corpusID=" + corpus.getPersistentID());
         }catch (KustvaktException e) {
@@ -315,8 +325,7 @@ public class ResourceService {
         }
 
         ss = new QuerySerializer().setQuery(q, ql, v);
-        if (cq != null)
-            ss.setCollection(cq);
+        ss.setCollection(cquery.toJSON());
 
         MetaQueryBuilder meta = new MetaQueryBuilder();
         if (pageIndex != null)
@@ -347,7 +356,8 @@ public class ResourceService {
      * @param pageIndex
      * @return
      */
-    // todo: test
+
+    //todo: does cq have any sensable worth here?
     @TRACE
     @Path("{type}/{id}/search")
     public Response buildQuery(@Context Locale locale,
@@ -372,6 +382,7 @@ public class ResourceService {
         try {
             User user = controller.getUser(ctx.getUsername());
 
+            //todo: instead of throwing exception, build notification and rewrites into result query
             KustvaktResource resource;
             if (StringUtils.isInteger(id))
                 resource = this.resourceHandler
@@ -387,14 +398,10 @@ public class ResourceService {
 
         }catch (KustvaktException e) {
             KustvaktLogger.ERROR_LOGGER.error("Exception encountered!", e);
-            throw KustvaktResponseHandler.throwit(e);
+            //throw KustvaktResponseHandler.throwit(e);
         }
 
         ss = new QuerySerializer().setQuery(q, ql, v);
-
-        // todo: parse resources
-        if (cq != null)
-            ss.setCollection(cq);
 
         MetaQueryBuilder meta = new MetaQueryBuilder();
         if (pageIndex != null)
@@ -483,7 +490,7 @@ public class ResourceService {
         //        meta.addEntry("itemsPerResource", 1);
         serializer.setMeta(meta.raw());
 
-        // policy rewrite!
+        //fixme: policy rewrite!
         String query = this.processor.preProcess(serializer.toJSON(), user);
 
         jlog.info("the serialized query {}", query);
@@ -567,8 +574,6 @@ public class ResourceService {
                             .throwit(StatusCodes.ILLEGAL_ARGUMENT,
                                     "Type parameter not supported", type);
 
-                //                functions.createQuery(id, type, user, query, ql, v);
-
                 meta.addEntry("startIndex", pageIndex);
                 meta.addEntry("startPage", pageInteger);
                 meta.setSpanContext(ctx);
@@ -582,6 +587,8 @@ public class ResourceService {
                 query = s.toJSON();
                 //                PolicyParser parser = new PolicyParser(user);
                 //                query = parser.parse(s.toJSON());
+                //todo: 1
+
             }
             String result;
             try {
@@ -899,7 +906,7 @@ public class ResourceService {
                 cachetmp.setStats(JsonUtils.readSimple(stats, Map.class));
             }
 
-            if (!cache && !user.isDemo()) {
+            if (!cache && !User.UserFactory.isDemo(ctx.getUsername())) {
                 collection = ResourceFactory
                         .getPermanentCollection(cachetmp, name, description);
                 vals = collection.toMap();

@@ -1,8 +1,11 @@
-import de.ids_mannheim.korap.config.BeanConfiguration;
+package de.ids_mannheim.korap.handlers;
+
+import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.handlers.DocumentDao;
 import de.ids_mannheim.korap.resources.Document;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.List;
 
@@ -10,29 +13,13 @@ import java.util.List;
  * @author hanl
  * @date 12/11/2015
  */
-public class DocumentDaoTest {
+public class DocumentDaoTest extends BeanConfigTest {
 
     private static DocumentDao dao;
 
-    @BeforeClass
-    public static void setup() {
-        BeanConfiguration.loadClasspathContext("default-config.xml");
-        dao = new DocumentDao(
-                BeanConfiguration.getBeans().getPersistenceClient());
-    }
-
-    @AfterClass
-    public static void close() {
-        BeanConfiguration.closeApplication();
-    }
-
     @After
     public void clear() {
-        try {
-            dao.deleteAll();
-        }catch (KustvaktException e) {
-            e.printStackTrace();
-        }
+        dao.truncate();
     }
 
     @Test
@@ -108,5 +95,10 @@ public class DocumentDaoTest {
         Assert.assertNotNull(dc);
         Assert.assertNotSame("should not be empty", 0, dc.size());
         Assert.assertEquals("not all found", length, dc.size());
+    }
+
+    @Override
+    public void initMethod() throws KustvaktException {
+        dao = new DocumentDao(helper().getContext().getPersistenceClient());
     }
 }

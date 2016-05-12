@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.security.ac;
 
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.ContextHolder;
+import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
@@ -12,6 +13,7 @@ import de.ids_mannheim.korap.security.PolicyCondition;
 import de.ids_mannheim.korap.security.SecurityPolicy;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.User;
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,12 +22,13 @@ import java.util.*;
 /**
  * Created by hanl on 3/20/14.
  */
+//todo: use factory pattern to init resourcefinder
 public class ResourceFinder {
 
     private static final Logger jlog = LoggerFactory
             .getLogger(ResourceFinder.class);
     private static PolicyHandlerIface policydao;
-    private static ResourceOperationIface resourcedao;
+    private static Map<Class, ResourceOperationIface> resourcedaos = new HashMap<>();
 
     private List<KustvaktResource.Container> containers;
     private User user;
@@ -37,17 +40,18 @@ public class ResourceFinder {
 
     private ResourceFinder() {
         this.containers = new ArrayList<>();
-        checkProviders();
+        overrideProviders(null);
     }
 
-    private static void checkProviders() {
-        if (BeanConfiguration.hasContext() && policydao == null) {
-            ResourceFinder.policydao = BeanConfiguration.getBeans()
-                    .getPolicyDbProvider();
-            ResourceFinder.resourcedao = BeanConfiguration.getBeans()
-                    .getResourceProvider();
+    public static void overrideProviders(ContextHolder beans) {
+        if (beans == null)
+            beans = BeansFactory.getKustvaktContext();
+        if (policydao == null | resourcedaos == null) {
+            ResourceFinder.policydao = beans.getPolicyDbProvider();
+            for (ResourceOperationIface iface : beans.getResourceProvider())
+                resourcedaos.put(iface.type(), iface);
         }
-        if (policydao == null | resourcedao == null)
+        if (policydao == null | resourcedaos.isEmpty())
             throw new RuntimeException("provider not set!");
     }
 
@@ -71,8 +75,8 @@ public class ResourceFinder {
     }
 
     //todo: needs to be much faster!
-    public static <T extends KustvaktResource> ResourceFinder init(User user,
-            Class<T> clazz) throws KustvaktException {
+    public static <T extends KustvaktResource> ResourceFinder init(
+            @NonNull User user, Class<T> clazz) throws KustvaktException {
         return init(null, true, user, clazz, Permissions.Permission.READ);
     }
 
@@ -85,15 +89,25 @@ public class ResourceFinder {
 
     public static <T extends KustvaktResource> Set<T> searchPublic(
             Class<T> clazz) throws KustvaktException {
-        checkProviders();
+        return searchPublicFiltered(clazz);
+    }
+
+    public static <T extends KustvaktResource> Set<T> searchPublicFiltered(
+            Class<T> clazz, String ...ids) throws KustvaktException {
+        overrideProviders(null);
         Set<T> sets = new HashSet<>();
         List<SecurityPolicy> policies = policydao
                 .getPolicies(new PolicyCondition(Attributes.PUBLIC_GROUP),
                         clazz, Permissions.Permission.READ.toByte());
 
-        for (SecurityPolicy policy : policies)
-            sets.add((T) resourcedao.findbyId(policy.getTarget(),
-                    User.UserFactory.getDemoUser()));
+        List<String> id_set = Arrays.asList(ids);
+        for (SecurityPolicy policy : policies) {
+            T r = (T) resourcedaos.get(KustvaktResource.class)
+                    .findbyId(policy.getTarget(),
+                            User.UserFactory.getDemoUser());
+            if (id_set.isEmpty() || id_set.contains(r.getPersistentID()))
+                sets.add(r);
+        }
         return sets;
     }
 
@@ -123,10 +137,8 @@ public class ResourceFinder {
         Set<T> resources = new HashSet<>();
         if (this.containers != null) {
             for (KustvaktResource.Container c : this.containers) {
-                ResourceOperationIface<T> iface = BeanConfiguration.getBeans()
-                        .getResourceProvider();
                 try {
-                    T resource = (T) iface
+                    T resource = (T) resourcedaos.get(KustvaktResource.class)
                             .findbyId(c.getPersistentID(), this.user);
                     if (resource != null) {
                         PolicyEvaluator e = PolicyEvaluator

@@ -10,7 +10,7 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.*;
@@ -40,7 +40,7 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
     private AuthenticationManagerIface controller;
 
     public PiwikFilter() {
-        controller = BeanConfiguration.getBeans().getAuthenticationManager();
+        controller = BeansFactory.getKustvaktContext().getAuthenticationManager();
         ClientConfig config = new DefaultClientConfig();
         Client client = Client.create(config);
         if (jlog.isDebugEnabled())

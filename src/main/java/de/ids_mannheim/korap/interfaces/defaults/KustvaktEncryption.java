@@ -283,7 +283,8 @@ public class KustvaktEncryption implements EncryptionIface {
 
     // todo: where applied?
     @Override
-    public Map<String, Object> validateMap(Map<String, Object> map) throws KustvaktException {
+    public Map<String, Object> validateMap(Map<String, Object> map)
+            throws KustvaktException {
         Map<String, Object> safeMap = new HashMap<>();
         KustvaktMap kmap = new KustvaktMap(map);
 
@@ -371,12 +372,11 @@ public class KustvaktEncryption implements EncryptionIface {
                     config.getValidationStringLength(), nullable);
         }catch (ValidationException ex) {
             jlog.error("Validation failed! Value '{}' with type '{}'",
-                    new Object[] { input, type, ex.getMessage() });
+                    new Object[] { input, type });
             throw new KustvaktException(StatusCodes.PARAMETER_VALIDATION_ERROR,
                     "invalid value of type " + type, input);
         }
     }
-
 
     public void validate(Object instance) throws KustvaktException {
         if (instance == null)

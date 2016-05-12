@@ -18,6 +18,7 @@ import java.util.Set;
  * Date: 10/9/13
  * Time: 11:20 AM
  */
+@Deprecated
 public class BeanConfiguration {
 
     private static final String CONFIG_FILE = "light-config.xml";

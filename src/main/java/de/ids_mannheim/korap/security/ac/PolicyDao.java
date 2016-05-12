@@ -79,10 +79,10 @@ public class PolicyDao implements PolicyHandlerIface {
         MapSqlParameterSource np = new MapSqlParameterSource();
         np.addValue("target", policy.getTarget());
         if (policy.getContext().getEnd() != 0L)
-            np.addValue("exp", new Timestamp(policy.getContext().getEnd()));
+            np.addValue("exp", policy.getContext().getEnd());
         else
             np.addValue("exp", null);
-        np.addValue("en", new Timestamp(policy.getContext().getStart()));
+        np.addValue("en", policy.getContext().getStart());
         np.addValue("posix", policy.getPermissionByte());
         np.addValue("cr", new Timestamp(TimeUtils.getNow().getMillis()));
         np.addValue("creator", user.getId());
@@ -95,6 +95,7 @@ public class PolicyDao implements PolicyHandlerIface {
             this.mapConstraints(policy);
             return policy.getID();
         }catch (DataAccessException e) {
+            e.printStackTrace();
             jlog.error("Operation (INSERT) not possible for '{}' for user '{}'",
                     policy.toString(), user.getId());
             throw new dbException(user.getId(), "policy_store",
@@ -146,6 +147,7 @@ public class PolicyDao implements PolicyHandlerIface {
             }
             policy.clear();
         }catch (DataAccessException e) {
+            e.printStackTrace();
             jlog.error(
                     "Operation (MAPPING POLICY CONDITIONS) not possible for '{}' for user '{}'",
                     policy.toString(), policy.getCreator());
@@ -249,7 +251,6 @@ public class PolicyDao implements PolicyHandlerIface {
         param.addValue("perm", perm);
         param.addValue("type", ResourceFactory.getResourceMapping(clazz));
         param.addValue("en", new Timestamp(TimeUtils.getNow().getMillis()));
-
         String sql_new = "select pv.*, pv.perm & :perm as allowed, " +
                 "rh.depth, (select max(depth) from resource_tree " +
                 "where child_id=rh.child_id) as max_depth from policy_view as pv "
@@ -258,7 +259,7 @@ public class PolicyDao implements PolicyHandlerIface {
                 "where " +
                 "pv.enable <= :en and (pv.expire > :en or pv.expire is NULL) and "
                 +
-                "pv.group_id=:cond and pv.typeand " +
+                "pv.group_id=:cond and pv.type=:type and " +
                 "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
                 +
                 "(select sum(distinct res.depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id=:cond)"
@@ -276,8 +277,7 @@ public class PolicyDao implements PolicyHandlerIface {
                         }
                     });
         }catch (DataAccessException e) {
-            e.printStackTrace();
-            jlog.error("Permission Denied for policy retrieval for '{}'",
+            jlog.error("Permission Denied: policy retrieval for '{}'",
                     condition.getSpecifier());
             return Collections.emptyList();
         }
@@ -308,7 +308,6 @@ public class PolicyDao implements PolicyHandlerIface {
                 "(select sum(distinct res.depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id in (select g.group_id from group_users "
                 +
                 "as g where g.user_id=:userid) or pos.group_id='self') and res.child_id=rh.child_id group by child_id)";
-
         try {
             return this.jdbcTemplate.query(sql_new, param,
                     new ResultSetExtractor<List<SecurityPolicy>[]>() {
@@ -316,12 +315,14 @@ public class PolicyDao implements PolicyHandlerIface {
                         @Override
                         public List<SecurityPolicy>[] extractData(ResultSet rs)
                                 throws SQLException, DataAccessException {
-                            return SecurityRowMappers.mapResourcePolicies(rs);
+                            List<SecurityPolicy>[] pol = SecurityRowMappers
+                                    .mapResourcePolicies(rs);
+                            return pol;
                         }
                     });
         }catch (DataAccessException e) {
             jlog.error(
-                    "Permission Denied for policy retrieval for '{}' for user '{}'",
+                    "Permission Denied: policy retrieval for '{}' for user '{}'",
                     target, user.getId());
             return new List[2];
         }

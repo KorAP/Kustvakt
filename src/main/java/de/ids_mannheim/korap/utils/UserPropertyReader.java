@@ -1,10 +1,11 @@
 package de.ids_mannheim.korap.utils;
 
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
+import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.user.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +32,8 @@ public class UserPropertyReader extends PropertyReader {
 
     public UserPropertyReader(String path) {
         this.path = path;
-        this.iface = BeanConfiguration.getBeans().getUserDBHandler();
-        this.crypto = BeanConfiguration.getBeans().getEncryption();
+        this.iface = BeansFactory.getKustvaktContext().getUserDBHandler();
+        this.crypto = BeansFactory.getKustvaktContext().getEncryption();
     }
 
     @Override
@@ -100,13 +101,18 @@ public class UserPropertyReader extends PropertyReader {
             UserDetails det = new UserDetails(user.getId());
             det.readDefaults(vals);
             det.validate(crypto);
-            UserdataFactory.getDaoInstance(det.getClass()).store(det);
 
             Userdata set = new UserSettings(user.getId());
             set.readDefaults(vals);
             set.validate(crypto);
-            UserdataFactory.getDaoInstance(set.getClass()).store(set);
 
+            UserDataDbIface dao = BeansFactory.getTypeFactory()
+                    .getTypedBean(BeansFactory.getKustvaktContext().getUserDataDaos(), UserDetails.class);
+            dao.store(det);
+
+            dao = BeansFactory.getTypeFactory()
+                    .getTypedBean(BeansFactory.getKustvaktContext().getUserDataDaos(), UserSettings.class);
+            dao.store(set);
         }
 
         jlog.info("successfully created account for user {}",

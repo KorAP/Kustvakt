@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.security.auth;
 
 import de.ids_mannheim.korap.auditing.AuditRecord;
+import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.exceptions.*;
@@ -23,6 +24,7 @@ import org.springframework.cache.annotation.CachePut;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -40,18 +42,20 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     private EntityHandlerIface entHandler;
     private AuditingIface auditing;
     private KustvaktConfiguration config;
-    private final LoginCounter counter;
+    private Collection userdatadaos;
+    private LoginCounter counter;
     private Cache user_cache;
 
     public KustvaktAuthenticationManager(EntityHandlerIface userdb,
             EncryptionIface crypto, KustvaktConfiguration config,
-            AuditingIface auditer) {
+            AuditingIface auditer, Collection<UserDataDbIface> userdatadaos) {
+        this.user_cache = CacheManager.getInstance().getCache("users");
         this.entHandler = userdb;
         this.config = config;
         this.crypto = crypto;
         this.auditing = auditer;
         this.counter = new LoginCounter(config);
-        this.user_cache = CacheManager.getInstance().getCache("users");
+        this.userdatadaos = userdatadaos;
     }
 
     /**
@@ -485,8 +489,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         }
 
         KorAPUser user = User.UserFactory.getUser(username);
-        user.setAccountLocked(confirmation_required);
+        Object id = attributes.get(Attributes.ID);
+        if (id != null && id instanceof Integer)
+            user.setId((Integer) id);
 
+        user.setAccountLocked(confirmation_required);
         if (confirmation_required) {
             URIParam param = new URIParam(crypto.createToken(),
                     TimeUtils.plusSeconds(config.getExpiration()).getMillis());
@@ -505,10 +512,15 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             settings.readDefaults(safeMap);
             settings.checkRequired();
 
-            UserdataFactory.getDaoInstance(UserDetails.class).store(details);
-            UserdataFactory.getDaoInstance(UserSettings.class).store(settings);
+            UserDataDbIface dao = BeansFactory.getTypeFactory()
+                    .getTypedBean(userdatadaos, UserDetails.class);
+            assert dao != null;
+            dao.store(details);
+            dao = BeansFactory.getTypeFactory()
+                    .getTypedBean(userdatadaos, UserSettings.class);
+            assert dao != null;
+            dao.store(settings);
         }catch (KustvaktException e) {
-            e.printStackTrace();
             throw new WrappedException(e, StatusCodes.CREATE_ACCOUNT_FAILED,
                     user.toString());
         }
@@ -538,12 +550,19 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         d.readDefaults(attributes);
         d.checkRequired();
 
-        UserdataFactory.getDaoInstance(d.getClass()).store(d);
+        UserDataDbIface dao = BeansFactory.getTypeFactory()
+                .getTypedBean(userdatadaos, UserDetails.class);
+        assert dao != null;
+        dao.store(d);
 
         UserSettings s = new UserSettings(user.getId());
         s.readDefaults(attributes);
         s.checkRequired();
-        UserdataFactory.getDaoInstance(s.getClass()).store(s);
+
+        dao = BeansFactory.getTypeFactory()
+                .getTypedBean(userdatadaos, UserSettings.class);
+        assert dao != null;
+        dao.store(d);
 
         return user;
     }
@@ -681,13 +700,16 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             throws WrappedException {
 
         try {
-            UserDataDbIface<T> dao = UserdataFactory.getDaoInstance(clazz);
-            T data = dao.get(user);
+            UserDataDbIface<T> dao = BeansFactory.getTypeFactory()
+                    .getTypedBean(BeansFactory.getKustvaktContext().getUserDataDaos(), clazz);
+            T data = null;
+            if (dao != null)
+                data = dao.get(user);
+
             if (data == null)
                 throw new WrappedException(user.getId(),
-                        StatusCodes.EMPTY_RESULTS, clazz.getSimpleName());
-
-            return data;
+                            StatusCodes.EMPTY_RESULTS, clazz.getSimpleName());
+                return data;
         }catch (KustvaktException e) {
             jlog.error("Error ", e);
             throw new WrappedException(e, StatusCodes.GET_ACCOUNT_FAILED);
@@ -698,10 +720,12 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     @Override
     public void updateUserData(Userdata data) throws WrappedException {
         try {
+
             data.validate(this.crypto);
-            UserDataDbIface dao = UserdataFactory
-                    .getDaoInstance(data.getClass());
-            dao.update(data);
+            UserDataDbIface dao = BeansFactory.getTypeFactory()
+                    .getTypedBean(BeansFactory.getKustvaktContext().getUserDataDaos(), data.getClass());
+            if (dao != null)
+                dao.update(data);
         }catch (KustvaktException e) {
             jlog.error("Error ", e);
             throw new WrappedException(e, StatusCodes.UPDATE_ACCOUNT_FAILED);

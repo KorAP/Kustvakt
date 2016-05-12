@@ -1,52 +1,45 @@
 package de.ids_mannheim.korap.config;
 
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.handlers.JDBCAuditing;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
-import de.ids_mannheim.korap.interfaces.defaults.DefaultAuditing;
-import org.junit.After;
-import org.junit.Assert;
+import de.ids_mannheim.korap.security.auth.KustvaktAuthenticationManager;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author hanl
  * @date 27/07/2015
  */
-public class ClassLoaderTest {
-
-    @After
-    public void close() {
-        BeanConfiguration.closeApplication();
-    }    
-
-    @Test
-    public void testBeanConfigurationLoaderThrowsNoException() {
-        BeanConfiguration.loadClasspathContext("default-config.xml");
-        assert BeanConfiguration.hasContext();
-    }
+public class ClassLoaderTest extends BeanConfigTest {
 
     @Test
     public void testDefaultCreationThrowsNoException() {
         DefaultHandler pl = new DefaultHandler();
-        Object o = pl.getDefault(BeanConfiguration.KUSTVAKT_AUDITING);
-        assert o != null;
-        assert o instanceof AuditingIface;
+        Object o = pl.getDefault(ContextHolder.KUSTVAKT_AUDITING);
+        assertNotNull(o);
+        assertTrue(o instanceof AuditingIface);
     }
 
     @Test
-    public void testDefaultCreationThrowsException() {
-        BeanConfiguration.loadClasspathContext();
-        AuthenticationManagerIface iface = BeanConfiguration.getBeans()
+    public void testDefaultCreation2ThrowsNoException() {
+        AuthenticationManagerIface iface = helper().getContext()
                 .getAuthenticationManager();
-        Assert.assertNull("default should be null", iface);
+        assertNotNull(iface);
+        assertTrue(iface instanceof KustvaktAuthenticationManager);
     }
 
     @Test
     public void testDefaultInterfaceMatchThrowsNoException() {
-        BeanConfiguration.loadClasspathContext();
-        AuditingIface iface = BeanConfiguration.getBeans()
-                .getAuditingProvider();
-        assert iface != null;
-        assert iface instanceof DefaultAuditing;
+        AuditingIface iface = helper().getContext().getAuditingProvider();
+        assertNotNull(iface);
+        assertTrue(iface instanceof JDBCAuditing);
     }
 
+    @Override
+    public void initMethod() throws KustvaktException {
+    }
 }

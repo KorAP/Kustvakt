@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.interfaces.defaults;
 
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.Configurable;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
@@ -16,7 +16,7 @@ import java.util.Map;
  * @author hanl
  * @date 05/06/2015
  */
-@Configurable(BeanConfiguration.KUSTVAKT_ENCRYPTION)
+@Configurable(ContextHolder.KUSTVAKT_ENCRYPTION)
 public class DefaultEncryption implements EncryptionIface {
 
     private SecureRandom randomizer;

@@ -2,7 +2,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.CollectionQueryBuilder3;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author hanl
@@ -17,10 +21,9 @@ public class CollectionQueryBuilderTest {
 
         JsonNode node = JsonUtils.readTree(b.toJSON());
 
-        assert node != null;
-        assert node.at("/collection/@type").asText().equals("koral:doc");
-        assert node.at("/collection/key").asText().equals("corpusID");
-
+        assertNotNull(node);
+        assertEquals("koral:doc",node.at("/collection/@type").asText());
+        assertEquals("corpusID",node.at("/collection/key").asText());
     }
 
     @Test
@@ -29,14 +32,12 @@ public class CollectionQueryBuilderTest {
         b.addQuery("corpusID=WPD & textClass=freizeit");
         JsonNode node = JsonUtils.readTree(b.toJSON());
 
-        assert node != null;
-        assert node.at("/collection/@type").asText().equals("koral:docGroup");
-        assert node.at("/collection/operation").asText()
-                .equals("operation:and");
-        assert node.at("/collection/operands/0/key").asText()
-                .equals("corpusID");
-        assert node.at("/collection/operands/1/key").asText()
-                .equals("textClass");
+        assertNotNull(node);
+        assertEquals("koral:docGroup",node.at("/collection/@type").asText());
+        assertEquals("operation:and",node.at("/collection/operation").asText());
+
+        assertEquals("corpusID",node.at("/collection/operands/0/key").asText());
+        assertEquals("textClass",node.at("/collection/operands/1/key").asText());
     }
 
     @Test

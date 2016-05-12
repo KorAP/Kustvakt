@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.resource.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import de.ids_mannheim.korap.config.BeanInjectable;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.user.User;
 
@@ -8,7 +9,8 @@ import de.ids_mannheim.korap.user.User;
  * @author hanl
  * @date 04/07/2015
  */
-public class MetaConstraint implements RewriteTask.RewriteNodeAt {
+public class MetaConstraint
+        implements RewriteTask.RewriteNodeAt {
 
 
     @Override
@@ -33,4 +35,5 @@ public class MetaConstraint implements RewriteTask.RewriteNodeAt {
     public String at() {
         return "/meta";
     }
+
 }

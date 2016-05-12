@@ -11,6 +11,7 @@ import com.sun.jersey.test.framework.spi.container.TestContainer;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
 import com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory;
 import com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory;
+import de.ids_mannheim.korap.config.BeanConfigTest;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -23,7 +24,7 @@ import java.net.URI;
  * @author hanl
  * @date 29/07/2015
  */
-public abstract class FastJerseyTest {
+public abstract class FastJerseyTest extends BeanConfigTest {
 
     private final static String API_VERSION = "v0.1";
 

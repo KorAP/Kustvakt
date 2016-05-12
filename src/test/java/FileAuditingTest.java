@@ -1,9 +1,8 @@
 import de.ids_mannheim.korap.auditing.AuditRecord;
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.BeanConfigTest;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import org.joda.time.LocalDate;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Date;
@@ -13,16 +12,11 @@ import java.util.Date;
  * @date 27/07/2015
  */
 //todo: test audit commit in thread and that no concurrency issue arrises
-public class FileAuditingTest {
+public class FileAuditingTest extends BeanConfigTest {
 
-    @BeforeClass
-    public static void init() {
-        BeanConfiguration.loadClasspathContext();
-    }
+    @Override
+    public void initMethod() throws KustvaktException {
 
-    @AfterClass
-    public static void finish() {
-        BeanConfiguration.closeApplication();
     }
 
     @Test
@@ -31,13 +25,13 @@ public class FileAuditingTest {
             AuditRecord record = AuditRecord
                     .serviceRecord("MichaelHanl", StatusCodes.ILLEGAL_ARGUMENT,
                             String.valueOf(i), "string value");
-            BeanConfiguration.getBeans().getAuditingProvider().audit(record);
+            helper().getContext().getAuditingProvider().audit(record);
         }
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void testRetrieval() {
-        BeanConfiguration.getBeans().getAuditingProvider()
+        helper().getContext().getAuditingProvider()
                 .retrieveRecords(new LocalDate(new Date().getTime()), 10);
     }
 

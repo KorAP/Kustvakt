@@ -53,7 +53,7 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
             user = this.jdbcTemplate.queryForObject(sql, namedParameters,
                     new RowMapperFactory.UserMapper());
         }catch (EmptyResultDataAccessException ae) {
-            jlog.error("No user found for name '{}'", username);
+            jlog.warn("No user found for name '{}'", username);
             throw new EmptyResultException(username);
         }catch (DataAccessException e) {
             jlog.error("Could not retrieve user for name: " + username, e);
@@ -139,7 +139,6 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
             np.addValue("acr", System.currentTimeMillis());
             np.addValue("id", k.getId());
 
-            System.out.println("query map " + np.getValues());
             if (user.getId() != -1)
                 query = "INSERT INTO korap_users (id, username, account_lock, "
                         +
@@ -226,6 +225,16 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
                     StatusCodes.DB_DELETE_FAILED, userid.toString());
         }
 
+    }
+
+    @Override
+    public int truncate() {
+        String sql = "DELETE FROM korap_users;";
+        try {
+            return this.jdbcTemplate.update(sql, new HashMap<String, Object>());
+        }catch (DataAccessException e) {
+            return -1;
+        }
     }
 
     @Override

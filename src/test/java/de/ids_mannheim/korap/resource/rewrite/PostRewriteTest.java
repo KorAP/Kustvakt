@@ -1,80 +1,82 @@
+package de.ids_mannheim.korap.resource.rewrite;
+
 import com.fasterxml.jackson.databind.JsonNode;
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.DocumentDao;
-import de.ids_mannheim.korap.resource.rewrite.DocMatchRewrite;
-import de.ids_mannheim.korap.resource.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.resources.Document;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import net.sf.ehcache.CacheManager;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * @author hanl
  * @date 12/11/2015
  */
 //fixme: tests only work with singleconnection data sources
-public class PostRewriteTest {
+// todo: logging!
+public class PostRewriteTest extends BeanConfigTest {
 
-    @BeforeClass
-    public static void setup() {
-        BeanConfiguration.loadClasspathContext("default-config.xml");
-    }
+    @Override
+    public void initMethod() throws KustvaktException {
 
-    @AfterClass
-    public static void close() {
-        BeanConfiguration.closeApplication();
     }
 
     // otherwise cache will maintain values not relevant for other tests
     @Before
     public void before() {
         CacheManager.getInstance().getCache("documents").removeAll();
+        DocumentDao dao = new DocumentDao(
+                helper().getContext().getPersistenceClient());
+        dao.truncate();
     }
 
     @Test
-    public void testPostRewriteNothingToDo() {
-        RewriteHandler ha = new RewriteHandler(null);
-        Assert.assertEquals("Handler could not be added to rewriter instance!",
-                true, ha.add(DocMatchRewrite.class));
+    public void testPostRewriteNothingToDo() throws KustvaktException {
+        RewriteHandler ha = new RewriteHandler();
+        ha.insertBeans(helper().getContext());
+        assertEquals("Handler could not be added to rewriter instance!", true,
+                ha.add(DocMatchRewrite.class));
 
         DocumentDao dao = new DocumentDao(
-                BeanConfiguration.getBeans().getPersistenceClient());
+                helper().getContext().getPersistenceClient());
         try {
             Document d = dao.findbyId("BRZ13_APR.00014", null);
-            Assert.assertNull(d);
-        }catch (KustvaktException e) {
+            assertNull(d);
+            String v = ha.postProcess(RESULT, null);
+            assertEquals("results do not match", JsonUtils.readTree(RESULT),
+                    JsonUtils.readTree(v));
+        }catch (Exception e) {
             e.printStackTrace();
         }
-
-        String v = ha.postProcess(RESULT, null);
-        Assert.assertEquals("results do not match", JsonUtils.readTree(RESULT),
-                JsonUtils.readTree(v));
     }
 
     @Test
     public void testPostRewriteRemoveDoc() {
         DocumentDao dao = new DocumentDao(
-                BeanConfiguration.getBeans().getPersistenceClient());
+                helper().getContext().getPersistenceClient());
 
         Document doc = new Document("BRZ13_APR.00014");
         doc.setDisabled(true);
         try {
             dao.storeResource(doc, null);
         }catch (KustvaktException e) {
-            e.printStackTrace();
             return;
         }
 
-        RewriteHandler ha = new RewriteHandler(null);
-        Assert.assertEquals("Handler could not be added to rewriter instance!",
-                true, ha.add(DocMatchRewrite.class));
+        RewriteHandler ha = new RewriteHandler();
+        ha.insertBeans(helper().getContext());
+        assertEquals("Handler could not be added to rewriter instance!", true,
+                ha.add(DocMatchRewrite.class));
 
         String v = ha.postProcess(RESULT, null);
 
         JsonNode node = JsonUtils.readTree(v);
 
-        Assert.assertNotEquals("Wrong DocID", "BRZ13_APR.00014",
+        assertNotEquals("Wrong DocID", "BRZ13_APR.00014",
                 node.at("/matches/1/docID"));
 
         try {

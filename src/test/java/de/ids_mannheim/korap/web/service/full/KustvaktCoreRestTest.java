@@ -1,12 +1,11 @@
 package de.ids_mannheim.korap.web.service.full;
 
 import com.sun.jersey.api.client.ClientResponse;
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -22,15 +21,9 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
 
     @BeforeClass
     public static void configure() {
-        BeanConfiguration.loadClasspathContext();
         FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.light",
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");
-    }
-
-    @AfterClass
-    public static void close() {
-        BeanConfiguration.closeApplication();
     }
 
     //    @Test
@@ -113,4 +106,8 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
         System.out.println("RESPONSE " + response.getEntity(String.class));
     }
 
+    @Override
+    public void initMethod() throws KustvaktException {
+        helper().setupAccount();
+    }
 }

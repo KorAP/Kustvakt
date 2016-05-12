@@ -58,6 +58,7 @@ public class UserDetailsDao implements UserDataDbIface<UserDetails> {
         try {
             return this.jdbcTemplate.update(sql, source);
         }catch (DataAccessException e) {
+            e.printStackTrace();
             return -1;
         }
     }

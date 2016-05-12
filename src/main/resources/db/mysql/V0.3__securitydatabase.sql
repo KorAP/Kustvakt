@@ -111,25 +111,4 @@ aud_timestamp TIMESTAMP,
 aud_failure VARCHAR(100)
 );
 
-
--- indices
-create trigger delete_policy after delete on resource_store
-for each row delete from policy_store where target_id=OLD.id;
-
-DELIMITER //
-CREATE TRIGGER tree_entry_insert AFTER INSERT ON resource_store FOR EACH ROW BEGIN
-	INSERT INTO resource_tree (parent_id, child_id, depth, name_path)
-	VALUES (NEW.id, NEW.id, 0, NEW.name);
-	INSERT INTO resource_tree (parent_id, child_id, depth, name_path)
-	SELECT parent_id, NEW.id, depth + 1, concat(name_path,"/",NEW.name) FROM resource_tree WHERE child_id = NEW.parent_id;
-END; //
-
-DELIMITER ;
-
--- todo: are this automatically adapted when refactoring?
-CREATE INDEX group_index ON group_users(user_id, group_id);
-CREATE INDEX policy_index ON group_ref(policy_id);
-CREATE UNIQUE INDEX resource_tree_index ON resource_tree (parent_id, depth, child_id);
-CREATE UNIQUE INDEX param_unique ON param_store (p_key, p_value);
-
 -- foreign key constraints

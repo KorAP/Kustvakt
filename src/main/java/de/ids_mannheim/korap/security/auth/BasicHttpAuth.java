@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.security.auth;
 
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.Scopes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -47,8 +47,8 @@ public class BasicHttpAuth implements AuthenticationIface {
     @Override
     public TokenContext getUserStatus(String authToken)
             throws KustvaktException {
-        EncryptionIface crypto = BeanConfiguration.getBeans().getEncryption();
-        EntityHandlerIface dao = BeanConfiguration.getBeans()
+        EncryptionIface crypto = BeansFactory.getKustvaktContext().getEncryption();
+        EntityHandlerIface dao = BeansFactory.getKustvaktContext()
                 .getUserDBHandler();
         String[] values = decode(authToken);
         if (values != null) {

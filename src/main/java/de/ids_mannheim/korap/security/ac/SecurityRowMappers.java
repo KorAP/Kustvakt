@@ -26,9 +26,10 @@ public class SecurityRowMappers {
         @Override
         public SecurityPolicy mapRow(ResultSet rs, int rowNum)
                 throws SQLException {
+            String perms = rs.getString("perm");
             SecurityPolicy p = new SecurityPolicy();
             p.setID(rs.getInt("pid")).setTarget(rs.getString("persistent_id"))
-                    .setPOSIX(rs.getString("perm"));
+                    .setPOSIX(perms);
 
             PolicyContext context = new PolicyContext();
             context.setIPMask(rs.getString("iprange"));
@@ -70,14 +71,16 @@ public class SecurityRowMappers {
         }
     }
 
+    @SuppressWarnings(value = "all")
     public static List<SecurityPolicy>[] mapResourcePolicies(ResultSet rs)
             throws SQLException {
         List<SecurityPolicy>[] policyArray = null;
         List<Integer>[] idx = null;
+        loop:
         while (rs.next()) {
-            // user has no permission here --> thus skip
+            // user has no permission here, thus skip
             if (rs.getInt("allowed") == 0)
-                continue;
+                continue loop;
 
             if (policyArray == null) {
                 int v = rs.getInt("max_depth") + 1;
@@ -86,7 +89,6 @@ public class SecurityRowMappers {
             }
 
             int depth = rs.getInt("depth");
-
             if (policyArray[depth] == null) {
                 policyArray[depth] = new ArrayList<>();
                 idx[depth] = new ArrayList<>();
@@ -142,7 +144,7 @@ public class SecurityRowMappers {
             PolicyCondition c = new PolicyCondition(rs.getString("group_id"));
 
             if (!policy.contains(c))
-                policy.addCondition(c);
+                policy.addNewCondition(c);
         }
         return new ArrayList<>(policyMap.values());
     }
@@ -172,7 +174,7 @@ public class SecurityRowMappers {
             PolicyCondition c = new PolicyCondition(rs.getString("group_id"));
 
             if (!policy.contains(c))
-                policy.addCondition(c);
+                policy.addNewCondition(c);
         }
 
         List<SecurityPolicy>[] results;

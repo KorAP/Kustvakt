@@ -1,7 +1,9 @@
 package de.ids_mannheim.korap.interfaces;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.user.*;
+import de.ids_mannheim.korap.user.TokenContext;
+import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.user.Userdata;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,7 +65,6 @@ public abstract class AuthenticationManagerIface {
 
     public abstract void updateUserData(Userdata data) throws KustvaktException;
 
-
     public abstract Object[] validateResetPasswordRequest(String username,
             String email) throws KustvaktException;
 
@@ -73,8 +74,7 @@ public abstract class AuthenticationManagerIface {
     public abstract void confirmRegistration(String uriFragment,
             String username) throws KustvaktException;
 
-    @Override
-    public String toString() {
+    public String providerList() {
         return "provider list: " + this.providers.toString();
     }
 }
