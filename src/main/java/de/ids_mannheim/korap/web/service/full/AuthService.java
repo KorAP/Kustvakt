@@ -41,28 +41,32 @@ public class AuthService {
     private static Logger jlog = KustvaktLogger.getLogger(AuthService.class);
 
     private AuthenticationManagerIface controller;
+
+
     //    private SendMail mail;
 
-    public AuthService() {
+    public AuthService () {
         this.controller = BeansFactory.getKustvaktContext()
                 .getAuthenticationManager();
         //todo: replace with real property values
         //        this.mail = new SendMail(ExtConfiguration.getMailProperties());
     }
 
+
     /**
-     * represents json string with data. All GUI clients can access this method to get certain default values
+     * represents json string with data. All GUI clients can access
+     * this method to get certain default values
      * --> security checks?
-     *
+     * 
      * @return String
      */
     @Deprecated
     @GET
     @Path("bootstrap")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response bootstrap() {
+    public Response bootstrap () {
         Map m = new HashMap();
-//        m.put("settings", new UserSettings().toObjectMap());
+        //        m.put("settings", new UserSettings().toObjectMap());
         m.put("ql", BeansFactory.getKustvaktContext().getConfiguration()
                 .getQueryLanguages());
         m.put("SortTypes", null); // types of sorting that are supported!
@@ -70,11 +74,12 @@ public class AuthService {
         return Response.ok(JsonUtils.toJSON(m)).build();
     }
 
+
     // fixme: moved to user
     @GET
     @Path("status")
     @ResourceFilters({ AuthFilter.class, DefaultFilter.class })
-    public Response getStatus(@Context SecurityContext context,
+    public Response getStatus (@Context SecurityContext context,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
             @Context Locale locale) {
@@ -82,9 +87,10 @@ public class AuthService {
         return Response.ok(ctx.toJSON()).build();
     }
 
+
     @GET
     @Path("apiToken")
-    public Response requestAPIToken(@Context HttpHeaders headers,
+    public Response requestAPIToken (@Context HttpHeaders headers,
             @Context Locale locale,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
@@ -103,8 +109,8 @@ public class AuthService {
             throw KustvaktResponseHandler
                     .throwit(StatusCodes.PERMISSION_DENIED);
 
-        if (values[0].equalsIgnoreCase("null") | values[1]
-                .equalsIgnoreCase("null"))
+        if (values[0].equalsIgnoreCase("null")
+                | values[1].equalsIgnoreCase("null"))
             // is actual an invalid request
             throw KustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
 
@@ -119,21 +125,23 @@ public class AuthService {
             Userdata data = this.controller
                     .getUserData(user, UserDetails.class);
             // todo: is this necessary?
-//            attr.putAll(data.fields());
+            //            attr.putAll(data.fields());
             context = controller.createTokenContext(user, attr,
                     Attributes.API_AUTHENTICATION);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
 
         return Response.ok(context.toResponse()).build();
     }
 
+
     // todo:
     @Deprecated
     @GET
     @Path("refresh")
-    public Response refresh(@Context SecurityContext context,
+    public Response refresh (@Context SecurityContext context,
             @Context Locale locale) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         TokenContext newContext;
@@ -148,9 +156,10 @@ public class AuthService {
         return null;
     }
 
+
     @GET
     @Path("sessionToken")
-    public Response requestSession(@Context HttpHeaders headers,
+    public Response requestSession (@Context HttpHeaders headers,
             @Context Locale locale,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host) {
@@ -172,8 +181,8 @@ public class AuthService {
             throw KustvaktResponseHandler
                     .throwit(StatusCodes.PERMISSION_DENIED);
 
-        if (values[0].equalsIgnoreCase("null") | values[1]
-                .equalsIgnoreCase("null"))
+        if (values[0].equalsIgnoreCase("null")
+                | values[1].equalsIgnoreCase("null"))
             throw KustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
 
         Map<String, Object> attr = new HashMap<>();
@@ -184,11 +193,13 @@ public class AuthService {
             User user = controller.authenticate(0, values[0], values[1], attr);
             context = controller.createTokenContext(user, attr,
                     Attributes.SESSION_AUTHENTICATION);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok().entity(context.toJSON()).build();
     }
+
 
     // fixme: security issues: setup shibboleth compatible authentication system
     // todo: will be purged with token authentication --> shib is client side
@@ -196,7 +207,7 @@ public class AuthService {
     @Consumes("application/x-www-form-urlencoded")
     @Produces("application/json")
     @Path("shibboleth")
-    public Response loginshib(@Context HttpHeaders headers,
+    public Response loginshib (@Context HttpHeaders headers,
             @Context Locale locale,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
@@ -215,23 +226,24 @@ public class AuthService {
             // todo: distinguish type KorAP/Shibusers
             User user = controller.authenticate(1, null, null, attr);
             context = controller.createTokenContext(user, attr, null);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok().entity(context.toJSON()).build();
     }
 
+
     //fixme: moved from userservice
     @GET
     @Path("logout")
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
-            PiwikFilter.class })
-    public Response logout(@Context SecurityContext ctx,
-            @Context Locale locale) {
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class })
+    public Response logout (@Context SecurityContext ctx, @Context Locale locale) {
         TokenContext context = (TokenContext) ctx.getUserPrincipal();
         try {
             controller.logout(context);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             jlog.error("Logout Exception", e);
             throw KustvaktResponseHandler.throwit(e);
         }

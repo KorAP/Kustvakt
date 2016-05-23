@@ -29,7 +29,8 @@ public class Scopes {
     private static final Enum[] SERVICE_DEFAULTS = { Scope.account,
             Scope.preferences, Scope.search, Scope.queries };
 
-    public static Scopes getProfileScopes(Map<String, Object> values) {
+
+    public static Scopes getProfileScopes (Map<String, Object> values) {
         Scopes r = new Scopes();
         for (String key : profile) {
             Object v = values.get(key);
@@ -39,21 +40,23 @@ public class Scopes {
         return r;
     }
 
+
     /**
      * expects space separated values
-     *
+     * 
      * @param scopes
      * @return
      */
     //todo: test
-    public static Scope[] mapScopes(String scopes) {
+    public static Scope[] mapScopes (String scopes) {
         List<Enum> s = new ArrayList<>();
         for (String value : scopes.split(" "))
             s.add(Scope.valueOf(value.toLowerCase()));
         return s.toArray(new Scope[s.size()]);
     }
 
-    public static Scopes mapScopes(String scopes, Map<String, Object> details) {
+
+    public static Scopes mapScopes (String scopes, Map<String, Object> details) {
         Scopes m = new Scopes();
         if (scopes != null && !scopes.isEmpty()) {
             Scope[] scopearr = mapScopes(scopes);
@@ -71,17 +74,20 @@ public class Scopes {
 
     private Map<String, Object> _values;
 
-    private Scopes() {
+
+    private Scopes () {
         this._values = new HashMap<>();
     }
 
-    public String toEntity() {
+
+    public String toEntity () {
         if (this._values.isEmpty())
             return "";
         return JsonUtils.toJSON(this._values);
     }
 
-    public Map<String, Object> toMap() {
+
+    public Map<String, Object> toMap () {
         return new HashMap<>(this._values);
     }
 

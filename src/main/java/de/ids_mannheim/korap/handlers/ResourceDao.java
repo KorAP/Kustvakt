@@ -27,45 +27,48 @@ import java.util.List;
  * Created by hanl on 7/21/14.
  */
 //todo: auditing // testing
-public class ResourceDao<T extends KustvaktResource>
-        implements ResourceOperationIface<T> {
+public class ResourceDao<T extends KustvaktResource> implements
+        ResourceOperationIface<T> {
 
     private static Logger log = LoggerFactory.getLogger(ResourceDao.class);
     protected final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public ResourceDao(PersistenceClient client) {
+
+    public ResourceDao (PersistenceClient client) {
         this.jdbcTemplate = (NamedParameterJdbcTemplate) client.getSource();
     }
 
+
     @Override
-    public Class<T> type() {
+    public Class<T> type () {
         return (Class<T>) KustvaktResource.class;
     }
 
+
     // todo: testing
     @Override
-    public List<T> getResources(Collection<Object> ids, User user)
+    public List<T> getResources (Collection<Object> ids, User user)
             throws KustvaktException {
-        String sql =
-                "SELECT rs.*, rt.name_path FROM resource_store as rs inner join resource_tree as rt"
-                        + " on rs.id=rt.child_id WHERE rs.id IN (:ids);";
+        String sql = "SELECT rs.*, rt.name_path FROM resource_store as rs inner join resource_tree as rt"
+                + " on rs.id=rt.child_id WHERE rs.id IN (:ids);";
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("ids", ids);
         try {
             return (List<T>) this.jdbcTemplate.query(sql, parameters,
                     new RowMapperFactory.ResourceMapper());
-        }catch (DataAccessException e) {
-            log.error(
-                    "Exception during database retrieval for ids '" + ids + "'",
-                    e);
+        }
+        catch (DataAccessException e) {
+            log.error("Exception during database retrieval for ids '" + ids
+                    + "'", e);
             throw new dbException(user.getId(), "resource_store",
                     StatusCodes.DB_GET_FAILED, ids.toString());
         }
 
     }
 
+
     @Override
-    public int updateResource(T resource, User user) throws KustvaktException {
+    public int updateResource (T resource, User user) throws KustvaktException {
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", resource.getPersistentID());
         source.addValue("name", resource.getName());
@@ -74,37 +77,42 @@ public class ResourceDao<T extends KustvaktResource>
         final String sql = "UPDATE resource_store set name=:name, data=:data, description=:desc where persistent_id=:id;";
         try {
             return this.jdbcTemplate.update(sql, source);
-        }catch (DataAccessException e) {
-            log.error("Exception during database update for id '" + resource
-                    .getPersistentID() + "'", e);
+        }
+        catch (DataAccessException e) {
+            log.error(
+                    "Exception during database update for id '"
+                            + resource.getPersistentID() + "'", e);
             throw new dbException(user.getId(), "resource_store",
                     StatusCodes.DB_UPDATE_FAILED, resource.toString());
         }
     }
 
+
     @Override
-    public int[] updateResources(List<T> resources, User user)
+    public int[] updateResources (List<T> resources, User user)
             throws KustvaktException {
         return new int[1];
     }
 
+
     @Override
-    public <T extends KustvaktResource> T findbyId(String id, User user)
+    public <T extends KustvaktResource> T findbyId (String id, User user)
             throws KustvaktException {
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("pid", id);
-        String sql =
-                "SELECT rs.*, rt.name_path FROM resource_store as rs inner join resource_tree as rt"
-                        + " on rs.id=rt.child_id WHERE rs.persistent_id=:pid group by rs.id;";
+        String sql = "SELECT rs.*, rt.name_path FROM resource_store as rs inner join resource_tree as rt"
+                + " on rs.id=rt.child_id WHERE rs.persistent_id=:pid group by rs.id;";
         try {
             return (T) this.jdbcTemplate.queryForObject(sql, source,
                     new RowMapperFactory.ResourceMapper());
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             return null;
         }
     }
 
-    public KustvaktResource findbyPath(String path, User user)
+
+    public KustvaktResource findbyPath (String path, User user)
             throws KustvaktException {
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("path", path);
@@ -112,7 +120,8 @@ public class ResourceDao<T extends KustvaktResource>
         try {
             return this.jdbcTemplate.queryForObject(sql, source,
                     new RowMapperFactory.ResourceMapper());
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             if (e instanceof IncorrectResultSizeDataAccessException)
                 throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
                         "invalid request path given!", path);
@@ -120,18 +129,19 @@ public class ResourceDao<T extends KustvaktResource>
         }
     }
 
+
     @Override
-    public <T extends KustvaktResource> T findbyId(Integer id, User user)
+    public <T extends KustvaktResource> T findbyId (Integer id, User user)
             throws KustvaktException {
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", id);
-        String sql =
-                "SELECT rs.*, rt.name_path FROM resource_store as rs inner join resource_tree as rt on rs.id=rt.child_id "
-                        + "WHERE rs.id=:id group by rs.id order by rt.depth desc;";
+        String sql = "SELECT rs.*, rt.name_path FROM resource_store as rs inner join resource_tree as rt on rs.id=rt.child_id "
+                + "WHERE rs.id=:id group by rs.id order by rt.depth desc;";
         try {
             return (T) this.jdbcTemplate.queryForObject(sql, source,
                     new RowMapperFactory.ResourceMapper());
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             if (e instanceof IncorrectResultSizeDataAccessException)
                 throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
                         "invalid request id given!", String.valueOf(id));
@@ -139,8 +149,9 @@ public class ResourceDao<T extends KustvaktResource>
         }
     }
 
+
     @Override
-    public int storeResource(T resource, User user) throws KustvaktException {
+    public int storeResource (T resource, User user) throws KustvaktException {
         MapSqlParameterSource source = new MapSqlParameterSource();
         KeyHolder holder = new GeneratedKeyHolder();
         // parent_id necessary so trigger can be used for tree insert!
@@ -149,14 +160,14 @@ public class ResourceDao<T extends KustvaktResource>
         b.insert(Attributes.NAME, Attributes.PARENT_ID,
                 Attributes.PERSISTENT_ID, Attributes.DESCRIPTION,
                 Attributes.CREATOR, Attributes.TYPE, Attributes.CREATED);
-        b.params(
-                ":name, :parent, :pid, :desc, :ow, :type, :created, :dtype, :data");
+        b.params(":name, :parent, :pid, :desc, :ow, :type, :created, :dtype, :data");
 
         if (resource.getParentID() == null) {
             sql = "INSERT INTO resource_store (name, parent_id, persistent_id, description, creator, type, created, data) "
                     + "VALUES (:name, :parent, :pid, :desc, :ow, :type, :created, :data);";
             parid = null;
-        }else {
+        }
+        else {
             // fixme: use trigger for consistency check!
             sql = "INSERT INTO resource_store (name, parent_id, persistent_id, description, creator, type, created, data) "
                     + "select :name, id, :pid, :desc, :ow, :type, :created, :data from resource_store where persistent_id=:parent;";
@@ -176,9 +187,11 @@ public class ResourceDao<T extends KustvaktResource>
         try {
             this.jdbcTemplate
                     .update(sql, source, holder, new String[] { "id" });
-        }catch (DataAccessException e) {
-            log.error("Exception during database store for id '" + resource
-                    .getPersistentID() + "'", e);
+        }
+        catch (DataAccessException e) {
+            log.error(
+                    "Exception during database store for id '"
+                            + resource.getPersistentID() + "'", e);
             throw new dbException(user.getId(), "resource_store",
                     StatusCodes.DB_INSERT_FAILED, resource.toString());
         }
@@ -186,37 +199,42 @@ public class ResourceDao<T extends KustvaktResource>
         return resource.getId();
     }
 
+
     @Override
-    public int deleteResource(String id, User user) throws KustvaktException {
+    public int deleteResource (String id, User user) throws KustvaktException {
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", id);
         final String sql = "DELETE FROM resource_store WHERE persistent_id=:id;";
         try {
             return this.jdbcTemplate.update(sql, source);
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             throw new dbException(user.getId(), "resource_store",
                     StatusCodes.DB_DELETE_FAILED, id);
         }
     }
 
+
     @Override
-    public int size() {
+    public int size () {
         final String sql = "SELECT COUNT(*) FROM resource_store;";
         try {
-            return this.jdbcTemplate
-                    .queryForObject(sql, new HashMap<String, Object>(),
-                            Integer.class);
-        }catch (DataAccessException e) {
+            return this.jdbcTemplate.queryForObject(sql,
+                    new HashMap<String, Object>(), Integer.class);
+        }
+        catch (DataAccessException e) {
             return 0;
         }
     }
 
+
     @Override
-    public int truncate() {
+    public int truncate () {
         final String sql = "DELETE FROM resource_store;";
         try {
             return this.jdbcTemplate.update(sql, new HashMap<String, Object>());
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             return -1;
         }
     }

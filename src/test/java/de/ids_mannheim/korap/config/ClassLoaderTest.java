@@ -17,29 +17,31 @@ import static org.junit.Assert.assertTrue;
 public class ClassLoaderTest extends BeanConfigTest {
 
     @Test
-    public void testDefaultCreationThrowsNoException() {
+    public void testDefaultCreationThrowsNoException () {
         DefaultHandler pl = new DefaultHandler();
         Object o = pl.getDefault(ContextHolder.KUSTVAKT_AUDITING);
         assertNotNull(o);
         assertTrue(o instanceof AuditingIface);
     }
 
+
     @Test
-    public void testDefaultCreation2ThrowsNoException() {
+    public void testDefaultCreation2ThrowsNoException () {
         AuthenticationManagerIface iface = helper().getContext()
                 .getAuthenticationManager();
         assertNotNull(iface);
         assertTrue(iface instanceof KustvaktAuthenticationManager);
     }
 
+
     @Test
-    public void testDefaultInterfaceMatchThrowsNoException() {
+    public void testDefaultInterfaceMatchThrowsNoException () {
         AuditingIface iface = helper().getContext().getAuditingProvider();
         assertNotNull(iface);
         assertTrue(iface instanceof JDBCAuditing);
     }
 
+
     @Override
-    public void initMethod() throws KustvaktException {
-    }
+    public void initMethod () throws KustvaktException {}
 }

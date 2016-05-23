@@ -18,9 +18,10 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * implementation of the AuthenticationIface to handle korap authentication
+ * implementation of the AuthenticationIface to handle korap
+ * authentication
  * internals
- *
+ * 
  * @author hanl
  */
 public class SessionAuthentication implements AuthenticationIface {
@@ -32,8 +33,9 @@ public class SessionAuthentication implements AuthenticationIface {
     private EncryptionIface crypto;
     private KustvaktConfiguration config;
 
-    public SessionAuthentication(KustvaktConfiguration config,
-            EncryptionIface crypto) {
+
+    public SessionAuthentication (KustvaktConfiguration config,
+                                  EncryptionIface crypto) {
         jlog.info("initialize session authentication handler");
         this.crypto = crypto;
         this.config = config;
@@ -45,24 +47,25 @@ public class SessionAuthentication implements AuthenticationIface {
                 this.config.getInactiveTime(), TimeUnit.SECONDS);
     }
 
+
     @Override
-    public TokenContext getUserStatus(String authenticationToken)
+    public TokenContext getUserStatus (String authenticationToken)
             throws KustvaktException {
-        jlog.debug("retrieving user session for user '{}'",
-                authenticationToken);
+        jlog.debug("retrieving user session for user '{}'", authenticationToken);
         if (authenticationToken == null)
             throw new KustvaktException(StatusCodes.PERMISSION_DENIED);
         return this.sessions.getSession(authenticationToken);
     }
 
+
     @Override
-    public TokenContext createUserSession(User user, Map<String, Object> attr)
+    public TokenContext createUserSession (User user, Map<String, Object> attr)
             throws KustvaktException {
         DateTime now = TimeUtils.getNow();
-        DateTime ex = TimeUtils
-                .getExpiration(now.getMillis(), config.getExpiration());
-        String token = crypto
-                .createToken(true, user.getUsername(), now.getMillis());
+        DateTime ex = TimeUtils.getExpiration(now.getMillis(),
+                config.getExpiration());
+        String token = crypto.createToken(true, user.getUsername(),
+                now.getMillis());
         TokenContext ctx = new TokenContext();
         ctx.setUsername(user.getUsername());
         ctx.setTokenType(Attributes.SESSION_AUTHENTICATION);
@@ -75,18 +78,21 @@ public class SessionAuthentication implements AuthenticationIface {
         return ctx;
     }
 
+
     @Override
-    public void removeUserSession(String token) {
+    public void removeUserSession (String token) {
         this.sessions.removeSession(token);
     }
 
+
     @Override
-    public TokenContext refresh(TokenContext context) throws KustvaktException {
+    public TokenContext refresh (TokenContext context) throws KustvaktException {
         throw new UnsupportedOperationException("method not supported");
     }
 
+
     @Override
-    public String getIdentifier() {
+    public String getIdentifier () {
         return Attributes.SESSION_AUTHENTICATION;
     }
 

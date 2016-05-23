@@ -39,8 +39,10 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
     private Map<String, String> customVars;
     private AuthenticationManagerIface controller;
 
-    public PiwikFilter() {
-        controller = BeansFactory.getKustvaktContext().getAuthenticationManager();
+
+    public PiwikFilter () {
+        controller = BeansFactory.getKustvaktContext()
+                .getAuthenticationManager();
         ClientConfig config = new DefaultClientConfig();
         Client client = Client.create(config);
         if (jlog.isDebugEnabled())
@@ -50,7 +52,8 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
         this.customVars = new HashMap<>();
     }
 
-    private void send(ContainerRequest request) {
+
+    private void send (ContainerRequest request) {
         Random random = new SecureRandom();
         MultivaluedMap<String, String> params = new MultivaluedMapImpl();
         params.add("idsite", "2");
@@ -66,7 +69,8 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
         if (request.getAcceptableLanguages() != null)
             l = request.getAcceptableLanguages().get(0);
         try {
-            service.path("piwik/piwik.php").queryParam("idsite", "2")
+            service.path("piwik/piwik.php")
+                    .queryParam("idsite", "2")
                     .queryParam("rec", "1")
                     //todo check for empty container
                     .queryParam("_cvar", translateCustomData())
@@ -79,16 +83,17 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
                     .header("Host", request.getHeaderValue("Host"))
                     .header("User-Agent", request.getHeaderValue("User-Agent"))
                     .acceptLanguage(l).method("GET");
-        }catch (Exception e) {
+        }
+        catch (Exception e) {
             // do nothing if piwik not available!
         }
     }
 
-    private String translateCustomData() {
+
+    private String translateCustomData () {
         final Map<String, List<String>> customVariables = new HashMap<String, List<String>>();
         int i = 0;
-        for (final Map.Entry<String, String> entry : this.customVars
-                .entrySet()) {
+        for (final Map.Entry<String, String> entry : this.customVars.entrySet()) {
             i++;
             final List<String> list = new ArrayList<String>();
             list.add(entry.getKey());
@@ -100,14 +105,15 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
         json.add(customVariables);
 
         // remove unnecessary parent square brackets from JSON-string
-        String jsonString = json.toString()
-                .substring(1, json.toString().length() - 1);
+        String jsonString = json.toString().substring(1,
+                json.toString().length() - 1);
         customVars.clear();
         return jsonString;
     }
 
+
     @Override
-    public ContainerRequest filter(ContainerRequest request) {
+    public ContainerRequest filter (ContainerRequest request) {
         if (ENABLED) {
             try {
                 TokenContext context = (TokenContext) request
@@ -118,7 +124,8 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
                         .getUserData(user, UserSettings.class);
                 if ((Boolean) data.get(Attributes.COLLECT_AUDITING_DATA))
                     customVars.put("username", context.getUsername());
-            }catch (KustvaktException | UnsupportedOperationException e) {
+            }
+            catch (KustvaktException | UnsupportedOperationException e) {
                 //do nothing
             }
             send(request);
@@ -126,13 +133,15 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
         return request;
     }
 
+
     @Override
-    public ContainerRequestFilter getRequestFilter() {
+    public ContainerRequestFilter getRequestFilter () {
         return this;
     }
 
+
     @Override
-    public ContainerResponseFilter getResponseFilter() {
+    public ContainerResponseFilter getResponseFilter () {
         return null;
     }
 }

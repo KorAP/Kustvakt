@@ -11,20 +11,26 @@ import de.ids_mannheim.korap.user.User;
  */
 public interface EntityHandlerIface {
 
-    User getAccount(String username)
-            throws EmptyResultException, KustvaktException;
+    User getAccount (String username) throws EmptyResultException,
+            KustvaktException;
 
-    int updateAccount(User user) throws KustvaktException;
 
-    int createAccount(User user) throws KustvaktException;
+    int updateAccount (User user) throws KustvaktException;
 
-    int deleteAccount(Integer userid) throws KustvaktException;
 
-    int truncate() throws KustvaktException;
+    int createAccount (User user) throws KustvaktException;
 
-    int resetPassphrase(String username, String uriToken, String passphrase)
+
+    int deleteAccount (Integer userid) throws KustvaktException;
+
+
+    int truncate () throws KustvaktException;
+
+
+    int resetPassphrase (String username, String uriToken, String passphrase)
             throws KustvaktException;
 
-    int activateAccount(String username, String uriToken)
+
+    int activateAccount (String username, String uriToken)
             throws KustvaktException;
 }

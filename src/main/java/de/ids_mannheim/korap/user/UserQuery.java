@@ -22,7 +22,8 @@ public class UserQuery {
     private String description;
     private Integer creator;
 
-    public UserQuery(Integer id, int creator) {
+
+    public UserQuery (Integer id, int creator) {
         setId(id);
         setCreator(creator);
         setName("");
@@ -31,34 +32,37 @@ public class UserQuery {
         setQueryLanguage("");
     }
 
-    public UserQuery(String ql, String query, String description) {
+
+    public UserQuery (String ql, String query, String description) {
         setDescription(description);
         setQuery(query);
         setQueryLanguage(ql);
     }
 
-    public UserQuery() {
+
+    public UserQuery () {
         setDescription("");
         setQuery("");
         setQueryLanguage("");
         setName("");
     }
 
-    public void setQuery(String query) {
+
+    public void setQuery (String query) {
         this.query = query;
-        setName("Query: " + query
-                .substring(0, query.length() > 20 ? 20 : query.length()));
+        setName("Query: "
+                + query.substring(0, query.length() > 20 ? 20 : query.length()));
     }
 
+
     // todo: use example queries or store in database
-    public static List<UserQuery> demoUserQueries() {
+    public static List<UserQuery> demoUserQueries () {
 
         List<UserQuery> queries = new ArrayList<>();
         UserQuery q1 = new UserQuery();
         q1.setQueryLanguage("COSMAS2");
         q1.setQuery("$wegen #IN(L) <s>");
-        q1.setDescription(
-                "Findet 'wegen' an Satzanfängen. Berücksichtigt auch Groß- und Kleinschreibung");
+        q1.setDescription("Findet 'wegen' an Satzanfängen. Berücksichtigt auch Groß- und Kleinschreibung");
 
         //todo: change query
         UserQuery q2 = new UserQuery();
@@ -86,11 +90,12 @@ public class UserQuery {
         return queries;
     }
 
+
     //id is irrevelant, since data was coming
     // from frontend and thus this object does not contain a id that could be compared!
     // same with the userAccount. Not set yet!
     @Override
-    public boolean equals(Object o) {
+    public boolean equals (Object o) {
         if (this == o)
             return true;
         if (!(o instanceof UserQuery))
@@ -103,18 +108,19 @@ public class UserQuery {
         return true;
     }
 
+
     @Override
-    public int hashCode() {
+    public int hashCode () {
         int result = getId() != null ? getId().hashCode() : 0;
-        result = 31 * result + (queryLanguage != null ?
-                queryLanguage.hashCode() :
-                0);
+        result = 31 * result
+                + (queryLanguage != null ? queryLanguage.hashCode() : 0);
         result = 31 * result + (query != null ? query.hashCode() : 0);
         return result;
     }
 
+
     @Override
-    public String toString() {
+    public String toString () {
         final StringBuffer sb = new StringBuffer("UserQuery{");
         sb.append("id=").append(getId());
         //        sb.append(", owner=").append(getOwner());
@@ -125,7 +131,8 @@ public class UserQuery {
         return sb.toString();
     }
 
-    public Map toMap() {
+
+    public Map toMap () {
         Map map = new HashMap();
         map.put("name", this.name);
         map.put("description", this.description);

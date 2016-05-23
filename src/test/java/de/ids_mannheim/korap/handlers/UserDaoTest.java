@@ -24,53 +24,58 @@ import static org.junit.Assert.assertNull;
 public class UserDaoTest extends BeanConfigTest {
 
     @Test
-    public void userput() throws KustvaktException {
+    public void userput () throws KustvaktException {
         User user1 = helper().getContext().getUserDBHandler()
                 .getAccount(TestHelper.getUserCredentials()[0]);
         assertEquals("user creation failed", true, user1.getId() != -1);
     }
 
+
     @Test
-    public void userputBatch() {
+    public void userputBatch () {
         //todo:
     }
 
+
     @Test
-    public void userget() throws KustvaktException {
+    public void userget () throws KustvaktException {
         User user1 = helper().getContext().getUserDBHandler()
                 .getAccount(TestHelper.getUserCredentials()[0]);
         assertEquals("User Retrieval does not work",
                 TestHelper.getUserCredentials()[0], user1.getUsername());
     }
 
+
     //    @Test
-    public void testUserdetailsGetNonExistent() throws KustvaktException {
+    public void testUserdetailsGetNonExistent () throws KustvaktException {
         helper().setupSimpleAccount("userdbtest", "userdbTest");
         User user = helper().getContext().getUserDBHandler()
                 .getAccount("userdbtest");
-        UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(helper()
-                .getContext().getUserDataDaos(), UserDetails.class);
+        UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
+                helper().getContext().getUserDataDaos(), UserDetails.class);
         Userdata data = dao.get(user);
         assertNull(data);
         helper().dropUser("userdbtest");
     }
 
+
     //    @Test
-    public void testUserSettingsGetNonExistent() throws KustvaktException {
+    public void testUserSettingsGetNonExistent () throws KustvaktException {
         helper().setupSimpleAccount("userdbtest", "userdbTest");
         User user = helper().getContext().getUserDBHandler()
                 .getAccount("userdbtest");
-        UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(helper()
-                .getContext().getUserDataDaos(), UserSettings.class);
+        UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
+                helper().getContext().getUserDataDaos(), UserSettings.class);
         Userdata data = dao.get(user);
         assertNull(data);
         helper().dropUser("userdbtest");
 
     }
+
 
     // username cannot currently be changed
     //    @Test
-    public void updateUsername() throws KustvaktException {
+    public void updateUsername () throws KustvaktException {
         User user1 = helper().getContext().getUserDBHandler()
                 .getAccount(TestHelper.getUserCredentials()[0]);
         user1.setUsername("new_user");
@@ -80,18 +85,20 @@ public class UserDaoTest extends BeanConfigTest {
         assertEquals("not found", user1.getUsername(), u2.getUsername());
     }
 
+
     @Test
-    public void userupdate() throws KustvaktException {
+    public void userupdate () throws KustvaktException {
         EntityHandlerIface dao = helper().getContext().getUserDBHandler();
         User user1 = dao.getAccount(TestHelper.getUserCredentials()[0]);
         user1.setAccountLocked(true);
         dao.updateAccount(user1);
-        assertEquals("not valid", true,
-                dao.getAccount(user1.getUsername()).isAccountLocked());
+        assertEquals("not valid", true, dao.getAccount(user1.getUsername())
+                .isAccountLocked());
     }
 
+
     @Override
-    public void initMethod() throws KustvaktException {
+    public void initMethod () throws KustvaktException {
         helper().setupAccount();
         helper().runBootInterfaces();
     }

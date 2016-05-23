@@ -44,9 +44,11 @@ public class PolicyDao implements PolicyHandlerIface {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    public PolicyDao(PersistenceClient client) {
+
+    public PolicyDao (PersistenceClient client) {
         this.jdbcTemplate = (NamedParameterJdbcTemplate) client.getSource();
     }
+
 
     /**
      * @param policy
@@ -57,11 +59,10 @@ public class PolicyDao implements PolicyHandlerIface {
     // fixme: better way of dealing with this?
     // fixme: enable needs to be set specifically for mysql db
     @Override
-    public int createPolicy(SecurityPolicy policy, User user)
+    public int createPolicy (SecurityPolicy policy, User user)
             throws KustvaktException {
-        String sql =
-                "INSERT INTO policy_store (target_id, creator, created, posix, enable, expire, iprange)"
-                        + " SELECT id, :creator, :cr, :posix, :en, :exp, :ip FROM resource_store WHERE persistent_id=:target;";
+        String sql = "INSERT INTO policy_store (target_id, creator, created, posix, enable, expire, iprange)"
+                + " SELECT id, :creator, :cr, :posix, :en, :exp, :ip FROM resource_store WHERE persistent_id=:target;";
 
         if (policy.getTarget() == null)
             throw new dbException(user.getId(), "policy_store",
@@ -94,25 +95,29 @@ public class PolicyDao implements PolicyHandlerIface {
             policy.setID(keyHolder.getKey().intValue());
             this.mapConstraints(policy);
             return policy.getID();
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             e.printStackTrace();
-            jlog.error("Operation (INSERT) not possible for '{}' for user '{}'",
+            jlog.error(
+                    "Operation (INSERT) not possible for '{}' for user '{}'",
                     policy.toString(), user.getId());
             throw new dbException(user.getId(), "policy_store",
                     StatusCodes.DB_INSERT_FAILED, policy.toString());
         }
     }
 
+
     /**
-     * should also include a remove operation, so removed policy constraints
-     *
+     * should also include a remove operation, so removed policy
+     * constraints
+     * 
      * @param policy
      * @return
      * @throws KustvaktException
      */
     // benchmark this!
     @Override
-    public void mapConstraints(SecurityPolicy policy) throws KustvaktException {
+    public void mapConstraints (SecurityPolicy policy) throws KustvaktException {
         final String cond = "INSERT INTO group_ref (group_id, policy_id) VALUES (:group, :policyID);";
         final String remove = "DELETE FROM group_ref WHERE group_id=:group and policy_id=:policyID;";
         try {
@@ -123,8 +128,8 @@ public class PolicyDao implements PolicyHandlerIface {
                         .getRemoved().size()];
                 for (Integer toremove : policy.getRemoved()) {
                     MapSqlParameterSource source = new MapSqlParameterSource();
-                    source.addValue("group",
-                            conditions.get(toremove).getSpecifier());
+                    source.addValue("group", conditions.get(toremove)
+                            .getSpecifier());
                     source.addValue("policyID", policy.getID());
                     sources_removed[idx++] = source;
                 }
@@ -138,15 +143,15 @@ public class PolicyDao implements PolicyHandlerIface {
                         .getAdded().size()];
                 for (Integer add : policy.getAdded()) {
                     MapSqlParameterSource source = new MapSqlParameterSource();
-                    source.addValue("group",
-                            conditions.get(add).getSpecifier());
+                    source.addValue("group", conditions.get(add).getSpecifier());
                     source.addValue("policyID", policy.getID());
                     sources[idx++] = source;
                 }
                 this.jdbcTemplate.batchUpdate(cond, sources);
             }
             policy.clear();
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             e.printStackTrace();
             jlog.error(
                     "Operation (MAPPING POLICY CONDITIONS) not possible for '{}' for user '{}'",
@@ -157,8 +162,9 @@ public class PolicyDao implements PolicyHandlerIface {
         }
     }
 
+
     // todo: check transactional behaviour! --> rollback
-    private void mapConditionsToUsers(SecurityPolicy policy, User user)
+    private void mapConditionsToUsers (SecurityPolicy policy, User user)
             throws KustvaktException {
         for (PolicyCondition cond : policy.getConditions()) {
             MapSqlParameterSource param = new MapSqlParameterSource();
@@ -169,10 +175,10 @@ public class PolicyDao implements PolicyHandlerIface {
                 final Integer[] results = new Integer[2];
                 jdbcTemplate
                         .query("SELECT COUNT(*) as total, (select count(*) from group_users where user_id=:userid and "
-                                        + "group_id=:name) as users FROM group_store WHERE name=:name",
+                                + "group_id=:name) as users FROM group_store WHERE name=:name",
                                 param, new RowCallbackHandler() {
                                     @Override
-                                    public void processRow(ResultSet rs)
+                                    public void processRow (ResultSet rs)
                                             throws SQLException {
                                         results[0] = rs.getInt("total");
                                         results[1] = rs.getInt("users");
@@ -185,9 +191,10 @@ public class PolicyDao implements PolicyHandlerIface {
                     this.createCondition(cond, user);
                 }
                 if (results[1] == 0)
-                    this.addToCondition(Arrays.asList(user.getUsername()), cond,
-                            admin);
-            }catch (DataAccessException e) {
+                    this.addToCondition(Arrays.asList(user.getUsername()),
+                            cond, admin);
+            }
+            catch (DataAccessException e) {
                 jlog.error(
                         "Operation (SELECT) not possible for '{}' for user '{}'",
                         policy.getTarget(), user.getId());
@@ -197,9 +204,10 @@ public class PolicyDao implements PolicyHandlerIface {
         }
     }
 
+
     // fixme: does not compare permissions. parent can still disregard policy because of missing permisssions
     @Override
-    public List<SecurityPolicy>[] getPolicies(Integer target, final User user,
+    public List<SecurityPolicy>[] getPolicies (Integer target, final User user,
             Byte perm) {
         MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("target", target);
@@ -207,34 +215,27 @@ public class PolicyDao implements PolicyHandlerIface {
         param.addValue("perm", perm);
         param.addValue("en", new Timestamp(TimeUtils.getNow().getMillis()));
 
-        String sql_new =
-                "select pv.*, pv.perm & :perm as allowed, rh.depth, (select max(depth) from resource_tree \n"
-                        +
-                        "where child_id=rh.child_id) as max_depth from policy_view as pv "
-                        +
-                        "inner join resource_tree as rh on rh.parent_id=pv.id "
-                        +
-                        "where rh.child_id=:target and pv.enable <= :en and (pv.expire > :en or pv.expire is NULL) and "
-                        +
-                        "(pv.group_id='self' or pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid)) and "
-                        +
-                        "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
-                        +
-                        "(select sum(distinct res.depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id in (select g.group_id from group_users as g "
-                        +
-                        "where g.user_id=:userid) or pos.group_id='self') and res.child_id=rh.child_id group by child_id);";
+        String sql_new = "select pv.*, pv.perm & :perm as allowed, rh.depth, (select max(depth) from resource_tree \n"
+                + "where child_id=rh.child_id) as max_depth from policy_view as pv "
+                + "inner join resource_tree as rh on rh.parent_id=pv.id "
+                + "where rh.child_id=:target and pv.enable <= :en and (pv.expire > :en or pv.expire is NULL) and "
+                + "(pv.group_id='self' or pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid)) and "
+                + "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
+                + "(select sum(distinct res.depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id in (select g.group_id from group_users as g "
+                + "where g.user_id=:userid) or pos.group_id='self') and res.child_id=rh.child_id group by child_id);";
 
         try {
             return this.jdbcTemplate.query(sql_new, param,
                     new ResultSetExtractor<List<SecurityPolicy>[]>() {
 
                         @Override
-                        public List<SecurityPolicy>[] extractData(ResultSet rs)
+                        public List<SecurityPolicy>[] extractData (ResultSet rs)
                                 throws SQLException, DataAccessException {
                             return SecurityRowMappers.mapResourcePolicies(rs);
                         }
                     });
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             jlog.error(
                     "Permission Denied for policy retrieval for '{}' for user '{}'",
                     target, user.getId());
@@ -242,49 +243,48 @@ public class PolicyDao implements PolicyHandlerIface {
         }
     }
 
+
     // without root policies, since these are policies from different resources!
     @Override
-    public List<SecurityPolicy> getPolicies(PolicyCondition condition,
+    public List<SecurityPolicy> getPolicies (PolicyCondition condition,
             Class<? extends KustvaktResource> clazz, Byte perm) {
         MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("cond", condition.getSpecifier());
         param.addValue("perm", perm);
         param.addValue("type", ResourceFactory.getResourceMapping(clazz));
         param.addValue("en", new Timestamp(TimeUtils.getNow().getMillis()));
-        String sql_new = "select pv.*, pv.perm & :perm as allowed, " +
-                "rh.depth, (select max(depth) from resource_tree " +
-                "where child_id=rh.child_id) as max_depth from policy_view as pv "
-                +
-                "inner join resource_tree as rh on rh.parent_id=pv.id " +
-                "where " +
-                "pv.enable <= :en and (pv.expire > :en or pv.expire is NULL) and "
-                +
-                "pv.group_id=:cond and pv.type=:type and " +
-                "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
-                +
-                "(select sum(distinct res.depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id=:cond)"
-                +
-                " and res.child_id=rh.child_id group by child_id)";
+        String sql_new = "select pv.*, pv.perm & :perm as allowed, "
+                + "rh.depth, (select max(depth) from resource_tree "
+                + "where child_id=rh.child_id) as max_depth from policy_view as pv "
+                + "inner join resource_tree as rh on rh.parent_id=pv.id "
+                + "where "
+                + "pv.enable <= :en and (pv.expire > :en or pv.expire is NULL) and "
+                + "pv.group_id=:cond and pv.type=:type and "
+                + "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
+                + "(select sum(distinct res.depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id=:cond)"
+                + " and res.child_id=rh.child_id group by child_id)";
 
         try {
             return this.jdbcTemplate.query(sql_new, param,
                     new ResultSetExtractor<List<SecurityPolicy>>() {
 
                         @Override
-                        public List<SecurityPolicy> extractData(ResultSet rs)
+                        public List<SecurityPolicy> extractData (ResultSet rs)
                                 throws SQLException, DataAccessException {
                             return SecurityRowMappers.mapConditionPolicies(rs);
                         }
                     });
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             jlog.error("Permission Denied: policy retrieval for '{}'",
                     condition.getSpecifier());
             return Collections.emptyList();
         }
     }
 
+
     @Override
-    public List<SecurityPolicy>[] getPolicies(String target, final User user,
+    public List<SecurityPolicy>[] getPolicies (String target, final User user,
             Byte perm) {
         MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("target", target);
@@ -292,35 +292,30 @@ public class PolicyDao implements PolicyHandlerIface {
         param.addValue("perm", perm);
         param.addValue("en", new Timestamp(TimeUtils.getNow().getMillis()));
 
-        String sql_new = "select pv.*, pv.perm & :perm as allowed, " +
-                "rh.depth, (select max(depth) from resource_tree " +
-                "where child_id=rh.child_id) as max_depth from policy_view as pv "
-                +
-                "inner join resource_tree as rh on rh.parent_id=pv.id " +
-                "where rh.child_id=(select id from resource_store where persistent_id=:target) and "
-                +
-                "pv.enable <= :en and (pv.expire > :en or pv.expire is NULL) and "
-                +
-                "(pv.group_id='self' or pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid)) and "
-                +
-                "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
-                +
-                "(select sum(distinct res.depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id in (select g.group_id from group_users "
-                +
-                "as g where g.user_id=:userid) or pos.group_id='self') and res.child_id=rh.child_id group by child_id)";
+        String sql_new = "select pv.*, pv.perm & :perm as allowed, "
+                + "rh.depth, (select max(depth) from resource_tree "
+                + "where child_id=rh.child_id) as max_depth from policy_view as pv "
+                + "inner join resource_tree as rh on rh.parent_id=pv.id "
+                + "where rh.child_id=(select id from resource_store where persistent_id=:target) and "
+                + "pv.enable <= :en and (pv.expire > :en or pv.expire is NULL) and "
+                + "(pv.group_id='self' or pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid)) and "
+                + "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
+                + "(select sum(distinct res.depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id in (select g.group_id from group_users "
+                + "as g where g.user_id=:userid) or pos.group_id='self') and res.child_id=rh.child_id group by child_id)";
         try {
             return this.jdbcTemplate.query(sql_new, param,
                     new ResultSetExtractor<List<SecurityPolicy>[]>() {
 
                         @Override
-                        public List<SecurityPolicy>[] extractData(ResultSet rs)
+                        public List<SecurityPolicy>[] extractData (ResultSet rs)
                                 throws SQLException, DataAccessException {
                             List<SecurityPolicy>[] pol = SecurityRowMappers
                                     .mapResourcePolicies(rs);
                             return pol;
                         }
                     });
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             jlog.error(
                     "Permission Denied: policy retrieval for '{}' for user '{}'",
                     target, user.getId());
@@ -328,8 +323,9 @@ public class PolicyDao implements PolicyHandlerIface {
         }
     }
 
+
     @Override
-    public List<SecurityPolicy>[] findPolicies(String path, final User user,
+    public List<SecurityPolicy>[] findPolicies (String path, final User user,
             Byte perm) {
         MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("path", StringUtils.buildSQLRegex(path));
@@ -337,33 +333,29 @@ public class PolicyDao implements PolicyHandlerIface {
         param.addValue("perm", perm);
         param.addValue("en", new Timestamp(TimeUtils.getNow().getMillis()));
 
-        String sql_new = "select pv.*, pv.perm & :perm as allowed, " +
-                "rh.depth, (select max(depth) from resource_tree " +
-                "where child_id=rh.child_id) as max_depth from policy_view as pv "
-                +
-                "inner join resource_tree as rh on rh.parent_id=pv.id " +
-                "where rt.name_path regexp :path and " +
-                "pv.enable <= :en and (pv.expire > :en or pv.expire is NULL) and "
-                +
-                "(pv.group_id='self' or pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid)) and "
-                +
-                "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
-                +
-                "(select sum(distinct res.depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id in (select g.group_id from group_users "
-                +
-                "as g where g.user_id=:userid) or pos.group_id='self') and res.child_id=rh.child_id group by child_id)";
+        String sql_new = "select pv.*, pv.perm & :perm as allowed, "
+                + "rh.depth, (select max(depth) from resource_tree "
+                + "where child_id=rh.child_id) as max_depth from policy_view as pv "
+                + "inner join resource_tree as rh on rh.parent_id=pv.id "
+                + "where rt.name_path regexp :path and "
+                + "pv.enable <= :en and (pv.expire > :en or pv.expire is NULL) and "
+                + "(pv.group_id='self' or pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid)) and "
+                + "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
+                + "(select sum(distinct res.depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id where (pos.group_id in (select g.group_id from group_users "
+                + "as g where g.user_id=:userid) or pos.group_id='self') and res.child_id=rh.child_id group by child_id)";
 
         try {
             return this.jdbcTemplate.query(sql_new, param,
                     new ResultSetExtractor<List<SecurityPolicy>[]>() {
 
                         @Override
-                        public List<SecurityPolicy>[] extractData(ResultSet rs)
+                        public List<SecurityPolicy>[] extractData (ResultSet rs)
                                 throws SQLException, DataAccessException {
                             return SecurityRowMappers.mapResourcePolicies(rs);
                         }
                     });
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             jlog.error(
                     "Permission Denied for retrieval for resource id '{}' for user '{}'",
                     path, user.getId());
@@ -371,8 +363,11 @@ public class PolicyDao implements PolicyHandlerIface {
         }
     }
 
+
     /**
-     * @param path  if set searches in path where the child element equals name. Also applicable for root resources!
+     * @param path
+     *            if set searches in path where the child element
+     *            equals name. Also applicable for root resources!
      * @param user
      * @param clazz
      * @return
@@ -380,7 +375,7 @@ public class PolicyDao implements PolicyHandlerIface {
     //todo: not working yet!
     // todo: does not concern itsself with location matching, ever!
     @Override
-    public List<KustvaktResource.Container> getDescending(String path,
+    public List<KustvaktResource.Container> getDescending (String path,
             final User user, Byte b,
             final Class<? extends KustvaktResource> clazz)
             throws KustvaktException {
@@ -393,57 +388,39 @@ public class PolicyDao implements PolicyHandlerIface {
         String sql;
         if (path != null && !path.isEmpty()) {
             sql = "select pv.*, pv.perm & :perm as allowed, rh.depth, rh.name_path, (select max(depth) from resource_tree \n"
-                    +
-                    "where child_id=rh.child_id) as max_depth from policy_view as pv "
-                    +
-                    "inner join resource_tree as rh on rh.child_id=pv.id " +
-                    "where pv.type=:type and (rh.name_path like :part) and ((pv.creator=:userid and pv.group_id='self') or "
-                    +
-                    "(pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid) and "
-                    +
-                    "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
-                    +
-                    "(select sum(distinct depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id "
-                    +
-                    "where pos.group_id in (select g.group_id from group_users as g where g.user_id=:userid) "
-                    +
-                    "and res.child_id=rh.child_id group by child_id))) " +
-                    "group by pv.pid, pv.id having count(distinct pv.group_id) = "
-                    +
-                    "((select count(co.group_id) from group_ref as co where co.policy_id=pv.pid) or "
-                    +
-                    "(select 1 from policy_view as cp2 where cp2.group_id='self' and cp2.id=pv.id)) "
-                    +
-                    "order by rh.depth asc, pv.id desc;";
-        }else {
+                    + "where child_id=rh.child_id) as max_depth from policy_view as pv "
+                    + "inner join resource_tree as rh on rh.child_id=pv.id "
+                    + "where pv.type=:type and (rh.name_path like :part) and ((pv.creator=:userid and pv.group_id='self') or "
+                    + "(pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid) and "
+                    + "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
+                    + "(select sum(distinct depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id "
+                    + "where pos.group_id in (select g.group_id from group_users as g where g.user_id=:userid) "
+                    + "and res.child_id=rh.child_id group by child_id))) "
+                    + "group by pv.pid, pv.id having count(distinct pv.group_id) = "
+                    + "((select count(co.group_id) from group_ref as co where co.policy_id=pv.pid) or "
+                    + "(select 1 from policy_view as cp2 where cp2.group_id='self' and cp2.id=pv.id)) "
+                    + "order by rh.depth asc, pv.id desc;";
+        }
+        else {
             sql = "select pv.*, pv.perm & :perm as allowed, rh.depth, rh.name_path, (select max(depth) from resource_tree \n"
-                    +
-                    "where child_id=rh.child_id) as max_depth from policy_view as pv "
-                    +
-                    "inner join resource_tree as rh on rh.child_id=pv.id " +
-                    "where pv.type=:type and ((pv.creator=:userid and pv.group_id='self') or "
-                    +
-                    "(pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid) and "
-                    +
-                    "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
-                    +
-                    "(select sum(distinct depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id "
-                    +
-                    "where pos.group_id in (select g.group_id from group_users as g where g.user_id=:userid) "
-                    +
-                    "and res.child_id=rh.child_id group by child_id))) " +
-                    "group by pv.pid, pv.id having count(distinct pv.group_id) = "
-                    +
-                    "((select count(co.group_id) from group_ref as co where co.policy_id=pv.pid) or "
-                    +
-                    "(select 1 from policy_view as cp2 where cp2.group_id='self' and cp2.id=pv.id)) "
-                    +
-                    "order by rh.depth asc, pv.id desc;";
+                    + "where child_id=rh.child_id) as max_depth from policy_view as pv "
+                    + "inner join resource_tree as rh on rh.child_id=pv.id "
+                    + "where pv.type=:type and ((pv.creator=:userid and pv.group_id='self') or "
+                    + "(pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid) and "
+                    + "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) = "
+                    + "(select sum(distinct depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id "
+                    + "where pos.group_id in (select g.group_id from group_users as g where g.user_id=:userid) "
+                    + "and res.child_id=rh.child_id group by child_id))) "
+                    + "group by pv.pid, pv.id having count(distinct pv.group_id) = "
+                    + "((select count(co.group_id) from group_ref as co where co.policy_id=pv.pid) or "
+                    + "(select 1 from policy_view as cp2 where cp2.group_id='self' and cp2.id=pv.id)) "
+                    + "order by rh.depth asc, pv.id desc;";
         }
         try {
             return this.jdbcTemplate.query(sql, param,
                     new SecurityRowMappers.HierarchicalResultExtractor());
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             jlog.error(
                     "Permission Denied for retrieval for path '{}' for user '{}'",
                     path, user.getId());
@@ -452,9 +429,10 @@ public class PolicyDao implements PolicyHandlerIface {
         }
     }
 
+
     @Override
-    public List<KustvaktResource.Container> getAscending(String name, User user,
-            Byte b, Class<? extends KustvaktResource> clazz)
+    public List<KustvaktResource.Container> getAscending (String name,
+            User user, Byte b, Class<? extends KustvaktResource> clazz)
             throws KustvaktException {
         final MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("userid", user.getId());
@@ -465,59 +443,41 @@ public class PolicyDao implements PolicyHandlerIface {
         String sql;
         if (name != null && !name.isEmpty()) {
             sql = "select pv.*, pv.perm & :perm as allowed, rh.depth, rh.name_path,\n"
-                    +
-                    "(select max(depth) from resource_tree \n" +
-                    "where child_id=rh.child_id) as max_depth from policy_view as pv\n"
-                    +
-                    "inner join resource_tree as rh on rh.child_id=pv.id\n" +
-                    "where pv.id in (select rt.parent_id from resource_tree as rt inner join resource_store rs on rs.id=rt.child_id\n"
-                    +
-                    "where rs.type=:type and rt.name_path like :part) and ((pv.creator=:userid and pv.group_id='self') or\n"
-                    +
-                    "(pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid) and\n"
-                    +
-                    "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) =\n"
-                    +
-                    "(select sum(distinct depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id\n"
-                    +
-                    "where pos.group_id in (select g.group_id from group_users as g where g.user_id=:userid)\n"
-                    +
-                    "and res.child_id=rh.child_id group by child_id)))\n" +
-                    "group by pv.pid, pv.id having count(distinct pv.group_id) = \n"
-                    +
-                    "case when pv.creator=:userid then 1 else (select count(distinct co.group_id) "
-                    +
-                    "from group_ref as co where co.policy_id=pv.pid) end order by rh.depth desc, pv.id desc;";
-        }else {
+                    + "(select max(depth) from resource_tree \n"
+                    + "where child_id=rh.child_id) as max_depth from policy_view as pv\n"
+                    + "inner join resource_tree as rh on rh.child_id=pv.id\n"
+                    + "where pv.id in (select rt.parent_id from resource_tree as rt inner join resource_store rs on rs.id=rt.child_id\n"
+                    + "where rs.type=:type and rt.name_path like :part) and ((pv.creator=:userid and pv.group_id='self') or\n"
+                    + "(pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid) and\n"
+                    + "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) =\n"
+                    + "(select sum(distinct depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.id\n"
+                    + "where pos.group_id in (select g.group_id from group_users as g where g.user_id=:userid)\n"
+                    + "and res.child_id=rh.child_id group by child_id)))\n"
+                    + "group by pv.pid, pv.id having count(distinct pv.group_id) = \n"
+                    + "case when pv.creator=:userid then 1 else (select count(distinct co.group_id) "
+                    + "from group_ref as co where co.policy_id=pv.pid) end order by rh.depth desc, pv.id desc;";
+        }
+        else {
             sql = "select pv.*, pv.perm & :perm as allowed, rh.depth, rh.name_path,\n"
-                    +
-                    "(select max(depth) from resource_tree \n" +
-                    "where child_id=rh.child_id) as max_depth from policy_view as pv\n"
-                    +
-                    "inner join resource_tree as rh on rh.child_id=pv.id\n" +
-                    "where pv.id in (select rt.parent_id from resource_tree as rt inner join resource_store rs on rs.id=rt.child_id\n"
-                    +
-                    "where rs.type=:type) and ((pv.creator=:userid and pv.group_id='self') or\n"
-                    +
-                    "(pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid) and\n"
-                    +
-                    "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) =\n"
-                    +
-                    "(select sum(distinct depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.target_id\n"
-                    +
-                    "where pos.group_id in (select g.group_id from group_users as g where g.user_id=:userid)\n"
-                    +
-                    "and res.child_id=rh.child_id group by child_id)))\n" +
-                    "group by pv.pid, pv.id having count(distinct pv.group_id) = \n"
-                    +
-                    "case when pv.creator=:userid then 1 else (select count(distinct co.group_id) "
-                    +
-                    "from group_ref as co where co.policy_id=pv.pid) end order by rh.depth desc, pv.id desc;";
+                    + "(select max(depth) from resource_tree \n"
+                    + "where child_id=rh.child_id) as max_depth from policy_view as pv\n"
+                    + "inner join resource_tree as rh on rh.child_id=pv.id\n"
+                    + "where pv.id in (select rt.parent_id from resource_tree as rt inner join resource_store rs on rs.id=rt.child_id\n"
+                    + "where rs.type=:type) and ((pv.creator=:userid and pv.group_id='self') or\n"
+                    + "(pv.group_id in (select g.group_id from group_users as g where g.user_id=:userid) and\n"
+                    + "(select sum(distinct depth) from resource_tree where child_id=rh.child_id) =\n"
+                    + "(select sum(distinct depth) from policy_view as pos inner join resource_tree as res on res.parent_id=pos.target_id\n"
+                    + "where pos.group_id in (select g.group_id from group_users as g where g.user_id=:userid)\n"
+                    + "and res.child_id=rh.child_id group by child_id)))\n"
+                    + "group by pv.pid, pv.id having count(distinct pv.group_id) = \n"
+                    + "case when pv.creator=:userid then 1 else (select count(distinct co.group_id) "
+                    + "from group_ref as co where co.policy_id=pv.pid) end order by rh.depth desc, pv.id desc;";
         }
         try {
             return this.jdbcTemplate.query(sql, param,
                     new SecurityRowMappers.HierarchicalResultExtractor());
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             jlog.error(
                     "Permission Denied for retrieval for path '{}' for user '{}'",
                     name, user.getId());
@@ -526,48 +486,55 @@ public class PolicyDao implements PolicyHandlerIface {
         }
     }
 
+
     // todo: return all resources or only leave nodes? --> currently only leaves are returned
     // todo: access to leave node also means that the path to the root for that permission is allowed,
     // todo: thus all upper resource access is as well allowed
 
     //todo: remove not used context?! --> who is allowed to do so?
     @Override
-    public int deletePolicy(SecurityPolicy policy, User user)
+    public int deletePolicy (SecurityPolicy policy, User user)
             throws KustvaktException {
         MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("id", policy.getID());
 
         try {
-            this.jdbcTemplate
-                    .update("DELETE FROM group_ref WHERE policy_id=:id", param);
-            return this.jdbcTemplate
-                    .update("DELETE FROM policy_store WHERE id=:id", param);
-        }catch (DataAccessException e) {
-            jlog.error("Operation (DELETE) not possible for '{}' for user '{}'",
+            this.jdbcTemplate.update(
+                    "DELETE FROM group_ref WHERE policy_id=:id", param);
+            return this.jdbcTemplate.update(
+                    "DELETE FROM policy_store WHERE id=:id", param);
+        }
+        catch (DataAccessException e) {
+            jlog.error(
+                    "Operation (DELETE) not possible for '{}' for user '{}'",
                     policy.toString(), user.getId());
             throw new dbException(user.getId(), "policy_store, group_ref",
                     StatusCodes.DB_DELETE_FAILED, policy.toString());
         }
     }
 
+
     @Override
-    public int deleteResourcePolicies(String id, User user)
+    public int deleteResourcePolicies (String id, User user)
             throws KustvaktException {
         MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("id", id);
         String sql = "DELETE FROM policy_store WHERE target_id in (SELECT id FROM resource_store WHERE persistent_id=:id);";
         try {
             return this.jdbcTemplate.update(sql, param);
-        }catch (DataAccessException e) {
-            jlog.error("Operation (DELETE) not possible for '{}' for user '{}'",
+        }
+        catch (DataAccessException e) {
+            jlog.error(
+                    "Operation (DELETE) not possible for '{}' for user '{}'",
                     id, user.getId());
             throw new dbException(user.getId(), "policy_store",
                     StatusCodes.DB_DELETE_FAILED, id);
         }
     }
 
+
     @Override
-    public int updatePolicy(SecurityPolicy policy, User user)
+    public int updatePolicy (SecurityPolicy policy, User user)
             throws KustvaktException {
         MapSqlParameterSource np = new MapSqlParameterSource();
         np.addValue("posix", policy.getPermissionByte());
@@ -576,21 +543,23 @@ public class PolicyDao implements PolicyHandlerIface {
         np.addValue("id", policy.getID());
 
         try {
-            int result = this.jdbcTemplate
-                    .update("UPDATE policy_store SET posix=:posix WHERE id=:id",
-                            np);
+            int result = this.jdbcTemplate.update(
+                    "UPDATE policy_store SET posix=:posix WHERE id=:id", np);
             this.mapConstraints(policy);
             return result;
-        }catch (DataAccessException e) {
-            jlog.error("Operation (UPDATE) not possible for '{}' for user '{}'",
+        }
+        catch (DataAccessException e) {
+            jlog.error(
+                    "Operation (UPDATE) not possible for '{}' for user '{}'",
                     policy.toString(), user.getId());
             throw new dbException(user.getId(), "policy_store",
                     StatusCodes.DB_UPDATE_FAILED, policy.toString());
         }
     }
 
+
     @Override
-    public int checkPolicy(SecurityPolicy policy, User user)
+    public int checkPolicy (SecurityPolicy policy, User user)
             throws KustvaktException {
         if (policy.getID() == -1)
             return 0;
@@ -601,17 +570,21 @@ public class PolicyDao implements PolicyHandlerIface {
 
         try {
             return this.jdbcTemplate.queryForObject(sql1, param, Integer.class);
-        }catch (DataAccessException e) {
-            jlog.error("Operation (SELECT) not possible for '{}' for user '{}'",
+        }
+        catch (DataAccessException e) {
+            jlog.error(
+                    "Operation (SELECT) not possible for '{}' for user '{}'",
                     policy.getTarget(), user.getId());
             throw new dbException(user.getId(), "policy_store",
                     StatusCodes.DB_GET_FAILED, policy.toString());
         }
     }
 
+
     /**
-     * checks if the user is a member of the specified group. Additional ownership can be tested via boolean flag
-     *
+     * checks if the user is a member of the specified group.
+     * Additional ownership can be tested via boolean flag
+     * 
      * @param user
      * @param group
      * @param owner
@@ -619,7 +592,7 @@ public class PolicyDao implements PolicyHandlerIface {
      * @throws KustvaktException
      */
     @Override
-    public int matchCondition(User user, String group, boolean owner)
+    public int matchCondition (User user, String group, boolean owner)
             throws KustvaktException {
         MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("userid", user.getId());
@@ -628,27 +601,29 @@ public class PolicyDao implements PolicyHandlerIface {
         String sql;
         if (owner) {
             sql = "SELECT COUNT(*) FROM group_users AS gu INNER JOIN group_store AS gs "
-                    +
-                    "ON gs.name=gu.group_id WHERE gu.user_id=:userid " +
-                    "AND gs.name=:group AND gu.admin=:isadmin;";
-        }else {
+                    + "ON gs.name=gu.group_id WHERE gu.user_id=:userid "
+                    + "AND gs.name=:group AND gu.admin=:isadmin;";
+        }
+        else {
             sql = "SELECT COUNT(*) FROM group_users AS gu INNER JOIN group_store AS gs "
-                    +
-                    "ON gs.name=gu.group_id WHERE gu.user_id=:userid " +
-                    "AND gs.name=:group;";
+                    + "ON gs.name=gu.group_id WHERE gu.user_id=:userid "
+                    + "AND gs.name=:group;";
         }
 
         try {
             return this.jdbcTemplate.queryForObject(sql, param, Integer.class);
-        }catch (DataAccessException e) {
-            jlog.error("Operation (SELECT) not possible for '{}' for user '{}'",
+        }
+        catch (DataAccessException e) {
+            jlog.error(
+                    "Operation (SELECT) not possible for '{}' for user '{}'",
                     group, user.getId());
             throw new dbException(user.getId(), "policy_store",
                     StatusCodes.DB_GET_FAILED, group);
         }
     }
 
-    private void createCondition(PolicyCondition condition, User user)
+
+    private void createCondition (PolicyCondition condition, User user)
             throws KustvaktException {
         MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("name", condition.getSpecifier());
@@ -658,10 +633,11 @@ public class PolicyDao implements PolicyHandlerIface {
         param.addValue("sy", condition.getFlags().get(Attributes.SYM_USE));
         param.addValue("ex", condition.getFlags().get(Attributes.LICENCE));
         try {
-            this.jdbcTemplate
-                    .update("INSERT INTO group_store (name, sym_use, export, commercial) "
+            this.jdbcTemplate.update(
+                    "INSERT INTO group_store (name, sym_use, export, commercial) "
                             + "VALUES (:name, :sy, :ex, :com);", param);
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             jlog.error("Operation (INSERT) not possible for '{}'",
                     condition.toString());
             throw new dbException(user.getId(), "group_store",
@@ -669,24 +645,24 @@ public class PolicyDao implements PolicyHandlerIface {
         }
     }
 
+
     //todo: check for unique constraint exception and exclude from throw!
     @Override
-    public int addToCondition(String username, PolicyCondition condition,
+    public int addToCondition (String username, PolicyCondition condition,
             boolean admin) throws KustvaktException {
-        final String insert =
-                "INSERT INTO group_users (user_id, group_id, admin) " +
-                        "VALUES ((SELECT id FROM korap_users " +
-                        "WHERE username=:username), :group, :status);";
+        final String insert = "INSERT INTO group_users (user_id, group_id, admin) "
+                + "VALUES ((SELECT id FROM korap_users "
+                + "WHERE username=:username), :group, :status);";
         try {
             MapSqlParameterSource param = new MapSqlParameterSource();
             param.addValue("group", condition.getSpecifier());
             param.addValue("username", username);
             param.addValue("status", BooleanUtils.getBoolean(admin));
             return this.jdbcTemplate.update(insert, param);
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             //todo: test with mysql
-            if (!e.getMessage().toLowerCase()
-                    .contains("UNIQUE".toLowerCase())) {
+            if (!e.getMessage().toLowerCase().contains("UNIQUE".toLowerCase())) {
                 jlog.error(
                         "Operation (INSERT) not possible for '{}' for user '{}'",
                         condition.toString(), username);
@@ -697,18 +673,22 @@ public class PolicyDao implements PolicyHandlerIface {
         }
     }
 
+
     /**
      * @param usernames
      * @param condition
      * @param admin
      * @return
-     * @throws KustvaktException userID and group_id have a unique constraint,
-     *                           thus: if any of the supplied users is already a member of the group, the entire chain will be broken!
+     * @throws KustvaktException
+     *             userID and group_id have a unique constraint,
+     *             thus: if any of the supplied users is already a
+     *             member of the group, the entire chain will be
+     *             broken!
      */
     //todo definitely needs rework
     //todo: test the unique index constraints!
     @Override
-    public int[] addToCondition(List<String> usernames,
+    public int[] addToCondition (List<String> usernames,
             PolicyCondition condition, boolean admin) throws KustvaktException {
         MapSqlParameterSource[] sources = new MapSqlParameterSource[usernames
                 .size()];
@@ -719,10 +699,9 @@ public class PolicyDao implements PolicyHandlerIface {
         //                "AND group_id=:group;";
 
         //todo: use index to create uniqueness. how to batch?
-        final String insert =
-                "INSERT INTO group_users (user_id, group_id, admin) " +
-                        "VALUES ((SELECT id FROM korap_users " +
-                        "WHERE username=:username), :group, :status);";
+        final String insert = "INSERT INTO group_users (user_id, group_id, admin) "
+                + "VALUES ((SELECT id FROM korap_users "
+                + "WHERE username=:username), :group, :status);";
         try {
             for (int idx = 0; idx < usernames.size(); idx++) {
                 //todo: dont do that here
@@ -743,22 +722,25 @@ public class PolicyDao implements PolicyHandlerIface {
             // todo: only insert if user is not already a member of this group
             //fixme: problem - unique constraints throws exception. skip that user entry?!
             return this.jdbcTemplate.batchUpdate(insert, sources);
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             if (!e.getCause().toString().contains("UNIQUE")) {
                 jlog.error(
                         "Operation (INSERT) not possible for '{}' for user '{}'",
                         condition.toString(), usernames, e);
                 throw new KustvaktException(
-                        "Operation (INSERT) not possible for '" + condition
-                                .toString() + "' for user '" + usernames + "'",
-                        e, StatusCodes.CONNECTION_ERROR);
+                        "Operation (INSERT) not possible for '"
+                                + condition.toString() + "' for user '"
+                                + usernames + "'", e,
+                        StatusCodes.CONNECTION_ERROR);
             }
             return null;
         }
     }
 
+
     @Override
-    public void removeFromCondition(List<String> usernames,
+    public void removeFromCondition (List<String> usernames,
             PolicyCondition condition) throws KustvaktException {
         MapSqlParameterSource[] sources = new MapSqlParameterSource[usernames
                 .size()];
@@ -770,21 +752,23 @@ public class PolicyDao implements PolicyHandlerIface {
             sources[idx++] = param;
         }
 
-        final String del =
-                "DELETE FROM group_users WHERE group_id=:group AND user_id=(SELECT id FROM "
-                        + "korap_users WHERE username=:username);";
+        final String del = "DELETE FROM group_users WHERE group_id=:group AND user_id=(SELECT id FROM "
+                + "korap_users WHERE username=:username);";
 
         try {
             this.jdbcTemplate.batchUpdate(del, sources);
-        }catch (DataAccessException e) {
-            jlog.error("Operation (DELETE) not possible for '{}' for user '{}'",
+        }
+        catch (DataAccessException e) {
+            jlog.error(
+                    "Operation (DELETE) not possible for '{}' for user '{}'",
                     condition.toString(), usernames);
             throw new KustvaktException(e, StatusCodes.CONNECTION_ERROR);
         }
     }
 
+
     @Override
-    public int createParamBinding(Parameter param) throws KustvaktException {
+    public int createParamBinding (Parameter param) throws KustvaktException {
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("key", param.getName());
         source.addValue("policy", param.getPolicy().getID());
@@ -794,44 +778,46 @@ public class PolicyDao implements PolicyHandlerIface {
         //todo:
         //        if (!parameterExists(param.getName()))
         //            createParameter(param.getName(), "", param.getOwner());
-        final String insert =
-                "INSERT INTO param_map (param_id, policy_id, value, flag) VALUES ((SELECT id FROM param_store "
-                        + "WHERE p_key=:key), (SELECT id FROM policy_store WHERE id=:policy), :value, :flag);";
+        final String insert = "INSERT INTO param_map (param_id, policy_id, value, flag) VALUES ((SELECT id FROM param_store "
+                + "WHERE p_key=:key), (SELECT id FROM policy_store WHERE id=:policy), :value, :flag);";
         try {
             return this.jdbcTemplate.update(insert, source);
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             jlog.error("Operation (INSERT) not possible for '{}",
                     param.toString());
             throw new KustvaktException(e, StatusCodes.CONNECTION_ERROR);
         }
     }
 
+
     @Override
-    public List<String> getUsersFromCondition(PolicyCondition condition)
+    public List<String> getUsersFromCondition (PolicyCondition condition)
             throws KustvaktException {
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("specifier", condition.getSpecifier());
-        final String sql1 =
-                "SELECT username FROM korap_users WHERE id IN (SELECT user_id FROM "
-                        + "group_users WHERE group_id=:specifier);";
+        final String sql1 = "SELECT username FROM korap_users WHERE id IN (SELECT user_id FROM "
+                + "group_users WHERE group_id=:specifier);";
         try {
             return this.jdbcTemplate.queryForList(sql1, source, String.class);
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             jlog.error("Operation (SELECT) not possible for '{}'",
                     condition.toString());
             throw new KustvaktException(StatusCodes.CONNECTION_ERROR);
         }
     }
 
-    private boolean parameterExists(String key) {
+
+    private boolean parameterExists (String key) {
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("key", key);
         final String select = "SELECT COUNT(*) FROM param_store WHERE p_key=:key;";
-        return this.jdbcTemplate.queryForObject(select, source, Integer.class)
-                == 1;
+        return this.jdbcTemplate.queryForObject(select, source, Integer.class) == 1;
     }
 
-    private void createParameter(String parameter, String value, Integer owner)
+
+    private void createParameter (String parameter, String value, Integer owner)
             throws KustvaktException {
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("name", parameter);
@@ -840,32 +826,36 @@ public class PolicyDao implements PolicyHandlerIface {
         final String sql = "INSERT INTO param_store (p_key, p_value) VALUES (:name, :value);";
         try {
             this.jdbcTemplate.update(sql, source);
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             throw new KustvaktException(e, StatusCodes.CONNECTION_ERROR);
         }
     }
 
+
     @Override
-    public int removeParamBinding(SecurityPolicy policy)
+    public int removeParamBinding (SecurityPolicy policy)
             throws KustvaktException {
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", policy.getID());
         final String sql = "DELETE FROM param_map WHERE policy_id=:id";
         try {
             return this.jdbcTemplate.update(sql, source);
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             throw new KustvaktException(e, StatusCodes.CONNECTION_ERROR);
         }
     }
 
+
     @Override
-    public int size() {
+    public int size () {
         String sql = "SELECT COUNT(*) FROM policy_view;";
         try {
-            return this.jdbcTemplate
-                    .queryForObject(sql, new HashMap<String, Object>(),
-                            Integer.class);
-        }catch (DataAccessException e) {
+            return this.jdbcTemplate.queryForObject(sql,
+                    new HashMap<String, Object>(), Integer.class);
+        }
+        catch (DataAccessException e) {
             return 0;
         }
     }

@@ -11,6 +11,7 @@ import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.NamingUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.oltu.oauth2.common.utils.OAuthUtils;
@@ -23,7 +24,7 @@ import java.util.Map;
  */
 public class BasicHttpAuth implements AuthenticationIface {
 
-    public static String[] decode(String token) {
+    public static String[] decode (String token) {
         return OAuthUtils.decodeClientAuthenticationHeader(token);
 
         //        String t = StringUtils.getTokenType(token);
@@ -38,16 +39,19 @@ public class BasicHttpAuth implements AuthenticationIface {
         //        return null;
     }
 
-    public static String encode(String user, String pass) {
+
+    public static String encode (String user, String pass) {
         String s = user + ":" + pass;
-        return Attributes.BASIC_AUTHENTICATION + " " + new String(
-                Base64.encodeBase64(s.getBytes()));
+        return Attributes.BASIC_AUTHENTICATION + " "
+                + new String(Base64.encodeBase64(s.getBytes()));
     }
 
+
     @Override
-    public TokenContext getUserStatus(String authToken)
+    public TokenContext getUserStatus (String authToken)
             throws KustvaktException {
-        EncryptionIface crypto = BeansFactory.getKustvaktContext().getEncryption();
+        EncryptionIface crypto = BeansFactory.getKustvaktContext()
+                .getEncryption();
         EntityHandlerIface dao = BeansFactory.getKustvaktContext()
                 .getUserDBHandler();
         String[] values = decode(authToken);
@@ -55,8 +59,8 @@ public class BasicHttpAuth implements AuthenticationIface {
             TokenContext c = new TokenContext();
             User user = dao.getAccount(values[0]);
             if (user instanceof KorAPUser) {
-                boolean check = crypto
-                        .checkHash(values[1], ((KorAPUser) user).getPassword());
+                boolean check = crypto.checkHash(values[1],
+                        ((KorAPUser) user).getPassword());
 
                 if (!check)
                     return null;
@@ -65,7 +69,7 @@ public class BasicHttpAuth implements AuthenticationIface {
             c.setTokenType(Attributes.BASIC_AUTHENTICATION);
             // todo: for production mode, set true
             c.setSecureRequired(false);
-            c.setToken(StringUtils.stripTokenType(authToken));
+            c.setToken(NamingUtils.stripTokenType(authToken));
             //            fixme: you can make queries, but user sensitive data is off limits?!
             c.addContextParameter(Attributes.SCOPES,
                     Scopes.Scope.search.toString());
@@ -74,25 +78,29 @@ public class BasicHttpAuth implements AuthenticationIface {
         return null;
     }
 
+
     // not supported!
     @Override
-    public TokenContext createUserSession(User user, Map<String, Object> attr)
+    public TokenContext createUserSession (User user, Map<String, Object> attr)
             throws KustvaktException {
         return null;
     }
 
+
     @Override
-    public void removeUserSession(String token) throws KustvaktException {
+    public void removeUserSession (String token) throws KustvaktException {
         throw new KustvaktException(StatusCodes.NOT_SUPPORTED);
     }
 
+
     @Override
-    public TokenContext refresh(TokenContext context) throws KustvaktException {
+    public TokenContext refresh (TokenContext context) throws KustvaktException {
         return null;
     }
 
+
     @Override
-    public String getIdentifier() {
+    public String getIdentifier () {
         return Attributes.BASIC_AUTHENTICATION;
     }
 }

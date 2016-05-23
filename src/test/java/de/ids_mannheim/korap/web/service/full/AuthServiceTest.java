@@ -14,7 +14,7 @@ import org.junit.Test;
 public class AuthServiceTest extends FastJerseyTest {
 
     @BeforeClass
-    public static void configure() throws Exception {
+    public static void configure () throws Exception {
         FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service",
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");
@@ -22,28 +22,32 @@ public class AuthServiceTest extends FastJerseyTest {
 
 
     @Override
-    public void initMethod() throws KustvaktException {
+    public void initMethod () throws KustvaktException {
         helper().setupAccount();
     }
 
+
     @Test
-    public void testBasicHttp() {
+    public void testBasicHttp () {
         User user = helper().getUser();
 
     }
 
+
     @Test
-    public void testBasicLogout(){
+    public void testBasicLogout () {
 
     }
 
+
     @Test
-    public void testSessionTokenLogin() {
+    public void testSessionTokenLogin () {
 
     }
 
+
     @Test
-    public void testSessionTokenLogout() {
+    public void testSessionTokenLogout () {
 
     }
 

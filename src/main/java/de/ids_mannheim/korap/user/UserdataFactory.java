@@ -25,10 +25,11 @@ public class UserdataFactory {
 
     private static final Map<Class<? extends Userdata>, UserDataDbIface> instances = new HashMap<>();
 
-    private UserdataFactory() {
-    }
 
-    public static UserDataDbIface getDaoInstanceFromBean(
+    private UserdataFactory () {}
+
+
+    public static UserDataDbIface getDaoInstanceFromBean (
             Class<? extends Userdata> type) {
         Collection<UserDataDbIface> daos = BeansFactory.getKustvaktContext()
                 .getUserDataDaos();
@@ -44,7 +45,8 @@ public class UserdataFactory {
         return null;
     }
 
-    public static Class<? extends UserDataDbIface> getClassFromAnno(
+
+    public static Class<? extends UserDataDbIface> getClassFromAnno (
             Class<? extends Userdata> data) {
         Set<Class<? extends UserDataDbIface>> c = KustvaktClassLoader
                 .loadSubTypes(UserDataDbIface.class);
@@ -60,28 +62,32 @@ public class UserdataFactory {
         return null;
     }
 
+
     // todo: remove and load userdata via bean context
     @Deprecated
-    public static UserDataDbIface getDaoInstance(Class<? extends Userdata> data)
+    public static UserDataDbIface getDaoInstance (Class<? extends Userdata> data)
             throws KustvaktException {
         if (instances.get(data) == null) {
             Class<? extends UserDataDbIface> cl = getClassFromAnno(data);
             if (cl != null) {
                 try {
                     Constructor c = cl.getConstructor(PersistenceClient.class);
-                    UserDataDbIface iface = (UserDataDbIface) c.newInstance(
-                            BeansFactory.getKustvaktContext()
+                    UserDataDbIface iface = (UserDataDbIface) c
+                            .newInstance(BeansFactory.getKustvaktContext()
                                     .getPersistenceClient());
                     instances.put(data, iface);
                     return iface;
-                }catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+                }
+                catch (NoSuchMethodException | InvocationTargetException
+                        | InstantiationException | IllegalAccessException e) {
                     return null;
                 }
             }
             throw new KustvaktException(StatusCodes.NOT_SUPPORTED,
-                    "No database handler found for type " + data
-                            .getSimpleName());
-        }else
+                    "No database handler found for type "
+                            + data.getSimpleName());
+        }
+        else
             return instances.get(data);
     }
 }

@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * convenience builder class for collection query
- *
+ * 
  * @author hanl
  * @date 16/09/2014
  */
@@ -23,15 +23,18 @@ public class CollectionQueryBuilder3 {
     private JsonNode base;
     private StringBuilder builder;
 
-    public CollectionQueryBuilder3() {
+
+    public CollectionQueryBuilder3 () {
         this(false);
     }
 
-    public CollectionQueryBuilder3(boolean verbose) {
+
+    public CollectionQueryBuilder3 (boolean verbose) {
         this.verbose = verbose;
         this.builder = new StringBuilder();
         this.base = null;
     }
+
 
     //    /**
     //     * convencience method for equal field value search operation
@@ -56,14 +59,15 @@ public class CollectionQueryBuilder3 {
     //    }
 
     /**
-     * raw method for field - value pair adding. Supports all operators (leq, geq, contains, etc.)
-     *
+     * raw method for field - value pair adding. Supports all
+     * operators (leq, geq, contains, etc.)
+     * 
      * @param field
      * @param op
      * @param value
      * @return
      */
-    public CollectionQueryBuilder3 fieldValue(String field, String op,
+    public CollectionQueryBuilder3 fieldValue (String field, String op,
             String value) {
         if (base == null)
             this.builder.append(field + op + value);
@@ -74,13 +78,17 @@ public class CollectionQueryBuilder3 {
         return this;
     }
 
+
     /**
-     * element can be a more complex sub query like (textClass=freizeit & corpusID=WPD)
-     *
-     * @param query will be parenthised in order to make sub query element
+     * element can be a more complex sub query like
+     * (textClass=freizeit & corpusID=WPD)
+     * 
+     * @param query
+     *            will be parenthised in order to make sub query
+     *            element
      * @return
      */
-    public CollectionQueryBuilder3 addQuery(String query) {
+    public CollectionQueryBuilder3 addQuery (String query) {
         if (!query.startsWith("(") && !query.endsWith(")"))
             query = "(" + query + ")";
 
@@ -88,25 +96,29 @@ public class CollectionQueryBuilder3 {
             CollectionQueryProcessor tree = new CollectionQueryProcessor(
                     this.verbose);
             tree.process(query);
-            JsonNode map = JsonUtils
-                    .valueToTree(tree.getRequestMap().get("collection"));
+            JsonNode map = JsonUtils.valueToTree(tree.getRequestMap().get(
+                    "collection"));
             appendToBaseGroup(map);
-        }else
+        }
+        else
             this.builder.append(query);
         return this;
     }
 
-    public CollectionQueryBuilder3 and() {
+
+    public CollectionQueryBuilder3 and () {
         this.builder.append(" & ");
         return this;
     }
 
-    public CollectionQueryBuilder3 or() {
+
+    public CollectionQueryBuilder3 or () {
         this.builder.append(" | ");
         return this;
     }
 
-    private Object build() {
+
+    private Object build () {
         Object request = base;
         if (request == null) {
             CollectionQueryProcessor tree = new CollectionQueryProcessor(
@@ -120,29 +132,34 @@ public class CollectionQueryBuilder3 {
         return request;
     }
 
+
     /**
-     * sets base query. All consequent queries are added to the first koral:docGroup within the collection base query
+     * sets base query. All consequent queries are added to the first
+     * koral:docGroup within the collection base query
      * If no group in base query, consequent queries are skipped.
-     *
+     * 
      * @param query
      */
-    public CollectionQueryBuilder3 setBaseQuery(String query) {
+    public CollectionQueryBuilder3 setBaseQuery (String query) {
         this.base = JsonUtils.readTree(query);
         return this;
     }
 
-    public String toJSON() {
+
+    public String toJSON () {
         return JsonUtils.toJSON(build());
     }
 
-    private CollectionQueryBuilder3 appendToBaseGroup(JsonNode node) {
+
+    private CollectionQueryBuilder3 appendToBaseGroup (JsonNode node) {
         if (base.at("/collection/@type").asText().equals("koral:docGroup")) {
             ArrayNode group = (ArrayNode) base.at("/collection/operands");
             if (node instanceof ArrayNode)
                 group.addAll((ArrayNode) node);
             else
                 group.add(node);
-        }else
+        }
+        else
             throw new IllegalArgumentException("No group found to add to!");
         // fixme: if base is a doc only, this function is not supported. requirement is a koral:docGroup, since
         // combination operator is unknown otherwise
@@ -151,7 +168,7 @@ public class CollectionQueryBuilder3 {
 
     public static class Utils {
 
-        public static JsonNode buildDoc(String key, String value, String op) {
+        public static JsonNode buildDoc (String key, String value, String op) {
             ObjectNode node = JsonUtils.createObjectNode();
             node.put("@type", "koral:doc");
             // eq.equals(EQ.EQUAL) ? "match:eq" : "match:ne"
@@ -162,7 +179,8 @@ public class CollectionQueryBuilder3 {
             return node;
         }
 
-        public static JsonNode buildDocGroup() {
+
+        public static JsonNode buildDocGroup () {
             ObjectNode node = JsonUtils.createObjectNode();
 
             return node;

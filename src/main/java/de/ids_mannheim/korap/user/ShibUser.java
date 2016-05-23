@@ -14,11 +14,14 @@ public class ShibUser extends User {
     private String affiliation;
     private String cn;
 
-    protected ShibUser() {
+
+    protected ShibUser () {
         super(1);
     }
 
-    private ShibUser(String eduPersonID, String mail, String cn, String affiliation) {
+
+    private ShibUser (String eduPersonID, String mail, String cn,
+                      String affiliation) {
         this(eduPersonID);
         this.setUsername(eduPersonID);
         this.mail = mail;
@@ -26,13 +29,15 @@ public class ShibUser extends User {
         this.cn = cn;
     }
 
-    public ShibUser(String username) {
+
+    public ShibUser (String username) {
         super(username, 1);
 
     }
 
+
     @Override
-    public String toString() {
+    public String toString () {
         final StringBuffer sb = new StringBuffer("ShibUser{");
         sb.append(", mail='").append(mail).append('\'');
         sb.append(", affiliation='").append(affiliation).append('\'');
@@ -41,8 +46,10 @@ public class ShibUser extends User {
         return sb.toString();
     }
 
+
     @Override
-    protected User clone() {
-        return new ShibUser(this.getUsername(), this.getMail(), this.getCn(), this.getAffiliation());
+    protected User clone () {
+        return new ShibUser(this.getUsername(), this.getMail(), this.getCn(),
+                this.getAffiliation());
     }
 }

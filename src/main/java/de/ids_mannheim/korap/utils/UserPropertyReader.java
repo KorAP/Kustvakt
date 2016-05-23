@@ -30,33 +30,39 @@ public class UserPropertyReader extends PropertyReader {
     private static Logger jlog = LoggerFactory
             .getLogger(UserPropertyReader.class);
 
-    public UserPropertyReader(String path) {
+
+    public UserPropertyReader (String path) {
         this.path = path;
         this.iface = BeansFactory.getKustvaktContext().getUserDBHandler();
         this.crypto = BeansFactory.getKustvaktContext().getEncryption();
     }
 
+
     @Override
-    public void load() {
+    public void load () {
         try {
             props = super.read(this.path);
             for (Map.Entry<String, Properties> e : props.entrySet()) {
                 try {
                     createUser(e.getKey(), e.getValue());
-                }catch (KustvaktException ex) {
+                }
+                catch (KustvaktException ex) {
                     jlog.error("KorAP-Exception: {} for user {}",
                             ex.getStatusCode(), e.getKey());
                 }
             }
             iface.createAccount(User.UserFactory.getDemoUser());
-        }catch (IOException e) {
+        }
+        catch (IOException e) {
             jlog.error("Could not read from path {}", path);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             jlog.error("KorAP-Exception: {}", e.getStatusCode());
         }
     }
 
-    private User createUser(String username, Properties p)
+
+    private User createUser (String username, Properties p)
             throws KustvaktException {
         KorAPUser user;
         if (username.equals(User.ADMINISTRATOR_NAME)) {
@@ -68,12 +74,14 @@ public class UserPropertyReader extends PropertyReader {
 
             try {
                 pass = crypto.produceSecureHash(pass);
-            }catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+            }
+            catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
                 throw new KustvaktException(StatusCodes.REQUEST_INVALID);
             }
             user.setPassword(pass);
             iface.createAccount(user);
-        }else {
+        }
+        else {
             user = User.UserFactory.getUser(username);
             Map<String, Object> vals = new HashMap<>();
             for (Map.Entry e : p.entrySet()) {
@@ -86,13 +94,14 @@ public class UserPropertyReader extends PropertyReader {
 
             try {
                 pass = crypto.produceSecureHash(pass);
-            }catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+            }
+            catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
                 throw new KustvaktException(StatusCodes.REQUEST_INVALID);
             }
 
             user.setPassword(pass);
-            user.setAccountLocked(Boolean.valueOf(
-                    p.getProperty(username + ".lock", "false")));
+            user.setAccountLocked(Boolean.valueOf(p.getProperty(username
+                    + ".lock", "false")));
             user.setAccountCreation(TimeUtils.getNow().getMillis());
 
             //todo: make sure uri is set to 0, so sql queries work with the null value
@@ -106,12 +115,14 @@ public class UserPropertyReader extends PropertyReader {
             set.readDefaults(vals);
             set.validate(crypto);
 
-            UserDataDbIface dao = BeansFactory.getTypeFactory()
-                    .getTypedBean(BeansFactory.getKustvaktContext().getUserDataDaos(), UserDetails.class);
+            UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
+                    BeansFactory.getKustvaktContext().getUserDataDaos(),
+                    UserDetails.class);
             dao.store(det);
 
-            dao = BeansFactory.getTypeFactory()
-                    .getTypedBean(BeansFactory.getKustvaktContext().getUserDataDaos(), UserSettings.class);
+            dao = BeansFactory.getTypeFactory().getTypedBean(
+                    BeansFactory.getKustvaktContext().getUserDataDaos(),
+                    UserSettings.class);
             dao.store(set);
         }
 

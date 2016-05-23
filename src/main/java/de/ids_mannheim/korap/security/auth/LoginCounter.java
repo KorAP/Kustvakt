@@ -19,17 +19,20 @@ public class LoginCounter {
     private final Map<String, Long[]> failedLogins;
     private KustvaktConfiguration config;
 
-    public LoginCounter(KustvaktConfiguration config) {
+
+    public LoginCounter (KustvaktConfiguration config) {
         jlog.debug("init login counter for authentication management");
         this.config = config;
         this.failedLogins = new HashMap<>();
     }
 
-    public void resetFailedCounter(String username) {
+
+    public void resetFailedCounter (String username) {
         failedLogins.remove(username);
     }
 
-    public void registerFail(String username) {
+
+    public void registerFail (String username) {
         long expires = TimeUtils.plusSeconds(config.getLoginAttemptTTL())
                 .getMillis();
         long fail = 1;
@@ -46,13 +49,15 @@ public class LoginCounter {
                 Arrays.asList(failedLogins.get(username)));
     }
 
-    public boolean validate(String username) {
+
+    public boolean validate (String username) {
         Long[] set = failedLogins.get(username);
         if (set != null) {
             if (TimeUtils.isPassed(set[1])) {
                 failedLogins.remove(username);
                 return true;
-            }else if (set[0] < config.getLoginAttemptNum())
+            }
+            else if (set[0] < config.getLoginAttemptNum())
                 return true;
             return false;
         }

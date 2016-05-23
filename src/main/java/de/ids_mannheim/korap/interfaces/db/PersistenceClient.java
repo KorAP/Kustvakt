@@ -13,39 +13,47 @@ public abstract class PersistenceClient<SOURCE> {
     protected String database;
     private InputStream schema;
 
-    public PersistenceClient(String database, TYPE type) {
+
+    public PersistenceClient (String database, TYPE type) {
         this.type = type;
         this.database = database;
     }
 
-    public PersistenceClient(TYPE type) {
+
+    public PersistenceClient (TYPE type) {
         this.type = type;
     }
 
-    public PersistenceClient() {
-    }
 
-    protected void setSource(SOURCE conn) {
+    public PersistenceClient () {}
+
+
+    protected void setSource (SOURCE conn) {
         this.source = conn;
     }
 
-    public void setDatabase(String name) {
+
+    public void setDatabase (String name) {
         this.database = name;
     }
 
-    public void setSchema(String schema_path) throws FileNotFoundException {
+
+    public void setSchema (String schema_path) throws FileNotFoundException {
         this.schema = new FileInputStream(new File(schema_path));
     }
 
+
     // for spring configuration
     @Deprecated
-    public void setSchema(InputStream schema) throws IOException {
+    public void setSchema (InputStream schema) throws IOException {
         this.schema = schema;
     }
 
-    public abstract boolean checkDatabase();
 
-    public abstract void createDatabase() throws IOException;
+    public abstract boolean checkDatabase ();
+
+
+    public abstract void createDatabase () throws IOException;
 
     public enum TYPE {
         SQL, CASSANDRA

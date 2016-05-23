@@ -16,26 +16,30 @@ public class KustvaktClassLoader {
     private static final Reflections reflections = new Reflections(
             "de.ids_mannheim.korap");
 
-    private KustvaktClassLoader() {
-    }
+
+    private KustvaktClassLoader () {}
+
 
     /**
      * loads interface implementations in current classpath
-     *
+     * 
      * @param iface
      * @param <T>
      * @return
      */
-    public static <T> Set<Class<? extends T>> loadSubTypes(Class<T> iface) {
+    public static <T> Set<Class<? extends T>> loadSubTypes (Class<T> iface) {
         return reflections.getSubTypesOf(iface);
     }
 
-    public static Set<Class<?>> loadFromAnnotation(
+
+    public static Set<Class<?>> loadFromAnnotation (
             Class<? extends Annotation> annotation) {
         return reflections.getTypesAnnotatedWith(annotation);
     }
 
-    public static <T> Class<? extends T> getTypeClass(Class type, Class<T> iface) {
+
+    public static <T> Class<? extends T> getTypeClass (Class type,
+            Class<T> iface) {
         Set<Class<? extends T>> c = KustvaktClassLoader.loadSubTypes(iface);
         for (Class<? extends T> o : c) {
             Type ctype = o.getGenericInterfaces()[0];

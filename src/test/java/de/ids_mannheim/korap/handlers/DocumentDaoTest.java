@@ -17,33 +17,38 @@ public class DocumentDaoTest extends BeanConfigTest {
 
     private static DocumentDao dao;
 
+
     @After
-    public void clear() {
+    public void clear () {
         dao.truncate();
     }
 
+
     @Test
-    public void testSet() throws KustvaktException {
+    public void testSet () throws KustvaktException {
         Document doc = new Document("BRZ13_APR.00001");
         doc.setDisabled(true);
         dao.storeResource(doc, null);
     }
 
+
     @Test
-    public void testGet() {
+    public void testGet () {
         Document doc = new Document("BRZ13_APR.00002");
         doc.setDisabled(true);
         try {
             dao.storeResource(doc, null);
             Document doc1 = dao.findbyId(doc.getPersistentID(), null);
             assert doc1 != null && doc.isDisabled();
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             e.printStackTrace();
         }
     }
 
+
     @Test
-    public void testRemove() {
+    public void testRemove () {
         Document doc = new Document("BRZ13_APR.00003");
         doc.setDisabled(true);
         try {
@@ -52,18 +57,21 @@ public class DocumentDaoTest extends BeanConfigTest {
             assert dao.deleteResource(doc.getPersistentID(), null) == 1;
             doc1 = dao.findbyId(doc.getPersistentID(), null);
             assert doc1 == null;
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             e.printStackTrace();
 
         }
     }
 
+
     @Test
-    public void testEmptyFind() {
+    public void testEmptyFind () {
         List<String> dc = null;
         try {
             dc = dao.findbyCorpus("WPD", true);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             e.printStackTrace();
         }
 
@@ -71,15 +79,17 @@ public class DocumentDaoTest extends BeanConfigTest {
         Assert.assertEquals("should be empty", 0, dc.size());
     }
 
+
     @Test
-    public void testFind() {
+    public void testFind () {
         int length = 10;
         for (int i = 0; i < length; i++) {
             Document doc = new Document("WPD_APR.0000" + i);
             doc.setDisabled(true);
             try {
                 dao.storeResource(doc, null);
-            }catch (KustvaktException e) {
+            }
+            catch (KustvaktException e) {
                 e.printStackTrace();
                 break;
             }
@@ -88,7 +98,8 @@ public class DocumentDaoTest extends BeanConfigTest {
         List<String> dc = null;
         try {
             dc = dao.findbyCorpus("WPD", true);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             e.printStackTrace();
         }
 
@@ -97,8 +108,9 @@ public class DocumentDaoTest extends BeanConfigTest {
         Assert.assertEquals("not all found", length, dc.size());
     }
 
+
     @Override
-    public void initMethod() throws KustvaktException {
+    public void initMethod () throws KustvaktException {
         dao = new DocumentDao(helper().getContext().getPersistenceClient());
     }
 }

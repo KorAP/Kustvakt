@@ -25,11 +25,14 @@ public class BatchBuilder {
 
     private JdbcOperations operations;
 
-    public BatchBuilder(JdbcOperations operations) {
+
+    public BatchBuilder (JdbcOperations operations) {
         this.operations = operations;
     }
 
-    public <T> List<T> selectFromIDs(String query, Collection ids, RowMapper<T> mapper) {
+
+    public <T> List<T> selectFromIDs (String query, Collection ids,
+            RowMapper<T> mapper) {
         List l = new ArrayList(ids);
         int size = ids.size();
         List<T> values = new ArrayList<>();
@@ -60,7 +63,8 @@ public class BatchBuilder {
             l.removeAll(d);
             try {
                 values.addAll(this.operations.query(sql, args, mapper));
-            } catch (DataAccessException e) {
+            }
+            catch (DataAccessException e) {
                 log.error("Exception during database retrieval", e);
             }
 

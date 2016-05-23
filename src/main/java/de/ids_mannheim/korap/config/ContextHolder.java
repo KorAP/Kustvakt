@@ -31,30 +31,35 @@ public abstract class ContextHolder {
     private ApplicationContext context = null;
     private DefaultHandler handler;
 
-    public ContextHolder(ApplicationContext context) {
+
+    public ContextHolder (ApplicationContext context) {
         this.handler = new DefaultHandler();
         this.context = context;
         // todo: better method?!
         KustvaktResponseHandler.init(getAuditingProvider());
     }
 
-    protected <T> T getBean(Class<T> clazz) {
+
+    protected <T> T getBean (Class<T> clazz) {
         if (this.context != null) {
             try {
                 return context.getBean(clazz);
-            }catch (NoSuchBeanDefinitionException e) {
+            }
+            catch (NoSuchBeanDefinitionException e) {
                 // do nothing
             }
         }
         return this.handler.getDefault(clazz);
     }
 
-    protected <T> T getBean(String name) {
+
+    protected <T> T getBean (String name) {
         T bean = null;
         if (this.context != null) {
             try {
                 bean = (T) context.getBean(name);
-            }catch (NoSuchBeanDefinitionException e) {
+            }
+            catch (NoSuchBeanDefinitionException e) {
                 // do nothing
                 bean = (T) this.handler.getDefault(name);
             }
@@ -63,52 +68,61 @@ public abstract class ContextHolder {
         return bean;
     }
 
-    public AuditingIface getAuditingProvider() {
+
+    public AuditingIface getAuditingProvider () {
         return (AuditingIface) getBean(KUSTVAKT_AUDITING);
     }
 
-    public <T extends KustvaktConfiguration> T getConfiguration() {
+
+    public <T extends KustvaktConfiguration> T getConfiguration () {
         return (T) getBean(KUSTVAKT_CONFIG);
     }
 
-    public PersistenceClient getPersistenceClient() {
+
+    public PersistenceClient getPersistenceClient () {
         return getBean(KUSTVAKT_DB);
     }
 
-    public Collection<UserDataDbIface> getUserDataDaos() {
+
+    public Collection<UserDataDbIface> getUserDataDaos () {
         return getBean(KUSTVAKT_USERDATA);
     }
 
-    public EncryptionIface getEncryption() {
+
+    public EncryptionIface getEncryption () {
         return getBean(KUSTVAKT_ENCRYPTION);
     }
 
-    public AuthenticationManagerIface getAuthenticationManager() {
+
+    public AuthenticationManagerIface getAuthenticationManager () {
         return getBean(KUSTVAKT_AUTHENTICATION_MANAGER);
     }
 
-    public EntityHandlerIface getUserDBHandler() {
+
+    public EntityHandlerIface getUserDBHandler () {
         return getBean(KUSTVAKT_USERDB);
     }
 
-    public PolicyHandlerIface getPolicyDbProvider() {
+
+    public PolicyHandlerIface getPolicyDbProvider () {
         Object b = getBean(KUSTVAKT_POLICIES);
         return (PolicyHandlerIface) b;
     }
 
 
-    public Collection<AuthenticationIface> getAuthProviders() {
+    public Collection<AuthenticationIface> getAuthProviders () {
         return getBean(KUSTVAKT_AUTHPROVIDERS);
     }
 
+
     // todo: !!!!!!!!!!!!!!!!!!!!!!!!!!
     // todo: more specific --> collection provider, document provider, etc.
-    public Collection<ResourceOperationIface> getResourceProvider() {
+    public Collection<ResourceOperationIface> getResourceProvider () {
         return getBean(KUSTVAKT_RESOURCES);
     }
 
 
-    private void finish() {
+    private void finish () {
         this.getAuditingProvider().finish();
         this.context = null;
     }

@@ -15,12 +15,14 @@ public class KustvaktCacheManager {
 
     private static boolean loaded = false;
 
-    public static void init() {
+
+    public static void init () {
         if (!loaded) {
             InputStream in = null;
             try {
                 in = new FileInputStream(new File("./ehcache.xml"));
-            }catch (FileNotFoundException e) {
+            }
+            catch (FileNotFoundException e) {
                 // do nothing
             }
 

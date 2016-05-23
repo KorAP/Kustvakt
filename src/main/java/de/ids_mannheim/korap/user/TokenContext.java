@@ -37,14 +37,16 @@ public class TokenContext implements java.security.Principal, Serializable {
     private String hostAddress;
     private String userAgent;
 
-    public TokenContext() {
+
+    public TokenContext () {
         this.parameters = new HashMap<>();
         this.setUsername("");
         this.setToken("");
         this.setSecureRequired(false);
     }
 
-    private Map statusMap() {
+
+    private Map statusMap () {
         Map m = new HashMap();
         if (username != null && !username.isEmpty())
             m.put(Attributes.USERNAME, username);
@@ -54,11 +56,13 @@ public class TokenContext implements java.security.Principal, Serializable {
         return m;
     }
 
-    public Map<String, Object> params() {
+
+    public Map<String, Object> params () {
         return new HashMap<>(parameters);
     }
 
-    public boolean match(TokenContext other) {
+
+    public boolean match (TokenContext other) {
         if (other.getToken().equals(this.token))
             if (this.getHostAddress().equals(this.hostAddress))
                 // user agent should be irrelvant -- what about os system version?
@@ -67,25 +71,30 @@ public class TokenContext implements java.security.Principal, Serializable {
         return false;
     }
 
-    public void addContextParameter(String key, String value) {
+
+    public void addContextParameter (String key, String value) {
         this.parameters.put(key, value);
     }
 
-    public void addParams(Map<String, Object> map) {
+
+    public void addParams (Map<String, Object> map) {
         for (Map.Entry<String, Object> e : map.entrySet())
             this.parameters.put(e.getKey(), String.valueOf(e.getValue()));
     }
 
-    public void removeContextParameter(String key) {
+
+    public void removeContextParameter (String key) {
         this.parameters.remove(key);
     }
 
-    public void setExpirationTime(long date) {
+
+    public void setExpirationTime (long date) {
         this.expirationTime = new Date(date);
     }
 
+
     //todo: complete
-    public static TokenContext fromJSON(String s) {
+    public static TokenContext fromJSON (String s) {
         JsonNode node = JsonUtils.readTree(s);
         TokenContext c = new TokenContext();
         if (node != null) {
@@ -95,35 +104,40 @@ public class TokenContext implements java.security.Principal, Serializable {
         return c;
     }
 
-    public static TokenContext fromOAuth2(String s) {
+
+    public static TokenContext fromOAuth2 (String s) {
         JsonNode node = JsonUtils.readTree(s);
         TokenContext c = new TokenContext();
         if (node != null) {
             c.setToken(node.path("token").asText());
             c.setTokenType(node.path("token_type").asText());
             c.setExpirationTime(node.path("expires_in").asLong());
-            c.addContextParameter("refresh_token",
-                    node.path("refresh_token").asText());
+            c.addContextParameter("refresh_token", node.path("refresh_token")
+                    .asText());
 
         }
         return c;
     }
 
-    public boolean isValid() {
-        return (this.username != null && !this.username.isEmpty()) && (
-                this.token != null && !this.token.isEmpty()) && (
-                this.tokenType != null && !this.tokenType.isEmpty());
+
+    public boolean isValid () {
+        return (this.username != null && !this.username.isEmpty())
+                && (this.token != null && !this.token.isEmpty())
+                && (this.tokenType != null && !this.tokenType.isEmpty());
     }
 
-    public String getToken() {
+
+    public String getToken () {
         return token;
     }
 
-    public String toJSON() {
+
+    public String toJSON () {
         return JsonUtils.toJSON(this.statusMap());
     }
 
-    public String toResponse() {
+
+    public String toResponse () {
         ObjectNode node = JsonUtils.createObjectNode();
         node.put("token", this.getToken());
         node.put("expires", this.getExpirationTime().getTime());
@@ -131,8 +145,9 @@ public class TokenContext implements java.security.Principal, Serializable {
         return JsonUtils.toJSON(node);
     }
 
+
     @Override
-    public String getName() {
+    public String getName () {
         return this.getUsername();
     }
 

@@ -15,24 +15,33 @@ public abstract class TestBeans {
 
     protected PersistenceClient dataSource;
 
-    public abstract PolicyHandlerIface getPolicyDao();
 
-    public abstract KustvaktConfiguration getConfig();
+    public abstract PolicyHandlerIface getPolicyDao ();
 
-    public abstract EntityHandlerIface getUserDao();
 
-    public abstract AuditingIface getAuditingDao();
+    public abstract KustvaktConfiguration getConfig ();
 
-    public abstract List<ResourceOperationIface> getResourceDaos();
 
-    public abstract List<UserDataDbIface> getUserdataDaos();
+    public abstract EntityHandlerIface getUserDao ();
 
-    public abstract EncryptionIface getCrypto();
 
-    public abstract AuthenticationManagerIface getAuthManager();
+    public abstract AuditingIface getAuditingDao ();
+
+
+    public abstract List<ResourceOperationIface> getResourceDaos ();
+
+
+    public abstract List<UserDataDbIface> getUserdataDaos ();
+
+
+    public abstract EncryptionIface getCrypto ();
+
+
+    public abstract AuthenticationManagerIface getAuthManager ();
+
 
     @Bean(name = "kustvakt_db")
-    public PersistenceClient getDataSource() {
+    public PersistenceClient getDataSource () {
         return this.dataSource;
     }
 }

@@ -14,13 +14,15 @@ public class DemoUser extends User implements Serializable {
     private static final long ACCOUNT_CREATED = 1377102171202L;
     public static final String PASSPHRASE = "demo";
 
-    protected DemoUser() {
+
+    protected DemoUser () {
         super(DEMOUSER_NAME, 2);
         this.setId(-1);
         this.setAccountCreation(ACCOUNT_CREATED);
     }
 
-    protected User clone() {
+
+    protected User clone () {
         return new DemoUser();
     }
 

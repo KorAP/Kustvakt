@@ -10,10 +10,10 @@ public class StringUtils {
     private final static Logger jlog = LoggerFactory
             .getLogger(StringUtils.class);
 
-    private static final String SLASH = "/";
     private static final String SEP = ";";
 
-    public static Collection<UUID> stringToUUIDList(String s) {
+
+    public static Collection<UUID> stringToUUIDList (String s) {
         String[] array = s.split(SEP);
         List<UUID> list = new LinkedList<>();
         for (String att : array) {
@@ -22,7 +22,8 @@ public class StringUtils {
         return list;
     }
 
-    public static List<String> toList(String values) {
+
+    public static List<String> toList (String values) {
         List<String> list = new ArrayList<>();
         StringTokenizer tokenizer = new StringTokenizer(values, SEP);
         while (tokenizer.hasMoreTokens())
@@ -30,7 +31,8 @@ public class StringUtils {
         return list;
     }
 
-    public static Set<String> toSet(String values, String sep) {
+
+    public static Set<String> toSet (String values, String sep) {
         Set<String> set = new HashSet<>();
         if (values != null && !values.isEmpty()) {
             StringTokenizer tokenizer = new StringTokenizer(values, sep);
@@ -40,15 +42,18 @@ public class StringUtils {
         return set;
     }
 
-    public static Set<String> toSet(String values) {
+
+    public static Set<String> toSet (String values) {
         return toSet(values, SEP);
     }
 
-    public static String toString(Collection<String> values) {
+
+    public static String toString (Collection<String> values) {
         return StringUtils.toString(values, SEP);
     }
 
-    public static String toString(Collection<String> values, String sep) {
+
+    public static String toString (Collection<String> values, String sep) {
         StringBuffer b = new StringBuffer();
         for (String s : values)
             b.append(s).append(sep);
@@ -58,12 +63,14 @@ public class StringUtils {
         return b.toString();
     }
 
-    public static String orderedToString(Collection<String> hash) {
+
+    public static String orderedToString (Collection<String> hash) {
         Set<String> orderedSet = new TreeSet<>();
         orderedSet.addAll(hash);
         if (orderedSet.isEmpty()) {
             return "";
-        }else {
+        }
+        else {
             StringBuilder builder = new StringBuilder();
             for (String s : orderedSet) {
                 builder.append(s);
@@ -74,12 +81,14 @@ public class StringUtils {
         }
     }
 
-    public static String UUIDsetToString(Collection<UUID> hash) {
+
+    public static String UUIDsetToString (Collection<UUID> hash) {
         Set<UUID> orderedSet = new TreeSet<>();
         orderedSet.addAll(hash);
         if (orderedSet.isEmpty()) {
             return "";
-        }else {
+        }
+        else {
             StringBuilder builder = new StringBuilder();
             for (UUID s : orderedSet) {
                 builder.append(s);
@@ -90,7 +99,8 @@ public class StringUtils {
         }
     }
 
-    public static String buildSQLRegex(String path) {
+
+    public static String buildSQLRegex (String path) {
         StringBuilder b = new StringBuilder();
         String[] match = path.split("/");
         b.append(match[0]);
@@ -99,87 +109,49 @@ public class StringUtils {
         return b.toString();
     }
 
-    public static Collection<String> joinStringSet(Collection<String> source,
-            String other) {
-        Set<String> set = new HashSet<>(source);
-        set.add(other);
-        return set;
-    }
 
-    public static Collection<UUID> joinUUIDSet(Collection<UUID> source,
-            UUID other) {
-        Set<UUID> set = new HashSet<>(source);
-        set.add(other);
-        return set;
-    }
-
-    public static String joinResources(String first, String second) {
-        String res;
-        if (first != null && !first.isEmpty())
-            res = first + SLASH + second;
-        else
-            res = second;
-        return res.replaceAll("\\s", "");
-    }
-
-    public static String[] splitAnnotations(String joined) {
-        String[] spl = joined.split(SLASH);
-        if (spl.length == 2)
-            return spl;
-        else
-            return null;
-    }
-
-    public static String stripTokenType(String token) {
-        int idx = token.lastIndexOf(" ");
-        if (idx == -1)
-            return token;
-        return token.substring(idx).replaceAll("\\s", "");
-    }
-
-    public static String getTokenType(String token) {
-        if (token.contains(" "))
-            return token.substring(0, token.lastIndexOf(" "))
-                    .replaceAll("\\s", "").toLowerCase();
-        else
-            return null;
-    }
-
-    public static boolean isInteger(String value) {
+    public static boolean isInteger (String value) {
         try {
             Integer.valueOf(value);
             return true;
-        }catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
             // do nothing!
             return false;
         }
     }
 
-    public static String normalize(String value) {
+
+    public static String normalize (String value) {
         return value.trim().toLowerCase();
     }
 
-    public static String normalizeHTML(String value) {
+
+    public static String normalizeHTML (String value) {
         return StringEscapeUtils.escapeHtml(value);
     }
 
-    public static String decodeHTML(String value) {
+
+    public static String decodeHTML (String value) {
         return StringEscapeUtils.unescapeHtml(value);
     }
 
+
     /**
-     * constructs a lucene query from query string and corpus parameters as set
-     *
+     * constructs a lucene query from query string and corpus
+     * parameters as set
+     * 
      * @param query
      * @param corpusIDs
      * @return
      */
-    public static String queryBuilder(String query,
+    public static String queryBuilder (String query,
             Collection<String> corpusIDs) {
         String completeQuery; // holds original query and corpus
         // selection
         /**
-         * find documents with metadataquery TODO: does not intercept with
+         * find documents with metadataquery TODO: does not intercept
+         * with
          * parameters foundries and corpusIDs
          */
 

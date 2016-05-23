@@ -25,13 +25,15 @@ public abstract class Userdata {
     @Setter(AccessLevel.PRIVATE)
     private Integer userID;
 
-    public Userdata(Integer userid) {
+
+    public Userdata (Integer userid) {
         this.fields = new HashMap<>();
         this.userID = userid;
         this.id = -1;
     }
 
-    public void setData(Map<String, Object> map) throws KustvaktException {
+
+    public void setData (Map<String, Object> map) throws KustvaktException {
         Set missing = missing(map);
         if (!missing.isEmpty())
             throw new KustvaktException(StatusCodes.MISSING_ARGUMENTS,
@@ -40,7 +42,8 @@ public abstract class Userdata {
         this.fields.putAll(map);
     }
 
-    private Set<String> missing(Map<String, Object> map) {
+
+    private Set<String> missing (Map<String, Object> map) {
         Set<String> missing = new HashSet<>();
         for (String key : requiredFields()) {
             if (!map.containsKey(key))
@@ -49,23 +52,27 @@ public abstract class Userdata {
         return missing;
     }
 
-    public int size() {
+
+    public int size () {
         return this.fields.size();
     }
 
-    public Object get(String key) {
+
+    public Object get (String key) {
         return this.fields.get(key);
     }
 
+
     /**
-     *
+     * 
      * @return
      */
-    public boolean isValid() {
+    public boolean isValid () {
         return missing().length == 0;
     }
 
-    public String[] missing() {
+
+    public String[] missing () {
         StringBuilder b = new StringBuilder();
         Set<String> m = missing(this.fields);
 
@@ -78,51 +85,61 @@ public abstract class Userdata {
         return b.toString().split(";");
     }
 
-    public void checkRequired() throws KustvaktException {
+
+    public void checkRequired () throws KustvaktException {
         if (!isValid()) {
             String[] fields = missing();
             throw new KustvaktException(StatusCodes.MISSING_ARGUMENTS,
-                    "User data object not valid. Missing fields: " + Arrays
-                            .asList(fields));
+                    "User data object not valid. Missing fields: "
+                            + Arrays.asList(fields));
         }
     }
 
-    public Set<String> keys() {
+
+    public Set<String> keys () {
         return this.fields.keySet();
     }
 
-    public Collection<Object> values() {
+
+    public Collection<Object> values () {
         return this.fields.values();
     }
 
-    public Map<String, Object> fields() {
+
+    public Map<String, Object> fields () {
         return new HashMap<>(this.fields);
     }
 
-    public void setData(String data) {
+
+    public void setData (String data) {
         Map m = JsonUtils.readSimple(data, Map.class);
         if (m != null)
             this.fields.putAll(m);
     }
 
-    public void update(Userdata other) {
+
+    public void update (Userdata other) {
         if (other != null && this.getClass().equals(other.getClass()))
             this.fields.putAll(other.fields);
     }
 
-    public String data() {
+
+    public String data () {
         return JsonUtils.toJSON(this.fields);
     }
 
-    public void setField(String key, Object value) {
+
+    public void setField (String key, Object value) {
         this.fields.put(key, value);
     }
 
-    public void validate(EncryptionIface crypto) throws KustvaktException {
+
+    public void validate (EncryptionIface crypto) throws KustvaktException {
         this.fields = crypto.validateMap(this.fields);
     }
 
-    public void readDefaults(Map<String, Object> map) throws KustvaktException {
+
+    public void readDefaults (Map<String, Object> map) throws KustvaktException {
         for (String k : defaultFields()) {
             Object o = map.get(k);
             if (o != null)
@@ -131,8 +148,10 @@ public abstract class Userdata {
         this.checkRequired();
     }
 
-    public abstract String[] requiredFields();
 
-    public abstract String[] defaultFields();
+    public abstract String[] requiredFields ();
+
+
+    public abstract String[] defaultFields ();
 
 }

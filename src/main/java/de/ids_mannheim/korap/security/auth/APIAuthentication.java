@@ -10,6 +10,7 @@ import de.ids_mannheim.korap.interfaces.AuthenticationIface;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.NamingUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -24,48 +25,55 @@ import java.util.Map;
 public class APIAuthentication implements AuthenticationIface {
 
     private JWTSigner signedToken;
-    private Cache invalided = CacheManager.getInstance()
-            .getCache("id_tokens_inv");
+    private Cache invalided = CacheManager.getInstance().getCache(
+            "id_tokens_inv");
     private Cache id_tokens = CacheManager.getInstance().getCache("id_tokens");
 
-    public APIAuthentication(KustvaktConfiguration bconfig) {
+
+    public APIAuthentication (KustvaktConfiguration bconfig) {
         KustvaktConfiguration config = bconfig;
         this.signedToken = new JWTSigner(config.getSharedSecret(),
                 config.getIssuer(), config.getTokenTTL());
     }
 
+
     //    @Cacheable(value = "id_tokens", key = "#authToken")
     // todo: test
     @Override
-    public TokenContext getUserStatus(String authToken)
+    public TokenContext getUserStatus (String authToken)
             throws KustvaktException {
         TokenContext context;
         Element e = id_tokens.get(authToken);
         Element ein = invalided.get(authToken);
         if (e == null && ein == null) {
             try {
-                authToken = StringUtils.stripTokenType(authToken);
+                authToken = NamingUtils.stripTokenType(authToken);
                 context = signedToken.getTokenContext(authToken);
                 context.setTokenType(Attributes.API_AUTHENTICATION);
-            }catch (JOSEException | ParseException ex) {
+            }
+            catch (JOSEException | ParseException ex) {
                 throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);
             }
-        }else if (ein == null) {
+        }
+        else if (ein == null) {
             context = (TokenContext) e.getObjectValue();
-        }else
+        }
+        else
             throw new KustvaktException(StatusCodes.EXPIRED);
         return context;
     }
 
+
     @Override
-    public TokenContext createUserSession(User user, Map<String, Object> attr)
+    public TokenContext createUserSession (User user, Map<String, Object> attr)
             throws KustvaktException {
         TokenContext c = new TokenContext();
         c.setUsername(user.getUsername());
         SignedJWT jwt = signedToken.createJWT(user, attr);
         try {
             c.setExpirationTime(jwt.getJWTClaimsSet().getExpirationTimeClaim());
-        }catch (ParseException e) {
+        }
+        catch (ParseException e) {
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);
         }
         c.setTokenType(Attributes.API_AUTHENTICATION);
@@ -75,22 +83,25 @@ public class APIAuthentication implements AuthenticationIface {
         return c;
     }
 
+
     // todo: cache and set expiration to token expiration. if token in that cache, it is not to be used anymore!
     // fixme: dont use annotations but function calls
     //    @CacheEvict(value = "id_tokens", key = "#token")
     @Override
-    public void removeUserSession(String token) throws KustvaktException {
+    public void removeUserSession (String token) throws KustvaktException {
         // invalidate token!
         invalided.put(new Element(token, null));
     }
 
+
     @Override
-    public TokenContext refresh(TokenContext context) throws KustvaktException {
+    public TokenContext refresh (TokenContext context) throws KustvaktException {
         return null;
     }
 
+
     @Override
-    public String getIdentifier() {
+    public String getIdentifier () {
         return Attributes.API_AUTHENTICATION;
     }
 

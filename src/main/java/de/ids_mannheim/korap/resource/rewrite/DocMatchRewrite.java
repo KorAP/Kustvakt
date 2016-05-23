@@ -18,24 +18,27 @@ import net.sf.ehcache.Element;
  * @date 12/11/2015
  */
 //todo : test
-public class DocMatchRewrite
-        implements RewriteTask.IterableRewriteAt, BeanInjectable {
+public class DocMatchRewrite implements RewriteTask.IterableRewriteAt,
+        BeanInjectable {
 
     private DocumentDao docDao;
     private Cache cache;
 
-    public DocMatchRewrite() {
+
+    public DocMatchRewrite () {
         this.cache = CacheManager.getInstance().getCache("documents");
     }
 
-    @Override
-    public void insertBeans(ContextHolder beans) {
-        this.docDao = BeansFactory.getTypeFactory()
-                .getTypedBean(beans.getResourceProvider(), Document.class);
-    }
 
     @Override
-    public JsonNode postProcess(KoralNode node) throws KustvaktException {
+    public void insertBeans (ContextHolder beans) {
+        this.docDao = BeansFactory.getTypeFactory().getTypedBean(
+                beans.getResourceProvider(), Document.class);
+    }
+
+
+    @Override
+    public JsonNode postProcess (KoralNode node) throws KustvaktException {
         Document doc = null;
         if (this.docDao == null)
             throw new RuntimeException("Document dao must be set!");
@@ -47,7 +50,8 @@ public class DocMatchRewrite
                 doc = docDao.findbyId(docID, null);
                 if (doc != null)
                     this.cache.put(new Element(docID, doc));
-            }else
+            }
+            else
                 doc = (Document) e.getObjectValue();
 
             if (doc != null && doc.isDisabled())
@@ -56,13 +60,15 @@ public class DocMatchRewrite
         return node.rawNode();
     }
 
+
     @Override
-    public String path() {
+    public String path () {
         return "matches";
     }
 
+
     @Override
-    public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
+    public JsonNode preProcess (KoralNode node, KustvaktConfiguration config,
             User user) {
         return null;
     }

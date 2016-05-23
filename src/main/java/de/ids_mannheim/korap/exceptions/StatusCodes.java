@@ -48,7 +48,8 @@ public class StatusCodes {
     public static final int CLIENT_AUTHORIZATION_FAILURE = 216;
 
     /**
-     * 500 status codes for access control related components (also policy rewrite)
+     * 500 status codes for access control related components (also
+     * policy rewrite)
      */
     public static final int PERMISSION_DENIED = 401;
     public static final int UNSUPPORTED_RESOURCE = 402;

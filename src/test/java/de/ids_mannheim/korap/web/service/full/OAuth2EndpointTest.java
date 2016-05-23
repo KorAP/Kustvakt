@@ -20,25 +20,28 @@ import org.junit.Test;
 public class OAuth2EndpointTest extends FastJerseyTest {
 
     @BeforeClass
-    public static void configure() throws Exception {
+    public static void configure () throws Exception {
         FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service",
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");
     }
 
+
     @Test
-    public void init() {
+    public void init () {
 
     }
 
+
     @Override
-    public void initMethod() throws KustvaktException {
+    public void initMethod () throws KustvaktException {
         helper().setupAccount();
     }
 
+
     @Test
     @Ignore
-    public void testAuthorizeClient() {
+    public void testAuthorizeClient () {
         ClientResponse response = resource().path("v0.1").path("oauth2")
                 .path("register")
                 .queryParam("redirect_url", "korap.ids-mannheim.de/redirect")
@@ -47,9 +50,10 @@ public class OAuth2EndpointTest extends FastJerseyTest {
         assert response.getStatus() == ClientResponse.Status.OK.getStatusCode();
     }
 
+
     @Test
     @Ignore
-    public void testRevokeClient() {
+    public void testRevokeClient () {
         ClientResponse response = resource().path("v0.1").path("oauth2")
                 .path("register")
                 .queryParam("redirect_url", "korap.ids-mannheim.de/redirect")
@@ -60,9 +64,10 @@ public class OAuth2EndpointTest extends FastJerseyTest {
 
     }
 
+
     @Test
     @Ignore
-    public void authenticate() {
+    public void authenticate () {
         String[] cred = TestHelper.getUserCredentials();
         String enc = BasicHttpAuth.encode(cred[0], cred[1]);
         ClientResponse response = resource().path("v0.1").path("oauth2")

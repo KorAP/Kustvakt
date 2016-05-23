@@ -20,22 +20,24 @@ import java.util.Map;
 public class KustvaktCoreRestTest extends FastJerseyTest {
 
     @BeforeClass
-    public static void configure() {
+    public static void configure () {
         FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.light",
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");
     }
 
+
     //    @Test
-    public void testFieldsInSearch() {
+    public void testFieldsInSearch () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("search").queryParam("q", "[base=Wort]")
                 .queryParam("ql", "poliqarp").get(ClientResponse.class);
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
     }
 
+
     @Test
-    public void testQuery() {
+    public void testQuery () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("search").queryParam("q", "[base=Wort]")
                 .queryParam("ql", "poliqarp").get(ClientResponse.class);
@@ -44,8 +46,9 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
     }
 
+
     @Test
-    public void testQueryRaw() {
+    public void testQueryRaw () {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[base=Wort]", "poliqarp");
 
@@ -56,29 +59,34 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
     }
 
+
     // in case no index is there, this will throw an error
     @Test
     @Ignore
-    public void testGetMatchInfoThrowsNoException() {
-        ClientResponse response = resource().path(getAPIVersion())
-                .get(ClientResponse.class);
+    public void testGetMatchInfoThrowsNoException () {
+        ClientResponse response = resource().path(getAPIVersion()).get(
+                ClientResponse.class);
     }
 
+
     //    @Test
-    public void testGetStatsThrowsNoException() {
+    public void testGetStatsThrowsNoException () {
         CollectionQueryProcessor pr = new CollectionQueryProcessor();
         pr.process("corpusID=WPD & textClass=Sport");
         Map map = new LinkedHashMap();
         map.put("collection", pr.getRequestMap());
-        ClientResponse response = resource().path(getAPIVersion()).path("stats")
+        ClientResponse response = resource().path(getAPIVersion())
+                .path("stats")
                 .post(ClientResponse.class, JsonUtils.toJSON(map));
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
     }
 
+
     @Test
     @Ignore
-    public void testGetStats2ThrowsNoException() {
-        ClientResponse response = resource().path(getAPIVersion()).path("stats")
+    public void testGetStats2ThrowsNoException () {
+        ClientResponse response = resource().path(getAPIVersion())
+                .path("stats")
                 .post(ClientResponse.class, "creationDate in 1787");
         String ent = response.getEntity(String.class);
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
@@ -87,8 +95,9 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
         //        System.out.println("STATS ENTITY " + ent);
     }
 
+
     //    @Test
-    public void testBuildQueryThrowsNoException() {
+    public void testBuildQueryThrowsNoException () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("search").queryParam("q", "[base=Haus & surface=Hauses]")
                 .queryParam("ql", "poliqarp").queryParam("cutOff", "true")
@@ -96,8 +105,9 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
     }
 
+
     //    @Test
-    public void testQueryByNameThrowsNoException() {
+    public void testQueryByNameThrowsNoException () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus").path("WPD").path("search")
                 .queryParam("q", "[base=Haus & surface=Hauses]")
@@ -106,8 +116,9 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
         System.out.println("RESPONSE " + response.getEntity(String.class));
     }
 
+
     @Override
-    public void initMethod() throws KustvaktException {
+    public void initMethod () throws KustvaktException {
         helper().setupAccount();
     }
 }

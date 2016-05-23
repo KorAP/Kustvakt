@@ -25,26 +25,30 @@ public class PolicyContext {
     private long end = 0L;
 
 
-    public PolicyContext() {
+    public PolicyContext () {
         start = TimeUtils.getNow().getMillis();
     }
 
-    public PolicyContext setIPMask(String ip) {
+
+    public PolicyContext setIPMask (String ip) {
         this.ipmask = ip;
         return this;
     }
 
-    public PolicyContext setExpirationTime(long limit) {
+
+    public PolicyContext setExpirationTime (long limit) {
         this.end = limit;
         return this;
     }
 
-    public PolicyContext setEnableTime(long start) {
+
+    public PolicyContext setEnableTime (long start) {
         this.start = start;
         return this;
     }
 
-    protected boolean isActive(String ipaddress) {
+
+    protected boolean isActive (String ipaddress) {
         if (ipaddress == null)
             return false;
         if (noMask())
@@ -54,22 +58,22 @@ public class PolicyContext {
             mask = IPNetMask.getIPMask(this.ipmask);
             boolean f = mask.matches(ipaddress);
             return f;
-        } catch (UnknownHostException e) {
+        }
+        catch (UnknownHostException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    protected boolean noMask() {
+
+    protected boolean noMask () {
         return ipmask == null || ipmask.isEmpty();
     }
 
+
     @Override
-    public String toString() {
-        return "PolicyContext{" +
-                ", ipmask='" + ipmask + '\'' +
-                ", start=" + start +
-                ", end=" + end +
-                '}';
+    public String toString () {
+        return "PolicyContext{" + ", ipmask='" + ipmask + '\'' + ", start="
+                + start + ", end=" + end + '}';
     }
 }

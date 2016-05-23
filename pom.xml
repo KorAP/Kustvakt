@@ -116,6 +116,29 @@
             </testResource>
         </testResources>
         <plugins>
+            <!--
+	  Formatter plugin for Eclipse based coding conventions
+	  http://maven-java-formatter-plugin.googlecode.com/svn/site/0.4/usage.html
+      -->
+            <plugin>
+                <groupId>com.googlecode.maven-java-formatter-plugin</groupId>
+                <artifactId>maven-java-formatter-plugin</artifactId>
+                <version>0.4</version>
+                <configuration>
+                    <configFile>${project.basedir}/Format.xml</configFile>
+                    <overrideConfigCompilerVersion>true</overrideConfigCompilerVersion>
+                    <compilerSource>1.7</compilerSource>
+                    <compilerCompliance>1.7</compilerCompliance>
+                    <compilerTargetPlatform>1.7</compilerTargetPlatform>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

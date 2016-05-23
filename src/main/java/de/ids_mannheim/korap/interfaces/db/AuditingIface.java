@@ -22,26 +22,31 @@ public abstract class AuditingIface {
             .synchronizedList(new ArrayList<>(BATCH_SIZE + 5));
     private final List<AuditRecord> buffer = new ArrayList<>(BATCH_SIZE + 5);
 
-    public abstract <T extends AuditRecord> List<T> retrieveRecords(
+
+    public abstract <T extends AuditRecord> List<T> retrieveRecords (
             AuditRecord.CATEGORY category, DateTime day, DateTime until,
             boolean exact, int limit);
 
-    public abstract <T extends AuditRecord> List<T> retrieveRecords(
+
+    public abstract <T extends AuditRecord> List<T> retrieveRecords (
             AuditRecord.CATEGORY category, User user, int limit);
 
-    public abstract <T extends AuditRecord> List<T> retrieveRecords(
+
+    public abstract <T extends AuditRecord> List<T> retrieveRecords (
             LocalDate day, int hitMax);
 
-    public abstract <T extends AuditRecord> List<T> retrieveRecords(
+
+    public abstract <T extends AuditRecord> List<T> retrieveRecords (
             String userID, LocalDate start, LocalDate end, int hitMax);
 
-    private void addAndRun(AuditRecord record) {
+
+    private void addAndRun (AuditRecord record) {
         if (buffer.size() > BATCH_SIZE) {
             records.clear();
             records.addAll(buffer);
             new Thread(new Runnable() {
                 @Override
-                public void run() {
+                public void run () {
                     apply();
                 }
             }).start();
@@ -51,21 +56,25 @@ public abstract class AuditingIface {
             buffer.add(record);
     }
 
-    public <T extends AuditRecord> void audit(T request) {
+
+    public <T extends AuditRecord> void audit (T request) {
         addAndRun(request);
     }
 
-    public <T extends AuditRecord> void audit(List<T> requests) {
+
+    public <T extends AuditRecord> void audit (List<T> requests) {
         for (T rec : requests)
             addAndRun(rec);
     }
 
-    public abstract void apply();
 
-    protected List<AuditRecord> getRecordsToSave() {
+    public abstract void apply ();
+
+
+    protected List<AuditRecord> getRecordsToSave () {
         return this.records;
     }
 
 
-    public abstract void finish();
+    public abstract void finish ();
 }

@@ -11,6 +11,7 @@ import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.NamingUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -29,22 +30,25 @@ public class OpenIDconnectAuthentication implements AuthenticationIface {
     private OAuthDb database;
     private KustvaktConfiguration config;
 
-    public OpenIDconnectAuthentication(KustvaktConfiguration config,
-            PersistenceClient client) {
+
+    public OpenIDconnectAuthentication (KustvaktConfiguration config,
+                                        PersistenceClient client) {
         this.database = new OAuthDb(client);
         this.config = config;
     }
 
+
     @Cacheable(value = "id_tokens", key = "#authToken")
     @Override
-    public TokenContext getUserStatus(String authToken)
+    public TokenContext getUserStatus (String authToken)
             throws KustvaktException {
-        authToken = StringUtils.stripTokenType(authToken);
+        authToken = NamingUtils.stripTokenType(authToken);
         return this.database.getContext(authToken);
     }
 
+
     @Override
-    public TokenContext createUserSession(User user, Map<String, Object> attr)
+    public TokenContext createUserSession (User user, Map<String, Object> attr)
             throws KustvaktException {
         String cl_secret = (String) attr.get(Attributes.CLIENT_SECRET);
         if (cl_secret == null)
@@ -57,7 +61,8 @@ public class OpenIDconnectAuthentication implements AuthenticationIface {
         SignedJWT jwt = signer.createJWT(user, attr);
         try {
             c.setExpirationTime(jwt.getJWTClaimsSet().getExpirationTimeClaim());
-        }catch (ParseException e) {
+        }
+        catch (ParseException e) {
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);
         }
         c.setTokenType(Attributes.OPENID_AUTHENTICATION);
@@ -67,19 +72,22 @@ public class OpenIDconnectAuthentication implements AuthenticationIface {
         return c;
     }
 
+
     @CacheEvict(value = "id_tokens", key = "#token")
     @Override
-    public void removeUserSession(String token) throws KustvaktException {
+    public void removeUserSession (String token) throws KustvaktException {
         // emit token from cache only
     }
 
+
     @Override
-    public TokenContext refresh(TokenContext context) throws KustvaktException {
+    public TokenContext refresh (TokenContext context) throws KustvaktException {
         throw new UnsupportedOperationException("method not supported");
     }
 
+
     @Override
-    public String getIdentifier() {
+    public String getIdentifier () {
         return Attributes.OPENID_AUTHENTICATION;
     }
 }

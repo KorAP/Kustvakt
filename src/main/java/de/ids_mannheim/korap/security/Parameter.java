@@ -16,29 +16,31 @@ public class Parameter extends KustvaktResource {
     // todo: what is this supposed to do?
     private boolean equal;
 
-    public Parameter(String identifier, String value, boolean equal,
-            User user) {
+
+    public Parameter (String identifier, String value, boolean equal, User user) {
         super();
         super.setName(identifier.toLowerCase());
         this.value = value;
         this.equal = equal;
     }
 
-    @Override
-    public void merge(KustvaktResource resource) {
-    }
 
     @Override
-    public void checkNull() {
-    }
+    public void merge (KustvaktResource resource) {}
 
-    public String getValue() {
+
+    @Override
+    public void checkNull () {}
+
+
+    public String getValue () {
         if (policy == null)
             return null;
         return value;
     }
 
-    public void setPolicy(SecurityPolicy policy) {
+
+    public void setPolicy (SecurityPolicy policy) {
         this.policy = policy;
     }
 

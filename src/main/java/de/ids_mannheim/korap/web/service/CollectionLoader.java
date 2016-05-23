@@ -21,7 +21,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class CollectionLoader implements BootableBeanInterface {
 
     @Override
-    public void load(ContextHolder beans) throws KustvaktException {
+    public void load (ContextHolder beans) throws KustvaktException {
         SecurityManager.overrideProviders(beans);
         ResourceFinder.overrideProviders(beans);
 
@@ -64,8 +64,9 @@ public class CollectionLoader implements BootableBeanInterface {
                     "creating collections caused errors", result);
     }
 
+
     @Override
-    public Class<? extends BootableBeanInterface>[] getDependencies() {
+    public Class<? extends BootableBeanInterface>[] getDependencies () {
         return new Class[] { UserLoader.class };
     }
 }

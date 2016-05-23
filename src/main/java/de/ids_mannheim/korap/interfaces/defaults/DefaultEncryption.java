@@ -21,77 +21,91 @@ public class DefaultEncryption implements EncryptionIface {
 
     private SecureRandom randomizer;
 
-    public DefaultEncryption() {
+
+    public DefaultEncryption () {
         randomizer = new SecureRandom();
     }
 
+
     @Override
-    public String produceSecureHash(String input, String salt)
+    public String produceSecureHash (String input, String salt)
             throws NoSuchAlgorithmException, UnsupportedEncodingException,
             KustvaktException {
         return null;
     }
 
+
     @Override
-    public String produceSecureHash(String input)
+    public String produceSecureHash (String input)
             throws NoSuchAlgorithmException, UnsupportedEncodingException,
             KustvaktException {
         return null;
     }
 
+
     @Override
-    public String hash(String text, String salt) throws Exception {
+    public String hash (String text, String salt) throws Exception {
         return null;
     }
 
+
     @Override
-    public String hash(String value) {
+    public String hash (String value) {
         return null;
     }
 
+
     @Override
-    public boolean checkHash(String plain, String hash, String salt) {
+    public boolean checkHash (String plain, String hash, String salt) {
         return false;
     }
 
+
     @Override
-    public boolean checkHash(String plain, String hash) {
+    public boolean checkHash (String plain, String hash) {
         return false;
     }
 
+
     @Override
-    public String getSalt(User user) {
+    public String getSalt (User user) {
         return null;
     }
 
+
     @Override
-    public String createToken(boolean hash, Object... obj) {
+    public String createToken (boolean hash, Object ... obj) {
         return createToken();
 
     }
 
+
     @Override
-    public String createToken() {
+    public String createToken () {
         return new BigInteger(100, randomizer).toString(20);
     }
 
+
     @Override
-    public String createID(Object... obj) {
+    public String createID (Object ... obj) {
         return createToken();
     }
 
+
     @Override
-    public String encodeBase() {
+    public String encodeBase () {
         return null;
     }
 
+
     @Override
-    public Map validateMap(Map map) throws KustvaktException {
+    public Map validateMap (Map map) throws KustvaktException {
         return null;
     }
 
+
     @Override
-    public String validateEntry(String input, String type)
+    public String validateEntry (String input, String type)
             throws KustvaktException {
         return input;
     }

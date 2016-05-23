@@ -11,29 +11,33 @@ import javax.ws.rs.ext.Provider;
 /**
  * @author hanl
  * @date 11/12/2014
- * <p/>
- * endpoint filter to block access to an endpoint, in case no anonymous access should be allowed!
+ *       <p/>
+ *       endpoint filter to block access to an endpoint, in case no
+ *       anonymous access should be allowed!
  */
 @Provider
 public class BlockingFilter implements ContainerRequestFilter, ResourceFilter {
 
     @Override
-    public ContainerRequest filter(ContainerRequest request) {
+    public ContainerRequest filter (ContainerRequest request) {
         try {
             request.getUserPrincipal();
-        }catch (UnsupportedOperationException e) {
+        }
+        catch (UnsupportedOperationException e) {
             throw KustvaktResponseHandler.throwAuthenticationException();
         }
         return request;
     }
 
+
     @Override
-    public ContainerRequestFilter getRequestFilter() {
+    public ContainerRequestFilter getRequestFilter () {
         return this;
     }
 
+
     @Override
-    public ContainerResponseFilter getResponseFilter() {
+    public ContainerResponseFilter getResponseFilter () {
         return null;
     }
 }

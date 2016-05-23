@@ -22,13 +22,15 @@ public class AuthFilter implements ContainerRequestFilter, ResourceFilter {
 
     private AuthenticationManagerIface userController;
 
-    public AuthFilter() {
+
+    public AuthFilter () {
         this.userController = BeansFactory.getKustvaktContext()
                 .getAuthenticationManager();
     }
 
+
     @Override
-    public ContainerRequest filter(ContainerRequest request) {
+    public ContainerRequest filter (ContainerRequest request) {
         String host = request.getHeaderValue(ContainerRequest.HOST);
         String ua = request.getHeaderValue(ContainerRequest.USER_AGENT);
 
@@ -37,15 +39,17 @@ public class AuthFilter implements ContainerRequestFilter, ResourceFilter {
         if (authentication != null && !authentication.isEmpty()) {
             TokenContext context;
             try {
-                context = userController
-                        .getTokenStatus(authentication, host, ua);
-            }catch (KustvaktException e) {
+                context = userController.getTokenStatus(authentication, host,
+                        ua);
+            }
+            catch (KustvaktException e) {
                 throw KustvaktResponseHandler.throwAuthenticationException();
             }
             // fixme: give reason why access is not granted?
-            if (context != null && context.isValid() && (
-                    (context.isSecureRequired() && request.isSecure())
-                            | !context.isSecureRequired()))
+            if (context != null
+                    && context.isValid()
+                    && ((context.isSecureRequired() && request.isSecure()) | !context
+                            .isSecureRequired()))
                 request.setSecurityContext(new KorAPContext(context));
             else
                 throw KustvaktResponseHandler.throwAuthenticationException();
@@ -53,13 +57,15 @@ public class AuthFilter implements ContainerRequestFilter, ResourceFilter {
         return request;
     }
 
+
     @Override
-    public ContainerRequestFilter getRequestFilter() {
+    public ContainerRequestFilter getRequestFilter () {
         return this;
     }
 
+
     @Override
-    public ContainerResponseFilter getResponseFilter() {
+    public ContainerResponseFilter getResponseFilter () {
         return null;
     }
 }

@@ -29,7 +29,8 @@ public class PolicyBuilder {
     private Relation rel = null;
     private PolicyContext context;
 
-    public PolicyBuilder(User user) {
+
+    public PolicyBuilder (User user) {
         this.user = user;
         this.notifications = new Notifications();
         // fixme: other exception!?
@@ -37,32 +38,39 @@ public class PolicyBuilder {
             throw new RuntimeException("user id must be a valid interger id");
     }
 
-    public PolicyBuilder setResources(KustvaktResource... targets) {
+
+    public PolicyBuilder setResources (KustvaktResource ... targets) {
         this.resources = targets;
         this.parents = new KustvaktResource[targets.length];
         return this;
     }
 
+
     /**
-     * set the parents for the resources. Order is relevant, since the relation parent - resource is handled
-     * via the index within the array. Parent relation is limited to depth 1!
-     * In case of a skipped parent resource relation within the array, set 'null'
-     *
+     * set the parents for the resources. Order is relevant, since the
+     * relation parent - resource is handled
+     * via the index within the array. Parent relation is limited to
+     * depth 1!
+     * In case of a skipped parent resource relation within the array,
+     * set 'null'
+     * 
      * @param parents
      * @return
      */
-    public PolicyBuilder setParents(KustvaktResource... parents) {
+    public PolicyBuilder setParents (KustvaktResource ... parents) {
         for (int idx = 0; idx < parents.length; idx++)
             this.parents[idx] = parents[idx];
         return this;
     }
 
-    public PolicyBuilder setContext(PolicyContext context) {
+
+    public PolicyBuilder setContext (PolicyContext context) {
         this.context = context;
         return this;
     }
 
-    public PolicyBuilder setContext(long start, long end) {
+
+    public PolicyBuilder setContext (long start, long end) {
         if (this.context == null)
             this.context = new PolicyContext();
         this.context.setEnableTime(start);
@@ -70,50 +78,57 @@ public class PolicyBuilder {
         return this;
     }
 
-    public PolicyBuilder setLocation(String iprange) {
+
+    public PolicyBuilder setLocation (String iprange) {
         if (this.context == null)
             this.context = new PolicyContext();
         this.context.setIPMask(iprange);
         return this;
     }
 
-    public PolicyBuilder setPermissions(
-            Permissions.Permission... permissions) {
+
+    public PolicyBuilder setPermissions (Permissions.Permission ... permissions) {
         this.permissions = permissions;
         return this;
     }
 
-    public PolicyBuilder setConditions(String... conditions) {
+
+    public PolicyBuilder setConditions (String ... conditions) {
         this.conditions = new PolicyCondition[conditions.length];
         for (int idx = 0; idx < conditions.length; idx++)
             this.conditions[idx] = new PolicyCondition(conditions[idx]);
         return this;
     }
 
-    public PolicyBuilder setConditions(PolicyCondition... conditions) {
+
+    public PolicyBuilder setConditions (PolicyCondition ... conditions) {
         this.conditions = new PolicyCondition[conditions.length];
         for (int idx = 0; idx < conditions.length; idx++)
             this.conditions[idx] = conditions[idx];
         return this;
     }
 
-    public PolicyBuilder setRelation(Relation rel) {
+
+    public PolicyBuilder setRelation (Relation rel) {
         this.rel = rel;
         return this;
     }
 
-    public PolicyBuilder addCondition(String condition) {
+
+    public PolicyBuilder addCondition (String condition) {
         if (this.rel == null)
             setRelation(Relation.AND);
         return setConditions(condition);
     }
 
-    public String create() throws KustvaktException {
+
+    public String create () throws KustvaktException {
         return this.doIt();
     }
 
+
     // for and relations there is no way of setting parameters conjoined with the policy
-    private String doIt() throws KustvaktException {
+    private String doIt () throws KustvaktException {
         if (this.resources == null)
             throw new KustvaktException(user.getId(),
                     StatusCodes.ILLEGAL_ARGUMENT, "resource must be set",
@@ -133,8 +148,8 @@ public class PolicyBuilder {
             try {
                 if (parents[idx] != null)
                     resources[idx].setParentID(parents[idx].getPersistentID());
-                SecurityManager manager = SecurityManager
-                        .register(resources[idx], user);
+                SecurityManager manager = SecurityManager.register(
+                        resources[idx], user);
 
                 if (rel.equals(Relation.AND)) {
                     SecurityPolicy policy = new SecurityPolicy()
@@ -148,7 +163,8 @@ public class PolicyBuilder {
 
                     manager.addPolicy(policy);
 
-                }else if (rel.equals(Relation.OR)) {
+                }
+                else if (rel.equals(Relation.OR)) {
                     for (PolicyCondition c : this.conditions) {
                         SecurityPolicy policy = new SecurityPolicy()
                                 .addNewCondition(c).setTarget(resources[idx])
@@ -172,7 +188,8 @@ public class PolicyBuilder {
                         manager.addPolicy(policy);
                     }
                 }
-            }catch (KustvaktException e) {
+            }
+            catch (KustvaktException e) {
                 this.notifications.addError(e.getStatusCode(), e.getMessage(),
                         resources[idx].getPersistentID());
             }

@@ -24,8 +24,9 @@ public class DefaultFilter implements ContainerRequestFilter, ResourceFilter {
     @Context
     UriInfo info;
 
+
     @Override
-    public ContainerRequest filter(ContainerRequest request) {
+    public ContainerRequest filter (ContainerRequest request) {
         String host = request.getHeaderValue(ContainerRequest.HOST);
         String ua = request.getHeaderValue(ContainerRequest.USER_AGENT);
         String authentication = request
@@ -36,18 +37,20 @@ public class DefaultFilter implements ContainerRequestFilter, ResourceFilter {
             Principal pr = null;
             try {
                 pr = request.getUserPrincipal();
-            }catch (UnsupportedOperationException e) {
+            }
+            catch (UnsupportedOperationException e) {
                 // do nothing
             }
             if (pr == null)
-                request.setSecurityContext(
-                        new KorAPContext(createShorterToken(host, ua)));
+                request.setSecurityContext(new KorAPContext(createShorterToken(
+                        host, ua)));
 
         }
         return request;
     }
 
-    private TokenContext createShorterToken(String host, String agent) {
+
+    private TokenContext createShorterToken (String host, String agent) {
         User demo = User.UserFactory.getDemoUser();
         TokenContext c = new TokenContext();
         c.setUsername(demo.getUsername());
@@ -59,13 +62,15 @@ public class DefaultFilter implements ContainerRequestFilter, ResourceFilter {
         return c;
     }
 
+
     @Override
-    public ContainerRequestFilter getRequestFilter() {
+    public ContainerRequestFilter getRequestFilter () {
         return this;
     }
 
+
     @Override
-    public ContainerResponseFilter getResponseFilter() {
+    public ContainerResponseFilter getResponseFilter () {
         return null;
     }
 }

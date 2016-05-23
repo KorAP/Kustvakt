@@ -18,28 +18,30 @@ import java.util.Locale;
  * @date 04/02/2014
  */
 @Provider
-public class LocaleProvider
-        extends AbstractHttpContextInjectable<Locale>
+public class LocaleProvider extends AbstractHttpContextInjectable<Locale>
         implements InjectableProvider<Context, Type> {
 
     @Override
-    public Locale getValue(HttpContext httpContext) {
-        final List<Locale> locales = httpContext.getRequest().getAcceptableLanguages();
+    public Locale getValue (HttpContext httpContext) {
+        final List<Locale> locales = httpContext.getRequest()
+                .getAcceptableLanguages();
         if (locales.isEmpty())
             return Locale.US;
         return locales.get(0);
     }
 
+
     @Override
-    public ComponentScope getScope() {
+    public ComponentScope getScope () {
         return ComponentScope.PerRequest;
     }
 
+
     @Override
-    public Injectable getInjectable(ComponentContext ic, Context context, Type type) {
+    public Injectable getInjectable (ComponentContext ic, Context context,
+            Type type) {
         if (type.equals(Locale.class))
             return this;
         return null;
     }
 }
-

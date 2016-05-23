@@ -43,7 +43,8 @@ public class LightService {
     private RewriteHandler processor;
     private KustvaktConfiguration config;
 
-    public LightService() {
+
+    public LightService () {
         this.config = BeansFactory.getKustvaktContext().getConfiguration();
         this.searchKrill = new SearchKrill(config.getIndexDir());
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
@@ -53,38 +54,42 @@ public class LightService {
         this.processor.insertBeans(BeansFactory.getKustvaktContext());
     }
 
+
     /**
      * @param query
      * @return response
      */
     @POST
     @Path("colloc")
-    public Response getCollocationBase(@QueryParam("q") String query) {
+    public Response getCollocationBase (@QueryParam("q") String query) {
         String result;
         try {
             result = graphDBhandler.getResponse("distCollo", "q", query);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok(result).build();
     }
 
+
     // todo
     @Deprecated
-    public Response postMatchFavorite() {
+    public Response postMatchFavorite () {
         return Response.ok().build();
     }
 
+
     @TRACE
     @Path("search")
-    public Response buildQuery(@QueryParam("q") String q,
+    public Response buildQuery (@QueryParam("q") String q,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
             @QueryParam("context") String context,
             @QueryParam("cutoff") Boolean cutoff,
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
             @QueryParam("page") Integer startPage,
-                               // fixme: remove cq from light service
+            // fixme: remove cq from light service
             @QueryParam("cq") String cq) {
         QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
 
@@ -101,10 +106,10 @@ public class LightService {
         return Response.ok(processor.preProcess(ss.toJSON(), null)).build();
     }
 
+
     @POST
     @Path("search")
-    public Response queryRaw(@QueryParam("engine") String engine,
-            String jsonld) {
+    public Response queryRaw (@QueryParam("engine") String engine, String jsonld) {
         jsonld = processor.preProcess(jsonld, null);
         // todo: should be possible to add the meta part to the query serialization
         jlog.info("Serialized search: {}", jsonld);
@@ -114,9 +119,10 @@ public class LightService {
         return Response.ok(result).build();
     }
 
+
     @GET
     @Path("search")
-    public Response searchbyNameAll(@QueryParam("q") String q,
+    public Response searchbyNameAll (@QueryParam("q") String q,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
             @QueryParam("context") String ctx,
             @QueryParam("cutoff") Boolean cutoff,
@@ -124,15 +130,14 @@ public class LightService {
             @QueryParam("offset") Integer pageIndex,
             @QueryParam("page") Integer pageInteger,
             @QueryParam("fields") Set<String> fields,
-                                    // fixme: remove cq value from lightservice
+            // fixme: remove cq value from lightservice
             @QueryParam("cq") String cq, @QueryParam("engine") String engine) {
         KustvaktConfiguration.BACKENDS eng = this.config.chooseBackend(engine);
 
         String result;
         QuerySerializer serializer = new QuerySerializer().setQuery(q, ql, v);
-        MetaQueryBuilder meta = QueryBuilderUtil
-                .defaultMetaBuilder(pageIndex, pageInteger, pageLength, ctx,
-                        cutoff);
+        MetaQueryBuilder meta = QueryBuilderUtil.defaultMetaBuilder(pageIndex,
+                pageInteger, pageLength, ctx, cutoff);
         if (fields != null && !fields.isEmpty())
             meta.addEntry("fields", fields);
         serializer.setMeta(meta);
@@ -154,20 +159,24 @@ public class LightService {
 
             try {
                 result = this.graphDBhandler.getResponse(map, "distKwic");
-            }catch (KustvaktException e) {
+            }
+            catch (KustvaktException e) {
                 throw KustvaktResponseHandler.throwit(e);
             }
-        }else
+        }
+        else
             result = searchKrill.search(query);
         KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
         return Response.ok(result).build();
     }
 
+
     /**
      * param context will be like this: context: "3-t,2-c"
      * <p/>
-     * id does not have to be an integer. name is also possible, in which case a type reference is required
-     *
+     * id does not have to be an integer. name is also possible, in
+     * which case a type reference is required
+     * 
      * @param query
      * @param ql
      * @param v
@@ -186,7 +195,7 @@ public class LightService {
     //fixme: search in collection /collection/collection-id/search
     @GET
     @Path("/{type}/{id}/search")
-    public Response searchbyName(@PathParam("id") String id,
+    public Response searchbyName (@PathParam("id") String id,
             @PathParam("type") String type, @QueryParam("q") String query,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
             @QueryParam("context") String ctx,
@@ -199,9 +208,8 @@ public class LightService {
         // ref is a virtual collection id!
         KustvaktConfiguration.BACKENDS eng = this.config.chooseBackend(engine);
         raw = raw == null ? false : raw;
-        MetaQueryBuilder meta = QueryBuilderUtil
-                .defaultMetaBuilder(pageIndex, pageInteger, pageLength, ctx,
-                        cutoff);
+        MetaQueryBuilder meta = QueryBuilderUtil.defaultMetaBuilder(pageIndex,
+                pageInteger, pageLength, ctx, cutoff);
         if (!raw) {
             // should only apply to CQL queries
             //                meta.addEntry("itemsPerResource", 1);
@@ -213,9 +221,9 @@ public class LightService {
         try {
             if (eng.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
                 if (raw)
-                    throw KustvaktResponseHandler
-                            .throwit(StatusCodes.ILLEGAL_ARGUMENT,
-                                    "raw not supported!", null);
+                    throw KustvaktResponseHandler.throwit(
+                            StatusCodes.ILLEGAL_ARGUMENT, "raw not supported!",
+                            null);
                 MultivaluedMap map = new MultivaluedMapImpl();
                 map.add("q", query);
                 map.add("count", String.valueOf(pageLength));
@@ -224,12 +232,13 @@ public class LightService {
                 map.add("rctxs",
                         String.valueOf(meta.getSpanContext().getRight_size()));
                 result = this.graphDBhandler.getResponse(map, "distKwic");
-            }else
+            }
+            else
                 result = searchKrill.search(query);
 
-        }catch (Exception e) {
-            KustvaktLogger.ERROR_LOGGER
-                    .error("Exception for serialized query: " + query, e);
+        }
+        catch (Exception e) {
+            jlog.error("Exception for serialized query: " + query, e);
             throw KustvaktResponseHandler.throwit(500, e.getMessage(), null);
         }
 
@@ -237,10 +246,11 @@ public class LightService {
         return Response.ok(result).build();
     }
 
+
     //todo: switch to new serialization
     @POST
     @Path("stats")
-    public Response getStats(String json) {
+    public Response getStats (String json) {
         CollectionQueryBuilder3 builder = new CollectionQueryBuilder3();
         builder.addQuery(json);
 
@@ -252,9 +262,10 @@ public class LightService {
         return Response.ok(stats).build();
     }
 
+
     @GET
     @Path("/corpus/{id}/{docid}/{rest}/matchInfo")
-    public Response getMatchInfo(@PathParam("id") String id,
+    public Response getMatchInfo (@PathParam("id") String id,
             @PathParam("docid") String docid, @PathParam("rest") String rest,
             @QueryParam("foundry") Set<String> foundries,
             @QueryParam("layer") Set<String> layers,
@@ -265,8 +276,8 @@ public class LightService {
         if (layers != null && !layers.isEmpty())
             l_list = new ArrayList<>(layers);
 
-        if (foundries != null && !foundries.isEmpty() && !foundries
-                .contains("*"))
+        if (foundries != null && !foundries.isEmpty()
+                && !foundries.contains("*"))
             f_list = new ArrayList<>(foundries);
 
         boolean match_only = foundries == null || foundries.isEmpty();
@@ -274,8 +285,8 @@ public class LightService {
         if (match_only)
             results = searchKrill.getMatch(matchid);
         else
-            results = searchKrill
-                    .getMatch(matchid, f_list, l_list, spans, false, true);
+            results = searchKrill.getMatch(matchid, f_list, l_list, spans,
+                    false, true);
 
         return Response.ok(results).build();
     }

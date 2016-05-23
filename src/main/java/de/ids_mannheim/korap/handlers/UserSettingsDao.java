@@ -30,12 +30,14 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public UserSettingsDao(PersistenceClient client) {
+
+    public UserSettingsDao (PersistenceClient client) {
         this.jdbcTemplate = (NamedParameterJdbcTemplate) client.getSource();
     }
 
+
     @Override
-    public int store(UserSettings data) {
+    public int store (UserSettings data) {
         String sql = "INSERT INTO user_settings (user_id, data) VALUES (:userid, :data);";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", data.getUserID());
@@ -47,7 +49,8 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
             int id = gen.getKey().intValue();
             data.setId(id);
             return id;
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             e.printStackTrace();
             jlog.error("couldn't store data in db for user with id '{}'",
                     data.getUserID());
@@ -55,8 +58,9 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
         }
     }
 
+
     @Override
-    public int update(UserSettings data) {
+    public int update (UserSettings data) {
         String sql = "UPDATE user_settings SET data = :data WHERE user_id=:userid;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", data.getUserID());
@@ -64,87 +68,98 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
 
         try {
             return this.jdbcTemplate.update(sql, source);
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             return -1;
         }
     }
 
+
     @Override
-    public UserSettings get(Integer id) throws dbException {
+    public UserSettings get (Integer id) throws dbException {
         String sql = "SELECT * FROM user_settings WHERE id=:id;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", id);
 
         try {
-            return this.jdbcTemplate
-                    .queryForObject(sql, source, new RowMapper<UserSettings>() {
+            return this.jdbcTemplate.queryForObject(sql, source,
+                    new RowMapper<UserSettings>() {
 
                         @Override
-                        public UserSettings mapRow(ResultSet rs, int rowNum)
+                        public UserSettings mapRow (ResultSet rs, int rowNum)
                                 throws SQLException {
-                            UserSettings details = new UserSettings(
-                                    rs.getInt("user_id"));
+                            UserSettings details = new UserSettings(rs
+                                    .getInt("user_id"));
                             details.setId(rs.getInt("id"));
                             details.setData(rs.getString("data"));
                             return details;
                         }
                     });
 
-        }catch (EmptyResultDataAccessException ex) {
+        }
+        catch (EmptyResultDataAccessException ex) {
             return null;
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             throw new dbException(-1, "userSettings",
                     StatusCodes.REQUEST_INVALID, String.valueOf(id));
         }
     }
 
+
     @Override
-    public UserSettings get(User user) throws dbException {
+    public UserSettings get (User user) throws dbException {
         String sql = "SELECT * FROM user_settings WHERE user_id=:userid;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", user.getId());
 
         try {
-            return this.jdbcTemplate
-                    .queryForObject(sql, source, new RowMapper<UserSettings>() {
+            return this.jdbcTemplate.queryForObject(sql, source,
+                    new RowMapper<UserSettings>() {
 
                         @Override
-                        public UserSettings mapRow(ResultSet rs, int rowNum)
+                        public UserSettings mapRow (ResultSet rs, int rowNum)
                                 throws SQLException {
-                            UserSettings details = new UserSettings(
-                                    rs.getInt("user_id"));
+                            UserSettings details = new UserSettings(rs
+                                    .getInt("user_id"));
                             details.setId(rs.getInt("id"));
                             details.setData(rs.getString("data"));
                             return details;
                         }
                     });
 
-        }catch (EmptyResultDataAccessException ex) {
+        }
+        catch (EmptyResultDataAccessException ex) {
             return null;
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             throw new dbException(-1, "userSettings",
                     StatusCodes.REQUEST_INVALID);
         }
     }
 
+
     @Override
-    public int delete(UserSettings data) {
+    public int delete (UserSettings data) {
         String sql = "DELETE FROM user_settings WHERE id=:id";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", data.getId());
         try {
             return this.jdbcTemplate.update(sql, source);
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             return -1;
         }
     }
 
+
     @Override
-    public int deleteAll() {
+    public int deleteAll () {
         String sql = "DELETE FROM user_settings;";
         try {
             return this.jdbcTemplate.update(sql, new HashMap<String, Object>());
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             e.printStackTrace();
             return -1;
         }

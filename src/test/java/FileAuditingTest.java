@@ -15,22 +15,24 @@ import java.util.Date;
 public class FileAuditingTest extends BeanConfigTest {
 
     @Override
-    public void initMethod() throws KustvaktException {
+    public void initMethod () throws KustvaktException {
 
     }
 
+
     @Test
-    public void testAdd() {
+    public void testAdd () {
         for (int i = 0; i < 20; i++) {
-            AuditRecord record = AuditRecord
-                    .serviceRecord("MichaelHanl", StatusCodes.ILLEGAL_ARGUMENT,
-                            String.valueOf(i), "string value");
+            AuditRecord record = AuditRecord.serviceRecord("MichaelHanl",
+                    StatusCodes.ILLEGAL_ARGUMENT, String.valueOf(i),
+                    "string value");
             helper().getContext().getAuditingProvider().audit(record);
         }
     }
 
+
     @Test(expected = UnsupportedOperationException.class)
-    public void testRetrieval() {
+    public void testRetrieval () {
         helper().getContext().getAuditingProvider()
                 .retrieveRecords(new LocalDate(new Date().getTime()), 10);
     }

@@ -19,7 +19,7 @@ import de.ids_mannheim.korap.user.User;
 public class PolicyLoader implements BootableBeanInterface {
 
     @Override
-    public void load(ContextHolder beans) throws KustvaktException {
+    public void load (ContextHolder beans) throws KustvaktException {
         SecurityManager.overrideProviders(beans);
         ResourceFinder.overrideProviders(beans);
 
@@ -47,8 +47,9 @@ public class PolicyLoader implements BootableBeanInterface {
         builder.create();
     }
 
+
     @Override
-    public Class<? extends BootableBeanInterface>[] getDependencies() {
+    public Class<? extends BootableBeanInterface>[] getDependencies () {
         return new Class[] { UserLoader.class };
     }
 }

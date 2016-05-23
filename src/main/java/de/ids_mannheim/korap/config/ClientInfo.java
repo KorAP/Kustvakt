@@ -21,12 +21,14 @@ public class ClientInfo {
     private String url;
     private String redirect_uri;
 
-    public ClientInfo(String client_id, String client_secret) {
+
+    public ClientInfo (String client_id, String client_secret) {
         this.client_id = client_id;
         this.client_secret = client_secret;
     }
 
-    public String toJSON() {
+
+    public String toJSON () {
         ObjectNode node = JsonUtils.createObjectNode();
         node.put("client_id", client_id);
         node.put("client_secret", client_secret);
@@ -36,15 +38,16 @@ public class ClientInfo {
         return JsonUtils.toJSON(node);
     }
 
-    public String toString() {
-        return "client_id: " + client_id + "\n" +
-                "application_name: " + application_name + "\n" +
-                "url: " + url + "\n" +
-                "redirect_uri: " + redirect_uri + "\n";
+
+    public String toString () {
+        return "client_id: " + client_id + "\n" + "application_name: "
+                + application_name + "\n" + "url: " + url + "\n"
+                + "redirect_uri: " + redirect_uri + "\n";
     }
 
+
     //todo:
-    public static ClientInfo fromJSON(String json) {
+    public static ClientInfo fromJSON (String json) {
         return null;
     }
 }

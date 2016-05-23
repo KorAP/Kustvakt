@@ -24,7 +24,7 @@ public class SecurityRowMappers {
     public static class PolicyRowMapper implements RowMapper<SecurityPolicy> {
 
         @Override
-        public SecurityPolicy mapRow(ResultSet rs, int rowNum)
+        public SecurityPolicy mapRow (ResultSet rs, int rowNum)
                 throws SQLException {
             String perms = rs.getString("perm");
             SecurityPolicy p = new SecurityPolicy();
@@ -51,33 +51,37 @@ public class SecurityRowMappers {
 
         private Map<String, Object> flags;
 
-        public FlagContext() {
+
+        public FlagContext () {
             this.flags = new HashMap<>();
         }
 
-        public FlagContext addFlag(String key, Object value) {
+
+        public FlagContext addFlag (String key, Object value) {
             this.flags.put(key, value);
             return this;
         }
 
-        public FlagContext removeFlag(String key) {
+
+        public FlagContext removeFlag (String key) {
             this.flags.remove(key);
             return this;
         }
 
-        public FlagContext clearFlags() {
+
+        public FlagContext clearFlags () {
             this.flags.clear();
             return this;
         }
     }
 
+
     @SuppressWarnings(value = "all")
-    public static List<SecurityPolicy>[] mapResourcePolicies(ResultSet rs)
+    public static List<SecurityPolicy>[] mapResourcePolicies (ResultSet rs)
             throws SQLException {
         List<SecurityPolicy>[] policyArray = null;
         List<Integer>[] idx = null;
-        loop:
-        while (rs.next()) {
+        loop: while (rs.next()) {
             // user has no permission here, thus skip
             if (rs.getInt("allowed") == 0)
                 continue loop;
@@ -102,13 +106,13 @@ public class SecurityRowMappers {
             if (index == -1) {
                 if (pid == -1 && grouping.equalsIgnoreCase("self")) {
                     policy = new SecurityPolicy.OwnerPolicy(
-                            rs.getString("persistent_id"),
-                            rs.getInt("creator"));
+                            rs.getString("persistent_id"), rs.getInt("creator"));
                     policyArray[depth].add(0, policy);
                     idx[depth].add(0, pid);
-                }else {
-                    policy = new SecurityRowMappers.PolicyRowMapper()
-                            .mapRow(rs, 0);
+                }
+                else {
+                    policy = new SecurityRowMappers.PolicyRowMapper().mapRow(
+                            rs, 0);
                     policyArray[depth].add(policy);
                     idx[depth].add(pid);
 
@@ -118,7 +122,8 @@ public class SecurityRowMappers {
                     //                        idx[depth].add(pid);
                     //                    }
                 }
-            }else
+            }
+            else
                 policy = policyArray[depth].get(index);
 
             PolicyCondition c = new PolicyCondition(rs.getString("group_id"));
@@ -128,7 +133,8 @@ public class SecurityRowMappers {
         return policyArray;
     }
 
-    public static List<SecurityPolicy> mapConditionPolicies(ResultSet rs)
+
+    public static List<SecurityPolicy> mapConditionPolicies (ResultSet rs)
             throws SQLException {
         Map<Integer, SecurityPolicy> policyMap = new HashMap<>();
         while (rs.next()) {
@@ -149,8 +155,9 @@ public class SecurityRowMappers {
         return new ArrayList<>(policyMap.values());
     }
 
+
     @Deprecated
-    public static List<SecurityPolicy>[] map(ResultSet rs) throws SQLException {
+    public static List<SecurityPolicy>[] map (ResultSet rs) throws SQLException {
         Map<Integer, SecurityPolicy>[] policyArray = null;
         while (rs.next()) {
             // user has no permission here!
@@ -181,7 +188,8 @@ public class SecurityRowMappers {
         if (policyArray == null) {
             results = new List[1];
             results[0] = new ArrayList<>();
-        }else {
+        }
+        else {
             results = new List[policyArray.length];
             for (int idx = 0; idx < policyArray.length; idx++) {
                 if (policyArray[idx] != null)
@@ -193,17 +201,18 @@ public class SecurityRowMappers {
         return results;
     }
 
-    public static class HierarchicalResultExtractor
-            implements ResultSetExtractor<List<KustvaktResource.Container>> {
+    public static class HierarchicalResultExtractor implements
+            ResultSetExtractor<List<KustvaktResource.Container>> {
 
         private boolean _withpid;
+
 
         //        public HierarchicalResultExtractor(boolean wpid) {
         //            this._withpid = wpid;
         //        }
 
         // todo: in order for this to work, all parent flags need to be matched in sql!
-        public List<KustvaktResource.Container> extractData(ResultSet rs)
+        public List<KustvaktResource.Container> extractData (ResultSet rs)
                 throws SQLException, DataAccessException {
             // contains the container with the highest available name_path to retrieve partial matches!
             PrefixTreeMap<KustvaktResource.Container[]> containerMap = new PrefixTreeMap<>();
@@ -219,30 +228,28 @@ public class SecurityRowMappers {
                     String persistentId = rs.getString("persistent_id");
                     int depth = rs.getInt("depth");
                     String namePath = rs.getString("name_path");
-                    policy = new SecurityRowMappers.PolicyRowMapper()
-                            .mapRow(rs, 0);
+                    policy = new SecurityRowMappers.PolicyRowMapper().mapRow(
+                            rs, 0);
 
                     //todo: put active status here!
                     trace.put(pid, policy);
 
                     //fixme: since leaves are mentioned first, maybe retrieve
                     SortedMap<String, KustvaktResource.Container[]> submatch;
-                    if ((submatch = containerMap.getPrefixSubMap(namePath))
-                            == null) {
+                    if ((submatch = containerMap.getPrefixSubMap(namePath)) == null) {
                         //create container for last child node
                         cursor = new KustvaktResource.Container[depth + 1];
                         cursor[depth] = new KustvaktResource.Container(
-                                persistentId,
-                                ResourceFactory.getResource(rs.getInt("type"))
-                                        .getClass());
+                                persistentId, ResourceFactory.getResource(
+                                        rs.getInt("type")).getClass());
                         containerMap.put(namePath, cursor);
-                    }else {
+                    }
+                    else {
                         KustvaktResource.Container[] values = submatch
                                 .get(submatch.firstKey());
                         values[depth] = new KustvaktResource.Container(
-                                persistentId,
-                                ResourceFactory.getResource(rs.getInt("type"))
-                                        .getClass());
+                                persistentId, ResourceFactory.getResource(
+                                        rs.getInt("type")).getClass());
                     }
                 }
             }

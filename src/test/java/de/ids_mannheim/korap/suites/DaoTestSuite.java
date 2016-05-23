@@ -16,5 +16,4 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ PolicyDaoTest.class, UserdataTest.class,
         UserDaoTest.class, ResourceDaoTest.class })
-public class DaoTestSuite {
-}
+public class DaoTestSuite {}

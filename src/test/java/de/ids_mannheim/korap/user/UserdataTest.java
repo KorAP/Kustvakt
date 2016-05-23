@@ -19,34 +19,36 @@ import static org.junit.Assert.*;
 public class UserdataTest extends BeanConfigTest {
 
     @Before
-    public void clear() {
-        UserDetailsDao dao = new UserDetailsDao(
-                helper().getContext().getPersistenceClient());
-        UserSettingsDao sdao = new UserSettingsDao(
-                helper().getContext().getPersistenceClient());
+    public void clear () {
+        UserDetailsDao dao = new UserDetailsDao(helper().getContext()
+                .getPersistenceClient());
+        UserSettingsDao sdao = new UserSettingsDao(helper().getContext()
+                .getPersistenceClient());
         assertNotEquals(-1, dao.deleteAll());
         assertNotEquals(-1, sdao.deleteAll());
     }
 
+
     @Test
-    public void testDataStore() {
+    public void testDataStore () {
         String val = "value1;value_data";
         User user = new KorAPUser();
         user.setId(1);
-        UserDetailsDao dao = new UserDetailsDao(
-                helper().getContext().getPersistenceClient());
+        UserDetailsDao dao = new UserDetailsDao(helper().getContext()
+                .getPersistenceClient());
         UserDetails d = new UserDetails(1);
         d.setField("key_1", val);
         assertNotEquals(-1, dao.store(d));
     }
 
+
     @Test
-    public void testDataGet() throws dbException {
+    public void testDataGet () throws dbException {
         String val = "value1;value_data";
         User user = new KorAPUser();
         user.setId(1);
-        UserDetailsDao dao = new UserDetailsDao(
-                helper().getContext().getPersistenceClient());
+        UserDetailsDao dao = new UserDetailsDao(helper().getContext()
+                .getPersistenceClient());
         UserDetails d = new UserDetails(1);
         d.setField("key_1", val);
         assertNotEquals(-1, dao.store(d));
@@ -60,8 +62,9 @@ public class UserdataTest extends BeanConfigTest {
         assertEquals(val, d.get("key_1"));
     }
 
+
     @Test
-    public void testDataValidation() {
+    public void testDataValidation () {
         Userdata data = new UserDetails(1);
         data.setField(Attributes.COUNTRY, "Germany");
 
@@ -72,8 +75,9 @@ public class UserdataTest extends BeanConfigTest {
         assertFalse(data.isValid());
     }
 
+
     @Test
-    public void testSettingsValidation() {
+    public void testSettingsValidation () {
         Userdata data = new UserSettings(1);
         data.setField(Attributes.FILE_FORMAT_FOR_EXPORT, "export");
 
@@ -84,37 +88,40 @@ public class UserdataTest extends BeanConfigTest {
         assertTrue(data.isValid());
     }
 
+
     @Test
-    public void testUserdatafactory() throws KustvaktException {
-        UserDataDbIface dao = BeansFactory.getTypeFactory()
-                .getTypedBean(helper().getContext().getUserDataDaos(), UserDetails.class);
+    public void testUserdatafactory () throws KustvaktException {
+        UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
+                helper().getContext().getUserDataDaos(), UserDetails.class);
         assertNotNull(dao);
         assertEquals(UserDetailsDao.class, dao.getClass());
 
-        dao = BeansFactory.getTypeFactory()
-                .getTypedBean(helper().getContext().getUserDataDaos(), UserSettings.class);
+        dao = BeansFactory.getTypeFactory().getTypedBean(
+                helper().getContext().getUserDataDaos(), UserSettings.class);
         assertNotNull(dao);
         assertEquals(UserSettingsDao.class, dao.getClass());
 
     }
 
+
     @Test(expected = RuntimeException.class)
-    public void testUserdatafactoryError() throws KustvaktException {
-        BeansFactory.getTypeFactory()
-                .getTypedBean(helper().getContext().getUserDataDaos(), new Userdata(1) {
+    public void testUserdatafactoryError () throws KustvaktException {
+        BeansFactory.getTypeFactory().getTypedBean(
+                helper().getContext().getUserDataDaos(), new Userdata(1) {
                     @Override
-                    public String[] requiredFields() {
+                    public String[] requiredFields () {
                         return new String[0];
                     }
 
+
                     @Override
-                    public String[] defaultFields() {
+                    public String[] defaultFields () {
                         return new String[0];
                     }
                 }.getClass());
     }
 
+
     @Override
-    public void initMethod() throws KustvaktException {
-    }
+    public void initMethod () throws KustvaktException {}
 }

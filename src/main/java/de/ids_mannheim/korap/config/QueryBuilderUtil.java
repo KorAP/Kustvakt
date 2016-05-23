@@ -8,9 +8,8 @@ import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
  */
 public class QueryBuilderUtil {
 
-    public static MetaQueryBuilder defaultMetaBuilder(Integer pageIndex,
-            Integer pageInteger, Integer pageLength, String ctx,
-            Boolean cutoff) {
+    public static MetaQueryBuilder defaultMetaBuilder (Integer pageIndex,
+            Integer pageInteger, Integer pageLength, String ctx, Boolean cutoff) {
         MetaQueryBuilder meta = new MetaQueryBuilder();
         meta.addEntry("startIndex", pageIndex)
                 .addEntry("startPage", pageInteger)

@@ -6,18 +6,20 @@ package de.ids_mannheim.korap.user;
  */
 public class UserSettings extends Userdata {
 
-    public UserSettings(Integer userid) {
+    public UserSettings (Integer userid) {
         super(userid);
     }
 
+
     @Override
-    public String[] requiredFields() {
+    public String[] requiredFields () {
         return new String[] {};
     }
 
+
     //todo: define default fields and values --> so they can never be null!
     @Override
-    public String[] defaultFields() {
+    public String[] defaultFields () {
         return new String[] { Attributes.DEFAULT_REL_FOUNDRY,
                 Attributes.DEFAULT_POS_FOUNDRY,
                 Attributes.DEFAULT_CONST_FOUNDRY,

@@ -13,26 +13,31 @@ public interface EncryptionIface {
         SIMPLE, ESAPICYPHER, BCRYPT
     }
 
+
     /**
      * One-way hashing of String input. Used to canonicalize
-     *
+     * 
      * @param input
      * @param salt
      * @return
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.UnsupportedEncodingException
      */
-    public String produceSecureHash(String input, String salt)
+    public String produceSecureHash (String input, String salt)
             throws NoSuchAlgorithmException, UnsupportedEncodingException,
             KustvaktException;
 
-    public String produceSecureHash(String input)
+
+    public String produceSecureHash (String input)
             throws NoSuchAlgorithmException, UnsupportedEncodingException,
             KustvaktException;
 
-    public String hash(String text, String salt) throws Exception;
 
-    public String hash(String text) throws Exception;
+    public String hash (String text, String salt) throws Exception;
+
+
+    public String hash (String text) throws Exception;
+
 
     /**
      * @param plain
@@ -40,36 +45,45 @@ public interface EncryptionIface {
      * @param salt
      * @return
      */
-    public boolean checkHash(String plain, String hash, String salt);
+    public boolean checkHash (String plain, String hash, String salt);
 
-    public boolean checkHash(String plain, String hash);
 
-    public String getSalt(User user);
+    public boolean checkHash (String plain, String hash);
+
+
+    public String getSalt (User user);
+
 
     /**
      * create random String to be used as authentication token
-     *
+     * 
      * @return
      */
-    public String createToken(boolean hash, Object... obj);
+    public String createToken (boolean hash, Object ... obj);
 
-    public String createToken();
+
+    public String createToken ();
+
 
     /**
      * create a random Integer to be used as ID for databases
-     *
+     * 
      * @return
      */
-    public String createID(Object... obj);
+    public String createID (Object ... obj);
 
-    public String encodeBase();
 
-    public Map<String, Object> validateMap(Map<String, Object> map) throws KustvaktException;
+    public String encodeBase ();
 
-    public String validateEntry(String input, String type)
+
+    public Map<String, Object> validateMap (Map<String, Object> map)
             throws KustvaktException;
 
 
-//    public void validate(Object instance) throws KustvaktException;
+    public String validateEntry (String input, String type)
+            throws KustvaktException;
+
+
+    //    public void validate(Object instance) throws KustvaktException;
 
 }

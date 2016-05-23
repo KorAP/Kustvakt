@@ -12,12 +12,14 @@ public class DefaultHandler {
 
     private Map<String, Object> defaults;
 
-    public DefaultHandler() {
+
+    public DefaultHandler () {
         this.defaults = new HashMap<>();
         loadClasses();
     }
 
-    private void loadClasses() {
+
+    private void loadClasses () {
         Set<Class<?>> cls = KustvaktClassLoader
                 .loadFromAnnotation(Configurable.class);
         for (Class clazz : cls) {
@@ -25,17 +27,20 @@ public class DefaultHandler {
                     .getAnnotation(Configurable.class);
             try {
                 this.defaults.put(c.value(), clazz.newInstance());
-            }catch (InstantiationException | IllegalAccessException e) {
+            }
+            catch (InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException("Could not instantiate class");
             }
         }
     }
 
-    public Object getDefault(String name) {
+
+    public Object getDefault (String name) {
         return this.defaults.get(name);
     }
 
-    public <T> T getDefault(Class<T> tClass) {
+
+    public <T> T getDefault (Class<T> tClass) {
         for (Object o : this.defaults.values()) {
             if (o.getClass().equals(tClass))
                 return (T) o;
@@ -43,12 +48,14 @@ public class DefaultHandler {
         return null;
     }
 
-    public void remove(String name) {
+
+    public void remove (String name) {
         this.defaults.remove(name);
     }
 
+
     @Override
-    public String toString() {
+    public String toString () {
         return defaults.toString();
     }
 }

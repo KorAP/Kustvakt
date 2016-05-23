@@ -11,7 +11,7 @@ public class ResourceRemoteApiTest {
 
 
     @Test
-    public void testResourceGetFromDemo() {
+    public void testResourceGetFromDemo () {
 
     }
 }

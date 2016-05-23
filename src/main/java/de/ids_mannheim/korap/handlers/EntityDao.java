@@ -38,24 +38,28 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
     private static Logger jlog = LoggerFactory.getLogger(EntityDao.class);
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    public EntityDao(PersistenceClient client) {
+
+    public EntityDao (PersistenceClient client) {
         this.jdbcTemplate = (NamedParameterJdbcTemplate) client.getSource();
     }
 
+
     // usersettings are fetched plus basic account info, no details, since i rarely use them anyway!
     @Override
-    public User getAccount(String username) throws KustvaktException {
-        Map<String, String> namedParameters = Collections
-                .singletonMap("username", username);
+    public User getAccount (String username) throws KustvaktException {
+        Map<String, String> namedParameters = Collections.singletonMap(
+                "username", username);
         final String sql = "select a.* from korap_users as a where a.username=:username;";
         User user;
         try {
             user = this.jdbcTemplate.queryForObject(sql, namedParameters,
                     new RowMapperFactory.UserMapper());
-        }catch (EmptyResultDataAccessException ae) {
+        }
+        catch (EmptyResultDataAccessException ae) {
             jlog.warn("No user found for name '{}'", username);
             throw new EmptyResultException(username);
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             jlog.error("Could not retrieve user for name: " + username, e);
             throw new dbException(username, "korap_users",
                     StatusCodes.DB_GET_FAILED, username);
@@ -63,8 +67,9 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
         return user;
     }
 
+
     @Override
-    public int updateAccount(User user) throws KustvaktException {
+    public int updateAccount (User user) throws KustvaktException {
         MapSqlParameterSource np = new MapSqlParameterSource();
         final String query;
         if (user instanceof KorAPUser) {
@@ -83,12 +88,13 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
             //            }
             np.addValue("id", k.getId());
 
-            query = "UPDATE korap_users SET account_lock=:alo," +
-                    "account_link=:ali, password=:ps "
+            query = "UPDATE korap_users SET account_lock=:alo,"
+                    + "account_link=:ali, password=:ps "
                     //                    "uri_fragment=:frag," +
                     //                    "uri_expiration=:exp "
                     + "WHERE id=:id";
-        }else if (user instanceof ShibUser) {
+        }
+        else if (user instanceof ShibUser) {
             ShibUser s = (ShibUser) user;
             //todo:
             //            np.addValue("ali", s.getAccountLink());
@@ -98,14 +104,16 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
             np.addValue("cn", s.getCn());
             np.addValue("mail", s.getMail());
 
-            query = "UPDATE shibusers SET account_link=:ali" +
-                    " eduPersonScopedAffiliation=:edu" +
-                    "mail=:mail, cn=:cn WHERE id=:id";
-        }else
+            query = "UPDATE shibusers SET account_link=:ali"
+                    + " eduPersonScopedAffiliation=:edu"
+                    + "mail=:mail, cn=:cn WHERE id=:id";
+        }
+        else
             return -1;
         try {
             return this.jdbcTemplate.update(query, np);
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             jlog.error(
                     "Could not update user account for user: " + user.getId(),
                     e);
@@ -115,8 +123,9 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
         }
     }
 
+
     @Override
-    public int createAccount(User user) throws KustvaktException {
+    public int createAccount (User user) throws KustvaktException {
         final String query;
         MapSqlParameterSource np = new MapSqlParameterSource();
 
@@ -131,7 +140,8 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
             if (param != null) {
                 np.addValue("uri", param.getUriFragment());
                 np.addValue("urie", param.getUriExpiration());
-            }else {
+            }
+            else {
                 np.addValue("uri", null);
                 np.addValue("urie", null);
             }
@@ -141,27 +151,26 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
 
             if (user.getId() != -1)
                 query = "INSERT INTO korap_users (id, username, account_lock, "
-                        +
-                        "account_link, password, uri_fragment, " +
-                        "account_creation, " +
-                        "uri_expiration) VALUES (:id, :us, :alo, :ali, " +
-                        ":ps, :uri, :acr, :urie);";
+                        + "account_link, password, uri_fragment, "
+                        + "account_creation, "
+                        + "uri_expiration) VALUES (:id, :us, :alo, :ali, "
+                        + ":ps, :uri, :acr, :urie);";
             else
-                query = "INSERT INTO korap_users (username, account_lock, " +
-                        "account_link, password, uri_fragment, " +
-                        "account_creation, " +
-                        "uri_expiration) VALUES (:us, :alo, :ali, " +
-                        ":ps, :uri, :acr, :urie);";
+                query = "INSERT INTO korap_users (username, account_lock, "
+                        + "account_link, password, uri_fragment, "
+                        + "account_creation, "
+                        + "uri_expiration) VALUES (:us, :alo, :ali, "
+                        + ":ps, :uri, :acr, :urie);";
 
             //fixme: still applicable?
-        }else if (user instanceof ShibUser) {
+        }
+        else if (user instanceof ShibUser) {
             ShibUser s = (ShibUser) user;
 
             query = "INSERT INTO shibusers (username, type, account_link, account_creation "
-                    +
-                    "eduPersonScopedAffiliation, cn, mail) " +
-                    "VALUES (:us, :type, :ali, " +
-                    ":edu, :cn, :mail, :logs, :logft);";
+                    + "eduPersonScopedAffiliation, cn, mail) "
+                    + "VALUES (:us, :type, :ali, "
+                    + ":edu, :cn, :mail, :logs, :logft);";
             np.addValue("us", s.getUsername());
             np.addValue("ali", null);
             np.addValue("edu", s.getAffiliation());
@@ -180,17 +189,19 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
             //            np.addValue("type", user.getType());
             //            np.addValue("alo", user.isAccountLocked());
             //            np.addValue("acr", System.currentTimeMillis());
-        }else
+        }
+        else
             return -1;
 
         KeyHolder holder = new GeneratedKeyHolder();
 
         try {
-            int r = this.jdbcTemplate
-                    .update(query, np, holder, new String[] { "id" });
+            int r = this.jdbcTemplate.update(query, np, holder,
+                    new String[] { "id" });
             user.setId(holder.getKey().intValue());
             return r;
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             jlog.error("Could not create user account with username: {}",
                     user.getUsername());
             throw new dbException(user.getUsername(), "korap_users",
@@ -198,15 +209,16 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
         }
     }
 
+
     @Override
-    public int deleteAccount(final Integer userid) throws KustvaktException {
+    public int deleteAccount (final Integer userid) throws KustvaktException {
         MapSqlParameterSource s = new MapSqlParameterSource();
         s.addValue("user", userid);
 
         try {
             int r;
-            r = this.jdbcTemplate
-                    .update("DELETE FROM korap_users WHERE id=:user", s);
+            r = this.jdbcTemplate.update(
+                    "DELETE FROM korap_users WHERE id=:user", s);
             //            if (user instanceof KorAPUser)
             //                r = this.jdbcTemplate
             //                        .update("DELETE FROM korap_users WHERE username=:user",
@@ -218,7 +230,8 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
             //            else
             //                r = -1;
             return r;
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             jlog.error("Could not delete account for user: " + userid, e);
             //            throw new KorAPException(e, StatusCodes.CONNECTION_ERROR);
             throw new dbException(userid, "korap_users",
@@ -227,22 +240,25 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
 
     }
 
+
     @Override
-    public int truncate() {
+    public int truncate () {
         String sql = "DELETE FROM korap_users;";
         try {
             return this.jdbcTemplate.update(sql, new HashMap<String, Object>());
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             return -1;
         }
     }
 
+
     @Override
-    public int resetPassphrase(String username, String uriToken,
+    public int resetPassphrase (String username, String uriToken,
             String passphrase) throws KustvaktException {
         MapSqlParameterSource np = new MapSqlParameterSource();
-        final String query = "UPDATE korap_users SET " +
-                "uri_expiration=0, password=:pass WHERE uri_fragment=:uri AND uri_expiration > :now "
+        final String query = "UPDATE korap_users SET "
+                + "uri_expiration=0, password=:pass WHERE uri_fragment=:uri AND uri_expiration > :now "
                 + "AND username=:us AND uri_expiration > :now;";
         np.addValue("uri", uriToken);
         np.addValue("now", new Date(TimeUtils.getNow().getMillis()));
@@ -250,7 +266,8 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
         np.addValue("us", username);
         try {
             return this.jdbcTemplate.update(query, np);
-        }catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             jlog.error("Could not reset password for name: " + username, e);
             throw new dbException(username, "korap_users",
                     StatusCodes.DB_UPDATE_FAILED, username, uriToken,
@@ -258,44 +275,46 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
         }
     }
 
+
     @Override
-    public int activateAccount(String username, String uriToken)
+    public int activateAccount (String username, String uriToken)
             throws KustvaktException {
         MapSqlParameterSource np = new MapSqlParameterSource();
-        final String query = "UPDATE korap_users SET uri_fragment='', " +
-                "uri_expiration=0, account_lock=:lock WHERE uri_fragment=:uri AND username=:us AND "
-                +
-                "uri_expiration > :now;";
+        final String query = "UPDATE korap_users SET uri_fragment='', "
+                + "uri_expiration=0, account_lock=:lock WHERE uri_fragment=:uri AND username=:us AND "
+                + "uri_expiration > :now;";
         np.addValue("uri", uriToken);
         np.addValue("now", TimeUtils.getNow().getMillis());
         np.addValue("us", username);
         np.addValue("lock", BooleanUtils.getBoolean(false));
         try {
             return this.jdbcTemplate.update(query, np);
-        }catch (DataAccessException e) {
-            jlog.error("Could not confirm registration for name " + username,
-                    e);
+        }
+        catch (DataAccessException e) {
+            jlog.error("Could not confirm registration for name " + username, e);
             throw new dbException(username, "korap_users",
                     StatusCodes.DB_UPDATE_FAILED, username, uriToken);
         }
     }
 
+
     @Override
-    public int size() {
+    public int size () {
         final String query = "SELECT COUNT(*) FROM korap_users;";
-        return this.jdbcTemplate
-                .queryForObject(query, new HashMap<String, Object>(),
-                        Integer.class);
+        return this.jdbcTemplate.queryForObject(query,
+                new HashMap<String, Object>(), Integer.class);
     }
 
+
     //todo:
-    public List getAccountLinks(User user) {
+    public List getAccountLinks (User user) {
 
         return Collections.emptyList();
     }
 
+
     //todo:
-    public void setAccountParameters(User user) {
+    public void setAccountParameters (User user) {
         ParamFields fields = user.getFields();
     }
 }

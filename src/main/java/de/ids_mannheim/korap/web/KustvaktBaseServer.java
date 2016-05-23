@@ -29,7 +29,7 @@ import java.util.Set;
  */
 public class KustvaktBaseServer {
 
-    public static void main(String[] args) throws Exception {
+    public static void main (String[] args) throws Exception {
         KustvaktConfiguration.loadLog4jLogger();
         KustvaktBaseServer server = new KustvaktBaseServer();
         KustvaktArgs kargs = server.readAttributes(args);
@@ -41,13 +41,13 @@ public class KustvaktBaseServer {
 
         KustvaktCacheManager.init();
 
-        kargs.setRootPackages(
-                new String[] { "de.ids_mannheim.korap.web.service.light" });
+        kargs.setRootPackages(new String[] { "de.ids_mannheim.korap.web.service.light" });
 
         server.startServer(kargs);
     }
 
-    protected KustvaktArgs readAttributes(String[] args) {
+
+    protected KustvaktArgs readAttributes (String[] args) {
         KustvaktArgs kargs = new KustvaktArgs();
         for (int i = 0; i < args.length; i++) {
             switch ((args[i])) {
@@ -79,7 +79,8 @@ public class KustvaktBaseServer {
         return kargs;
     }
 
-    public void runPreStart() {
+
+    public void runPreStart () {
         Set<Class<? extends BootableBeanInterface>> set = KustvaktClassLoader
                 .loadSubTypes(BootableBeanInterface.class);
 
@@ -89,7 +90,8 @@ public class KustvaktBaseServer {
             try {
                 iface = (BootableBeanInterface) cl.newInstance();
                 list.add(iface);
-            }catch (InstantiationException | IllegalAccessException e) {
+            }
+            catch (InstantiationException | IllegalAccessException e) {
                 continue;
             }
         }
@@ -99,11 +101,11 @@ public class KustvaktBaseServer {
             for (BootableBeanInterface iface : new ArrayList<>(list)) {
                 try {
                     iface.load(BeansFactory.getKustvaktContext());
-                }catch (KustvaktException e) {
+                }
+                catch (KustvaktException e) {
                     // don't do anything!
-                    System.out.println(
-                            "An error occurred in class " + iface.getClass()
-                                    .getSimpleName() + "!\n" + e);
+                    System.out.println("An error occurred in class "
+                            + iface.getClass().getSimpleName() + "!\n" + e);
                     continue;
                 }
                 list.remove(iface);
@@ -115,15 +117,17 @@ public class KustvaktBaseServer {
         }
     }
 
-    protected void startServer(KustvaktArgs kargs) {
+
+    protected void startServer (KustvaktArgs kargs) {
         if (kargs.init)
             runPreStart();
 
         if (kargs.port == -1)
-            kargs.setPort(BeansFactory.getKustvaktContext().getConfiguration().getPort());
+            kargs.setPort(BeansFactory.getKustvaktContext().getConfiguration()
+                    .getPort());
 
-        System.out.println(
-                "Starting Kustvakt Service on port '" + kargs.port + "'");
+        System.out.println("Starting Kustvakt Service on port '" + kargs.port
+                + "'");
         try {
             // from http://wiki.eclipse.org/Jetty/Tutorial/Embedding_Jetty
             Server server = new Server();
@@ -140,9 +144,8 @@ public class KustvaktBaseServer {
                     kargs.rootPackages);
 
             // from http://stackoverflow.com/questions/7421574/embedded-jetty-with-jersey-or-resteasy
-            contextHandler
-                    .addServlet(new ServletHolder(new ServletContainer(rc)),
-                            "/api/*");
+            contextHandler.addServlet(new ServletHolder(
+                    new ServletContainer(rc)), "/api/*");
 
             server.setHandler(contextHandler);
 
@@ -151,14 +154,15 @@ public class KustvaktBaseServer {
                         kargs.sslContext);
                 sslConnector.setPort(8443);
                 sslConnector.setMaxIdleTime(60000);
-                server.setConnectors(
-                        new Connector[] { connector, sslConnector });
-            }else
+                server.setConnectors(new Connector[] { connector, sslConnector });
+            }
+            else
                 server.setConnectors(new Connector[] { connector });
 
             server.start();
             server.join();
-        }catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -175,7 +179,8 @@ public class KustvaktBaseServer {
         private String[] rootPackages;
         private boolean init;
 
-        public KustvaktArgs() {
+
+        public KustvaktArgs () {
             this.port = -1;
             this.sslContext = null;
             this.debug = false;

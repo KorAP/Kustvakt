@@ -37,54 +37,64 @@ public class PolicyCondition implements Comparable<PolicyCondition> {
     private static final String EX_PRE = "ex:";
     private Map<String, Object> flags;
 
-    public PolicyCondition(String target) {
+
+    public PolicyCondition (String target) {
         // pattern to map extensionally created groups
         this.specifier = target;
         this.flags = new HashMap<>(stats);
     }
 
-    public PolicyCondition() {
+
+    public PolicyCondition () {
         this(EX_PRE + createGroupName());
     }
 
+
     @Deprecated
     //todo: do this in crypto bean!
-    private static String createGroupName() {
+    private static String createGroupName () {
         //        return Base64.encodeBase64String(SecureRGenerator
         //                .getNextSecureRandom(64));
         return "<new group name>";
     }
 
-    public void setDescription(String description) {
+
+    public void setDescription (String description) {
         this.description = description;
     }
 
-    public void setFlag(String key, Object value) {
+
+    public void setFlag (String key, Object value) {
         Object f = this.flags.get(key);
         if (f != null && f.getClass().equals(value.getClass()))
             this.flags.put(key, value);
     }
 
-    public String getSpecifier() {
+
+    public String getSpecifier () {
         return this.specifier;
     }
 
-    public boolean isExtensional() {
+
+    public boolean isExtensional () {
         return getSpecifier().startsWith(EX_PRE);
     }
 
+
     @Override
-    public String toString() {
+    public String toString () {
         return "(" + this.specifier + ")";
     }
 
+
     @Override
-    public int compareTo(PolicyCondition o) {
+    public int compareTo (PolicyCondition o) {
         return this.getSpecifier().compareTo(o.getSpecifier());
     }
 
+
     @Override
-    public boolean equals(Object o) {
+    public boolean equals (Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -94,8 +104,9 @@ public class PolicyCondition implements Comparable<PolicyCondition> {
         return specifier.equals(that.specifier);
     }
 
+
     @Override
-    public int hashCode() {
+    public int hashCode () {
         return specifier.hashCode();
     }
 

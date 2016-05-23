@@ -22,18 +22,23 @@ import static org.junit.Assert.assertNotNull;
 public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
 
     @After
-    public void after() {
+    public void after () {
         try {
-            User user = helper().getContext().getAuthenticationManager().getUser(
-                    (String) KustvaktConfiguration.KUSTVAKT_USER
-                            .get(Attributes.USERNAME));
-            helper().getContext().getAuthenticationManager().deleteAccount(user);
-        } catch (KustvaktException e) {
+            User user = helper()
+                    .getContext()
+                    .getAuthenticationManager()
+                    .getUser(
+                            (String) KustvaktConfiguration.KUSTVAKT_USER
+                                    .get(Attributes.USERNAME));
+            helper().getContext().getAuthenticationManager()
+                    .deleteAccount(user);
         }
+        catch (KustvaktException e) {}
     }
 
+
     @Test
-    public void testCreateUser() throws KustvaktException {
+    public void testCreateUser () throws KustvaktException {
         User user = helper().getContext().getAuthenticationManager()
                 .createUserAccount(KustvaktConfiguration.KUSTVAKT_USER, false);
 
@@ -43,45 +48,50 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
         assertNotNull(check);
     }
 
+
     @Test
-    public void testBatchStore() {
+    public void testBatchStore () {
         int i = 6;
 
         AuthenticationManagerIface manager = helper().getContext()
                 .getAuthenticationManager();
-        for (int ix = 0; ix < i; ix++) {
-        }
+        for (int ix = 0; ix < i; ix++) {}
 
     }
 
+
     @Test
-    public void testUserdetailsGet() throws KustvaktException {
+    public void testUserdetailsGet () throws KustvaktException {
         testCreateUser();
         AuthenticationManagerIface manager = helper().getContext()
                 .getAuthenticationManager();
 
-        User user = manager.getUser((String) KustvaktConfiguration.KUSTVAKT_USER
-                .get(Attributes.USERNAME));
+        User user = manager
+                .getUser((String) KustvaktConfiguration.KUSTVAKT_USER
+                        .get(Attributes.USERNAME));
 
         Userdata data = manager.getUserData(user, UserDetails.class);
         assertNotNull(data);
     }
 
+
     @Test
-    public void testUsersettingsGet() throws KustvaktException {
+    public void testUsersettingsGet () throws KustvaktException {
         testCreateUser();
         AuthenticationManagerIface manager = helper().getContext()
                 .getAuthenticationManager();
 
-        User user = manager.getUser((String) KustvaktConfiguration.KUSTVAKT_USER
-                .get(Attributes.USERNAME));
+        User user = manager
+                .getUser((String) KustvaktConfiguration.KUSTVAKT_USER
+                        .get(Attributes.USERNAME));
 
         Userdata data = manager.getUserData(user, UserSettings.class);
         assertNotNull(data);
     }
 
+
     @Test(expected = KustvaktException.class)
-    public void testUserDetailsGetNonExistent() throws KustvaktException {
+    public void testUserDetailsGetNonExistent () throws KustvaktException {
         testCreateUser();
         AuthenticationManagerIface manager = helper().getContext()
                 .getAuthenticationManager();
@@ -92,8 +102,9 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
         assertNotNull(data);
     }
 
+
     @Test(expected = KustvaktException.class)
-    public void testUserSettingsGetNonExistent() throws KustvaktException {
+    public void testUserSettingsGetNonExistent () throws KustvaktException {
         testCreateUser();
         AuthenticationManagerIface manager = helper().getContext()
                 .getAuthenticationManager();
@@ -103,9 +114,10 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
         Userdata data = manager.getUserData(user, UserSettings.class);
         assertNotNull(data);
     }
+
 
     @Override
-    public void initMethod() throws KustvaktException {
+    public void initMethod () throws KustvaktException {
         helper().setupAccount();
     }
 }

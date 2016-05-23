@@ -15,7 +15,7 @@ import java.util.Properties;
  */
 public abstract class PropertyReader {
 
-    protected Map<String, Properties> read(String path) throws IOException {
+    protected Map<String, Properties> read (String path) throws IOException {
         Map<String, Properties> res = new HashMap<>();
         Properties s = new Properties();
         s.load(new FileInputStream(new File(path)));
@@ -31,6 +31,7 @@ public abstract class PropertyReader {
         return res;
     }
 
-    public abstract void load();
+
+    public abstract void load ();
 
 }

@@ -8,35 +8,40 @@ import java.security.Principal;
 /**
  * @author hanl
  * @date 13/05/2014
- *
- * wrapper for REST security context
- *
+ * 
+ *       wrapper for REST security context
+ * 
  */
 public class KorAPContext implements SecurityContext {
 
     private TokenContext user;
 
-    public KorAPContext(final TokenContext user) {
+
+    public KorAPContext (final TokenContext user) {
         this.user = user;
     }
 
+
     @Override
-    public Principal getUserPrincipal() {
+    public Principal getUserPrincipal () {
         return this.user;
     }
 
+
     @Override
-    public boolean isUserInRole(String role) {
+    public boolean isUserInRole (String role) {
         throw new UnsupportedOperationException();
     }
 
+
     @Override
-    public boolean isSecure() {
+    public boolean isSecure () {
         return false;
     }
 
+
     @Override
-    public String getAuthenticationScheme() {
+    public String getAuthenticationScheme () {
         return SecurityContext.BASIC_AUTH;
     }
 }

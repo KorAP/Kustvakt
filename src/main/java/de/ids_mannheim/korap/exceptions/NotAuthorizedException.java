@@ -11,23 +11,27 @@ import lombok.Data;
 @Deprecated
 public class NotAuthorizedException extends KustvaktException {
 
-    public NotAuthorizedException(int status) {
+    public NotAuthorizedException (int status) {
         super(status);
     }
 
-    public NotAuthorizedException(int status, String entity) {
+
+    public NotAuthorizedException (int status, String entity) {
         super(status, "", entity);
     }
 
-    public NotAuthorizedException(int status, String message, String entity) {
+
+    public NotAuthorizedException (int status, String message, String entity) {
         super(status, message, entity);
     }
 
-    public NotAuthorizedException(Throwable cause, int status) {
+
+    public NotAuthorizedException (Throwable cause, int status) {
         super(cause, status);
     }
 
-    public NotAuthorizedException(String message, Throwable cause, int status) {
+
+    public NotAuthorizedException (String message, Throwable cause, int status) {
         super(message, cause, status);
     }
 }

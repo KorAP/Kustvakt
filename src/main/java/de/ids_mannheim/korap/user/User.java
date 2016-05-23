@@ -43,7 +43,8 @@ public abstract class User implements Serializable {
 
     private List<Userdata> userdata;
 
-    protected User() {
+
+    protected User () {
         this.fields = new ParamFields();
         this.accountCreation = TimeUtils.getNow().getMillis();
         this.isAccountLocked = false;
@@ -52,25 +53,30 @@ public abstract class User implements Serializable {
         this.userdata = new ArrayList<>();
     }
 
-    protected User(int type) {
+
+    protected User (int type) {
         this();
         this.type = type;
     }
 
-    protected User(String username, int type) {
+
+    protected User (String username, int type) {
         this(type);
         this.username = username;
     }
 
-    public void addField(ParamFields.Param param) {
+
+    public void addField (ParamFields.Param param) {
         this.fields.add(param);
     }
 
-    public <T extends ParamFields.Param> T getField(Class<T> cl) {
+
+    public <T extends ParamFields.Param> T getField (Class<T> cl) {
         return this.fields.get(cl);
     }
 
-    public void addUserData(Userdata data) {
+
+    public void addUserData (Userdata data) {
         if (data != null) {
             for (Userdata d : this.userdata) {
                 // already has an object of that type!
@@ -81,7 +87,8 @@ public abstract class User implements Serializable {
         }
     }
 
-    public void setId(Integer id) {
+
+    public void setId (Integer id) {
         this.id = id;
         //        if (this.settings != null)
         //            this.settings.setUserID(this.id);
@@ -89,7 +96,8 @@ public abstract class User implements Serializable {
         //            this.details.setUserID(this.id);
     }
 
-    public Map<String, Object> toMap() {
+
+    public Map<String, Object> toMap () {
         Map map = new HashMap();
         map.put(Attributes.USERNAME, this.username);
         //TimeUtils.format(new DateTime(this.accountCreation))
@@ -100,7 +108,8 @@ public abstract class User implements Serializable {
         return map;
     }
 
-    public Map toCache() {
+
+    public Map toCache () {
         Map map = new HashMap();
         map.put(Attributes.ID, this.id);
         map.put(Attributes.USERNAME, this.username);
@@ -111,8 +120,9 @@ public abstract class User implements Serializable {
         return map;
     }
 
+
     @Override
-    public boolean equals(Object o) {
+    public boolean equals (Object o) {
         if (this == o)
             return true;
         if (!(o instanceof User))
@@ -123,14 +133,17 @@ public abstract class User implements Serializable {
         return true;
     }
 
-    public boolean isAdmin() {
+
+    public boolean isAdmin () {
         return this.getUsername().equals(ADMINISTRATOR_ID);
     }
 
-    protected abstract User clone();
+
+    protected abstract User clone ();
+
 
     @Override
-    public String toString() {
+    public String toString () {
         final StringBuffer sb = new StringBuffer();
         sb.append("id='").append(id).append('\'');
         sb.append(", username='").append(username).append('\'');
@@ -139,36 +152,42 @@ public abstract class User implements Serializable {
 
     public static class UserFactory {
 
-        public static KorAPUser getUser(String username) {
+        public static KorAPUser getUser (String username) {
             return new KorAPUser(username);
         }
 
-        public static KorAPUser getUser(String username, String password) {
+
+        public static KorAPUser getUser (String username, String password) {
             KorAPUser user = new KorAPUser(username);
             user.setPassword(password);
             return user;
         }
 
-        public static KorAPUser getAdmin() {
+
+        public static KorAPUser getAdmin () {
             return new KorAPUser(ADMINISTRATOR_ID, ADMINISTRATOR_NAME);
         }
 
-        public static DemoUser getDemoUser() {
+
+        public static DemoUser getDemoUser () {
             return new DemoUser();
         }
 
-        public static DemoUser getDemoUser(Integer id) {
+
+        public static DemoUser getDemoUser (Integer id) {
             DemoUser demo = new DemoUser();
             demo.setId(id);
             return demo;
         }
 
-        public static boolean isDemo(String username) {
+
+        public static boolean isDemo (String username) {
             return new DemoUser().getUsername().equalsIgnoreCase(username);
         }
 
-        public static ShibUser getShibInstance(String eduPersonID, String mail,
-                String cn) {
+
+        public static ShibUser getShibInstance (String eduPersonID,
+                String mail, String cn) {
             ShibUser u = new ShibUser(eduPersonID);
             u.setAffiliation("");
             u.setMail(mail);
@@ -177,34 +196,32 @@ public abstract class User implements Serializable {
             return u;
         }
 
-        public static KorAPUser toKorAPUser(Map<String, Object> map) {
-            KorAPUser user = UserFactory
-                    .getUser((String) map.get(Attributes.USERNAME));
+
+        public static KorAPUser toKorAPUser (Map<String, Object> map) {
+            KorAPUser user = UserFactory.getUser((String) map
+                    .get(Attributes.USERNAME));
             user.setPassword((String) map.get(Attributes.PASSWORD));
-            int id = map.get(Attributes.ID) == null ?
-                    -1 :
-                    (int) map.get(Attributes.ID);
+            int id = map.get(Attributes.ID) == null ? -1 : (int) map
+                    .get(Attributes.ID);
             if (id != -1)
                 user.setId(id);
-            long cr = map.get(Attributes.ACCOUNT_CREATION) == null ?
-                    -1 :
-                    (long) map.get(Attributes.ACCOUNT_CREATION);
+            long cr = map.get(Attributes.ACCOUNT_CREATION) == null ? -1
+                    : (long) map.get(Attributes.ACCOUNT_CREATION);
             if (cr != -1)
-                user.setAccountCreation(
-                        (Long) map.get(Attributes.ACCOUNT_CREATION));
+                user.setAccountCreation((Long) map
+                        .get(Attributes.ACCOUNT_CREATION));
             return user;
         }
 
-        public static User toUser(Map<String, Object> map) {
+
+        public static User toUser (Map<String, Object> map) {
             KustvaktMap kmap = new KustvaktMap(map);
-            int type = map.get(Attributes.TYPE) == null ?
-                    0 :
-                    (Integer) kmap.get(Attributes.TYPE, Integer.class);
+            int type = map.get(Attributes.TYPE) == null ? 0 : (Integer) kmap
+                    .get(Attributes.TYPE, Integer.class);
             User user;
             long created = -1;
-            int id = kmap.get(Attributes.ID, Integer.class) == null ?
-                    -1 :
-                    (Integer) kmap.get(Attributes.ID, Integer.class);
+            int id = kmap.get(Attributes.ID, Integer.class) == null ? -1
+                    : (Integer) kmap.get(Attributes.ID, Integer.class);
 
             if (map.get(Attributes.ACCOUNT_CREATION) != null)
                 created = DateTime.parse(kmap.get(Attributes.ACCOUNT_CREATION))
@@ -213,13 +230,11 @@ public abstract class User implements Serializable {
                 case 0:
                     user = UserFactory.getUser(kmap.get(Attributes.USERNAME));
                     if (id != -1)
-                        user.setId((Integer) kmap
-                                .get(Attributes.ID, Integer.class));
-                    user.setAccountLocked(
-                            map.get(Attributes.ACCOUNTLOCK) == null ?
-                                    false :
-                                    (Boolean) kmap.get(Attributes.ACCOUNTLOCK,
-                                            Boolean.class));
+                        user.setId((Integer) kmap.get(Attributes.ID,
+                                Integer.class));
+                    user.setAccountLocked(map.get(Attributes.ACCOUNTLOCK) == null ? false
+                            : (Boolean) kmap.get(Attributes.ACCOUNTLOCK,
+                                    Boolean.class));
                     user.setAccountCreation(created);
                     break;
                 default:
@@ -229,15 +244,15 @@ public abstract class User implements Serializable {
             return user;
         }
 
-        public static KorAPUser toUser(String value) {
+
+        public static KorAPUser toUser (String value) {
             JsonNode node = JsonUtils.readTree(value);
-            KorAPUser user = UserFactory
-                    .getUser(node.path(Attributes.USERNAME).asText());
-            user.setAccountLocked(
-                    node.path(Attributes.ACCOUNTLOCK).asBoolean());
+            KorAPUser user = UserFactory.getUser(node.path(Attributes.USERNAME)
+                    .asText());
+            user.setAccountLocked(node.path(Attributes.ACCOUNTLOCK).asBoolean());
             user.setAccountLink(node.path(Attributes.ACCOUNTLINK).asText());
-            user.setAccountCreation(
-                    node.path(Attributes.ACCOUNT_CREATION).asLong());
+            user.setAccountCreation(node.path(Attributes.ACCOUNT_CREATION)
+                    .asLong());
             user.setPassword(node.path(Attributes.PASSWORD).asText());
             return user;
         }

@@ -6,8 +6,9 @@ package de.ids_mannheim.korap.config;
  */
 public interface KustvaktBaseDaoInterface {
 
-    int size();
+    int size ();
 
-    int truncate();
+
+    int truncate ();
 
 }

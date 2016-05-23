@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNotEquals;
 public class PolicyLoaderTest extends BeanConfigTest {
 
     @Test
-    public void testPolicyLoader() {
+    public void testPolicyLoader () {
         boolean error = false;
         UserLoader u = new UserLoader();
         CollectionLoader c = new CollectionLoader();
@@ -26,17 +26,20 @@ public class PolicyLoaderTest extends BeanConfigTest {
             u.load(helper().getContext());
             c.load(helper().getContext());
             l.load(helper().getContext());
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             e.printStackTrace();
             error = true;
         }
         assertFalse(error);
-        PolicyDao dao = new PolicyDao(helper().getContext().getPersistenceClient());
+        PolicyDao dao = new PolicyDao(helper().getContext()
+                .getPersistenceClient());
         assertNotEquals("Is not supposed to be zero", 0, dao.size());
     }
 
+
     @Override
-    public void initMethod() throws KustvaktException {
+    public void initMethod () throws KustvaktException {
 
     }
 }

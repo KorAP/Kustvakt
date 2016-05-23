@@ -24,7 +24,7 @@ public class RowMapperFactory {
     public static class UserMapMapper implements RowMapper<Map> {
 
         @Override
-        public Map mapRow(ResultSet rs, int rowNum) throws SQLException {
+        public Map mapRow (ResultSet rs, int rowNum) throws SQLException {
             User user = new UserMapper().mapRow(rs, rowNum);
             return user.toMap();
         }
@@ -33,7 +33,7 @@ public class RowMapperFactory {
     public static class UserMapper implements RowMapper<User> {
 
         @Override
-        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+        public User mapRow (ResultSet rs, int rowNum) throws SQLException {
             User user;
             switch (rs.getInt("type")) {
                 case 0:
@@ -45,17 +45,17 @@ public class RowMapperFactory {
                 default:
                     user = User.UserFactory.getDemoUser();
                     user.setId(rs.getInt("id"));
-                    user.setAccountCreation(
-                            rs.getTimestamp(Attributes.ACCOUNT_CREATION)
-                                    .getTime());
+                    user.setAccountCreation(rs.getTimestamp(
+                            Attributes.ACCOUNT_CREATION).getTime());
                     return user;
             }
             return user;
         }
 
-        private KorAPUser getKorAP(ResultSet rs) throws SQLException {
-            KorAPUser user = User.UserFactory
-                    .getUser(rs.getString(Attributes.USERNAME));
+
+        private KorAPUser getKorAP (ResultSet rs) throws SQLException {
+            KorAPUser user = User.UserFactory.getUser(rs
+                    .getString(Attributes.USERNAME));
             user.setPassword(rs.getString(Attributes.PASSWORD));
             user.setId(rs.getInt(Attributes.ID));
             user.setAccountLocked(rs.getBoolean(Attributes.ACCOUNTLOCK));
@@ -63,17 +63,18 @@ public class RowMapperFactory {
             user.setAccountLink(rs.getString(Attributes.ACCOUNTLINK));
             long l = rs.getLong(Attributes.URI_EXPIRATION);
 
-            URIParam param = new URIParam(rs.getString(Attributes.URI_FRAGMENT),
-                    l == 0 ? -1 : new Timestamp(l).getTime());
+            URIParam param = new URIParam(
+                    rs.getString(Attributes.URI_FRAGMENT), l == 0 ? -1
+                            : new Timestamp(l).getTime());
             user.addField(param);
             return user;
         }
 
-        private ShibUser getShib(ResultSet rs) throws SQLException {
-            ShibUser user = User.UserFactory
-                    .getShibInstance(rs.getString(Attributes.USERNAME),
-                            rs.getString(Attributes.MAIL),
-                            rs.getString(Attributes.CN));
+
+        private ShibUser getShib (ResultSet rs) throws SQLException {
+            ShibUser user = User.UserFactory.getShibInstance(
+                    rs.getString(Attributes.USERNAME),
+                    rs.getString(Attributes.MAIL), rs.getString(Attributes.CN));
             user.setId(rs.getInt(Attributes.ID));
             return user;
         }
@@ -83,10 +84,10 @@ public class RowMapperFactory {
     public static class AuditMapper implements RowMapper<AuditRecord> {
 
         @Override
-        public AuditRecord mapRow(ResultSet rs, int rowNum)
+        public AuditRecord mapRow (ResultSet rs, int rowNum)
                 throws SQLException {
-            AuditRecord r = new AuditRecord(
-                    AuditRecord.CATEGORY.valueOf(rs.getString("aud_category")));
+            AuditRecord r = new AuditRecord(AuditRecord.CATEGORY.valueOf(rs
+                    .getString("aud_category")));
             r.setUserid(rs.getString("aud_user"));
             r.setField_1(rs.getString("aud_field_1"));
             r.setTimestamp(rs.getTimestamp("aud_timestamp").getTime());
@@ -100,7 +101,7 @@ public class RowMapperFactory {
     public static class ResourceMapper implements RowMapper<KustvaktResource> {
 
         @Override
-        public KustvaktResource mapRow(ResultSet rs, int rowNum)
+        public KustvaktResource mapRow (ResultSet rs, int rowNum)
                 throws SQLException {
             KustvaktResource r = ResourceFactory.getResource(rs.getInt("type"));
             if (r != null) {

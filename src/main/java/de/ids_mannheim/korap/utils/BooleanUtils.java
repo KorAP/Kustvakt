@@ -8,13 +8,15 @@ public class BooleanUtils {
 
     public static String dbname;
 
-    public static Object getBoolean(Object val) {
+
+    public static Object getBoolean (Object val) {
         if (val == null)
             val = false;
         if (dbname != null && dbname.equalsIgnoreCase("sqlite")) {
             if (val instanceof Boolean) {
                 return ((boolean) val) ? 1 : 0;
-            }else if (val instanceof Integer) {
+            }
+            else if (val instanceof Integer) {
                 return ((Integer) val == 1);
             }
         }

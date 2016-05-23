@@ -40,26 +40,27 @@ public class UserService {
     private static Logger jlog = LoggerFactory.getLogger(UserService.class);
     private AuthenticationManagerIface controller;
 
-    private
-    @Context
+    private @Context
     UriInfo info;
 
-    public UserService() {
+
+    public UserService () {
         this.controller = BeansFactory.getKustvaktContext()
                 .getAuthenticationManager();
     }
+
 
     // fixme: json contains password in clear text. Encrypt request?
     // fixme: should also collect service exception, not just db exception!
     @POST
     @Path("register")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response signUp(
+    public Response signUp (
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
             @Context Locale locale, MultivaluedMap form_values) {
-        Map<String, Object> wrapper = FormRequestWrapper
-                .toMap(form_values, true);
+        Map<String, Object> wrapper = FormRequestWrapper.toMap(form_values,
+                true);
 
         wrapper.put(Attributes.HOST, host);
         wrapper.put(Attributes.USER_AGENT, agent);
@@ -71,15 +72,15 @@ public class UserService {
                     .path("confirm");
 
             user = controller.createUserAccount(wrapper, true);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
         URIParam uri = user.getField(URIParam.class);
         if (uri.hasValues()) {
             uriBuilder.queryParam(Attributes.QUERY_PARAM_URI,
-                    uri.getUriFragment())
-                    .queryParam(Attributes.QUERY_PARAM_USER,
-                            user.getUsername());
+                    uri.getUriFragment()).queryParam(
+                    Attributes.QUERY_PARAM_USER, user.getUsername());
             jlog.info("registration was successful for user '{}'",
                     form_values.get(Attributes.USERNAME));
             Map object = new HashMap();
@@ -87,7 +88,8 @@ public class UserService {
             object.put("uri_expiration",
                     TimeUtils.format(uri.getUriExpiration()));
             return Response.ok(JsonUtils.toJSON(object)).build();
-        }else {
+        }
+        else {
             // todo: return error or warning
             throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     "failed to validate uri paramter", "confirmation fragment");
@@ -95,13 +97,14 @@ public class UserService {
 
     }
 
+
     //todo: password update in special function? --> password reset only!
     @POST
     @Path("update")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
-            BlockingFilter.class })
-    public Response updateAccount(@Context SecurityContext ctx, String json) {
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
+            PiwikFilter.class, BlockingFilter.class })
+    public Response updateAccount (@Context SecurityContext ctx, String json) {
         TokenContext context = (TokenContext) ctx.getUserPrincipal();
         try {
             User user = controller.getUser(context.getUsername());
@@ -113,41 +116,43 @@ public class UserService {
             //                    .checkPasswordAllowance(ident, values.getPassword(),
             //                            node.path("new_password").asText());
             //            controller.updateAccount(user);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
 
+
     @GET
     @Path("confirm")
     @Produces(MediaType.TEXT_HTML)
-    public Response confirmRegistration(@QueryParam("uri") String uritoken,
+    public Response confirmRegistration (@QueryParam("uri") String uritoken,
             @Context Locale locale, @QueryParam("user") String username) {
         if (uritoken == null || uritoken.isEmpty())
-            throw KustvaktResponseHandler
-                    .throwit(StatusCodes.ILLEGAL_ARGUMENT, "parameter missing",
-                            "uri parameter");
+            throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+                    "parameter missing", "uri parameter");
         if (username == null || username.isEmpty())
-            throw KustvaktResponseHandler
-                    .throwit(StatusCodes.ILLEGAL_ARGUMENT, "parameter missing",
-                            "Username");
+            throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+                    "parameter missing", "Username");
 
         try {
             controller.confirmRegistration(uritoken, username);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             e.printStackTrace();
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok("success").build();
     }
 
+
     // todo: auditing!
     @POST
     @Path("requestReset")
     @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response requestPasswordReset(@Context Locale locale, String json) {
+    public Response requestPasswordReset (@Context Locale locale, String json) {
         JsonNode node = JsonUtils.readTree(json);
         StringBuilder builder = new StringBuilder();
         String username, email;
@@ -173,7 +178,8 @@ public class UserService {
                     .append(objects[0]);
             builder.append(Attributes.QUERY_PARAM_USER).append("=")
                     .append(username);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             jlog.error("Eoxception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
@@ -184,28 +190,31 @@ public class UserService {
         return Response.ok(JsonUtils.toJSON(obj)).build();
     }
 
+
     @POST
     @Path("reset")
     @Produces(MediaType.TEXT_HTML)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response resetPassword(
+    public Response resetPassword (
             @QueryParam(Attributes.QUERY_PARAM_URI) String uri,
             @QueryParam(Attributes.QUERY_PARAM_USER) String username,
             @Context HttpHeaders headers, String passphrase) {
         try {
             controller.resetPassword(uri, username, passphrase);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
             return Response.notModified().build();
         }
         return Response.ok().build();
     }
 
+
     @GET
     @Path("info")
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
-            BlockingFilter.class })
-    public Response getStatus(@Context SecurityContext context,
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
+            PiwikFilter.class, BlockingFilter.class })
+    public Response getStatus (@Context SecurityContext context,
             @QueryParam("scopes") String scopes) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         Scopes m;
@@ -218,17 +227,19 @@ public class UserService {
                 base_scope.retainAll(StringUtils.toSet(scopes));
             scopes = StringUtils.toString(base_scope);
             m = Scopes.mapScopes(scopes, data.fields());
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok(m.toEntity()).build();
     }
 
+
     @GET
     @Path("settings")
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
-            BlockingFilter.class })
-    public Response getUserSettings(@Context SecurityContext context,
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
+            PiwikFilter.class, BlockingFilter.class })
+    public Response getUserSettings (@Context SecurityContext context,
             @Context Locale locale) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         String result;
@@ -237,20 +248,22 @@ public class UserService {
             Userdata data = controller.getUserData(user, UserSettings.class);
             data.setField(Attributes.USERNAME, ctx.getUsername());
             result = data.data();
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok(result).build();
     }
 
+
     // todo: test
     @POST
     @Path("settings")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
-            BlockingFilter.class })
-    public Response updateSettings(@Context SecurityContext context,
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
+            PiwikFilter.class, BlockingFilter.class })
+    public Response updateSettings (@Context SecurityContext context,
             @Context Locale locale, MultivaluedMap form) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         Map<String, Object> settings = FormRequestWrapper.toMap(form, false);
@@ -272,7 +285,8 @@ public class UserService {
             data.update(new_data);
 
             controller.updateUserData(data);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
@@ -280,11 +294,12 @@ public class UserService {
         return Response.ok().build();
     }
 
+
     @GET
     @Path("details")
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
-            BlockingFilter.class })
-    public Response getDetails(@Context SecurityContext context,
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
+            PiwikFilter.class, BlockingFilter.class })
+    public Response getDetails (@Context SecurityContext context,
             @Context Locale locale) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         String result;
@@ -293,19 +308,21 @@ public class UserService {
             Userdata data = controller.getUserData(user, UserDetails.class);
             data.setField(Attributes.USERNAME, ctx.getUsername());
             result = data.data();
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok(result).build();
     }
 
+
     @POST
     @Path("details")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
-            BlockingFilter.class })
-    public Response updateDetails(@Context SecurityContext context,
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
+            PiwikFilter.class, BlockingFilter.class })
+    public Response updateDetails (@Context SecurityContext context,
             @Context Locale locale, MultivaluedMap form) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
 
@@ -322,7 +339,8 @@ public class UserService {
             UserDetails det = controller.getUserData(user, UserDetails.class);
             det.update(new_data);
             controller.updateUserData(det);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
@@ -330,14 +348,14 @@ public class UserService {
         return Response.ok().build();
     }
 
+
     //fixme: if policy allows, foreign user might be allowed to change search!
     @POST
     @Path("queries")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
-            BlockingFilter.class })
-    public Response updateQueries(@Context SecurityContext context,
-            String json) {
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
+            PiwikFilter.class, BlockingFilter.class })
+    public Response updateQueries (@Context SecurityContext context, String json) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         Collection<UserQuery> add = new HashSet<>();
         try {
@@ -377,35 +395,39 @@ public class UserService {
             //                resourceHandler.deleteResources(user,
             //                        resources.toArray(new UserQuery[resources.size()]));
             //            }
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok(JsonUtils.toJSON(add)).build();
     }
 
+
     @DELETE
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
-            BlockingFilter.class })
-    public Response deleteUser(@Context SecurityContext context) {
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
+            PiwikFilter.class, BlockingFilter.class })
+    public Response deleteUser (@Context SecurityContext context) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         try {
             User user = controller.getUser(ctx.getUsername());
             if (User.UserFactory.isDemo(ctx.getUsername()))
                 return Response.notModified().build();
             controller.deleteAccount(user);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
 
+
     @GET
     @Path("queries")
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
-            BlockingFilter.class })
-    public Response getQueries(@Context SecurityContext context,
+    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
+            PiwikFilter.class, BlockingFilter.class })
+    public Response getQueries (@Context SecurityContext context,
             @Context Locale locale) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         String queryStr;
@@ -416,7 +438,8 @@ public class UserService {
             //            queryStr = JsonUtils.toJSON(queries);
             //todo:
             queryStr = "";
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }

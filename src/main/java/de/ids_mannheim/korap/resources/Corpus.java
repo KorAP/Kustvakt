@@ -18,20 +18,24 @@ public class Corpus extends KustvaktResource {
     @Deprecated
     private Map stats;
 
-    public Corpus() {
+
+    public Corpus () {
         super();
     }
 
-    public Corpus(String pers) {
+
+    public Corpus (String pers) {
         super(pers);
     }
 
-    public Corpus(Integer id) {
+
+    public Corpus (Integer id) {
         super(id);
     }
 
+
     @Override
-    public Map toMap() {
+    public Map toMap () {
         Map res = super.toMap();
         if (stats != null && !stats.isEmpty())
             res.put("statistics", stats);

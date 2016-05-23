@@ -8,16 +8,19 @@ import java.util.Map;
 
 public interface AuthenticationIface {
 
-    TokenContext getUserStatus(String authToken) throws
-            KustvaktException;
+    TokenContext getUserStatus (String authToken) throws KustvaktException;
 
-    TokenContext createUserSession(User user, Map<String, Object> attr)
+
+    TokenContext createUserSession (User user, Map<String, Object> attr)
             throws KustvaktException;
 
-    void removeUserSession(String token) throws KustvaktException;
 
-    TokenContext refresh(TokenContext context) throws KustvaktException;
+    void removeUserSession (String token) throws KustvaktException;
 
-    String getIdentifier();
+
+    TokenContext refresh (TokenContext context) throws KustvaktException;
+
+
+    String getIdentifier ();
 
 }

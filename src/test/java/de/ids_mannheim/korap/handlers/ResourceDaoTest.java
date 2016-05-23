@@ -25,8 +25,9 @@ public class ResourceDaoTest extends BeanConfigTest {
 
     private static List<Integer> ids = new ArrayList<>();
 
+
     @Override
-    public void initMethod() {
+    public void initMethod () {
         helper().setupAccount();
 
         List classes = new ArrayList<>(
@@ -40,41 +41,48 @@ public class ResourceDaoTest extends BeanConfigTest {
                 r.setPersistentID(r.getName());
                 int id = helper().setupResource(r);
                 ids.add(id);
-                assertNotEquals(0,
-                        new ResourceDao<>(helper().getContext().getPersistenceClient())
-                                .size());
-            }catch (InstantiationException e) {
+                assertNotEquals(0, new ResourceDao<>(helper().getContext()
+                        .getPersistenceClient()).size());
+            }
+            catch (InstantiationException e) {
                 if (i < classes.size())
                     classes.remove(i);
-            }catch (KustvaktException | IllegalAccessException e) {
+            }
+            catch (KustvaktException | IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
     }
 
+
     @Test
-    public void testBatchGetResources() throws KustvaktException {
-        ResourceDao dao = new ResourceDao(helper().getContext().getPersistenceClient());
+    public void testBatchGetResources () throws KustvaktException {
+        ResourceDao dao = new ResourceDao(helper().getContext()
+                .getPersistenceClient());
         assertNotEquals(0, dao.size());
         Collection res = dao.getResources(ids, User.UserFactory.getDemoUser());
         assertEquals(ids.size(), res.size());
     }
 
+
     @Test
-    public void testGetResource() throws KustvaktException {
-        ResourceDao dao = new ResourceDao(helper().getContext().getPersistenceClient());
-        assertEquals("sqlite",
-                helper().getContext().getPersistenceClient().getDatabase());
+    public void testGetResource () throws KustvaktException {
+        ResourceDao dao = new ResourceDao(helper().getContext()
+                .getPersistenceClient());
+        assertEquals("sqlite", helper().getContext().getPersistenceClient()
+                .getDatabase());
 
         assertNotEquals(0, dao.size());
-        KustvaktResource res = dao
-                .findbyId(ids.get(0), User.UserFactory.getDemoUser());
+        KustvaktResource res = dao.findbyId(ids.get(0),
+                User.UserFactory.getDemoUser());
         assertNotNull(res);
     }
 
+
     @Test
-    public void createCollection() throws KustvaktException {
-        ResourceDao dao = new ResourceDao(helper().getContext().getPersistenceClient());
+    public void createCollection () throws KustvaktException {
+        ResourceDao dao = new ResourceDao(helper().getContext()
+                .getPersistenceClient());
         VirtualCollection c = new VirtualCollection("testColl1");
         c.addField("key_1", "this is a test");
         c.addField("key_2", 2);
@@ -85,15 +93,17 @@ public class ResourceDaoTest extends BeanConfigTest {
         int id = dao.storeResource(c, user);
 
         KustvaktResource r = dao.findbyId(id, user);
-        assertNotEquals(dao.size(),0);
+        assertNotEquals(dao.size(), 0);
         assertNotNull(r);
-        assertEquals(r.getField("key_1") instanceof String,true);
-        assertEquals(r.getField("key_2") instanceof Integer,true);
+        assertEquals(r.getField("key_1") instanceof String, true);
+        assertEquals(r.getField("key_2") instanceof Integer, true);
     }
 
+
     @Test
-    public void ResourceDataUpdate() throws KustvaktException {
-        ResourceDao dao = new ResourceDao(helper().getContext().getPersistenceClient());
+    public void ResourceDataUpdate () throws KustvaktException {
+        ResourceDao dao = new ResourceDao(helper().getContext()
+                .getPersistenceClient());
         VirtualCollection c = new VirtualCollection("testColl2");
         c.addField("key_1", "this is a test");
         c.addField("key_2", 2);

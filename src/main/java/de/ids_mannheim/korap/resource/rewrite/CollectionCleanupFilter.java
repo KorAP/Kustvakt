@@ -14,16 +14,16 @@ import java.util.Iterator;
  * @author hanl
  * @date 28/07/2015
  */
-public class CollectionCleanupFilter
-        implements RewriteTask.RewriteNodeAt {
+public class CollectionCleanupFilter implements RewriteTask.RewriteNodeAt {
 
     @Override
-    public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
+    public JsonNode preProcess (KoralNode node, KustvaktConfiguration config,
             User user) {
         return process(node.rawNode());
     }
 
-    private JsonNode process(JsonNode root) {
+
+    private JsonNode process (JsonNode root) {
         JsonNode sub = root;
         if (root.isObject()) {
             if (root.has("operands")) {
@@ -40,9 +40,8 @@ public class CollectionCleanupFilter
                 // remove group element and replace with single doc
                 if (count == 1)
                     sub = node.path(0);
-                    // indicate empty group
-                else if (count
-                        == 0) // can't do anything here -- fixme: edge case?!
+                // indicate empty group
+                else if (count == 0) // can't do anything here -- fixme: edge case?!
                     return null;
             }
 
@@ -58,9 +57,10 @@ public class CollectionCleanupFilter
         return root;
     }
 
+
     // return null deletes node, if node return replace at level -1
     @Deprecated
-    private JsonNode processNodes(JsonNode jsonNode) {
+    private JsonNode processNodes (JsonNode jsonNode) {
         if (jsonNode.isObject()) {
             if (jsonNode.has("operands")) {
                 JsonNode node = jsonNode.at("/operands");
@@ -68,7 +68,8 @@ public class CollectionCleanupFilter
                 if (count == 1) {
                     // move to super node if any
                     return node.path(0);
-                }else if (count == 0) {
+                }
+                else if (count == 0) {
                     // remove container
                     return null;
                 }
@@ -78,13 +79,15 @@ public class CollectionCleanupFilter
         return JsonUtils.createArrayNode();
     }
 
+
     @Override
-    public JsonNode postProcess(KoralNode node) {
+    public JsonNode postProcess (KoralNode node) {
         return null;
     }
 
+
     @Override
-    public String at() {
+    public String at () {
         return "/collection";
     }
 }

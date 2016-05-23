@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 public class IdRewriteTest extends BeanConfigTest {
 
     @Test
-    public void insertTokenId() {
+    public void insertTokenId () {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         assertTrue(handler.add(IdWriter.class));
@@ -32,8 +32,9 @@ public class IdRewriteTest extends BeanConfigTest {
         assertTrue(result.path("query").has("idn"));
     }
 
+
     @Test
-    public void testIdWriterTest() {
+    public void testIdWriterTest () {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         assertTrue(handler.add(IdWriter.class));
@@ -47,8 +48,9 @@ public class IdRewriteTest extends BeanConfigTest {
         assertFalse(node.at("/query/idn").isMissingNode());
     }
 
+
     @Override
-    public void initMethod() throws KustvaktException {
+    public void initMethod () throws KustvaktException {
 
     }
 }

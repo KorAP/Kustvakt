@@ -26,7 +26,8 @@ public class JDBCClient extends PersistenceClient<NamedParameterJdbcTemplate> {
     @Setter(AccessLevel.NONE)
     private DataSource dataSource;
 
-    public JDBCClient(DataSource datasource) {
+
+    public JDBCClient (DataSource datasource) {
         NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(
                 datasource);
         template.setCacheLimit(500);
@@ -34,19 +35,22 @@ public class JDBCClient extends PersistenceClient<NamedParameterJdbcTemplate> {
         this.dataSource = datasource;
     }
 
-    public JDBCClient(DataSource dataSource, Resource resource)
+
+    public JDBCClient (DataSource dataSource, Resource resource)
             throws IOException {
         this(dataSource);
         this.setSchema(resource.getInputStream());
     }
 
+
     @Override
-    public void setSchema(InputStream stream) throws IOException {
+    public void setSchema (InputStream stream) throws IOException {
         super.setSchema(stream);
     }
 
+
     @Override
-    public boolean checkDatabase() {
+    public boolean checkDatabase () {
         int size;
         NamedParameterJdbcTemplate tmp = this.getSource();
         try {
@@ -54,29 +58,33 @@ public class JDBCClient extends PersistenceClient<NamedParameterJdbcTemplate> {
             size = tmp.queryForObject(
                     "select count(*) from schema_version limit 5;",
                     new HashMap<String, Object>(), Integer.class);
-        }catch (Exception e) {
+        }
+        catch (Exception e) {
             System.out.println("No database schema found!");
             return false;
         }
         return size > 0;
     }
 
+
     @Override
-    public void setDatabase(String name) {
+    public void setDatabase (String name) {
         super.setDatabase(name);
         BooleanUtils.dbname = name;
     }
 
+
     // get schema file from configuration and create database
     @Override
-    public void createDatabase() {
+    public void createDatabase () {
         if (!checkDatabase()) {
             final ResourceDatabasePopulator rdp = new ResourceDatabasePopulator();
             rdp.addScript(new InputStreamResource(this.getSchema()));
             rdp.setSeparator("$$");
             try {
                 rdp.populate(this.dataSource.getConnection());
-            }catch (SQLException e) {
+            }
+            catch (SQLException e) {
                 // do nothing
                 e.printStackTrace();
             }

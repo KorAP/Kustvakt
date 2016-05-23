@@ -6,5 +6,5 @@ package de.ids_mannheim.korap.config;
  */
 public interface KustvaktTypeInterface<T> {
 
-    Class<T> type();
+    Class<T> type ();
 }

@@ -13,7 +13,8 @@ import java.util.Date;
 /**
  * @author hanl
  *         <p/>
- *         Record holder for auditing requests. Holds the data until it can be persisted to a database
+ *         Record holder for auditing requests. Holds the data until
+ *         it can be persisted to a database
  */
 @Getter
 @Setter
@@ -43,16 +44,19 @@ public class AuditRecord {
     private String args;
     private String field_1 = "None";
 
-    private AuditRecord() {
+
+    private AuditRecord () {
         this.timestamp = TimeUtils.getNow().getMillis();
     }
 
-    public AuditRecord(CATEGORY category) {
+
+    public AuditRecord (CATEGORY category) {
         this();
         this.category = category;
     }
 
-    public AuditRecord(CATEGORY cat, Object userID, Integer status) {
+
+    public AuditRecord (CATEGORY cat, Object userID, Integer status) {
         this(cat);
         this.status = status;
         if (userID != null) {
@@ -61,14 +65,16 @@ public class AuditRecord {
             //                    user.getTokenContext().getUserAgent());
             this.loc = clientInfoToString("null", "null");
             userid = String.valueOf(userID);
-        }else {
+        }
+        else {
             this.loc = clientInfoToString("null", "null");
             userid = "-1";
         }
     }
 
-    public static AuditRecord serviceRecord(Object user, Integer status,
-            String... args) {
+
+    public static AuditRecord serviceRecord (Object user, Integer status,
+            String ... args) {
         AuditRecord r = new AuditRecord(CATEGORY.SERVICE);
         r.setArgs(Arrays.asList(args).toString());
         r.setUserid(String.valueOf(user));
@@ -76,8 +82,9 @@ public class AuditRecord {
         return r;
     }
 
-    public static AuditRecord dbRecord(Object user, Integer status,
-            String... args) {
+
+    public static AuditRecord dbRecord (Object user, Integer status,
+            String ... args) {
         AuditRecord r = new AuditRecord(CATEGORY.DATABASE);
         r.setArgs(Arrays.asList(args).toString());
         r.setUserid(String.valueOf(user));
@@ -85,7 +92,8 @@ public class AuditRecord {
         return r;
     }
 
-    public AuditRecord fromJson(String json) {
+
+    public AuditRecord fromJson (String json) {
         JsonNode n = JsonUtils.readTree(json);
         AuditRecord r = new AuditRecord();
         r.setCategory(CATEGORY.valueOf(n.path("category").asText()));
@@ -97,13 +105,15 @@ public class AuditRecord {
         return r;
     }
 
-    private String clientInfoToString(String IP, String userAgent) {
+
+    private String clientInfoToString (String IP, String userAgent) {
         return userAgent + "@" + IP;
     }
 
+
     // fixme: add id, useragent
     @Override
-    public String toString() {
+    public String toString () {
         StringBuilder b = new StringBuilder();
         b.append(category.toString().toLowerCase() + " audit : ")
                 .append(userid + "@" + new Date(timestamp)).append("\n")
@@ -116,8 +126,9 @@ public class AuditRecord {
         return b.toString();
     }
 
+
     @Override
-    public boolean equals(Object o) {
+    public boolean equals (Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -131,24 +142,23 @@ public class AuditRecord {
             return false;
         if (status != null ? !status.equals(that.status) : that.status != null)
             return false;
-        if (field_1 != null ?
-                !field_1.equals(that.field_1) :
-                that.field_1 != null)
+        if (field_1 != null ? !field_1.equals(that.field_1)
+                : that.field_1 != null)
             return false;
         if (loc != null ? !loc.equals(that.loc) : that.loc != null)
             return false;
         if (target != null ? !target.equals(that.target) : that.target != null)
             return false;
-        if (timestamp != null ?
-                !timestamp.equals(that.timestamp) :
-                that.timestamp != null)
+        if (timestamp != null ? !timestamp.equals(that.timestamp)
+                : that.timestamp != null)
             return false;
 
         return true;
     }
 
+
     @Override
-    public int hashCode() {
+    public int hashCode () {
         int result = userid != null ? userid.hashCode() : 0;
         result = 31 * result + (target != null ? target.hashCode() : 0);
         result = 31 * result + category.hashCode();

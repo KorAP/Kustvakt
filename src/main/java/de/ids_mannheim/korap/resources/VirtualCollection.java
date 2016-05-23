@@ -16,47 +16,49 @@ public class VirtualCollection extends KustvaktResource {
     @Deprecated
     private Map stats;
 
-    public VirtualCollection() {
+
+    public VirtualCollection () {
         super();
     }
 
-    public VirtualCollection(Integer id) {
+
+    public VirtualCollection (Integer id) {
         super(id);
     }
 
-    public VirtualCollection(String persistentID) {
+
+    public VirtualCollection (String persistentID) {
         super(persistentID);
     }
 
+
     @Override
-    public void merge(KustvaktResource resource) {
+    public void merge (KustvaktResource resource) {
         super.merge(resource);
         if (resource == null | !(resource instanceof VirtualCollection))
             return;
         VirtualCollection other = (VirtualCollection) resource;
-        this.setFields(this.getFields() == null ?
-                other.getFields() :
-                this.getFields());
+        this.setFields(this.getFields() == null ? other.getFields() : this
+                .getFields());
     }
+
 
     @Override
     @SuppressWarnings("unchecked")
-    public void checkNull() {
-        this.setDescription(
-                this.getDescription() == null ? "" : this.getDescription());
+    public void checkNull () {
+        this.setDescription(this.getDescription() == null ? "" : this
+                .getDescription());
         super.checkNull();
     }
 
+
     @Override
-    public String toString() {
-        return "VirtualCollection{" +
-                "id='" + this.getId() + '\'' +
-                ", persistentID='" + this.getPersistentID() + '\'' +
-                ", created=" + created +
-                ", path=" + this.getPath() +
-                ", name='" + this.getName() + '\'' +
-                ", data='" + this.getData() + '\'' +
-                '}';
+    public String toString () {
+        return "VirtualCollection{" + "id='" + this.getId() + '\''
+                + ", persistentID='" + this.getPersistentID() + '\''
+                + ", created=" + created + ", path=" + this.getPath()
+                + ", name='" + this.getName() + '\'' + ", data='"
+                + this.getData() + '\'' + '}';
     }
 
     //    @Override

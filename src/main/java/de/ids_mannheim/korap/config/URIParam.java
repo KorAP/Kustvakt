@@ -12,13 +12,15 @@ public class URIParam extends ParamFields.Param {
     private final String uriFragment;
     private final Long uriExpiration;
 
-    public URIParam(String uri, Long expire) {
+
+    public URIParam (String uri, Long expire) {
         this.uriFragment = uri;
         this.uriExpiration = expire;
     }
 
+
     @Override
-    public boolean hasValues() {
+    public boolean hasValues () {
         return this.uriFragment != null && !this.uriFragment.isEmpty()
                 && this.uriExpiration != null;
     }

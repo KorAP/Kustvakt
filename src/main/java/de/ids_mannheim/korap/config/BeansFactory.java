@@ -24,89 +24,98 @@ public class BeansFactory {
 
     private static ContextHolder beanHolder;
 
+
     //todo: allow this for external plugin systems that are not kustvakt specific
     @Deprecated
-    public static void setCustomBeansHolder(ContextHolder holder) {
+    public static void setCustomBeansHolder (ContextHolder holder) {
         beanHolder = holder;
     }
 
-    public static synchronized ContextHolder getKustvaktContext() {
+
+    public static synchronized ContextHolder getKustvaktContext () {
         return beanHolder;
     }
 
-    public static synchronized ContextHolder getKustvaktContext(int i) {
+
+    public static synchronized ContextHolder getKustvaktContext (int i) {
         return beanHolder;
     }
 
-    public static synchronized TypeBeanFactory getTypeFactory() {
+
+    public static synchronized TypeBeanFactory getTypeFactory () {
         return new TypeBeanFactory(beanHolder);
     }
 
-    public static int loadClasspathContext(String... files) {
+
+    public static int loadClasspathContext (String ... files) {
         ApplicationContext context;
         if (files.length == 0)
             context = new ClassPathXmlApplicationContext(CONFIG_FILE);
         else
             context = new ClassPathXmlApplicationContext(files);
-        ContextHolder h = new ContextHolder(context) {
-        };
+        ContextHolder h = new ContextHolder(context) {};
         BeansFactory.beanHolder = h;
         //        return BeansFactory.beanHolder.indexOf(h);
         return 0;
     }
 
-    public static synchronized int addApplicationContext(
+
+    public static synchronized int addApplicationContext (
             ApplicationContext context) {
-        ContextHolder h = new ContextHolder(context) {
-        };
+        ContextHolder h = new ContextHolder(context) {};
         BeansFactory.beanHolder = h;
         //        return BeansFactory.beanHolder.indexOf(h);
         return 0;
     }
 
-    public static synchronized void setKustvaktContext(ContextHolder holder) {
+
+    public static synchronized void setKustvaktContext (ContextHolder holder) {
         BeansFactory.beanHolder = holder;
     }
 
-    public static synchronized int setApplicationContext(
+
+    public static synchronized int setApplicationContext (
             ApplicationContext context) {
-        ContextHolder h = new ContextHolder(context) {
-        };
+        ContextHolder h = new ContextHolder(context) {};
         BeansFactory.beanHolder = h;
         return 0;
     }
 
-    public static synchronized int loadFileContext(String filepath) {
+
+    public static synchronized int loadFileContext (String filepath) {
         ApplicationContext context = new FileSystemXmlApplicationContext(
                 "file:" + filepath);
-        ContextHolder h = new ContextHolder(context) {
-        };
+        ContextHolder h = new ContextHolder(context) {};
         BeansFactory.beanHolder = h;
         return 0;
     }
 
-    public static void closeApplication() {
+
+    public static void closeApplication () {
         BeansFactory.beanHolder = null;
     }
 
+
     //todo: set response handler
     @Deprecated
-    public static KustvaktResponseHandler getResponseHandler() {
+    public static KustvaktResponseHandler getResponseHandler () {
         return null;
     }
 
-    public BeansFactory() {
-    }
+
+    public BeansFactory () {}
 
     public static class TypeBeanFactory {
 
         private ContextHolder holder;
 
-        private TypeBeanFactory(ContextHolder holder) {
+
+        private TypeBeanFactory (ContextHolder holder) {
             this.holder = holder;
         }
 
-        public <T> T getTypedBean(Collection objs, Class type) {
+
+        public <T> T getTypedBean (Collection objs, Class type) {
             for (Object o : objs) {
                 Type gtype = o.getClass().getGenericInterfaces()[0];
                 if (gtype instanceof ParameterizedType) {
@@ -116,11 +125,14 @@ public class BeansFactory {
                         return (T) o;
                 }
             }
-            throw new RuntimeException("Could not find typed bean in context for class '"+type+"'");
+            throw new RuntimeException(
+                    "Could not find typed bean in context for class '" + type
+                            + "'");
         }
 
+
         @Deprecated
-        public UserDataDbIface getUserDaoInstance(
+        public UserDataDbIface getUserDaoInstance (
                 Class<? extends Userdata> type) {
             return getTypedBean(this.holder.getUserDataDaos(), type);
         }

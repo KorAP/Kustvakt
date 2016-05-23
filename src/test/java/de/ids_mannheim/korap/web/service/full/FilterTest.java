@@ -17,40 +17,49 @@ import org.junit.Test;
 public class FilterTest extends FastJerseyTest {
 
     @BeforeClass
-    public static void setup() throws Exception {
+    public static void setup () throws Exception {
         FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.full",
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");
     }
 
+
     @Test
-    public void testTestUserAuth() {
-        ClientResponse resp = resource().path(getAPIVersion()).path("user/info")
-                .header(Attributes.AUTHORIZATION, BasicHttpAuth
-                        .encode(TestHelper.getUserCredentials()[0],
+    public void testTestUserAuth () {
+        ClientResponse resp = resource()
+                .path(getAPIVersion())
+                .path("user/info")
+                .header(Attributes.AUTHORIZATION,
+                        BasicHttpAuth.encode(
+                                TestHelper.getUserCredentials()[0],
                                 TestHelper.getUserCredentials()[1]))
                 .get(ClientResponse.class);
         assert resp.getStatus() == Response.SC_OK;
     }
 
+
     @Test
-    public void testDemoAuth() {
-        ClientResponse resp = resource().path(getAPIVersion()).path("user/info")
-                .get(ClientResponse.class);
+    public void testDemoAuth () {
+        ClientResponse resp = resource().path(getAPIVersion())
+                .path("user/info").get(ClientResponse.class);
         assert resp.getStatus() == Response.SC_OK;
     }
 
+
     @Test
-    public void testUnauthorizedAuth() {
-        ClientResponse resp = resource().path(getAPIVersion()).path("user/info")
+    public void testUnauthorizedAuth () {
+        ClientResponse resp = resource()
+                .path(getAPIVersion())
+                .path("user/info")
                 .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
         assert resp.getStatus() == Response.SC_UNAUTHORIZED;
     }
 
+
     @Override
-    public void initMethod() throws KustvaktException {
+    public void initMethod () throws KustvaktException {
         helper().setupAccount();
     }
 }

@@ -1,5 +1,6 @@
 // Connector to the Lucene Backend
 package de.ids_mannheim.korap.web;
+
 import de.ids_mannheim.korap.Krill;
 import de.ids_mannheim.korap.KrillCollection;
 import de.ids_mannheim.korap.KrillIndex;
@@ -15,21 +16,24 @@ import java.nio.file.Paths;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
 /**
  * The SearchKrill class allows for searching in the
  * Lucene based Krill backend by applying KoralQuery.
- *
+ * 
  * @author Nils Diewald
  */
 public class SearchKrill {
     private final static Logger qlog = KustvaktLogger.getLogger("queryLogger");
-    private final static Logger log = LoggerFactory
+    private final static Logger jlog = LoggerFactory
             .getLogger(SearchKrill.class);
     // Temporary
     String indexDir = "/data/prep_corpus/index/";
     String i = "/Users/hanl/Projects/prep_corpus";
     String klinux10 = "/vol/work/hanl/indices";
     private KrillIndex index;
+
+
     /**
      * Constructor
      */
@@ -41,54 +45,74 @@ public class SearchKrill {
             }
             else {
                 File f = new File(path);
-                log.info("Loading index from " + path);
+                jlog.info("Loading index from " + path);
                 if (!f.exists()) {
-                    KustvaktLogger.ERROR_LOGGER.error("Index not found!");
+                    jlog.error("Index not found!");
                     System.exit(-1);
                 }
                 this.index = new KrillIndex(new MMapDirectory(Paths.get(path)));
             };
-        } catch (IOException e) {
-            KustvaktLogger.ERROR_LOGGER
-                    .error("Unable to loadSubTypes index: {}", e.getMessage());
+        }
+        catch (IOException e) {
+            jlog.error("Unable to loadSubTypes index: {}", e.getMessage());
         };
-    };
+    }
+
+
     public KrillIndex getIndex () {
         return this.index;
-    };
+    }
+
+    ;
+
+
     /**
      * Search in the Lucene index.
-     *
-     * @param json JSON-LD string with search and potential meta filters.
+     * 
+     * @param json
+     *            JSON-LD string with search and potential meta
+     *            filters.
      */
-    public String search(String json) {
+    public String search (String json) {
         qlog.trace(json);
         if (this.index != null)
             return new Krill(json).apply(this.index).toJsonString();
         Result kr = new Result();
         kr.addError(601, "Unable to find index");
         return kr.toJsonString();
-    };
+    }
+
+    ;
+
+
     /**
      * Search in the Lucene index and return matches as token lists.
-     *
-     * @param json JSON-LD string with search and potential meta filters.
+     * 
+     * @param json
+     *            JSON-LD string with search and potential meta
+     *            filters.
      */
     @Deprecated
-    public String searchTokenList(String json) {
+    public String searchTokenList (String json) {
         qlog.trace(json);
         if (this.index != null)
             return new Krill(json).apply(this.index).toTokenListJsonString();
         Result kr = new Result();
         kr.addError(601, "Unable to find index");
         return kr.toJsonString();
-    };
+    }
+
+    ;
+
+
     /**
-     * Get info on a match - by means of a richly annotated html snippet.
-     *
-     * @param id match id
+     * Get info on a match - by means of a richly annotated html
+     * snippet.
+     * 
+     * @param id
+     *            match id
      */
-    public String getMatch(String id) {
+    public String getMatch (String id) {
         if (this.index != null) {
             try {
                 return this.index.getMatch(id).toJsonString();
@@ -102,18 +126,22 @@ public class SearchKrill {
         Match km = new Match();
         km.addError(601, "Unable to find index");
         return km.toJsonString();
-    };
-    public String getMatch(String id, List<String> foundries,
+    }
+
+    ;
+
+
+    public String getMatch (String id, List<String> foundries,
             List<String> layers, boolean includeSpans,
             boolean includeHighlights, boolean sentenceExpansion) {
         if (this.index != null) {
             try {
 
-                return this.index
-                        .getMatchInfo(id, "tokens", true, foundries, layers,
-                                includeSpans, includeHighlights,
-                                sentenceExpansion).toJsonString();
-            } catch (QueryException qe) {
+                return this.index.getMatchInfo(id, "tokens", true, foundries,
+                        layers, includeSpans, includeHighlights,
+                        sentenceExpansion).toJsonString();
+            }
+            catch (QueryException qe) {
                 Match km = new Match();
                 km.addError(qe.getErrorCode(), qe.getMessage());
                 return km.toJsonString();
@@ -123,17 +151,27 @@ public class SearchKrill {
         Match km = new Match();
         km.addError(601, "Unable to find index");
         return km.toJsonString();
-    };
+    }
+
+    ;
+
+
     /**
-     * Get info on a match - by means of a richly annotated html snippet.
-     *
-     * @param id                match id
-     * @param foundry           the foundry of interest - may be null
-     * @param layer             the layer of interest - may be null
-     * @param includeSpans      Should spans be included (or only token infos)?
-     * @param includeHighlights Should highlight markup be included?
+     * Get info on a match - by means of a richly annotated html
+     * snippet.
+     * 
+     * @param id
+     *            match id
+     * @param foundry
+     *            the foundry of interest - may be null
+     * @param layer
+     *            the layer of interest - may be null
+     * @param includeSpans
+     *            Should spans be included (or only token infos)?
+     * @param includeHighlights
+     *            Should highlight markup be included?
      */
-    public String getMatch(String id, String foundry, String layer,
+    public String getMatch (String id, String foundry, String layer,
             boolean includeSpans, boolean includeHighlights,
             boolean sentenceExpansion) {
 
@@ -151,8 +189,7 @@ public class SearchKrill {
                   boolean extendToSentence
                 */
                 return this.index.getMatchInfo(id, "tokens", foundry, layer,
-                        includeSpans, includeHighlights,
-                        sentenceExpansion)
+                        includeSpans, includeHighlights, sentenceExpansion)
                         .toJsonString();
             }
             catch (QueryException qe) {
@@ -164,16 +201,19 @@ public class SearchKrill {
         Match km = new Match();
         km.addError(601, "Unable to find index");
         return km.toJsonString();
-    };
+    }
+
+    ;
 
 
     /**
      * Get statistics on (virtual) collections.
-     *
-     * @param json JSON-LD string with potential meta filters.
+     * 
+     * @param json
+     *            JSON-LD string with potential meta filters.
      */
     @Deprecated
-    public String getStatistics(String json) {
+    public String getStatistics (String json) {
         qlog.trace(json);
         if (this.index == null) {
             return "{\"documents\" : -1, error\" : \"No index given\" }";
@@ -182,10 +222,7 @@ public class SearchKrill {
         KrillCollection kc = new KrillCollection(json);
         // Set index
         kc.setIndex(this.index);
-        long docs = 0,
-                tokens = 0,
-                sentences = 0,
-                paragraphs = 0;
+        long docs = 0, tokens = 0, sentences = 0, paragraphs = 0;
         // Get numbers from index (currently slow)
         try {
             docs = kc.numberOf("documents");
@@ -202,10 +239,16 @@ public class SearchKrill {
                 .append(tokens).append(",\"sentences\":").append(sentences)
                 .append(",\"paragraphs\":").append(paragraphs).append("}");
         return sb.toString();
-    };
-    public String getMatchId(String type, String docid, String tofrom) {
+    }
+
+    ;
+
+
+    public String getMatchId (String type, String docid, String tofrom) {
         return new StringBuilder().append("match-").append(type).append("!")
                 .append(type).append("_").append(docid).append("-")
                 .append(tofrom).toString();
-    };
+    }
+
+    ;
 };

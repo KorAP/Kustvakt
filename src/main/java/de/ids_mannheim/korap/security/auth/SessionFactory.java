@@ -19,10 +19,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * session object to hold current user sessions and track inactive time to close
- * unused sessions. Inactive sessions are not enforced until user makes a
+ * session object to hold current user sessions and track inactive
+ * time to close
+ * unused sessions. Inactive sessions are not enforced until user
+ * makes a
  * request through thrift
- *
+ * 
  * @author hanl
  */
 //todo: use simple ehcache!
@@ -37,7 +39,8 @@ public class SessionFactory implements Runnable {
     private final boolean multipleEnabled;
     private final int inactive;
 
-    public SessionFactory(boolean multipleEnabled, int inactive) {
+
+    public SessionFactory (boolean multipleEnabled, int inactive) {
         jlog.debug("allow multiple sessions per user: '{}'", multipleEnabled);
         this.multipleEnabled = multipleEnabled;
         this.inactive = inactive;
@@ -46,43 +49,50 @@ public class SessionFactory implements Runnable {
         this.loggedInRecord = new ConcurrentMultiMap<>();
     }
 
-    public boolean hasSession(TokenContext context) {
+
+    public boolean hasSession (TokenContext context) {
         if (context.getUsername().equalsIgnoreCase(DemoUser.DEMOUSER_NAME))
             return false;
         return loggedInRecord.containsKey(context.getUsername())
                 && !loggedInRecord.get(context.getUsername()).isEmpty();
     }
 
+
     @Cacheable("session")
-    public TokenContext getSession(String token) throws KustvaktException {
+    public TokenContext getSession (String token) throws KustvaktException {
         jlog.debug("logged in users: {}", loggedInRecord);
         TokenContext context = sessionsObject.get(token);
         if (context != null) {
             if (isUserSessionValid(token)) {
                 resetInterval(token);
                 return context;
-            }else
+            }
+            else
                 throw new KustvaktException(StatusCodes.EXPIRED);
 
-        }else
+        }
+        else
             throw new KustvaktException(StatusCodes.PERMISSION_DENIED);
     }
 
+
     //todo: ?!
     @CacheEvict(value = "session", key = "#session.token")
-    public void putSession(final String token, final TokenContext activeUser)
+    public void putSession (final String token, final TokenContext activeUser)
             throws KustvaktException {
         if (!hasSession(activeUser) | multipleEnabled) {
             loggedInRecord.put(activeUser.getUsername(), token);
             sessionsObject.put(token, activeUser);
             timeCheck.put(token, TimeUtils.getNow());
-        }else {
+        }
+        else {
             removeAll(activeUser);
             throw new KustvaktException(StatusCodes.ALREADY_LOGGED_IN);
         }
     }
 
-    public void removeAll(final TokenContext activeUser) {
+
+    public void removeAll (final TokenContext activeUser) {
         for (String existing : loggedInRecord.get(activeUser.getUsername())) {
             timeCheck.remove(existing);
             sessionsObject.remove(existing);
@@ -90,8 +100,9 @@ public class SessionFactory implements Runnable {
         loggedInRecord.remove(activeUser.getUsername());
     }
 
+
     @CacheEvict(value = "session", key = "#session.token")
-    public void removeSession(String token) {
+    public void removeSession (String token) {
         String username = sessionsObject.get(token).getUsername();
         loggedInRecord.remove(username, token);
         if (loggedInRecord.get(username).isEmpty())
@@ -100,39 +111,42 @@ public class SessionFactory implements Runnable {
         sessionsObject.remove(token);
     }
 
+
     /**
      * reset inactive time interval to 0
-     *
+     * 
      * @param token
      */
-    private void resetInterval(String token) {
+    private void resetInterval (String token) {
         timeCheck.put(token, TimeUtils.getNow());
     }
 
+
     /**
      * if user possesses a valid non-expired session token
-     *
+     * 
      * @param token
      * @return validity of user to request a backend function
      */
-    private boolean isUserSessionValid(String token) {
+    private boolean isUserSessionValid (String token) {
         if (timeCheck.containsKey(token)) {
-            if (TimeUtils
-                    .plusSeconds(timeCheck.get(token).getMillis(), inactive)
-                    .isAfterNow()) {
+            if (TimeUtils.plusSeconds(timeCheck.get(token).getMillis(),
+                    inactive).isAfterNow()) {
                 jlog.debug("user has session");
                 return true;
-            }else
+            }
+            else
                 jlog.debug("user with token {} has an invalid session", token);
         }
         return false;
     }
 
+
     /**
      * clean inactive sessions from session object
      * TODO: persist userdata to database when session times out!
      */
-    private void timeoutMaintenance() {
+    private void timeoutMaintenance () {
         jlog.trace("running session cleanup thread");
         Set<String> inactive = new HashSet<>();
         for (Entry<String, DateTime> entry : timeCheck.entrySet()) {
@@ -150,11 +164,12 @@ public class SessionFactory implements Runnable {
                     inactive);
     }
 
+
     /**
      * run cleanup-thread
      */
     @Override
-    public void run() {
+    public void run () {
         timeoutMaintenance();
         if (loggedInRecord.size() > 0)
             jlog.debug("logged users: {}", loggedInRecord.toString());

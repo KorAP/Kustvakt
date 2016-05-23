@@ -6,27 +6,31 @@ package de.ids_mannheim.korap.resources;
  */
 public class Layer extends KustvaktResource {
 
-    public Layer() {
+    public Layer () {
         super();
     }
 
-    public Layer(Integer id, int creator) {
+
+    public Layer (Integer id, int creator) {
         super(id);
     }
 
+
     // layer name must not be unique!
-    public Layer(Integer id, String name) {
+    public Layer (Integer id, String name) {
         super(id);
         this.setName(name);
     }
 
-    public Layer(String persistentID, String name) {
+
+    public Layer (String persistentID, String name) {
         super(persistentID);
         this.setPersistentID(persistentID);
         this.setName(name);
     }
 
-    public Layer(String persistentID) {
+
+    public Layer (String persistentID) {
         super(persistentID);
     }
 

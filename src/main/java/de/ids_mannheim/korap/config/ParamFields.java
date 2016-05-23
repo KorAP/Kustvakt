@@ -12,19 +12,22 @@ import java.util.HashMap;
 // could also be an array or list!
 public class ParamFields extends HashMap<String, ParamFields.Param> {
 
-    public void add(Param param) {
+    public void add (Param param) {
         this.put(param.getClass().getName(), param);
     }
 
-    public <T extends Param> T get(Class<T> cl) {
+
+    public <T extends Param> T get (Class<T> cl) {
         return (T) this.get(cl.getName());
     }
 
-    public <T extends Param> T remove(Class<T> cl) {
+
+    public <T extends Param> T remove (Class<T> cl) {
         return (T) this.remove(cl.getName());
     }
 
-    public void addAll(Collection<Param> params) {
+
+    public void addAll (Collection<Param> params) {
         for (Param p : params)
             super.put(p.getClass().getName(), p);
     }
@@ -32,7 +35,7 @@ public class ParamFields extends HashMap<String, ParamFields.Param> {
     @Getter
     public abstract static class Param {
 
-        public boolean hasValues() {
+        public boolean hasValues () {
             return false;
         }
 

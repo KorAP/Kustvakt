@@ -29,14 +29,15 @@ public class PolicyDaoTest extends BeanConfigTest {
 
 
     @Override
-    public void initMethod() throws KustvaktException {
+    public void initMethod () throws KustvaktException {
         helper().setupAccount();
         helper().runBootInterfaces();
         helper().setupResource(new Corpus("WPD_1"));
     }
 
+
     @Test
-    public void testPoliciesGet() throws KustvaktException {
+    public void testPoliciesGet () throws KustvaktException {
         User user = helper().getUser();
         SecurityPolicy policy = new SecurityPolicy();
         policy.addNewCondition(new PolicyCondition("test_1"));
@@ -49,8 +50,9 @@ public class PolicyDaoTest extends BeanConfigTest {
         dao.getPolicies("WPD_1", user, Permissions.Permission.READ.toByte());
     }
 
+
     @Test
-    public void testPolicyCreate() throws KustvaktException {
+    public void testPolicyCreate () throws KustvaktException {
         User user = helper().getUser();
         SecurityPolicy policy = new SecurityPolicy();
         policy.addNewCondition(new PolicyCondition("test_1"));
@@ -64,13 +66,15 @@ public class PolicyDaoTest extends BeanConfigTest {
         assertTrue(dao.deleteResourcePolicies("WPD_1", user) > 0);
     }
 
+
     @Test
-    public void testMappingConditions() {
+    public void testMappingConditions () {
 
     }
 
+
     @Test
-    public void failAddToConditionEqual() throws KustvaktException {
+    public void failAddToConditionEqual () throws KustvaktException {
         User user = helper().getUser();
         SecurityPolicy policy = new SecurityPolicy();
         policy.addNewCondition(new PolicyCondition("test_1"));
@@ -88,8 +92,9 @@ public class PolicyDaoTest extends BeanConfigTest {
 
     }
 
+
     @Test
-    public void failAddToConditionUnEqual() throws KustvaktException {
+    public void failAddToConditionUnEqual () throws KustvaktException {
         User user = helper().getUser();
         SecurityPolicy policy = new SecurityPolicy();
         policy.addNewCondition(new PolicyCondition("test_1"));
@@ -107,8 +112,9 @@ public class PolicyDaoTest extends BeanConfigTest {
 
     }
 
+
     @Test
-    public void removeUserFromCondition() throws KustvaktException {
+    public void removeUserFromCondition () throws KustvaktException {
         User user = helper().getUser();
         PolicyHandlerIface dao = helper().getContext().getPolicyDbProvider();
 
@@ -125,8 +131,9 @@ public class PolicyDaoTest extends BeanConfigTest {
         assertTrue(dao.deleteResourcePolicies("WPD_1", user) > 0);
     }
 
+
     @Test
-    public void testPolicyHierarchySelfSameType() throws KustvaktException {
+    public void testPolicyHierarchySelfSameType () throws KustvaktException {
         String res = "WPD_child";
         User user = helper().getUser();
         Corpus c = new Corpus(res);
@@ -144,9 +151,10 @@ public class PolicyDaoTest extends BeanConfigTest {
         helper().dropResource(res);
     }
 
+
     @Test
     @Ignore
-    public void testPolicyHierarchySelfDifferentType()
+    public void testPolicyHierarchySelfDifferentType ()
             throws KustvaktException {
         String res = "WPD_child";
         User user = helper().getUser();
@@ -165,43 +173,45 @@ public class PolicyDaoTest extends BeanConfigTest {
         helper().dropResource(res);
     }
 
+
     @Test
-    public void testPolicyHierarchyPublic() {
+    public void testPolicyHierarchyPublic () {
 
     }
 
+
     @Test
-    public void testPoliciesPublic() {
+    public void testPoliciesPublic () {
         PolicyHandlerIface dao = helper().getContext().getPolicyDbProvider();
-        Collection<SecurityPolicy> policies = dao
-                .getPolicies(new PolicyCondition("public"), Corpus.class,
-                        Permissions.Permission.READ.toByte());
+        Collection<SecurityPolicy> policies = dao.getPolicies(
+                new PolicyCondition("public"), Corpus.class,
+                Permissions.Permission.READ.toByte());
         assertNotEquals(0, policies.size());
     }
+
 
     @Test
     @Ignore
-    public void testPoliciesPublicGeneric() {
+    public void testPoliciesPublicGeneric () {
         PolicyHandlerIface dao = helper().getContext().getPolicyDbProvider();
-        Collection<SecurityPolicy> policies = dao
-                .getPolicies(new PolicyCondition("public"),
-                        KustvaktResource.class,
-                        Permissions.Permission.READ.toByte());
+        Collection<SecurityPolicy> policies = dao.getPolicies(
+                new PolicyCondition("public"), KustvaktResource.class,
+                Permissions.Permission.READ.toByte());
         assertNotEquals(0, policies.size());
     }
 
+
     @Test
-    public void searchResourcePoliciesPublic() throws KustvaktException {
+    public void searchResourcePoliciesPublic () throws KustvaktException {
         User user = helper().getUser();
         new PolicyBuilder(user).setConditions(new PolicyCondition("public"))
                 .setPermissions(Permissions.Permission.READ)
                 .setResources(new VirtualCollection("new_corpus")).create();
 
         PolicyHandlerIface dao = helper().getContext().getPolicyDbProvider();
-        List<SecurityPolicy> list = dao
-                .getPolicies(new PolicyCondition(Attributes.PUBLIC_GROUP),
-                        VirtualCollection.class,
-                        Permissions.Permission.READ.toByte());
+        List<SecurityPolicy> list = dao.getPolicies(new PolicyCondition(
+                Attributes.PUBLIC_GROUP), VirtualCollection.class,
+                Permissions.Permission.READ.toByte());
         assertNotEquals(0, list.size());
         Set<String> ids = new HashSet<>();
         for (SecurityPolicy p : list)
@@ -209,23 +219,27 @@ public class PolicyDaoTest extends BeanConfigTest {
         assertNotEquals(0, ids.size());
     }
 
+
     @Test
-    public void testPolicyHierarchyRestricted() {
+    public void testPolicyHierarchyRestricted () {
 
     }
 
+
     @Test
-    public void testSelfPolicies() {
+    public void testSelfPolicies () {
 
     }
 
+
     @Test
-    public void testPublicPolicies() {
+    public void testPublicPolicies () {
 
     }
 
+
     @Test
-    public void testConditions() {
+    public void testConditions () {
 
     }
 

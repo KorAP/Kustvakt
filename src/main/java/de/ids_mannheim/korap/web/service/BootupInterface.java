@@ -8,8 +8,9 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
  */
 public interface BootupInterface {
 
-    void load() throws KustvaktException;
+    void load () throws KustvaktException;
 
-    Class<? extends BootupInterface>[] getDependencies();
+
+    Class<? extends BootupInterface>[] getDependencies ();
 
 }

@@ -6,15 +6,17 @@ package de.ids_mannheim.korap.resources;
  */
 public class Foundry extends KustvaktResource {
 
-    public Foundry() {
+    public Foundry () {
         super();
     }
 
-    public Foundry(Integer id) {
+
+    public Foundry (Integer id) {
         super(id);
     }
 
-    public Foundry(String persistentID) {
+
+    public Foundry (String persistentID) {
         super(persistentID);
     }
 

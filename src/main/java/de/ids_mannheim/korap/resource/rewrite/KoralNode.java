@@ -20,25 +20,28 @@ public abstract class KoralNode {
     private boolean remove;
     private final String target;
 
-    private KoralNode(String target, JsonNode node) {
+
+    private KoralNode (String target, JsonNode node) {
         this.node = node;
         this.target = target;
         this.builder = new KoralRewriteBuilder();
         this.remove = false;
     }
 
-    public static KoralNode wrapNode(JsonNode node) {
-        return new KoralNode(null, node) {
-        };
+
+    public static KoralNode wrapNode (JsonNode node) {
+        return new KoralNode(null, node) {};
     }
 
+
     @Override
-    public String toString() {
+    public String toString () {
         return this.node.toString();
     }
 
+
     @Deprecated
-    public boolean setNode(Object path) {
+    public boolean setNode (Object path) {
         JsonNode n = null;
         if (this.node.isObject() && this.node.has((String) path))
             n = this.node.path((String) path);
@@ -52,7 +55,8 @@ public abstract class KoralNode {
         return false;
     }
 
-    public void put(String name, Object value) {
+
+    public void put (String name, Object value) {
 
         if (this.node.isObject() && this.node.path(name).isMissingNode()) {
             ObjectNode node = (ObjectNode) this.node;
@@ -62,18 +66,21 @@ public abstract class KoralNode {
                 node.put(name, (Integer) value);
             builder.setOperation("injection");
             builder.build(this.node);
-        }else
+        }
+        else
             throw new UnsupportedOperationException(
                     "node doesn't support this operation");
     }
 
-    public void remove(Object identifier) {
+
+    public void remove (Object identifier) {
         boolean set = false;
         if (this.node.isObject() && identifier instanceof String) {
             ObjectNode n = (ObjectNode) this.node;
             n.remove((String) identifier);
             set = true;
-        }else if (this.node.isArray() && identifier instanceof Integer) {
+        }
+        else if (this.node.isArray() && identifier instanceof Integer) {
             ArrayNode n = (ArrayNode) this.node;
             n.remove((Integer) identifier);
             set = true;
@@ -84,7 +91,8 @@ public abstract class KoralNode {
         }
     }
 
-    public void replace(String name, String value) {
+
+    public void replace (String name, String value) {
         if (this.node.isObject() && this.node.has(name)) {
             ObjectNode n = (ObjectNode) this.node;
             n.put(name, value);
@@ -93,17 +101,20 @@ public abstract class KoralNode {
         }
     }
 
-    public String get(String name) {
+
+    public String get (String name) {
         if (this.node.isObject())
             return this.node.path(name).asText();
         return null;
     }
 
-    public JsonNode at(String name) {
+
+    public JsonNode at (String name) {
         return this.node.at(name);
     }
 
-    public boolean has(Object ident) {
+
+    public boolean has (Object ident) {
         if (ident instanceof String)
             return this.node.has((String) ident);
         else if (ident instanceof Integer)
@@ -111,19 +122,23 @@ public abstract class KoralNode {
         return false;
     }
 
-    public JsonNode rawNode() {
+
+    public JsonNode rawNode () {
         return this.node;
     }
 
-    public void removeNode() {
+
+    public void removeNode () {
         this.remove = true;
     }
 
-    public boolean isRemove() {
+
+    public boolean isRemove () {
         return this.remove;
     }
 
-    public final String target() {
+
+    public final String target () {
         return this.target;
     }
 
@@ -132,25 +147,29 @@ public abstract class KoralNode {
 
         private Map<String, String> map;
 
-        public KoralRewriteBuilder() {
+
+        public KoralRewriteBuilder () {
             this.map = new LinkedHashMap<>();
             this.map.put("@type", "koral:rewrite");
             this.map.put("src", "Kustvakt");
         }
 
-        public KoralRewriteBuilder setOperation(String op) {
+
+        public KoralRewriteBuilder setOperation (String op) {
             if (!op.startsWith("operation:"))
                 op = "operation:" + op;
             this.map.put("operation", op);
             return this;
         }
 
-        public KoralRewriteBuilder setScope(String scope) {
+
+        public KoralRewriteBuilder setScope (String scope) {
             this.map.put("scope", scope);
             return this;
         }
 
-        public JsonNode build(JsonNode node) {
+
+        public JsonNode build (JsonNode node) {
             if (this.map.get("operation") == null)
                 throw new UnsupportedOperationException(
                         "operation not set properly");
@@ -158,7 +177,8 @@ public abstract class KoralNode {
             if (node.has("rewrites")) {
                 ArrayNode n = (ArrayNode) node.path("rewrites");
                 n.add(JsonUtils.valueToTree(this.map));
-            }else {
+            }
+            else {
                 ObjectNode n = (ObjectNode) node;
                 List l = new LinkedList<>();
                 l.add(JsonUtils.valueToTree(this.map));
@@ -169,7 +189,3 @@ public abstract class KoralNode {
 
     }
 }
-
-
-
-

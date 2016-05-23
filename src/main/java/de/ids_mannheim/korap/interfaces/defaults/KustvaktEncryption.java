@@ -43,7 +43,8 @@ public class KustvaktEncryption implements EncryptionIface {
     private final Randomizer randomizer;
     private KustvaktConfiguration config;
 
-    public KustvaktEncryption(KustvaktConfiguration config) {
+
+    public KustvaktEncryption (KustvaktConfiguration config) {
         jlog.info("initializing KorAPEncryption implementation");
         this.nullable = false;
         this.validator = DefaultValidator.getInstance();
@@ -51,7 +52,8 @@ public class KustvaktEncryption implements EncryptionIface {
         this.config = config;
     }
 
-    public static boolean matchTokenByteCode(Object param) {
+
+    public static boolean matchTokenByteCode (Object param) {
         if (!(param instanceof String))
             return false;
         String token = (String) param;
@@ -59,34 +61,41 @@ public class KustvaktEncryption implements EncryptionIface {
         return 64 == bytes.length;
     }
 
-    private String encodeBase(byte[] bytes) throws EncoderException {
+
+    private String encodeBase (byte[] bytes) throws EncoderException {
         return Base64.encodeBase64String(bytes);
     }
 
+
     @Override
-    public String encodeBase() {
+    public String encodeBase () {
         try {
             return encodeBase(this.createSecureRandom(24));
-        }catch (EncoderException e) {
+        }
+        catch (EncoderException e) {
             return "";
         }
     }
 
-    public String produceSecureHash(String input) {
+
+    public String produceSecureHash (String input) {
         return produceSecureHash(input, "");
     }
 
+
     @Override
-    public String produceSecureHash(String input, String salt) {
+    public String produceSecureHash (String input, String salt) {
         String hashString = "";
         switch (config.getEncryption()) {
             case ESAPICYPHER:
                 try {
                     hashString = hash(input, salt);
-                }catch (NoSuchAlgorithmException e) {
+                }
+                catch (NoSuchAlgorithmException e) {
                     jlog.error("there was an encryption error!", e);
                     return null;
-                }catch (Exception e) {
+                }
+                catch (Exception e) {
                     jlog.error("there was an error!", e);
                     return null;
                 }
@@ -99,7 +108,8 @@ public class KustvaktEncryption implements EncryptionIface {
 
                     for (byte b : digest)
                         hashString += String.format("%02x", b);
-                }catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
+                }
+                catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
                     e.printStackTrace();
                 }
                 break;
@@ -113,7 +123,8 @@ public class KustvaktEncryption implements EncryptionIface {
         return hashString;
     }
 
-    public String hash(String text, String salt) throws Exception {
+
+    public String hash (String text, String salt) throws Exception {
         byte[] bytes;
 
         MessageDigest md = MessageDigest.getInstance(ALGORITHM);
@@ -131,16 +142,19 @@ public class KustvaktEncryption implements EncryptionIface {
         return coding;
     }
 
+
     @Override
-    public String hash(String input) {
+    public String hash (String input) {
         String hashString = "";
         MessageDigest md;
         try {
             md = MessageDigest.getInstance("SHA-256");
             md.update(input.getBytes("UTF-8"));
-        }catch (NoSuchAlgorithmException e) {
+        }
+        catch (NoSuchAlgorithmException e) {
             return "";
-        }catch (UnsupportedEncodingException e) {
+        }
+        catch (UnsupportedEncodingException e) {
             return "";
         }
 
@@ -152,8 +166,10 @@ public class KustvaktEncryption implements EncryptionIface {
         return hashString;
     }
 
+
     /**
-     * // some sort of algorithm to create token and isSystem regularly the integrity
+     * // some sort of algorithm to create token and isSystem
+     * regularly the integrity
      * // of the token
      * public String createAuthToken() {
      * final byte[] rNumber = SecureRGenerator
@@ -161,19 +177,21 @@ public class KustvaktEncryption implements EncryptionIface {
      * String hash;
      * try {
      * hash = produceSimpleHash(SecureRGenerator.toHex(rNumber));
-     * } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+     * } catch (NoSuchAlgorithmException |
+     * UnsupportedEncodingException e) {
      * return "";
      * }
      * return hash;
      * }
      */
 
-    private byte[] createSecureRandom(int size) {
+    private byte[] createSecureRandom (int size) {
         return SecureRGenerator.getNextSecureRandom(size);
     }
 
+
     @Override
-    public String createToken(boolean hash, Object... obj) {
+    public String createToken (boolean hash, Object ... obj) {
         StringBuffer b = new StringBuffer();
         try {
             for (Object o : obj) {
@@ -184,41 +202,45 @@ public class KustvaktEncryption implements EncryptionIface {
                 return encodeBase(hash(b.toString().trim()).getBytes());
             else
                 return encodeBase(b.toString().trim().getBytes());
-        }catch (EncoderException e) {
+        }
+        catch (EncoderException e) {
             return "";
         }
 
     }
 
+
     @Override
-    public String createToken() {
+    public String createToken () {
         String encoded;
-        String v = randomizer
-                .getRandomString(SecureRGenerator.TOKEN_RANDOM_SIZE,
-                        SecureRGenerator.toHex(createSecureRandom(64))
-                                .toCharArray());
+        String v = randomizer.getRandomString(
+                SecureRGenerator.TOKEN_RANDOM_SIZE,
+                SecureRGenerator.toHex(createSecureRandom(64)).toCharArray());
         encoded = hash(v);
         jlog.trace("creating new token {}", encoded);
         return encoded;
     }
 
+
     @Override
-    public String createID(Object... obj) {
+    public String createID (Object ... obj) {
         final byte[] rNumber = SecureRGenerator
                 .getNextSecureRandom(SecureRGenerator.CORPUS_RANDOM_SIZE);
         if (obj.length != 0) {
             ArrayList s = new ArrayList();
             Collections.addAll(s, obj);
             obj = s.toArray();
-        }else {
+        }
+        else {
             obj = new Object[1];
             obj[0] = rNumber;
         }
         return createToken(false, obj);
     }
 
+
     @Override
-    public boolean checkHash(String plain, String hash, String salt) {
+    public boolean checkHash (String plain, String hash, String salt) {
         String pw = "";
         switch (config.getEncryption()) {
             case ESAPICYPHER:
@@ -227,7 +249,8 @@ public class KustvaktEncryption implements EncryptionIface {
             case BCRYPT:
                 try {
                     return BCrypt.checkpw(plain, hash);
-                }catch (IllegalArgumentException e) {
+                }
+                catch (IllegalArgumentException e) {
                     return false;
                 }
             case SIMPLE:
@@ -237,15 +260,17 @@ public class KustvaktEncryption implements EncryptionIface {
         return pw.equals(hash);
     }
 
+
     @Override
-    public boolean checkHash(String plain, String hash) {
+    public boolean checkHash (String plain, String hash) {
         switch (config.getEncryption()) {
             case ESAPICYPHER:
                 return produceSecureHash(plain).equals(hash);
             case BCRYPT:
                 try {
                     return BCrypt.checkpw(plain, hash);
-                }catch (IllegalArgumentException e) {
+                }
+                catch (IllegalArgumentException e) {
                     return false;
                 }
             case SIMPLE:
@@ -254,16 +279,19 @@ public class KustvaktEncryption implements EncryptionIface {
         return false;
     }
 
+
     @Override
-    public String getSalt(User user) {
+    public String getSalt (User user) {
         Class u = user.getClass();
         Field field;
         try {
             field = u.getSuperclass().getDeclaredField(PASSWORD_SALT_FIELD);
-        }catch (NoSuchFieldException e) {
+        }
+        catch (NoSuchFieldException e) {
             try {
                 field = u.getDeclaredField(PASSWORD_SALT_FIELD);
-            }catch (NoSuchFieldException e1) {
+            }
+            catch (NoSuchFieldException e1) {
                 // do nothing
                 e.printStackTrace();
                 return null;
@@ -274,16 +302,18 @@ public class KustvaktEncryption implements EncryptionIface {
             String value = String.valueOf(field.get(user));
             field.setAccessible(false);
             return value;
-        }catch (IllegalAccessException e) {
+        }
+        catch (IllegalAccessException e) {
             // do nothing
             e.printStackTrace();
         }
         return null;
     }
 
+
     // todo: where applied?
     @Override
-    public Map<String, Object> validateMap(Map<String, Object> map)
+    public Map<String, Object> validateMap (Map<String, Object> map)
             throws KustvaktException {
         Map<String, Object> safeMap = new HashMap<>();
         KustvaktMap kmap = new KustvaktMap(map);
@@ -294,13 +324,15 @@ public class KustvaktEncryption implements EncryptionIface {
                     String value = validateEntry(kmap.get(key), key);
                     safeMap.put(key, value);
                 }
-            }else {
+            }
+            else {
                 for (String key : kmap.keySet()) {
                     Object value = kmap.getRaw(key);
                     if (value instanceof String) {
                         value = validateEntry((String) value, key);
 
-                    }else if (value instanceof List) {
+                    }
+                    else if (value instanceof List) {
                         List list = (List) value;
                         for (Object v : list) {
                             if (v instanceof String)
@@ -319,13 +351,15 @@ public class KustvaktEncryption implements EncryptionIface {
         return safeMap;
     }
 
+
     @Deprecated
-    private String validateString(String descr, String input, String type,
+    private String validateString (String descr, String input, String type,
             int length, boolean nullable) throws KustvaktException {
         String s;
         try {
             s = validator.getValidInput(descr, input, type, length, nullable);
-        }catch (ValidationException e) {
+        }
+        catch (ValidationException e) {
             jlog.error(
                     "String value did not validate ('{}') with validation type {}",
                     new Object[] { input, type, e.getMessage() });
@@ -335,8 +369,9 @@ public class KustvaktEncryption implements EncryptionIface {
         return s;
     }
 
+
     @Override
-    public String validateEntry(String input, String type)
+    public String validateEntry (String input, String type)
             throws KustvaktException {
         try {
             if (type != null) {
@@ -345,32 +380,34 @@ public class KustvaktEncryption implements EncryptionIface {
                     jlog.debug("validating email entry '{}'", input.hashCode());
                     return validator.getValidInput("Email", input, "email",
                             config.getValidationEmaillength(), false);
-                }else if (type.equals(Attributes.USERNAME)) {
+                }
+                else if (type.equals(Attributes.USERNAME)) {
                     jlog.debug("validating username entry '{}'",
                             input.hashCode());
-                    return validator
-                            .getValidInput("Username", input, "username",
-                                    config.getValidationEmaillength(), false);
-                }else if (type.equals(Attributes.IP_RANG)) {
+                    return validator.getValidInput("Username", input,
+                            "username", config.getValidationEmaillength(),
+                            false);
+                }
+                else if (type.equals(Attributes.IP_RANG)) {
                     jlog.debug("validating ip address entry '{}'",
                             input.hashCode());
-                    return validator
-                            .getValidInput("IP Address", input, "ipaddress",
-                                    config.getValidationStringLength(),
-                                    nullable);
-                }else if (type.equals(Attributes.PASSWORD)) {
+                    return validator.getValidInput("IP Address", input,
+                            "ipaddress", config.getValidationStringLength(),
+                            nullable);
+                }
+                else if (type.equals(Attributes.PASSWORD)) {
                     jlog.debug("validating password entry '{}'",
                             input.hashCode());
-                    return validator
-                            .getValidInput("Password", input, "password",
-                                    config.getValidationStringLength(),
-                                    nullable);
+                    return validator.getValidInput("Password", input,
+                            "password", config.getValidationStringLength(),
+                            nullable);
                 }
             }
             jlog.debug("validating string entry '{}'", input.hashCode());
             return validator.getValidInput("Safe String", input, "SafeString",
                     config.getValidationStringLength(), nullable);
-        }catch (ValidationException ex) {
+        }
+        catch (ValidationException ex) {
             jlog.error("Validation failed! Value '{}' with type '{}'",
                     new Object[] { input, type });
             throw new KustvaktException(StatusCodes.PARAMETER_VALIDATION_ERROR,
@@ -378,26 +415,28 @@ public class KustvaktEncryption implements EncryptionIface {
         }
     }
 
-    public void validate(Object instance) throws KustvaktException {
+
+    public void validate (Object instance) throws KustvaktException {
         if (instance == null)
             return;
         try {
             validateStringField(instance.getClass().getDeclaredFields(),
                     instance);
-            validateStringField(
-                    instance.getClass().getSuperclass().getDeclaredFields(),
-                    instance);
-        }catch (IllegalAccessException e) {
+            validateStringField(instance.getClass().getSuperclass()
+                    .getDeclaredFields(), instance);
+        }
+        catch (IllegalAccessException e) {
             jlog.error("object value did not validate", e.getMessage());
             throw new KustvaktException(StatusCodes.PARAMETER_VALIDATION_ERROR,
                     "object could not be validated", instance.toString());
         }
     }
 
+
     //FIXME: currently all sets are skipped during validation (since users should not be allowed to edit those sets anyway,
     //I think we will be safe here
     @Deprecated
-    private void validateStringField(Field[] fields, Object instance)
+    private void validateStringField (Field[] fields, Object instance)
             throws KustvaktException, IllegalAccessException {
         for (Field field : fields) {
             boolean priv = false;
@@ -406,8 +445,8 @@ public class KustvaktEncryption implements EncryptionIface {
                     priv = true;
                     field.setAccessible(true);
                 }
-                if (field.getName().equals("password") | Modifier
-                        .isFinal(field.getModifiers()))
+                if (field.getName().equals("password")
+                        | Modifier.isFinal(field.getModifiers()))
                     continue;
                 String val = (String) field.get(instance);
                 if (val != null) {
@@ -431,14 +470,16 @@ public class KustvaktEncryption implements EncryptionIface {
         }
     }
 
-    private String bcryptHash(String text, String salt) {
+
+    private String bcryptHash (String text, String salt) {
         if (salt == null || salt.isEmpty())
             salt = BCrypt.gensalt(config.getLoadFactor());
         return BCrypt.hashpw(text, salt);
     }
 
+
     @Override
-    public String toString() {
+    public String toString () {
         return this.getClass().getCanonicalName();
     }
 
@@ -449,19 +490,21 @@ public class KustvaktEncryption implements EncryptionIface {
         protected static final int USERID_RANDOM_SIZE = 64;
         protected static final int CORPUS_RANDOM_SIZE = 48;
         private static final char[] HEX_DIGIT = { '0', '1', '2', '3', '4', '5',
-                '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'z', 'x', 'h',
-                'q', 'w' };
+                '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'z', 'x',
+                'h', 'q', 'w' };
         private static final SecureRandom sRandom__;
 
         static {
             try {
                 sRandom__ = SecureRandom.getInstance("SHA1PRNG");
-            }catch (NoSuchAlgorithmException e) {
+            }
+            catch (NoSuchAlgorithmException e) {
                 throw new Error(e);
             }
         }
 
-        public static byte[] getNextSecureRandom(int bits) {
+
+        public static byte[] getNextSecureRandom (int bits) {
             if (bits % 8 != 0) {
                 throw new IllegalArgumentException(
                         "Size is not divisible by 8!");
@@ -474,7 +517,8 @@ public class KustvaktEncryption implements EncryptionIface {
             return bytes;
         }
 
-        public static String toHex(byte[] bytes) {
+
+        public static String toHex (byte[] bytes) {
             if (bytes == null) {
                 return null;
             }
@@ -487,7 +531,8 @@ public class KustvaktEncryption implements EncryptionIface {
             return buffer.toString();
         }
 
-        private static String byteToHex(byte b) {
+
+        private static String byteToHex (byte b) {
             char[] array = { HEX_DIGIT[(b >> 4 & 0xF)], HEX_DIGIT[(b & 0xF)] };
             return new String(array);
         }

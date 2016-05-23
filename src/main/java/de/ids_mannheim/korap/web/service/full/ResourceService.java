@@ -19,10 +19,7 @@ import de.ids_mannheim.korap.security.ac.ResourceHandler;
 import de.ids_mannheim.korap.security.ac.SecurityManager;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.CollectionQueryBuilder3;
-import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
-import de.ids_mannheim.korap.utils.StringUtils;
+import de.ids_mannheim.korap.utils.*;
 import de.ids_mannheim.korap.web.ClientsHandler;
 import de.ids_mannheim.korap.web.KustvaktServer;
 import de.ids_mannheim.korap.web.SearchKrill;
@@ -58,7 +55,8 @@ public class ResourceService {
     private KustvaktConfiguration config;
     private RewriteHandler processor;
 
-    public ResourceService() {
+
+    public ResourceService () {
         this.controller = BeansFactory.getKustvaktContext()
                 .getAuthenticationManager();
         this.config = BeansFactory.getKustvaktContext().getConfiguration();
@@ -73,10 +71,12 @@ public class ResourceService {
         this.processor.insertBeans(BeansFactory.getKustvaktContext());
     }
 
+
     /**
      * retrieve resources dependent by type. determines based on
-     * the user's permission or resource owner if the user can access the resource.
-     *
+     * the user's permission or resource owner if the user can access
+     * the resource.
+     * 
      * @param locale
      * @param context
      * @param type
@@ -84,7 +84,7 @@ public class ResourceService {
      */
     @GET
     @Path("{type}")
-    public Response getResources(@Context Locale locale,
+    public Response getResources (@Context Locale locale,
             @Context SecurityContext context, @PathParam("type") String type) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         Set<KustvaktResource> resources = new HashSet<>();
@@ -97,9 +97,10 @@ public class ResourceService {
         try {
             User user = controller.getUser(ctx.getUsername());
 
-            resources = ResourceFinder
-                    .search(user, ResourceFactory.getResourceClass(type));
-        }catch (KustvaktException e) {
+            resources = ResourceFinder.search(user,
+                    ResourceFactory.getResourceClass(type));
+        }
+        catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
 
@@ -126,14 +127,16 @@ public class ResourceService {
         return Response.ok(JsonUtils.toJSON(values)).build();
     }
 
+
     @GET
     @Path("{type}/{id}/{child}")
-    public Response getResource(@Context SecurityContext context,
+    public Response getResource (@Context SecurityContext context,
             @Context Locale locale, @PathParam("type") String type,
             @PathParam("id") String id, @PathParam("child") String child) {
         return getResource(context, locale, type,
-                StringUtils.joinResources(id, child));
+                NamingUtils.joinResources(id, child));
     }
+
 
     /**
      * @param context
@@ -144,7 +147,7 @@ public class ResourceService {
      */
     @GET
     @Path("{type}/{id}")
-    public Response getResource(@Context SecurityContext context,
+    public Response getResource (@Context SecurityContext context,
             @Context Locale locale, @PathParam("type") String type,
             @PathParam("id") String id) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
@@ -154,25 +157,28 @@ public class ResourceService {
         try {
             User user = controller.getUser(ctx.getUsername());
             if (StringUtils.isInteger(id))
-                resource = resourceHandler
-                        .findbyIntId(Integer.valueOf(id), user);
+                resource = resourceHandler.findbyIntId(Integer.valueOf(id),
+                        user);
             else
                 resource = resourceHandler.findbyStrId(id, user,
                         ResourceFactory.getResourceClass(type));
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
         CollectionQueryBuilder3 query = new CollectionQueryBuilder3();
         if (cl_type.equals(VirtualCollection.class)) {
             VirtualCollection c = (VirtualCollection) resource;
             query.setBaseQuery((String) c.getData());
-        }else if (cl_type.equals(Corpus.class)) {
+        }
+        else if (cl_type.equals(Corpus.class)) {
             Corpus c = (Corpus) resource;
             query.addQuery("corpusID=" + c.getPersistentID());
         }
 
         return Response.ok(JsonUtils.toJSON(resource.toMap())).build();
     }
+
 
     //    @GET
     //    @Path("colloc")
@@ -275,27 +281,30 @@ public class ResourceService {
     //    }
     @POST
     @Path("colloc")
-    public Response getCollocationBase(@QueryParam("q") String query) {
+    public Response getCollocationBase (@QueryParam("q") String query) {
         String result;
         try {
             result = graphDBhandler.getResponse("distCollo", "q", query);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok(result).build();
     }
 
+
     @Deprecated
-    public Response postMatchFavorite() {
+    public Response postMatchFavorite () {
         return Response.ok().build();
     }
 
+
     @TRACE
     @Path("search")
-    public Response buildQuery(@Context Locale locale,
-            @Context SecurityContext securityContext, @QueryParam("q") String q,
-            @QueryParam("ql") String ql, @QueryParam("v") String v,
-            @QueryParam("context") String context,
+    public Response buildQuery (@Context Locale locale,
+            @Context SecurityContext securityContext,
+            @QueryParam("q") String q, @QueryParam("ql") String ql,
+            @QueryParam("v") String v, @QueryParam("context") String context,
             @QueryParam("cutoff") Boolean cutoff,
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
@@ -316,11 +325,12 @@ public class ResourceService {
                 resources = ResourceFinder.searchPublic(Corpus.class);
             else
                 resources = ResourceFinder.search(user, Corpus.class);
-            System.out.println("RESOURCES FOUND "+ resources);
+            System.out.println("RESOURCES FOUND " + resources);
 
             for (KustvaktResource corpus : resources)
                 cquery.addQuery("corpusID=" + corpus.getPersistentID());
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
 
@@ -344,10 +354,12 @@ public class ResourceService {
         return Response.ok(query).build();
     }
 
+
     /**
-     * currently only supports either no reference at all in which case all corpora are retrieved or a corpus name like "WPD".
+     * currently only supports either no reference at all in which
+     * case all corpora are retrieved or a corpus name like "WPD".
      * No virtual collections supported!
-     *
+     * 
      * @param locale
      * @param q
      * @param ql
@@ -360,10 +372,10 @@ public class ResourceService {
     //todo: does cq have any sensable worth here?
     @TRACE
     @Path("{type}/{id}/search")
-    public Response buildQuery(@Context Locale locale,
-            @Context SecurityContext securityContext, @QueryParam("q") String q,
-            @QueryParam("ql") String ql, @QueryParam("v") String v,
-            @QueryParam("context") String context,
+    public Response buildQuery (@Context Locale locale,
+            @Context SecurityContext securityContext,
+            @QueryParam("q") String q, @QueryParam("ql") String ql,
+            @QueryParam("v") String v, @QueryParam("context") String context,
             @QueryParam("cutoff") Boolean cutoff,
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
@@ -385,8 +397,8 @@ public class ResourceService {
             //todo: instead of throwing exception, build notification and rewrites into result query
             KustvaktResource resource;
             if (StringUtils.isInteger(id))
-                resource = this.resourceHandler
-                        .findbyIntId(Integer.valueOf(id), user);
+                resource = this.resourceHandler.findbyIntId(
+                        Integer.valueOf(id), user);
             else
                 resource = this.resourceHandler.findbyStrId(id, user,
                         ResourceFactory.getResourceClass(type));
@@ -396,8 +408,9 @@ public class ResourceService {
             else if (resource instanceof Corpus)
                 cquery.addQuery("corpusID=" + resource.getPersistentID());
 
-        }catch (KustvaktException e) {
-            KustvaktLogger.ERROR_LOGGER.error("Exception encountered!", e);
+        }
+        catch (KustvaktException e) {
+            jlog.error("Exception encountered!", e);
             //throw KustvaktResponseHandler.throwit(e);
         }
 
@@ -421,9 +434,10 @@ public class ResourceService {
         return Response.ok(ss.toJSON()).build();
     }
 
+
     @POST
     @Path("search")
-    public Response queryRaw(@Context SecurityContext context,
+    public Response queryRaw (@Context SecurityContext context,
             @Context Locale locale, @QueryParam("engine") String engine,
             String jsonld) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
@@ -434,7 +448,8 @@ public class ResourceService {
         try {
             User user = controller.getUser(ctx.getUsername());
             jsonld = this.processor.preProcess(jsonld, user);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
         jlog.info("Serialized search: {}", jsonld);
@@ -444,9 +459,10 @@ public class ResourceService {
         return Response.ok(result).build();
     }
 
+
     @GET
     @Path("search")
-    public Response searchbyNameAll(@Context SecurityContext securityContext,
+    public Response searchbyNameAll (@Context SecurityContext securityContext,
             @Context Locale locale, @QueryParam("q") String q,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
             @QueryParam("context") String ctx,
@@ -466,8 +482,9 @@ public class ResourceService {
             Set<Corpus> resources = ResourceFinder.search(user, Corpus.class);
             for (KustvaktResource resource : resources)
                 cquery.addQuery("corpusID=" + resource.getPersistentID());
-        }catch (KustvaktException e) {
-            KustvaktLogger.ERROR_LOGGER.error("Exception encountered!", e);
+        }
+        catch (KustvaktException e) {
+            jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
         String result;
@@ -505,14 +522,17 @@ public class ResourceService {
                     String.valueOf(meta.getSpanContext().getRight_size()));
             try {
                 result = this.graphDBhandler.getResponse(map, "distKwic");
-            }catch (KustvaktException e) {
+            }
+            catch (KustvaktException e) {
                 throw KustvaktResponseHandler.throwit(e);
             }
-        }else
+        }
+        else
             result = searchKrill.search(query);
         KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
         return Response.ok(result).build();
     }
+
 
     /**
      * String search, String ql, List<String> parents,
@@ -520,8 +540,9 @@ public class ResourceService {
      * int num, int page, boolean cutoff)
      * param context will be like this: context: "3-t,2-c"
      * <p/>
-     * id does not have to be an integer. name is also possible, in which case a type reference is required
-     *
+     * id does not have to be an integer. name is also possible, in
+     * which case a type reference is required
+     * 
      * @param securityContext
      * @param locale
      * @return
@@ -529,16 +550,16 @@ public class ResourceService {
     //fixme: does not use policyrewrite!
     @GET
     @Path("/{type}/{id}/search")
-    public Response searchbyName(@Context SecurityContext securityContext,
+    public Response searchbyName (@Context SecurityContext securityContext,
             @Context Locale locale, @QueryParam("q") String query,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
             @QueryParam("context") String ctx,
             @QueryParam("cutoff") Boolean cutoff,
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
-            @QueryParam("page") Integer pageInteger, @PathParam("id") String id,
-            @PathParam("type") String type, @QueryParam("cq") String cq,
-            @QueryParam("raw") Boolean raw,
+            @QueryParam("page") Integer pageInteger,
+            @PathParam("id") String id, @PathParam("type") String type,
+            @QueryParam("cq") String cq, @QueryParam("raw") Boolean raw,
             @QueryParam("engine") String engine) {
         // ref is a virtual collection id!
         TokenContext context = (TokenContext) securityContext
@@ -559,8 +580,8 @@ public class ResourceService {
 
                 KustvaktResource resource;
                 if (StringUtils.isInteger(id))
-                    resource = this.resourceHandler
-                            .findbyIntId(Integer.valueOf(id), user);
+                    resource = this.resourceHandler.findbyIntId(
+                            Integer.valueOf(id), user);
                 else
                     resource = this.resourceHandler.findbyStrId(id, user,
                             ResourceFactory.getResourceClass(type));
@@ -570,9 +591,9 @@ public class ResourceService {
                 else if (resource instanceof Corpus)
                     builder.addQuery("corpusID=" + resource.getPersistentID());
                 else
-                    throw KustvaktResponseHandler
-                            .throwit(StatusCodes.ILLEGAL_ARGUMENT,
-                                    "Type parameter not supported", type);
+                    throw KustvaktResponseHandler.throwit(
+                            StatusCodes.ILLEGAL_ARGUMENT,
+                            "Type parameter not supported", type);
 
                 meta.addEntry("startIndex", pageIndex);
                 meta.addEntry("startPage", pageInteger);
@@ -598,39 +619,42 @@ public class ResourceService {
 
                 if (eng.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
                     if (raw)
-                        throw KustvaktResponseHandler
-                                .throwit(StatusCodes.ILLEGAL_ARGUMENT,
-                                        "raw not supported!", null);
+                        throw KustvaktResponseHandler.throwit(
+                                StatusCodes.ILLEGAL_ARGUMENT,
+                                "raw not supported!", null);
                     MultivaluedMap map = new MultivaluedMapImpl();
                     map.add("q", query);
                     map.add("count", String.valueOf(pageLength));
-                    map.add("lctxs", String.valueOf(
-                            meta.getSpanContext().getLeft_size()));
-                    map.add("rctxs", String.valueOf(
-                            meta.getSpanContext().getRight_size()));
+                    map.add("lctxs", String.valueOf(meta.getSpanContext()
+                            .getLeft_size()));
+                    map.add("rctxs", String.valueOf(meta.getSpanContext()
+                            .getRight_size()));
                     result = this.graphDBhandler.getResponse(map, "distKwic");
-                }else
+                }
+                else
                     result = searchKrill.search(query);
 
-            }catch (Exception e) {
-                KustvaktLogger.ERROR_LOGGER
-                        .error("Exception for serialized query: " + query, e);
+            }
+            catch (Exception e) {
+                jlog.error("Exception for serialized query: " + query, e);
                 throw KustvaktResponseHandler
                         .throwit(500, e.getMessage(), null);
             }
 
             KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
             return Response.ok(result).build();
-        }catch (KustvaktException e) {
-            KustvaktLogger.ERROR_LOGGER.error("Exception encountered!", e);
+        }
+        catch (KustvaktException e) {
+            jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
 
     }
 
+
     @POST
     @Path("stats")
-    public Response getStats(@Context SecurityContext context,
+    public Response getStats (@Context SecurityContext context,
             @Context Locale locale, String json) {
         CollectionQueryBuilder3 builder = new CollectionQueryBuilder3();
         builder.addQuery(json);
@@ -642,18 +666,20 @@ public class ResourceService {
         return Response.ok(stats).build();
     }
 
+
     @GET
     @Path("{type}/{id}/{child}/stats")
-    public Response getStatisticsbyName(@Context SecurityContext context,
+    public Response getStatisticsbyName (@Context SecurityContext context,
             @Context Locale locale, @PathParam("type") String type,
             @PathParam("id") String id, @PathParam("child") String child) {
         return getStatisticsbyId(context, locale, type,
-                StringUtils.joinResources(id, child));
+                NamingUtils.joinResources(id, child));
     }
+
 
     @GET
     @Path("{type}/{id}/stats")
-    public Response getStatisticsbyId(@Context SecurityContext context,
+    public Response getStatisticsbyId (@Context SecurityContext context,
             @Context Locale locale, @PathParam("type") String type,
             @PathParam("id") String id) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
@@ -669,8 +695,8 @@ public class ResourceService {
             User user = controller.getUser(ctx.getUsername());
             KustvaktResource resource;
             if (StringUtils.isInteger(id))
-                resource = this.resourceHandler
-                        .findbyIntId(Integer.valueOf(id), user);
+                resource = this.resourceHandler.findbyIntId(
+                        Integer.valueOf(id), user);
             else
                 resource = this.resourceHandler.findbyStrId(id, user,
                         ResourceFactory.getResourceClass(type));
@@ -679,17 +705,20 @@ public class ResourceService {
             CollectionQueryBuilder3 query = new CollectionQueryBuilder3();
             if (resource instanceof VirtualCollection) {
                 query.setBaseQuery(resource.getData());
-            }else if (resource instanceof Corpus) {
+            }
+            else if (resource instanceof Corpus) {
                 query.addQuery("corpusID=" + resource.getName());
             }
 
             // rewrite process
             String qstr = processor.preProcess(query.toJSON(), user);
             return Response.ok(searchKrill.getStatistics(qstr)).build();
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
     }
+
 
     /**
      * @param context
@@ -700,28 +729,30 @@ public class ResourceService {
     //todo: rename
     @POST
     @Path("collection_raw")
-    public Response createRawCollection(@Context SecurityContext context,
+    public Response createRawCollection (@Context SecurityContext context,
             @Context Locale locale, String json) {
         TokenContext c = (TokenContext) context.getUserPrincipal();
         VirtualCollection cache = ResourceFactory.getCachedCollection(json);
         User user;
         try {
             user = controller.getUser(c.getUsername());
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
 
-        VirtualCollection tmp = resourceHandler
-                .getCache(cache.getId(), VirtualCollection.class);
+        VirtualCollection tmp = resourceHandler.getCache(cache.getId(),
+                VirtualCollection.class);
         if (tmp == null) {
             CollectionQueryBuilder3 cquery = new CollectionQueryBuilder3()
                     .setBaseQuery((String) cache.getData());
-            String query = this.processor
-                    .preProcess((String) cache.getData(), user);
+            String query = this.processor.preProcess((String) cache.getData(),
+                    user);
             String stats = searchKrill.getStatistics(query);
             cache.setStats(JsonUtils.readSimple(stats, Map.class));
             resourceHandler.cache(cache);
-        }else
+        }
+        else
             cache = tmp;
 
         Map vals = new HashMap();
@@ -730,44 +761,47 @@ public class ResourceService {
         return Response.ok(JsonUtils.toJSON(vals)).build();
     }
 
+
     @POST
     @Path("{type}/{id}")
-    public Response updateResource(@Context SecurityContext context,
+    public Response updateResource (@Context SecurityContext context,
             @Context Locale locale, @PathParam("type") String type,
             @PathParam("id") String id, String json) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         User user;
         try {
             user = controller.getUser(ctx.getUsername());
-            KustvaktResource resource = this.resourceHandler
-                    .findbyStrId(id, user,
-                            ResourceFactory.getResourceClass(type));
+            KustvaktResource resource = this.resourceHandler.findbyStrId(id,
+                    user, ResourceFactory.getResourceClass(type));
             JsonNode node = JsonUtils.readTree(json);
 
             if (node.isObject() && !node.path("name").isMissingNode()) {
                 String s = node.path("name").asText();
                 if (s.equals("null") || s.isEmpty())
-                    throw KustvaktResponseHandler
-                            .throwit(StatusCodes.ILLEGAL_ARGUMENT,
-                                    "Name must be set", "name");
+                    throw KustvaktResponseHandler.throwit(
+                            StatusCodes.ILLEGAL_ARGUMENT, "Name must be set",
+                            "name");
                 resource.setName(s);
             }
 
             if (node.isObject() && !node.path("description").isMissingNode())
                 resource.setDescription(node.path("description").asText());
             this.resourceHandler.updateResources(user, resource);
-        }catch (KustvaktException e) {
-            KustvaktLogger.ERROR_LOGGER.error("Exception encountered!", e);
+        }
+        catch (KustvaktException e) {
+            jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
 
+
     //todo: change or deprecate
     @POST
     @Path("nv/{type}")
-    public Response storeResource(@Context SecurityContext context,
-            @Context Locale locale, @PathParam("type") String type,
+    public Response storeResource (@Context SecurityContext context,
+            @Context Locale locale,
+            @PathParam("type") String type,
             @QueryParam("name") String name,
             @QueryParam("description") String description,
             // deprecate -> if you want to store a resource based on another, build the query first yourself or via a function
@@ -782,24 +816,27 @@ public class ResourceService {
         User user;
         try {
             user = controller.getUser(ctx.getUsername());
-        }catch (KustvaktException e) {
-            KustvaktLogger.ERROR_LOGGER.error("Exception encountered!", e);
+        }
+        catch (KustvaktException e) {
+            jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
-        if (VirtualCollection.class
-                .equals(ResourceFactory.getResourceClass(type))) {
+        if (VirtualCollection.class.equals(ResourceFactory
+                .getResourceClass(type))) {
             VirtualCollection cachetmp, collection;
 
             String base;
             if (reference != null && !reference.equals("null")) {
                 try {
-                    base = (String) resourceHandler.findbyStrId(reference, user,
-                            VirtualCollection.class).getData();
-                }catch (KustvaktException e) {
+                    base = (String) resourceHandler.findbyStrId(reference,
+                            user, VirtualCollection.class).getData();
+                }
+                catch (KustvaktException e) {
                     throw KustvaktResponseHandler.throwit(e);
                 }
 
-            }else if (query != null)
+            }
+            else if (query != null)
                 base = query;
             else
                 // todo: throw exception response for no resource to save!
@@ -811,8 +848,8 @@ public class ResourceService {
             cachetmp = ResourceFactory.getCachedCollection(cquery.toJSON());
 
             // see if collection was cached!
-            VirtualCollection tmp = resourceHandler
-                    .getCache(cachetmp.getId(), VirtualCollection.class);
+            VirtualCollection tmp = resourceHandler.getCache(cachetmp.getId(),
+                    VirtualCollection.class);
             // if not cached, fill with stats values
             if (tmp == null) {
                 String stats = searchKrill.getStatistics(cquery.toJSON());
@@ -820,17 +857,18 @@ public class ResourceService {
             }
 
             if (!cache) {
-                collection = ResourceFactory
-                        .getPermanentCollection(cachetmp, name, description);
+                collection = ResourceFactory.getPermanentCollection(cachetmp,
+                        name, description);
                 vals = collection.toMap();
                 try {
                     resourceHandler.storeResources(user, collection);
-                }catch (KustvaktException e) {
-                    KustvaktLogger.ERROR_LOGGER
-                            .error("Exception encountered!", e);
+                }
+                catch (KustvaktException e) {
+                    jlog.error("Exception encountered!", e);
                     throw KustvaktResponseHandler.throwit(e);
                 }
-            }else {
+            }
+            else {
                 resourceHandler.cache(cachetmp);
                 vals = cachetmp.toMap();
             }
@@ -838,9 +876,11 @@ public class ResourceService {
         return Response.ok(JsonUtils.toJSON(vals)).build();
     }
 
+
     /**
-     * store a virtual collection. Retrieve cached entry first and then store VCollection
-     *
+     * store a virtual collection. Retrieve cached entry first and
+     * then store VCollection
+     * 
      * @param context
      * @param locale
      * @param query
@@ -848,7 +888,7 @@ public class ResourceService {
      */
     @POST
     @Path("{type}")
-    public Response storeResource(@Context SecurityContext context,
+    public Response storeResource (@Context SecurityContext context,
             @Context Locale locale, @PathParam("type") String type,
             @QueryParam("filter") Boolean filter,
             @QueryParam("name") String name,
@@ -864,12 +904,13 @@ public class ResourceService {
         User user;
         try {
             user = controller.getUser(ctx.getUsername());
-        }catch (KustvaktException e) {
-            KustvaktLogger.ERROR_LOGGER.error("Exception encountered!", e);
+        }
+        catch (KustvaktException e) {
+            jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
-        if (VirtualCollection.class
-                .equals(ResourceFactory.getResourceClass(type))) {
+        if (VirtualCollection.class.equals(ResourceFactory
+                .getResourceClass(type))) {
 
             VirtualCollection cachetmp, collection;
             // todo: ??
@@ -877,10 +918,10 @@ public class ResourceService {
             CollectionQueryBuilder3 cquery = new CollectionQueryBuilder3();
             if (reference != null && !reference.equals("null")) {
                 try {
-                    cquery.addQuery((String) resourceHandler
-                            .findbyStrId(reference, user,
-                                    VirtualCollection.class).getData());
-                }catch (KustvaktException e) {
+                    cquery.addQuery((String) resourceHandler.findbyStrId(
+                            reference, user, VirtualCollection.class).getData());
+                }
+                catch (KustvaktException e) {
                     throw KustvaktResponseHandler.throwit(e);
                 }
                 // todo: 11.01
@@ -897,8 +938,8 @@ public class ResourceService {
             cachetmp = ResourceFactory.getCachedCollection(cquery.toJSON());
 
             // see if vc was cached!
-            VirtualCollection tmp = resourceHandler
-                    .getCache(cachetmp.getId(), VirtualCollection.class);
+            VirtualCollection tmp = resourceHandler.getCache(cachetmp.getId(),
+                    VirtualCollection.class);
 
             // if not cached, fill with stats values
             if (tmp == null) {
@@ -907,17 +948,18 @@ public class ResourceService {
             }
 
             if (!cache && !User.UserFactory.isDemo(ctx.getUsername())) {
-                collection = ResourceFactory
-                        .getPermanentCollection(cachetmp, name, description);
+                collection = ResourceFactory.getPermanentCollection(cachetmp,
+                        name, description);
                 vals = collection.toMap();
                 try {
                     resourceHandler.storeResources(user, collection);
-                }catch (KustvaktException e) {
-                    KustvaktLogger.ERROR_LOGGER
-                            .error("Exception encountered!", e);
+                }
+                catch (KustvaktException e) {
+                    jlog.error("Exception encountered!", e);
                     throw KustvaktResponseHandler.throwit(e);
                 }
-            }else {
+            }
+            else {
                 resourceHandler.cache(cachetmp);
                 vals = cachetmp.toMap();
             }
@@ -925,18 +967,20 @@ public class ResourceService {
         return Response.ok(JsonUtils.toJSON(vals)).build();
     }
 
+
     @DELETE
     @Path("{type}/{id}/{child}")
-    public Response deleteResourcewChild(@Context SecurityContext context,
+    public Response deleteResourceChild (@Context SecurityContext context,
             @Context Locale locale, @PathParam("type") String type,
             @PathParam("id") String id, @PathParam("child") String child) {
         return deleteResource(context, locale, type,
-                StringUtils.joinResources(id, child));
+                NamingUtils.joinResources(id, child));
     }
+
 
     @DELETE
     @Path("{type}/{id}")
-    public Response deleteResource(@Context SecurityContext context,
+    public Response deleteResource (@Context SecurityContext context,
             @Context Locale locale, @PathParam("type") String type,
             @PathParam("id") String id) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
@@ -948,18 +992,20 @@ public class ResourceService {
             r.setPersistentID(id);
             //todo: eliminate the need to find the resource first!
             resourceHandler.deleteResources(user, r);
-        }catch (KustvaktException e) {
-            KustvaktLogger.ERROR_LOGGER.error("Exception encountered!", e);
+        }
+        catch (KustvaktException e) {
+            jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
 
         return Response.ok().build();
     }
 
+
     //fixme: only allowed for corpus?!
     @GET
     @Path("/corpus/{id}/{docid}/{rest}/matchInfo")
-    public Response getMatchInfo(@Context SecurityContext ctx,
+    public Response getMatchInfo (@Context SecurityContext ctx,
             @Context Locale locale, @PathParam("id") String id,
             @PathParam("docid") String docid, @PathParam("rest") String rest,
             @QueryParam("foundry") Set<String> foundries,
@@ -977,8 +1023,9 @@ public class ResourceService {
         User user;
         try {
             user = controller.getUser(tokenContext.getUsername());
-        }catch (KustvaktException e) {
-            KustvaktLogger.ERROR_LOGGER.error("Exception encountered!", e);
+        }
+        catch (KustvaktException e) {
+            jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
 
@@ -997,33 +1044,36 @@ public class ResourceService {
                     if (!manager.isAllowed())
                         continue;
 
-                    String[] sep = StringUtils.splitAnnotations(spl);
+                    String[] sep = NamingUtils.splitAnnotations(spl);
                     if (spl != null) {
                         f_list.add(sep[0]);
                         l_list.add(sep[1]);
                     }
-                    results = searchKrill
-                            .getMatch(matchid, new ArrayList<>(f_list),
-                                    new ArrayList<>(l_list), spans, false,
-                                    true);
-                }catch (EmptyResultException e) {
-                    throw KustvaktResponseHandler
-                            .throwit(StatusCodes.EMPTY_RESULTS,
-                                    "Resource not found!", id);
-                }catch (NotAuthorizedException e) {
-                    throw KustvaktResponseHandler
-                            .throwit(StatusCodes.PERMISSION_DENIED,
-                                    "Permission denied", id);
+                    results = searchKrill.getMatch(matchid, new ArrayList<>(
+                            f_list), new ArrayList<>(l_list), spans, false,
+                            true);
+                }
+                catch (EmptyResultException e) {
+                    throw KustvaktResponseHandler.throwit(
+                            StatusCodes.EMPTY_RESULTS, "Resource not found!",
+                            id);
+                }
+                catch (NotAuthorizedException e) {
+                    throw KustvaktResponseHandler.throwit(
+                            StatusCodes.PERMISSION_DENIED, "Permission denied",
+                            id);
                 }
 
             }
             // all foundries shall be returned
-        }else if (foundries != null && foundries.contains("*")) {
+        }
+        else if (foundries != null && foundries.contains("*")) {
             Set<Layer> resources;
             try {
                 resources = ResourceFinder.search(user, Layer.class);
-            }catch (KustvaktException e) {
-                KustvaktLogger.ERROR_LOGGER.error("Exception encountered!", e);
+            }
+            catch (KustvaktException e) {
+                jlog.error("Exception encountered!", e);
                 throw KustvaktResponseHandler.throwit(e);
             }
             // returns foundries and layers.
@@ -1031,7 +1081,7 @@ public class ResourceService {
             foundries = new HashSet<>();
             layers = new HashSet<>();
             for (Layer r : resources) {
-                String[] spl = StringUtils.splitAnnotations(r.getName());
+                String[] spl = NamingUtils.splitAnnotations(r.getName());
                 if (spl != null) {
                     foundries.add(spl[0]);
                     layers.add(spl[1]);
@@ -1045,19 +1095,21 @@ public class ResourceService {
                                 new ArrayList<>(layers), spans, false, true);
             else
                 results = searchKrill.getMatch(matchid);
-        }catch (Exception e) {
-            KustvaktLogger.ERROR_LOGGER.error("Exception encountered!", e);
-            throw KustvaktResponseHandler
-                    .throwit(StatusCodes.ILLEGAL_ARGUMENT, e.getMessage(), "");
+        }
+        catch (Exception e) {
+            jlog.error("Exception encountered!", e);
+            throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+                    e.getMessage(), "");
         }
         return Response.ok(results).build();
     }
+
 
     // todo:?!
     @POST
     @Path("match/{id}/save")
     @Deprecated
-    public Response save(@PathParam("{id}") String id,
+    public Response save (@PathParam("{id}") String id,
             @QueryParam("d") String description,
             @Context SecurityContext context) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
@@ -1075,28 +1127,30 @@ public class ResourceService {
         return Response.ok().build();
     }
 
+
     @GET
     @Path("matches")
     @Deprecated
-    public Response get(@Context SecurityContext context) {
+    public Response get (@Context SecurityContext context) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         //todo save match for user and later retrieval!
         //todo: retrieve matches in range! --choices: date, document, id (matchid)
         return Response.ok().build();
     }
 
+
     @POST
     @Path("match/{id}/delete")
     @Deprecated
-    public Response remove(@PathParam("{id}") String id,
+    public Response remove (@PathParam("{id}") String id,
             @Context SecurityContext context) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         // save match for user and later retrieval!
         try {
-            this.resourceHandler
-                    .deleteResources(this.controller.getUser(ctx.getUsername()),
-                            id);
-        }catch (KustvaktException e) {
+            this.resourceHandler.deleteResources(
+                    this.controller.getUser(ctx.getUsername()), id);
+        }
+        catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
 

@@ -19,26 +19,28 @@ import java.util.Collection;
  * @author hanl
  * @date 30/06/2015
  */
-public class FoundryInject
-        implements RewriteTask.IterableRewriteAt, BeanInjectable {
+public class FoundryInject implements RewriteTask.IterableRewriteAt,
+        BeanInjectable {
 
     private Collection userdaos;
 
-    public FoundryInject() {
+
+    public FoundryInject () {
         this.userdaos = Collections.emptyList();
     }
 
 
     @Override
-    public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
+    public JsonNode preProcess (KoralNode node, KustvaktConfiguration config,
             User user) throws KustvaktException {
         LayerMapper mapper;
 
         if (user != null && !userdaos.isEmpty()) {
-            UserDataDbIface dao = BeansFactory.getTypeFactory()
-                    .getTypedBean(userdaos, UserSettings.class);
+            UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
+                    userdaos, UserSettings.class);
             mapper = new LayerMapper(config, dao.get(user));
-        }else
+        }
+        else
             mapper = new LayerMapper(config);
 
         if (node.get("@type").equals("koral:term") && !node.has("foundry")) {
@@ -53,18 +55,21 @@ public class FoundryInject
         return node.rawNode();
     }
 
+
     @Override
-    public String path() {
+    public String path () {
         return "query";
     }
 
+
     @Override
-    public JsonNode postProcess(KoralNode node) {
+    public JsonNode postProcess (KoralNode node) {
         return null;
     }
 
+
     @Override
-    public <T extends ContextHolder> void insertBeans(T beans) {
+    public <T extends ContextHolder> void insertBeans (T beans) {
         this.userdaos = beans.getUserDataDaos();
     }
 }

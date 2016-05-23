@@ -23,17 +23,20 @@ public class ResourceFactory {
         //        subTypes.add(USERQUERY, UserQuery.class);
     }
 
-    public static KustvaktResource getResource(
+
+    public static KustvaktResource getResource (
             Class<? extends KustvaktResource> clazz) {
         try {
             return (KustvaktResource) clazz.newInstance();
-        }catch (InstantiationException | IllegalAccessException e) {
+        }
+        catch (InstantiationException | IllegalAccessException e) {
             // do nothing
         }
         return null;
     }
 
-    public static int getResourceMapping(Class<? extends KustvaktResource> r) {
+
+    public static int getResourceMapping (Class<? extends KustvaktResource> r) {
         int value = -1;
         if (r != null) {
             for (int i = 0; i < subTypes.size(); i++) {
@@ -44,11 +47,13 @@ public class ResourceFactory {
         return value;
     }
 
-    public static KustvaktResource getResource(String type) {
+
+    public static KustvaktResource getResource (String type) {
         return getResource(getResourceClass(type));
     }
 
-    public static KustvaktResource getResource(int j) {
+
+    public static KustvaktResource getResource (int j) {
         Class s = subTypes.get(j);
         if (s != null) {
             return getResource(s);
@@ -56,37 +61,42 @@ public class ResourceFactory {
         return null;
     }
 
-    public static <T extends KustvaktResource> T createID(T resource) {
+
+    public static <T extends KustvaktResource> T createID (T resource) {
         if (resource.getData() != null && !resource.getData().isEmpty())
             resource.setPersistentID(DigestUtils.sha1Hex(resource.getData()));
         return resource;
     }
 
-    public static <T extends KustvaktResource> Class<T> getResourceClass(
+
+    public static <T extends KustvaktResource> Class<T> getResourceClass (
             String type) {
         for (Class value : subTypes) {
-            if (value == VirtualCollection.class && type
-                    .equalsIgnoreCase("collection"))
+            if (value == VirtualCollection.class
+                    && type.equalsIgnoreCase("collection"))
                 return (Class<T>) VirtualCollection.class;
-                //todo
-                //            else if (value == UserQuery.class && type.equalsIgnoreCase("query"))
-                //                return (Class<T>) UserQuery.class;
+            //todo
+            //            else if (value == UserQuery.class && type.equalsIgnoreCase("query"))
+            //                return (Class<T>) UserQuery.class;
             else if (value.getSimpleName().equalsIgnoreCase(type.trim())) {
                 return value;
             }
         }
         return null;
     }
+
+
     // all deprecated!
 
-    public static VirtualCollection getCachedCollection(String query) {
+    public static VirtualCollection getCachedCollection (String query) {
         VirtualCollection v = new VirtualCollection(query);
         v.setName("");
         v.setDescription("");
         return v;
     }
 
-    public static VirtualCollection getPermanentCollection(
+
+    public static VirtualCollection getPermanentCollection (
             VirtualCollection mergable, String corpusName, String description) {
         VirtualCollection v = new VirtualCollection();
         v.merge(mergable);
@@ -94,6 +104,7 @@ public class ResourceFactory {
         v.setDescription(description);
         return createID(v);
     }
+
 
     //    public static VirtualCollection createCollection(String name, String query,
     //            Integer owner) {
@@ -130,7 +141,7 @@ public class ResourceFactory {
     //        return v;
     //    }
 
-    public static VirtualCollection getIDContainer(Integer id) {
+    public static VirtualCollection getIDContainer (Integer id) {
         return new VirtualCollection(id);
     }
 }

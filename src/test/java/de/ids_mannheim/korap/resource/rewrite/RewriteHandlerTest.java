@@ -20,19 +20,21 @@ import static org.junit.Assert.*;
 public class RewriteHandlerTest extends BeanConfigTest {
 
     @Test
-    public void initHandler() {
+    public void initHandler () {
         try {
             RewriteHandler handler = new RewriteHandler();
             handler.insertBeans(helper().getContext());
             assertTrue(handler.add(FoundryInject.class));
-        }catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
 
         }
     }
 
+
     @Test
-    public void testRewriteTaskAdd() {
+    public void testRewriteTaskAdd () {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         assertTrue(handler.add(FoundryInject.class));
@@ -41,9 +43,10 @@ public class RewriteHandlerTest extends BeanConfigTest {
         assertTrue(handler.add(IdWriter.class));
     }
 
+
     // throws exception cause of missing configuration
     @Test(expected = RuntimeException.class)
-    public void testRewriteConfigThrowsException() {
+    public void testRewriteConfigThrowsException () {
         RewriteHandler handler = new RewriteHandler();
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[(base=laufen | base=gehen) & tt/pos=VVFIN]", "poliqarp");
@@ -51,9 +54,11 @@ public class RewriteHandlerTest extends BeanConfigTest {
         handler.preProcess(s.toJSON(), null);
     }
 
+
     @Test
-    public void testRewriteNoBeanInject() {
-        RewriteHandler handler = new RewriteHandler(helper().getContext().getConfiguration());
+    public void testRewriteNoBeanInject () {
+        RewriteHandler handler = new RewriteHandler(helper().getContext()
+                .getConfiguration());
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[(base=laufen | base=gehen) & tt/pos=VVFIN]", "poliqarp");
         assertTrue(handler.add(FoundryInject.class));
@@ -61,8 +66,9 @@ public class RewriteHandlerTest extends BeanConfigTest {
         assertNotNull(res);
     }
 
+
     @Test
-    public void testRewriteBeanInject() {
+    public void testRewriteBeanInject () {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         QuerySerializer s = new QuerySerializer();
@@ -72,13 +78,16 @@ public class RewriteHandlerTest extends BeanConfigTest {
         JsonNode node = JsonUtils.readTree(res);
         assertNotNull(node);
 
-        assertEquals("tt", node.at("/query/wrap/operands/0/operands/0/foundry").asText());
-        assertEquals("tt", node.at("/query/wrap/operands/0/operands/1/foundry").asText());
+        assertEquals("tt", node.at("/query/wrap/operands/0/operands/0/foundry")
+                .asText());
+        assertEquals("tt", node.at("/query/wrap/operands/0/operands/1/foundry")
+                .asText());
         assertEquals("tt", node.at("/query/wrap/operands/1/foundry").asText());
     }
 
+
     @Test
-    public void testRewriteUserSpecific() {
+    public void testRewriteUserSpecific () {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         QuerySerializer s = new QuerySerializer();
@@ -87,16 +96,21 @@ public class RewriteHandlerTest extends BeanConfigTest {
         String res = handler.preProcess(s.toJSON(), helper().getUser());
         JsonNode node = JsonUtils.readTree(res);
         assertNotNull(node);
-        assertEquals("tt_test", node.at("/query/wrap/operands/0/operands/0/foundry").asText());
-        assertEquals("tt_test", node.at("/query/wrap/operands/0/operands/1/foundry").asText());
-        assertNotEquals("tt_test", node.at("/query/wrap/operands/1/foundry").asText());
+        assertEquals("tt_test",
+                node.at("/query/wrap/operands/0/operands/0/foundry").asText());
+        assertEquals("tt_test",
+                node.at("/query/wrap/operands/0/operands/1/foundry").asText());
+        assertNotEquals("tt_test", node.at("/query/wrap/operands/1/foundry")
+                .asText());
     }
 
+
     @Override
-    public void initMethod() throws KustvaktException {
+    public void initMethod () throws KustvaktException {
         helper().setupAccount();
         UserDataDbIface settingsdao = BeansFactory.getTypeFactory()
-                .getTypedBean(helper().getContext().getUserDataDaos(),UserSettings.class);
+                .getTypedBean(helper().getContext().getUserDataDaos(),
+                        UserSettings.class);
         UserSettings s = (UserSettings) settingsdao.get(helper().getUser());
         s.setField(Attributes.DEFAULT_LEMMA_FOUNDRY, "tt_test");
         settingsdao.update(s);

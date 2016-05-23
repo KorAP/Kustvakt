@@ -13,14 +13,16 @@ import org.junit.Test;
 public class UserLoaderTest extends BeanConfigTest {
 
     @Test
-    public void testUserLoader() {
-        EntityDao dao = new EntityDao(helper().getContext().getPersistenceClient());
+    public void testUserLoader () {
+        EntityDao dao = new EntityDao(helper().getContext()
+                .getPersistenceClient());
 
         boolean error = false;
         UserLoader l = new UserLoader();
         try {
             l.load(helper().getContext());
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             e.printStackTrace();
             error = true;
         }
@@ -28,8 +30,9 @@ public class UserLoaderTest extends BeanConfigTest {
         Assert.assertNotEquals("Is not supposed to be zero", 0, dao.size());
     }
 
+
     @Override
-    public void initMethod() throws KustvaktException {
+    public void initMethod () throws KustvaktException {
 
     }
 }

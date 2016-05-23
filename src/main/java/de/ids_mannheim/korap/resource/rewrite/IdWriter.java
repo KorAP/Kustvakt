@@ -10,17 +10,18 @@ import de.ids_mannheim.korap.user.User;
  * @author hanl
  * @date 25/09/2015
  */
-public class IdWriter
-        implements RewriteTask.RewriteKoralToken {
+public class IdWriter implements RewriteTask.RewriteKoralToken {
 
     private int counter;
 
-    public IdWriter() {
+
+    public IdWriter () {
         this.counter = 0;
     }
 
+
     @Override
-    public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
+    public JsonNode preProcess (KoralNode node, KustvaktConfiguration config,
             User user) {
         if (node.get("@type").equals("koral:token")) {
             String s = extractToken(node.rawNode());
@@ -30,8 +31,9 @@ public class IdWriter
         return node.rawNode();
     }
 
+
     // fixme: koral token --> how does grouping behave?!
-    private String extractToken(JsonNode token) {
+    private String extractToken (JsonNode token) {
         JsonNode wrap = token.path("wrap");
         if (!wrap.isMissingNode())
             return wrap.path("key").asText();

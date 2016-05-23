@@ -9,12 +9,11 @@ import de.ids_mannheim.korap.user.User;
  * @author hanl
  * @date 04/07/2015
  */
-public class MetaConstraint
-        implements RewriteTask.RewriteNodeAt {
+public class MetaConstraint implements RewriteTask.RewriteNodeAt {
 
 
     @Override
-    public JsonNode preProcess(KoralNode node, KustvaktConfiguration config,
+    public JsonNode preProcess (KoralNode node, KustvaktConfiguration config,
             User user) {
         // redundant
         if (node.rawNode().has("meta")) {
@@ -25,14 +24,15 @@ public class MetaConstraint
         return node.rawNode();
     }
 
+
     @Override
-    public JsonNode postProcess(KoralNode node) {
+    public JsonNode postProcess (KoralNode node) {
         return null;
     }
 
 
     @Override
-    public String at() {
+    public String at () {
         return "/meta";
     }
 

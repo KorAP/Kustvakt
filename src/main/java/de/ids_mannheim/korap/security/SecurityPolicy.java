@@ -30,7 +30,8 @@ public class SecurityPolicy {
     private PolicyContext ctx;
     private Integer creator;
 
-    public SecurityPolicy() {
+
+    public SecurityPolicy () {
         this.setID(-1);
         this.ctx = new PolicyContext();
         this.conditions = new ArrayList<>();
@@ -39,71 +40,85 @@ public class SecurityPolicy {
         this.permissions = new PermissionsBuffer();
     }
 
-    public SecurityPolicy(Integer id) {
+
+    public SecurityPolicy (Integer id) {
         this();
         this.setID(id);
     }
 
-    public SecurityPolicy setID(Integer id) {
+
+    public SecurityPolicy setID (Integer id) {
         this.id = id;
         return this;
     }
 
-    public Integer getID() {
+
+    public Integer getID () {
         return this.id;
     }
 
-    public Integer getCreator() {
+
+    public Integer getCreator () {
         return this.creator;
     }
 
-    public PolicyContext getContext() {
+
+    public PolicyContext getContext () {
         return this.ctx;
     }
 
-    public SecurityPolicy setTarget(KustvaktResource resource) {
+
+    public SecurityPolicy setTarget (KustvaktResource resource) {
         this.target = resource.getPersistentID();
         return this;
     }
 
-    public SecurityPolicy setTarget(String target) {
+
+    public SecurityPolicy setTarget (String target) {
         this.target = target;
         return this;
     }
 
-    public String getTarget() {
+
+    public String getTarget () {
         return this.target;
     }
 
-    public SecurityPolicy setPOSIX(String posix) {
+
+    public SecurityPolicy setPOSIX (String posix) {
         this.permissions = new PermissionsBuffer(Short.valueOf(posix));
         return this;
     }
 
-    public SecurityPolicy setCreator(Integer creator) {
+
+    public SecurityPolicy setCreator (Integer creator) {
         this.creator = creator;
         return this;
     }
 
+
     // todo ???????
     @Deprecated
-    private SecurityPolicy setOverride(Permissions.Permission... perms) {
+    private SecurityPolicy setOverride (Permissions.Permission ... perms) {
         for (Permissions.Permission p : perms)
             this.permissions.addOverride(p.toByte());
         return this;
     }
 
-    public SecurityPolicy setContext(PolicyContext ctx) {
+
+    public SecurityPolicy setContext (PolicyContext ctx) {
         this.ctx = ctx;
         return this;
     }
 
-    private boolean hasContext() {
+
+    private boolean hasContext () {
         return !ctx.noMask();
     }
 
+
     //todo:
-    public boolean isActive(User user) {
+    public boolean isActive (User user) {
         System.out.println("THE POLICY " + this.toString());
         System.out.println("DOES THIS HAVE CONTEXT? " + this.hasContext());
         //        String host = (String) user.getField(Attributes.HOST);
@@ -114,7 +129,8 @@ public class SecurityPolicy {
         return !this.hasContext();
     }
 
-    public List<String> getConditionList() {
+
+    public List<String> getConditionList () {
         List<String> c = new LinkedList<>();
         Collections.sort(conditions);
         for (PolicyCondition p : conditions)
@@ -122,7 +138,8 @@ public class SecurityPolicy {
         return c;
     }
 
-    public String getConditionString() {
+
+    public String getConditionString () {
         if (conditions.isEmpty())
             return "";
 
@@ -136,11 +153,13 @@ public class SecurityPolicy {
         return b.toString();
     }
 
-    public List<PolicyCondition> getConditions() {
+
+    public List<PolicyCondition> getConditions () {
         return this.conditions;
     }
 
-    public SecurityPolicy setConditions(PolicyCondition... constraints) {
+
+    public SecurityPolicy setConditions (PolicyCondition ... constraints) {
         this.conditions.clear();
         this.removedidx.clear();
         this.addedidx.clear();
@@ -151,7 +170,8 @@ public class SecurityPolicy {
         return this;
     }
 
-    public SecurityPolicy removeCondition(PolicyCondition constraint) {
+
+    public SecurityPolicy removeCondition (PolicyCondition constraint) {
         int idx = this.conditions.indexOf(constraint);
         if (this.addedidx.contains(idx))
             this.addedidx.remove(idx);
@@ -160,30 +180,36 @@ public class SecurityPolicy {
         return this;
     }
 
-    public SecurityPolicy addCondition(PolicyCondition constraint) {
+
+    public SecurityPolicy addCondition (PolicyCondition constraint) {
         this.conditions.add(constraint);
         return this;
     }
 
-    public SecurityPolicy addNewCondition(PolicyCondition constraint) {
+
+    public SecurityPolicy addNewCondition (PolicyCondition constraint) {
         if (this.conditions.add(constraint))
             this.addedidx.add(this.conditions.indexOf(constraint));
         return this;
     }
 
-    public boolean contains(PolicyCondition constraint) {
+
+    public boolean contains (PolicyCondition constraint) {
         return conditions.contains(constraint);
     }
 
-    public Collection<Integer> getRemoved() {
+
+    public Collection<Integer> getRemoved () {
         return this.removedidx;
     }
 
-    public Collection<Integer> getAdded() {
+
+    public Collection<Integer> getAdded () {
         return this.addedidx;
     }
 
-    public void clear() {
+
+    public void clear () {
         // clear remove, add, conditions list!
         for (Integer remove : this.removedidx)
             this.conditions.remove(remove);
@@ -191,39 +217,45 @@ public class SecurityPolicy {
         this.addedidx.clear();
     }
 
-    public boolean hasPermission(Permissions.Permission perm) {
+
+    public boolean hasPermission (Permissions.Permission perm) {
         return permissions != null && permissions.containsPermission(perm);
     }
 
+
     /**
      * function to add a permission byte to the collection.
-     *
+     * 
      * @param perms
      * @return
      */
-    public SecurityPolicy addPermission(Permissions.Permission... perms) {
+    public SecurityPolicy addPermission (Permissions.Permission ... perms) {
         permissions.addPermissions(perms);
         return this;
     }
 
-    public boolean equalsPermission(Permissions.Permission... perms) {
+
+    public boolean equalsPermission (Permissions.Permission ... perms) {
         PermissionsBuffer b = new PermissionsBuffer();
         b.addPermissions(perms);
-        return permissions != null && permissions.getPbyte()
-                .equals(b.getPbyte());
+        return permissions != null
+                && permissions.getPbyte().equals(b.getPbyte());
     }
 
-    public void removePermission(Permissions.Permission perm) {
+
+    public void removePermission (Permissions.Permission perm) {
         if (permissions != null)
             permissions.removePermission(perm);
     }
 
-    public Byte getPermissionByte() {
+
+    public Byte getPermissionByte () {
         return permissions.getPbyte();
     }
 
+
     @Override
-    public String toString() {
+    public String toString () {
         final StringBuffer sb = new StringBuffer("SecurityPolicy{");
         sb.append("id=").append(id);
         sb.append(", target='").append(target).append('\'');
@@ -233,12 +265,14 @@ public class SecurityPolicy {
         return sb.toString();
     }
 
-    public Set<Permissions.Permission> getPermissions() {
+
+    public Set<Permissions.Permission> getPermissions () {
         return permissions.getPermissions();
     }
 
+
     @Override
-    public boolean equals(Object o) {
+    public boolean equals (Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -254,8 +288,9 @@ public class SecurityPolicy {
         return true;
     }
 
+
     @Override
-    public int hashCode() {
+    public int hashCode () {
         int result = id;
         result = 31 * result + target.hashCode();
         return result;
@@ -265,13 +300,15 @@ public class SecurityPolicy {
     public static class OwnerPolicy extends SecurityPolicy {
         private final Integer owner;
 
-        public OwnerPolicy(String target, Integer owner) {
+
+        public OwnerPolicy (String target, Integer owner) {
             this.owner = owner;
             super.setTarget(target);
         }
 
+
         @Override
-        public String toString() {
+        public String toString () {
             return "OwnerPolicy(" + super.getTarget() + "," + owner + ")";
         }
 

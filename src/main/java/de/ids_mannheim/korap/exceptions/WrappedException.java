@@ -12,21 +12,24 @@ import java.util.Arrays;
 // is the extension of the notauthorized exception!
 public class WrappedException extends KustvaktException {
 
-    private WrappedException(Object userid, Integer status, String message,
-            String args) {
+    private WrappedException (Object userid, Integer status, String message,
+                              String args) {
         super(String.valueOf(userid), status, message, args);
     }
 
-    public WrappedException(Object userid, Integer status, String... args) {
+
+    public WrappedException (Object userid, Integer status, String ... args) {
         this(userid, status, "", Arrays.asList(args).toString());
         AuditRecord record = AuditRecord.serviceRecord(userid, status, args);
         this.records.add(record);
     }
 
-    public WrappedException(KustvaktException e, Integer status, String... args) {
+
+    public WrappedException (KustvaktException e, Integer status,
+                             String ... args) {
         this(e.getUserid(), e.getStatusCode(), e.getMessage(), e.getEntity());
-        AuditRecord record = AuditRecord
-                .serviceRecord(e.getUserid(), status, args);
+        AuditRecord record = AuditRecord.serviceRecord(e.getUserid(), status,
+                args);
         record.setField_1(e.toString());
         this.records.addAll(e.getRecords());
         this.records.add(record);

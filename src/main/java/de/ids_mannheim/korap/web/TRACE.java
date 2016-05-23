@@ -10,8 +10,7 @@ import java.lang.annotation.Target;
  * @author hanl
  * @date 03/07/2014
  */
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 @HttpMethod("TRACE")
-public @interface TRACE {
-}
+public @interface TRACE {}

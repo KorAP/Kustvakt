@@ -11,12 +11,14 @@ public class SqlBuilder {
     private String[] fields;
     private String where;
 
-    public SqlBuilder(String table) {
+
+    public SqlBuilder (String table) {
         this.buffer = new StringBuffer();
         this.table = table;
     }
 
-    public SqlBuilder select(String... fields) {
+
+    public SqlBuilder select (String ... fields) {
         this.buffer.append("SELECT ");
         if (fields.length > 0) {
             for (int i = 0; i < fields.length; i++) {
@@ -24,30 +26,35 @@ public class SqlBuilder {
                     this.buffer.append(", ");
                 this.buffer.append(fields[i]);
             }
-        }else
+        }
+        else
             this.buffer.append("*");
         this.buffer.append(" FROM ").append(table);
         return this;
     }
 
-    public SqlBuilder update(String... fields) {
+
+    public SqlBuilder update (String ... fields) {
         this.buffer.append("UPDATE ").append(table);
         this.fields = fields;
         return this;
     }
 
-    public SqlBuilder insert(String... fields) {
+
+    public SqlBuilder insert (String ... fields) {
         this.buffer.append("INSERT INTO ").append(table);
         this.fields = fields;
         return this;
     }
 
-    public SqlBuilder delete() {
+
+    public SqlBuilder delete () {
         this.buffer.append("DELETE FROM ").append(table);
         return this;
     }
 
-    public SqlBuilder params(String... values) {
+
+    public SqlBuilder params (String ... values) {
         if (values.length != fields.length)
             return this;
         if (this.buffer.lastIndexOf("INSERT INTO") != -1) {
@@ -77,13 +84,15 @@ public class SqlBuilder {
         return this;
     }
 
-    public SqlBuilder where(String where) {
+
+    public SqlBuilder where (String where) {
         this.where = where;
         return this;
     }
 
+
     @Override
-    public String toString() {
+    public String toString () {
         StringBuffer b = new StringBuffer(this.buffer);
         //exclude where clauses from insert statements
         if (this.where != null && this.buffer.lastIndexOf("INSERT INTO") == -1)

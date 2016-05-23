@@ -14,9 +14,9 @@ import org.junit.Test;
 public class CollectionLoaderTest extends BeanConfigTest {
 
     @Test
-    public void testCollectionLoader() {
-        ResourceDao dao = new ResourceDao(
-                helper().getContext().getPersistenceClient());
+    public void testCollectionLoader () {
+        ResourceDao dao = new ResourceDao(helper().getContext()
+                .getPersistenceClient());
 
         boolean error = false;
         UserLoader u = new UserLoader();
@@ -24,15 +24,17 @@ public class CollectionLoaderTest extends BeanConfigTest {
         try {
             u.load(helper().getContext());
             l.load(helper().getContext());
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             error = true;
         }
         Assert.assertFalse(error);
         Assert.assertNotEquals("Is not supposed to be zero", 0, dao.size());
     }
 
+
     @Override
-    public void initMethod() throws KustvaktException {
+    public void initMethod () throws KustvaktException {
 
     }
 }

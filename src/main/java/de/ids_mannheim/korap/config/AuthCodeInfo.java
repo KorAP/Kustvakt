@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
-* @author hanl
-* @date 13/05/2015
-*/
+ * @author hanl
+ * @date 13/05/2015
+ */
 @Data
 public class AuthCodeInfo {
     private String clientId;
@@ -18,12 +18,14 @@ public class AuthCodeInfo {
     private String code;
     private List<String> tokens;
 
-    public AuthCodeInfo() {
+
+    public AuthCodeInfo () {
         this.setStatus(true);
         this.tokens = new ArrayList<>();
     }
 
-    public AuthCodeInfo(String clientid, String authcode) {
+
+    public AuthCodeInfo (String clientid, String authcode) {
         this();
         this.clientId = clientid;
         this.code = authcode;

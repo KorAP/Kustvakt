@@ -39,7 +39,7 @@ import static org.junit.Assert.assertNotNull;
 
 /**
  * creates a test user that can be used to access protected functions
- *
+ * 
  * @author hanl
  * @date 16/10/2015
  */
@@ -51,37 +51,41 @@ public class TestHelper {
 
     private ContextHolder beansHolder;
 
-    public static TestHelper newInstance(ApplicationContext ctx)
+
+    public static TestHelper newInstance (ApplicationContext ctx)
             throws Exception {
         TestHelper b = new TestHelper();
-        b.beansHolder = new ContextHolder(ctx) {
-        };
+        b.beansHolder = new ContextHolder(ctx) {};
         return b;
     }
 
-    public <T> T getBean(Class<T> type) {
+
+    public <T> T getBean (Class<T> type) {
         return this.beansHolder.getBean(type);
     }
 
-    public ContextHolder getContext() {
+
+    public ContextHolder getContext () {
         return this.beansHolder;
     }
 
-    public <T> T getBean(String name) {
+
+    public <T> T getBean (String name) {
         return (T) this.beansHolder.getBean(name);
     }
 
-    public TestHelper setupAccount() {
+
+    public TestHelper setupAccount () {
         KustvaktBaseDaoInterface dao = getBean(ContextHolder.KUSTVAKT_USERDB);
 
-        KustvaktAuthenticationManager manager = getBean(
-                ContextHolder.KUSTVAKT_AUTHENTICATION_MANAGER);
+        KustvaktAuthenticationManager manager = getBean(ContextHolder.KUSTVAKT_AUTHENTICATION_MANAGER);
 
         try {
             getUser();
             System.out.println("found user, skipping setup ...");
             return this;
-        }catch (RuntimeException e) {
+        }
+        catch (RuntimeException e) {
             // do nothing and continue
         }
 
@@ -101,7 +105,8 @@ public class TestHelper {
 
         try {
             manager.createUserAccount(m, false);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             // do nothing
             e.printStackTrace();
             assertNotNull("Test user could not be set up", null);
@@ -110,7 +115,8 @@ public class TestHelper {
         return this;
     }
 
-    public TestHelper setupSimpleAccount(String username, String password) {
+
+    public TestHelper setupSimpleAccount (String username, String password) {
         KustvaktBaseDaoInterface dao = getBean(ContextHolder.KUSTVAKT_USERDB);
 
         if (dao.size() == 0) {
@@ -118,11 +124,12 @@ public class TestHelper {
             m.put(Attributes.USERNAME, username);
 
             try {
-                String hash = ((EncryptionIface) getBean(
-                        ContextHolder.KUSTVAKT_ENCRYPTION))
+                String hash = ((EncryptionIface) getBean(ContextHolder.KUSTVAKT_ENCRYPTION))
                         .produceSecureHash(password);
                 m.put(Attributes.PASSWORD, hash);
-            }catch (NoSuchAlgorithmException | UnsupportedEncodingException | KustvaktException e) {
+            }
+            catch (NoSuchAlgorithmException | UnsupportedEncodingException
+                    | KustvaktException e) {
                 // do nohting
                 assertNotNull("Exception thrown", null);
             }
@@ -134,7 +141,8 @@ public class TestHelper {
                 assert BeansFactory.getKustvaktContext().getUserDBHandler()
                         .getAccount(credentials[0]) != null;
                 assert i == 1;
-            }catch (KustvaktException e) {
+            }
+            catch (KustvaktException e) {
                 // do nothing
                 Assert.assertNull("Test user could not be set up", true);
             }
@@ -142,20 +150,22 @@ public class TestHelper {
         return this;
     }
 
-    public User getUser() {
+
+    public User getUser () {
         try {
             return ((EntityHandlerIface) getBean(ContextHolder.KUSTVAKT_USERDB))
                     .getAccount(credentials[0]);
-        }catch (KustvaktException e) {
+        }
+        catch (KustvaktException e) {
             // do nothing
         }
         throw new RuntimeException("User could not be retrieved!");
     }
 
-    public TestHelper dropUser(String... usernames) throws KustvaktException {
+
+    public TestHelper dropUser (String ... usernames) throws KustvaktException {
         if (usernames == null || usernames.length == 0) {
-            KustvaktBaseDaoInterface dao = getBean(
-                    ContextHolder.KUSTVAKT_USERDB);
+            KustvaktBaseDaoInterface dao = getBean(ContextHolder.KUSTVAKT_USERDB);
             dao.truncate();
         }
         for (String name : Arrays.asList(usernames)) {
@@ -165,14 +175,16 @@ public class TestHelper {
         return this;
     }
 
-    private boolean remove(String username) throws KustvaktException {
+
+    private boolean remove (String username) throws KustvaktException {
         EntityHandlerIface dao = getBean(ContextHolder.KUSTVAKT_USERDB);
         User us = dao.getAccount(username);
         dao.deleteAccount(us.getId());
         return true;
     }
 
-    public TestHelper truncateAll() {
+
+    public TestHelper truncateAll () {
         String sql = "SELECT Concat('TRUNCATE TABLE ', TABLE_NAME) FROM INFORMATION_SCHEMA.TABLES";
         final Set<String> queries = new HashSet<>();
         PersistenceClient cl = getBean(ContextHolder.KUSTVAKT_POLICIES);
@@ -181,7 +193,7 @@ public class TestHelper {
 
         source.query(sql, new RowCallbackHandler() {
             @Override
-            public void processRow(ResultSet rs) throws SQLException {
+            public void processRow (ResultSet rs) throws SQLException {
                 queries.add(rs.getString(1));
 
             }
@@ -192,11 +204,13 @@ public class TestHelper {
         return this;
     }
 
-    public static final String[] getUserCredentials() {
+
+    public static final String[] getUserCredentials () {
         return Arrays.copyOf(credentials, 2);
     }
 
-    public TestHelper runBootInterfaces() {
+
+    public TestHelper runBootInterfaces () {
         Set<Class<? extends BootableBeanInterface>> set = KustvaktClassLoader
                 .loadSubTypes(BootableBeanInterface.class);
 
@@ -206,18 +220,17 @@ public class TestHelper {
             try {
                 iface = (BootableBeanInterface) cl.newInstance();
                 list.add(iface);
-            }catch (InstantiationException | IllegalAccessException e) {
+            }
+            catch (InstantiationException | IllegalAccessException e) {
                 // do nothing
             }
         }
         System.out.println("Found boot loading interfaces: " + list);
         while (!set.isEmpty()) {
-            out_loop:
-            for (BootableBeanInterface iface : new ArrayList<>(list)) {
+            out_loop: for (BootableBeanInterface iface : new ArrayList<>(list)) {
                 try {
-                    System.out.println(
-                            "Running boot instructions from class " + iface
-                                    .getClass().getSimpleName());
+                    System.out.println("Running boot instructions from class "
+                            + iface.getClass().getSimpleName());
                     for (Class cl : iface.getDependencies()) {
                         if (set.contains(cl))
                             continue out_loop;
@@ -225,11 +238,11 @@ public class TestHelper {
                     set.remove(iface.getClass());
                     list.remove(iface);
                     iface.load(beansHolder);
-                }catch (KustvaktException e) {
+                }
+                catch (KustvaktException e) {
                     // don't do anything!
-                    System.out.println(
-                            "An error occurred in class " + iface.getClass()
-                                    .getSimpleName() + "!\n" + e);
+                    System.out.println("An error occurred in class "
+                            + iface.getClass().getSimpleName() + "!\n" + e);
                     throw new RuntimeException(
                             "Boot loading interface failed ...");
                 }
@@ -238,24 +251,27 @@ public class TestHelper {
         return this;
     }
 
-    public int setupResource(KustvaktResource resource)
+
+    public int setupResource (KustvaktResource resource)
             throws KustvaktException {
         ResourceDao dao = new ResourceDao(
                 (PersistenceClient) getBean(ContextHolder.KUSTVAKT_DB));
         return dao.storeResource(resource, getUser());
     }
 
-    public KustvaktResource getResource(String name) throws KustvaktException {
+
+    public KustvaktResource getResource (String name) throws KustvaktException {
         ResourceDao dao = new ResourceDao(
                 (PersistenceClient) getBean(ContextHolder.KUSTVAKT_DB));
         KustvaktResource res = dao.findbyId(name, getUser());
         if (res == null)
-            throw new RuntimeException(
-                    "resource with name " + name + " not found ...");
+            throw new RuntimeException("resource with name " + name
+                    + " not found ...");
         return res;
     }
 
-    public TestHelper dropResource(String... names) throws KustvaktException {
+
+    public TestHelper dropResource (String ... names) throws KustvaktException {
         ResourceDao dao = new ResourceDao(
                 (PersistenceClient) getBean(ContextHolder.KUSTVAKT_DB));
         if (names == null || names.length == 0)
@@ -265,15 +281,18 @@ public class TestHelper {
         return this;
     }
 
-    public void close() {
+
+    public void close () {
         BeansFactory.closeApplication();
     }
 
-    private TestHelper() {
+
+    private TestHelper () {
 
     }
 
-    private static PersistenceClient mysql_db() throws IOException {
+
+    private static PersistenceClient mysql_db () throws IOException {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
         dataSource.setUrl("jdbc:mysql://localhost:3306/kustvakt_test");
@@ -290,7 +309,8 @@ public class TestHelper {
         return client;
     }
 
-    private static PersistenceClient sqlite_db(Class testclass, boolean memory)
+
+    private static PersistenceClient sqlite_db (Class testclass, boolean memory)
             throws InterruptedException {
         SingleConnectionDataSource dataSource = new SingleConnectionDataSource();
         dataSource.setDriverClassName("org.sqlite.JDBC");
@@ -303,8 +323,8 @@ public class TestHelper {
             File tmp = new File("tmp");
             if (!tmp.exists())
                 tmp.mkdirs();
-            dataSource.setUrl("jdbc:sqlite:tmp/sqlite_" + name +
-                    t.getMillis() + ".sqlite");
+            dataSource.setUrl("jdbc:sqlite:tmp/sqlite_" + name + t.getMillis()
+                    + ".sqlite");
         }
         dataSource.setSuppressClose(true);
 
@@ -318,7 +338,8 @@ public class TestHelper {
         return client;
     }
 
-    public static PersistenceClient sqlite_db_norm(boolean memory) {
+
+    public static PersistenceClient sqlite_db_norm (boolean memory) {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("org.sqlite.JDBC");
         dataSource.setMaxTotal(1);
@@ -345,7 +366,8 @@ public class TestHelper {
         return client;
     }
 
-    public static PersistenceClient h2_emb() throws SQLException {
+
+    public static PersistenceClient h2_emb () throws SQLException {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setUrl("jdbc:h2:mem:");
         dataSource.getConnection().nativeSQL("SET MODE MySQL;");
@@ -365,26 +387,29 @@ public class TestHelper {
 
     public static class AppTestConfig extends TestBeans {
 
-        public AppTestConfig() throws InterruptedException, IOException {
+        public AppTestConfig () throws InterruptedException, IOException {
             this.dataSource = TestHelper.sqlite_db(TestHelper.clazz, false);
             //this.dataSource = TestHelper.mysql_db();
         }
 
+
         @Bean(name = ContextHolder.KUSTVAKT_POLICIES)
         @Override
-        public PolicyHandlerIface getPolicyDao() {
+        public PolicyHandlerIface getPolicyDao () {
             return new PolicyDao(this.dataSource);
         }
 
+
         @Bean(name = ContextHolder.KUSTVAKT_USERDB)
         @Override
-        public EntityHandlerIface getUserDao() {
+        public EntityHandlerIface getUserDao () {
             return new EntityDao(this.dataSource);
         }
 
+
         @Bean(name = ContextHolder.KUSTVAKT_CONFIG)
         @Override
-        public KustvaktConfiguration getConfig() {
+        public KustvaktConfiguration getConfig () {
             KustvaktConfiguration c = new KustvaktConfiguration();
             InputStream s = TestHelper.class.getClassLoader()
                     .getResourceAsStream("kustvakt.conf");
@@ -397,39 +422,44 @@ public class TestHelper {
             return c;
         }
 
+
         @Bean(name = ContextHolder.KUSTVAKT_AUDITING)
         @Override
-        public AuditingIface getAuditingDao() {
+        public AuditingIface getAuditingDao () {
             return new JDBCAuditing(this.dataSource);
         }
 
+
         @Bean(name = ContextHolder.KUSTVAKT_RESOURCES)
         @Override
-        public List<ResourceOperationIface> getResourceDaos() {
+        public List<ResourceOperationIface> getResourceDaos () {
             List<ResourceOperationIface> res = new ArrayList<>();
             res.add(new ResourceDao(getDataSource()));
             res.add(new DocumentDao(getDataSource()));
             return res;
         }
 
+
         @Bean(name = ContextHolder.KUSTVAKT_USERDATA)
         @Override
-        public List<UserDataDbIface> getUserdataDaos() {
+        public List<UserDataDbIface> getUserdataDaos () {
             List<UserDataDbIface> ud = new ArrayList<>();
             ud.add(new UserSettingsDao(getDataSource()));
             ud.add(new UserDetailsDao(getDataSource()));
             return ud;
         }
 
+
         @Bean(name = ContextHolder.KUSTVAKT_ENCRYPTION)
         @Override
-        public EncryptionIface getCrypto() {
+        public EncryptionIface getCrypto () {
             return new KustvaktEncryption(getConfig());
         }
 
+
         @Bean(name = ContextHolder.KUSTVAKT_AUTHENTICATION_MANAGER)
         @Override
-        public AuthenticationManagerIface getAuthManager() {
+        public AuthenticationManagerIface getAuthManager () {
             AuthenticationManagerIface manager = new KustvaktAuthenticationManager(
                     getUserDao(), getCrypto(), getConfig(), getAuditingDao(),
                     getUserdataDaos());

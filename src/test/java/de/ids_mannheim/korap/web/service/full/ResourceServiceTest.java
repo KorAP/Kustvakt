@@ -23,17 +23,19 @@ import static org.junit.Assert.assertNotNull;
 public class ResourceServiceTest extends FastJerseyTest {
 
     @BeforeClass
-    public static void configure() throws Exception {
+    public static void configure () throws Exception {
         FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.full",
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");
     }
 
+
     @Test
-    @Ignore
-    public void testSearchSimple() {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("search").queryParam("q", "[orth=das]")
+    public void testSearchSimple () {
+        ClientResponse response = resource()
+                .path(getAPIVersion())
+                .path("search")
+                .queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp")
                 //                .queryParam("cq", "corpusID=GOE")
                 .header(Attributes.AUTHORIZATION,
@@ -43,15 +45,17 @@ public class ResourceServiceTest extends FastJerseyTest {
                 response.getStatus());
 
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
-        Assert.assertNotNull(node);
+        assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
     }
 
+
     @Test
-    @Ignore
-    public void testCollectionGet() {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("collection").header(Attributes.AUTHORIZATION,
+    public void testCollectionGet () {
+        ClientResponse response = resource()
+                .path(getAPIVersion())
+                .path("collection")
+                .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -61,49 +65,58 @@ public class ResourceServiceTest extends FastJerseyTest {
         assertNotEquals(0, node.size());
     }
 
+
     @Test
-    @Ignore
-    public void testStats() {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("collection").header(Attributes.AUTHORIZATION,
+    public void testStats () {
+        ClientResponse response = resource()
+                .path(getAPIVersion())
+                .path("collection")
+                .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
-        Assert.assertNotNull(node);
+        assertNotNull(node);
+        assertNotEquals(0, node.size());
 
-        System.out.println("-------------------------------");
-        System.out.println("NODE COLLECTIONS" + node);
         String id = node.path(0).path("id").asText();
 
-        System.out.println("ID IS " + id);
-        System.out.println("FROM NODE " + node);
-        response = resource().path(getAPIVersion()).path("collection").path(id)
-                .path("stats").header(Attributes.AUTHORIZATION,
+        response = resource()
+                .path(getAPIVersion())
+                .path("collection")
+                .path(id)
+                .path("stats")
+                .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         node = JsonUtils.readTree(response.getEntity(String.class));
-        Assert.assertNotNull(node);
+        assertNotNull(node);
         int docs = node.path("documents").asInt();
-        System.out.println("-------------------------------");
-        System.out.println("NODE " + node);
         assertNotEquals(0, docs);
         Assert.assertTrue(docs < 15);
     }
 
+
     @Test
-    public void testResourceStore() {
+    public void testResourceStore () {
 
     }
 
+
+    @Test
+    public void testResourceDelete () {
+
+    }
+
+
     @Test
     @Ignore
-    public void testSerializationQueryInCollection() {
+    public void testSerializationQueryInCollection () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus/WPD/search").queryParam("q", "[base=Haus]")
                 .queryParam("ql", "poliqarp").queryParam("context", "base/s:s")
@@ -113,8 +126,9 @@ public class ResourceServiceTest extends FastJerseyTest {
         System.out.println("Entity 1 " + ent);
     }
 
+
     @Test
-    public void testSerializationQueryPublic() {
+    public void testSerializationQueryPublic () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("search").queryParam("q", "[base=Haus]")
                 .queryParam("ql", "poliqarp").queryParam("context", "sentence")
@@ -125,8 +139,9 @@ public class ResourceServiceTest extends FastJerseyTest {
         System.out.println(node);
     }
 
+
     @Test
-    public void testQuery() {
+    public void testQuery () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("search").queryParam("q", "[base=Haus]")
                 .queryParam("ql", "poliqarp").queryParam("context", "sentence")
@@ -138,24 +153,33 @@ public class ResourceServiceTest extends FastJerseyTest {
         assertNotEquals("${project.version}", "/meta/version");
     }
 
+
     @Test
     @Ignore
-    public void testSerializationMeta() {
+    public void testSerializationMeta () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("search").queryParam("context", "sentence")
                 .queryParam("q", "[pos=ADJA]").queryParam("ql", "poliqarp")
                 .get(ClientResponse.class);
     }
 
+
     @Test
     @Ignore
-    public void testSerializationCollection() {
+    public void testSerializationCollection () {
         ClientResponse response = resource().path(getAPIVersion()).path("")
                 .get(ClientResponse.class);
     }
 
+
+    @Test
+    public void testMatchInfo () {
+
+    }
+
+
     @Override
-    public void initMethod() throws KustvaktException {
+    public void initMethod () throws KustvaktException {
         helper().runBootInterfaces();
     }
 }

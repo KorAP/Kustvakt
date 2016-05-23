@@ -12,15 +12,14 @@ import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 public class UserLoader implements BootableBeanInterface {
 
     @Override
-    public void load(ContextHolder beans) throws KustvaktException {
-        AuthenticationManagerIface manager = beans
-                .getAuthenticationManager();
-        manager.createUserAccount(KustvaktConfiguration.KUSTVAKT_USER,
-                false);
+    public void load (ContextHolder beans) throws KustvaktException {
+        AuthenticationManagerIface manager = beans.getAuthenticationManager();
+        manager.createUserAccount(KustvaktConfiguration.KUSTVAKT_USER, false);
     }
 
+
     @Override
-    public Class<? extends BootableBeanInterface>[] getDependencies() {
+    public Class<? extends BootableBeanInterface>[] getDependencies () {
         return new Class[0];
     }
 }

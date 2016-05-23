@@ -32,14 +32,16 @@ public class FoundryRewriteTest extends BeanConfigTest {
 
     private static KustvaktConfiguration config;
 
+
     @Override
-    public void initMethod() throws KustvaktException {
+    public void initMethod () throws KustvaktException {
         config = helper().getContext().getConfiguration();
         helper().setupAccount();
     }
 
+
     @Test
-    public void testDefaultLayerMapperThrowsNoException() {
+    public void testDefaultLayerMapperThrowsNoException () {
         LayerMapper m = new LayerMapper(config);
 
         assertEquals(config.getDefault_lemma(), m.findFoundry("lemma"));
@@ -49,11 +51,12 @@ public class FoundryRewriteTest extends BeanConfigTest {
         assertEquals(config.getDefault_const(), m.findFoundry("c"));
     }
 
-    @Test
-    public void testDefaultFoundryInjectLemmaThrowsNoError() {
 
-        KustvaktConfiguration c = helper()
-                .getBean(ContextHolder.KUSTVAKT_CONFIG);
+    @Test
+    public void testDefaultFoundryInjectLemmaThrowsNoError () {
+
+        KustvaktConfiguration c = helper().getBean(
+                ContextHolder.KUSTVAKT_CONFIG);
 
         RewriteHandler processor = new RewriteHandler();
         processor.insertBeans(helper().getContext());
@@ -65,19 +68,20 @@ public class FoundryRewriteTest extends BeanConfigTest {
 
         assertNotNull(node);
         assertFalse(node.at("/query/wrap/foundry").isMissingNode());
-        assertEquals(c.getDefault_lemma(),
-                node.at("/query/wrap/foundry").asText());
+        assertEquals(c.getDefault_lemma(), node.at("/query/wrap/foundry")
+                .asText());
         assertEquals("lemma", node.at("/query/wrap/layer").asText());
         assertFalse(node.at("/query/wrap/rewrites").isMissingNode());
-        assertEquals("koral:rewrite",
-                node.at("/query/wrap/rewrites/0/@type").asText());
+        assertEquals("koral:rewrite", node.at("/query/wrap/rewrites/0/@type")
+                .asText());
     }
 
-    @Test
-    public void testDefaultFoundryInjectPOSNoErrors() {
 
-        KustvaktConfiguration c = helper()
-                .getBean(ContextHolder.KUSTVAKT_CONFIG);
+    @Test
+    public void testDefaultFoundryInjectPOSNoErrors () {
+
+        KustvaktConfiguration c = helper().getBean(
+                ContextHolder.KUSTVAKT_CONFIG);
 
         QuerySerializer s = new QuerySerializer();
         RewriteHandler handler = new RewriteHandler();
@@ -89,17 +93,18 @@ public class FoundryRewriteTest extends BeanConfigTest {
 
         assertNotNull(node);
         assertFalse(node.at("/query/wrap/foundry").isMissingNode());
-        assertEquals(c.getDefault_pos(),
-                node.at("/query/wrap/foundry").asText());
+        assertEquals(c.getDefault_pos(), node.at("/query/wrap/foundry")
+                .asText());
         assertEquals("pos", node.at("/query/wrap/layer").asText());
         assertFalse(node.at("/query/wrap/rewrites").isMissingNode());
-        assertEquals("koral:rewrite",
-                node.at("/query/wrap/rewrites/0/@type").asText());
+        assertEquals("koral:rewrite", node.at("/query/wrap/rewrites/0/@type")
+                .asText());
 
     }
 
+
     @Test
-    public void testRewriteFoundryInjectPOSThrowsNoError()
+    public void testRewriteFoundryInjectPOSThrowsNoError ()
             throws KustvaktException {
         User user = helper().getUser();
 
@@ -111,9 +116,8 @@ public class FoundryRewriteTest extends BeanConfigTest {
         String result = handler.preProcess(s.toJSON(), user);
         JsonNode node = JsonUtils.readTree(result);
 
-        UserDataDbIface dao = BeansFactory.getTypeFactory()
-                .getTypedBean(helper().getContext().getUserDataDaos(),
-                        UserSettings.class);
+        UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
+                helper().getContext().getUserDataDaos(), UserSettings.class);
         UserSettings settings = (UserSettings) dao.get(user);
         assertTrue(settings.isValid());
         String pos = (String) settings.get(Attributes.DEFAULT_POS_FOUNDRY);
@@ -122,15 +126,16 @@ public class FoundryRewriteTest extends BeanConfigTest {
         assertEquals("pos", node.at("/query/wrap/layer").asText());
         assertEquals(pos, node.at("/query/wrap/foundry").asText());
         assertFalse(node.at("/query/wrap/rewrites").isMissingNode());
-        assertEquals("koral:rewrite",
-                node.at("/query/wrap/rewrites/0/@type").asText());
+        assertEquals("koral:rewrite", node.at("/query/wrap/rewrites/0/@type")
+                .asText());
     }
 
+
     @Test
-    public void testRewriteFoundryInjectLemmaThrowsNoError()
+    public void testRewriteFoundryInjectLemmaThrowsNoError ()
             throws KustvaktException {
-        KustvaktConfiguration c = helper()
-                .getBean(ContextHolder.KUSTVAKT_CONFIG);
+        KustvaktConfiguration c = helper().getBean(
+                ContextHolder.KUSTVAKT_CONFIG);
         User user = helper().getUser();
 
         RewriteHandler handler = new RewriteHandler();
@@ -141,9 +146,8 @@ public class FoundryRewriteTest extends BeanConfigTest {
         String result = handler.preProcess(s.toJSON(), user);
         JsonNode node = JsonUtils.readTree(result);
 
-        UserDataDbIface dao = BeansFactory.getTypeFactory()
-                .getTypedBean(helper().getContext().getUserDataDaos(),
-                        UserSettings.class);
+        UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
+                helper().getContext().getUserDataDaos(), UserSettings.class);
         UserSettings settings = (UserSettings) dao.get(user);
         assertTrue(settings.isValid());
         String lemma = (String) settings.get(Attributes.DEFAULT_LEMMA_FOUNDRY);
@@ -152,14 +156,15 @@ public class FoundryRewriteTest extends BeanConfigTest {
         assertEquals("lemma", node.at("/query/wrap/layer").asText());
         assertEquals(lemma, node.at("/query/wrap/foundry").asText());
         assertFalse(node.at("/query/wrap/rewrites").isMissingNode());
-        assertEquals("koral:rewrite",
-                node.at("/query/wrap/rewrites/0/@type").asText());
+        assertEquals("koral:rewrite", node.at("/query/wrap/rewrites/0/@type")
+                .asText());
     }
 
+
     @Test
-    public void testFoundryInjectJoinedQueryNoErrors() {
-        KustvaktConfiguration c = helper()
-                .getBean(ContextHolder.KUSTVAKT_CONFIG);
+    public void testFoundryInjectJoinedQueryNoErrors () {
+        KustvaktConfiguration c = helper().getBean(
+                ContextHolder.KUSTVAKT_CONFIG);
 
         QuerySerializer s = new QuerySerializer();
         RewriteHandler handler = new RewriteHandler();
@@ -177,8 +182,9 @@ public class FoundryRewriteTest extends BeanConfigTest {
         assertFalse(node.at("/query/wrap/operands/1/rewrites").isMissingNode());
     }
 
+
     @Test
-    public void testFoundryInjectGroupedQueryNoErrors() {
+    public void testFoundryInjectGroupedQueryNoErrors () {
         QuerySerializer s = new QuerySerializer();
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
