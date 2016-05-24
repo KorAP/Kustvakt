@@ -7,7 +7,7 @@ import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.ResourceFactory;
-import de.ids_mannheim.korap.user.Attributes;
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.SqlBuilder;
 import org.slf4j.Logger;

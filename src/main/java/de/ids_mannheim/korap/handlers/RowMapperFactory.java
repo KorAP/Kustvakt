@@ -4,7 +4,7 @@ import de.ids_mannheim.korap.auditing.AuditRecord;
 import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.ResourceFactory;
-import de.ids_mannheim.korap.user.Attributes;
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.ShibUser;
 import de.ids_mannheim.korap.user.User;

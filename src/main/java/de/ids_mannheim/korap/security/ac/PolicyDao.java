@@ -10,7 +10,7 @@ import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.security.Parameter;
 import de.ids_mannheim.korap.security.PolicyCondition;
 import de.ids_mannheim.korap.security.SecurityPolicy;
-import de.ids_mannheim.korap.user.Attributes;
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.BooleanUtils;
 import de.ids_mannheim.korap.utils.StringUtils;

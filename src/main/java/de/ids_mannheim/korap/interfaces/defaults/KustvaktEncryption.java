@@ -4,7 +4,7 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.user.Attributes;
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.web.utils.KustvaktMap;
 import edu.emory.mathcs.backport.java.util.Collections;

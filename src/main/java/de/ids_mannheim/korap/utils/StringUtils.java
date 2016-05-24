@@ -136,35 +136,4 @@ public class StringUtils {
         return StringEscapeUtils.unescapeHtml(value);
     }
 
-
-    /**
-     * constructs a lucene query from query string and corpus
-     * parameters as set
-     * 
-     * @param query
-     * @param corpusIDs
-     * @return
-     */
-    public static String queryBuilder (String query,
-            Collection<String> corpusIDs) {
-        String completeQuery; // holds original query and corpus
-        // selection
-        /**
-         * find documents with metadataquery TODO: does not intercept
-         * with
-         * parameters foundries and corpusIDs
-         */
-
-        /* add corpus ids to corpus query */
-        StringBuilder corpusQuery = new StringBuilder("corpus:/(");
-        for (String corpusId : corpusIDs) {
-            corpusQuery.append(corpusId + "|");
-        }
-        corpusQuery.deleteCharAt(corpusQuery.length() - 1);
-        corpusQuery.append(")/");
-        completeQuery = "(" + query + ") AND " + corpusQuery.toString();
-        jlog.debug("Searching documents matching '" + completeQuery + "'.");
-        return completeQuery;
-    }
-
 }

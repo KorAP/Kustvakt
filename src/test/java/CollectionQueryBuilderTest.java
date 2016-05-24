@@ -1,11 +1,11 @@
 import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
-import de.ids_mannheim.korap.utils.CollectionQueryBuilder3;
+import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -16,28 +16,28 @@ public class CollectionQueryBuilderTest {
 
     @Test
     public void testsimpleAdd () {
-        CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
-        b.addQuery("corpusID=WPD");
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        b.with("corpusSigle=WPD");
 
         JsonNode node = JsonUtils.readTree(b.toJSON());
 
         assertNotNull(node);
         assertEquals("koral:doc", node.at("/collection/@type").asText());
-        assertEquals("corpusID", node.at("/collection/key").asText());
+        assertEquals("corpusSigle", node.at("/collection/key").asText());
     }
 
 
     @Test
     public void testSimpleConjunction () {
-        CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
-        b.addQuery("corpusID=WPD & textClass=freizeit");
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        b.with("corpusSigle=WPD & textClass=freizeit");
         JsonNode node = JsonUtils.readTree(b.toJSON());
 
         assertNotNull(node);
         assertEquals("koral:docGroup", node.at("/collection/@type").asText());
         assertEquals("operation:and", node.at("/collection/operation").asText());
 
-        assertEquals("corpusID", node.at("/collection/operands/0/key").asText());
+        assertEquals("corpusSigle", node.at("/collection/operands/0/key").asText());
         assertEquals("textClass", node.at("/collection/operands/1/key")
                 .asText());
     }
@@ -45,17 +45,14 @@ public class CollectionQueryBuilderTest {
 
     @Test
     public void testSimpleDisjunction () {
-        CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
-        b.addQuery("corpusID=WPD | textClass=freizeit");
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        b.with("corpusSigle=WPD | textClass=freizeit");
         JsonNode node = JsonUtils.readTree(b.toJSON());
 
-        System.out.println("_____________________________________________");
-        System.out.println(node);
-
-        assert node != null;
+        assertNotNull(node);
         assert node.at("/collection/operation").asText().equals("operation:or");
         assert node.at("/collection/operands/0/key").asText()
-                .equals("corpusID");
+                .equals("corpusSigle");
         assert node.at("/collection/operands/1/key").asText()
                 .equals("textClass");
     }
@@ -63,17 +60,14 @@ public class CollectionQueryBuilderTest {
 
     @Test
     public void testComplexSubQuery () {
-        CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
-        b.addQuery("(corpusID=WPD) | (textClass=freizeit & corpusID=WPD)");
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        b.with("(corpusSigle=WPD) | (textClass=freizeit & corpusSigle=BRZ13)");
         JsonNode node = JsonUtils.readTree(b.toJSON());
 
-        System.out
-                .println("_____________________________________________ COMPLEX");
-        System.out.println(node);
-        assert node != null;
+        assertNotNull(node);
         assert node.at("/collection/operation").asText().equals("operation:or");
         assert node.at("/collection/operands/0/key").asText()
-                .equals("corpusID");
+                .equals("corpusSigle");
         assert node.at("/collection/operands/1/@type").asText()
                 .equals("koral:docGroup");
 
@@ -82,60 +76,128 @@ public class CollectionQueryBuilderTest {
 
     @Test
     public void testAddResourceQueryAfter () {
-        CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
-        b.addQuery("(corpusID=ADF) | (textClass=freizeit & corpusID=WPD)");
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        b.with("(textClass=politik & title=\"random title\") | textClass=wissenschaft");
 
-        CollectionQueryBuilder3 c = new CollectionQueryBuilder3();
+        KoralCollectionQueryBuilder c = new KoralCollectionQueryBuilder();
         c.setBaseQuery(b.toJSON());
-        c.addQuery("textClass=wissenschaft");
+        c.with("corpusSigle=WPD");
 
         JsonNode node = JsonUtils.readTree(c.toJSON());
 
-        assert node != null;
-        assert node.at("/collection/operands/2/@type").asText()
-                .equals("koral:doc");
-        assert node.at("/collection/operands/2/value").asText()
-                .equals("wissenschaft");
+        assertNotNull(node);
+        assertEquals("koral:doc", node.at("/collection/operands/0/@type")
+                .asText());
+        assertEquals("WPD", node.at("/collection/operands/0/value").asText());
+        assertEquals(2, node.at("/collection/operands").size());
     }
 
 
     @Test
     public void testAddComplexResourceQueryAfter () {
-        CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
-        b.addQuery("(corpusID=ADF) | (textClass=freizeit & corpusID=WPD)");
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        b.with("(title=\"random title\") | (textClass=wissenschaft)");
 
-        CollectionQueryBuilder3 c = new CollectionQueryBuilder3();
+        KoralCollectionQueryBuilder c = new KoralCollectionQueryBuilder();
         c.setBaseQuery(b.toJSON());
-        c.addQuery("(textClass=politik & corpusID=AZPS)");
+        c.with("(corpusSigle=BRZ13 | corpusSigle=AZPS)");
 
         JsonNode node = JsonUtils.readTree(c.toJSON());
-
-        assert node != null;
-        assert node.at("/collection/operands/2/@type").asText()
-                .equals("koral:docGroup");
-        assert node.at("/collection/operands/2/operands/0/value").asText()
-                .equals("politik");
-        assert node.at("/collection/operands/2/operands/1/value").asText()
-                .equals("AZPS");
-
+        assertNotNull(node);
+        assertEquals("koral:docGroup", node.at("/collection/operands/0/@type")
+                .asText());
+        assertEquals("koral:docGroup", node.at("/collection/operands/1/@type")
+                .asText());
+        assertEquals("BRZ13", node
+                .at("/collection/operands/0/operands/0/value").asText());
+        assertEquals("AZPS", node.at("/collection/operands/0/operands/1/value")
+                .asText());
+        assertEquals("random title",
+                node.at("/collection/operands/1/operands/0/value").asText());
+        assertEquals("wissenschaft",
+                node.at("/collection/operands/1/operands/1/value").asText());
     }
 
 
     @Test
-    public void buildQuery () {
+    public void testBuildQuery () {
+        String coll = "corpusSigle=WPD";
         String query = "[base=Haus]";
-        QuerySerializer s = new QuerySerializer();
-        s.setQuery(query, "poliqarp");
-        CollectionQueryBuilder3 b = new CollectionQueryBuilder3();
-        b.addQuery("corpusID=WPD");
-        s.setCollection("corpusID=WPD");
+        QuerySerializer check = new QuerySerializer();
+        check.setQuery(query, "poliqarp");
+        check.setCollection(coll);
 
-        System.out.println("QUERY " + s.toJSON());
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        b.setBaseQuery(check.toJSON());
+        b.with("textClass=freizeit");
+
+        JsonNode res = (JsonNode) b.rebaseCollection();
+        assertNotNull(res);
+        assertEquals("koral:docGroup", res.at("/collection/@type").asText());
+        assertEquals("operation:and", res.at("/collection/operation").asText());
+        assertEquals("koral:doc", res.at("/collection/operands/0/@type")
+                .asText());
+        assertEquals("freizeit", res.at("/collection/operands/0/value")
+                .asText());
+        assertEquals("textClass", res.at("/collection/operands/0/key").asText());
+
+        assertEquals("koral:doc", res.at("/collection/operands/1/@type")
+                .asText());
+        assertEquals("WPD", res.at("/collection/operands/1/value").asText());
+        assertEquals("corpusSigle", res.at("/collection/operands/1/key").asText());
+
+        // check also that query is still there
+        assertEquals("koral:token", res.at("/query/@type").asText());
+        assertEquals("koral:term", res.at("/query/wrap/@type").asText());
+        assertEquals("Haus", res.at("/query/wrap/key").asText());
+        assertEquals("lemma", res.at("/query/wrap/layer").asText());
     }
 
 
     @Test
     public void testBaseQueryBuild () {
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        b.with("(corpusSigle=ADF) | (textClass=freizeit & corpusSigle=WPD)");
+
+        KoralCollectionQueryBuilder c = new KoralCollectionQueryBuilder();
+        c.setBaseQuery(b.toJSON());
+
+        c.with("corpusSigle=BRZ13");
+        JsonNode base = (JsonNode) c.rebaseCollection();
+        assertNotNull(base);
+        assertEquals(base.at("/collection/@type").asText(), "koral:docGroup");
+        assertEquals(base.at("/collection/operands/0/@type").asText(),
+                "koral:doc");
+        assertEquals(base.at("/collection/operands/0/value").asText(), "BRZ13");
+        assertEquals(base.at("/collection/operands/1/@type").asText(),
+                "koral:docGroup");
+        assertEquals(base.at("/collection/operands/1/operands").size(), 2);
+    }
+
+    @Test
+    public void testNodeMergeWithBase() {
+        String coll = "corpusSigle=WPD";
+        String query = "[base=Haus]";
+        QuerySerializer check = new QuerySerializer();
+        check.setQuery(query, "poliqarp");
+        check.setCollection(coll);
+
+        KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
+        b.setBaseQuery(check.toJSON());
+
+        KoralCollectionQueryBuilder test = new KoralCollectionQueryBuilder();
+        test.with("textClass=wissenschaft | textClass=politik");
+        JsonNode node = (JsonNode) test.rebaseCollection();
+        node = b.mergeWith(node);
+        assertNotNull(node);
+        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
+        assertEquals("operation:and", node.at("/collection/operation").asText());
+        assertEquals(2, node.at("/collection/operands").size());
+    }
+
+
+    @Test
+    public void testStoredCollectionBaseQueryBuild () {
 
     }
 

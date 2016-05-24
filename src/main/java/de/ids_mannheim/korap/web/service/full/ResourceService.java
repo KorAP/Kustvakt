@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.web.service.full;//package de.ids_mannheim.korap.e
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.spi.container.ResourceFilters;
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
@@ -92,6 +93,8 @@ public class ResourceService {
         Class cl_type = ResourceFactory.getResourceClass(type);
         if (cl_type == null) {
             //todo return bad request response
+            throw KustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID,
+                    "Resource type not available!", "");
         }
 
         try {
@@ -105,25 +108,8 @@ public class ResourceService {
         }
 
         Set values = new HashSet();
-        for (KustvaktResource resource : resources) {
-            // fixme: remove -- to costly
-            //            if (cl_type.equals(VirtualCollection.class)) {
-            //                VirtualCollection c = (VirtualCollection) resource;
-            //                CollectionQueryBuilder3 query = new CollectionQueryBuilder3();
-            //                query.setBaseQuery(c.getQuery());
-            //                String stats = searchKrill.getStatistics(query.toJSON());
-            //
-            //                c.setStats(JsonUtils.readSimple(stats, Map.class));
-            //
-            //            }else if (cl_type.equals(Corpus.class)) {
-            //                Corpus c = (Corpus) resource;
-            //                CollectionQueryBuilder3 query = new CollectionQueryBuilder3();
-            //                query.addQuery("corpusID=" + c.getPersistentID());
-            //                String stats = searchKrill.getStatistics(query.toJSON());
-            //                c.setStats(JsonUtils.readSimple(stats, Map.class));
-            //            }
+        for (KustvaktResource resource : resources)
             values.add(resource.toMap());
-        }
         return Response.ok(JsonUtils.toJSON(values)).build();
     }
 
@@ -166,16 +152,6 @@ public class ResourceService {
         catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
-        CollectionQueryBuilder3 query = new CollectionQueryBuilder3();
-        if (cl_type.equals(VirtualCollection.class)) {
-            VirtualCollection c = (VirtualCollection) resource;
-            query.setBaseQuery((String) c.getData());
-        }
-        else if (cl_type.equals(Corpus.class)) {
-            Corpus c = (Corpus) resource;
-            query.addQuery("corpusID=" + c.getPersistentID());
-        }
-
         return Response.ok(JsonUtils.toJSON(resource.toMap())).build();
     }
 
@@ -191,7 +167,7 @@ public class ResourceService {
     //            @QueryParam("paths") Boolean wPaths) {
     //        TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
     //        ColloQuery.ColloQueryBuilder builder;
-    //        CollectionQueryBuilder3 cquery = new CollectionQueryBuilder3();
+    //        KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
     //        String result;
     //        try {
     //            User user = controller.getUser(tokenContext.getUsername());
@@ -238,7 +214,7 @@ public class ResourceService {
     //        TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
     //        String result;
     //        try {
-    //            CollectionQueryBuilder3 cquery = new CollectionQueryBuilder3();
+    //            KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
     //            try {
     //                User user = controller.getUser(tokenContext.getUsername());
     //
@@ -312,30 +288,16 @@ public class ResourceService {
             @QueryParam("ref") String reference, @QueryParam("cq") String cq) {
         TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
         QuerySerializer ss;
-        CollectionQueryBuilder3 cquery = new CollectionQueryBuilder3();
-        if (cq != null)
-            cquery.setBaseQuery(cq);
 
         User user;
         try {
             user = controller.getUser(ctx.getUsername());
-            Set<Corpus> resources = new HashSet<>();
-
-            if (User.UserFactory.isDemo(ctx.getUsername()))
-                resources = ResourceFinder.searchPublic(Corpus.class);
-            else
-                resources = ResourceFinder.search(user, Corpus.class);
-            System.out.println("RESOURCES FOUND " + resources);
-
-            for (KustvaktResource corpus : resources)
-                cquery.addQuery("corpusID=" + corpus.getPersistentID());
         }
         catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
 
         ss = new QuerySerializer().setQuery(q, ql, v);
-        ss.setCollection(cquery.toJSON());
 
         MetaQueryBuilder meta = new MetaQueryBuilder();
         if (pageIndex != null)
@@ -369,7 +331,7 @@ public class ResourceService {
      * @return
      */
 
-    //todo: does cq have any sensable worth here?
+    //todo: does cq have any sensible worth here?
     @TRACE
     @Path("{type}/{id}/search")
     public Response buildQuery (@Context Locale locale,
@@ -385,36 +347,8 @@ public class ResourceService {
         TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
         type = StringUtils.normalize(type);
         id = StringUtils.decodeHTML(id);
-        QuerySerializer ss;
-        //fixme: not used anywhere!
-        CollectionQueryBuilder3 cquery = new CollectionQueryBuilder3();
-        if (cq != null)
-            cquery.setBaseQuery(cq);
 
-        try {
-            User user = controller.getUser(ctx.getUsername());
-
-            //todo: instead of throwing exception, build notification and rewrites into result query
-            KustvaktResource resource;
-            if (StringUtils.isInteger(id))
-                resource = this.resourceHandler.findbyIntId(
-                        Integer.valueOf(id), user);
-            else
-                resource = this.resourceHandler.findbyStrId(id, user,
-                        ResourceFactory.getResourceClass(type));
-
-            if (resource instanceof VirtualCollection)
-                cquery.addQuery((String) resource.getData());
-            else if (resource instanceof Corpus)
-                cquery.addQuery("corpusID=" + resource.getPersistentID());
-
-        }
-        catch (KustvaktException e) {
-            jlog.error("Exception encountered!", e);
-            //throw KustvaktResponseHandler.throwit(e);
-        }
-
-        ss = new QuerySerializer().setQuery(q, ql, v);
+        QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
 
         MetaQueryBuilder meta = new MetaQueryBuilder();
         if (pageIndex != null)
@@ -429,6 +363,35 @@ public class ResourceService {
             meta.addEntry("cutOff", cutoff);
 
         ss.setMeta(meta.raw());
+        if (cq != null)
+            ss.setCollection(cq);
+
+        KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
+        cquery.setBaseQuery(ss.toJSON());
+
+        try {
+            User user = controller.getUser(ctx.getUsername());
+
+            //todo: instead of throwing exception, build notification and rewrites into result query
+            KustvaktResource resource;
+            if (StringUtils.isInteger(id))
+                resource = this.resourceHandler.findbyIntId(
+                        Integer.valueOf(id), user);
+            else
+                resource = this.resourceHandler.findbyStrId(id, user,
+                        ResourceFactory.getResourceClass(type));
+
+            if (resource instanceof VirtualCollection)
+                cquery.with((String) resource.getData());
+            else if (resource instanceof Corpus)
+                cquery.with(Attributes.CORPUS_SIGLE + resource.getPersistentID());
+
+        }
+        catch (KustvaktException e) {
+            jlog.error("Exception encountered!", e);
+            //throw KustvaktResponseHandler.throwit(e);
+        }
+
 
         // todo: policy parsing before return
         return Response.ok(ss.toJSON()).build();
@@ -441,8 +404,6 @@ public class ResourceService {
             @Context Locale locale, @QueryParam("engine") String engine,
             String jsonld) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        //        KustvaktConfiguration.BACKENDS eng = KustvaktConfiguration
-        //                .chooseBackend(engine);
 
         // todo: should be possible to add the meta part to the query serialization
         try {
@@ -473,15 +434,12 @@ public class ResourceService {
             @QueryParam("cq") String cq, @QueryParam("engine") String engine) {
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
-        CollectionQueryBuilder3 cquery = new CollectionQueryBuilder3();
+        KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
         KustvaktConfiguration.BACKENDS eng = this.config.chooseBackend(engine);
         User user;
         // todo: not added to query!!
         try {
             user = controller.getUser(context.getUsername());
-            Set<Corpus> resources = ResourceFinder.search(user, Corpus.class);
-            for (KustvaktResource resource : resources)
-                cquery.addQuery("corpusID=" + resource.getPersistentID());
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
@@ -492,8 +450,9 @@ public class ResourceService {
         serializer.setQuery(q, ql, v);
 
         // todo: parse for security reasons
-        if (cq != null)
-            serializer.setCollection(cq);
+        // todo: remove cq parameter
+        // if (cq != null)
+        //    serializer.setCollection(cq);
 
         MetaQueryBuilder meta = new MetaQueryBuilder();
         meta.addEntry("startIndex", pageIndex);
@@ -576,7 +535,9 @@ public class ResourceService {
             if (!raw) {
                 QuerySerializer s = new QuerySerializer();
                 s.setQuery(query, ql, v);
-                CollectionQueryBuilder3 builder = new CollectionQueryBuilder3();
+
+                // fixme: be replaced by public collection rewrite
+                KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
 
                 KustvaktResource resource;
                 if (StringUtils.isInteger(id))
@@ -589,7 +550,7 @@ public class ResourceService {
                 if (resource instanceof VirtualCollection)
                     builder.setBaseQuery((String) resource.getData());
                 else if (resource instanceof Corpus)
-                    builder.addQuery("corpusID=" + resource.getPersistentID());
+                    builder.with(Attributes.CORPUS_SIGLE+ resource.getPersistentID());
                 else
                     throw KustvaktResponseHandler.throwit(
                             StatusCodes.ILLEGAL_ARGUMENT,
@@ -656,8 +617,8 @@ public class ResourceService {
     @Path("stats")
     public Response getStats (@Context SecurityContext context,
             @Context Locale locale, String json) {
-        CollectionQueryBuilder3 builder = new CollectionQueryBuilder3();
-        builder.addQuery(json);
+        KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
+        builder.with(json);
         String stats = searchKrill.getStatistics(builder.toJSON());
 
         if (stats.contains("-1"))
@@ -702,16 +663,19 @@ public class ResourceService {
                         ResourceFactory.getResourceClass(type));
 
             //todo ?!
-            CollectionQueryBuilder3 query = new CollectionQueryBuilder3();
+            KoralCollectionQueryBuilder query = new KoralCollectionQueryBuilder();
             if (resource instanceof VirtualCollection) {
                 query.setBaseQuery(resource.getData());
             }
             else if (resource instanceof Corpus) {
-                query.addQuery("corpusID=" + resource.getName());
+                query.with("corpusID=" + resource.getName());
             }
 
+            String res = query.toJSON();
+            jlog.info("BEFORE REWRITE " + res);
             // rewrite process
-            String qstr = processor.preProcess(query.toJSON(), user);
+            String qstr = processor.preProcess(res, user);
+            jlog.info("AFTER REWRITE " + qstr);
             return Response.ok(searchKrill.getStatistics(qstr)).build();
         }
         catch (KustvaktException e) {
@@ -744,7 +708,7 @@ public class ResourceService {
         VirtualCollection tmp = resourceHandler.getCache(cache.getId(),
                 VirtualCollection.class);
         if (tmp == null) {
-            CollectionQueryBuilder3 cquery = new CollectionQueryBuilder3()
+            KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder()
                     .setBaseQuery((String) cache.getData());
             String query = this.processor.preProcess((String) cache.getData(),
                     user);
@@ -842,7 +806,7 @@ public class ResourceService {
                 // todo: throw exception response for no resource to save!
                 return null;
 
-            CollectionQueryBuilder3 cquery = new CollectionQueryBuilder3();
+            KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
             cquery.setBaseQuery(base);
 
             cachetmp = ResourceFactory.getCachedCollection(cquery.toJSON());
@@ -915,10 +879,10 @@ public class ResourceService {
             VirtualCollection cachetmp, collection;
             // todo: ??
             Object read = JsonUtils.readTree(query);
-            CollectionQueryBuilder3 cquery = new CollectionQueryBuilder3();
+            KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
             if (reference != null && !reference.equals("null")) {
                 try {
-                    cquery.addQuery((String) resourceHandler.findbyStrId(
+                    cquery.with((String) resourceHandler.findbyStrId(
                             reference, user, VirtualCollection.class).getData());
                 }
                 catch (KustvaktException e) {

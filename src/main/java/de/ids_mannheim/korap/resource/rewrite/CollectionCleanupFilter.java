@@ -57,29 +57,6 @@ public class CollectionCleanupFilter implements RewriteTask.RewriteNodeAt {
         return root;
     }
 
-
-    // return null deletes node, if node return replace at level -1
-    @Deprecated
-    private JsonNode processNodes (JsonNode jsonNode) {
-        if (jsonNode.isObject()) {
-            if (jsonNode.has("operands")) {
-                JsonNode node = jsonNode.at("/operands");
-                int count = node.size();
-                if (count == 1) {
-                    // move to super node if any
-                    return node.path(0);
-                }
-                else if (count == 0) {
-                    // remove container
-                    return null;
-                }
-                return jsonNode;
-            }
-        }
-        return JsonUtils.createArrayNode();
-    }
-
-
     @Override
     public JsonNode postProcess (KoralNode node) {
         return null;

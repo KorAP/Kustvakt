@@ -14,7 +14,6 @@ public class IdWriter implements RewriteTask.RewriteKoralToken {
 
     private int counter;
 
-
     public IdWriter () {
         this.counter = 0;
     }
@@ -31,8 +30,6 @@ public class IdWriter implements RewriteTask.RewriteKoralToken {
         return node.rawNode();
     }
 
-
-    // fixme: koral token --> how does grouping behave?!
     private String extractToken (JsonNode token) {
         JsonNode wrap = token.path("wrap");
         if (!wrap.isMissingNode())

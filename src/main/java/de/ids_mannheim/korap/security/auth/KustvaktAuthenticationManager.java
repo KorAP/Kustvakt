@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.security.auth;
 
 import de.ids_mannheim.korap.auditing.AuditRecord;
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.URIParam;
@@ -13,7 +14,6 @@ import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.user.*;
 import de.ids_mannheim.korap.utils.NamingUtils;
-import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;

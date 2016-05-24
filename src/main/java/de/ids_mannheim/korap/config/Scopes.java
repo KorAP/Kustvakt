@@ -1,6 +1,5 @@
 package de.ids_mannheim.korap.config;
 
-import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 import java.util.ArrayList;

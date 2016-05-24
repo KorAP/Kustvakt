@@ -8,7 +8,7 @@ import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.Permissions;
 import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.security.ac.PolicyBuilder;
-import de.ids_mannheim.korap.user.Attributes;
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.User;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import org.junit.Ignore;

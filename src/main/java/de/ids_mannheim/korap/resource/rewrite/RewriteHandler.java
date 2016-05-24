@@ -7,6 +7,7 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import org.apache.xpath.SourceTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,6 +175,7 @@ public class RewriteHandler implements BeanInjectable {
     }
 
 
+    // fixme: redo with first, second iteration and push clean up filters into second run
     public String preProcess (String json, User user) {
         return JsonUtils.toJSON(preProcess(JsonUtils.readTree(json), user));
     }
@@ -246,17 +248,18 @@ public class RewriteHandler implements BeanInjectable {
                 if ((rwa.at() != null && !node.at(rwa.at()).isMissingNode()))
                     next = node.at(rwa.at());
             }
+
             try {
-                if (!post && task instanceof RewriteTask.RewriteBefore)
+                if (!post & task instanceof RewriteTask.RewriteBefore)
                     ((RewriteTask.RewriteBefore) task).preProcess(
                             KoralNode.wrapNode(next), this.config, user);
-                else
+                else if (task instanceof RewriteTask.RewriteAfter)
                     ((RewriteTask.RewriteAfter) task).postProcess(KoralNode
                             .wrapNode(next));
             }
             catch (KustvaktException e) {
                 jlog.error("Error in rewrite processor {} for node {}", task
-                        .getClass().getSimpleName(), node.toString());
+                        .getClass().getSimpleName(), next.toString());
                 e.printStackTrace();
             }
         }

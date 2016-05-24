@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.security.auth;
 
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.KustvaktBaseDaoInterface;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
@@ -8,8 +9,6 @@ import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.user.*;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotEquals;

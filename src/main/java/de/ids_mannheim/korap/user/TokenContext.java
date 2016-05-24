@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.user;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import lombok.AccessLevel;
 import lombok.Data;

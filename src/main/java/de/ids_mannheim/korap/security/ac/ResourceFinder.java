@@ -11,7 +11,7 @@ import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.security.PermissionsBuffer;
 import de.ids_mannheim.korap.security.PolicyCondition;
 import de.ids_mannheim.korap.security.SecurityPolicy;
-import de.ids_mannheim.korap.user.Attributes;
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.User;
 import lombok.NonNull;
 import org.slf4j.Logger;
@@ -123,7 +123,12 @@ public class ResourceFinder {
     // todo: should this be working?
     public static <T extends KustvaktResource> Set<T> search (User user,
             Class<T> clazz) throws KustvaktException {
-        return search(null, true, user, clazz, Permissions.Permission.READ);
+        Set set = new HashSet();
+        if (user != null && !User.UserFactory.isDemo(user.getUsername()))
+            set = search(null, true, user, clazz, Permissions.Permission.READ);
+        if (set.isEmpty())
+            set = searchPublic(clazz);
+        return set;
     }
 
 

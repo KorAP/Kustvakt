@@ -1,7 +1,6 @@
 package de.ids_mannheim.korap.config;
 
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.Getter;
 import org.apache.log4j.PropertyConfigurator;

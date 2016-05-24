@@ -1,7 +1,6 @@
 package de.ids_mannheim.korap.config;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.utils.ServiceInfo;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.service.BootableBeanInterface;

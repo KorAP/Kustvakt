@@ -11,6 +11,10 @@ import de.ids_mannheim.korap.user.User;
  */
 public interface RewriteTask {
 
+
+    /**
+     * unspecified query rewrite that gets injected the entire root node during preprocessing
+     */
     interface RewriteBefore extends RewriteTask {
         /**
          * @param node
@@ -69,28 +73,5 @@ public interface RewriteTask {
      * deletion of the respective node
      */
     interface RewriteKoralToken extends RewriteBefore {}
-
-    /**
-     * query rewrites get injected the entire query from root
-     * containing all child nodes
-     * <p/> {@link RewriteQuery} does not allow the deletion of the
-     * root node or subnode through KoralNode.
-     * The
-     * {@link de.ids_mannheim.korap.resource.rewrite.RewriteHandler}
-     * will igonore respecitve invalid requests
-     */
-    @Deprecated
-    interface RewriteQuery extends RewriteBefore, RewriteAfter {}
-
-    /**
-     * Koral term nodes that are subject to rewrites
-     * Be aware that node rewrites are processed before query
-     * rewrites. Thus query rewrite may override previous node
-     * rewrites
-     * <p/> {@link RewriteNode} rewrite supports the deletion of the
-     * respective node by simply setting the node invalid in KoralNode
-     */
-    @Deprecated
-    interface RewriteNode extends RewriteBefore {}
 
 }

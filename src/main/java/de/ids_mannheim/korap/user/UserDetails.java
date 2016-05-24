@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.user;
 
+import de.ids_mannheim.korap.config.Attributes;
+
 /**
  * @author hanl
  * @date 22/01/2016

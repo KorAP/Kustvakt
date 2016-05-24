@@ -10,7 +10,7 @@ import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.resource.rewrite.FoundryInject;
 import de.ids_mannheim.korap.resource.rewrite.RewriteHandler;
-import de.ids_mannheim.korap.utils.CollectionQueryBuilder3;
+import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.web.ClientsHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
@@ -89,7 +89,6 @@ public class LightService {
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
             @QueryParam("page") Integer startPage,
-            // fixme: remove cq from light service
             @QueryParam("cq") String cq) {
         QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
 
@@ -251,8 +250,8 @@ public class LightService {
     @POST
     @Path("stats")
     public Response getStats (String json) {
-        CollectionQueryBuilder3 builder = new CollectionQueryBuilder3();
-        builder.addQuery(json);
+        KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
+        builder.with(json);
 
         // todo: policy override in extension!
         String stats = searchKrill.getStatistics(builder.toJSON());

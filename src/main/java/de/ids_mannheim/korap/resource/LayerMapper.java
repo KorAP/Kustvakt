@@ -1,7 +1,7 @@
 package de.ids_mannheim.korap.resource;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
-import de.ids_mannheim.korap.user.Attributes;
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.Userdata;
 
 /**

@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.user;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.ParamFields;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;

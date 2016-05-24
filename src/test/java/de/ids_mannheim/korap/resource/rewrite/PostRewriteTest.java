@@ -16,7 +16,6 @@ import static org.junit.Assert.*;
  * @author hanl
  * @date 12/11/2015
  */
-//fixme: tests only work with singleconnection data sources
 // todo: logging!
 public class PostRewriteTest extends BeanConfigTest {
 

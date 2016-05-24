@@ -5,11 +5,15 @@ import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
+import de.ids_mannheim.korap.resources.Corpus;
+import de.ids_mannheim.korap.resources.KustvaktResource;
+import de.ids_mannheim.korap.security.ac.ResourceFinder;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +33,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
 
     @Override
     public void initMethod () throws KustvaktException {
+        helper().runBootInterfaces();
         config = helper().getContext().getConfiguration();
     }
 
@@ -178,6 +183,46 @@ public class CollectionRewriteTest extends BeanConfigTest {
         assertEquals(2, node.at("/collection/operands").size());
         assertEquals("koral:doc", node.at("/collection/operands/0/@type")
                 .asText());
+    }
+
+
+    @Test
+    public void testPublicCollectionRewriteEmptyAdd () throws KustvaktException {
+        RewriteHandler handler = new RewriteHandler();
+        handler.insertBeans(helper().getContext());
+        handler.add(PublicCollection.class);
+
+        QuerySerializer s = new QuerySerializer();
+        s.setQuery(simple_add_query, "poliqarp");
+        String org = s.toJSON();
+        JsonNode node = JsonUtils.readTree(handler.preProcess(org,
+                User.UserFactory.getUser("test_user")));
+        assertNotNull(node);
+        System.out.println("EMPTY " + node);
+    }
+
+
+    @Test
+    public void testPublicCollectionRewriteNonEmptyAdd ()
+            throws KustvaktException {
+        RewriteHandler handler = new RewriteHandler();
+        handler.insertBeans(helper().getContext());
+        handler.add(PublicCollection.class);
+
+        try {
+            QuerySerializer s = new QuerySerializer();
+            s.setQuery(simple_add_query, "poliqarp");
+            s.setCollection("(docSigle=WPD_AAA & textClass=wissenschaft)");
+            String org = s.toJSON();
+            JsonNode node = JsonUtils.readTree(handler.preProcess(org,
+                    User.UserFactory.getUser("test_user")));
+            assertNotNull(node);
+            System.out.println("NON EMPTY " + node);
+            Set<Corpus> resourceSet = ResourceFinder.searchPublic(Corpus.class);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

@@ -9,9 +9,9 @@ import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.security.ac.PolicyBuilder;
 import de.ids_mannheim.korap.security.ac.ResourceFinder;
 import de.ids_mannheim.korap.security.ac.SecurityManager;
-import de.ids_mannheim.korap.user.Attributes;
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.CollectionQueryBuilder3;
+import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
@@ -28,8 +28,8 @@ public class CollectionLoader implements BootableBeanInterface {
         User user = User.UserFactory
                 .toUser(KustvaktConfiguration.KUSTVAKT_USER);
 
-        CollectionQueryBuilder3 bui = new CollectionQueryBuilder3();
-        bui.addQuery("creationDate since 1775");
+        KoralCollectionQueryBuilder bui = new KoralCollectionQueryBuilder();
+        bui.with("creationDate since 1775");
 
         VirtualCollection c1 = new VirtualCollection();
         c1.setName("Weimarer Werke");
@@ -37,16 +37,16 @@ public class CollectionLoader implements BootableBeanInterface {
 
         c1.setDescription("Goethe-Werke in Weimar (seit 1775)");
 
-        bui = new CollectionQueryBuilder3();
-        bui.addQuery("textType = Aphorismus");
+        bui = new KoralCollectionQueryBuilder();
+        bui.with("textType = Aphorismus");
 
         VirtualCollection c2 = new VirtualCollection();
         c2.setName("Aphorismen");
         c2.addField(Attributes.QUERY, bui.toJSON());
         c2.setDescription("Aphorismentexte Goethes");
 
-        bui = new CollectionQueryBuilder3();
-        bui.addQuery("title ~ \"Werther\"");
+        bui = new KoralCollectionQueryBuilder();
+        bui.with("title ~ \"Werther\"");
 
         VirtualCollection c3 = new VirtualCollection();
         c3.setName("Werther");

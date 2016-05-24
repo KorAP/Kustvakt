@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.security;
 
-import de.ids_mannheim.korap.user.Attributes;
+import de.ids_mannheim.korap.config.Attributes;
 import lombok.Getter;
 
 import java.util.HashMap;

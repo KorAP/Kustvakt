@@ -12,7 +12,6 @@ import de.ids_mannheim.korap.security.ac.PolicyDao;
 import de.ids_mannheim.korap.security.auth.APIAuthentication;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.security.auth.KustvaktAuthenticationManager;
-import de.ids_mannheim.korap.user.Attributes;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.web.service.BootableBeanInterface;
 import org.apache.commons.dbcp2.BasicDataSource;

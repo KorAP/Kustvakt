@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.resource.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeanInjectable;
 import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
@@ -20,7 +21,7 @@ public class CollectionConstraint implements RewriteTask.IterableRewriteAt {
     public JsonNode preProcess (KoralNode node, KustvaktConfiguration config,
             User user) {
         if (node.get("@type").equals("koral:doc")) {
-            if (node.get("key").equals("corpusID") && !check(node, user)) {
+            if (node.get("key").equals(Attributes.CORPUS_SIGLE) && !check(node, user)) {
                 node.removeNode();
                 // todo: add message that node was removed!
             }

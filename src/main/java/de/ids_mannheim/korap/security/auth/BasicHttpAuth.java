@@ -7,12 +7,11 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
-import de.ids_mannheim.korap.user.Attributes;
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.NamingUtils;
-import de.ids_mannheim.korap.utils.StringUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.oltu.oauth2.common.utils.OAuthUtils;
 

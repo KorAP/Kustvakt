@@ -18,41 +18,23 @@ public abstract class KoralNode {
     private JsonNode node;
     private KoralRewriteBuilder builder;
     private boolean remove;
-    private final String target;
 
 
-    private KoralNode (String target, JsonNode node) {
+    private KoralNode (JsonNode node) {
         this.node = node;
-        this.target = target;
         this.builder = new KoralRewriteBuilder();
         this.remove = false;
     }
 
 
     public static KoralNode wrapNode (JsonNode node) {
-        return new KoralNode(null, node) {};
+        return new KoralNode(node) {};
     }
 
 
     @Override
     public String toString () {
         return this.node.toString();
-    }
-
-
-    @Deprecated
-    public boolean setNode (Object path) {
-        JsonNode n = null;
-        if (this.node.isObject() && this.node.has((String) path))
-            n = this.node.path((String) path);
-        else if (this.node.isArray() && this.node.has((int) path))
-            n = this.node.path((int) path);
-
-        if (n != null) {
-            this.node = n;
-            return true;
-        }
-        return false;
     }
 
 
@@ -64,6 +46,8 @@ public abstract class KoralNode {
                 node.put(name, (String) value);
             else if (value instanceof Integer)
                 node.put(name, (Integer) value);
+            else if (value instanceof JsonNode)
+                node.put(name, (JsonNode) value);
             builder.setOperation("injection");
             builder.build(this.node);
         }
@@ -92,11 +76,30 @@ public abstract class KoralNode {
     }
 
 
-    public void replace (String name, String value) {
+    public void replace (String name, Object value) {
         if (this.node.isObject() && this.node.has(name)) {
             ObjectNode n = (ObjectNode) this.node;
-            n.put(name, value);
+            if (value instanceof String)
+                n.put(name, (String) value);
+            else if (value instanceof Integer)
+                n.put(name, (Integer) value);
+            else if (value instanceof JsonNode)
+                n.put(name, (JsonNode) value);
             builder.setOperation("override");
+            builder.build(this.node);
+        }
+    }
+
+    public void set (String name, Object value) {
+        if (this.node.isObject()) {
+            ObjectNode n = (ObjectNode) this.node;
+            if (value instanceof String)
+                n.put(name, (String) value);
+            else if (value instanceof Integer)
+                n.put(name, (Integer) value);
+            else if (value instanceof JsonNode)
+                n.put(name, (JsonNode) value);
+            builder.setOperation("insertion");
             builder.build(this.node);
         }
     }
@@ -109,8 +112,8 @@ public abstract class KoralNode {
     }
 
 
-    public JsonNode at (String name) {
-        return this.node.at(name);
+    public KoralNode at (String name) {
+        return KoralNode.wrapNode(this.node.at(name));
     }
 
 
@@ -138,12 +141,8 @@ public abstract class KoralNode {
     }
 
 
-    public final String target () {
-        return this.target;
-    }
-
     //todo: 21.10.15 -- redo with better return policies!
-    private static class KoralRewriteBuilder {
+    public static class KoralRewriteBuilder {
 
         private Map<String, String> map;
 

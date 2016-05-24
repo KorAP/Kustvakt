@@ -4,17 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
-import de.ids_mannheim.korap.user.Attributes;
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * @author hanl
@@ -37,7 +34,6 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .path("search")
                 .queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp")
-                //                .queryParam("cq", "corpusID=GOE")
                 .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
@@ -98,7 +94,7 @@ public class ResourceServiceTest extends FastJerseyTest {
         assertNotNull(node);
         int docs = node.path("documents").asInt();
         assertNotEquals(0, docs);
-        Assert.assertTrue(docs < 15);
+        assertTrue(docs < 15);
     }
 
 
@@ -121,6 +117,8 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .path("corpus/WPD/search").queryParam("q", "[base=Haus]")
                 .queryParam("ql", "poliqarp").queryParam("context", "base/s:s")
                 .method("TRACE", ClientResponse.class);
+        assertEquals(response.getStatus(),
+                ClientResponse.Status.OK.getStatusCode());
         System.out.println("RESPONSE 1 " + response);
         String ent = response.getEntity(String.class);
         System.out.println("Entity 1 " + ent);
@@ -133,6 +131,8 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .path("search").queryParam("q", "[base=Haus]")
                 .queryParam("ql", "poliqarp").queryParam("context", "sentence")
                 .method("TRACE", ClientResponse.class);
+        assertEquals(response.getStatus(),
+                ClientResponse.Status.OK.getStatusCode());
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         System.out.println("PUBLIC COLLECTION");
@@ -146,6 +146,8 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .path("search").queryParam("q", "[base=Haus]")
                 .queryParam("ql", "poliqarp").queryParam("context", "sentence")
                 .get(ClientResponse.class);
+        assertEquals(response.getStatus(),
+                ClientResponse.Status.OK.getStatusCode());
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
@@ -161,6 +163,8 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .path("search").queryParam("context", "sentence")
                 .queryParam("q", "[pos=ADJA]").queryParam("ql", "poliqarp")
                 .get(ClientResponse.class);
+        assertEquals(response.getStatus(),
+                ClientResponse.Status.OK.getStatusCode());
     }
 
 
@@ -169,12 +173,27 @@ public class ResourceServiceTest extends FastJerseyTest {
     public void testSerializationCollection () {
         ClientResponse response = resource().path(getAPIVersion()).path("")
                 .get(ClientResponse.class);
+        assertEquals(response.getStatus(),
+                ClientResponse.Status.OK.getStatusCode());
     }
 
 
     @Test
     public void testMatchInfo () {
 
+    }
+
+
+    @Test
+    public void testGetResources () {
+        ClientResponse response = resource().path(getAPIVersion())
+                .path("corpus").get(ClientResponse.class);
+        assertEquals(response.getStatus(),
+                ClientResponse.Status.OK.getStatusCode());
+        String ent = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        System.out.println("NODE 1 " + node);
     }
 
 

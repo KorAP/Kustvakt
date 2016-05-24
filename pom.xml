@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.ids_mannheim.korap</groupId>
     <artifactId>Kustvakt-core</artifactId>
-    <version>0.59.1</version>
+    <version>0.59.2</version>
     <packaging>jar</packaging>
     <name>Kustvakt core</name>
     <description>Kustvakt core, basic rest api for testing purposes and default
@@ -131,6 +131,7 @@
                     <compilerCompliance>1.7</compilerCompliance>
                     <compilerTargetPlatform>1.7</compilerTargetPlatform>
                 </configuration>
+                <!--
                 <executions>
                     <execution>
                         <goals>
@@ -138,6 +139,7 @@
                         </goals>
                     </execution>
                 </executions>
+                -->
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
