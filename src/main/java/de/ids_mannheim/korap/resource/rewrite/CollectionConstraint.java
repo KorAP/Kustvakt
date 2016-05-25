@@ -2,8 +2,6 @@ package de.ids_mannheim.korap.resource.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.BeanInjectable;
-import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.resources.Corpus;
@@ -15,16 +13,18 @@ import de.ids_mannheim.korap.user.User;
  * @author hanl
  * @date 03/07/2015
  */
-public class CollectionConstraint implements RewriteTask.IterableRewriteAt {
+public class CollectionConstraint implements RewriteTask.IterableRewritePath {
+
+
+
 
     @Override
     public JsonNode preProcess (KoralNode node, KustvaktConfiguration config,
             User user) {
         if (node.get("@type").equals("koral:doc")) {
-            if (node.get("key").equals(Attributes.CORPUS_SIGLE) && !check(node, user)) {
+            if (node.get("key").equals(Attributes.CORPUS_SIGLE)
+                    && !check(node, user))
                 node.removeNode();
-                // todo: add message that node was removed!
-            }
         }
         return node.rawNode();
     }

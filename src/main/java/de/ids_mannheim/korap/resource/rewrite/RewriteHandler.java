@@ -7,7 +7,6 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import org.apache.xpath.SourceTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +23,7 @@ import java.util.*;
 public class RewriteHandler implements BeanInjectable {
 
     private static Logger jlog = LoggerFactory.getLogger(RewriteHandler.class);
-    private Collection<RewriteTask.IterableRewriteAt> node_processors;
+    private Collection<RewriteTask.IterableRewritePath> node_processors;
     private Collection<RewriteTask.RewriteKoralToken> token_node_processors;
     private Collection<RewriteTask> query_processors;
 
@@ -66,9 +65,9 @@ public class RewriteHandler implements BeanInjectable {
         if (rewriter instanceof RewriteTask.RewriteKoralToken)
             return this.token_node_processors
                     .add((RewriteTask.RewriteKoralToken) rewriter);
-        else if (rewriter instanceof RewriteTask.IterableRewriteAt)
+        else if (rewriter instanceof RewriteTask.IterableRewritePath)
             return this.node_processors
-                    .add((RewriteTask.IterableRewriteAt) rewriter);
+                    .add((RewriteTask.IterableRewritePath) rewriter);
         else if (rewriter instanceof RewriteTask.RewriteBefore
                 | rewriter instanceof RewriteTask.RewriteAfter)
             return this.query_processors.add(rewriter);
@@ -122,25 +121,25 @@ public class RewriteHandler implements BeanInjectable {
     }
 
 
-    private boolean process (String name, JsonNode root, User user, boolean post) {
+    private boolean processNode (String name, JsonNode root, User user, boolean post) {
         if (root.isObject()) {
             if (root.has("operands")) {
                 JsonNode ops = root.at("/operands");
                 Iterator<JsonNode> it = ops.elements();
                 while (it.hasNext()) {
                     JsonNode next = it.next();
-                    if (process(name, next, user, post))
+                    if (processNode(name, next, user, post))
                         it.remove();
                 }
             }
             else if (root.path("@type").asText().equals("koral:token")) {
                 // todo: koral:token nodes cannot be flagged for deletion --> creates the possibility for empty koral:token nodes
-                processNode(name, KoralNode.wrapNode(root), user,
+                rewrite(name, KoralNode.wrapNode(root), user,
                         this.token_node_processors, post);
-                return process(name, root.path("wrap"), user, post);
+                return processNode(name, root.path("wrap"), user, post);
             }
             else {
-                return processNode(name, KoralNode.wrapNode(root), user,
+                return rewrite(name, KoralNode.wrapNode(root), user,
                         this.node_processors, post);
             }
         }
@@ -148,7 +147,7 @@ public class RewriteHandler implements BeanInjectable {
             Iterator<JsonNode> it = root.elements();
             while (it.hasNext()) {
                 JsonNode next = it.next();
-                if (process(name, next, user, post))
+                if (processNode(name, next, user, post))
                     it.remove();
             }
         }
@@ -156,13 +155,13 @@ public class RewriteHandler implements BeanInjectable {
     }
 
 
-    private JsonNode process (JsonNode root, User user, boolean post) {
+    private JsonNode iterate (JsonNode root, User user, boolean post) {
         jlog.debug("Running rewrite process on query {}", root);
         if (root != null) {
             Iterator<Map.Entry<String, JsonNode>> it = root.fields();
             while (it.hasNext()) {
                 Map.Entry<String, JsonNode> next = it.next();
-                process(next.getKey(), next.getValue(), user, post);
+                processNode(next.getKey(), next.getValue(), user, post);
             }
             processFixedNode(root, user, this.query_processors, post);
         }
@@ -170,24 +169,14 @@ public class RewriteHandler implements BeanInjectable {
     }
 
 
-    public JsonNode preProcess (JsonNode root, User user) {
-        return process(root, user, false);
+    public JsonNode process(JsonNode root, User user) {
+        JsonNode pre = iterate(root, user, false);
+        return iterate(pre, user, true);
     }
 
 
-    // fixme: redo with first, second iteration and push clean up filters into second run
-    public String preProcess (String json, User user) {
-        return JsonUtils.toJSON(preProcess(JsonUtils.readTree(json), user));
-    }
-
-
-    public JsonNode postProcess (JsonNode root, User user) {
-        return process(root, user, true);
-    }
-
-
-    public String postProcess (String json, User user) {
-        return JsonUtils.toJSON(postProcess(JsonUtils.readTree(json), user));
+    public String process(String json, User user) {
+        return JsonUtils.toJSON(process(JsonUtils.readTree(json), user));
     }
 
 
@@ -198,8 +187,7 @@ public class RewriteHandler implements BeanInjectable {
      * @return boolean true if node is to be removed from parent! Only
      *         applies if parent is an array node
      */
-    // todo: integrate notifications into system!
-    private boolean processNode (String rootNode, KoralNode node, User user,
+    private boolean rewrite (String rootNode, KoralNode node, User user,
             Collection<? extends RewriteTask> tasks, boolean post) {
         if (this.config == null)
             throw new RuntimeException("KustvaktConfiguration must be set!");
@@ -211,8 +199,8 @@ public class RewriteHandler implements BeanInjectable {
             if (this.beans != null && task instanceof BeanInjectable)
                 ((BeanInjectable) task).insertBeans(this.beans);
 
-            if (task instanceof RewriteTask.IterableRewriteAt) {
-                RewriteTask.IterableRewriteAt rw = (RewriteTask.IterableRewriteAt) task;
+            if (task instanceof RewriteTask.IterableRewritePath) {
+                RewriteTask.IterableRewritePath rw = (RewriteTask.IterableRewritePath) task;
                 if (rw.path() != null && !rw.path().equals(rootNode)) {
                     jlog.debug("skipping node: " + node);
                     continue;
@@ -226,6 +214,7 @@ public class RewriteHandler implements BeanInjectable {
                 else if (task instanceof RewriteTask.RewriteAfter) {
                     ((RewriteTask.RewriteAfter) task).postProcess(node);
                 }
+                node.buildRewrites();
             }
             catch (KustvaktException e) {
                 jlog.error("Error in rewrite processor {} for node {}", task
@@ -242,20 +231,20 @@ public class RewriteHandler implements BeanInjectable {
     private void processFixedNode (JsonNode node, User user,
             Collection<RewriteTask> tasks, boolean post) {
         for (RewriteTask task : tasks) {
-            JsonNode next = node;
+            KoralNode next = KoralNode.wrapNode(node);
             if (task instanceof RewriteTask.RewriteNodeAt) {
                 RewriteTask.RewriteNodeAt rwa = (RewriteTask.RewriteNodeAt) task;
                 if ((rwa.at() != null && !node.at(rwa.at()).isMissingNode()))
-                    next = node.at(rwa.at());
+                    next = next.at(rwa.at());
             }
 
             try {
                 if (!post & task instanceof RewriteTask.RewriteBefore)
-                    ((RewriteTask.RewriteBefore) task).preProcess(
-                            KoralNode.wrapNode(next), this.config, user);
+                    ((RewriteTask.RewriteBefore) task).preProcess(next,
+                            this.config, user);
                 else if (task instanceof RewriteTask.RewriteAfter)
-                    ((RewriteTask.RewriteAfter) task).postProcess(KoralNode
-                            .wrapNode(next));
+                    ((RewriteTask.RewriteAfter) task).postProcess(next);
+                next.buildRewrites();
             }
             catch (KustvaktException e) {
                 jlog.error("Error in rewrite processor {} for node {}", task

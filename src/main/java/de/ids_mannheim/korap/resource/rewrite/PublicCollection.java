@@ -11,8 +11,10 @@ import de.ids_mannheim.korap.security.ac.ResourceFinder;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import org.w3c.dom.Attr;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -43,7 +45,7 @@ public class PublicCollection implements RewriteTask.RewriteBefore {
                 ArrayList<KustvaktResource> list = new ArrayList(resources);
 
                 if (list.isEmpty())
-                    throw new KustvaktException(StatusCodes.REQUEST_INVALID,
+                    throw new KustvaktException(StatusCodes.PERMISSION_DENIED,
                             "No resources found for user", user.getUsername());
 
                 for (int i = 0; i < list.size(); i++) {
@@ -52,7 +54,8 @@ public class PublicCollection implements RewriteTask.RewriteBefore {
                     b.with(Attributes.CORPUS_SIGLE+"=" + list.get(i).getPersistentID());
                 }
                 JsonNode rewritten = JsonUtils.readTree(b.toJSON());
-                node.set("collection", rewritten.at("/collection"));
+                node.set("collection", rewritten.at("/collection"), Attributes.CORPUS_SIGLE);
+                node.at("/collection");
             }
             catch (KustvaktException e) {
                 e.printStackTrace();

@@ -47,7 +47,7 @@ public class PostRewriteTest extends BeanConfigTest {
         try {
             Document d = dao.findbyId("BRZ13_APR.00014", null);
             assertNull(d);
-            String v = ha.postProcess(RESULT, null);
+            String v = ha.process(RESULT, null);
             assertEquals("results do not match", JsonUtils.readTree(RESULT),
                     JsonUtils.readTree(v));
         }
@@ -76,7 +76,7 @@ public class PostRewriteTest extends BeanConfigTest {
         assertEquals("Handler could not be added to rewriter instance!", true,
                 ha.add(DocMatchRewrite.class));
 
-        String v = ha.postProcess(RESULT, null);
+        String v = ha.process(RESULT, null);
 
         JsonNode node = JsonUtils.readTree(v);
 

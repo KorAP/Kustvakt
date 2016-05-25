@@ -51,7 +51,7 @@ public class RewriteHandlerTest extends BeanConfigTest {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[(base=laufen | base=gehen) & tt/pos=VVFIN]", "poliqarp");
         assertTrue(handler.add(FoundryInject.class));
-        handler.preProcess(s.toJSON(), null);
+        handler.process(s.toJSON(), null);
     }
 
 
@@ -62,7 +62,7 @@ public class RewriteHandlerTest extends BeanConfigTest {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[(base=laufen | base=gehen) & tt/pos=VVFIN]", "poliqarp");
         assertTrue(handler.add(FoundryInject.class));
-        String res = handler.preProcess(s.toJSON(), null);
+        String res = handler.process(s.toJSON(), null);
         assertNotNull(res);
     }
 
@@ -74,7 +74,7 @@ public class RewriteHandlerTest extends BeanConfigTest {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[(base=laufen | base=gehen) & tt/pos=VVFIN]", "poliqarp");
         assertTrue(handler.add(FoundryInject.class));
-        String res = handler.preProcess(s.toJSON(), null);
+        String res = handler.process(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(res);
         assertNotNull(node);
 
@@ -93,7 +93,7 @@ public class RewriteHandlerTest extends BeanConfigTest {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[(base=laufen | base=gehen) & tt/pos=VVFIN]", "poliqarp");
         assertTrue(handler.add(FoundryInject.class));
-        String res = handler.preProcess(s.toJSON(), helper().getUser());
+        String res = handler.process(s.toJSON(), helper().getUser());
         JsonNode node = JsonUtils.readTree(res);
         assertNotNull(node);
         assertEquals("tt_test",

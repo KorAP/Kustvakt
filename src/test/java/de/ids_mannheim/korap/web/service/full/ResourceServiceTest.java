@@ -135,8 +135,10 @@ public class ResourceServiceTest extends FastJerseyTest {
                 ClientResponse.Status.OK.getStatusCode());
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        System.out.println("PUBLIC COLLECTION");
-        System.out.println(node);
+        assertNotNull(node);
+        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
+        assertEquals("operation:or", node.at("/collection/operation").asText());
+        assertNotEquals(0, node.at("/collection/operands").size());
     }
 
 

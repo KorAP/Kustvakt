@@ -18,7 +18,7 @@ import net.sf.ehcache.Element;
  * @date 12/11/2015
  */
 //todo : test
-public class DocMatchRewrite implements RewriteTask.IterableRewriteAt,
+public class DocMatchRewrite implements RewriteTask.IterableRewritePath,
         BeanInjectable {
 
     private DocumentDao docDao;

@@ -96,9 +96,7 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
                 .getAuthenticationManager();
 
         User user = new KorAPUser(10, "random");
-
-        Userdata data = manager.getUserData(user, UserDetails.class);
-        assertNotNull(data);
+        manager.getUserData(user, UserDetails.class);
     }
 
 
@@ -109,9 +107,7 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
                 .getAuthenticationManager();
 
         User user = new KorAPUser(10, "random");
-
-        Userdata data = manager.getUserData(user, UserSettings.class);
-        assertNotNull(data);
+        manager.getUserData(user, UserSettings.class);
     }
 
 

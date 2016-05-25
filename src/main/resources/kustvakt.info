@@ -1,0 +1,2 @@
+kustvakt.version=${project.version}
+kustvakt.name=${project.name}

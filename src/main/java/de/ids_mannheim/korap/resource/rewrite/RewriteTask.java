@@ -38,7 +38,7 @@ public interface RewriteTask {
      * {@link de.ids_mannheim.korap.resource.rewrite.RewriteTask.RewriteAfter}
      * queries will run
      * after
-     * {@link de.ids_mannheim.korap.resource.rewrite.RewriteTask.IterableRewriteAt}
+     * {@link IterableRewritePath}
      * have been processed
      */
     interface RewriteAfter extends RewriteTask {
@@ -61,7 +61,7 @@ public interface RewriteTask {
      * iteration
      * (both object and array node iteration supported)
      */
-    interface IterableRewriteAt extends RewriteBefore, RewriteAfter {
+    interface IterableRewritePath extends RewriteBefore, RewriteAfter {
         String path ();
     }
 

@@ -72,7 +72,7 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
     //    @Test
     public void testGetStatsThrowsNoException () {
         CollectionQueryProcessor pr = new CollectionQueryProcessor();
-        pr.process("corpusID=WPD & textClass=Sport");
+        pr.process("corpusSigle=WPD & textClass=Sport");
         Map map = new LinkedHashMap();
         map.put("collection", pr.getRequestMap());
         ClientResponse response = resource().path(getAPIVersion())

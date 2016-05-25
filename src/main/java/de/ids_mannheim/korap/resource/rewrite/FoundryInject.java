@@ -8,7 +8,6 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.resource.LayerMapper;
-import de.ids_mannheim.korap.resources.Foundry;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserSettings;
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -19,7 +18,7 @@ import java.util.Collection;
  * @author hanl
  * @date 30/06/2015
  */
-public class FoundryInject implements RewriteTask.IterableRewriteAt,
+public class FoundryInject implements RewriteTask.IterableRewritePath,
         BeanInjectable {
 
     private Collection userdaos;

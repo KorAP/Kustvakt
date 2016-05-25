@@ -312,7 +312,7 @@ public class ResourceService {
 
         ss.setMeta(meta);
 
-        String query = this.processor.preProcess(ss.toJSON(), user);
+        String query = this.processor.process(ss.toJSON(), user);
         return Response.ok(query).build();
     }
 
@@ -408,7 +408,7 @@ public class ResourceService {
         // todo: should be possible to add the meta part to the query serialization
         try {
             User user = controller.getUser(ctx.getUsername());
-            jsonld = this.processor.preProcess(jsonld, user);
+            jsonld = this.processor.process(jsonld, user);
         }
         catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
@@ -467,7 +467,7 @@ public class ResourceService {
         serializer.setMeta(meta.raw());
 
         //fixme: policy rewrite!
-        String query = this.processor.preProcess(serializer.toJSON(), user);
+        String query = this.processor.process(serializer.toJSON(), user);
 
         jlog.info("the serialized query {}", query);
 
@@ -576,7 +576,7 @@ public class ResourceService {
             try {
 
                 // rewrite process
-                query = this.processor.preProcess(query, user);
+                query = this.processor.process(query, user);
 
                 if (eng.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
                     if (raw)
@@ -668,14 +668,10 @@ public class ResourceService {
                 query.setBaseQuery(resource.getData());
             }
             else if (resource instanceof Corpus) {
-                query.with("corpusID=" + resource.getName());
+                query.with(Attributes.CORPUS_SIGLE+"=" + resource.getName());
             }
-
             String res = query.toJSON();
-            jlog.info("BEFORE REWRITE " + res);
-            // rewrite process
-            String qstr = processor.preProcess(res, user);
-            jlog.info("AFTER REWRITE " + qstr);
+            String qstr = processor.process(res, user);
             return Response.ok(searchKrill.getStatistics(qstr)).build();
         }
         catch (KustvaktException e) {
@@ -710,7 +706,7 @@ public class ResourceService {
         if (tmp == null) {
             KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder()
                     .setBaseQuery((String) cache.getData());
-            String query = this.processor.preProcess((String) cache.getData(),
+            String query = this.processor.process((String) cache.getData(),
                     user);
             String stats = searchKrill.getStatistics(query);
             cache.setStats(JsonUtils.readSimple(stats, Map.class));

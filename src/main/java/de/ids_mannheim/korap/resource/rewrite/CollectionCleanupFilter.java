@@ -19,7 +19,7 @@ public class CollectionCleanupFilter implements RewriteTask.RewriteNodeAt {
     @Override
     public JsonNode preProcess (KoralNode node, KustvaktConfiguration config,
             User user) {
-        return process(node.rawNode());
+        return node.rawNode();
     }
 
 
@@ -59,7 +59,7 @@ public class CollectionCleanupFilter implements RewriteTask.RewriteNodeAt {
 
     @Override
     public JsonNode postProcess (KoralNode node) {
-        return null;
+        return process(node.rawNode());
     }
 
 

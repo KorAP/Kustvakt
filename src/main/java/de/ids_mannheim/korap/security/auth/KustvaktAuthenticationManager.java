@@ -756,12 +756,12 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                 data = dao.get(user);
 
             if (data == null)
-                throw new WrappedException(user.getId(),
-                        StatusCodes.EMPTY_RESULTS, clazz.getSimpleName());
+                throw new KustvaktException(user.getId(),
+                        StatusCodes.EMPTY_RESULTS, "No data found!", clazz.getSimpleName());
             return data;
         }
         catch (KustvaktException e) {
-            jlog.error("Error ", e);
+            jlog.error("Error during user data retrieval!", e.getEntity());
             throw new WrappedException(e, StatusCodes.GET_ACCOUNT_FAILED);
         }
     }
@@ -780,31 +780,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                 dao.update(data);
         }
         catch (KustvaktException e) {
-            jlog.error("Error ", e);
+            jlog.error("Error during update of user data!", e.getEntity());
             throw new WrappedException(e, StatusCodes.UPDATE_ACCOUNT_FAILED);
         }
     }
-
-
-    //    public UserDetails getUserDetails(User user) throws KustvaktException {
-    //        try {
-    //            if (user.getDetails() == null)
-    //                user.setDetails(entHandler.getUserDetails(user.getId()));
-    //        }catch (KustvaktException e) {
-    //            throw new WrappedException(e, StatusCodes.GET_ACCOUNT_FAILED);
-    //        }
-    //        return user.getDetails();
-    //    }
-    //
-    //    public UserSettings getUserSettings(User user) throws KustvaktException {
-    //        try {
-    //            if (user.getSettings() == null)
-    //                user.setSettings(entHandler.getUserSettings(user.getId()));
-    //        }catch (KustvaktException e) {
-    //            throw new WrappedException(e, StatusCodes.GET_ACCOUNT_FAILED);
-    //        }
-    //        return user.getSettings();
-    //    }
 
     private String cache_key (String input) throws KustvaktException {
         try {

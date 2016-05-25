@@ -25,7 +25,7 @@ public class IdRewriteTest extends BeanConfigTest {
         QuerySerializer s = new QuerySerializer();
         s.setQuery(query, "poliqarp");
 
-        String value = handler.preProcess(s.toJSON(), null);
+        String value = handler.process(s.toJSON(), null);
         JsonNode result = JsonUtils.readTree(value);
 
         assertNotNull(result);
@@ -41,7 +41,7 @@ public class IdRewriteTest extends BeanConfigTest {
 
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[base=Haus]", "poliqarp");
-        String result = handler.preProcess(s.toJSON(), null);
+        String result = handler.process(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
         assertNotNull(node);
         assertFalse(node.at("/query/wrap").isMissingNode());
