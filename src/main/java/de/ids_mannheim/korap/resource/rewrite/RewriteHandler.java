@@ -114,64 +114,13 @@ public class RewriteHandler implements BeanInjectable {
     }
 
 
-    public void clear () {
-        this.node_processors.clear();
-        this.query_processors.clear();
-        this.token_node_processors.clear();
-    }
-
-
-    private boolean processNode (String name, JsonNode root, User user, boolean post) {
-        if (root.isObject()) {
-            if (root.has("operands")) {
-                JsonNode ops = root.at("/operands");
-                Iterator<JsonNode> it = ops.elements();
-                while (it.hasNext()) {
-                    JsonNode next = it.next();
-                    if (processNode(name, next, user, post))
-                        it.remove();
-                }
-            }
-            else if (root.path("@type").asText().equals("koral:token")) {
-                // todo: koral:token nodes cannot be flagged for deletion --> creates the possibility for empty koral:token nodes
-                rewrite(name, KoralNode.wrapNode(root), user,
-                        this.token_node_processors, post);
-                return processNode(name, root.path("wrap"), user, post);
-            }
-            else {
-                return rewrite(name, KoralNode.wrapNode(root), user,
-                        this.node_processors, post);
-            }
-        }
-        else if (root.isArray()) {
-            Iterator<JsonNode> it = root.elements();
-            while (it.hasNext()) {
-                JsonNode next = it.next();
-                if (processNode(name, next, user, post))
-                    it.remove();
-            }
-        }
-        return false;
-    }
-
-
-    private JsonNode iterate (JsonNode root, User user, boolean post) {
-        jlog.debug("Running rewrite process on query {}", root);
-        if (root != null) {
-            Iterator<Map.Entry<String, JsonNode>> it = root.fields();
-            while (it.hasNext()) {
-                Map.Entry<String, JsonNode> next = it.next();
-                processNode(next.getKey(), next.getValue(), user, post);
-            }
-            processFixedNode(root, user, this.query_processors, post);
-        }
-        return root;
-    }
 
 
     public JsonNode process(JsonNode root, User user) {
-        JsonNode pre = iterate(root, user, false);
-        return iterate(pre, user, true);
+        RewriteProcess process = new RewriteProcess(root, user);
+        JsonNode pre = process.start(false);
+        //return iterate(pre, user, true);
+        return pre;
     }
 
 
@@ -180,78 +129,10 @@ public class RewriteHandler implements BeanInjectable {
     }
 
 
-    /**
-     * @param node
-     * @param user
-     * @param tasks
-     * @return boolean true if node is to be removed from parent! Only
-     *         applies if parent is an array node
-     */
-    private boolean rewrite (String rootNode, KoralNode node, User user,
-            Collection<? extends RewriteTask> tasks, boolean post) {
-        if (this.config == null)
-            throw new RuntimeException("KustvaktConfiguration must be set!");
-
-        for (RewriteTask task : tasks) {
-            jlog.debug("running processor on node: " + node);
-            jlog.debug("on processor: " + task.getClass().toString());
-
-            if (this.beans != null && task instanceof BeanInjectable)
-                ((BeanInjectable) task).insertBeans(this.beans);
-
-            if (task instanceof RewriteTask.IterableRewritePath) {
-                RewriteTask.IterableRewritePath rw = (RewriteTask.IterableRewritePath) task;
-                if (rw.path() != null && !rw.path().equals(rootNode)) {
-                    jlog.debug("skipping node: " + node);
-                    continue;
-                }
-            }
-            try {
-                if (!post && task instanceof RewriteTask.RewriteBefore) {
-                    ((RewriteTask.RewriteBefore) task).preProcess(node,
-                            this.config, user);
-                }
-                else if (task instanceof RewriteTask.RewriteAfter) {
-                    ((RewriteTask.RewriteAfter) task).postProcess(node);
-                }
-                node.buildRewrites();
-            }
-            catch (KustvaktException e) {
-                jlog.error("Error in rewrite processor {} for node {}", task
-                        .getClass().getSimpleName(), node.rawNode().toString());
-                e.printStackTrace();
-            }
-            if (node.isRemove())
-                break;
-        }
-        return node.isRemove();
-    }
-
-
-    private void processFixedNode (JsonNode node, User user,
-            Collection<RewriteTask> tasks, boolean post) {
-        for (RewriteTask task : tasks) {
-            KoralNode next = KoralNode.wrapNode(node);
-            if (task instanceof RewriteTask.RewriteNodeAt) {
-                RewriteTask.RewriteNodeAt rwa = (RewriteTask.RewriteNodeAt) task;
-                if ((rwa.at() != null && !node.at(rwa.at()).isMissingNode()))
-                    next = next.at(rwa.at());
-            }
-
-            try {
-                if (!post & task instanceof RewriteTask.RewriteBefore)
-                    ((RewriteTask.RewriteBefore) task).preProcess(next,
-                            this.config, user);
-                else if (task instanceof RewriteTask.RewriteAfter)
-                    ((RewriteTask.RewriteAfter) task).postProcess(next);
-                next.buildRewrites();
-            }
-            catch (KustvaktException e) {
-                jlog.error("Error in rewrite processor {} for node {}", task
-                        .getClass().getSimpleName(), next.toString());
-                e.printStackTrace();
-            }
-        }
+    public void clear () {
+        this.node_processors.clear();
+        this.query_processors.clear();
+        this.token_node_processors.clear();
     }
 
 
@@ -259,5 +140,145 @@ public class RewriteHandler implements BeanInjectable {
     public <T extends ContextHolder> void insertBeans (T beans) {
         this.beans = beans;
         this.config = beans.getConfiguration();
+    }
+
+
+
+    public class RewriteProcess {
+
+        private JsonNode root;
+        private User user;
+
+        private RewriteProcess(JsonNode root, User user) {
+            this.root = root;
+            this.user = user;
+        }
+
+        private KoralNode processNode (String key, JsonNode value, boolean post) {
+            KoralNode kroot = KoralNode.wrapNode(value);
+            if (value.isObject()) {
+                if (value.has("operands")) {
+                    JsonNode ops = value.at("/operands");
+                    Iterator<JsonNode> it = ops.elements();
+                    while (it.hasNext()) {
+                        JsonNode next = it.next();
+                        KoralNode kn = processNode(key, next, post);
+                        if (kn.isRemove())
+                            it.remove();
+                    }
+                }
+                else if (value.path("@type").asText().equals("koral:token")) {
+                    // todo: koral:token nodes cannot be flagged for deletion --> creates the possibility for empty koral:token nodes
+                    rewrite(key, kroot,
+                            RewriteHandler.this.token_node_processors, post);
+                    return processNode(key, value.path("wrap"), post);
+                }
+                else {
+                    return rewrite(key, kroot,
+                            RewriteHandler.this.node_processors, post);
+                }
+            }
+            else if (value.isArray()) {
+                Iterator<JsonNode> it = value.elements();
+                while (it.hasNext()) {
+                    JsonNode next = it.next();
+                    KoralNode kn = processNode(key, next, post);
+                    if (kn.isRemove())
+                        it.remove();
+                }
+            }
+            return kroot;
+        }
+
+
+        private JsonNode start(boolean post) {
+            jlog.debug("Running rewrite process on query {}", root);
+            if (root != null) {
+                Iterator<Map.Entry<String, JsonNode>> it = root.fields();
+                while (it.hasNext()) {
+                    Map.Entry<String, JsonNode> next = it.next();
+                    processNode(next.getKey(), next.getValue(), post);
+                }
+                processFixedNode(root, RewriteHandler.this.query_processors, post);
+            }
+            return root;
+        }
+
+        /**
+         * @param node
+         * @param tasks
+         * @return boolean true if node is to be removed from parent! Only
+         *         applies if parent is an array node
+         */
+        private KoralNode rewrite (String rootNode, KoralNode node,
+                                   Collection<? extends RewriteTask> tasks, boolean post) {
+            if (RewriteHandler.this.config == null)
+                throw new RuntimeException("KustvaktConfiguration must be set!");
+
+            for (RewriteTask task : tasks) {
+                jlog.debug("running processor on node: " + node);
+                jlog.debug("on processor: " + task.getClass().toString());
+
+                if (RewriteHandler.this.beans != null && task instanceof BeanInjectable)
+                    ((BeanInjectable) task).insertBeans(RewriteHandler.this.beans);
+
+                if (task instanceof RewriteTask.IterableRewritePath) {
+                    RewriteTask.IterableRewritePath rw = (RewriteTask.IterableRewritePath) task;
+                    if (rw.path() != null && !rw.path().equals(rootNode)) {
+                        jlog.debug("skipping node: " + node);
+                        continue;
+                    }
+                }
+                try {
+                    if (!post && task instanceof RewriteTask.RewriteBefore) {
+                        ((RewriteTask.RewriteBefore) task).preProcess(node,
+                                RewriteHandler.this.config, this.user);
+                    }
+                    else if (task instanceof RewriteTask.RewriteAfter) {
+                        ((RewriteTask.RewriteAfter) task).postProcess(node);
+                    }
+                }
+                catch (KustvaktException e) {
+                    jlog.error("Error in rewrite processor {} for node {}", task
+                            .getClass().getSimpleName(), node.rawNode().toString());
+                    e.printStackTrace();
+                }
+                if (node.isRemove()) {
+                    node.buildRewrites(this.root.at("/"+ rootNode));
+                    break;
+                } else
+                    node.buildRewrites();
+            }
+            return node;
+        }
+
+        // fixme: merge with processNode!
+        private void processFixedNode (JsonNode node,
+                                       Collection<RewriteTask> tasks, boolean post) {
+            for (RewriteTask task : tasks) {
+                KoralNode next = KoralNode.wrapNode(node);
+                if (task instanceof RewriteTask.RewriteNodeAt) {
+                    RewriteTask.RewriteNodeAt rwa = (RewriteTask.RewriteNodeAt) task;
+                    if ((rwa.at() != null && !node.at(rwa.at()).isMissingNode()))
+                        next = next.at(rwa.at());
+                }
+
+                try {
+                    if (!post & task instanceof RewriteTask.RewriteBefore)
+                        ((RewriteTask.RewriteBefore) task).preProcess(next,
+                                RewriteHandler.this.config, user);
+                    else if (task instanceof RewriteTask.RewriteAfter)
+                        ((RewriteTask.RewriteAfter) task).postProcess(next);
+                    next.buildRewrites();
+                }
+                catch (KustvaktException e) {
+                    jlog.error("Error in rewrite processor {} for node {}", task
+                            .getClass().getSimpleName(), next.toString());
+                    e.printStackTrace();
+                }
+            }
+        }
+
+
     }
 }

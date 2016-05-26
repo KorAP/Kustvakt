@@ -7,6 +7,7 @@ import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 import java.util.Iterator;
 
@@ -19,7 +20,7 @@ public class CollectionCleanupFilter implements RewriteTask.RewriteNodeAt {
     @Override
     public JsonNode preProcess (KoralNode node, KustvaktConfiguration config,
             User user) {
-        return node.rawNode();
+        return process(node.rawNode());
     }
 
 
@@ -49,8 +50,10 @@ public class CollectionCleanupFilter implements RewriteTask.RewriteNodeAt {
             if (!root.equals(sub)) {
                 if (sub.isObject()) {
                     ObjectNode ob = (ObjectNode) root;
-                    ob.removeAll();
+                    ob.remove(Arrays.asList(new String[]{"@type", "operation", "operands"}));
                     ob.putAll((ObjectNode) sub);
+                    //if (!rewrites.isMissingNode())
+                    //    ob.put("rewrites", rewrites);
                 }
             }
         }
@@ -59,7 +62,7 @@ public class CollectionCleanupFilter implements RewriteTask.RewriteNodeAt {
 
     @Override
     public JsonNode postProcess (KoralNode node) {
-        return process(node.rawNode());
+        return null;
     }
 
 

@@ -29,10 +29,12 @@ public abstract class KoralNode {
     }
 
 
-    public void buildRewrites() {
-        System.out.println("LIST REWRITES "+ this.rewrites.rewrites);
-        this.rewrites.build(this.node);
+    public void buildRewrites(JsonNode node) {
+        this.rewrites.build(node);
+    }
 
+    public void buildRewrites() {
+        this.rewrites.build(this.node);
     }
 
     @Override
@@ -129,8 +131,8 @@ public abstract class KoralNode {
     }
 
 
-    public void removeNode () {
-        this.rewrites.add("deletion", this.node);
+    public void removeNode (String identifier) {
+        this.rewrites.add("deletion", identifier);
         this.remove = true;
     }
 

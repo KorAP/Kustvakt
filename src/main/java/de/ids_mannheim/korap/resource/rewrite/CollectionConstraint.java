@@ -24,7 +24,7 @@ public class CollectionConstraint implements RewriteTask.IterableRewritePath {
         if (node.get("@type").equals("koral:doc")) {
             if (node.get("key").equals(Attributes.CORPUS_SIGLE)
                     && !check(node, user))
-                node.removeNode();
+                node.removeNode(Attributes.CORPUS_SIGLE);
         }
         return node.rawNode();
     }
