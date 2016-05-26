@@ -1,2 +1,7 @@
 .*
 !/.gitignore
+target
+tmp
+logs
+cache_store
+*.iml

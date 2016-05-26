@@ -1,10 +1,7 @@
 package de.ids_mannheim.korap.resource.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import de.ids_mannheim.korap.config.BeanInjectable;
-import de.ids_mannheim.korap.config.BeansFactory;
-import de.ids_mannheim.korap.config.ContextHolder;
-import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.config.*;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.DocumentDao;
 import de.ids_mannheim.korap.resources.Document;
@@ -12,6 +9,7 @@ import de.ids_mannheim.korap.user.User;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import org.w3c.dom.Attr;
 
 /**
  * @author hanl
@@ -43,8 +41,8 @@ public class DocMatchRewrite implements RewriteTask.IterableRewritePath,
         if (this.docDao == null)
             throw new RuntimeException("Document dao must be set!");
 
-        if (node.has("docID")) {
-            String docID = node.get("docID");
+        if (node.has(Attributes.DOC_SIGLE)) {
+            String docID = node.get(Attributes.DOC_SIGLE);
             Element e = this.cache.get(docID);
             if (e == null) {
                 doc = docDao.findbyId(docID, null);
@@ -55,7 +53,7 @@ public class DocMatchRewrite implements RewriteTask.IterableRewritePath,
                 doc = (Document) e.getObjectValue();
 
             if (doc != null && doc.isDisabled())
-                node.removeNode();
+                node.removeNode(Attributes.DOC_SIGLE);
         }
         return node.rawNode();
     }
