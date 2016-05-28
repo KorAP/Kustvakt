@@ -65,8 +65,6 @@ public class FoundryRewriteTest extends BeanConfigTest {
         s.setQuery("[base=Haus]", "poliqarp");
         String result = processor.process(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
-
-        System.out.println("REWRITTEN "+ node);
         assertNotNull(node);
         assertFalse(node.at("/query/wrap/foundry").isMissingNode());
         assertEquals(c.getDefault_lemma(), node.at("/query/wrap/foundry")

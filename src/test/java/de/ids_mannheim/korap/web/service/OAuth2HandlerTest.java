@@ -13,6 +13,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
+
 /**
  * @author hanl
  * @date 13/05/2015
@@ -65,7 +67,7 @@ public class OAuth2HandlerTest extends BeanConfigTest {
                 .getPersistenceClient());
         handler.authorize(codeInfo, helper().getUser());
         codeInfo = handler.getAuthorization(auth_code);
-        Assert.assertNotNull("client is null!", codeInfo);
+        assertNotNull("client is null!", codeInfo);
     }
 
 
@@ -84,7 +86,7 @@ public class OAuth2HandlerTest extends BeanConfigTest {
         handler.addToken(codeInfo.getCode(), t, refresh, 7200);
 
         TokenContext ctx = handler.getContext(t);
-        Assert.assertNotNull("context is null", ctx);
+        assertNotNull("context is null", ctx);
 
         AuthCodeInfo c2 = handler.getAuthorization(codeInfo.getCode());
         Assert.assertNull("clearing authorization failed", c2);

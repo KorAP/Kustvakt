@@ -381,8 +381,9 @@ public class ResourceService {
                 resource = this.resourceHandler.findbyStrId(id, user,
                         ResourceFactory.getResourceClass(type));
 
+            // todo: test this
             if (resource instanceof VirtualCollection)
-                cquery.with((String) resource.getData());
+                cquery.mergeWith(resource.getData());
             else if (resource instanceof Corpus)
                 cquery.with(Attributes.CORPUS_SIGLE + resource.getPersistentID());
 
@@ -548,7 +549,7 @@ public class ResourceService {
                             ResourceFactory.getResourceClass(type));
 
                 if (resource instanceof VirtualCollection)
-                    builder.setBaseQuery((String) resource.getData());
+                    builder.setBaseQuery(resource.getData());
                 else if (resource instanceof Corpus)
                     builder.with(Attributes.CORPUS_SIGLE+ resource.getPersistentID());
                 else
@@ -704,9 +705,7 @@ public class ResourceService {
         VirtualCollection tmp = resourceHandler.getCache(cache.getId(),
                 VirtualCollection.class);
         if (tmp == null) {
-            KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder()
-                    .setBaseQuery((String) cache.getData());
-            String query = this.processor.process((String) cache.getData(),
+            String query = this.processor.process(cache.getData(),
                     user);
             String stats = searchKrill.getStatistics(query);
             cache.setStats(JsonUtils.readSimple(stats, Map.class));
@@ -785,10 +784,10 @@ public class ResourceService {
                 .getResourceClass(type))) {
             VirtualCollection cachetmp, collection;
 
-            String base;
+            JsonNode base;
             if (reference != null && !reference.equals("null")) {
                 try {
-                    base = (String) resourceHandler.findbyStrId(reference,
+                    base = resourceHandler.findbyStrId(reference,
                             user, VirtualCollection.class).getData();
                 }
                 catch (KustvaktException e) {
@@ -797,7 +796,7 @@ public class ResourceService {
 
             }
             else if (query != null)
-                base = query;
+                base = JsonUtils.readTree(query);
             else
                 // todo: throw exception response for no resource to save!
                 return null;
@@ -839,13 +838,14 @@ public class ResourceService {
 
     /**
      * store a virtual collection. Retrieve cached entry first and
-     * then store VCollection
+     * then store collection
      * 
      * @param context
      * @param locale
      * @param query
      * @return
      */
+    // todo: testing
     @POST
     @Path("{type}")
     public Response storeResource (@Context SecurityContext context,
@@ -873,28 +873,21 @@ public class ResourceService {
                 .getResourceClass(type))) {
 
             VirtualCollection cachetmp, collection;
-            // todo: ??
-            Object read = JsonUtils.readTree(query);
+
             KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
             if (reference != null && !reference.equals("null")) {
                 try {
-                    cquery.with((String) resourceHandler.findbyStrId(
+                    cquery.setBaseQuery(resourceHandler.findbyStrId(
                             reference, user, VirtualCollection.class).getData());
+
                 }
                 catch (KustvaktException e) {
                     throw KustvaktResponseHandler.throwit(e);
                 }
-                // todo: 11.01
-                //                if (!filter)
-                //                    cquery.addMetaExtendQuery(query);
-                //                else
-                //                    cquery.addMetaFilterQuery(query);
-                //            }else {
-                //                if (read != null)
-                //                    cquery.addResource(query);
-                //                else
-                //                    cquery.addMetaFilterQuery(query);
             }
+            if (query != null && !query.isEmpty())
+                cquery.with(query);
+
             cachetmp = ResourceFactory.getCachedCollection(cquery.toJSON());
 
             // see if vc was cached!

@@ -23,6 +23,7 @@ public class KoralCollectionQueryBuilder {
     private boolean verbose;
     private JsonNode base;
     private StringBuilder builder;
+    private String mergeOperator;
 
 
     public KoralCollectionQueryBuilder() {
@@ -34,6 +35,7 @@ public class KoralCollectionQueryBuilder {
         this.verbose = verbose;
         this.builder = new StringBuilder();
         this.base = null;
+        this.mergeOperator = null;
     }
 
 
@@ -75,44 +77,53 @@ public class KoralCollectionQueryBuilder {
 
 
     public KoralCollectionQueryBuilder and () {
-        this.builder.append(" & ");
+        if (this.builder.length() != 0)
+            this.builder.append(" & ");
+        if (this.base != null && this.mergeOperator == null)
+            this.mergeOperator = "AND";
         return this;
     }
 
 
     public KoralCollectionQueryBuilder or () {
-        this.builder.append(" | ");
+        if (this.builder.length() != 0)
+            this.builder.append(" | ");
+        if (this.base != null && this.mergeOperator == null)
+            this.mergeOperator = "OR";
         return this;
     }
 
 
     public Object rebaseCollection () {
-        if (builder.length() == 0 && base == null)
+        if (this.builder.length() == 0 && this.base == null)
             return null;
 
         JsonNode request = null;
-        if (builder.length() != 0) {
+        if (this.builder.length() != 0) {
             CollectionQueryProcessor tree = new CollectionQueryProcessor(
                     this.verbose);
             tree.process(this.builder.toString());
             request = JsonUtils.valueToTree(tree.getRequestMap());
         }
 
-        if (base != null) {
+        if (this.base != null) {
             // check that collection non empty
+            JsonNode tmp = this.base.deepCopy();
             if (request != null) {
                 JsonNode tobase = request.at("/collection");
-                request = base.deepCopy();
-                JsonNode result = JsonBuilder.buildDocGroup("and",
+                request = tmp;
+                JsonNode result = JsonBuilder.buildDocGroup(this.mergeOperator != null
+                        ? this.mergeOperator.toLowerCase() : "and",
                         request.at("/collection"), tobase);
                 ((ObjectNode) request).put("collection", result);
-            }
+            } else
+                request = tmp;
         }
         return request;
     }
 
     public JsonNode mergeWith(JsonNode node) {
-        if (base != null) {
+        if (this.base != null) {
             // check that collection non empty
             if (node != null) {
                 JsonNode tobase = node.at("/collection");
@@ -137,6 +148,10 @@ public class KoralCollectionQueryBuilder {
      */
     public KoralCollectionQueryBuilder setBaseQuery (String query) {
         this.base = JsonUtils.readTree(query);
+        return this;
+    }
+    public KoralCollectionQueryBuilder setBaseQuery (JsonNode query) {
+        this.base = query;
         return this;
     }
 

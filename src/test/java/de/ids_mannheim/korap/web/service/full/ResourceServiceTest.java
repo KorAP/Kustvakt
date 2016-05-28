@@ -189,13 +189,13 @@ public class ResourceServiceTest extends FastJerseyTest {
     @Test
     public void testGetResources () {
         ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").get(ClientResponse.class);
+                .path("collection").get(ClientResponse.class);
         assertEquals(response.getStatus(),
                 ClientResponse.Status.OK.getStatusCode());
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        System.out.println("NODE 1 " + node);
+        assertNotEquals(0, node.size());
     }
 
 

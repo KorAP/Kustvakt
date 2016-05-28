@@ -116,16 +116,16 @@ public class RewriteHandler implements BeanInjectable {
 
 
 
-    public JsonNode process(JsonNode root, User user) {
+    public String process(JsonNode root, User user) {
         RewriteProcess process = new RewriteProcess(root, user);
         JsonNode pre = process.start(false);
         //return iterate(pre, user, true);
-        return pre;
+        return JsonUtils.toJSON(pre);
     }
 
 
     public String process(String json, User user) {
-        return JsonUtils.toJSON(process(JsonUtils.readTree(json), user));
+        return process(JsonUtils.readTree(json), user);
     }
 
 

@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.resources;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.AccessLevel;
@@ -99,7 +100,11 @@ public abstract class KustvaktResource {
     }
 
 
-    public String getData () {
+    public JsonNode getData () {
+        return JsonUtils.valueToTree(this.fields);
+    }
+
+    public String getStringData() {
         return JsonUtils.toJSON(this.fields);
     }
 
@@ -178,8 +183,9 @@ public abstract class KustvaktResource {
         //        m.put("path", path);
         m.put("description", description);
         m.put("created", TimeUtils.format(new DateTime(created)));
-        m.put("data", getData());
+        m.put("data", this.fields);
         // deprecated
+        // todo:
         //        m.put("managed", managed);
         //        m.put("shared", shared);
         return m;
