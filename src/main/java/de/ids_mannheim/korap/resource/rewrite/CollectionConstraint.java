@@ -17,30 +17,32 @@ public class CollectionConstraint implements RewriteTask.IterableRewritePath {
 
 
 
-
     @Override
-    public JsonNode preProcess (KoralNode node, KustvaktConfiguration config,
+    public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) {
         if (node.get("@type").equals("koral:doc")) {
-            if (node.get("key").equals(Attributes.CORPUS_SIGLE)
-                    && !check(node, user))
-                node.removeNode(Attributes.CORPUS_SIGLE);
+            if (node.get("key").equals(Attributes.CORPUS_SIGLE)) {
+                String id = node.get("value");
+                KustvaktResource corpus = check(id, user);
+                if (corpus == null)
+                    node.removeNode(new KoralNode.RewriteIdentifier(
+                            Attributes.CORPUS_SIGLE, id));
+            }
         }
         return node.rawNode();
     }
 
 
     /**
-     * @param node
+     * @param id
      * @param user
      * @return boolean if true access granted
      */
-    private boolean check (KoralNode node, User user) {
+    private KustvaktResource check (String id, User user) {
         // todo: can be used to circumvent access control if public filter not applied
         if (user == null)
-            return true;
+            return null;
 
-        String id = node.get("value");
         KustvaktResource corpus;
         try {
             SecurityManager m = SecurityManager
@@ -48,14 +50,14 @@ public class CollectionConstraint implements RewriteTask.IterableRewritePath {
             corpus = m.getResource();
         }
         catch (RuntimeException | KustvaktException e) {
-            return false;
+            return null;
         }
-        return corpus != null;
+        return corpus;
     }
 
 
     @Override
-    public JsonNode postProcess (KoralNode node) {
+    public JsonNode rewriteResult (KoralNode node) {
         return null;
     }
 

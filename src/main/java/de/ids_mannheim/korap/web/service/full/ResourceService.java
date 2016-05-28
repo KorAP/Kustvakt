@@ -312,7 +312,7 @@ public class ResourceService {
 
         ss.setMeta(meta);
 
-        String query = this.processor.process(ss.toJSON(), user);
+        String query = this.processor.processQuery(ss.toJSON(), user);
         return Response.ok(query).build();
     }
 
@@ -385,7 +385,8 @@ public class ResourceService {
             if (resource instanceof VirtualCollection)
                 cquery.mergeWith(resource.getData());
             else if (resource instanceof Corpus)
-                cquery.with(Attributes.CORPUS_SIGLE + resource.getPersistentID());
+                cquery.with(Attributes.CORPUS_SIGLE
+                        + resource.getPersistentID());
 
         }
         catch (KustvaktException e) {
@@ -409,7 +410,7 @@ public class ResourceService {
         // todo: should be possible to add the meta part to the query serialization
         try {
             User user = controller.getUser(ctx.getUsername());
-            jsonld = this.processor.process(jsonld, user);
+            jsonld = this.processor.processQuery(jsonld, user);
         }
         catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
@@ -468,7 +469,7 @@ public class ResourceService {
         serializer.setMeta(meta.raw());
 
         //fixme: policy rewrite!
-        String query = this.processor.process(serializer.toJSON(), user);
+        String query = this.processor.processQuery(serializer.toJSON(), user);
 
         jlog.info("the serialized query {}", query);
 
@@ -551,7 +552,8 @@ public class ResourceService {
                 if (resource instanceof VirtualCollection)
                     builder.setBaseQuery(resource.getData());
                 else if (resource instanceof Corpus)
-                    builder.with(Attributes.CORPUS_SIGLE+ resource.getPersistentID());
+                    builder.with(Attributes.CORPUS_SIGLE
+                            + resource.getPersistentID());
                 else
                     throw KustvaktResponseHandler.throwit(
                             StatusCodes.ILLEGAL_ARGUMENT,
@@ -577,7 +579,7 @@ public class ResourceService {
             try {
 
                 // rewrite process
-                query = this.processor.process(query, user);
+                query = this.processor.processQuery(query, user);
 
                 if (eng.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
                     if (raw)
@@ -669,10 +671,10 @@ public class ResourceService {
                 query.setBaseQuery(resource.getData());
             }
             else if (resource instanceof Corpus) {
-                query.with(Attributes.CORPUS_SIGLE+"=" + resource.getName());
+                query.with(Attributes.CORPUS_SIGLE + "=" + resource.getName());
             }
             String res = query.toJSON();
-            String qstr = processor.process(res, user);
+            String qstr = processor.processQuery(res, user);
             return Response.ok(searchKrill.getStatistics(qstr)).build();
         }
         catch (KustvaktException e) {
@@ -705,8 +707,7 @@ public class ResourceService {
         VirtualCollection tmp = resourceHandler.getCache(cache.getId(),
                 VirtualCollection.class);
         if (tmp == null) {
-            String query = this.processor.process(cache.getData(),
-                    user);
+            String query = this.processor.processQuery(cache.getData(), user);
             String stats = searchKrill.getStatistics(query);
             cache.setStats(JsonUtils.readSimple(stats, Map.class));
             resourceHandler.cache(cache);
@@ -787,8 +788,8 @@ public class ResourceService {
             JsonNode base;
             if (reference != null && !reference.equals("null")) {
                 try {
-                    base = resourceHandler.findbyStrId(reference,
-                            user, VirtualCollection.class).getData();
+                    base = resourceHandler.findbyStrId(reference, user,
+                            VirtualCollection.class).getData();
                 }
                 catch (KustvaktException e) {
                     throw KustvaktResponseHandler.throwit(e);
@@ -877,8 +878,8 @@ public class ResourceService {
             KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
             if (reference != null && !reference.equals("null")) {
                 try {
-                    cquery.setBaseQuery(resourceHandler.findbyStrId(
-                            reference, user, VirtualCollection.class).getData());
+                    cquery.setBaseQuery(resourceHandler.findbyStrId(reference,
+                            user, VirtualCollection.class).getData());
 
                 }
                 catch (KustvaktException e) {

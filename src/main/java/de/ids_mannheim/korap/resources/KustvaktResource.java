@@ -104,7 +104,8 @@ public abstract class KustvaktResource {
         return JsonUtils.valueToTree(this.fields);
     }
 
-    public String getStringData() {
+
+    public String getStringData () {
         return JsonUtils.toJSON(this.fields);
     }
 

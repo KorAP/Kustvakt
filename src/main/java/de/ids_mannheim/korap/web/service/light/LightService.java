@@ -88,8 +88,7 @@ public class LightService {
             @QueryParam("cutoff") Boolean cutoff,
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
-            @QueryParam("page") Integer startPage,
-            @QueryParam("cq") String cq) {
+            @QueryParam("page") Integer startPage, @QueryParam("cq") String cq) {
         QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
 
         MetaQueryBuilder meta = new MetaQueryBuilder();
@@ -102,14 +101,14 @@ public class LightService {
         ss.setMeta(meta);
         if (cq != null)
             ss.setCollection(cq);
-        return Response.ok(processor.process(ss.toJSON(), null)).build();
+        return Response.ok(processor.processQuery(ss.toJSON(), null)).build();
     }
 
 
     @POST
     @Path("search")
     public Response queryRaw (@QueryParam("engine") String engine, String jsonld) {
-        jsonld = processor.process(jsonld, null);
+        jsonld = processor.processQuery(jsonld, null);
         // todo: should be possible to add the meta part to the query serialization
         jlog.info("Serialized search: {}", jsonld);
 
@@ -143,7 +142,7 @@ public class LightService {
         if (cq != null)
             serializer.setCollection(cq);
 
-        String query = processor.process(serializer.toJSON(), null);
+        String query = processor.processQuery(serializer.toJSON(), null);
         jlog.info("the serialized query {}", query);
 
         // This may not work with the the KoralQuery
@@ -214,7 +213,7 @@ public class LightService {
             //                meta.addEntry("itemsPerResource", 1);
             QuerySerializer s = new QuerySerializer().setQuery(query, ql, v)
                     .setMeta(meta);
-            query = processor.process(s.toJSON(), null);
+            query = processor.processQuery(s.toJSON(), null);
         }
         String result;
         try {

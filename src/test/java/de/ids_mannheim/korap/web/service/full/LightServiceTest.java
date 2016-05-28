@@ -46,12 +46,11 @@ public class LightServiceTest extends FastJerseyTest {
         assertEquals("13", node.at("/meta/count").asText());
     }
 
+
     @Test
-    public void testbuildAndPostQuery() {
-        ClientResponse response = resource()
-                .path(getAPIVersion())
-                .path("search")
-                .queryParam("q", "[orth=das]")
+    public void testbuildAndPostQuery () {
+        ClientResponse response = resource().path(getAPIVersion())
+                .path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp")
                 .queryParam("cq", "corpusSigle=WPD | corpusSigle=GOE")
                 .method("TRACE", ClientResponse.class);
@@ -62,9 +61,8 @@ public class LightServiceTest extends FastJerseyTest {
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
 
-        response = resource()
-                .path(getAPIVersion())
-                .path("search").post(ClientResponse.class, query);
+        response = resource().path(getAPIVersion()).path("search")
+                .post(ClientResponse.class, query);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());

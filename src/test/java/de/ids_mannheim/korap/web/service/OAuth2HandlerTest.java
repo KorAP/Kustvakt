@@ -14,6 +14,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author hanl
@@ -48,14 +49,6 @@ public class OAuth2HandlerTest extends BeanConfigTest {
     }
 
 
-    //    @AfterClass
-    //    public static void drop() throws KustvaktException {
-    //        assert handler != null;
-    //        handler.removeClient(info, helper().getUser());
-    //        helper().dropUser();
-    //        BeansFactory.closeApplication();
-    //    }
-
     @Test
     public void testStoreAuthorizationCodeThrowsNoException ()
             throws KustvaktException {
@@ -89,7 +82,7 @@ public class OAuth2HandlerTest extends BeanConfigTest {
         assertNotNull("context is null", ctx);
 
         AuthCodeInfo c2 = handler.getAuthorization(codeInfo.getCode());
-        Assert.assertNull("clearing authorization failed", c2);
+        assertNull("clearing authorization failed", c2);
     }
 
 

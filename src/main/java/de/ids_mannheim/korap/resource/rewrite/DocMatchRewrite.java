@@ -36,24 +36,25 @@ public class DocMatchRewrite implements RewriteTask.IterableRewritePath,
 
 
     @Override
-    public JsonNode postProcess (KoralNode node) throws KustvaktException {
+    public JsonNode rewriteResult (KoralNode node) throws KustvaktException {
         Document doc = null;
         if (this.docDao == null)
             throw new RuntimeException("Document dao must be set!");
 
-        if (node.has(Attributes.DOC_SIGLE)) {
-            String docID = node.get(Attributes.DOC_SIGLE);
-            Element e = this.cache.get(docID);
+        if (node.has(Attributes.TEXT_SIGLE)) {
+            String textSigle = node.get(Attributes.TEXT_SIGLE);
+            Element e = this.cache.get(textSigle);
             if (e == null) {
-                doc = docDao.findbyId(docID, null);
+                doc = docDao.findbyId(textSigle, null);
                 if (doc != null)
-                    this.cache.put(new Element(docID, doc));
+                    this.cache.put(new Element(textSigle, doc));
             }
             else
                 doc = (Document) e.getObjectValue();
 
             if (doc != null && doc.isDisabled())
-                node.removeNode(Attributes.DOC_SIGLE);
+                node.removeNode(new KoralNode.RewriteIdentifier(
+                        Attributes.TEXT_SIGLE, doc.getPersistentID()));
         }
         return node.rawNode();
     }
@@ -66,7 +67,7 @@ public class DocMatchRewrite implements RewriteTask.IterableRewritePath,
 
 
     @Override
-    public JsonNode preProcess (KoralNode node, KustvaktConfiguration config,
+    public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) {
         return null;
     }

@@ -757,7 +757,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
             if (data == null)
                 throw new KustvaktException(user.getId(),
-                        StatusCodes.EMPTY_RESULTS, "No data found!", clazz.getSimpleName());
+                        StatusCodes.EMPTY_RESULTS, "No data found!",
+                        clazz.getSimpleName());
             return data;
         }
         catch (KustvaktException e) {
@@ -784,6 +785,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             throw new WrappedException(e, StatusCodes.UPDATE_ACCOUNT_FAILED);
         }
     }
+
 
     private String cache_key (String input) throws KustvaktException {
         try {

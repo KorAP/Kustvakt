@@ -11,26 +11,24 @@ import de.ids_mannheim.korap.security.ac.ResourceFinder;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import org.w3c.dom.Attr;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
  * @author hanl
  * @date 04/07/2015
  */
-public class PublicCollection implements RewriteTask.RewriteBefore {
+public class PublicCollection implements RewriteTask.RewriteQuery {
 
     public PublicCollection () {
         super();
     }
 
 
-    // todo: where to inject the array node into? --> super group with and relation plus subgroup with ids and or operator
     @Override
-    public JsonNode preProcess (KoralNode node, KustvaktConfiguration config,
+    public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) {
         JsonNode subnode = node.rawNode();
 
@@ -48,13 +46,18 @@ public class PublicCollection implements RewriteTask.RewriteBefore {
                     throw new KustvaktException(StatusCodes.PERMISSION_DENIED,
                             "No resources found for user", user.getUsername());
 
+                Set ids = new HashSet(resources.size());
                 for (int i = 0; i < list.size(); i++) {
                     if (i > 0)
                         b.or();
-                    b.with(Attributes.CORPUS_SIGLE+"=" + list.get(i).getPersistentID());
+                    b.with(Attributes.CORPUS_SIGLE + "="
+                            + list.get(i).getPersistentID());
+                    ids.add(list.get(i).getPersistentID());
                 }
                 JsonNode rewritten = JsonUtils.readTree(b.toJSON());
-                node.set("collection", rewritten.at("/collection"), Attributes.CORPUS_SIGLE);
+                node.set("collection", rewritten.at("/collection"),
+                        new KoralNode.RewriteIdentifier(
+                                Attributes.CORPUS_SIGLE, ids));
                 node.at("/collection");
             }
             catch (KustvaktException e) {

@@ -42,6 +42,7 @@ public class ResourceServiceTest extends FastJerseyTest {
 
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         assertNotNull(node);
+        System.out.println("NODE " + node);
         assertNotEquals(0, node.path("matches").size());
     }
 

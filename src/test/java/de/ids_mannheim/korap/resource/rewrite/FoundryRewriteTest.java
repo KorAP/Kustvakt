@@ -63,7 +63,7 @@ public class FoundryRewriteTest extends BeanConfigTest {
         processor.add(FoundryInject.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[base=Haus]", "poliqarp");
-        String result = processor.process(s.toJSON(), null);
+        String result = processor.processQuery(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
         assertNotNull(node);
         assertFalse(node.at("/query/wrap/foundry").isMissingNode());
@@ -87,7 +87,7 @@ public class FoundryRewriteTest extends BeanConfigTest {
         handler.insertBeans(helper().getContext());
         s.setQuery("[pos=ADJA]", "poliqarp");
         assertTrue(handler.add(FoundryInject.class));
-        String result = handler.process(s.toJSON(), null);
+        String result = handler.processQuery(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
 
         assertNotNull(node);
@@ -112,7 +112,7 @@ public class FoundryRewriteTest extends BeanConfigTest {
         handler.add(FoundryInject.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[pos=ADJA]", "poliqarp");
-        String result = handler.process(s.toJSON(), user);
+        String result = handler.processQuery(s.toJSON(), user);
         JsonNode node = JsonUtils.readTree(result);
 
         UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
@@ -142,7 +142,7 @@ public class FoundryRewriteTest extends BeanConfigTest {
         handler.add(FoundryInject.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[base=Haus]", "poliqarp");
-        String result = handler.process(s.toJSON(), user);
+        String result = handler.processQuery(s.toJSON(), user);
         JsonNode node = JsonUtils.readTree(result);
 
         UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
@@ -170,7 +170,7 @@ public class FoundryRewriteTest extends BeanConfigTest {
         handler.insertBeans(helper().getContext());
         s.setQuery("[orth=laufe/i & base!=Lauf]", "poliqarp");
         assertTrue(handler.add(FoundryInject.class));
-        String result = handler.process(s.toJSON(), null);
+        String result = handler.processQuery(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
 
         assertNotNull(node);
@@ -189,7 +189,7 @@ public class FoundryRewriteTest extends BeanConfigTest {
         handler.insertBeans(helper().getContext());
         s.setQuery("[(base=laufen | base=gehen) & tt/pos=VVFIN]", "poliqarp");
         assertTrue(handler.add(FoundryInject.class));
-        String result = handler.process(s.toJSON(), null);
+        String result = handler.processQuery(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
 
         assertNotNull(node);

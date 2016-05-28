@@ -5,13 +5,10 @@ import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
-import de.ids_mannheim.korap.resources.Corpus;
-import de.ids_mannheim.korap.security.ac.ResourceFinder;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import org.junit.Test;
 
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,14 +55,15 @@ public class CollectionRewriteTest extends BeanConfigTest {
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection("textClass=politik & corpusSigle=WPD");
         String result = s.toJSON();
-        JsonNode node = JsonUtils.readTree(handler.process(result,
+        JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
         assertEquals(1, node.at("/collection/operands").size());
     }
 
+
     @Test
-    public void testCollectionNodeDeletionNotification() {
+    public void testCollectionNodeDeletionNotification () {
 
     }
 
@@ -80,13 +78,15 @@ public class CollectionRewriteTest extends BeanConfigTest {
         s.setCollection("corpusSigle=BRZ13 & corpusSigle=WPD");
         String result = s.toJSON();
         try {
-            JsonNode node = JsonUtils.readTree(handler.process(result,
+            JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                     User.UserFactory.getUser("test_user")));
             System.out.println(node);
             assertNotNull(node);
             assertEquals(0, node.at("/collection/operands").size());
-            assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type").asText());
-        } catch ( Exception e) {
+            assertEquals("koral:rewrite",
+                    node.at("/collection/rewrites/0/@type").asText());
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -101,7 +101,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection("(corpusSigle=BRZ13 & textClass=Wissenschaft) & corpusSigle=WPD");
         String result = s.toJSON();
-        JsonNode node = JsonUtils.readTree(handler.process(result,
+        JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                 User.UserFactory.getUser("test_user")));
 
         assertNotNull(node);
@@ -109,7 +109,8 @@ public class CollectionRewriteTest extends BeanConfigTest {
                 .asText());
         assertEquals("textClass",
                 node.at("/collection/operands/0/operands/0/key").asText());
-        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type").asText());
+        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type")
+                .asText());
     }
 
 
@@ -119,13 +120,13 @@ public class CollectionRewriteTest extends BeanConfigTest {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
-        handler.add(CollectionCleanupFilter.class);
+        handler.add(CollectionCleanRewrite.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection("(corpusSigle=BRZ13 & corpusSigle=WPD) & textClass=Wissenschaft & textClass=Sport");
         String result = s.toJSON();
 
-        JsonNode node = JsonUtils.readTree(handler.process(result,
+        JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                 User.UserFactory.getUser("test_user")));
 
 
@@ -137,7 +138,8 @@ public class CollectionRewriteTest extends BeanConfigTest {
                 .asText());
         assertEquals("textClass", node.at("/collection/operands/1/key")
                 .asText());
-        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type").asText());
+        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type")
+                .asText());
     }
 
 
@@ -146,18 +148,19 @@ public class CollectionRewriteTest extends BeanConfigTest {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
-        handler.add(CollectionCleanupFilter.class);
+        handler.add(CollectionCleanRewrite.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection("(corpusSigle=BRZ13 & textClass=wissenschaft)");
         String result = s.toJSON();
-        JsonNode node = JsonUtils.readTree(handler.process(result,
+        JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
         assertEquals("koral:doc", node.at("/collection/@type").asText());
         assertEquals("textClass", node.at("/collection/key").asText());
         assertEquals("wissenschaft", node.at("/collection/value").asText());
-        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type").asText());
+        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type")
+                .asText());
     }
 
 
@@ -166,18 +169,19 @@ public class CollectionRewriteTest extends BeanConfigTest {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
-        handler.add(CollectionCleanupFilter.class);
+        handler.add(CollectionCleanRewrite.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection("(corpusSigle=BRZ13 & corpusSigle=WPD) & textClass=Wissenschaft");
         String result = s.toJSON();
-        JsonNode node = JsonUtils.readTree(handler.process(result,
+        JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                 User.UserFactory.getUser("test_user")));
 
         assertNotNull(node);
         assertEquals("koral:doc", node.at("/collection/@type").asText());
         assertEquals("textClass", node.at("/collection/key").asText());
-        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type").asText());
+        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type")
+                .asText());
     }
 
 
@@ -186,12 +190,12 @@ public class CollectionRewriteTest extends BeanConfigTest {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
-        handler.add(CollectionCleanupFilter.class);
+        handler.add(CollectionCleanRewrite.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection("(docID=random & textClass=Wissenschaft) & corpusSigle=WPD");
         String org = s.toJSON();
-        JsonNode node = JsonUtils.readTree(handler.process(org,
+        JsonNode node = JsonUtils.readTree(handler.processQuery(org,
                 User.UserFactory.getUser("test_user")));
         System.out.println(node);
         assertNotNull(node);
@@ -201,7 +205,8 @@ public class CollectionRewriteTest extends BeanConfigTest {
                 .asText());
         assertEquals("koral:doc", node.at("/collection/operands/1/@type")
                 .asText());
-        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type").asText());
+        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type")
+                .asText());
     }
 
 
@@ -214,12 +219,16 @@ public class CollectionRewriteTest extends BeanConfigTest {
         QuerySerializer s = new QuerySerializer();
         s.setQuery(simple_add_query, "poliqarp");
         String org = s.toJSON();
-        JsonNode node = JsonUtils.readTree(handler.process(org,
+        JsonNode node = JsonUtils.readTree(handler.processQuery(org,
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
-        assertEquals("corpusSigle", node.at("/collection/operands/0/key").asText());
-        assertEquals("corpusSigle", node.at("/collection/operands/1/key").asText());
-        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type").asText());
+        assertEquals("corpusSigle", node.at("/collection/operands/0/key")
+                .asText());
+        assertEquals("corpusSigle", node.at("/collection/operands/1/key")
+                .asText());
+        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type")
+                .asText());
+        System.out.println("NODE " + node);
     }
 
 
@@ -230,22 +239,25 @@ public class CollectionRewriteTest extends BeanConfigTest {
         handler.insertBeans(helper().getContext());
         handler.add(PublicCollection.class);
 
-            QuerySerializer s = new QuerySerializer();
-            s.setQuery(simple_add_query, "poliqarp");
-            s.setCollection("(docSigle=WPD_AAA & textClass=wissenschaft)");
-            String org = s.toJSON();
-            JsonNode node = JsonUtils.readTree(handler.process(org,
-                    User.UserFactory.getUser("test_user")));
-            assertNotNull(node);
-            assertEquals(2, node.at("/collection/operands").size());
-            assertEquals("corpusSigle", node.at("/collection/operands/1/operands/0/key").asText());
-            assertEquals("corpusSigle", node.at("/collection/operands/1/operands/1/key").asText());
-            assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type").asText());
+        QuerySerializer s = new QuerySerializer();
+        s.setQuery(simple_add_query, "poliqarp");
+        s.setCollection("(docSigle=WPD_AAA & textClass=wissenschaft)");
+        String org = s.toJSON();
+        JsonNode node = JsonUtils.readTree(handler.processQuery(org,
+                User.UserFactory.getUser("test_user")));
+        assertNotNull(node);
+        assertEquals(2, node.at("/collection/operands").size());
+        assertEquals("corpusSigle",
+                node.at("/collection/operands/1/operands/0/key").asText());
+        assertEquals("corpusSigle",
+                node.at("/collection/operands/1/operands/1/key").asText());
+        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type")
+                .asText());
     }
 
 
     @Test
-    public void testRemoveCorpusFromDifferentGroups() {
+    public void testRemoveCorpusFromDifferentGroups () {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
@@ -253,7 +265,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection("(corpusSigle=BRZ14 & textClass=wissenschaft) | (corpusSigle=AZPR | textClass=freizeit)");
         String org = s.toJSON();
-        JsonNode node = JsonUtils.readTree(handler.process(org,
+        JsonNode node = JsonUtils.readTree(handler.processQuery(org,
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
         assertEquals("koral:docGroup", node.at("/collection/@type").asText());
@@ -264,34 +276,43 @@ public class CollectionRewriteTest extends BeanConfigTest {
                 .asText());
         assertEquals(1, node.at("/collection/operands/0/operands").size());
         assertEquals(1, node.at("/collection/operands/1/operands").size());
-        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type").asText());
+        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type")
+                .asText());
     }
 
+
     @Test
-    public void testRemoveOneCorpusAndMoveDocFromTwoGroups() {
+    public void testRemoveOneCorpusAndMoveDocFromTwoGroups () {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
         // todo: use this collection query also to test clean up filter! after reduction of corpusSigle (wiss | freizeit)!
-        handler.add(CollectionCleanupFilter.class);
+        handler.add(CollectionCleanRewrite.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(simple_add_query, "poliqarp");
         s.setCollection("(corpusSigle=BRZ14 & textClass=wissenschaft) | (corpusSigle=AZPR | textClass=freizeit)");
         String org = s.toJSON();
-        JsonNode node = JsonUtils.readTree(handler.process(org,
+        JsonNode node = JsonUtils.readTree(handler.processQuery(org,
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
         assertEquals("koral:docGroup", node.at("/collection/@type").asText());
         assertEquals(2, node.at("/collection/operands").size());
         assertEquals("koral:doc", node.at("/collection/operands/0/@type")
                 .asText());
-        assertEquals("koral:doc", node.at("/collection/operands/0/@type").asText());
-        assertEquals("textClass", node.at("/collection/operands/0/key").asText());
-        assertEquals("wissenschaft", node.at("/collection/operands/0/value").asText());
-        assertEquals("koral:doc", node.at("/collection/operands/1/@type").asText());
-        assertEquals("textClass", node.at("/collection/operands/1/key").asText());
-        assertEquals("freizeit", node.at("/collection/operands/1/value").asText());
-        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type").asText());
+        assertEquals("koral:doc", node.at("/collection/operands/0/@type")
+                .asText());
+        assertEquals("textClass", node.at("/collection/operands/0/key")
+                .asText());
+        assertEquals("wissenschaft", node.at("/collection/operands/0/value")
+                .asText());
+        assertEquals("koral:doc", node.at("/collection/operands/1/@type")
+                .asText());
+        assertEquals("textClass", node.at("/collection/operands/1/key")
+                .asText());
+        assertEquals("freizeit", node.at("/collection/operands/1/value")
+                .asText());
+        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type")
+                .asText());
     }
 
 

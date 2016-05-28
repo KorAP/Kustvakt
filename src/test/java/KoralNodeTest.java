@@ -7,6 +7,7 @@ import org.junit.Test;
  * @author hanl
  * @date 21/10/2015
  */
+// todo: complete tests
 public class KoralNodeTest {
 
     // todo: 21.10.15 --> e.g. injection does not tell you if an entire node was injected, or just a value!
@@ -25,7 +26,7 @@ public class KoralNodeTest {
         ObjectNode node = JsonUtils.createObjectNode();
         node.put("value_1", "setting_1");
         KoralNode knode = KoralNode.wrapNode(node);
-        knode.remove("value_1");
+        knode.remove("value_1", null);
         System.out.println(knode.rawNode().toString());
     }
 
@@ -35,7 +36,7 @@ public class KoralNodeTest {
         ObjectNode node = JsonUtils.createObjectNode();
         node.put("value_1", "setting_1");
         KoralNode knode = KoralNode.wrapNode(node);
-        knode.replace("value_1", "settings_2");
+        knode.replace("value_1", "settings_2", null);
         System.out.println(knode.rawNode().toString());
     }
 

@@ -13,9 +13,10 @@ public interface RewriteTask {
 
 
     /**
-     * unspecified query rewrite that gets injected the entire root node during preprocessing
+     * unspecified query rewrite that gets injected the entire root
+     * node during preprocessing
      */
-    interface RewriteBefore extends RewriteTask {
+    interface RewriteQuery extends RewriteTask {
         /**
          * @param node
          *            Json node in KoralNode wrapper
@@ -28,21 +29,18 @@ public interface RewriteTask {
          *            checked properly
          * @return
          */
-        JsonNode preProcess (KoralNode node, KustvaktConfiguration config,
+        JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
                 User user) throws KustvaktException;
 
     }
 
     /**
      * Post processor targeted at result sets for queries
-     * {@link de.ids_mannheim.korap.resource.rewrite.RewriteTask.RewriteAfter}
-     * queries will run
-     * after
-     * {@link IterableRewritePath}
-     * have been processed
+     * {@link RewriteResult} queries will run
+     * after {@link IterableRewritePath} have been processed
      */
-    interface RewriteAfter extends RewriteTask {
-        JsonNode postProcess (KoralNode node) throws KustvaktException;
+    interface RewriteResult extends RewriteTask {
+        JsonNode rewriteResult (KoralNode node) throws KustvaktException;
     }
 
     /**
@@ -52,7 +50,7 @@ public interface RewriteTask {
      * Deletion via KoralNode not allowed. Supports pre- and
      * post-processing
      */
-    interface RewriteNodeAt extends RewriteBefore, RewriteAfter {
+    interface RewriteNodeAt extends RewriteQuery, RewriteResult {
         String at ();
     }
 
@@ -61,7 +59,7 @@ public interface RewriteTask {
      * iteration
      * (both object and array node iteration supported)
      */
-    interface IterableRewritePath extends RewriteBefore, RewriteAfter {
+    interface IterableRewritePath extends RewriteQuery, RewriteResult {
         String path ();
     }
 
@@ -72,6 +70,6 @@ public interface RewriteTask {
      * rewrites {@link RewriteKoralToken} rewrite DOES NOT support the
      * deletion of the respective node
      */
-    interface RewriteKoralToken extends RewriteBefore {}
+    interface RewriteKoralToken extends RewriteQuery {}
 
 }

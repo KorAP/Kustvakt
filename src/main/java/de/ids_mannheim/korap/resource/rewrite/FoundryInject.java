@@ -30,7 +30,7 @@ public class FoundryInject implements RewriteTask.IterableRewritePath,
 
 
     @Override
-    public JsonNode preProcess (KoralNode node, KustvaktConfiguration config,
+    public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) throws KustvaktException {
         LayerMapper mapper;
 
@@ -62,7 +62,7 @@ public class FoundryInject implements RewriteTask.IterableRewritePath,
 
 
     @Override
-    public JsonNode postProcess (KoralNode node) {
+    public JsonNode rewriteResult (KoralNode node) {
         return null;
     }
 

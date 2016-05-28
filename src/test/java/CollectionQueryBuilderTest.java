@@ -38,7 +38,8 @@ public class CollectionQueryBuilderTest {
         assertEquals("koral:docGroup", node.at("/collection/@type").asText());
         assertEquals("operation:and", node.at("/collection/operation").asText());
 
-        assertEquals("corpusSigle", node.at("/collection/operands/0/key").asText());
+        assertEquals("corpusSigle", node.at("/collection/operands/0/key")
+                .asText());
         assertEquals("textClass", node.at("/collection/operands/1/key")
                 .asText());
     }
@@ -92,11 +93,14 @@ public class CollectionQueryBuilderTest {
                 .asText());
         assertEquals(2, node.at("/collection/operands").size());
         assertEquals(2, node.at("/collection/operands/0/operands").size());
-        assertEquals(2, node.at("/collection/operands/0/operands/0/operands").size());
+        assertEquals(2, node.at("/collection/operands/0/operands/0/operands")
+                .size());
 
         assertEquals("operation:and", node.at("/collection/operation").asText());
-        assertEquals("operation:or", node.at("/collection/operands/0/operation").asText());
-        assertEquals("operation:and", node.at("/collection/operands/0/operands/0/operation").asText());
+        assertEquals("operation:or", node
+                .at("/collection/operands/0/operation").asText());
+        assertEquals("operation:and",
+                node.at("/collection/operands/0/operands/0/operation").asText());
         assertEquals("WPD", node.at("/collection/operands/1/value").asText());
     }
 
@@ -152,7 +156,8 @@ public class CollectionQueryBuilderTest {
         assertEquals("koral:doc", res.at("/collection/operands/1/@type")
                 .asText());
         assertEquals("WPD", res.at("/collection/operands/0/value").asText());
-        assertEquals("corpusSigle", res.at("/collection/operands/0/key").asText());
+        assertEquals("corpusSigle", res.at("/collection/operands/0/key")
+                .asText());
 
         // check also that query is still there
         assertEquals("koral:token", res.at("/query/@type").asText());
@@ -182,8 +187,9 @@ public class CollectionQueryBuilderTest {
         assertEquals(base.at("/collection/operands/0/operands").size(), 2);
     }
 
+
     @Test
-    public void testNodeMergeWithBase() {
+    public void testNodeMergeWithBase () {
         String coll = "corpusSigle=WPD";
         String query = "[base=Haus]";
         QuerySerializer check = new QuerySerializer();
@@ -209,8 +215,9 @@ public class CollectionQueryBuilderTest {
 
     }
 
+
     @Test
-    public void testAddOROperator() {
+    public void testAddOROperator () {
         String coll = "corpusSigle=WPD";
         String query = "[base=Haus]";
         QuerySerializer check = new QuerySerializer();
@@ -227,8 +234,9 @@ public class CollectionQueryBuilderTest {
         assertEquals(2, node.at("/collection/operands/1/operands").size());
     }
 
+
     @Test
-    public void testAddANDOperator() {
+    public void testAddANDOperator () {
         String coll = "corpusSigle=WPD";
         String query = "[base=Haus]";
         QuerySerializer check = new QuerySerializer();
@@ -245,8 +253,9 @@ public class CollectionQueryBuilderTest {
         assertEquals(2, node.at("/collection/operands/1/operands").size());
     }
 
+
     @Test
-    public void testAddDefaultOperator() {
+    public void testAddDefaultOperator () {
         String coll = "corpusSigle=WPD";
         String query = "[base=Haus]";
         QuerySerializer check = new QuerySerializer();
@@ -263,9 +272,10 @@ public class CollectionQueryBuilderTest {
         assertEquals(2, node.at("/collection/operands/1/operands").size());
     }
 
+
     @Test
     @Ignore
-    public void testMergeOperator() {
+    public void testMergeOperator () {
         String coll = "corpusSigle=WPD";
         String query = "[base=Haus]";
         QuerySerializer check = new QuerySerializer();

@@ -52,7 +52,7 @@ public class RewriteHandler implements BeanInjectable {
         this.add(PublicCollection.class);
         this.add(IdWriter.class);
         this.add(DocMatchRewrite.class);
-        this.add(CollectionCleanupFilter.class);
+        this.add(CollectionCleanRewrite.class);
     }
 
 
@@ -68,8 +68,8 @@ public class RewriteHandler implements BeanInjectable {
         else if (rewriter instanceof RewriteTask.IterableRewritePath)
             return this.node_processors
                     .add((RewriteTask.IterableRewritePath) rewriter);
-        else if (rewriter instanceof RewriteTask.RewriteBefore
-                | rewriter instanceof RewriteTask.RewriteAfter)
+        else if (rewriter instanceof RewriteTask.RewriteQuery
+                | rewriter instanceof RewriteTask.RewriteResult)
             return this.query_processors.add(rewriter);
 
         this.failed_task_registration.add(rewriter.getClass());
@@ -115,18 +115,29 @@ public class RewriteHandler implements BeanInjectable {
 
 
 
-
-    public String process(JsonNode root, User user) {
+    public String processQuery (JsonNode root, User user) {
         RewriteProcess process = new RewriteProcess(root, user);
         JsonNode pre = process.start(false);
-        //return iterate(pre, user, true);
         return JsonUtils.toJSON(pre);
     }
 
 
-    public String process(String json, User user) {
-        return process(JsonUtils.readTree(json), user);
+    public String processQuery (String json, User user) {
+        return processQuery(JsonUtils.readTree(json), user);
     }
+
+
+    public String processResult (String json, User user) {
+        return processResult(JsonUtils.readTree(json), user);
+    }
+
+
+    public String processResult (JsonNode node, User user) {
+        RewriteProcess process = new RewriteProcess(node, user);
+        JsonNode pre = process.start(true);
+        return JsonUtils.toJSON(pre);
+    }
+
 
 
     public void clear () {
@@ -149,12 +160,15 @@ public class RewriteHandler implements BeanInjectable {
         private JsonNode root;
         private User user;
 
-        private RewriteProcess(JsonNode root, User user) {
+
+        private RewriteProcess (JsonNode root, User user) {
             this.root = root;
             this.user = user;
         }
 
-        private KoralNode processNode (String key, JsonNode value, boolean post) {
+
+        private KoralNode processNode (String key, JsonNode value,
+                boolean result) {
             KoralNode kroot = KoralNode.wrapNode(value);
             if (value.isObject()) {
                 if (value.has("operands")) {
@@ -162,7 +176,7 @@ public class RewriteHandler implements BeanInjectable {
                     Iterator<JsonNode> it = ops.elements();
                     while (it.hasNext()) {
                         JsonNode next = it.next();
-                        KoralNode kn = processNode(key, next, post);
+                        KoralNode kn = processNode(key, next, result);
                         if (kn.isRemove())
                             it.remove();
                     }
@@ -170,19 +184,19 @@ public class RewriteHandler implements BeanInjectable {
                 else if (value.path("@type").asText().equals("koral:token")) {
                     // todo: koral:token nodes cannot be flagged for deletion --> creates the possibility for empty koral:token nodes
                     rewrite(key, kroot,
-                            RewriteHandler.this.token_node_processors, post);
-                    return processNode(key, value.path("wrap"), post);
+                            RewriteHandler.this.token_node_processors, result);
+                    return processNode(key, value.path("wrap"), result);
                 }
                 else {
                     return rewrite(key, kroot,
-                            RewriteHandler.this.node_processors, post);
+                            RewriteHandler.this.node_processors, result);
                 }
             }
             else if (value.isArray()) {
                 Iterator<JsonNode> it = value.elements();
                 while (it.hasNext()) {
                     JsonNode next = it.next();
-                    KoralNode kn = processNode(key, next, post);
+                    KoralNode kn = processNode(key, next, result);
                     if (kn.isRemove())
                         it.remove();
                 }
@@ -191,27 +205,30 @@ public class RewriteHandler implements BeanInjectable {
         }
 
 
-        private JsonNode start(boolean post) {
+        private JsonNode start (boolean result) {
             jlog.debug("Running rewrite process on query {}", root);
             if (root != null) {
                 Iterator<Map.Entry<String, JsonNode>> it = root.fields();
                 while (it.hasNext()) {
                     Map.Entry<String, JsonNode> next = it.next();
-                    processNode(next.getKey(), next.getValue(), post);
+                    processNode(next.getKey(), next.getValue(), result);
                 }
-                processFixedNode(root, RewriteHandler.this.query_processors, post);
+                processFixedNode(root, RewriteHandler.this.query_processors,
+                        result);
             }
             return root;
         }
 
+
         /**
          * @param node
          * @param tasks
-         * @return boolean true if node is to be removed from parent! Only
+         * @return boolean true if node is to be removed from parent!
+         *         Only
          *         applies if parent is an array node
          */
         private KoralNode rewrite (String rootNode, KoralNode node,
-                                   Collection<? extends RewriteTask> tasks, boolean post) {
+                Collection<? extends RewriteTask> tasks, boolean result) {
             if (RewriteHandler.this.config == null)
                 throw new RuntimeException("KustvaktConfiguration must be set!");
 
@@ -219,8 +236,10 @@ public class RewriteHandler implements BeanInjectable {
                 jlog.debug("running processor on node: " + node);
                 jlog.debug("on processor: " + task.getClass().toString());
 
-                if (RewriteHandler.this.beans != null && task instanceof BeanInjectable)
-                    ((BeanInjectable) task).insertBeans(RewriteHandler.this.beans);
+                if (RewriteHandler.this.beans != null
+                        && task instanceof BeanInjectable)
+                    ((BeanInjectable) task)
+                            .insertBeans(RewriteHandler.this.beans);
 
                 if (task instanceof RewriteTask.IterableRewritePath) {
                     RewriteTask.IterableRewritePath rw = (RewriteTask.IterableRewritePath) task;
@@ -230,31 +249,34 @@ public class RewriteHandler implements BeanInjectable {
                     }
                 }
                 try {
-                    if (!post && task instanceof RewriteTask.RewriteBefore) {
-                        ((RewriteTask.RewriteBefore) task).preProcess(node,
+                    if (!result && task instanceof RewriteTask.RewriteQuery) {
+                        ((RewriteTask.RewriteQuery) task).rewriteQuery(node,
                                 RewriteHandler.this.config, this.user);
                     }
-                    else if (task instanceof RewriteTask.RewriteAfter) {
-                        ((RewriteTask.RewriteAfter) task).postProcess(node);
+                    else if (task instanceof RewriteTask.RewriteResult) {
+                        ((RewriteTask.RewriteResult) task).rewriteResult(node);
                     }
                 }
                 catch (KustvaktException e) {
-                    jlog.error("Error in rewrite processor {} for node {}", task
-                            .getClass().getSimpleName(), node.rawNode().toString());
+                    jlog.error("Error in rewrite processor {} for node {}",
+                            task.getClass().getSimpleName(), node.rawNode()
+                                    .toString());
                     e.printStackTrace();
                 }
                 if (node.isRemove()) {
-                    node.buildRewrites(this.root.at("/"+ rootNode));
+                    node.buildRewrites(this.root.at("/" + rootNode));
                     break;
-                } else
+                }
+                else
                     node.buildRewrites();
             }
             return node;
         }
 
+
         // fixme: merge with processNode!
         private void processFixedNode (JsonNode node,
-                                       Collection<RewriteTask> tasks, boolean post) {
+                Collection<RewriteTask> tasks, boolean post) {
             for (RewriteTask task : tasks) {
                 KoralNode next = KoralNode.wrapNode(node);
                 if (task instanceof RewriteTask.RewriteNodeAt) {
@@ -264,16 +286,16 @@ public class RewriteHandler implements BeanInjectable {
                 }
 
                 try {
-                    if (!post & task instanceof RewriteTask.RewriteBefore)
-                        ((RewriteTask.RewriteBefore) task).preProcess(next,
+                    if (!post & task instanceof RewriteTask.RewriteQuery)
+                        ((RewriteTask.RewriteQuery) task).rewriteQuery(next,
                                 RewriteHandler.this.config, user);
-                    else if (task instanceof RewriteTask.RewriteAfter)
-                        ((RewriteTask.RewriteAfter) task).postProcess(next);
+                    else if (task instanceof RewriteTask.RewriteResult)
+                        ((RewriteTask.RewriteResult) task).rewriteResult(next);
                     next.buildRewrites();
                 }
                 catch (KustvaktException e) {
-                    jlog.error("Error in rewrite processor {} for node {}", task
-                            .getClass().getSimpleName(), next.toString());
+                    jlog.error("Error in rewrite processor {} for node {}",
+                            task.getClass().getSimpleName(), next.toString());
                     e.printStackTrace();
                 }
             }

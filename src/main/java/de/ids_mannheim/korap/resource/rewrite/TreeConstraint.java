@@ -60,7 +60,7 @@ public class TreeConstraint implements RewriteTask.RewriteNodeAt {
 
 
     @Override
-    public JsonNode preProcess (KoralNode node, KustvaktConfiguration config,
+    public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) {
         System.out.println("FIND PATH " + node.rawNode().findParent(pointer));
 
@@ -69,7 +69,7 @@ public class TreeConstraint implements RewriteTask.RewriteNodeAt {
 
 
     @Override
-    public JsonNode postProcess (KoralNode node) {
+    public JsonNode rewriteResult (KoralNode node) {
         return null;
     }
 

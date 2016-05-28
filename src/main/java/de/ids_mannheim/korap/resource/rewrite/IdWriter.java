@@ -14,13 +14,14 @@ public class IdWriter implements RewriteTask.RewriteKoralToken {
 
     private int counter;
 
+
     public IdWriter () {
         this.counter = 0;
     }
 
 
     @Override
-    public JsonNode preProcess (KoralNode node, KustvaktConfiguration config,
+    public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) {
         if (node.get("@type").equals("koral:token")) {
             String s = extractToken(node.rawNode());
@@ -29,6 +30,7 @@ public class IdWriter implements RewriteTask.RewriteKoralToken {
         }
         return node.rawNode();
     }
+
 
     private String extractToken (JsonNode token) {
         JsonNode wrap = token.path("wrap");

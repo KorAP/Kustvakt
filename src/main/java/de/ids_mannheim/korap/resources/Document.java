@@ -7,6 +7,7 @@ import lombok.Setter;
  * @author hanl
  * @date 05/11/2014
  */
+// todo: distinguish between document and text!
 @Getter
 @Setter
 public class Document extends KustvaktResource {
@@ -34,6 +35,11 @@ public class Document extends KustvaktResource {
         if (this.getPersistentID() != null)
             return this.getPersistentID().split("_")[0];
         return null;
+    }
+
+
+    public boolean isText () {
+        return this.getPersistentID().contains(".");
     }
 
 

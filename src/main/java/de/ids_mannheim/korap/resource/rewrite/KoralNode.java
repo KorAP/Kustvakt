@@ -29,13 +29,15 @@ public abstract class KoralNode {
     }
 
 
-    public void buildRewrites(JsonNode node) {
+    public void buildRewrites (JsonNode node) {
         this.rewrites.build(node);
     }
 
-    public void buildRewrites() {
+
+    public void buildRewrites () {
         this.rewrites.build(this.node);
     }
+
 
     @Override
     public String toString () {
@@ -60,7 +62,7 @@ public abstract class KoralNode {
     }
 
 
-    public void remove (Object identifier) {
+    public void remove (Object identifier, RewriteIdentifier ident) {
         boolean set = false;
         if (this.node.isObject() && identifier instanceof String) {
             ObjectNode n = (ObjectNode) this.node;
@@ -72,13 +74,17 @@ public abstract class KoralNode {
             n.remove((Integer) identifier);
             set = true;
         }
+
+        if (ident != null)
+            identifier = ident.toString();
+
         if (set) {
             this.rewrites.add("deletion", identifier);
         }
     }
 
 
-    public void replace (String name, Object value) {
+    public void replace (String name, Object value, RewriteIdentifier ident) {
         if (this.node.isObject() && this.node.has(name)) {
             ObjectNode n = (ObjectNode) this.node;
             if (value instanceof String)
@@ -87,11 +93,16 @@ public abstract class KoralNode {
                 n.put(name, (Integer) value);
             else if (value instanceof JsonNode)
                 n.put(name, (JsonNode) value);
+
+            if (ident != null)
+                name = ident.toString();
+
             this.rewrites.add("override", name);
         }
     }
 
-    public void set (String name, Object value, String attrIdent) {
+
+    public void set (String name, Object value, RewriteIdentifier ident) {
         if (this.node.isObject()) {
             ObjectNode n = (ObjectNode) this.node;
             if (value instanceof String)
@@ -100,9 +111,15 @@ public abstract class KoralNode {
                 n.put(name, (Integer) value);
             else if (value instanceof JsonNode)
                 n.put(name, (JsonNode) value);
-            this.rewrites.add("insertion", attrIdent);
+
+
+            if (ident != null)
+                name = ident.toString();
+
+            this.rewrites.add("insertion", name);
         }
     }
+
 
     public String get (String name) {
         if (this.node.isObject())
@@ -131,9 +148,28 @@ public abstract class KoralNode {
     }
 
 
-    public void removeNode (String identifier) {
-        this.rewrites.add("deletion", identifier);
+    public void removeNode (RewriteIdentifier ident) {
+        this.rewrites.add("deletion", ident.toString());
         this.remove = true;
+    }
+
+    public static class RewriteIdentifier {
+
+        private String key, value;
+
+
+        public RewriteIdentifier (String key, Object value) {
+            this.key = key;
+            this.value = value.toString();
+        }
+
+
+        @Override
+        public String toString () {
+            return key + "(" + value + ")";
+        }
+
+
     }
 
 
@@ -144,14 +180,15 @@ public abstract class KoralNode {
 
     public static class KoralRewriteBuilder {
 
-       private List<KoralRewrite> rewrites;
+        private List<KoralRewrite> rewrites;
 
-        public KoralRewriteBuilder() {
+
+        public KoralRewriteBuilder () {
             this.rewrites = new ArrayList<>();
         }
 
 
-        public KoralRewriteBuilder add(String op, Object scope) {
+        public KoralRewriteBuilder add (String op, Object scope) {
             KoralRewrite rewrite = new KoralRewrite();
             rewrite.setOperation(op);
             rewrite.setScope(scope.toString());
@@ -169,12 +206,17 @@ public abstract class KoralNode {
                 if (node.has("rewrites")) {
                     ArrayNode n = (ArrayNode) node.path("rewrites");
                     n.add(JsonUtils.valueToTree(rewrite.map));
-                } else {
+                }
+                else if (node.isObject()) {
                     ObjectNode n = (ObjectNode) node;
                     List l = new LinkedList<>();
                     l.add(JsonUtils.valueToTree(rewrite.map));
                     n.put("rewrites", JsonUtils.valueToTree(l));
                 }
+                else {
+                    //fixme: matches in result will land here. rewrites need to be placed under root node - though then there might be unclear where they belong to
+                }
+
             }
             this.rewrites.clear();
             return node;
@@ -184,10 +226,10 @@ public abstract class KoralNode {
 
 
 
-
     private static class KoralRewrite {
 
         private Map<String, String> map;
+
 
         private KoralRewrite () {
             this.map = new LinkedHashMap<>();

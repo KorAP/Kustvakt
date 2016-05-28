@@ -64,7 +64,8 @@ public class ResourceFactory {
 
     public static <T extends KustvaktResource> T createID (T resource) {
         if (resource.getData() != null && !resource.getStringData().isEmpty())
-            resource.setPersistentID(DigestUtils.sha1Hex(resource.getStringData()));
+            resource.setPersistentID(DigestUtils.sha1Hex(resource
+                    .getStringData()));
         return resource;
     }
 
