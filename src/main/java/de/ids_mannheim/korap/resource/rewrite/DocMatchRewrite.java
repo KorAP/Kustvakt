@@ -35,9 +35,10 @@ public class DocMatchRewrite implements RewriteTask.IterableRewritePath,
     }
 
 
+    //todo: benchmark: see if retrieval and and get docs for all ids at once is better --> outside this rewrite handler
     @Override
     public JsonNode rewriteResult (KoralNode node) throws KustvaktException {
-        Document doc = null;
+        Document doc;
         if (this.docDao == null)
             throw new RuntimeException("Document dao must be set!");
 

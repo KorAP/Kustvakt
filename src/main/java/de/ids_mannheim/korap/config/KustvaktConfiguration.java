@@ -69,6 +69,7 @@ public class KustvaktConfiguration {
     // fixme: should move to base config?!
     private EncryptionIface.Encryption encryption;
     private byte[] sharedSecret;
+    @Deprecated
     private String adminToken;
     private int longTokenTTL;
     private int tokenTTL;

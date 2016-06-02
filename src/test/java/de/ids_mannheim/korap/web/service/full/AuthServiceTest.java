@@ -51,6 +51,31 @@ public class AuthServiceTest extends FastJerseyTest {
 
     }
 
+
+    @Test
+    public void testOpenIDLogin () {
+
+    }
+
+
+    @Test
+    public void testOpenIDLogout () {
+
+    }
+
+
+    // -- are these even right? auth - authorization
+    @Test
+    public void testOAuth2Login () {
+
+    }
+
+
+    @Test
+    public void testOAuth2Logout () {
+
+    }
+
     //todo: test basicauth via secure connection
 
 }

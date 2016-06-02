@@ -23,20 +23,21 @@ public interface EncryptionIface {
      * @throws java.security.NoSuchAlgorithmException
      * @throws java.io.UnsupportedEncodingException
      */
-    public String produceSecureHash (String input, String salt)
+    public String secureHash (String input, String salt)
             throws NoSuchAlgorithmException, UnsupportedEncodingException,
             KustvaktException;
 
 
-    public String produceSecureHash (String input)
-            throws NoSuchAlgorithmException, UnsupportedEncodingException,
-            KustvaktException;
+    public String secureHash (String input) throws NoSuchAlgorithmException,
+            UnsupportedEncodingException, KustvaktException;
 
 
-    public String hash (String text, String salt) throws Exception;
+    //@Deprecated
+    //public String hash (String text, String salt) throws Exception;
 
 
-    public String hash (String text) throws Exception;
+    //@Deprecated
+    //public String hash (String text) throws Exception;
 
 
     /**

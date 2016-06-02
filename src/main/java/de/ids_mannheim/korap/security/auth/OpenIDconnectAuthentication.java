@@ -12,6 +12,7 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.NamingUtils;
+import de.ids_mannheim.korap.utils.StringUtils;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.springframework.cache.annotation.CacheEvict;
@@ -41,7 +42,7 @@ public class OpenIDconnectAuthentication implements AuthenticationIface {
     @Override
     public TokenContext getUserStatus (String authToken)
             throws KustvaktException {
-        authToken = NamingUtils.stripTokenType(authToken);
+        authToken = StringUtils.stripTokenType(authToken);
         return this.database.getContext(authToken);
     }
 

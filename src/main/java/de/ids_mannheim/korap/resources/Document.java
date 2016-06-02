@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.resources;
 
+import bsh.StringUtil;
+import de.ids_mannheim.korap.utils.StringUtils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,27 +16,28 @@ public class Document extends KustvaktResource {
 
     private String corpus;
     private boolean disabled;
+    private String docSigle;
 
 
-    public Document (String persistentID) {
+    public Document (String textSigle) {
+        this.setPersistentID(textSigle);
+        this.docSigle = StringUtils.getDocSigle(textSigle);
+        this.corpus = StringUtils.getCorpusSigle(textSigle);
+    }
+
+
+    public Document (String docSigle, String textSigle) {
         this.setId(-1);
-        this.setPersistentID(persistentID);
-        this.corpus = getCorpusID();
+        this.setPersistentID(textSigle);
+        this.docSigle = docSigle;
+        this.corpus = StringUtils.getCorpusSigle(textSigle);
         this.setDisabled(true);
     }
 
 
-    public Document (String persistentID, boolean disabled) {
-        this(persistentID);
+    public Document (String docsigle, String textSigle, boolean disabled) {
+        this(docsigle, textSigle);
         this.setDisabled(disabled);
-    }
-
-
-    private String getCorpusID () {
-        //WPD_SSS.07367
-        if (this.getPersistentID() != null)
-            return this.getPersistentID().split("_")[0];
-        return null;
     }
 
 

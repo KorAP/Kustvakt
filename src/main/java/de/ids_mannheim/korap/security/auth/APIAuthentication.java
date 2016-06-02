@@ -11,6 +11,7 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.NamingUtils;
+import de.ids_mannheim.korap.utils.StringUtils;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -46,7 +47,7 @@ public class APIAuthentication implements AuthenticationIface {
         Element ein = invalided.get(authToken);
         if (e == null && ein == null) {
             try {
-                authToken = NamingUtils.stripTokenType(authToken);
+                authToken = StringUtils.stripTokenType(authToken);
                 context = signedToken.getTokenContext(authToken);
                 context.setTokenType(Attributes.API_AUTHENTICATION);
             }

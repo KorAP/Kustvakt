@@ -124,7 +124,7 @@ public class TestHelper {
 
             try {
                 String hash = ((EncryptionIface) getBean(ContextHolder.KUSTVAKT_ENCRYPTION))
-                        .produceSecureHash(password);
+                        .secureHash(password);
                 m.put(Attributes.PASSWORD, hash);
             }
             catch (NoSuchAlgorithmException | UnsupportedEncodingException

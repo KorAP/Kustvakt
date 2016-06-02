@@ -73,7 +73,7 @@ public class UserPropertyReader extends PropertyReader {
                 throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);
 
             try {
-                pass = crypto.produceSecureHash(pass);
+                pass = crypto.secureHash(pass);
             }
             catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
                 throw new KustvaktException(StatusCodes.REQUEST_INVALID);
@@ -93,7 +93,7 @@ public class UserPropertyReader extends PropertyReader {
                 throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);
 
             try {
-                pass = crypto.produceSecureHash(pass);
+                pass = crypto.secureHash(pass);
             }
             catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
                 throw new KustvaktException(StatusCodes.REQUEST_INVALID);

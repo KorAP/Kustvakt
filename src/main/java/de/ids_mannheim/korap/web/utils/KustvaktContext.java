@@ -12,12 +12,12 @@ import java.security.Principal;
  *       wrapper for REST security context
  * 
  */
-public class KorAPContext implements SecurityContext {
+public class KustvaktContext implements SecurityContext {
 
     private TokenContext user;
 
 
-    public KorAPContext (final TokenContext user) {
+    public KustvaktContext (final TokenContext user) {
         this.user = user;
     }
 

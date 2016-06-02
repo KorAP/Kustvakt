@@ -92,7 +92,10 @@ public class KoralCollectionQueryBuilder {
     }
 
 
-    public Object rebaseCollection () {
+    public Object rebaseCollection (JsonNode node) {
+        if (node != null)
+            return mergeWith(node);
+
         if (this.builder.length() == 0 && this.base == null)
             return null;
 
@@ -125,18 +128,26 @@ public class KoralCollectionQueryBuilder {
 
     public JsonNode mergeWith (JsonNode node) {
         if (this.base != null) {
-            // check that collection non empty
             if (node != null) {
                 JsonNode tobase = node.at("/collection");
                 JsonNode base = this.base.deepCopy();
-                JsonNode result = JsonBuilder.buildDocGroup("and",
-                        base.at("/collection"), tobase);
+                JsonNode result = base.at("/collection");
+
+                if (result.isMissingNode() && !tobase.isMissingNode())
+                    result = tobase;
+                else if (result.isMissingNode() && tobase.isMissingNode())
+                    return base;
+                else {
+                    result = JsonBuilder.buildDocGroup(
+                            this.mergeOperator != null ? this.mergeOperator
+                                    .toLowerCase() : "and", result, tobase);
+                }
                 ((ObjectNode) base).put("collection", result);
                 return base;
             }
-            return null;
+            return this.base;
         }
-        return null;
+        throw new RuntimeException("no query found to merge with!");
     }
 
 
@@ -160,7 +171,12 @@ public class KoralCollectionQueryBuilder {
 
 
     public String toJSON () {
-        return JsonUtils.toJSON(rebaseCollection());
+        return JsonUtils.toJSON(rebaseCollection(null));
+    }
+
+
+    public String mergeToJSON (JsonNode node) {
+        return JsonUtils.toJSON(rebaseCollection(node));
     }
 
 
@@ -169,22 +185,6 @@ public class KoralCollectionQueryBuilder {
         return this.builder.toString();
     }
 
-
-    @Deprecated
-    private KoralCollectionQueryBuilder appendToBaseGroup (JsonNode node) {
-        if (base.at("/collection/@type").asText().equals("koral:docGroup")) {
-            ArrayNode group = (ArrayNode) base.at("/collection/operands");
-            if (node instanceof ArrayNode)
-                group.addAll((ArrayNode) node);
-            else
-                group.add(node);
-        }
-        else
-            throw new IllegalArgumentException("No group found to add to!");
-        // fixme: if base is a doc only, this function is not supported. requirement is a koral:docGroup, since
-        // combination operator is unknown otherwise
-        return this;
-    }
 
     private static class JsonBuilder {
 

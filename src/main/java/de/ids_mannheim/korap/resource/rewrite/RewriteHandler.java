@@ -139,7 +139,6 @@ public class RewriteHandler implements BeanInjectable {
     }
 
 
-
     public void clear () {
         this.node_processors.clear();
         this.query_processors.clear();

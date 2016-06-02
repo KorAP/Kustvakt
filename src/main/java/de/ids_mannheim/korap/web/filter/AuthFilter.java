@@ -8,7 +8,7 @@ import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.TokenContext;
-import de.ids_mannheim.korap.web.utils.KorAPContext;
+import de.ids_mannheim.korap.web.utils.KustvaktContext;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 import javax.ws.rs.ext.Provider;
@@ -50,7 +50,7 @@ public class AuthFilter implements ContainerRequestFilter, ResourceFilter {
                     && context.isValid()
                     && ((context.isSecureRequired() && request.isSecure()) | !context
                             .isSecureRequired()))
-                request.setSecurityContext(new KorAPContext(context));
+                request.setSecurityContext(new KustvaktContext(context));
             else
                 throw KustvaktResponseHandler.throwAuthenticationException();
         }

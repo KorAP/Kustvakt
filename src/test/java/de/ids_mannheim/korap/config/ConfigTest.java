@@ -1,11 +1,21 @@
 package de.ids_mannheim.korap.config;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.utils.ServiceInfo;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.service.BootableBeanInterface;
+import de.ids_mannheim.korap.web.service.full.AdminService;
+import org.apache.lucene.util.IOUtils;
+import org.codehaus.plexus.util.IOUtil;
+import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +27,22 @@ import static org.junit.Assert.*;
  * @date 02/09/2015
  */
 public class ConfigTest extends BeanConfigTest {
+
+
+    @Test
+    public void testAdminHash () throws IOException, KustvaktException,
+            NoSuchAlgorithmException {
+        AdminSetup setup = AdminSetup.getInstance();
+        String hash = setup.getHash();
+        File f = new File("./admin_token");
+        FileInputStream stream = new FileInputStream(f);
+        String token = IOUtil.toString(stream);
+        assertNotEquals("", hash);
+        assertNotEquals("", token);
+        EncryptionIface crypto = helper().getContext().getEncryption();
+        assertTrue(crypto.checkHash(token, hash));
+    }
+
 
     @Test
     public void testServiceInfo () {
