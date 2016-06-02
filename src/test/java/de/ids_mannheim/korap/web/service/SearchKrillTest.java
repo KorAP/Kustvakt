@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.web.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import de.ids_mannheim.korap.KrillIndex;
 import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -23,8 +24,20 @@ public class SearchKrillTest extends BeanConfigTest {
     @Test
     public void testInit () {
         KustvaktConfiguration config = helper().getContext().getConfiguration();
+        System.out.println("'" + config.getIndexDir() + "'");
         SearchKrill krill = new SearchKrill(config.getIndexDir());
         assertNotNull(krill);
+    }
+
+
+    @Test
+    public void testIndex () {
+        KustvaktConfiguration config = helper().getContext().getConfiguration();
+        SearchKrill krill = new SearchKrill(config.getIndexDir());
+        assertNotNull(krill);
+
+        KrillIndex index = krill.getIndex();
+        assertNotNull(index);
     }
 
 
