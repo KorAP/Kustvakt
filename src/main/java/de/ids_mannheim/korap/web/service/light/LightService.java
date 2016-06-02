@@ -98,7 +98,7 @@ public class LightService {
         meta.addEntry("count", pageLength);
         meta.setSpanContext(context);
         meta.addEntry("cutOff", cutoff);
-        ss.setMeta(meta);
+        ss.setMeta(meta.raw());
         if (cq != null)
             ss.setCollection(cq);
         return Response.ok(processor.processQuery(ss.toJSON(), null)).build();
@@ -138,7 +138,7 @@ public class LightService {
                 pageInteger, pageLength, ctx, cutoff);
         if (fields != null && !fields.isEmpty())
             meta.addEntry("fields", fields);
-        serializer.setMeta(meta);
+        serializer.setMeta(meta.raw());
         if (cq != null)
             serializer.setCollection(cq);
 
@@ -212,7 +212,7 @@ public class LightService {
             // should only apply to CQL queries
             //                meta.addEntry("itemsPerResource", 1);
             QuerySerializer s = new QuerySerializer().setQuery(query, ql, v)
-                    .setMeta(meta);
+                    .setMeta(meta.raw());
             query = processor.processQuery(s.toJSON(), null);
         }
         String result;

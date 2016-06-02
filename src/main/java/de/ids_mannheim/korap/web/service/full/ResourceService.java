@@ -310,7 +310,7 @@ public class ResourceService {
             meta.setSpanContext(context);
         meta.addEntry("cutOff", cutoff);
 
-        ss.setMeta(meta);
+        ss.setMeta(meta.raw());
 
         String query = this.processor.processQuery(ss.toJSON(), user);
         return Response.ok(query).build();
@@ -567,7 +567,7 @@ public class ResourceService {
                 meta.addEntry("cutoff", cutoff);
                 // should only apply to CQL queries
                 //                meta.addEntry("itemsPerResource", 1);
-                s.setMeta(meta);
+                s.setMeta(meta.raw());
 
                 query = s.toJSON();
                 //                PolicyParser parser = new PolicyParser(user);
