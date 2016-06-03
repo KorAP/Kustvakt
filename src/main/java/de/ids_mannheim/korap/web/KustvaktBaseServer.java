@@ -25,11 +25,15 @@ import java.util.Set;
  * @author hanl
  * @date 01/06/2015
  */
-public class KustvaktBaseServer {
+public abstract class KustvaktBaseServer {
 
     public static void main (String[] args) throws Exception {
         KustvaktConfiguration.loadLog4jLogger();
-        KustvaktBaseServer server = new KustvaktBaseServer();
+        KustvaktBaseServer server = new KustvaktBaseServer() {
+            @Override
+            protected void setup() {
+            }
+        };
         KustvaktArgs kargs = server.readAttributes(args);
 
         if (kargs.config != null)
@@ -74,53 +78,11 @@ public class KustvaktBaseServer {
         return kargs;
     }
 
-
-    public void runPreStart () {
-        Set<Class<? extends BootableBeanInterface>> set = KustvaktClassLoader
-                .loadSubTypes(BootableBeanInterface.class);
-
-        List<BootableBeanInterface> list = new ArrayList<>(set.size());
-        for (Class cl : set) {
-            BootableBeanInterface iface;
-            try {
-                iface = (BootableBeanInterface) cl.newInstance();
-                list.add(iface);
-            }
-            catch (InstantiationException | IllegalAccessException e) {
-                continue;
-            }
-        }
-        System.out.println("Found boot loading interfaces: " + list);
-
-        while (!list.isEmpty()) {
-            loop: for (BootableBeanInterface iface : new ArrayList<>(list)) {
-                try {
-                    for (Class dep : iface.getDependencies()) {
-                        if (set.contains(dep))
-                            continue loop;
-                    }
-                    iface.load(BeansFactory.getKustvaktContext());
-                    list.remove(iface);
-                    set.remove(iface.getClass());
-                    System.out.println("Done with interface "
-                            + iface.getClass().getSimpleName());
-                }
-                catch (KustvaktException e) {
-                    // don't do anything!
-                    System.out.println("An error occurred in class "
-                            + iface.getClass().getSimpleName() + "!\n");
-                    System.exit(-1);
-                }
-            }
-        }
-    }
-
+    protected abstract void setup();
 
     protected void startServer (KustvaktArgs kargs) {
-        if (kargs.init) {
-            runPreStart();
-            AdminSetup.getInstance();
-        }
+        if (kargs.init)
+            setup();
 
         if (kargs.port == -1)
             kargs.setPort(BeansFactory.getKustvaktContext().getConfiguration()
