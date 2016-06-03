@@ -35,8 +35,7 @@ public class KustvaktEncryption implements EncryptionIface {
     private static final String ALGORITHM = "SHA-256";
     private static Logger jlog = LoggerFactory
             .getLogger(KustvaktEncryption.class);
-    // todo: disable this
-    private static final String PASSWORD_SALT_FIELD = "accountCreation";
+
 
     private final boolean nullable;
     private final Validator validator;
@@ -223,7 +222,7 @@ public class KustvaktEncryption implements EncryptionIface {
 
 
     @Override
-    public String createID (Object ... obj) {
+    public String createRandomNumber(Object ... obj) {
         final byte[] rNumber = SecureRGenerator
                 .getNextSecureRandom(SecureRGenerator.CORPUS_RANDOM_SIZE);
         if (obj.length != 0) {
@@ -277,37 +276,6 @@ public class KustvaktEncryption implements EncryptionIface {
                 return hash(plain).equals(hash);
         }
         return false;
-    }
-
-
-    @Override
-    public String getSalt (User user) {
-        Class u = user.getClass();
-        Field field;
-        try {
-            field = u.getSuperclass().getDeclaredField(PASSWORD_SALT_FIELD);
-        }
-        catch (NoSuchFieldException e) {
-            try {
-                field = u.getDeclaredField(PASSWORD_SALT_FIELD);
-            }
-            catch (NoSuchFieldException e1) {
-                // do nothing
-                e.printStackTrace();
-                return null;
-            }
-        }
-        try {
-            field.setAccessible(true);
-            String value = String.valueOf(field.get(user));
-            field.setAccessible(false);
-            return value;
-        }
-        catch (IllegalAccessException e) {
-            // do nothing
-            e.printStackTrace();
-        }
-        return null;
     }
 
 

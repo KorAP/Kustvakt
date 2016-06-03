@@ -19,6 +19,9 @@ import static org.junit.Assert.*;
 public class RewriteBenchmarkTest extends BeanConfigTest {
 
 
+    private static int THRESHOLD = 1000;
+
+
     @Test
     public void testDocMatchRewriteByTextSigle () throws KustvaktException {
         DocumentDao dao = new DocumentDao(helper().getContext()
@@ -38,7 +41,7 @@ public class RewriteBenchmarkTest extends BeanConfigTest {
         DateTime now = TimeUtils.getNow();
         String v = ha.processResult(TestVariables.RESULT, null);
         long diff = TimeUtils.calcDiff(now, new DateTime());
-        assertTrue(diff < 600);
+        assertTrue(diff < THRESHOLD);
         JsonNode node = JsonUtils.readTree(v);
 
         JsonNode check = JsonUtils.readTree(TestVariables.RESULT);
@@ -70,7 +73,7 @@ public class RewriteBenchmarkTest extends BeanConfigTest {
         DateTime now = TimeUtils.getNow();
         String v = ha.processResult(TestVariables.RESULT, null);
         long diff = TimeUtils.calcDiff(now, new DateTime());
-        assertTrue(diff < 600);
+        assertTrue(diff < THRESHOLD);
         JsonNode node = JsonUtils.readTree(v);
 
         JsonNode check = JsonUtils.readTree(TestVariables.RESULT);

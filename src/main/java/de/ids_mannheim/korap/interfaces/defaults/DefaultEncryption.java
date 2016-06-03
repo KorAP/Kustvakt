@@ -74,7 +74,7 @@ public class DefaultEncryption implements EncryptionIface {
 
 
     @Override
-    public String createID (Object ... obj) {
+    public String createRandomNumber(Object ... obj) {
         return createToken();
     }
 

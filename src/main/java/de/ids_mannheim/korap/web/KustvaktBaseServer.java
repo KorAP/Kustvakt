@@ -110,8 +110,8 @@ public class KustvaktBaseServer {
                 }
                 list.remove(iface);
             }
-            if (track == list.size()) {
-                System.out.println("Some or all bootup classes raised errors");
+            if (!list.isEmpty()) {
+                System.out.println("Following bootup classes raised errors: "+ list);
                 break;
             }
         }

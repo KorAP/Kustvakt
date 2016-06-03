@@ -9,7 +9,6 @@ import de.ids_mannheim.korap.handlers.OAuth2Handler;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.user.TokenContext;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -131,7 +130,7 @@ public class OAuth2HandlerTest extends BeanConfigTest {
         helper().setupAccount();
 
         EncryptionIface crypto = helper().getContext().getEncryption();
-        info = new ClientInfo(crypto.createID(), crypto.createToken());
+        info = new ClientInfo(crypto.createRandomNumber(), crypto.createToken());
         info.setConfidential(true);
         //todo: support for subdomains?!
         info.setUrl("http://localhost:8080/api/v0.1");

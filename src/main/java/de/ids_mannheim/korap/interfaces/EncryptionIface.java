@@ -32,14 +32,6 @@ public interface EncryptionIface {
             UnsupportedEncodingException, KustvaktException;
 
 
-    //@Deprecated
-    //public String hash (String text, String salt) throws Exception;
-
-
-    //@Deprecated
-    //public String hash (String text) throws Exception;
-
-
     /**
      * @param plain
      * @param hash
@@ -50,9 +42,6 @@ public interface EncryptionIface {
 
 
     public boolean checkHash (String plain, String hash);
-
-
-    public String getSalt (User user);
 
 
     /**
@@ -71,7 +60,7 @@ public interface EncryptionIface {
      * 
      * @return
      */
-    public String createID (Object ... obj);
+    public String createRandomNumber(Object ... obj);
 
 
     public String encodeBase ();
@@ -83,8 +72,5 @@ public interface EncryptionIface {
 
     public String validateEntry (String input, String type)
             throws KustvaktException;
-
-
-    //    public void validate(Object instance) throws KustvaktException;
 
 }

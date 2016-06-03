@@ -101,7 +101,7 @@ public class OAuthService {
     public Response registerClient (@Context SecurityContext context,
             @HeaderParam("Host") String host,
             @QueryParam("redirect_url") String rurl) {
-        ClientInfo info = new ClientInfo(crypto.createID(),
+        ClientInfo info = new ClientInfo(crypto.createRandomNumber(),
                 crypto.createToken());
         info.setUrl(host);
         if (rurl == null)

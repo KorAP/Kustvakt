@@ -64,7 +64,6 @@ public class PolicyEvaluator {
             Permissions.Permission perm) throws NotAuthorizedException {
         //fixme: what happens in case a parent relation does not allow changing a resource, but the owner of child per default
         //todo: receives all rights? --> test casing
-        jlog.error("IS USER RESOURCE OWNER? " + isOwner());
         if (isOwner()) {
             jlog.debug("Resource is owned by the user!");
             return policies[0];
@@ -100,7 +99,6 @@ public class PolicyEvaluator {
                 }
             }
             this.processed = true;
-            System.out.println("FINAL BYTE :" + this.permissions.getPbyte());
             if (this.permissions.containsPermission(perm))
                 return policies[0];
         }

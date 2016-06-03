@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.resources;
 
-import bsh.StringUtil;
+
 import de.ids_mannheim.korap.utils.StringUtils;
 import lombok.Getter;
 import lombok.Setter;

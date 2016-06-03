@@ -223,7 +223,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
                 .asText());
         assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type")
                 .asText());
-        System.out.println("NODE " + node);
+        //todo:
     }
 
 

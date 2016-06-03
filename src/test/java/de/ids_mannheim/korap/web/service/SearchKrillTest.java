@@ -27,6 +27,7 @@ public class SearchKrillTest extends BeanConfigTest {
 
     }
 
+
     @Test
     public void testInit () {
         KustvaktConfiguration config = helper().getContext().getConfiguration();
