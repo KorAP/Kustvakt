@@ -164,4 +164,10 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
             return -1;
         }
     }
+
+
+    @Override
+    public Class<UserSettings> type () {
+        return UserSettings.class;
+    }
 }

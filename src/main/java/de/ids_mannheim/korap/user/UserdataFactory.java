@@ -32,7 +32,7 @@ public class UserdataFactory {
     public static UserDataDbIface getDaoInstanceFromBean (
             Class<? extends Userdata> type) {
         Collection<UserDataDbIface> daos = BeansFactory.getKustvaktContext()
-                .getUserDataDaos();
+                .getUserDataProviders();
         for (UserDataDbIface o : daos) {
             Type gtype = o.getClass().getGenericInterfaces()[0];
             if (gtype instanceof ParameterizedType) {

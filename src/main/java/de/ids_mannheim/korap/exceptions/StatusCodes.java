@@ -47,10 +47,8 @@ public class StatusCodes {
     public static final int CLIENT_REMOVAL_FAILURE = 215;
     public static final int CLIENT_AUTHORIZATION_FAILURE = 216;
 
-    /**
-     * 500 status codes for access control related components (also
-     * policy rewrite)
-     */
+
+
     public static final int PERMISSION_DENIED = 401;
     public static final int UNSUPPORTED_RESOURCE = 402;
     public static final int UNSUPPORTED_FOUNDRY = 403;
@@ -67,7 +65,13 @@ public class StatusCodes {
     public static final int MISSING_POLICY_CONDITIONS = 413;
     public static final int MISSING_POLICY_PERMISSION = 414;
     public static final int RESOURCE_NOT_FOUND = 415;
+    public static final int ACCESS_DENIED_NO_RESOURCES = 416;
 
+
+    /**
+     * 500 status codes for access control related components (also
+     * policy rewrite)
+     */
     // todo: extend according to policy rewrite possible!
     // policy errors
     public static final int POLICY_ERROR_DEFAULT = 500;

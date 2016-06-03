@@ -462,8 +462,13 @@ public class ResourceService {
         // fixme: should only apply to CQL queries per default!
         //        meta.addEntry("itemsPerResource", 1);
         serializer.setMeta(meta.raw());
-
-        String query = this.processor.processQuery(serializer.toJSON(), user);
+        String query;
+        try {
+            query = this.processor.processQuery(serializer.toJSON(), user);
+        }
+        catch (KustvaktException e) {
+            throw KustvaktResponseHandler.throwit(e);
+        }
 
         jlog.info("the serialized query {}", query);
 
@@ -696,7 +701,13 @@ public class ResourceService {
         VirtualCollection tmp = resourceHandler.getCache(cache.getId(),
                 VirtualCollection.class);
         if (tmp == null) {
-            String query = this.processor.processQuery(cache.getData(), user);
+            String query;
+            try {
+                query = this.processor.processQuery(cache.getData(), user);
+            }
+            catch (KustvaktException e) {
+                throw KustvaktResponseHandler.throwit(e);
+            }
             String stats = searchKrill.getStatistics(query);
             cache.setStats(JsonUtils.readSimple(stats, Map.class));
             resourceHandler.cache(cache);

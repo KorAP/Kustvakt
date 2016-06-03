@@ -70,7 +70,7 @@ public class SecurityManager<T extends KustvaktResource> {
             SecurityManager.crypto = beans.getEncryption();
             SecurityManager.handlers = new HashMap<>();
             Collection<ResourceOperationIface> providers = beans
-                    .getResourceProvider();
+                    .getResourceProviders();
             for (ResourceOperationIface op : providers)
                 SecurityManager.handlers.put(op.type(), op);
         }

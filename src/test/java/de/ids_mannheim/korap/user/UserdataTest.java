@@ -92,13 +92,16 @@ public class UserdataTest extends BeanConfigTest {
 
     @Test
     public void testUserdatafactory () throws KustvaktException {
-        UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
-                helper().getContext().getUserDataDaos(), UserDetails.class);
+        UserDataDbIface dao = BeansFactory.getTypeFactory()
+                .getTypeInterfaceBean(
+                        helper().getContext().getUserDataProviders(),
+                        UserDetails.class);
         assertNotNull(dao);
         assertEquals(UserDetailsDao.class, dao.getClass());
 
-        dao = BeansFactory.getTypeFactory().getTypedBean(
-                helper().getContext().getUserDataDaos(), UserSettings.class);
+        dao = BeansFactory.getTypeFactory().getTypeInterfaceBean(
+                helper().getContext().getUserDataProviders(),
+                UserSettings.class);
         assertNotNull(dao);
         assertEquals(UserSettingsDao.class, dao.getClass());
 
@@ -107,8 +110,8 @@ public class UserdataTest extends BeanConfigTest {
 
     @Test(expected = RuntimeException.class)
     public void testUserdatafactoryError () throws KustvaktException {
-        BeansFactory.getTypeFactory().getTypedBean(
-                helper().getContext().getUserDataDaos(), new Userdata(1) {
+        BeansFactory.getTypeFactory().getTypeInterfaceBean(
+                helper().getContext().getUserDataProviders(), new Userdata(1) {
                     @Override
                     public String[] requiredFields () {
                         return new String[0];

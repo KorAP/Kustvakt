@@ -51,7 +51,7 @@ public class ResourceFinder {
             beans = BeansFactory.getKustvaktContext();
         if (policydao == null | resourcedaos == null) {
             ResourceFinder.policydao = beans.getPolicyDbProvider();
-            for (ResourceOperationIface iface : beans.getResourceProvider())
+            for (ResourceOperationIface iface : beans.getResourceProviders())
                 resourcedaos.put(iface.type(), iface);
         }
         if (policydao == null | resourcedaos.isEmpty())

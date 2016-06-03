@@ -13,7 +13,6 @@ import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.user.*;
-import de.ids_mannheim.korap.utils.NamingUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import net.sf.ehcache.Cache;
@@ -546,12 +545,12 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             settings.readDefaults(safeMap);
             settings.checkRequired();
 
-            UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
-                    userdatadaos, UserDetails.class);
+            UserDataDbIface dao = BeansFactory.getTypeFactory()
+                    .getTypeInterfaceBean(userdatadaos, UserDetails.class);
             assert dao != null;
             dao.store(details);
-            dao = BeansFactory.getTypeFactory().getTypedBean(userdatadaos,
-                    UserSettings.class);
+            dao = BeansFactory.getTypeFactory().getTypeInterfaceBean(
+                    userdatadaos, UserSettings.class);
             assert dao != null;
             dao.store(settings);
         }
@@ -586,8 +585,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         d.readDefaults(attributes);
         d.checkRequired();
 
-        UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
-                userdatadaos, UserDetails.class);
+        UserDataDbIface dao = BeansFactory.getTypeFactory()
+                .getTypeInterfaceBean(userdatadaos, UserDetails.class);
         assert dao != null;
         dao.store(d);
 
@@ -595,7 +594,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         s.readDefaults(attributes);
         s.checkRequired();
 
-        dao = BeansFactory.getTypeFactory().getTypedBean(userdatadaos,
+        dao = BeansFactory.getTypeFactory().getTypeInterfaceBean(userdatadaos,
                 UserSettings.class);
         assert dao != null;
         dao.store(d);
@@ -747,11 +746,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             throws WrappedException {
 
         try {
-            UserDataDbIface<T> dao = BeansFactory
-                    .getTypeFactory()
-                    .getTypedBean(
-                            BeansFactory.getKustvaktContext().getUserDataDaos(),
-                            clazz);
+            UserDataDbIface<T> dao = BeansFactory.getTypeFactory()
+                    .getTypeInterfaceBean(
+                            BeansFactory.getKustvaktContext()
+                                    .getUserDataProviders(), clazz);
             T data = null;
             if (dao != null)
                 data = dao.get(user);
@@ -775,9 +773,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         try {
 
             data.validate(this.crypto);
-            UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
-                    BeansFactory.getKustvaktContext().getUserDataDaos(),
-                    data.getClass());
+            UserDataDbIface dao = BeansFactory.getTypeFactory()
+                    .getTypeInterfaceBean(
+                            BeansFactory.getKustvaktContext()
+                                    .getUserDataProviders(), data.getClass());
             if (dao != null)
                 dao.update(data);
         }

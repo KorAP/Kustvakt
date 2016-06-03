@@ -35,8 +35,8 @@ public class FoundryInject implements RewriteTask.IterableRewritePath,
         LayerMapper mapper;
 
         if (user != null && !userdaos.isEmpty()) {
-            UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
-                    userdaos, UserSettings.class);
+            UserDataDbIface dao = BeansFactory.getTypeFactory()
+                    .getTypeInterfaceBean(userdaos, UserSettings.class);
             mapper = new LayerMapper(config, dao.get(user));
         }
         else
@@ -69,6 +69,6 @@ public class FoundryInject implements RewriteTask.IterableRewritePath,
 
     @Override
     public <T extends ContextHolder> void insertBeans (T beans) {
-        this.userdaos = beans.getUserDataDaos();
+        this.userdaos = beans.getUserDataProviders();
     }
 }

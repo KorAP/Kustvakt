@@ -21,8 +21,6 @@
                             http://www.springframework.org/schema/util
                             http://www.springframework.org/schema/util/spring-util-4.0.xsd">
 
-    <cache:annotation-driven/>
-
     <bean id="props"
           class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="ignoreResourceNotFound" value="true"/>
@@ -67,7 +65,7 @@
           class="org.springframework.jdbc.datasource.SingleConnectionDataSource"
           lazy-init="false">
         <property name="driverClassName" value="org.sqlite.JDBC"/>
-        <property name="url" value="jdbc:sqlite:tmp_new.sqlite"/>
+        <property name="url" value="jdbc:sqlite::memory:"/>
         <!--<property name="initialSize" value="1" />-->
         <!--<property name="maxTotal" value="1" />-->
         <!--<property name="maxIdle" value="1" />-->
@@ -116,14 +114,13 @@
         <constructor-arg ref="kustvakt_db"/>
     </bean>
 
-    <!--<bean id="collectionProvider"-->
-    <!--class="de.ids_mannheim.korap.handlers.CollectionDao">-->
-    <!--<constructor-arg ref="kustvakt_db"/>-->
-    <!--</bean>-->
-
-    <!--fixme: change name according to convention -->
-    <bean id="resourceProvider"
+    <bean id="resource_provider"
           class="de.ids_mannheim.korap.handlers.ResourceDao">
+        <constructor-arg ref="kustvakt_db"/>
+    </bean>
+
+    <bean id="document_provider"
+          class="de.ids_mannheim.korap.handlers.DocumentDao">
         <constructor-arg ref="kustvakt_db"/>
     </bean>
 
@@ -184,7 +181,7 @@
                 ref="kustvakt_db"/>
     </bean>
     <bean id="userdata_settings"
-          class="de.ids_mannheim.korap.handlers.UserDetailsDao">
+          class="de.ids_mannheim.korap.handlers.UserSettingsDao">
         <constructor-arg
                 type="de.ids_mannheim.korap.interfaces.db.PersistenceClient"
                 ref="kustvakt_db"/>
@@ -194,6 +191,12 @@
                value-type="de.ids_mannheim.korap.interfaces.db.UserdataDbIface">
         <ref bean="userdata_details"/>
         <ref bean="userdata_settings"/>
+    </util:list>
+
+    <util:list id="kustvakt_resources"
+               value-type="de.ids_mannheim.korap.interfaces.db.ResourceOperationIface">
+        <ref bean="document_provider"/>
+        <ref bean="resource_provider"/>
     </util:list>
 
 

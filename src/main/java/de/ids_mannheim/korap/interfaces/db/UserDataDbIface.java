@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.interfaces.db;
 
+import de.ids_mannheim.korap.config.KustvaktTypeInterface;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.Userdata;
@@ -8,7 +9,8 @@ import de.ids_mannheim.korap.user.Userdata;
  * @author hanl
  * @date 27/01/2016
  */
-public interface UserDataDbIface<T extends Userdata> {
+public interface UserDataDbIface<T extends Userdata> extends
+        KustvaktTypeInterface<T> {
 
     public int store (T data) throws KustvaktException;
 

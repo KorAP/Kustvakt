@@ -61,12 +61,12 @@ public class LoaderTest extends BeanConfigTest {
         while (!set.isEmpty()) {
             out_loop: for (BootableBeanInterface iface : new ArrayList<>(list)) {
                 try {
-                    System.out.println("Running boot instructions from class "
-                            + iface.getClass().getSimpleName());
                     for (Class cl : iface.getDependencies()) {
                         if (set.contains(cl))
                             continue out_loop;
                     }
+                    System.out.println("Running boot instructions from class "
+                            + iface.getClass().getSimpleName());
                     set.remove(iface.getClass());
                     list.remove(iface);
                     iface.load(helper().getContext());

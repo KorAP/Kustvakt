@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.config.*;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.DocumentDao;
+import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
 import de.ids_mannheim.korap.resources.Document;
 import de.ids_mannheim.korap.user.User;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
-import org.w3c.dom.Attr;
 
 /**
  * @author hanl
@@ -19,7 +19,7 @@ import org.w3c.dom.Attr;
 public class DocMatchRewrite implements RewriteTask.IterableRewritePath,
         BeanInjectable {
 
-    private DocumentDao docDao;
+    private ResourceOperationIface<Document> docDao;
     private Cache cache;
 
 
@@ -30,8 +30,8 @@ public class DocMatchRewrite implements RewriteTask.IterableRewritePath,
 
     @Override
     public void insertBeans (ContextHolder beans) {
-        this.docDao = BeansFactory.getTypeFactory().getTypedBean(
-                beans.getResourceProvider(), Document.class);
+        this.docDao = BeansFactory.getTypeFactory().getTypeInterfaceBean(
+                beans.getResourceProviders(), Document.class);
     }
 
 

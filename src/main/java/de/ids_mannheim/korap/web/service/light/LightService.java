@@ -101,14 +101,27 @@ public class LightService {
         ss.setMeta(meta.raw());
         if (cq != null)
             ss.setCollection(cq);
-        return Response.ok(processor.processQuery(ss.toJSON(), null)).build();
+
+        String query;
+        try {
+            query = this.processor.processQuery(ss.toJSON(), null);
+        }
+        catch (KustvaktException e) {
+            throw KustvaktResponseHandler.throwit(e);
+        }
+        return Response.ok(query).build();
     }
 
 
     @POST
     @Path("search")
     public Response queryRaw (@QueryParam("engine") String engine, String jsonld) {
-        jsonld = processor.processQuery(jsonld, null);
+        try {
+            jsonld = processor.processQuery(jsonld, null);
+        }
+        catch (KustvaktException e) {
+            throw KustvaktResponseHandler.throwit(e);
+        }
         // todo: should be possible to add the meta part to the query serialization
         jlog.info("Serialized search: {}", jsonld);
 
@@ -142,7 +155,13 @@ public class LightService {
         if (cq != null)
             serializer.setCollection(cq);
 
-        String query = processor.processQuery(serializer.toJSON(), null);
+        String query;
+        try {
+            query = this.processor.processQuery(serializer.toJSON(), null);
+        }
+        catch (KustvaktException e) {
+            throw KustvaktResponseHandler.throwit(e);
+        }
         jlog.info("the serialized query {}", query);
 
         // This may not work with the the KoralQuery
@@ -213,7 +232,12 @@ public class LightService {
             //                meta.addEntry("itemsPerResource", 1);
             QuerySerializer s = new QuerySerializer().setQuery(query, ql, v)
                     .setMeta(meta.raw());
-            query = processor.processQuery(s.toJSON(), null);
+            try {
+                query = this.processor.processQuery(s.toJSON(), null);
+            }
+            catch (KustvaktException e) {
+                throw KustvaktResponseHandler.throwit(e);
+            }
         }
         String result;
         try {

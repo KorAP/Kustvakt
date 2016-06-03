@@ -84,7 +84,7 @@ public abstract class ContextHolder {
     }
 
 
-    public Collection<UserDataDbIface> getUserDataDaos () {
+    public Collection<UserDataDbIface> getUserDataProviders () {
         return getBean(KUSTVAKT_USERDATA);
     }
 
@@ -115,9 +115,7 @@ public abstract class ContextHolder {
     }
 
 
-    // todo: !!!!!!!!!!!!!!!!!!!!!!!!!!
-    // todo: more specific --> collection provider, document provider, etc.
-    public Collection<ResourceOperationIface> getResourceProvider () {
+    public Collection<ResourceOperationIface> getResourceProviders () {
         return getBean(KUSTVAKT_RESOURCES);
     }
 

@@ -10,6 +10,7 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserDetails;
 import de.ids_mannheim.korap.user.UserSettings;
 import de.ids_mannheim.korap.user.Userdata;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -46,26 +47,32 @@ public class UserDaoTest extends BeanConfigTest {
     }
 
 
-    //    @Test
+    @Test
+    @Ignore
     public void testUserdetailsGetNonExistent () throws KustvaktException {
         helper().setupSimpleAccount("userdbtest", "userdbTest");
         User user = helper().getContext().getUserDBHandler()
                 .getAccount("userdbtest");
-        UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
-                helper().getContext().getUserDataDaos(), UserDetails.class);
+        UserDataDbIface dao = BeansFactory.getTypeFactory()
+                .getTypeInterfaceBean(
+                        helper().getContext().getUserDataProviders(),
+                        UserDetails.class);
         Userdata data = dao.get(user);
         assertNull(data);
         helper().dropUser("userdbtest");
     }
 
 
-    //    @Test
+    @Test
+    @Ignore
     public void testUserSettingsGetNonExistent () throws KustvaktException {
         helper().setupSimpleAccount("userdbtest", "userdbTest");
         User user = helper().getContext().getUserDBHandler()
                 .getAccount("userdbtest");
-        UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
-                helper().getContext().getUserDataDaos(), UserSettings.class);
+        UserDataDbIface dao = BeansFactory.getTypeFactory()
+                .getTypeInterfaceBean(
+                        helper().getContext().getUserDataProviders(),
+                        UserSettings.class);
         Userdata data = dao.get(user);
         assertNull(data);
         helper().dropUser("userdbtest");
@@ -74,7 +81,8 @@ public class UserDaoTest extends BeanConfigTest {
 
 
     // username cannot currently be changed
-    //    @Test
+    @Test
+    @Ignore
     public void updateUsername () throws KustvaktException {
         User user1 = helper().getContext().getUserDBHandler()
                 .getAccount(TestHelper.getUserCredentials()[0]);

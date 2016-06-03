@@ -115,13 +115,14 @@ public class UserPropertyReader extends PropertyReader {
             set.readDefaults(vals);
             set.validate(crypto);
 
-            UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
-                    BeansFactory.getKustvaktContext().getUserDataDaos(),
-                    UserDetails.class);
+            UserDataDbIface dao = BeansFactory.getTypeFactory()
+                    .getTypeInterfaceBean(
+                            BeansFactory.getKustvaktContext()
+                                    .getUserDataProviders(), UserDetails.class);
             dao.store(det);
 
-            dao = BeansFactory.getTypeFactory().getTypedBean(
-                    BeansFactory.getKustvaktContext().getUserDataDaos(),
+            dao = BeansFactory.getTypeFactory().getTypeInterfaceBean(
+                    BeansFactory.getKustvaktContext().getUserDataProviders(),
                     UserSettings.class);
             dao.store(set);
         }

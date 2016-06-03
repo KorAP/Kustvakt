@@ -33,7 +33,7 @@ public class RewriteHandlerTest extends BeanConfigTest {
 
     // throws exception cause of missing configuration
     @Test(expected = RuntimeException.class)
-    public void testRewriteConfigThrowsException () {
+    public void testRewriteConfigThrowsException () throws KustvaktException {
         RewriteHandler handler = new RewriteHandler();
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[(base=laufen | base=gehen) & tt/pos=VVFIN]", "poliqarp");
@@ -43,7 +43,7 @@ public class RewriteHandlerTest extends BeanConfigTest {
 
 
     @Test
-    public void testRewriteNoBeanInject () {
+    public void testRewriteNoBeanInject () throws KustvaktException {
         RewriteHandler handler = new RewriteHandler(helper().getContext()
                 .getConfiguration());
         QuerySerializer s = new QuerySerializer();
@@ -55,7 +55,7 @@ public class RewriteHandlerTest extends BeanConfigTest {
 
 
     @Test
-    public void testRewriteBeanInject () {
+    public void testRewriteBeanInject () throws KustvaktException {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         QuerySerializer s = new QuerySerializer();
@@ -74,7 +74,7 @@ public class RewriteHandlerTest extends BeanConfigTest {
 
 
     @Test
-    public void testRewriteUserSpecific () {
+    public void testRewriteUserSpecific () throws KustvaktException {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         QuerySerializer s = new QuerySerializer();
@@ -96,7 +96,8 @@ public class RewriteHandlerTest extends BeanConfigTest {
     public void initMethod () throws KustvaktException {
         helper().setupAccount();
         UserDataDbIface settingsdao = BeansFactory.getTypeFactory()
-                .getTypedBean(helper().getContext().getUserDataDaos(),
+                .getTypeInterfaceBean(
+                        helper().getContext().getUserDataProviders(),
                         UserSettings.class);
         assertNotNull(settingsdao);
         UserSettings s = (UserSettings) settingsdao.get(helper().getUser());

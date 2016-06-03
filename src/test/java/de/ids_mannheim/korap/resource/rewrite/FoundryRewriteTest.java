@@ -53,7 +53,8 @@ public class FoundryRewriteTest extends BeanConfigTest {
 
 
     @Test
-    public void testDefaultFoundryInjectLemmaThrowsNoError () {
+    public void testDefaultFoundryInjectLemmaThrowsNoError ()
+            throws KustvaktException {
 
         KustvaktConfiguration c = helper().getBean(
                 ContextHolder.KUSTVAKT_CONFIG);
@@ -77,7 +78,7 @@ public class FoundryRewriteTest extends BeanConfigTest {
 
 
     @Test
-    public void testDefaultFoundryInjectPOSNoErrors () {
+    public void testDefaultFoundryInjectPOSNoErrors () throws KustvaktException {
 
         KustvaktConfiguration c = helper().getBean(
                 ContextHolder.KUSTVAKT_CONFIG);
@@ -115,8 +116,10 @@ public class FoundryRewriteTest extends BeanConfigTest {
         String result = handler.processQuery(s.toJSON(), user);
         JsonNode node = JsonUtils.readTree(result);
 
-        UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
-                helper().getContext().getUserDataDaos(), UserSettings.class);
+        UserDataDbIface dao = BeansFactory.getTypeFactory()
+                .getTypeInterfaceBean(
+                        helper().getContext().getUserDataProviders(),
+                        UserSettings.class);
         UserSettings settings = (UserSettings) dao.get(user);
         assertTrue(settings.isValid());
         String pos = (String) settings.get(Attributes.DEFAULT_POS_FOUNDRY);
@@ -145,8 +148,10 @@ public class FoundryRewriteTest extends BeanConfigTest {
         String result = handler.processQuery(s.toJSON(), user);
         JsonNode node = JsonUtils.readTree(result);
 
-        UserDataDbIface dao = BeansFactory.getTypeFactory().getTypedBean(
-                helper().getContext().getUserDataDaos(), UserSettings.class);
+        UserDataDbIface dao = BeansFactory.getTypeFactory()
+                .getTypeInterfaceBean(
+                        helper().getContext().getUserDataProviders(),
+                        UserSettings.class);
         UserSettings settings = (UserSettings) dao.get(user);
         assertTrue(settings.isValid());
         String lemma = (String) settings.get(Attributes.DEFAULT_LEMMA_FOUNDRY);
@@ -161,7 +166,8 @@ public class FoundryRewriteTest extends BeanConfigTest {
 
 
     @Test
-    public void testFoundryInjectJoinedQueryNoErrors () {
+    public void testFoundryInjectJoinedQueryNoErrors ()
+            throws KustvaktException {
         KustvaktConfiguration c = helper().getBean(
                 ContextHolder.KUSTVAKT_CONFIG);
 
@@ -183,7 +189,8 @@ public class FoundryRewriteTest extends BeanConfigTest {
 
 
     @Test
-    public void testFoundryInjectGroupedQueryNoErrors () {
+    public void testFoundryInjectGroupedQueryNoErrors ()
+            throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());

@@ -157,4 +157,10 @@ public class UserDetailsDao implements UserDataDbIface<UserDetails> {
             return -1;
         }
     }
+
+
+    @Override
+    public Class<UserDetails> type () {
+        return UserDetails.class;
+    }
 }

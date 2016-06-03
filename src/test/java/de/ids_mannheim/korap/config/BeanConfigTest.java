@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.config;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import net.jcip.annotations.NotThreadSafe;
+import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -28,13 +29,16 @@ import static org.junit.Assert.assertNotNull;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class BeanConfigTest {
 
+
+    private static Logger jlog = Logger.getLogger(BeanConfigTest.class);
+
     @Autowired
     private ApplicationContext context;
 
 
     public void init () throws Exception {
         assertNotNull("Application context must not be null!", this.context);
-        System.out.println("running one-time before init for class "
+        jlog.debug("running one-time before init for class "
                 + this.getClass().getSimpleName() + " ...");
         initMethod();
         BeansFactory.setKustvaktContext(helper().getContext());

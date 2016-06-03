@@ -29,7 +29,7 @@ public class PublicCollection implements RewriteTask.RewriteQuery {
 
     @Override
     public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
-            User user) {
+            User user) throws KustvaktException {
         JsonNode subnode = node.rawNode();
 
         if (!subnode.at("/collection").findValuesAsText("key")
@@ -38,32 +38,28 @@ public class PublicCollection implements RewriteTask.RewriteQuery {
             if (subnode.has("collection"))
                 b.setBaseQuery(JsonUtils.toJSON(subnode));
 
-            try {
-                Set resources = ResourceFinder.search(user, Corpus.class);
-                ArrayList<KustvaktResource> list = new ArrayList(resources);
+            Set resources = ResourceFinder.search(user, Corpus.class);
+            ArrayList<KustvaktResource> list = new ArrayList(resources);
 
-                if (list.isEmpty())
-                    throw new KustvaktException(StatusCodes.PERMISSION_DENIED,
-                            "No resources found for user", user.getUsername());
+            if (list.isEmpty())
+                throw new KustvaktException(
+                        StatusCodes.ACCESS_DENIED_NO_RESOURCES,
+                        "Resources could not be loaded for user ",
+                        user.getUsername());
 
-                Set ids = new HashSet(resources.size());
-                for (int i = 0; i < list.size(); i++) {
-                    if (i > 0)
-                        b.or();
-                    b.with(Attributes.CORPUS_SIGLE + "="
-                            + list.get(i).getPersistentID());
-                    ids.add(list.get(i).getPersistentID());
-                }
-                JsonNode rewritten = JsonUtils.readTree(b.toJSON());
-                node.set("collection", rewritten.at("/collection"),
-                        new KoralNode.RewriteIdentifier(
-                                Attributes.CORPUS_SIGLE, ids));
-                node.at("/collection");
+            Set ids = new HashSet(resources.size());
+            for (int i = 0; i < list.size(); i++) {
+                if (i > 0)
+                    b.or();
+                b.with(Attributes.CORPUS_SIGLE + "="
+                        + list.get(i).getPersistentID());
+                ids.add(list.get(i).getPersistentID());
             }
-            catch (KustvaktException e) {
-                e.printStackTrace();
-                // todo:
-            }
+            JsonNode rewritten = JsonUtils.readTree(b.toJSON());
+            node.set("collection", rewritten.at("/collection"),
+                    new KoralNode.RewriteIdentifier(Attributes.CORPUS_SIGLE,
+                            ids));
+            node.at("/collection");
         }
 
         return node.rawNode();

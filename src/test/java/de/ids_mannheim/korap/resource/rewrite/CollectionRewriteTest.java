@@ -46,7 +46,8 @@ public class CollectionRewriteTest extends BeanConfigTest {
 
 
     @Test
-    public void testCollectionNodeRemoveCorpusIdNoErrors () {
+    public void testCollectionNodeRemoveCorpusIdNoErrors ()
+            throws KustvaktException {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
@@ -68,7 +69,8 @@ public class CollectionRewriteTest extends BeanConfigTest {
 
 
     @Test
-    public void testCollectionNodeRemoveAllCorpusIdNoErrors () {
+    public void testCollectionNodeRemoveAllCorpusIdNoErrors ()
+            throws KustvaktException {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
@@ -88,7 +90,8 @@ public class CollectionRewriteTest extends BeanConfigTest {
 
 
     @Test
-    public void testCollectionNodeRemoveGroupedCorpusIdNoErrors () {
+    public void testCollectionNodeRemoveGroupedCorpusIdNoErrors ()
+            throws KustvaktException {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
@@ -111,7 +114,8 @@ public class CollectionRewriteTest extends BeanConfigTest {
 
     //fixme: will probably fail when one doc groups are being refactored
     @Test
-    public void testCollectionCleanEmptyDocGroupNoErrors () {
+    public void testCollectionCleanEmptyDocGroupNoErrors ()
+            throws KustvaktException {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
@@ -139,7 +143,8 @@ public class CollectionRewriteTest extends BeanConfigTest {
 
 
     @Test
-    public void testCollectionCleanMoveOneDocFromGroupUpNoErrors () {
+    public void testCollectionCleanMoveOneDocFromGroupUpNoErrors ()
+            throws KustvaktException {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
@@ -160,7 +165,8 @@ public class CollectionRewriteTest extends BeanConfigTest {
 
 
     @Test
-    public void testCollectionCleanEmptyGroupAndMoveOneFromGroupUpNoErrors () {
+    public void testCollectionCleanEmptyGroupAndMoveOneFromGroupUpNoErrors ()
+            throws KustvaktException {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
@@ -181,7 +187,8 @@ public class CollectionRewriteTest extends BeanConfigTest {
 
 
     @Test
-    public void testCollectionRemoveAndMoveOneFromGroupUpNoErrors () {
+    public void testCollectionRemoveAndMoveOneFromGroupUpNoErrors ()
+            throws KustvaktException {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
@@ -251,7 +258,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
 
 
     @Test
-    public void testRemoveCorpusFromDifferentGroups () {
+    public void testRemoveCorpusFromDifferentGroups () throws KustvaktException {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
@@ -276,7 +283,8 @@ public class CollectionRewriteTest extends BeanConfigTest {
 
 
     @Test
-    public void testRemoveOneCorpusAndMoveDocFromTwoGroups () {
+    public void testRemoveOneCorpusAndMoveDocFromTwoGroups ()
+            throws KustvaktException {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);

@@ -17,6 +17,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -48,9 +49,6 @@ public class KustvaktBaseServer {
         KustvaktArgs kargs = new KustvaktArgs();
         for (int i = 0; i < args.length; i++) {
             switch ((args[i])) {
-                case "--debug":
-                    kargs.setDebug(true);
-                    break;
                 case "--config":
                     kargs.setConfig(args[i + 1]);
                     break;
@@ -93,32 +91,36 @@ public class KustvaktBaseServer {
             }
         }
         System.out.println("Found boot loading interfaces: " + list);
+
         while (!list.isEmpty()) {
-            for (BootableBeanInterface iface : new ArrayList<>(list)) {
+            loop: for (BootableBeanInterface iface : new ArrayList<>(list)) {
                 try {
+                    for (Class dep : iface.getDependencies()) {
+                        if (set.contains(dep))
+                            continue loop;
+                    }
                     iface.load(BeansFactory.getKustvaktContext());
+                    list.remove(iface);
+                    set.remove(iface.getClass());
+                    System.out.println("Done with interface "
+                            + iface.getClass().getSimpleName());
                 }
                 catch (KustvaktException e) {
                     // don't do anything!
                     System.out.println("An error occurred in class "
-                            + iface.getClass().getSimpleName() + "!\n" + e);
-                    continue;
+                            + iface.getClass().getSimpleName() + "!\n");
+                    System.exit(-1);
                 }
-                list.remove(iface);
-            }
-            if (!list.isEmpty()) {
-                System.out.println("Following bootup classes raised errors: "
-                        + list);
-                break;
             }
         }
-        AdminSetup.getInstance();
     }
 
 
     protected void startServer (KustvaktArgs kargs) {
-        if (kargs.init)
+        if (kargs.init) {
             runPreStart();
+            AdminSetup.getInstance();
+        }
 
         if (kargs.port == -1)
             kargs.setPort(BeansFactory.getKustvaktContext().getConfiguration()
@@ -162,6 +164,7 @@ public class KustvaktBaseServer {
         }
         catch (Exception e) {
             e.printStackTrace();
+            System.exit(-1);
         }
 
     }
@@ -169,7 +172,6 @@ public class KustvaktBaseServer {
     @Setter
     public static class KustvaktArgs {
 
-        private boolean debug;
         @Getter
         private String config;
         private int port;
@@ -181,7 +183,6 @@ public class KustvaktBaseServer {
         public KustvaktArgs () {
             this.port = -1;
             this.sslContext = null;
-            this.debug = false;
             this.config = null;
             this.init = false;
         }

@@ -245,4 +245,5 @@ public class ResourceDao<T extends KustvaktResource> implements
             return -1;
         }
     }
+
 }

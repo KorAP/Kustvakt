@@ -51,27 +51,6 @@ public class BeanConfiguration {
     }
 
 
-    @Deprecated
-    public static void loadAuthenticationProviders () {
-        Set<Class<? extends AuthenticationIface>> set = KustvaktClassLoader
-                .loadSubTypes(AuthenticationIface.class);
-        Set<AuthenticationIface> set2 = new HashSet<>();
-        for (Class<? extends AuthenticationIface> i : set) {
-            try {
-                set2.add(i.newInstance());
-            }
-            catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        try {
-            getBeans().getAuthenticationManager().setProviders(set2);
-        }
-        catch (RuntimeException e) {
-            // do nothing
-        }
-    }
-
 
     public static boolean hasContext () {
         return beans != null && beans.context != null;

@@ -49,12 +49,14 @@ public class AdminSetup {
             store.setReadable(true, true);
             store.setWritable(true, true);
             store.setExecutable(false);
+            System.out.println();
             System.out
                     .println("_______________________________________________");
             System.out.println("Token created. Please make note of it!");
             System.out.println("Token: " + token);
             System.out
                     .println("_______________________________________________");
+            System.out.println();
             return setup;
         }
         catch (Exception e) {

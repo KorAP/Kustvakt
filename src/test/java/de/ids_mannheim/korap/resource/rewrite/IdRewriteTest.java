@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 public class IdRewriteTest extends BeanConfigTest {
 
     @Test
-    public void insertTokenId () {
+    public void insertTokenId () throws KustvaktException {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         assertTrue(handler.add(IdWriter.class));
@@ -34,7 +34,7 @@ public class IdRewriteTest extends BeanConfigTest {
 
 
     @Test
-    public void testIdWriterTest () {
+    public void testIdWriterTest () throws KustvaktException {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         assertTrue(handler.add(IdWriter.class));

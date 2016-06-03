@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import javax.print.Doc;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -290,4 +291,5 @@ public class DocumentDao implements ResourceOperationIface<Document> {
     public Class<Document> type () {
         return Document.class;
     }
+
 }

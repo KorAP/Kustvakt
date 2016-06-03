@@ -1,8 +1,6 @@
 package de.ids_mannheim.korap.config;
 
-import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
-import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.user.Userdata;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.springframework.context.ApplicationContext;
@@ -11,6 +9,7 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -43,7 +42,7 @@ public class BeansFactory {
 
 
     public static synchronized TypeBeanFactory getTypeFactory () {
-        return new TypeBeanFactory(beanHolder);
+        return new TypeBeanFactory();
     }
 
 
@@ -107,21 +106,11 @@ public class BeansFactory {
 
     public static class TypeBeanFactory {
 
-        private ContextHolder holder;
-
-
-        private TypeBeanFactory (ContextHolder holder) {
-            this.holder = holder;
-        }
-
-
-        public <T> T getTypedBean (Collection objs, Class type) {
+        public <T> T getTypeInterfaceBean (Collection objs, Class type) {
             for (Object o : objs) {
-                Type gtype = o.getClass().getGenericInterfaces()[0];
-                if (gtype instanceof ParameterizedType) {
-                    ParameterizedType ptype = (ParameterizedType) gtype;
-                    Object ctype = ptype.getActualTypeArguments()[0];
-                    if (ctype.equals(type))
+                if (o instanceof KustvaktTypeInterface) {
+                    Class t = ((KustvaktTypeInterface) o).type();
+                    if (type.equals(t))
                         return (T) o;
                 }
             }
@@ -132,9 +121,19 @@ public class BeansFactory {
 
 
         @Deprecated
-        public UserDataDbIface getUserDaoInstance (
-                Class<? extends Userdata> type) {
-            return getTypedBean(this.holder.getUserDataDaos(), type);
+        public <T> T getTypedBean (Collection objs, Class type) {
+            for (Object o : objs) {
+                Type gtype = o.getClass().getGenericSuperclass();
+                if (gtype instanceof ParameterizedType) {
+                    ParameterizedType ptype = (ParameterizedType) gtype;
+                    Object ctype = ptype.getActualTypeArguments()[0];
+                    if (ctype.equals(type))
+                        return (T) o;
+                }
+            }
+            throw new RuntimeException(
+                    "Could not find typed bean in context for class '" + type
+                            + "'");
         }
     }
 }
