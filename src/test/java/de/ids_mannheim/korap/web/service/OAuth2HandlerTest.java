@@ -27,27 +27,6 @@ public class OAuth2HandlerTest extends BeanConfigTest {
     private static final String SCOPES = "search preferences queries account";
 
 
-    @BeforeClass
-    public static void setup () throws Exception {
-        //        BeanConfiguration.loadClasspathContext("default-config.xml");
-        //        handler = new OAuth2Handler(
-        //                BeanConfiguration.getKustvaktContext().getPersistenceClient());
-        //        crypto = BeanConfiguration.getKustvaktContext().getEncryption();
-        //        info = new ClientInfo(crypto.createID(), crypto.createToken());
-        //        info.setConfidential(true);
-        //        //todo: support for subdomains?!
-        //        info.setUrl("http://localhost:8080/api/v0.1");
-        //        info.setRedirect_uri("testwebsite/login");
-        //
-        //        helper = TestHelper.newInstance();
-        //        helper.setupAccount();
-        //        PersistenceClient cl = helper.getBean(ContextHolder.KUSTVAKT_DB);
-        //        handler = new OAuth2Handler(cl);
-        //        handler.registerClient(info, helper.getUser());
-        //        crypto = helper.getBean(ContextHolder.KUSTVAKT_ENCRYPTION);
-    }
-
-
     @Test
     public void testStoreAuthorizationCodeThrowsNoException ()
             throws KustvaktException {

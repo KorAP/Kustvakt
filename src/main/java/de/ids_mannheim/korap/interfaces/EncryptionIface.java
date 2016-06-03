@@ -60,7 +60,7 @@ public interface EncryptionIface {
      * 
      * @return
      */
-    public String createRandomNumber(Object ... obj);
+    public String createRandomNumber (Object ... obj);
 
 
     public String encodeBase ();

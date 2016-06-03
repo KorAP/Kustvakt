@@ -55,12 +55,6 @@ public class DefaultEncryption implements EncryptionIface {
 
 
     @Override
-    public String getSalt (User user) {
-        return null;
-    }
-
-
-    @Override
     public String createToken (boolean hash, Object ... obj) {
         return createToken();
 
@@ -74,7 +68,7 @@ public class DefaultEncryption implements EncryptionIface {
 
 
     @Override
-    public String createRandomNumber(Object ... obj) {
+    public String createRandomNumber (Object ... obj) {
         return createToken();
     }
 

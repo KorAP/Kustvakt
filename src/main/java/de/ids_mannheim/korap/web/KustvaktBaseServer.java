@@ -111,7 +111,8 @@ public class KustvaktBaseServer {
                 list.remove(iface);
             }
             if (!list.isEmpty()) {
-                System.out.println("Following bootup classes raised errors: "+ list);
+                System.out.println("Following bootup classes raised errors: "
+                        + list);
                 break;
             }
         }

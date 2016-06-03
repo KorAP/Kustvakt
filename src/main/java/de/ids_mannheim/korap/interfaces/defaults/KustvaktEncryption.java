@@ -222,7 +222,7 @@ public class KustvaktEncryption implements EncryptionIface {
 
 
     @Override
-    public String createRandomNumber(Object ... obj) {
+    public String createRandomNumber (Object ... obj) {
         final byte[] rNumber = SecureRGenerator
                 .getNextSecureRandom(SecureRGenerator.CORPUS_RANDOM_SIZE);
         if (obj.length != 0) {
