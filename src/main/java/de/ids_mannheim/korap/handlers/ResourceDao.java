@@ -151,6 +151,13 @@ public class ResourceDao<T extends KustvaktResource> implements
 
 
     @Override
+    public <T1 extends KustvaktResource> List<T1> findbyPartialId (String id,
+            User user) throws KustvaktException {
+        return null;
+    }
+
+
+    @Override
     public int storeResource (T resource, User user) throws KustvaktException {
         MapSqlParameterSource source = new MapSqlParameterSource();
         KeyHolder holder = new GeneratedKeyHolder();

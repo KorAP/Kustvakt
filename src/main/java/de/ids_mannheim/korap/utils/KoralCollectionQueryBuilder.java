@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
 import edu.emory.mathcs.backport.java.util.Arrays;
 
+import java.io.IOError;
 import java.util.Map;
 
 /**
@@ -48,9 +49,14 @@ public class KoralCollectionQueryBuilder {
      * @param value
      * @return
      */
-    public KoralCollectionQueryBuilder fieldValue (String field, String op,
+    public KoralCollectionQueryBuilder with (String field, String op,
             String value) {
-        this.builder.append(field + op + value);
+        //String end = this.builder.substring(this.builder.length() - 4,
+        //        this.builder.length() - 1);
+        //if (this.builder.length() != 0
+        //        && (!end.contains("&") | !end.contains("|")))
+        //    throw new RuntimeException("no join operator given!");
+        this.with(field + op + value);
         return this;
     }
 
@@ -107,15 +113,8 @@ public class KoralCollectionQueryBuilder {
         if (this.base != null) {
             // check that collection non empty
             JsonNode tmp = this.base.deepCopy();
-            if (request != null) {
-                JsonNode tobase = request.at("/collection");
-                request = tmp;
-                JsonNode result = JsonBuilder.buildDocGroup(
-                        this.mergeOperator != null ? this.mergeOperator
-                                .toLowerCase() : "and", request
-                                .at("/collection"), tobase);
-                ((ObjectNode) request).put("collection", result);
-            }
+            if (request != null)
+                request = mergeWith(request);
             else
                 request = tmp;
         }
@@ -125,18 +124,26 @@ public class KoralCollectionQueryBuilder {
 
     public JsonNode mergeWith (JsonNode node) {
         if (this.base != null) {
-            // check that collection non empty
             if (node != null) {
                 JsonNode tobase = node.at("/collection");
                 JsonNode base = this.base.deepCopy();
-                JsonNode result = JsonBuilder.buildDocGroup("and",
-                        base.at("/collection"), tobase);
+                JsonNode result = base.at("/collection");
+
+                if (result.isMissingNode() && !tobase.isMissingNode())
+                    result = tobase;
+                else if (result.isMissingNode() && tobase.isMissingNode())
+                    return base;
+                else {
+                    result = JsonBuilder.buildDocGroup(
+                            this.mergeOperator != null ? this.mergeOperator
+                                    .toLowerCase() : "and", result, tobase);
+                }
                 ((ObjectNode) base).put("collection", result);
                 return base;
             }
-            return null;
+            return this.base;
         }
-        return null;
+        throw new RuntimeException("no query found to merge with!");
     }
 
 
@@ -170,22 +177,6 @@ public class KoralCollectionQueryBuilder {
     }
 
 
-    @Deprecated
-    private KoralCollectionQueryBuilder appendToBaseGroup (JsonNode node) {
-        if (base.at("/collection/@type").asText().equals("koral:docGroup")) {
-            ArrayNode group = (ArrayNode) base.at("/collection/operands");
-            if (node instanceof ArrayNode)
-                group.addAll((ArrayNode) node);
-            else
-                group.add(node);
-        }
-        else
-            throw new IllegalArgumentException("No group found to add to!");
-        // fixme: if base is a doc only, this function is not supported. requirement is a koral:docGroup, since
-        // combination operator is unknown otherwise
-        return this;
-    }
-
     private static class JsonBuilder {
 
         public static ObjectNode buildDoc (String key, String value) {
@@ -200,6 +191,8 @@ public class KoralCollectionQueryBuilder {
 
 
         public static ObjectNode buildDocGroup (String op, JsonNode ... groups) {
+            System.out.println("GROUPS " + Arrays.asList(groups));
+
             ObjectNode node = JsonUtils.createObjectNode();
             node.put("@type", "koral:docGroup");
             node.put("operation", "operation:" + op);

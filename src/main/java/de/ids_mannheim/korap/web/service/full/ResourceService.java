@@ -63,7 +63,6 @@ public class ResourceService {
         this.config = BeansFactory.getKustvaktContext().getConfiguration();
         this.resourceHandler = new ResourceHandler();
         this.searchKrill = new SearchKrill(config.getIndexDir());
-
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
         this.graphDBhandler = new ClientsHandler(builder.build());
 
@@ -120,7 +119,7 @@ public class ResourceService {
             @Context Locale locale, @PathParam("type") String type,
             @PathParam("id") String id, @PathParam("child") String child) {
         return getResource(context, locale, type,
-                NamingUtils.joinResources(id, child));
+                StringUtils.joinResources(id, child));
     }
 
 
@@ -275,6 +274,7 @@ public class ResourceService {
     }
 
 
+    // ref query parameter removed!
     @TRACE
     @Path("search")
     public Response buildQuery (@Context Locale locale,
@@ -284,20 +284,21 @@ public class ResourceService {
             @QueryParam("cutoff") Boolean cutoff,
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
-            @QueryParam("page") Integer startPage,
-            @QueryParam("ref") String reference, @QueryParam("cq") String cq) {
+            @QueryParam("page") Integer startPage, @QueryParam("cq") String cq) {
         TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
         QuerySerializer ss;
 
-        User user;
-        try {
-            user = controller.getUser(ctx.getUsername());
-        }
-        catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
-        }
+        //User user;
+        //try {
+        //    user = controller.getUser(ctx.getUsername());
+        //}
+        //catch (KustvaktException e) {
+        //    throw KustvaktResponseHandler.throwit(e);
+        //}
 
         ss = new QuerySerializer().setQuery(q, ql, v);
+        if (cq != null)
+            ss.setCollection(cq);
 
         MetaQueryBuilder meta = new MetaQueryBuilder();
         if (pageIndex != null)
@@ -311,9 +312,7 @@ public class ResourceService {
         meta.addEntry("cutOff", cutoff);
 
         ss.setMeta(meta.raw());
-
-        String query = this.processor.processQuery(ss.toJSON(), user);
-        return Response.ok(query).build();
+        return Response.ok(ss.toJSON()).build();
     }
 
 
@@ -331,10 +330,10 @@ public class ResourceService {
      * @return
      */
 
-    //todo: does cq have any sensible worth here?
+    //todo: does cq have any sensible worth here? --> would say no! --> is useful in non type/id scenarios
     @TRACE
     @Path("{type}/{id}/search")
-    public Response buildQuery (@Context Locale locale,
+    public Response buildQueryWithId (@Context Locale locale,
             @Context SecurityContext securityContext,
             @QueryParam("q") String q, @QueryParam("ql") String ql,
             @QueryParam("v") String v, @QueryParam("context") String context,
@@ -342,8 +341,7 @@ public class ResourceService {
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
             @QueryParam("page") Integer startPage,
-            @PathParam("type") String type, @PathParam("id") String id,
-            @QueryParam("cq") String cq) {
+            @PathParam("type") String type, @PathParam("id") String id) {
         TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
         type = StringUtils.normalize(type);
         id = StringUtils.decodeHTML(id);
@@ -363,40 +361,40 @@ public class ResourceService {
             meta.addEntry("cutOff", cutoff);
 
         ss.setMeta(meta.raw());
-        if (cq != null)
-            ss.setCollection(cq);
 
         KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
         cquery.setBaseQuery(ss.toJSON());
 
+
+        String query = "";
+        KustvaktResource resource;
         try {
             User user = controller.getUser(ctx.getUsername());
 
-            //todo: instead of throwing exception, build notification and rewrites into result query
-            KustvaktResource resource;
             if (StringUtils.isInteger(id))
                 resource = this.resourceHandler.findbyIntId(
                         Integer.valueOf(id), user);
             else
                 resource = this.resourceHandler.findbyStrId(id, user,
                         ResourceFactory.getResourceClass(type));
-
-            // todo: test this
-            if (resource instanceof VirtualCollection)
-                cquery.mergeWith(resource.getData());
-            else if (resource instanceof Corpus)
-                cquery.with(Attributes.CORPUS_SIGLE
-                        + resource.getPersistentID());
-
         }
         catch (KustvaktException e) {
-            jlog.error("Exception encountered!", e);
-            //throw KustvaktResponseHandler.throwit(e);
+            //todo: instead of throwing exception, build notification and rewrites into result query
+            jlog.error("Exception encountered!");
+            throw KustvaktResponseHandler.throwit(e);
         }
 
-
-        // todo: policy parsing before return
-        return Response.ok(ss.toJSON()).build();
+        if (resource != null) {
+            if (resource instanceof VirtualCollection)
+                query = JsonUtils.toJSON(cquery.and().mergeWith(
+                        resource.getData()));
+            else if (resource instanceof Corpus) {
+                cquery.and().with(Attributes.CORPUS_SIGLE, "=",
+                        resource.getPersistentID());
+                query = cquery.toJSON();
+            }
+        }
+        return Response.ok(query).build();
     }
 
 
@@ -410,7 +408,7 @@ public class ResourceService {
         // todo: should be possible to add the meta part to the query serialization
         try {
             User user = controller.getUser(ctx.getUsername());
-            jsonld = this.processor.processQuery(jsonld, user);
+            //jsonld = this.processor.processQuery(jsonld, user);
         }
         catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
@@ -418,6 +416,7 @@ public class ResourceService {
         jlog.info("Serialized search: {}", jsonld);
 
         String result = searchKrill.search(jsonld);
+        // todo: logging
         KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
         return Response.ok(result).build();
     }
@@ -436,10 +435,8 @@ public class ResourceService {
             @QueryParam("cq") String cq, @QueryParam("engine") String engine) {
         TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
-        KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
         KustvaktConfiguration.BACKENDS eng = this.config.chooseBackend(engine);
         User user;
-        // todo: not added to query!!
         try {
             user = controller.getUser(context.getUsername());
         }
@@ -451,10 +448,8 @@ public class ResourceService {
         QuerySerializer serializer = new QuerySerializer();
         serializer.setQuery(q, ql, v);
 
-        // todo: parse for security reasons
-        // todo: remove cq parameter
-        // if (cq != null)
-        //    serializer.setCollection(cq);
+        if (cq != null)
+            serializer.setCollection(cq);
 
         MetaQueryBuilder meta = new MetaQueryBuilder();
         meta.addEntry("startIndex", pageIndex);
@@ -468,7 +463,6 @@ public class ResourceService {
         //        meta.addEntry("itemsPerResource", 1);
         serializer.setMeta(meta.raw());
 
-        //fixme: policy rewrite!
         String query = this.processor.processQuery(serializer.toJSON(), user);
 
         jlog.info("the serialized query {}", query);
@@ -508,7 +502,7 @@ public class ResourceService {
      * @param locale
      * @return
      */
-    //fixme: does not use policyrewrite!
+    // todo: remove raw
     @GET
     @Path("/{type}/{id}/search")
     public Response searchbyName (@Context SecurityContext securityContext,
@@ -538,7 +532,6 @@ public class ResourceService {
                 QuerySerializer s = new QuerySerializer();
                 s.setQuery(query, ql, v);
 
-                // fixme: be replaced by public collection rewrite
                 KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
 
                 KustvaktResource resource;
@@ -570,10 +563,6 @@ public class ResourceService {
                 s.setMeta(meta.raw());
 
                 query = s.toJSON();
-                //                PolicyParser parser = new PolicyParser(user);
-                //                query = parser.parse(s.toJSON());
-                //todo: 1
-
             }
             String result;
             try {
@@ -633,11 +622,11 @@ public class ResourceService {
 
     @GET
     @Path("{type}/{id}/{child}/stats")
-    public Response getStatisticsbyName (@Context SecurityContext context,
+    public Response getStatisticsbyIdChild (@Context SecurityContext context,
             @Context Locale locale, @PathParam("type") String type,
             @PathParam("id") String id, @PathParam("child") String child) {
         return getStatisticsbyId(context, locale, type,
-                NamingUtils.joinResources(id, child));
+                StringUtils.joinResources(id, child));
     }
 
 
@@ -928,7 +917,7 @@ public class ResourceService {
             @Context Locale locale, @PathParam("type") String type,
             @PathParam("id") String id, @PathParam("child") String child) {
         return deleteResource(context, locale, type,
-                NamingUtils.joinResources(id, child));
+                StringUtils.joinResources(id, child));
     }
 
 
@@ -998,7 +987,7 @@ public class ResourceService {
                     if (!manager.isAllowed())
                         continue;
 
-                    String[] sep = NamingUtils.splitAnnotations(spl);
+                    String[] sep = StringUtils.splitAnnotations(spl);
                     if (spl != null) {
                         f_list.add(sep[0]);
                         l_list.add(sep[1]);
@@ -1035,7 +1024,7 @@ public class ResourceService {
             foundries = new HashSet<>();
             layers = new HashSet<>();
             for (Layer r : resources) {
-                String[] spl = NamingUtils.splitAnnotations(r.getName());
+                String[] spl = StringUtils.splitAnnotations(r.getName());
                 if (spl != null) {
                     foundries.add(spl[0]);
                     layers.add(spl[1]);
@@ -1061,7 +1050,7 @@ public class ResourceService {
 
     // todo:?!
     @POST
-    @Path("match/{id}/save")
+    @Path("match/{id}")
     @Deprecated
     public Response save (@PathParam("{id}") String id,
             @QueryParam("d") String description,
@@ -1093,8 +1082,8 @@ public class ResourceService {
     }
 
 
-    @POST
-    @Path("match/{id}/delete")
+    @DELETE
+    @Path("match/{id}")
     @Deprecated
     public Response remove (@PathParam("{id}") String id,
             @Context SecurityContext context) {

@@ -14,6 +14,7 @@ import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.user.*;
 import de.ids_mannheim.korap.utils.NamingUtils;
+import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -79,7 +80,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         jlog.info("getting session status of token type '{}'",
                 token.split(" ")[0]);
         AuthenticationIface provider = getProvider(
-                NamingUtils.getTokenType(token), null);
+                StringUtils.getTokenType(token), null);
 
         if (provider == null)
             // throw exception for missing type paramter
@@ -398,7 +399,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                     StatusCodes.PASSWORD_RESET_FAILED);
 
         try {
-            user.setPassword(crypto.produceSecureHash(newPassword));
+            user.setPassword(crypto.secureHash(newPassword));
         }
         catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             //            throw new KorAPException(StatusCodes.ILLEGAL_ARGUMENT,
@@ -431,7 +432,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         }
 
         try {
-            safePass = crypto.produceSecureHash(safePass);
+            safePass = crypto.secureHash(safePass);
         }
         catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             jlog.error("Encoding/Algorithm Error", e);
@@ -514,7 +515,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                 (String) safeMap.get(Attributes.PASSWORD), Attributes.PASSWORD);
         String hash;
         try {
-            hash = crypto.produceSecureHash(safePass);
+            hash = crypto.secureHash(safePass);
         }
         catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
             jlog.error("Encryption error", e);
@@ -789,7 +790,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
     private String cache_key (String input) throws KustvaktException {
         try {
-            return crypto.hash(KEY + "@" + input);
+            return crypto.secureHash(KEY + "@" + input);
         }
         catch (Exception e) {
             jlog.error("illegal cache key input '{}'", input);

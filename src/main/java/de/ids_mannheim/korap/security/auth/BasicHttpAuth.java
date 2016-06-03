@@ -12,6 +12,7 @@ import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.NamingUtils;
+import de.ids_mannheim.korap.utils.StringUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.oltu.oauth2.common.utils.OAuthUtils;
 
@@ -25,17 +26,6 @@ public class BasicHttpAuth implements AuthenticationIface {
 
     public static String[] decode (String token) {
         return OAuthUtils.decodeClientAuthenticationHeader(token);
-
-        //        String t = StringUtils.getTokenType(token);
-        //        if (t != null && t.toUpperCase()
-        //                .equals(Attributes.BASIC_AUTHENTICATION.toUpperCase())) {
-        //            token = StringUtils.stripTokenType(token);
-        //            String[] sp = new String(Base64.decodeBase64(token)).split(":", 2);
-        //            sp[0].replaceAll(" ", "");
-        //            sp[1].replaceAll(" ", "");
-        //            return sp;
-        //        }
-        //        return null;
     }
 
 
@@ -68,7 +58,7 @@ public class BasicHttpAuth implements AuthenticationIface {
             c.setTokenType(Attributes.BASIC_AUTHENTICATION);
             // todo: for production mode, set true
             c.setSecureRequired(false);
-            c.setToken(NamingUtils.stripTokenType(authToken));
+            c.setToken(StringUtils.stripTokenType(authToken));
             //            fixme: you can make queries, but user sensitive data is off limits?!
             c.addContextParameter(Attributes.SCOPES,
                     Scopes.Scope.search.toString());

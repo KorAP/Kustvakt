@@ -11,6 +11,7 @@ public class StringUtils {
             .getLogger(StringUtils.class);
 
     private static final String SEP = ";";
+    private static final String SLASH = "/";
 
 
     public static Collection<UUID> stringToUUIDList (String s) {
@@ -135,5 +136,73 @@ public class StringUtils {
     public static String decodeHTML (String value) {
         return StringEscapeUtils.unescapeHtml(value);
     }
+
+
+    public static String getDocSigle (String textSigle) {
+        if (textSigle != null)
+            return textSigle.split("\\.")[0];
+        return null;
+    }
+
+
+    public static String getCorpusSigle (String textSigle) {
+        //WPD_SSS.07367
+        if (textSigle != null)
+            return textSigle.split("_")[0];
+        return null;
+    }
+
+
+    public static Collection<String> joinStringSet (Collection<String> source,
+            String other) {
+        Set<String> set = new HashSet<>(source);
+        set.add(other);
+        return set;
+    }
+
+
+    public static Collection<UUID> joinUUIDSet (Collection<UUID> source,
+            UUID other) {
+        Set<UUID> set = new HashSet<>(source);
+        set.add(other);
+        return set;
+    }
+
+
+    public static String joinResources (String first, String second) {
+        String res;
+        if (first != null && !first.isEmpty())
+            res = first + SLASH + second;
+        else
+            res = second;
+        return res.replaceAll("\\s", "");
+    }
+
+
+    public static String[] splitAnnotations (String joined) {
+        String[] spl = joined.split(SLASH);
+        if (spl.length == 2)
+            return spl;
+        else
+            return null;
+    }
+
+
+    public static String stripTokenType (String token) {
+        int idx = token.lastIndexOf(" ");
+        if (idx == -1)
+            return token;
+        return token.substring(idx).replaceAll("\\s", "");
+    }
+
+
+    public static String getTokenType (String token) {
+        if (token.contains(" "))
+            return token.substring(0, token.lastIndexOf(" "))
+                    .replaceAll("\\s", "").toLowerCase();
+        else
+            return null;
+    }
+
 
 }

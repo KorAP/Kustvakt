@@ -8,6 +8,7 @@ import de.ids_mannheim.korap.user.User;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 // todo: for transaction to work this should go into core module!?!
 // todo: user instance only required for auditing pointcut operations
@@ -19,6 +20,11 @@ public interface ResourceOperationIface<T extends KustvaktResource> extends
 
 
     <T extends KustvaktResource> T findbyId (Integer id, User user)
+            throws KustvaktException;
+
+
+    // todo: regex should be considered here to consider determination of partial id offset information
+    <T extends KustvaktResource> List<T> findbyPartialId (String id, User user)
             throws KustvaktException;
 
 

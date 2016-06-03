@@ -26,6 +26,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -42,7 +43,7 @@ import java.util.Locale;
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class AdminService {
 
-    private static Logger jlog = KustvaktLogger.getLogger(AdminService.class);
+    private static Logger jlog = LoggerFactory.getLogger(AdminService.class);
     // todo: map in timeutils
     private static DateTimeFormatter dtf = DateTimeFormat
             .forPattern("dd/MM/yyyy");
@@ -136,9 +137,9 @@ public class AdminService {
     }
 
 
-    //fixme: documentservice?!
     @POST
     @Path("doc/{id}/add")
+    @Deprecated
     public Response addDocument (@PathParam("id") String id) {
         Document document = new Document(id);
         try {

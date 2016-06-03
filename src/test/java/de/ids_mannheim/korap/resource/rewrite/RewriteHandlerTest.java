@@ -19,19 +19,6 @@ import static org.junit.Assert.*;
  */
 public class RewriteHandlerTest extends BeanConfigTest {
 
-    @Test
-    public void initHandler () {
-        try {
-            RewriteHandler handler = new RewriteHandler();
-            handler.insertBeans(helper().getContext());
-            assertTrue(handler.add(FoundryInject.class));
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-
-        }
-    }
-
 
     @Test
     public void testRewriteTaskAdd () {
@@ -111,6 +98,7 @@ public class RewriteHandlerTest extends BeanConfigTest {
         UserDataDbIface settingsdao = BeansFactory.getTypeFactory()
                 .getTypedBean(helper().getContext().getUserDataDaos(),
                         UserSettings.class);
+        assertNotNull(settingsdao);
         UserSettings s = (UserSettings) settingsdao.get(helper().getUser());
         s.setField(Attributes.DEFAULT_LEMMA_FOUNDRY, "tt_test");
         settingsdao.update(s);

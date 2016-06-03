@@ -8,7 +8,11 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.SearchKrill;
+
+import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -18,12 +22,10 @@ import static org.junit.Assert.assertNotNull;
  */
 public class SearchKrillTest extends BeanConfigTest {
 
-
     @Override
     public void initMethod () throws KustvaktException {
 
     }
-
 
     @Test
     public void testInit () {
@@ -57,8 +59,7 @@ public class SearchKrillTest extends BeanConfigTest {
     @Test
     public void testSearch () {
         QuerySerializer s = new QuerySerializer();
-        s.setQuery("[orth=das]", "poliqarp");
-
+        s.setQuery("[orth=der]", "poliqarp");
 
         KustvaktConfiguration config = helper().getContext().getConfiguration();
         SearchKrill krill = new SearchKrill(config.getIndexDir());
@@ -67,7 +68,6 @@ public class SearchKrillTest extends BeanConfigTest {
         JsonNode node = JsonUtils.readTree(result);
         assertNotNull(node);
         assertNotEquals(0, node.at("/matches").size());
-
     }
 
 }

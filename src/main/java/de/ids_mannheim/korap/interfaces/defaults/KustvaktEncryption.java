@@ -78,13 +78,13 @@ public class KustvaktEncryption implements EncryptionIface {
     }
 
 
-    public String produceSecureHash (String input) {
-        return produceSecureHash(input, "");
+    public String secureHash (String input) {
+        return secureHash(input, "");
     }
 
 
     @Override
-    public String produceSecureHash (String input, String salt) {
+    public String secureHash (String input, String salt) {
         String hashString = "";
         switch (config.getEncryption()) {
             case ESAPICYPHER:
@@ -124,6 +124,7 @@ public class KustvaktEncryption implements EncryptionIface {
     }
 
 
+
     public String hash (String text, String salt) throws Exception {
         byte[] bytes;
 
@@ -143,7 +144,6 @@ public class KustvaktEncryption implements EncryptionIface {
     }
 
 
-    @Override
     public String hash (String input) {
         String hashString = "";
         MessageDigest md;
@@ -244,7 +244,7 @@ public class KustvaktEncryption implements EncryptionIface {
         String pw = "";
         switch (config.getEncryption()) {
             case ESAPICYPHER:
-                pw = produceSecureHash(plain, salt);
+                pw = secureHash(plain, salt);
                 break;
             case BCRYPT:
                 try {
@@ -265,7 +265,7 @@ public class KustvaktEncryption implements EncryptionIface {
     public boolean checkHash (String plain, String hash) {
         switch (config.getEncryption()) {
             case ESAPICYPHER:
-                return produceSecureHash(plain).equals(hash);
+                return secureHash(plain).equals(hash);
             case BCRYPT:
                 try {
                     return BCrypt.checkpw(plain, hash);

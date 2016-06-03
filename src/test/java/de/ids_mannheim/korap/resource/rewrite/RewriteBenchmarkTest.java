@@ -7,57 +7,58 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.DocumentDao;
 import de.ids_mannheim.korap.resources.Document;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import net.sf.ehcache.CacheManager;
-import org.junit.Before;
+import de.ids_mannheim.korap.utils.TimeUtils;
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 /**
- * @author hanl
- * @date 12/11/2015
+ * Created by hanl on 30.05.16.
  */
-public class ResultRewriteTest extends BeanConfigTest {
-
-    @Override
-    public void initMethod () throws KustvaktException {
-
-    }
-
-
-    // otherwise cache will maintain values not relevant for other tests
-    @Before
-    public void before () {
-        CacheManager.getInstance().getCache("documents").removeAll();
-        DocumentDao dao = new DocumentDao(helper().getContext()
-                .getPersistenceClient());
-        dao.truncate();
-    }
+public class RewriteBenchmarkTest extends BeanConfigTest {
 
 
     @Test
-    public void testPostRewriteNothingToDo () throws KustvaktException {
+    public void testDocMatchRewriteByTextSigle () throws KustvaktException {
+        DocumentDao dao = new DocumentDao(helper().getContext()
+                .getPersistenceClient());
+
+        int i = 999;
+        for (int j = 100; j < i; j++) {
+            Document doc = new Document("WPD_AAA.02" + j);
+            doc.setDisabled(true);
+            dao.storeResource(doc, null);
+        }
         RewriteHandler ha = new RewriteHandler();
         ha.insertBeans(helper().getContext());
         assertEquals("Handler could not be added to rewrite handler instance!",
                 true, ha.add(DocMatchRewrite.class));
 
-        DocumentDao dao = new DocumentDao(helper().getContext()
-                .getPersistenceClient());
-        Document d = dao.findbyId("BRZ13_APR.00014", null);
-        assertNull(d);
+        DateTime now = TimeUtils.getNow();
         String v = ha.processResult(TestVariables.RESULT, null);
-        assertEquals("results do not match",
-                JsonUtils.readTree(TestVariables.RESULT), JsonUtils.readTree(v));
+        long diff = TimeUtils.calcDiff(now, new DateTime());
+        assertTrue(diff < 600);
+        JsonNode node = JsonUtils.readTree(v);
+
+        JsonNode check = JsonUtils.readTree(TestVariables.RESULT);
+        assertNotNull(check);
+        int check_size = check.at("/matches").size();
+
+        assertNotNull(node);
+        int size = node.at("/matches").size();
+        assertNotEquals("documents were not removed", check_size, size);
+
+        dao.truncate();
     }
 
 
     @Test
-    public void testResultRewriteRemoveDoc () throws KustvaktException {
+    public void testDocMatchRewriteByDocSigle () throws KustvaktException {
         DocumentDao dao = new DocumentDao(helper().getContext()
                 .getPersistenceClient());
 
-        Document doc = new Document("WPD_AAA.02439");
+        Document doc = new Document("WPD_AAA");
         doc.setDisabled(true);
         dao.storeResource(doc, null);
 
@@ -66,21 +67,36 @@ public class ResultRewriteTest extends BeanConfigTest {
         assertEquals("Handler could not be added to rewrite handler instance!",
                 true, ha.add(DocMatchRewrite.class));
 
+        DateTime now = TimeUtils.getNow();
+        String v = ha.processResult(TestVariables.RESULT, null);
+        long diff = TimeUtils.calcDiff(now, new DateTime());
+        assertTrue(diff < 600);
+        JsonNode node = JsonUtils.readTree(v);
+
         JsonNode check = JsonUtils.readTree(TestVariables.RESULT);
         assertNotNull(check);
         int check_size = check.at("/matches").size();
 
-        String v = ha.processResult(TestVariables.RESULT, null);
-        JsonNode node = JsonUtils.readTree(v);
-
         assertNotNull(node);
         int size = node.at("/matches").size();
         assertNotEquals("documents were not removed", check_size, size);
-        assertEquals("result does not contain required matches", 22, size);
-
-        dao.deleteResource(doc.getPersistentID(), null);
-        Document d = dao.findbyId(doc.getPersistentID(), null);
-        assertNull("document should not exist anymore!", d);
+        assertEquals(0, size);
+        dao.truncate();
     }
 
+
+    @Test
+    public void testCollectionRewriteInject () {
+
+    }
+
+
+    @Test
+    public void testCollectionRewriteRemoval () {
+
+    }
+
+
+    @Override
+    public void initMethod () throws KustvaktException {}
 }

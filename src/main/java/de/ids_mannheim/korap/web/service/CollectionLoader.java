@@ -29,20 +29,21 @@ public class CollectionLoader implements BootableBeanInterface {
                 .toUser(KustvaktConfiguration.KUSTVAKT_USER);
 
         KoralCollectionQueryBuilder bui = new KoralCollectionQueryBuilder();
-        bui.with("creationDate since 1775");
+        bui.with("creationDate since 1775 & corpusSigle=GOE");
 
         VirtualCollection c1 = new VirtualCollection();
         c1.setName("Weimarer Werke");
-        c1.addField(Attributes.QUERY, bui.toJSON());
+
+        c1.setFields(bui.toJSON());
 
         c1.setDescription("Goethe-Werke in Weimar (seit 1775)");
 
         bui = new KoralCollectionQueryBuilder();
-        bui.with("textType = Aphorismus");
+        bui.with("textType=Aphorismus");
 
         VirtualCollection c2 = new VirtualCollection();
         c2.setName("Aphorismen");
-        c2.addField(Attributes.QUERY, bui.toJSON());
+        c2.setFields(bui.toJSON());
         c2.setDescription("Aphorismentexte Goethes");
 
         bui = new KoralCollectionQueryBuilder();
@@ -50,7 +51,7 @@ public class CollectionLoader implements BootableBeanInterface {
 
         VirtualCollection c3 = new VirtualCollection();
         c3.setName("Werther");
-        c3.addField(Attributes.QUERY, bui.toJSON());
+        c3.setFields(bui.toJSON());
         c3.setDescription("Goethe - Die Leiden des jungen Werther");
 
         PolicyBuilder b = new PolicyBuilder(user);

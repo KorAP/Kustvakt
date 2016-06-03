@@ -28,7 +28,7 @@ public class DefaultEncryption implements EncryptionIface {
 
 
     @Override
-    public String produceSecureHash (String input, String salt)
+    public String secureHash (String input, String salt)
             throws NoSuchAlgorithmException, UnsupportedEncodingException,
             KustvaktException {
         return null;
@@ -36,21 +36,8 @@ public class DefaultEncryption implements EncryptionIface {
 
 
     @Override
-    public String produceSecureHash (String input)
-            throws NoSuchAlgorithmException, UnsupportedEncodingException,
-            KustvaktException {
-        return null;
-    }
-
-
-    @Override
-    public String hash (String text, String salt) throws Exception {
-        return null;
-    }
-
-
-    @Override
-    public String hash (String value) {
+    public String secureHash (String input) throws NoSuchAlgorithmException,
+            UnsupportedEncodingException, KustvaktException {
         return null;
     }
 

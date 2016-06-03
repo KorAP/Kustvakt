@@ -8,7 +8,7 @@ import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.TimeUtils;
-import de.ids_mannheim.korap.web.utils.KorAPContext;
+import de.ids_mannheim.korap.web.utils.KustvaktContext;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
@@ -42,8 +42,8 @@ public class DefaultFilter implements ContainerRequestFilter, ResourceFilter {
                 // do nothing
             }
             if (pr == null)
-                request.setSecurityContext(new KorAPContext(createShorterToken(
-                        host, ua)));
+                request.setSecurityContext(new KustvaktContext(
+                        createShorterToken(host, ua)));
 
         }
         return request;

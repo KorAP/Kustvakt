@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.resource.rewrite;
 import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.config.TestVariables;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.user.User;
@@ -20,8 +21,6 @@ import static org.junit.Assert.assertNotNull;
  * @date 03/09/2015
  */
 public class CollectionRewriteTest extends BeanConfigTest {
-
-    private static String simple_add_query = "[pos=ADJA]";
 
     private static KustvaktConfiguration config;
 
@@ -52,7 +51,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
         QuerySerializer s = new QuerySerializer();
-        s.setQuery(simple_add_query, "poliqarp");
+        s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection("textClass=politik & corpusSigle=WPD");
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
@@ -74,21 +73,17 @@ public class CollectionRewriteTest extends BeanConfigTest {
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
         QuerySerializer s = new QuerySerializer();
-        s.setQuery(simple_add_query, "poliqarp");
+        s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection("corpusSigle=BRZ13 & corpusSigle=WPD");
         String result = s.toJSON();
-        try {
-            JsonNode node = JsonUtils.readTree(handler.processQuery(result,
-                    User.UserFactory.getUser("test_user")));
-            System.out.println(node);
-            assertNotNull(node);
-            assertEquals(0, node.at("/collection/operands").size());
-            assertEquals("koral:rewrite",
-                    node.at("/collection/rewrites/0/@type").asText());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        JsonNode node = JsonUtils.readTree(handler.processQuery(result,
+                User.UserFactory.getUser("test_user")));
+        System.out.println(node);
+        assertNotNull(node);
+        assertEquals(0, node.at("/collection/operands").size());
+        assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type")
+                .asText());
     }
 
 
@@ -98,7 +93,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
         QuerySerializer s = new QuerySerializer();
-        s.setQuery(simple_add_query, "poliqarp");
+        s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection("(corpusSigle=BRZ13 & textClass=Wissenschaft) & corpusSigle=WPD");
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
@@ -122,7 +117,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
         handler.add(CollectionConstraint.class);
         handler.add(CollectionCleanRewrite.class);
         QuerySerializer s = new QuerySerializer();
-        s.setQuery(simple_add_query, "poliqarp");
+        s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection("(corpusSigle=BRZ13 & corpusSigle=WPD) & textClass=Wissenschaft & textClass=Sport");
         String result = s.toJSON();
 
@@ -150,7 +145,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
         handler.add(CollectionConstraint.class);
         handler.add(CollectionCleanRewrite.class);
         QuerySerializer s = new QuerySerializer();
-        s.setQuery(simple_add_query, "poliqarp");
+        s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection("(corpusSigle=BRZ13 & textClass=wissenschaft)");
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
@@ -171,7 +166,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
         handler.add(CollectionConstraint.class);
         handler.add(CollectionCleanRewrite.class);
         QuerySerializer s = new QuerySerializer();
-        s.setQuery(simple_add_query, "poliqarp");
+        s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection("(corpusSigle=BRZ13 & corpusSigle=WPD) & textClass=Wissenschaft");
         String result = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
@@ -192,7 +187,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
         handler.add(CollectionConstraint.class);
         handler.add(CollectionCleanRewrite.class);
         QuerySerializer s = new QuerySerializer();
-        s.setQuery(simple_add_query, "poliqarp");
+        s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection("(docID=random & textClass=Wissenschaft) & corpusSigle=WPD");
         String org = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
@@ -217,7 +212,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
         handler.add(PublicCollection.class);
 
         QuerySerializer s = new QuerySerializer();
-        s.setQuery(simple_add_query, "poliqarp");
+        s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         String org = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
                 User.UserFactory.getUser("test_user")));
@@ -240,7 +235,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
         handler.add(PublicCollection.class);
 
         QuerySerializer s = new QuerySerializer();
-        s.setQuery(simple_add_query, "poliqarp");
+        s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection("(docSigle=WPD_AAA & textClass=wissenschaft)");
         String org = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
@@ -262,7 +257,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
         handler.insertBeans(helper().getContext());
         handler.add(CollectionConstraint.class);
         QuerySerializer s = new QuerySerializer();
-        s.setQuery(simple_add_query, "poliqarp");
+        s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection("(corpusSigle=BRZ14 & textClass=wissenschaft) | (corpusSigle=AZPR | textClass=freizeit)");
         String org = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
@@ -289,7 +284,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
         // todo: use this collection query also to test clean up filter! after reduction of corpusSigle (wiss | freizeit)!
         handler.add(CollectionCleanRewrite.class);
         QuerySerializer s = new QuerySerializer();
-        s.setQuery(simple_add_query, "poliqarp");
+        s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
         s.setCollection("(corpusSigle=BRZ14 & textClass=wissenschaft) | (corpusSigle=AZPR | textClass=freizeit)");
         String org = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
