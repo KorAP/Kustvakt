@@ -8,6 +8,7 @@ import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 import com.sun.jersey.test.framework.spi.container.TestContainer;
+import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
 import com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory;
 import com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory;
@@ -18,6 +19,7 @@ import org.junit.BeforeClass;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
+import java.net.BindException;
 import java.net.URI;
 
 /**
@@ -36,6 +38,9 @@ public abstract class FastJerseyTest extends BeanConfigTest {
 
     private static Client client;
     private static String[] classPackages = null;
+
+    private static int PORT = 9000;
+    private static int PORT_IT = 1;
 
 
     public static void addClass (Class<?> resourceClass) {
@@ -87,7 +92,7 @@ public abstract class FastJerseyTest extends BeanConfigTest {
     }
 
 
-    public static void initServer () {
+    public static void initServer (int port) {
         AppDescriptor ad;
         if (classPackages == null)
             ad = new LowLevelAppDescriptor.Builder(resourceConfig).build();
@@ -103,7 +108,7 @@ public abstract class FastJerseyTest extends BeanConfigTest {
         }
 
         testContainer = tcf.create(UriBuilder.fromUri("http://localhost/")
-                .port(9998).build(), ad);
+                .port(port).build(), ad);
         client = testContainer.getClient();
         if (client == null) {
             client = Client.create(ad.getClientConfig());
@@ -112,8 +117,14 @@ public abstract class FastJerseyTest extends BeanConfigTest {
 
 
     public static void startServer () {
-        if (testContainer != null) {
-            testContainer.start();
+        try {
+            if (testContainer != null) {
+                testContainer.start();
+            }
+        }
+        catch (TestContainerException e) {
+            initServer(PORT + PORT_IT++);
+            startServer();
         }
     }
 
@@ -144,7 +155,7 @@ public abstract class FastJerseyTest extends BeanConfigTest {
     @Before
     public void startServerBeforeFirstTestRun () {
         if (testContainer == null) {
-            initServer();
+            initServer(PORT);
             startServer();
         }
     }

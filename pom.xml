@@ -172,7 +172,7 @@
                 <version>2.19.1</version>
                 <configuration>
                     <reuseForks>false</reuseForks>
-                    <forkCount>1</forkCount>
+                    <forkCount>2</forkCount>
                     <threadCount>10</threadCount>
 
                     <excludes>

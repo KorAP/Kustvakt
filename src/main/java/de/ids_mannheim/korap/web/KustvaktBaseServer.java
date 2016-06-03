@@ -93,7 +93,6 @@ public class KustvaktBaseServer {
             }
         }
         System.out.println("Found boot loading interfaces: " + list);
-        int track = list.size();
         while (!list.isEmpty()) {
             for (BootableBeanInterface iface : new ArrayList<>(list)) {
                 try {

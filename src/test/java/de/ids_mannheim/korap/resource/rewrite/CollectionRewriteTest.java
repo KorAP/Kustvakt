@@ -79,7 +79,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
 
         JsonNode node = JsonUtils.readTree(handler.processQuery(result,
                 User.UserFactory.getUser("test_user")));
-        System.out.println(node);
+
         assertNotNull(node);
         assertEquals(0, node.at("/collection/operands").size());
         assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type")
@@ -192,7 +192,6 @@ public class CollectionRewriteTest extends BeanConfigTest {
         String org = s.toJSON();
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
                 User.UserFactory.getUser("test_user")));
-        System.out.println(node);
         assertNotNull(node);
         assertEquals("koral:docGroup", node.at("/collection/@type").asText());
         assertEquals(2, node.at("/collection/operands").size());

@@ -4,7 +4,7 @@
   <groupId>de.ids_mannheim.korap</groupId>
   <artifactId>Kustvakt-core</artifactId>
   <name>Kustvakt core</name>
-  <version>0.59.1</version>
+  <version>0.59.4</version>
   <description>Kustvakt core, basic rest api for testing purposes and default
         interfaces</description>
   <build>
@@ -47,6 +47,13 @@
         <groupId>com.googlecode.maven-java-formatter-plugin</groupId>
         <artifactId>maven-java-formatter-plugin</artifactId>
         <version>0.4</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>format</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
           <configFile>${project.basedir}/Format.xml</configFile>
           <overrideConfigCompilerVersion>true</overrideConfigCompilerVersion>
@@ -81,7 +88,7 @@
         <version>2.19.1</version>
         <configuration>
           <reuseForks>false</reuseForks>
-          <forkCount>1</forkCount>
+          <forkCount>2</forkCount>
           <threadCount>10</threadCount>
           <excludes>
             <exclude>**/*APITest.java</exclude>
