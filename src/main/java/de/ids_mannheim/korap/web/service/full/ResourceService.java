@@ -312,8 +312,6 @@ public class ResourceService {
         meta.addEntry("cutOff", cutoff);
 
         ss.setMeta(meta.raw());
-        //fixme: parsing should be done only in search functions!
-        //String query = this.processor.processQuery(ss.toJSON(), user);
         return Response.ok(ss.toJSON()).build();
     }
 
@@ -367,6 +365,7 @@ public class ResourceService {
         KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
         cquery.setBaseQuery(ss.toJSON());
 
+
         String query = "";
         KustvaktResource resource;
         try {
@@ -387,10 +386,11 @@ public class ResourceService {
 
         if (resource != null) {
             if (resource instanceof VirtualCollection)
-                query = cquery.and().mergeToJSON(resource.getData());
+                query = JsonUtils.toJSON(cquery.and().mergeWith(
+                        resource.getData()));
             else if (resource instanceof Corpus) {
-                cquery.and().with(
-                        Attributes.CORPUS_SIGLE + resource.getPersistentID());
+                cquery.and().with(Attributes.CORPUS_SIGLE, "=",
+                        resource.getPersistentID());
                 query = cquery.toJSON();
             }
         }
@@ -464,7 +464,6 @@ public class ResourceService {
         serializer.setMeta(meta.raw());
 
         String query = this.processor.processQuery(serializer.toJSON(), user);
-        //String query = serializer.toJSON();
 
         jlog.info("the serialized query {}", query);
 
@@ -484,7 +483,7 @@ public class ResourceService {
             }
         }
         else
-            result = searchKrill.search(serializer.toJSON());
+            result = searchKrill.search(query);
         KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
         return Response.ok(result).build();
     }
@@ -503,7 +502,7 @@ public class ResourceService {
      * @param locale
      * @return
      */
-    //fixme: does not use policyrewrite!
+    // todo: remove raw
     @GET
     @Path("/{type}/{id}/search")
     public Response searchbyName (@Context SecurityContext securityContext,
@@ -533,7 +532,6 @@ public class ResourceService {
                 QuerySerializer s = new QuerySerializer();
                 s.setQuery(query, ql, v);
 
-                // fixme: be replaced by public collection rewrite
                 KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
 
                 KustvaktResource resource;
@@ -565,10 +563,6 @@ public class ResourceService {
                 s.setMeta(meta.raw());
 
                 query = s.toJSON();
-                //                PolicyParser parser = new PolicyParser(user);
-                //                query = parser.parse(s.toJSON());
-                //todo: 1
-
             }
             String result;
             try {

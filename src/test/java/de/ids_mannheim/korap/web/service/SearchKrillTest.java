@@ -53,7 +53,7 @@ public class SearchKrillTest extends BeanConfigTest {
     @Test
     public void testSearch () {
         QuerySerializer s = new QuerySerializer();
-        s.setQuery("[base=Haus]", "poliqarp");
+        s.setQuery("[orth=der]", "poliqarp");
 
 
         KustvaktConfiguration config = helper().getContext().getConfiguration();

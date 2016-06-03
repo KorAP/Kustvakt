@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
 import edu.emory.mathcs.backport.java.util.Arrays;
 
+import java.io.IOError;
 import java.util.Map;
 
 /**
@@ -48,9 +49,14 @@ public class KoralCollectionQueryBuilder {
      * @param value
      * @return
      */
-    public KoralCollectionQueryBuilder fieldValue (String field, String op,
+    public KoralCollectionQueryBuilder with (String field, String op,
             String value) {
-        this.builder.append(field + op + value);
+        //String end = this.builder.substring(this.builder.length() - 4,
+        //        this.builder.length() - 1);
+        //if (this.builder.length() != 0
+        //        && (!end.contains("&") | !end.contains("|")))
+        //    throw new RuntimeException("no join operator given!");
+        this.with(field + op + value);
         return this;
     }
 
@@ -92,10 +98,7 @@ public class KoralCollectionQueryBuilder {
     }
 
 
-    public Object rebaseCollection (JsonNode node) {
-        if (node != null)
-            return mergeWith(node);
-
+    public Object rebaseCollection () {
         if (this.builder.length() == 0 && this.base == null)
             return null;
 
@@ -110,15 +113,8 @@ public class KoralCollectionQueryBuilder {
         if (this.base != null) {
             // check that collection non empty
             JsonNode tmp = this.base.deepCopy();
-            if (request != null) {
-                JsonNode tobase = request.at("/collection");
-                request = tmp;
-                JsonNode result = JsonBuilder.buildDocGroup(
-                        this.mergeOperator != null ? this.mergeOperator
-                                .toLowerCase() : "and", request
-                                .at("/collection"), tobase);
-                ((ObjectNode) request).put("collection", result);
-            }
+            if (request != null)
+                request = mergeWith(request);
             else
                 request = tmp;
         }
@@ -171,12 +167,7 @@ public class KoralCollectionQueryBuilder {
 
 
     public String toJSON () {
-        return JsonUtils.toJSON(rebaseCollection(null));
-    }
-
-
-    public String mergeToJSON (JsonNode node) {
-        return JsonUtils.toJSON(rebaseCollection(node));
+        return JsonUtils.toJSON(rebaseCollection());
     }
 
 
@@ -200,6 +191,8 @@ public class KoralCollectionQueryBuilder {
 
 
         public static ObjectNode buildDocGroup (String op, JsonNode ... groups) {
+            System.out.println("GROUPS " + Arrays.asList(groups));
+
             ObjectNode node = JsonUtils.createObjectNode();
             node.put("@type", "koral:docGroup");
             node.put("operation", "operation:" + op);

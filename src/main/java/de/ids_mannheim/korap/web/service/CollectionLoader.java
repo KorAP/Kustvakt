@@ -39,7 +39,7 @@ public class CollectionLoader implements BootableBeanInterface {
         c1.setDescription("Goethe-Werke in Weimar (seit 1775)");
 
         bui = new KoralCollectionQueryBuilder();
-        bui.with("textType = Aphorismus");
+        bui.with("textType=Aphorismus");
 
         VirtualCollection c2 = new VirtualCollection();
         c2.setName("Aphorismen");
