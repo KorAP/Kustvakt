@@ -3,10 +3,7 @@ package de.ids_mannheim.korap.web;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
-import de.ids_mannheim.korap.config.BeansFactory;
-import de.ids_mannheim.korap.config.KustvaktCacheManager;
-import de.ids_mannheim.korap.config.KustvaktClassLoader;
-import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.config.*;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.web.service.BootableBeanInterface;
 import lombok.Getter;
@@ -116,6 +113,7 @@ public class KustvaktBaseServer {
                 break;
             }
         }
+        AdminSetup.getInstance();
     }
 
 

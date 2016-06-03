@@ -47,7 +47,6 @@ public class AdminService {
     // todo: map in timeutils
     private static DateTimeFormatter dtf = DateTimeFormat
             .forPattern("dd/MM/yyyy");
-    //    private AdminQueryController adminController;
     private AuthenticationManagerIface controller;
     private AuditingIface auditingController;
     private DocumentDao documentDao;

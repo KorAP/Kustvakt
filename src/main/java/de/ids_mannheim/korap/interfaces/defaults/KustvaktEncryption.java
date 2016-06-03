@@ -36,11 +36,10 @@ public class KustvaktEncryption implements EncryptionIface {
     private static Logger jlog = LoggerFactory
             .getLogger(KustvaktEncryption.class);
 
-
     private final boolean nullable;
     private final Validator validator;
     private final Randomizer randomizer;
-    private KustvaktConfiguration config;
+    private final KustvaktConfiguration config;
 
 
     public KustvaktEncryption (KustvaktConfiguration config) {

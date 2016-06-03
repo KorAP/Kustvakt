@@ -18,6 +18,8 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.flywaydb.core.Flyway;
 import org.joda.time.DateTime;
 import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -44,9 +46,9 @@ import static org.junit.Assert.assertNotNull;
  */
 public class TestHelper {
 
+    private static Logger jlog = LoggerFactory.getLogger(TestHelper.class);
     private static final String[] credentials = new String[] { "test1",
             "testPass2015" };
-    private static Class clazz = null;
 
     private ContextHolder beansHolder;
 
@@ -81,7 +83,7 @@ public class TestHelper {
 
         try {
             getUser();
-            System.out.println("found user, skipping setup ...");
+            jlog.debug("found user, skipping setup ...");
             return this;
         }
         catch (RuntimeException e) {
@@ -107,7 +109,6 @@ public class TestHelper {
         }
         catch (KustvaktException e) {
             // do nothing
-            e.printStackTrace();
             assertNotNull("Test user could not be set up", null);
         }
         assertNotEquals(0, dao.size());
@@ -224,11 +225,11 @@ public class TestHelper {
                 // do nothing
             }
         }
-        System.out.println("Found boot loading interfaces: " + list);
+        jlog.debug("Found boot loading interfaces: " + list);
         while (!set.isEmpty()) {
             out_loop: for (BootableBeanInterface iface : new ArrayList<>(list)) {
                 try {
-                    System.out.println("Running boot instructions from class "
+                    jlog.debug("Running boot instructions from class "
                             + iface.getClass().getSimpleName());
                     for (Class cl : iface.getDependencies()) {
                         if (set.contains(cl))
@@ -309,12 +310,12 @@ public class TestHelper {
     }
 
 
-    private static PersistenceClient sqlite_db (Class testclass, boolean memory)
+    private static PersistenceClient sqlite_db (boolean memory)
             throws InterruptedException {
         SingleConnectionDataSource dataSource = new SingleConnectionDataSource();
         dataSource.setDriverClassName("org.sqlite.JDBC");
         DateTime t = new DateTime();
-        String name = testclass != null ? testclass.getSimpleName() + "_" : "";
+        //String name = testclass != null ? testclass.getSimpleName() + "_" : "";
 
         if (memory)
             dataSource.setUrl("jdbc:sqlite::memory:");
@@ -322,7 +323,7 @@ public class TestHelper {
             File tmp = new File("tmp");
             if (!tmp.exists())
                 tmp.mkdirs();
-            dataSource.setUrl("jdbc:sqlite:tmp/sqlite_" + name + t.getMillis()
+            dataSource.setUrl("jdbc:sqlite:tmp/sqlite_" + t.getMillis()
                     + ".sqlite");
         }
         dataSource.setSuppressClose(true);
@@ -387,7 +388,7 @@ public class TestHelper {
     public static class AppTestConfig extends TestBeans {
 
         public AppTestConfig () throws InterruptedException, IOException {
-            this.dataSource = TestHelper.sqlite_db(TestHelper.clazz, false);
+            this.dataSource = TestHelper.sqlite_db(true);
             //this.dataSource = TestHelper.mysql_db();
         }
 
