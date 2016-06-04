@@ -170,9 +170,9 @@ public class LightService {
             map.add("q", query);
             map.add("count", String.valueOf(pageLength));
             map.add("lctxs",
-                    String.valueOf(meta.getSpanContext().getLeft_size()));
+                    String.valueOf(meta.getSpanContext().getLeftSize()));
             map.add("rctxs",
-                    String.valueOf(meta.getSpanContext().getRight_size()));
+                    String.valueOf(meta.getSpanContext().getRightSize()));
 
             try {
                 result = this.graphDBhandler.getResponse(map, "distKwic");
@@ -250,9 +250,9 @@ public class LightService {
                 map.add("q", query);
                 map.add("count", String.valueOf(pageLength));
                 map.add("lctxs",
-                        String.valueOf(meta.getSpanContext().getLeft_size()));
+                        String.valueOf(meta.getSpanContext().getLeftSize()));
                 map.add("rctxs",
-                        String.valueOf(meta.getSpanContext().getRight_size()));
+                        String.valueOf(meta.getSpanContext().getRightSize()));
                 result = this.graphDBhandler.getResponse(map, "distKwic");
             }
             else

@@ -91,7 +91,6 @@ public class ResourceService {
         type = StringUtils.normalize(type);
         Class cl_type = ResourceFactory.getResourceClass(type);
         if (cl_type == null) {
-            //todo return bad request response
             throw KustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID,
                     "Resource type not available!", "");
         }
@@ -477,9 +476,9 @@ public class ResourceService {
             map.add("q", query);
             map.add("count", String.valueOf(pageLength));
             map.add("lctxs",
-                    String.valueOf(meta.getSpanContext().getLeft_size()));
+                    String.valueOf(meta.getSpanContext().getLeftSize()));
             map.add("rctxs",
-                    String.valueOf(meta.getSpanContext().getRight_size()));
+                    String.valueOf(meta.getSpanContext().getRightSize()));
             try {
                 result = this.graphDBhandler.getResponse(map, "distKwic");
             }
@@ -584,9 +583,9 @@ public class ResourceService {
                     map.add("q", query);
                     map.add("count", String.valueOf(pageLength));
                     map.add("lctxs", String.valueOf(meta.getSpanContext()
-                            .getLeft_size()));
+                            .getLeftSize()));
                     map.add("rctxs", String.valueOf(meta.getSpanContext()
-                            .getRight_size()));
+                            .getRightSize()));
                     result = this.graphDBhandler.getResponse(map, "distKwic");
                 }
                 else
