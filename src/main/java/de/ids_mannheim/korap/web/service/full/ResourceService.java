@@ -148,7 +148,16 @@ public class ResourceService {
                         ResourceFactory.getResourceClass(type));
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            if (e.getStatusCode() != StatusCodes.PERMISSION_DENIED)
+                throw KustvaktResponseHandler.throwit(e);
+
+            try {
+                Set set = ResourceFinder.searchPublicFiltered(cl_type, id);
+                resource = (KustvaktResource) set.toArray()[0];
+            }
+            catch (KustvaktException e1) {
+                throw KustvaktResponseHandler.throwit(e);
+            }
         }
         return Response.ok(JsonUtils.toJSON(resource.toMap())).build();
     }
@@ -377,10 +386,20 @@ public class ResourceService {
                 resource = this.resourceHandler.findbyStrId(id, user,
                         ResourceFactory.getResourceClass(type));
         }
+        //todo: instead of throwing exception, build notification and rewrites into result query
         catch (KustvaktException e) {
-            //todo: instead of throwing exception, build notification and rewrites into result query
-            jlog.error("Exception encountered: {}", e.string());
-            throw KustvaktResponseHandler.throwit(e);
+            if (e.getStatusCode() != StatusCodes.PERMISSION_DENIED) {
+                jlog.error("Exception encountered: {}", e.string());
+                throw KustvaktResponseHandler.throwit(e);
+            }
+            try {
+                Set set = ResourceFinder.searchPublicFiltered(
+                        ResourceFactory.getResourceClass(type), id);
+                resource = (KustvaktResource) set.toArray()[0];
+            }
+            catch (KustvaktException e1) {
+                throw KustvaktResponseHandler.throwit(e);
+            }
         }
 
         if (resource != null) {

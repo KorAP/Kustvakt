@@ -111,10 +111,11 @@ public class ResourceFinder {
 
         List<String> id_set = Arrays.asList(ids);
         for (SecurityPolicy policy : policies) {
-            T r = (T) resourcedaos.get(KustvaktResource.class).findbyId(
-                    policy.getTarget(), User.UserFactory.getDemoUser());
-            if (id_set.isEmpty() || id_set.contains(r.getPersistentID()))
+            if (id_set.isEmpty() || id_set.contains(policy.getTarget())) {
+                T r = (T) resourcedaos.get(KustvaktResource.class).findbyId(
+                        policy.getTarget(), User.UserFactory.getDemoUser());
                 sets.add(r);
+            }
         }
         return sets;
     }
