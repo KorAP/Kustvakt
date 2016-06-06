@@ -311,7 +311,7 @@ public class UserService {
             result = data.data();
         }
         catch (KustvaktException e) {
-            jlog.error("Exception encountered!", e);
+            jlog.error("Exception encountered: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok(result).build();

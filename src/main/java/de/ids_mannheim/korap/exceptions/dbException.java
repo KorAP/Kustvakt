@@ -31,14 +31,14 @@ public class dbException extends KustvaktException {
     public dbException (KustvaktException e, Integer status, String ... args) {
         this(e.getUserid(), e.getStatusCode(), e.getMessage(), e.getEntity());
         AuditRecord record = AuditRecord.dbRecord(e.getUserid(), status, args);
-        record.setField_1(e.toString());
+        record.setField_1(e.string());
         this.records.addAll(e.getRecords());
         this.records.add(record);
     }
 
 
     @Override
-    public String toString () {
+    public String string () {
         return "DBExcpt{" + "status=" + getStatusCode() + ", message="
                 + getMessage() + ", args=" + getEntity() + ", userid="
                 + this.getUserid() + '}';

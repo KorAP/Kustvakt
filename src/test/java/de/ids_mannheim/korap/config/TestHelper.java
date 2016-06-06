@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.config;
 
+import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.*;
 import de.ids_mannheim.korap.interfaces.AuthenticationIface;
@@ -35,8 +36,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * creates a test user that can be used to access protected functions
@@ -118,34 +118,42 @@ public class TestHelper {
 
     public TestHelper setupSimpleAccount (String username, String password) {
         KustvaktBaseDaoInterface dao = getBean(ContextHolder.KUSTVAKT_USERDB);
+        EntityHandlerIface edao = (EntityHandlerIface) dao;
+        try {
+            edao.getAccount(username);
+        }
+        catch (EmptyResultException e) {
+            // do nothing
+        }
+        catch (KustvaktException ex) {
+            assertNull("Test user could not be set up", true);
+        }
 
-        if (dao.size() == 0) {
-            Map m = new HashMap<>();
-            m.put(Attributes.USERNAME, username);
+        Map m = new HashMap<>();
+        m.put(Attributes.USERNAME, username);
 
-            try {
-                String hash = ((EncryptionIface) getBean(ContextHolder.KUSTVAKT_ENCRYPTION))
-                        .secureHash(password);
-                m.put(Attributes.PASSWORD, hash);
-            }
-            catch (NoSuchAlgorithmException | UnsupportedEncodingException
-                    | KustvaktException e) {
-                // do nohting
-                assertNotNull("Exception thrown", null);
-            }
-            assertNotNull("userdatabase handler must not be null", dao);
+        try {
+            String hash = ((EncryptionIface) getBean(ContextHolder.KUSTVAKT_ENCRYPTION))
+                    .secureHash(password);
+            m.put(Attributes.PASSWORD, hash);
+        }
+        catch (NoSuchAlgorithmException | UnsupportedEncodingException
+                | KustvaktException e) {
+            // do nohting
+            assertNotNull("Exception thrown", null);
+        }
+        assertNotNull("userdatabase handler must not be null", dao);
 
-            try {
-                EntityHandlerIface edao = (EntityHandlerIface) dao;
-                int i = edao.createAccount(User.UserFactory.toKorAPUser(m));
-                assert BeansFactory.getKustvaktContext().getUserDBHandler()
-                        .getAccount(credentials[0]) != null;
-                assert i == 1;
-            }
-            catch (KustvaktException e) {
-                // do nothing
-                Assert.assertNull("Test user could not be set up", true);
-            }
+        try {
+
+            int i = edao.createAccount(User.UserFactory.toKorAPUser(m));
+            assert BeansFactory.getKustvaktContext().getUserDBHandler()
+                    .getAccount(credentials[0]) != null;
+            assertEquals(1, i);
+        }
+        catch (KustvaktException e) {
+            // do nothing
+            assertNull("Test user could not be set up", true);
         }
         return this;
     }

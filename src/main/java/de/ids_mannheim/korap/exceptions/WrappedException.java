@@ -30,7 +30,7 @@ public class WrappedException extends KustvaktException {
         this(e.getUserid(), e.getStatusCode(), e.getMessage(), e.getEntity());
         AuditRecord record = AuditRecord.serviceRecord(e.getUserid(), status,
                 args);
-        record.setField_1(e.toString());
+        record.setField_1(e.string());
         this.records.addAll(e.getRecords());
         this.records.add(record);
     }

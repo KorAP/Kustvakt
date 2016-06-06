@@ -761,7 +761,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             return data;
         }
         catch (KustvaktException e) {
-            jlog.error("Error during user data retrieval!", e.getEntity());
+            jlog.error("Error during user data retrieval: {}", e.getEntity());
             throw new WrappedException(e, StatusCodes.GET_ACCOUNT_FAILED);
         }
     }

@@ -245,7 +245,7 @@ public class AuthService {
             controller.logout(context);
         }
         catch (KustvaktException e) {
-            jlog.error("Logout Exception", e);
+            jlog.error("Logout Exception: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();

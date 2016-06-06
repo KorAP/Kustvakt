@@ -31,6 +31,7 @@ public class AuthServiceTest extends FastJerseyTest {
     public void testBasicHttp () {
         User user = helper().getUser();
 
+
     }
 
 

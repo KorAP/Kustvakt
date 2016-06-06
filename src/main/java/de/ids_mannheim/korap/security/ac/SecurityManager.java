@@ -58,13 +58,11 @@ public class SecurityManager<T extends KustvaktResource> {
         this.policies[0] = new ArrayList<>();
         this.silent = true;
         this.user = user;
-        overrideProviders(null);
+        overrideProviders(BeansFactory.getKustvaktContext());
     }
 
 
     public static void overrideProviders (ContextHolder beans) {
-        if (beans == null)
-            beans = BeansFactory.getKustvaktContext();
         if (policydao == null | crypto == null) {
             SecurityManager.policydao = beans.getPolicyDbProvider();
             SecurityManager.crypto = beans.getEncryption();

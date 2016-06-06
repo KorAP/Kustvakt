@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.security.ac;
 
-import de.ids_mannheim.korap.config.BeanConfiguration;
+import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.NotAuthorizedException;
@@ -28,7 +28,8 @@ public class ConditionManagement {
 
     public ConditionManagement (User user) {
         this.user = user;
-        this.policydao = BeanConfiguration.getBeans().getPolicyDbProvider();
+        this.policydao = BeansFactory.getKustvaktContext()
+                .getPolicyDbProvider();
 
     }
 

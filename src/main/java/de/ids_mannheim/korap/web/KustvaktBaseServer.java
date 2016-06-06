@@ -31,8 +31,7 @@ public abstract class KustvaktBaseServer {
         KustvaktConfiguration.loadLog4jLogger();
         KustvaktBaseServer server = new KustvaktBaseServer() {
             @Override
-            protected void setup() {
-            }
+            protected void setup () {}
         };
         KustvaktArgs kargs = server.readAttributes(args);
 
@@ -78,7 +77,9 @@ public abstract class KustvaktBaseServer {
         return kargs;
     }
 
-    protected abstract void setup();
+
+    protected abstract void setup ();
+
 
     protected void startServer (KustvaktArgs kargs) {
         if (kargs.init)
@@ -125,7 +126,7 @@ public abstract class KustvaktBaseServer {
             server.join();
         }
         catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Server could not be started!");
             System.exit(-1);
         }
 

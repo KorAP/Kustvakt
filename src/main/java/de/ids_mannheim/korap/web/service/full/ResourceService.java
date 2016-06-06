@@ -379,7 +379,7 @@ public class ResourceService {
         }
         catch (KustvaktException e) {
             //todo: instead of throwing exception, build notification and rewrites into result query
-            jlog.error("Exception encountered!");
+            jlog.error("Exception encountered: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
 
@@ -440,7 +440,7 @@ public class ResourceService {
             user = controller.getUser(context.getUsername());
         }
         catch (KustvaktException e) {
-            jlog.error("Exception encountered!", e);
+            jlog.error("Exception encountered: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
         String result;
@@ -483,6 +483,7 @@ public class ResourceService {
                 result = this.graphDBhandler.getResponse(map, "distKwic");
             }
             catch (KustvaktException e) {
+                jlog.error("Exception encountered: {}", e.string());
                 throw KustvaktResponseHandler.throwit(e);
             }
         }
@@ -582,8 +583,8 @@ public class ResourceService {
                     MultivaluedMap map = new MultivaluedMapImpl();
                     map.add("q", query);
                     map.add("count", String.valueOf(pageLength));
-                    map.add("lctxs", String.valueOf(meta.getSpanContext()
-                            .getLeftSize()));
+                    map.add("lctxs",
+                            String.valueOf(meta.getSpanContext().getLeftSize()));
                     map.add("rctxs", String.valueOf(meta.getSpanContext()
                             .getRightSize()));
                     result = this.graphDBhandler.getResponse(map, "distKwic");
@@ -602,7 +603,7 @@ public class ResourceService {
             return Response.ok(result).build();
         }
         catch (KustvaktException e) {
-            jlog.error("Exception encountered!", e);
+            jlog.error("Exception encountered: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
 
@@ -671,6 +672,7 @@ public class ResourceService {
             return Response.ok(searchKrill.getStatistics(qstr)).build();
         }
         catch (KustvaktException e) {
+            jlog.error("Exception encountered: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
     }
@@ -694,6 +696,7 @@ public class ResourceService {
             user = controller.getUser(c.getUsername());
         }
         catch (KustvaktException e) {
+            jlog.error("Exception encountered: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
 
@@ -748,7 +751,7 @@ public class ResourceService {
             this.resourceHandler.updateResources(user, resource);
         }
         catch (KustvaktException e) {
-            jlog.error("Exception encountered!", e);
+            jlog.error("Exception encountered: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
@@ -777,7 +780,7 @@ public class ResourceService {
             user = controller.getUser(ctx.getUsername());
         }
         catch (KustvaktException e) {
-            jlog.error("Exception encountered!", e);
+            jlog.error("Exception encountered: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
         if (VirtualCollection.class.equals(ResourceFactory
@@ -823,7 +826,7 @@ public class ResourceService {
                     resourceHandler.storeResources(user, collection);
                 }
                 catch (KustvaktException e) {
-                    jlog.error("Exception encountered!", e);
+                    jlog.error("Exception encountered: {}", e.string());
                     throw KustvaktResponseHandler.throwit(e);
                 }
             }
@@ -866,7 +869,7 @@ public class ResourceService {
             user = controller.getUser(ctx.getUsername());
         }
         catch (KustvaktException e) {
-            jlog.error("Exception encountered!", e);
+            jlog.error("Exception encountered: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
         if (VirtualCollection.class.equals(ResourceFactory
@@ -908,7 +911,7 @@ public class ResourceService {
                     resourceHandler.storeResources(user, collection);
                 }
                 catch (KustvaktException e) {
-                    jlog.error("Exception encountered!", e);
+                    jlog.error("Exception encountered: {}", e.string());
                     throw KustvaktResponseHandler.throwit(e);
                 }
             }
@@ -947,7 +950,7 @@ public class ResourceService {
             resourceHandler.deleteResources(user, r);
         }
         catch (KustvaktException e) {
-            jlog.error("Exception encountered!", e);
+            jlog.error("Exception encountered: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
 
@@ -978,7 +981,7 @@ public class ResourceService {
             user = controller.getUser(tokenContext.getUsername());
         }
         catch (KustvaktException e) {
-            jlog.error("Exception encountered!", e);
+            jlog.error("Exception encountered: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
 
@@ -1026,7 +1029,7 @@ public class ResourceService {
                 resources = ResourceFinder.search(user, Layer.class);
             }
             catch (KustvaktException e) {
-                jlog.error("Exception encountered!", e);
+                jlog.error("Exception encountered: {}", e.string());
                 throw KustvaktResponseHandler.throwit(e);
             }
             // returns foundries and layers.
@@ -1104,6 +1107,7 @@ public class ResourceService {
                     this.controller.getUser(ctx.getUsername()), id);
         }
         catch (KustvaktException e) {
+            jlog.error("Exception encountered: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
 

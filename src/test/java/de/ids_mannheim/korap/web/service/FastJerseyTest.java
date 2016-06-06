@@ -122,7 +122,7 @@ public abstract class FastJerseyTest extends BeanConfigTest {
                 testContainer.start();
             }
         }
-        catch (TestContainerException e) {
+        catch (Exception e) {
             initServer(PORT + PORT_IT++);
             startServer();
         }

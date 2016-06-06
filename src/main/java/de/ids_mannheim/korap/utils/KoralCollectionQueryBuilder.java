@@ -191,8 +191,6 @@ public class KoralCollectionQueryBuilder {
 
 
         public static ObjectNode buildDocGroup (String op, JsonNode ... groups) {
-            System.out.println("GROUPS " + Arrays.asList(groups));
-
             ObjectNode node = JsonUtils.createObjectNode();
             node.put("@type", "koral:docGroup");
             node.put("operation", "operation:" + op);

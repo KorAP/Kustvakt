@@ -67,8 +67,8 @@ public class KustvaktException extends Exception {
     }
 
 
-    @Override
-    public String toString () {
+
+    public String string () {
         return "Excpt{" + "status=" + getStatusCode() + ", message="
                 + getMessage() + ", args=" + getEntity() + ", userid=" + userid
                 + '}';
