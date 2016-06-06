@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.web.service.full;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jmx.snmp.SnmpOidTable;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
@@ -56,7 +57,7 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .path("search")
                 .queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp")
-                .queryParam("cq", "textClass=politik && corpusSigle=WPD")
+                .queryParam("cq", "textClass=politik & corpusSigle=WPD")
                 .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
@@ -65,7 +66,13 @@ public class ResourceServiceTest extends FastJerseyTest {
 
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         assertNotNull(node);
-
+        System.out.println(node);
+        assertEquals(2, node.at("/collection/operands").size());
+        assertEquals("textClass", node.at("/collection/operands/0/key")
+                .asText());
+        assertEquals("corpusSigle", node.at("/collection/operands/1/key")
+                .asText());
+        assertEquals("koral:token", node.at("/query/@type").asText());
     }
 
 
@@ -162,6 +169,7 @@ public class ResourceServiceTest extends FastJerseyTest {
 
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         assertNotNull(node);
+        assertTrue(node.isArray());
         assertNotEquals(0, node.size());
     }
 
@@ -170,11 +178,12 @@ public class ResourceServiceTest extends FastJerseyTest {
     public void testCorporaGet () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus").get(ClientResponse.class);
-        assertEquals(response.getStatus(),
-                ClientResponse.Status.OK.getStatusCode());
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
+        assertTrue(node.isArray());
         assertNotEquals(0, node.size());
     }
 
@@ -183,11 +192,12 @@ public class ResourceServiceTest extends FastJerseyTest {
     public void testFoundriesGet () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("foundry").get(ClientResponse.class);
-        assertEquals(response.getStatus(),
-                ClientResponse.Status.OK.getStatusCode());
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
+        assertTrue(node.isArray());
         assertNotEquals(0, node.size());
     }
 
@@ -230,12 +240,13 @@ public class ResourceServiceTest extends FastJerseyTest {
     }
 
 
+    // todo:
     @Test
     public void testCollecionGet () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("collection").path("id").get(ClientResponse.class);
-        assertEquals(response.getStatus(),
-                ClientResponse.Status.OK.getStatusCode());
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
@@ -247,13 +258,43 @@ public class ResourceServiceTest extends FastJerseyTest {
     @Test
     public void testCorpusGet () {
         ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").path("id").get(ClientResponse.class);
-        assertEquals(response.getStatus(),
-                ClientResponse.Status.OK.getStatusCode());
+                .path("corpus").path("WPD").get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        assertNotEquals(0, node.size());
+        assertTrue(node.isObject());
+        assertEquals("WPD", node.path("id").asText());
+    }
+
+
+    @Test
+    public void testCorpusGet2 () {
+        ClientResponse response = resource().path(getAPIVersion())
+                .path("corpus").path("GOE").get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String ent = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertTrue(node.isObject());
+        assertEquals("GOE", node.path("id").asText());
+    }
+
+
+    @Test
+    @Ignore
+    public void testCorpusGetUnauthorized () {
+        ClientResponse response = resource().path(getAPIVersion())
+                .path("corpus").path("BRZ20").get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
+                response.getStatus());
+        String ent = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertTrue(node.isObject());
+        assertNotNull(node);
     }
 
 
@@ -261,8 +302,8 @@ public class ResourceServiceTest extends FastJerseyTest {
     public void testFoundryGet () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("foundry").path("id").get(ClientResponse.class);
-        assertEquals(response.getStatus(),
-                ClientResponse.Status.OK.getStatusCode());
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
@@ -283,17 +324,18 @@ public class ResourceServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testSerializationQueryWithCorpusUnAuthorized () {
+    public void testSerializationQueryWithCorpusThroughFilteredPublic () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus/WPD/search").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp").queryParam("context", "base/s:s")
                 .method("TRACE", ClientResponse.class);
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        assertEquals(401, node.at("/errors/0/0").asInt());
+        assertEquals("corpusSigle", node.at("/collection/key").asText());
+        assertEquals("WPD", node.at("/collection/value").asText());
     }
 
 
