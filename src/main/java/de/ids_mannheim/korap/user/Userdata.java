@@ -38,7 +38,6 @@ public abstract class Userdata {
     }
 
 
-    // fixme: test with json pointer and normal field name
     public Object get (String key) {
         return DataFactory.getFactory().getValue(this.data, key);
     }
