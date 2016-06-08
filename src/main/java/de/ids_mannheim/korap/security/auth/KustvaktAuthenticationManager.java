@@ -538,11 +538,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                     user.getUsername());
             entHandler.createAccount(user);
             UserDetails details = new UserDetails(user.getId());
-            details.readDefaults(safeMap);
+            details.read(safeMap, true);
             details.checkRequired();
 
             UserSettings settings = new UserSettings(user.getId());
-            settings.readDefaults(safeMap);
+            settings.read(safeMap, true);
             settings.checkRequired();
 
             UserDataDbIface dao = BeansFactory.getTypeFactory()
@@ -582,7 +582,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         entHandler.createAccount(user);
 
         UserDetails d = new UserDetails(user.getId());
-        d.readDefaults(attributes);
+        d.read(attributes, true);
         d.checkRequired();
 
         UserDataDbIface dao = BeansFactory.getTypeFactory()
@@ -591,7 +591,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         dao.store(d);
 
         UserSettings s = new UserSettings(user.getId());
-        s.readDefaults(attributes);
+        s.read(attributes, true);
         s.checkRequired();
 
         dao = BeansFactory.getTypeFactory().getTypeInterfaceBean(userdatadaos,

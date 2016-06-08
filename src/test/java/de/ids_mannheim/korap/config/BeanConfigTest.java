@@ -18,6 +18,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.annotation.PostConstruct;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author hanl
@@ -40,8 +41,9 @@ public abstract class BeanConfigTest {
         assertNotNull("Application context must not be null!", this.context);
         jlog.debug("running one-time before init for class "
                 + this.getClass().getSimpleName() + " ...");
-        initMethod();
         BeansFactory.setKustvaktContext(helper().getContext());
+        assertNotNull(BeansFactory.getKustvaktContext());
+        initMethod();
     }
 
 

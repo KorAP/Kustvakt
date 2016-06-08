@@ -19,7 +19,6 @@ public class UserSettings extends Userdata {
     }
 
 
-    //todo: define default fields and values --> so they can never be null!
     @Override
     public String[] defaultFields () {
         return new String[] { Attributes.DEFAULT_REL_FOUNDRY,

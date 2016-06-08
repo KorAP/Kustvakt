@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.config;
 
+import de.ids_mannheim.korap.user.Userdata;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 import java.util.ArrayList;
@@ -29,12 +30,12 @@ public class Scopes {
             Scope.preferences, Scope.search, Scope.queries };
 
 
-    public static Scopes getProfileScopes (Map<String, Object> values) {
+    public static Scopes getProfileScopes (Userdata values) {
         Scopes r = new Scopes();
         for (String key : profile) {
             Object v = values.get(key);
             if (v != null)
-                r._values.put(key, v);
+                r.values.put(key, v);
         }
         return r;
     }
@@ -55,39 +56,39 @@ public class Scopes {
     }
 
 
-    public static Scopes mapScopes (String scopes, Map<String, Object> details) {
+    public static Scopes mapScopes (String scopes, Userdata details) {
         Scopes m = new Scopes();
         if (scopes != null && !scopes.isEmpty()) {
             Scope[] scopearr = mapScopes(scopes);
             for (Scope s : scopearr) {
                 Object v = details.get(s.toString());
                 if (v != null)
-                    m._values.put(s.toString(), v);
+                    m.values.put(s.toString(), v);
             }
             if (scopes.contains(Scope.profile.toString()))
-                m._values.putAll(Scopes.getProfileScopes(details)._values);
-            m._values.put(Attributes.SCOPES, scopes);
+                m.values.putAll(Scopes.getProfileScopes(details).values);
+            m.values.put(Attributes.SCOPES, scopes);
         }
         return m;
     }
 
-    private Map<String, Object> _values;
+    private Map<String, Object> values;
 
 
     private Scopes () {
-        this._values = new HashMap<>();
+        this.values = new HashMap<>();
     }
 
 
     public String toEntity () {
-        if (this._values.isEmpty())
+        if (this.values.isEmpty())
             return "";
-        return JsonUtils.toJSON(this._values);
+        return JsonUtils.toJSON(this.values);
     }
 
 
     public Map<String, Object> toMap () {
-        return new HashMap<>(this._values);
+        return new HashMap<>(this.values);
     }
 
 }

@@ -108,11 +108,11 @@ public class UserPropertyReader extends PropertyReader {
             //            user.setURIExpiration(0L);
             iface.createAccount(user);
             UserDetails det = new UserDetails(user.getId());
-            det.readDefaults(vals);
+            det.read(vals, true);
             det.validate(crypto);
 
             Userdata set = new UserSettings(user.getId());
-            set.readDefaults(vals);
+            set.read(vals, true);
             set.validate(crypto);
 
             UserDataDbIface dao = BeansFactory.getTypeFactory()

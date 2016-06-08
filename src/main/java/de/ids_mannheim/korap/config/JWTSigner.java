@@ -7,8 +7,10 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.user.GenericUserData;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.user.Userdata;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import org.joda.time.DateTime;
 
@@ -55,7 +57,9 @@ public class JWTSigner {
         cs.setIssuerClaim(this.issuer.toString());
 
         if ((scopes = (String) attr.get(Attributes.SCOPES)) != null) {
-            Scopes claims = Scopes.mapScopes(scopes, attr);
+            Userdata data = new GenericUserData();
+            data.readQuietly(attr, false);
+            Scopes claims = Scopes.mapScopes(scopes, data);
             cs.setCustomClaims(claims.toMap());
         }
 

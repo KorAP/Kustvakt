@@ -66,7 +66,6 @@ public class ResourceServiceTest extends FastJerseyTest {
 
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         assertNotNull(node);
-        System.out.println(node);
         assertEquals(2, node.at("/collection/operands").size());
         assertEquals("textClass", node.at("/collection/operands/0/key")
                 .asText());
@@ -81,8 +80,8 @@ public class ResourceServiceTest extends FastJerseyTest {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("search").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp").get(ClientResponse.class);
-        assertEquals(response.getStatus(),
-                ClientResponse.Status.OK.getStatusCode());
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
@@ -96,8 +95,8 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .path("search").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp").queryParam("context", "sentence")
                 .get(ClientResponse.class);
-        assertEquals(response.getStatus(),
-                ClientResponse.Status.OK.getStatusCode());
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
@@ -114,8 +113,8 @@ public class ResourceServiceTest extends FastJerseyTest {
 
         ClientResponse response = resource().path(getAPIVersion())
                 .path("search").post(ClientResponse.class, s.toJSON());
-        assertEquals(response.getStatus(),
-                ClientResponse.Status.OK.getStatusCode());
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
         String ent = response.getEntity(String.class);
 
         JsonNode node = JsonUtils.readTree(ent);
@@ -132,8 +131,8 @@ public class ResourceServiceTest extends FastJerseyTest {
 
         ClientResponse response = resource().path(getAPIVersion())
                 .path("search").post(ClientResponse.class, s.toJSON());
-        assertEquals(response.getStatus(),
-                ClientResponse.Status.OK.getStatusCode());
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
         String ent = response.getEntity(String.class);
 
 

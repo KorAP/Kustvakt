@@ -126,12 +126,10 @@ public class OAuthService {
     public Response getStatus (@Context SecurityContext context,
             @QueryParam("scope") String scopes) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        Map<String, Object> details;
+        Userdata data;
         try {
             User user = this.controller.getUser(ctx.getUsername());
-            Userdata data = this.controller
-                    .getUserData(user, UserDetails.class);
-            details = data.fields();
+            data = this.controller.getUserData(user, UserDetails.class);
             Set<String> base_scope = StringUtils.toSet(scopes, " ");
             base_scope.retainAll(StringUtils.toSet(scopes));
             scopes = StringUtils.toString(base_scope);
@@ -141,7 +139,7 @@ public class OAuthService {
         }
         // json format with scope callback parameter
         // todo: add other scopes as well!
-        return Response.ok(JsonUtils.toJSON(Scopes.mapScopes(scopes, details)))
+        return Response.ok(JsonUtils.toJSON(Scopes.mapScopes(scopes, data)))
                 .build();
     }
 

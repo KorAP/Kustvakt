@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.handlers;
 
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.exceptions.dbException;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
@@ -32,11 +33,11 @@ public class UserDetailsDao implements UserDataDbIface<UserDetails> {
 
 
     @Override
-    public int store (UserDetails data) {
+    public int store (UserDetails data) throws KustvaktException {
         String sql = "INSERT INTO user_details (user_id, data) VALUES (:userid, :data);";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", data.getUserID());
-        source.addValue("data", data.data());
+        source.addValue("data", data.serialize());
 
         GeneratedKeyHolder gen = new GeneratedKeyHolder();
         try {
@@ -46,18 +47,17 @@ public class UserDetailsDao implements UserDataDbIface<UserDetails> {
             return id;
         }
         catch (DataAccessException e) {
-            e.printStackTrace();
             return -1;
         }
     }
 
 
     @Override
-    public int update (UserDetails data) {
+    public int update (UserDetails data) throws KustvaktException {
         String sql = "UPDATE user_details SET data = :data WHERE user_id=:userid;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", data.getUserID());
-        source.addValue("data", data.data());
+        source.addValue("data", data.serialize());
 
         try {
             return this.jdbcTemplate.update(sql, source);

@@ -31,8 +31,21 @@ public class ResourceFinderTest extends BeanConfigTest {
     @Test
     public void searchResourcesDemo () throws KustvaktException {
         Set<Corpus> resources = ResourceFinder.searchPublic(Corpus.class);
-        assertFalse(resources.isEmpty());
         assertNotEquals(0, resources.size());
+    }
+
+
+    @Test
+    public void testResourcesDemoFiltered () throws KustvaktException {
+        Set<Corpus> resources = ResourceFinder.searchPublicFiltered(
+                Corpus.class, "WPD");
+        assertNotEquals(0, resources.size());
+        assertEquals(1, resources.size());
+
+        resources = ResourceFinder.searchPublicFiltered(Corpus.class, "WPD",
+                "GOE");
+        assertNotEquals(0, resources.size());
+        assertEquals(2, resources.size());
     }
 
 

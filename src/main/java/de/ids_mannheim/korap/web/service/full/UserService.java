@@ -227,7 +227,7 @@ public class UserService {
             if (scopes != null)
                 base_scope.retainAll(StringUtils.toSet(scopes));
             scopes = StringUtils.toString(base_scope);
-            m = Scopes.mapScopes(scopes, data.fields());
+            m = Scopes.mapScopes(scopes, data);
         }
         catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
@@ -248,7 +248,7 @@ public class UserService {
             User user = controller.getUser(ctx.getUsername());
             Userdata data = controller.getUserData(user, UserSettings.class);
             data.setField(Attributes.USERNAME, ctx.getUsername());
-            result = data.data();
+            result = data.serialize();
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
@@ -282,9 +282,8 @@ public class UserService {
             //            SecurityManager.findbyId(us.getDefaultPOSfoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultRelfoundry(), user, Foundry.class);
             Userdata new_data = new UserSettings(user.getId());
-            new_data.setData(JsonUtils.toJSON(settings));
+            new_data.readQuietly(settings, false);
             data.update(new_data);
-
             controller.updateUserData(data);
         }
         catch (KustvaktException e) {
@@ -301,14 +300,17 @@ public class UserService {
     @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
             PiwikFilter.class, BlockingFilter.class })
     public Response getDetails (@Context SecurityContext context,
-            @Context Locale locale) {
+            @Context Locale locale, @QueryParam("pointer") String pointer) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         String result;
         try {
             User user = controller.getUser(ctx.getUsername());
             Userdata data = controller.getUserData(user, UserDetails.class);
             data.setField(Attributes.USERNAME, ctx.getUsername());
-            result = data.data();
+            if (pointer != null)
+                result = data.get(pointer).toString();
+            else
+                result = data.serialize();
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered: {}", e.string());
@@ -327,7 +329,7 @@ public class UserService {
             @Context Locale locale, MultivaluedMap form) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
 
-        Map<String, Object> wrapper = FormRequestWrapper.toMap(form, true);
+        Map<String, Object> new_details = FormRequestWrapper.toMap(form, true);
 
         try {
             User user = controller.getUser(ctx.getUsername());
@@ -335,7 +337,7 @@ public class UserService {
                 return Response.notModified().build();
 
             UserDetails new_data = new UserDetails(user.getId());
-            new_data.setData(JsonUtils.toJSON(wrapper));
+            new_data.readQuietly(new_details, false);
 
             UserDetails det = controller.getUserData(user, UserDetails.class);
             det.update(new_data);

@@ -32,6 +32,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
