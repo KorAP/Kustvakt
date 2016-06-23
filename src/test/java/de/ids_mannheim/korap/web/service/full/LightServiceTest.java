@@ -6,6 +6,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
+import org.apache.lucene.LucenePackage;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -168,6 +169,9 @@ public class LightServiceTest extends FastJerseyTest {
                 .queryParam("context", "sentence").queryParam("count", "13")
                 .queryParam("cq", "textClass=Politik & corpus=WPD")
                 .get(ClientResponse.class);
+        String version = LucenePackage.get().getImplementationVersion();;
+        System.out.println("VERSION "+ version);
+        System.out.println("RESPONSE "+ response);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         query = response.getEntity(String.class);

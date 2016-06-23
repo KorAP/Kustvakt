@@ -41,7 +41,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
     public int store (UserSettings data) throws KustvaktException {
         String sql = "INSERT INTO user_settings (user_id, data) VALUES (:userid, :data);";
         MapSqlParameterSource source = new MapSqlParameterSource();
-        source.addValue("userid", data.getUserID());
+        source.addValue("userid", data.getUserId());
         source.addValue("data", data.serialize());
 
         GeneratedKeyHolder gen = new GeneratedKeyHolder();
@@ -53,7 +53,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
         }
         catch (DataAccessException e) {
             jlog.error("couldn't store data in db for user with id '{}'",
-                    data.getUserID());
+                    data.getUserId());
             return -1;
         }
     }
@@ -63,7 +63,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
     public int update (UserSettings data) throws KustvaktException {
         String sql = "UPDATE user_settings SET data = :data WHERE user_id=:userid;";
         MapSqlParameterSource source = new MapSqlParameterSource();
-        source.addValue("userid", data.getUserID());
+        source.addValue("userid", data.getUserId());
         source.addValue("data", data.serialize());
 
         try {

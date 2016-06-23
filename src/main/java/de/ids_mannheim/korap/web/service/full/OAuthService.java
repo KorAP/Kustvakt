@@ -37,10 +37,7 @@ import org.apache.oltu.oauth2.common.utils.OAuthUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -55,7 +52,6 @@ import java.util.Set;
 //todo: only allow oauth2 access_token requests GET methods?
 //todo: allow refresh tokens
 @Path(KustvaktServer.API_VERSION + "/oauth2")
-//@ResourceFilters({ AccessLevelFilter.class, PiwikFilter.class })
 public class OAuthService {
 
     private OAuth2Handler handler;
@@ -85,7 +81,7 @@ public class OAuthService {
         info.setUrl(host);
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         try {
-            this.handler.removeClient(info,
+            this.handler.getPersistenceHandler().removeClient(info,
                     this.controller.getUser(ctx.getUsername()));
         }
         catch (KustvaktException e) {
@@ -110,8 +106,8 @@ public class OAuthService {
         info.setRedirect_uri(rurl);
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         try {
-            this.handler.registerClient(info,
-                    this.controller.getUser(ctx.getUsername()));
+            User user = this.controller.getUser(ctx.getUsername());
+            this.handler.getPersistenceHandler().registerClient(info, user);
         }
         catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
@@ -155,7 +151,7 @@ public class OAuthService {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         try {
             User user = this.controller.getUser(ctx.getUsername());
-            Collection auths = this.handler.getAuthorizedClients(user.getId());
+            Collection auths = this.handler.getPersistenceHandler().getAuthorizedClients(user.getId());
             if (auths.isEmpty())
                 return Response.noContent().build();
             return Response.ok(JsonUtils.toJSON(auths)).build();
@@ -217,7 +213,7 @@ public class OAuthService {
 
             final String authorizationCode = oauthIssuerImpl
                     .authorizationCode();
-            ClientInfo info = this.handler
+            ClientInfo info = this.handler.getPersistenceHandler()
                     .getClient(oauthRequest.getClientId());
 
             if (info == null
@@ -242,7 +238,7 @@ public class OAuthService {
                         .entity(res.getBody()).build();
             }
 
-            String accessToken = this.handler.getToken(
+            String accessToken = this.handler.getPersistenceHandler().getToken(
                     oauthRequest.getClientId(), user.getId());
 
             //todo: test correct redirect and parameters
@@ -302,7 +298,7 @@ public class OAuthService {
                 String token = oauthIssuerImpl.accessToken();
                 String refresh = oauthIssuerImpl.refreshToken();
 
-                this.handler.addToken(token, refresh, user.getId(),
+                this.handler.getPersistenceHandler().addToken(token, refresh, user.getId(),
                         oauthRequest.getClientId(),
                         StringUtils.toString(oauthRequest.getScopes(), " "),
                         config.getLongTokenTTL());
@@ -384,7 +380,7 @@ public class OAuthService {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         try {
 
-            if (!this.handler.revokeToken(ctx.getToken())) {
+            if (!this.handler.getPersistenceHandler().revokeToken(ctx.getToken())) {
                 OAuthResponse res = OAuthASResponse
                         .errorResponse(HttpServletResponse.SC_BAD_REQUEST)
                         .setError(OAuthError.TokenResponse.UNAUTHORIZED_CLIENT)
@@ -437,7 +433,7 @@ public class OAuthService {
             oauthRequest = new OAuthTokenRequest(new FormRequestWrapper(
                     request, form));
 
-            if ((info = this.handler.getClient(oauthRequest.getClientId())) == null) {
+            if ((info = this.handler.getPersistenceHandler().getClient(oauthRequest.getClientId())) == null) {
                 OAuthResponse res = OAuthASResponse
                         .errorResponse(HttpServletResponse.SC_BAD_REQUEST)
                         .setError(OAuthError.TokenResponse.INVALID_CLIENT)
@@ -537,12 +533,12 @@ public class OAuthService {
                 }
 
                 try {
-                    String accessToken = this.handler.getToken(
+                    String accessToken = this.handler.getPersistenceHandler().getToken(
                             oauthRequest.getClientId(), user.getId());
                     if (accessToken == null) {
                         String refresh = oauthIssuerImpl.refreshToken();
                         accessToken = oauthIssuerImpl.accessToken();
-                        this.handler.addToken(accessToken, refresh, user
+                        this.handler.getPersistenceHandler().addToken(accessToken, refresh, user
                                 .getId(), oauthRequest.getClientId(),
                                 StringUtils.toString(oauthRequest.getScopes(),
                                         " "), config.getLongTokenTTL());

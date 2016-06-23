@@ -2,13 +2,16 @@ package de.ids_mannheim.korap.config;
 
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.interfaces.db.*;
+import de.ids_mannheim.korap.interfaces.defaults.ApacheValidator;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -177,6 +180,14 @@ public class BeanConfiguration {
             return getBean(KUSTVAKT_POLICIES);
         }
 
+
+        public ValidatorIface getValidator()  {
+            try {
+                return new ApacheValidator();
+            } catch (IOException e) {
+                throw new RuntimeException("validator could not be loaded!");
+            }
+        }
 
         // todo: !!!!!!!!!!!!!!!!!!!!!!!!!!
         // todo: more specific --> collection provider, document provider, etc.

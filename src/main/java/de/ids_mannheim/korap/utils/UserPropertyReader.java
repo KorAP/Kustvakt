@@ -4,6 +4,7 @@ import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.user.*;
@@ -23,18 +24,22 @@ import java.util.Properties;
  */
 public class UserPropertyReader extends PropertyReader {
 
+    private static Logger jlog = LoggerFactory
+            .getLogger(UserPropertyReader.class);
+
+
     private Map<String, Properties> props;
     private String path;
     private EntityHandlerIface iface;
     private EncryptionIface crypto;
-    private static Logger jlog = LoggerFactory
-            .getLogger(UserPropertyReader.class);
+    private ValidatorIface validator;
 
 
     public UserPropertyReader (String path) {
         this.path = path;
         this.iface = BeansFactory.getKustvaktContext().getUserDBHandler();
         this.crypto = BeansFactory.getKustvaktContext().getEncryption();
+        this.validator = BeansFactory.getKustvaktContext().getValidator();
     }
 
 
@@ -107,13 +112,15 @@ public class UserPropertyReader extends PropertyReader {
             //todo: make sure uri is set to 0, so sql queries work with the null value
             //            user.setURIExpiration(0L);
             iface.createAccount(user);
-            UserDetails det = new UserDetails(user.getId());
+            UserDetails det = new UserDetails();
+            det.setUserId(user.getId());
             det.read(vals, true);
-            det.validate(crypto);
+            det.validate(this.validator);
 
-            Userdata set = new UserSettings(user.getId());
+            Userdata set = new UserSettings();
+            set.setUserId(user.getId());
             set.read(vals, true);
-            set.validate(crypto);
+            set.validate(this.validator);
 
             UserDataDbIface dao = BeansFactory.getTypeFactory()
                     .getTypeInterfaceBean(

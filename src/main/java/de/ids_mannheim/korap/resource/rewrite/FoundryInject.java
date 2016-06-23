@@ -49,7 +49,8 @@ public class FoundryInject implements RewriteTask.IterableRewritePath,
             else
                 layer = node.get("key");
             String foundry = mapper.findFoundry(layer);
-            node.put("foundry", foundry);
+            if (foundry != null)
+                node.put("foundry", foundry);
         }
         return node.rawNode();
     }

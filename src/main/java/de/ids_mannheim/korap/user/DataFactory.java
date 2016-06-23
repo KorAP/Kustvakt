@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -48,6 +50,7 @@ public abstract class DataFactory {
 
     public abstract Collection<Object> values (Object data);
 
+    public abstract Object validate(Object data, ValidatorIface validator);
 
     @Deprecated
     public abstract Map<String, Object> fields (Object data);
@@ -116,6 +119,19 @@ public abstract class DataFactory {
         @Override
         public Collection<Object> values (Object data) {
             return new HashSet<>();
+        }
+
+        @Override
+        public Object validate(Object data, ValidatorIface validator) {
+            if (checkDataType(data) && ((JsonNode) data).isObject()) {
+                try {
+                    Map mdata = JsonUtils.read(toStringValue(data), HashMap.class);
+                    return validator.validateMap(mdata);
+                } catch (IOException e) {
+                    // do nothing
+                }
+            }
+            return JsonUtils.createObjectNode();
         }
 
 

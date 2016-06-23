@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -26,7 +27,7 @@ public class TokenContext implements java.security.Principal, Serializable {
      * session relevant data. Are never persisted into a database
      */
     private String username;
-    private Date expirationTime;
+    private long expirationTime;
     // either "session_token " / "api_token
     private String tokenType;
     private String token;
@@ -44,6 +45,7 @@ public class TokenContext implements java.security.Principal, Serializable {
         this.setUsername("");
         this.setToken("");
         this.setSecureRequired(false);
+        this.setExpirationTime(-1);
     }
 
 
@@ -90,7 +92,7 @@ public class TokenContext implements java.security.Principal, Serializable {
 
 
     public void setExpirationTime (long date) {
-        this.expirationTime = new Date(date);
+        this.expirationTime = date;
     }
 
 
@@ -141,7 +143,7 @@ public class TokenContext implements java.security.Principal, Serializable {
     public String toResponse () {
         ObjectNode node = JsonUtils.createObjectNode();
         node.put("token", this.getToken());
-        node.put("expires", this.getExpirationTime().getTime());
+        node.put("expires", TimeUtils.format(this.getExpirationTime()));
         node.put("token_type", this.getTokenType());
         return JsonUtils.toJSON(node);
     }

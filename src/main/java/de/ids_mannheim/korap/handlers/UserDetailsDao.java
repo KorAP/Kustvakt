@@ -36,7 +36,7 @@ public class UserDetailsDao implements UserDataDbIface<UserDetails> {
     public int store (UserDetails data) throws KustvaktException {
         String sql = "INSERT INTO user_details (user_id, data) VALUES (:userid, :data);";
         MapSqlParameterSource source = new MapSqlParameterSource();
-        source.addValue("userid", data.getUserID());
+        source.addValue("userid", data.getUserId());
         source.addValue("data", data.serialize());
 
         GeneratedKeyHolder gen = new GeneratedKeyHolder();
@@ -56,7 +56,7 @@ public class UserDetailsDao implements UserDataDbIface<UserDetails> {
     public int update (UserDetails data) throws KustvaktException {
         String sql = "UPDATE user_details SET data = :data WHERE user_id=:userid;";
         MapSqlParameterSource source = new MapSqlParameterSource();
-        source.addValue("userid", data.getUserID());
+        source.addValue("userid", data.getUserId());
         source.addValue("data", data.serialize());
 
         try {
@@ -82,8 +82,8 @@ public class UserDetailsDao implements UserDataDbIface<UserDetails> {
                         @Override
                         public UserDetails mapRow (ResultSet rs, int rowNum)
                                 throws SQLException {
-                            UserDetails details = new UserDetails(rs
-                                    .getInt("user_id"));
+                            UserDetails details = new UserDetails();
+                            details.setUserId(rs.getInt("user_id"));
                             details.setId(rs.getInt("id"));
                             details.setData(rs.getString("data"));
                             return details;
@@ -114,8 +114,8 @@ public class UserDetailsDao implements UserDataDbIface<UserDetails> {
                         @Override
                         public UserDetails mapRow (ResultSet rs, int rowNum)
                                 throws SQLException {
-                            UserDetails details = new UserDetails(rs
-                                    .getInt("user_id"));
+                            UserDetails details = new UserDetails();
+                            details.setUserId(rs.getInt("user_id"));
                             details.setId(rs.getInt("id"));
                             details.setData(rs.getString("data"));
                             return details;

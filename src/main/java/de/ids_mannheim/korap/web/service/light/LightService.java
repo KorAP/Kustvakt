@@ -124,10 +124,15 @@ public class LightService {
         }
         // todo: should be possible to add the meta part to the query serialization
         jlog.info("Serialized search: {}", jsonld);
-
-        String result = searchKrill.search(jsonld);
-        KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
-        return Response.ok(result).build();
+        try {
+            String result = searchKrill.search(jsonld);
+            KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
+            return Response.ok(result).build();
+        } catch(Exception e) {
+            System.out.println("_____________________________________" );
+            e.printStackTrace();
+        }
+        return Response.ok().build();
     }
 
 

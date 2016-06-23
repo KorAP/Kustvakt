@@ -78,17 +78,4 @@ public class DefaultEncryption implements EncryptionIface {
         return null;
     }
 
-
-    @Override
-    public Map validateMap (Map map) throws KustvaktException {
-        return null;
-    }
-
-
-    @Override
-    public String validateEntry (String input, String type)
-            throws KustvaktException {
-        return input;
-    }
-
 }

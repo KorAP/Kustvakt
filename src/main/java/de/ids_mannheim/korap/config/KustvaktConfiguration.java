@@ -64,7 +64,9 @@ public class KustvaktConfiguration {
     private boolean allowMultiLogIn;
     private int expiration;
     private int loadFactor;
+    @Deprecated
     private int validationStringLength;
+    @Deprecated
     private int validationEmaillength;
     // fixme: should move to base config?!
     private EncryptionIface.Encryption encryption;
@@ -197,6 +199,16 @@ public class KustvaktConfiguration {
     }
 
 
+
+    public static void loadLogger () {
+        InputStream stream = ConfigLoader.loadConfigStream("log4j.properties");
+        PropertyConfigurator.configure(stream);
+        jlog.info("Done loading logging framework Log4j!");
+    }
+
+
+
+    @Deprecated
     public static void loadLog4jLogger () {
         /** loadSubTypes log4j configuration file programmatically */
         Properties log4j = new Properties();
@@ -219,6 +231,7 @@ public class KustvaktConfiguration {
     }
 
 
+    @Deprecated
     private static void loadClassLogger () {
         Properties log4j = new Properties();
         jlog.info("using class path logging properties file to configure logging system");

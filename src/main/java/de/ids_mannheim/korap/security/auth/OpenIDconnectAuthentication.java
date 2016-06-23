@@ -38,9 +38,8 @@ public class OpenIDconnectAuthentication implements AuthenticationIface {
     }
 
 
-    @Cacheable(value = "id_tokens", key = "#authToken")
     @Override
-    public TokenContext getUserStatus (String authToken)
+    public TokenContext getTokenContext(String authToken)
             throws KustvaktException {
         authToken = StringUtils.stripTokenType(authToken);
         return this.database.getContext(authToken);
@@ -48,7 +47,7 @@ public class OpenIDconnectAuthentication implements AuthenticationIface {
 
 
     @Override
-    public TokenContext createUserSession (User user, Map<String, Object> attr)
+    public TokenContext createTokenContext(User user, Map<String, Object> attr)
             throws KustvaktException {
         String cl_secret = (String) attr.get(Attributes.CLIENT_SECRET);
         if (cl_secret == null)
@@ -73,7 +72,6 @@ public class OpenIDconnectAuthentication implements AuthenticationIface {
     }
 
 
-    @CacheEvict(value = "id_tokens", key = "#token")
     @Override
     public void removeUserSession (String token) throws KustvaktException {
         // emit token from cache only

@@ -181,13 +181,13 @@ public class UserService {
                     .append(username);
         }
         catch (KustvaktException e) {
-            jlog.error("Eoxception encountered!", e);
+            jlog.error("Eoxception encountered!", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
 
         ObjectNode obj = JsonUtils.createObjectNode();
         obj.put(Attributes.URI, builder.toString());
-        obj.put(Attributes.URI_EXPIRATION, String.valueOf(objects[1]));
+        obj.put(Attributes.URI_EXPIRATION, objects[1].toString());
         return Response.ok(JsonUtils.toJSON(obj)).build();
     }
 
@@ -213,7 +213,7 @@ public class UserService {
 
     @GET
     @Path("info")
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class,
+    @ResourceFilters({ AuthFilter.class,
             PiwikFilter.class, BlockingFilter.class })
     public Response getStatus (@Context SecurityContext context,
             @QueryParam("scopes") String scopes) {
@@ -230,7 +230,7 @@ public class UserService {
             m = Scopes.mapScopes(scopes, data);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw KustvaktResponseHandler.throwAuthenticationException(ctx.getUsername());
         }
         return Response.ok(m.toEntity()).build();
     }

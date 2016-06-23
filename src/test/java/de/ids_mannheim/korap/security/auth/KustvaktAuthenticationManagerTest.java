@@ -9,6 +9,7 @@ import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.user.*;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotEquals;
@@ -108,6 +109,15 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
 
         User user = new KorAPUser(10, "random");
         manager.getUserData(user, UserSettings.class);
+    }
+
+    @Test
+    @Ignore
+    public void testUserUpdate() throws KustvaktException {
+        testCreateUser();
+        AuthenticationManagerIface manager = helper().getContext()
+                .getAuthenticationManager();
+        // todo:
     }
 
 

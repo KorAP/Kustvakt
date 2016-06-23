@@ -53,7 +53,7 @@ public class LoginCounter {
     public boolean validate (String username) {
         Long[] set = failedLogins.get(username);
         if (set != null) {
-            if (TimeUtils.isPassed(set[1])) {
+            if (TimeUtils.isExpired(set[1])) {
                 failedLogins.remove(username);
                 return true;
             }

@@ -225,7 +225,7 @@ public abstract class User implements Serializable {
                     : (Integer) kmap.get(Attributes.ID, Integer.class);
 
             if (map.get(Attributes.ACCOUNT_CREATION) != null)
-                created = DateTime.parse(kmap.get(Attributes.ACCOUNT_CREATION))
+                created = TimeUtils.getTime(kmap.get(Attributes.ACCOUNT_CREATION))
                         .getMillis();
             switch (type) {
                 case 0:

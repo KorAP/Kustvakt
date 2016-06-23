@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.security.auth;
 
 import de.ids_mannheim.korap.config.BeansFactory;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.Scopes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -13,9 +14,11 @@ import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.NamingUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
+import de.ids_mannheim.korap.utils.TimeUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.oltu.oauth2.common.utils.OAuthUtils;
 
+import java.beans.Beans;
 import java.util.Map;
 
 /**
@@ -23,6 +26,17 @@ import java.util.Map;
  * @date 28/04/2015
  */
 public class BasicHttpAuth implements AuthenticationIface {
+
+    private KustvaktConfiguration config;
+
+    public BasicHttpAuth() {
+
+    }
+
+    public BasicHttpAuth(KustvaktConfiguration config) {
+        this.config = config;
+    }
+
 
     public static String[] decode (String token) {
         return OAuthUtils.decodeClientAuthenticationHeader(token);
@@ -37,8 +51,10 @@ public class BasicHttpAuth implements AuthenticationIface {
 
 
     @Override
-    public TokenContext getUserStatus (String authToken)
+    public TokenContext getTokenContext(String authToken)
             throws KustvaktException {
+        //fixme: handled via constructor
+        this.config = BeansFactory.getKustvaktContext().getConfiguration();
         EncryptionIface crypto = BeansFactory.getKustvaktContext()
                 .getEncryption();
         EntityHandlerIface dao = BeansFactory.getKustvaktContext()
@@ -55,6 +71,7 @@ public class BasicHttpAuth implements AuthenticationIface {
                     return null;
             }
             c.setUsername(values[0]);
+            c.setExpirationTime(TimeUtils.plusSeconds(this.config.getExpiration()).getMillis());
             c.setTokenType(Attributes.BASIC_AUTHENTICATION);
             // todo: for production mode, set true
             c.setSecureRequired(false);
@@ -70,7 +87,7 @@ public class BasicHttpAuth implements AuthenticationIface {
 
     // not supported!
     @Override
-    public TokenContext createUserSession (User user, Map<String, Object> attr)
+    public TokenContext createTokenContext(User user, Map<String, Object> attr)
             throws KustvaktException {
         return null;
     }

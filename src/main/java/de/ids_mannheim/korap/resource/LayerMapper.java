@@ -55,7 +55,7 @@ public class LayerMapper {
                 default:
                     // if the layer is not in this specific listing, assume a default layer
                     // like orth or other tokenization layers
-                    return "opennlp";
+                    return null;
             }
         }
         else {
@@ -76,7 +76,7 @@ public class LayerMapper {
                 default:
                     // if the layer is not in this specific listing, assume a default layer
                     // like orth or other tokenization layers
-                    return "opennlp";
+                    return null;
             }
         }
     }

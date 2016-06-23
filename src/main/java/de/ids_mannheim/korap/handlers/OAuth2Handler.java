@@ -1,53 +1,54 @@
 package de.ids_mannheim.korap.handlers;
 
 import de.ids_mannheim.korap.config.AuthCodeInfo;
+import de.ids_mannheim.korap.config.ClientInfo;
+import de.ids_mannheim.korap.config.KustvaktCacheable;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.user.User;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 
 /**
  * extends OAuthDb to allow temporary caching of tokens
- * and authorizations (authorizations are not persisted in db)
+ * and authorization codes.
+ * Authorization codes are not persisted in db,
+ * but stored in file of ehcache
  * 
  * @author hanl
  * @date 04/05/2015
  */
-public class OAuth2Handler extends OAuthDb {
+public class OAuth2Handler extends KustvaktCacheable {
 
-    private Cache cache;
-
+    private OAuthDb oauthdb;
 
     public OAuth2Handler (PersistenceClient client) {
-        super(client);
-        this.cache = CacheManager.getInstance().getCache("auth_codes");
+        super("auth_codes", "key:auth_codes");
+        this.oauthdb = new OAuthDb(client);
     }
 
 
+    // fixme: caching should not be obligatory here. alternative to caching if not available?
     public AuthCodeInfo getAuthorization (String code) {
-        Element e = this.cache.get(code);
-        if (e != null)
-            return (AuthCodeInfo) e.getObjectValue();
+        Object value = this.getCacheValue(code);
+        if (value != null)
+            return (AuthCodeInfo) value;
         return null;
     }
 
 
-    public void authorize (AuthCodeInfo code, User user)
+    public void authorize (AuthCodeInfo info, User user)
             throws KustvaktException {
-        code.setUserId(user.getId());
-        cache.put(new Element(code.getCode(), code));
+        info.setUserId(user.getId());
+        this.storeInCache(info.getCode(), info);
     }
 
 
     public boolean addToken (String code, String token, String refresh, int ttl)
             throws KustvaktException {
-        Element e = cache.get(code);
-        if (e != null) {
-            AuthCodeInfo info = (AuthCodeInfo) e.getObjectValue();
-            cache.remove(code);
-            return super.addToken(token, refresh, info.getUserId(),
+        Object o = this.getCacheValue(code);
+        if (o != null) {
+            AuthCodeInfo info = (AuthCodeInfo) o;
+            this.removeCacheEntry(code);
+            return oauthdb.addToken(token, refresh, info.getUserId(),
                     info.getClientId(), info.getScopes(), ttl);
         }
         return false;
@@ -55,7 +56,11 @@ public class OAuth2Handler extends OAuthDb {
 
 
     public void exchangeToken (String refresh) {
+        // todo:
+    }
 
+    public OAuthDb getPersistenceHandler(){
+        return this.oauthdb;
     }
 
 }

@@ -9,20 +9,18 @@ import de.ids_mannheim.korap.exceptions.*;
 import de.ids_mannheim.korap.interfaces.AuthenticationIface;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
+import de.ids_mannheim.korap.interfaces.defaults.ApacheValidator;
 import de.ids_mannheim.korap.user.*;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CachePut;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
@@ -38,7 +36,6 @@ import java.util.Map;
  */
 public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
-    private static String KEY = "kustvakt:key";
     private static Logger jlog = LoggerFactory
             .getLogger(KustvaktAuthenticationManager.class);
     private EncryptionIface crypto;
@@ -47,21 +44,25 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     private KustvaktConfiguration config;
     private Collection userdatadaos;
     private LoginCounter counter;
-    private Cache user_cache;
-
+    private ValidatorIface validator;
 
     public KustvaktAuthenticationManager (EntityHandlerIface userdb,
                                           EncryptionIface crypto,
                                           KustvaktConfiguration config,
                                           AuditingIface auditer,
                                           Collection<UserDataDbIface> userdatadaos) {
-        this.user_cache = CacheManager.getInstance().getCache("users");
         this.entHandler = userdb;
         this.config = config;
         this.crypto = crypto;
         this.auditing = auditer;
         this.counter = new LoginCounter(config);
         this.userdatadaos = userdatadaos;
+        // todo: load via beancontext
+        try {
+            this.validator = new ApacheValidator();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -74,6 +75,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
      * @return
      * @throws KustvaktException
      */
+    @Override
     public TokenContext getTokenStatus (String token, String host,
             String useragent) throws KustvaktException {
         jlog.info("getting session status of token type '{}'",
@@ -82,39 +84,44 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                 StringUtils.getTokenType(token), null);
 
         if (provider == null)
-            // throw exception for missing type paramter
+            // throw exception for missing type parameter
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
                     "token type not defined or found", "token_type");
 
-        TokenContext context = provider.getUserStatus(token);
+        TokenContext context = provider.getTokenContext(token);
+        System.out.println("CONTEXT "+ context.toResponse());
+        if (context != null && TimeUtils.isExpired(context.getExpirationTime()))
+            throw new KustvaktException(StatusCodes.EXPIRED);
+
         //        if (!matchStatus(host, useragent, context))
         //            provider.removeUserSession(token);
         return context;
     }
 
 
+    @Override
     public User getUser (String username) throws KustvaktException {
-        User user;
-        String key = cache_key(username);
-        Element e = user_cache.get(key);
+        //User user;
+        //Object value = this.getCacheValue(username);
 
         if (User.UserFactory.isDemo(username))
             return User.UserFactory.getDemoUser();
 
-        if (e != null) {
-            Map map = (Map) e.getObjectValue();
-            user = User.UserFactory.toUser(map);
-        }
-        else {
-            user = entHandler.getAccount(username);
-            user_cache.put(new Element(key, user.toCache()));
+        //if (value != null) {
+         //   Map map = (Map) value;
+          //  user = User.UserFactory.toUser(map);
+        //}
+       // else {
+        //    user = entHandler.getAccount(username);
+        //    this.storeInCache(username, user.toCache());
             // todo: not valid. for the duration of the session, the host should not change!
-        }
+        //}
         //todo:
         //        user.addField(Attributes.HOST, context.getHostAddress());
         //        user.addField(Attributes.USER_AGENT, context.getUserAgent());
-        return user;
+        return entHandler.getAccount(username);
     }
+
 
 
     public TokenContext refresh (TokenContext context) throws KustvaktException {
@@ -126,7 +133,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         try {
             provider.removeUserSession(context.getToken());
             User user = getUser(context.getUsername());
-            return provider.createUserSession(user, context.params());
+            return provider.createTokenContext(user, context.params());
         }
         catch (KustvaktException e) {
             throw new WrappedException(e, StatusCodes.LOGIN_FAILED);
@@ -163,9 +170,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     }
 
 
-    // todo: dont use annotations for caching
     @Override
-    @CachePut(value = "users", key = "#user.getUsername()")
     public TokenContext createTokenContext (User user,
             Map<String, Object> attr, String provider_key)
             throws KustvaktException {
@@ -175,7 +180,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         if (attr.get(Attributes.SCOPES) != null)
             this.getUserData(user, UserDetails.class);
 
-        TokenContext context = provider.createUserSession(user, attr);
+        TokenContext context = provider.createTokenContext(user, attr);
         if (context == null)
             throw new KustvaktException(StatusCodes.NOT_SUPPORTED);
         context.setUserAgent((String) attr.get(Attributes.USER_AGENT));
@@ -205,12 +210,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             throw new KustvaktException(StatusCodes.REQUEST_INVALID);
 
         if (!attributes.containsKey(Attributes.EMAIL)
-                && crypto.validateEntry(eppn, Attributes.EMAIL) != null)
+                && validator.isValid(eppn, Attributes.EMAIL))
             attributes.put(Attributes.EMAIL, eppn);
 
-        // fixme?!
-        User user = isRegistered(eppn);
-        if (user == null)
+        User user = null;
+        if (isRegistered(eppn))
             user = createShibbUserAccount(attributes);
         return user;
     }
@@ -219,32 +223,30 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     //todo: what if attributes null?
     private User authenticate (String username, String password,
             Map<String, Object> attr) throws KustvaktException {
-        Map<String, Object> attributes = crypto.validateMap(attr);
-        String safeUS;
+        Map<String, Object> attributes = validator.validateMap(attr);
         User unknown;
         // just to make sure that the plain password does not appear anywhere in the logs!
 
         try {
-            safeUS = crypto.validateEntry(username, Attributes.USERNAME);
-        }
-        catch (KustvaktException e) {
+            validator.validateEntry(username, Attributes.USERNAME);
+        } catch (KustvaktException e) {
             throw new WrappedException(e, StatusCodes.LOGIN_FAILED, username);
         }
 
-        if (safeUS == null || safeUS.isEmpty())
+        if (username == null || username.isEmpty())
             throw new WrappedException(new KustvaktException(username,
                     StatusCodes.BAD_CREDENTIALS), StatusCodes.LOGIN_FAILED);
         else {
             try {
-                unknown = entHandler.getAccount(safeUS);
-            }
-            catch (EmptyResultException e) {
+                unknown = entHandler.getAccount(username);
+            } catch (EmptyResultException e) {
                 // mask exception to disable user guessing in possible attacks
                 throw new WrappedException(new KustvaktException(username,
                         StatusCodes.BAD_CREDENTIALS), StatusCodes.LOGIN_FAILED,
                         username);
             }
             catch (KustvaktException e) {
+                jlog.error("Error: {}", e);
                 throw new WrappedException(e, StatusCodes.LOGIN_FAILED,
                         attributes.toString());
             }
@@ -302,43 +304,44 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         else if (unknown instanceof ShibUser) {
             //todo
         }
-        jlog.debug("Authentication done: " + safeUS);
+        jlog.debug("Authentication done: " + username);
         return unknown;
     }
 
 
-    public User isRegistered (String username) throws KustvaktException {
+    public boolean isRegistered (String username) {
         User user;
         if (username == null || username.isEmpty())
-            throw new KustvaktException(username, StatusCodes.ILLEGAL_ARGUMENT,
-                    "username must be set", username);
+            return false;
+        //    throw new KustvaktException(username, StatusCodes.ILLEGAL_ARGUMENT,
+        //            "username must be set", username);
 
         try {
             user = entHandler.getAccount(username);
         }
         catch (EmptyResultException e) {
             jlog.debug("user does not exist ({})", username);
-            return null;
+            return false;
 
         }
         catch (KustvaktException e) {
-            jlog.error("KorAPException", e);
-            throw new KustvaktException(username, StatusCodes.ILLEGAL_ARGUMENT,
-                    "username invalid", username);
+            jlog.error("KorAPException", e.string());
+            return false;
+            //throw new KustvaktException(username, StatusCodes.ILLEGAL_ARGUMENT,
+             //       "username invalid", username);
         }
-        return user;
+        return user != null;
     }
 
 
     public void logout (TokenContext context) throws KustvaktException {
-        String key = cache_key(context.getUsername());
         try {
             AuthenticationIface provider = getProvider(context.getTokenType(),
                     null);
 
             if (provider == null) {
-                //todo:
-                return;
+                throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
+                        "provider not supported!", context.getTokenType());
             }
             provider.removeUserSession(context.getToken());
         }
@@ -348,7 +351,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         }
         auditing.audit(AuditRecord.serviceRecord(context.getUsername(),
                 StatusCodes.LOGOUT_SUCCESSFUL, context.toString()));
-        user_cache.remove(key);
+        this.removeCacheEntry(context.getToken());
     }
 
 
@@ -359,7 +362,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                 this.lockAccount(user);
             }
             catch (KustvaktException e) {
-                jlog.error("user account could not be locked!", e);
+                jlog.error("user account could not be locked", e);
                 throw new WrappedException(e, StatusCodes.UPDATE_ACCOUNT_FAILED);
             }
             throw new WrappedException(new KustvaktException(user.getId(),
@@ -401,8 +404,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             user.setPassword(crypto.secureHash(newPassword));
         }
         catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            //            throw new KorAPException(StatusCodes.ILLEGAL_ARGUMENT,
-            //                    "Creating password hash failed!", "password");
             throw new WrappedException(new KustvaktException(user.getId(),
                     StatusCodes.ILLEGAL_ARGUMENT, "password invalid",
                     newPassword), StatusCodes.PASSWORD_RESET_FAILED,
@@ -416,14 +417,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     @Override
     public void resetPassword (String uriFragment, String username,
             String newPassphrase) throws KustvaktException {
-        String safeUser, safePass;
-
         try {
-            safeUser = crypto.validateEntry(username, Attributes.USERNAME);
-            safePass = crypto.validateEntry(newPassphrase, Attributes.PASSWORD);
-        }
-        catch (KustvaktException e) {
-            jlog.error("Error", e);
+            validator.validateEntry(username, Attributes.USERNAME);
+            validator.validateEntry(newPassphrase, Attributes.PASSWORD);
+        } catch (KustvaktException e) {
+            jlog.error("Error: {}", e.string());
             throw new WrappedException(new KustvaktException(username,
                     StatusCodes.ILLEGAL_ARGUMENT, "password invalid",
                     newPassphrase), StatusCodes.PASSWORD_RESET_FAILED,
@@ -431,9 +429,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         }
 
         try {
-            safePass = crypto.secureHash(safePass);
-        }
-        catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+            newPassphrase= crypto.secureHash(newPassphrase);
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             jlog.error("Encoding/Algorithm Error", e);
             throw new WrappedException(new KustvaktException(username,
                     StatusCodes.ILLEGAL_ARGUMENT, "password invalid",
@@ -441,30 +438,28 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                     username, uriFragment, newPassphrase);
         }
         int result = entHandler
-                .resetPassphrase(safeUser, uriFragment, safePass);
+                .resetPassphrase(username, uriFragment, newPassphrase);
 
         if (result == 0)
             throw new WrappedException(new KustvaktException(username,
                     StatusCodes.EXPIRED, "URI fragment expired", uriFragment),
                     StatusCodes.PASSWORD_RESET_FAILED, username, uriFragment);
         else if (result == 1)
-            jlog.info("successfully reset password for user {}", safeUser);
+            jlog.info("successfully reset password for user {}", username);
     }
 
 
     public void confirmRegistration (String uriFragment, String username)
             throws KustvaktException {
-        String safeUser;
         try {
-            safeUser = crypto.validateEntry(username, Attributes.USERNAME);
-        }
-        catch (KustvaktException e) {
-            jlog.error("error", e);
+            validator.validateEntry(username, Attributes.USERNAME);
+        } catch (KustvaktException e) {
+            jlog.error("Error: {}", e.string());
             throw new WrappedException(e,
                     StatusCodes.ACCOUNT_CONFIRMATION_FAILED, username,
                     uriFragment);
         }
-        int r = entHandler.activateAccount(safeUser, uriFragment);
+        int r = entHandler.activateAccount(username, uriFragment);
         if (r == 0) {
             User user;
             try {
@@ -484,7 +479,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         }
         else if (r == 1)
             jlog.info("successfully confirmed user registration for user {}",
-                    safeUser);
+                    username);
         // register successful audit!
     }
 
@@ -497,7 +492,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     //fixme: remove clientinfo object (not needed), use json representation to get stuff
     public User createUserAccount (Map<String, Object> attributes,
             boolean confirmation_required) throws KustvaktException {
-        Map<String, Object> safeMap = crypto.validateMap(attributes);
+        Map<String, Object> safeMap = validator.validateMap(attributes);
+
         if (safeMap.get(Attributes.USERNAME) == null
                 || ((String) safeMap.get(Attributes.USERNAME)).isEmpty())
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
@@ -508,13 +504,13 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                     StatusCodes.ILLEGAL_ARGUMENT, "password must be set",
                     "password");
 
-        String username = crypto.validateEntry(
+        String username = validator.validateEntry(
                 (String) safeMap.get(Attributes.USERNAME), Attributes.USERNAME);
-        String safePass = crypto.validateEntry(
+        String password = validator.validateEntry(
                 (String) safeMap.get(Attributes.PASSWORD), Attributes.PASSWORD);
         String hash;
         try {
-            hash = crypto.secureHash(safePass);
+            hash = crypto.secureHash(password);
         }
         catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
             jlog.error("Encryption error", e);
@@ -534,19 +530,21 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         }
         user.setPassword(hash);
         try {
+            UserDetails details = new UserDetails();
+            details.read(safeMap, true);
+
+            UserSettings settings = new UserSettings();
+            settings.read(safeMap, true);
+
             jlog.info("Creating new user account for user {}",
                     user.getUsername());
             entHandler.createAccount(user);
-            UserDetails details = new UserDetails(user.getId());
-            details.read(safeMap, true);
-            details.checkRequired();
-
-            UserSettings settings = new UserSettings(user.getId());
-            settings.read(safeMap, true);
-            settings.checkRequired();
+            details.setUserId(user.getId());
+            settings.setUserId(user.getId());
 
             UserDataDbIface dao = BeansFactory.getTypeFactory()
                     .getTypeInterfaceBean(userdatadaos, UserDetails.class);
+            //todo: remove this
             assert dao != null;
             dao.store(details);
             dao = BeansFactory.getTypeFactory().getTypeInterfaceBean(
@@ -555,6 +553,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             dao.store(settings);
         }
         catch (KustvaktException e) {
+            jlog.error("Error: {}", e.string());
             throw new WrappedException(e, StatusCodes.CREATE_ACCOUNT_FAILED,
                     user.toString());
         }
@@ -570,7 +569,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             throws KustvaktException {
         jlog.debug("creating shibboleth user account for user attr: {}",
                 attributes);
-        Map<String, Object> safeMap = crypto.validateMap(attributes);
+        Map<String, Object> safeMap = validator.validateMap(attributes);
 
         //todo eppn non-unique.join with idp or use persistent_id as username identifier
         ShibUser user = User.UserFactory.getShibInstance(
@@ -579,20 +578,23 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                 (String) safeMap.get(Attributes.CN));
         user.setAffiliation((String) safeMap.get(Attributes.EDU_AFFIL));
         user.setAccountCreation(TimeUtils.getNow().getMillis());
+
+
+        UserDetails d = new UserDetails();
+        d.read(attributes, true);
+
+        UserSettings s = new UserSettings();
+        s.read(attributes, true);
+
         entHandler.createAccount(user);
 
-        UserDetails d = new UserDetails(user.getId());
-        d.read(attributes, true);
-        d.checkRequired();
+        s.setUserId(user.getId());
+        d.setUserId(user.getId());
 
         UserDataDbIface dao = BeansFactory.getTypeFactory()
                 .getTypeInterfaceBean(userdatadaos, UserDetails.class);
         assert dao != null;
         dao.store(d);
-
-        UserSettings s = new UserSettings(user.getId());
-        s.read(attributes, true);
-        s.checkRequired();
 
         dao = BeansFactory.getTypeFactory().getTypeInterfaceBean(userdatadaos,
                 UserSettings.class);
@@ -648,9 +650,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     }
 
 
+    // todo: test and rest usage?!
     public boolean updateAccount (User user) throws KustvaktException {
         boolean result;
-        String key = cache_key(user.getUsername());
         if (user instanceof DemoUser)
             throw new KustvaktException(user.getId(),
                     StatusCodes.REQUEST_INVALID,
@@ -661,12 +663,12 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                 result = entHandler.updateAccount(user) > 0;
             }
             catch (KustvaktException e) {
-                jlog.error("Error ", e);
+                jlog.error("Error: {}", e.string());
                 throw new WrappedException(e, StatusCodes.UPDATE_ACCOUNT_FAILED);
             }
         }
         if (result) {
-            user_cache.remove(key);
+            // this.removeCacheEntry(user.getUsername());
             auditing.audit(AuditRecord.serviceRecord(user.getId(),
                     StatusCodes.UPDATE_ACCOUNT_SUCCESSFUL, user.toString()));
         }
@@ -676,7 +678,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
     public boolean deleteAccount (User user) throws KustvaktException {
         boolean result;
-        String key = cache_key(user.getUsername());
         if (user instanceof DemoUser)
             return true;
         else {
@@ -684,12 +685,12 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                 result = entHandler.deleteAccount(user.getId()) > 0;
             }
             catch (KustvaktException e) {
-                jlog.error("Error ", e);
+                jlog.error("Error: {}", e.string());
                 throw new WrappedException(e, StatusCodes.DELETE_ACCOUNT_FAILED);
             }
         }
         if (result) {
-            user_cache.remove(key);
+            // this.removeCacheEntry(user.getUsername());
             auditing.audit(AuditRecord.serviceRecord(user.getUsername(),
                     StatusCodes.DELETE_ACCOUNT_SUCCESSFUL, user.toString()));
         }
@@ -699,8 +700,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
     public Object[] validateResetPasswordRequest (String username, String email)
             throws KustvaktException {
-        String mail, uritoken;
-        mail = crypto.validateEntry(email, Attributes.EMAIL);
+        String uritoken;
+        validator.validateEntry(email, Attributes.EMAIL);
         User ident;
         try {
             ident = entHandler.getAccount(username);
@@ -719,7 +720,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         Userdata data = this.getUserData(ident, UserDetails.class);
         KorAPUser user = (KorAPUser) ident;
 
-        if (!mail.equals(data.get(Attributes.EMAIL)))
+        if (!email.equals(data.get(Attributes.EMAIL)))
             //            throw new NotAuthorizedException(StatusCodes.ILLEGAL_ARGUMENT,
             //                    "invalid parameter: email", "email");
             throw new WrappedException(new KustvaktException(user.getId(),
@@ -734,10 +735,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             entHandler.updateAccount(user);
         }
         catch (KustvaktException e) {
-            jlog.error("Error ", e);
+            jlog.error("Error ", e.string());
             throw new WrappedException(e, StatusCodes.PASSWORD_RESET_FAILED);
         }
-        return new Object[] { uritoken, new DateTime(param.getUriExpiration()) };
+        return new Object[] { uritoken, TimeUtils.format(param.getUriExpiration()) };
     }
 
 
@@ -771,8 +772,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     @Override
     public void updateUserData (Userdata data) throws WrappedException {
         try {
-
-            data.validate(this.crypto);
+            data.validate(this.validator);
             UserDataDbIface dao = BeansFactory.getTypeFactory()
                     .getTypeInterfaceBean(
                             BeansFactory.getKustvaktContext()
@@ -783,18 +783,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         catch (KustvaktException e) {
             jlog.error("Error during update of user data!", e.getEntity());
             throw new WrappedException(e, StatusCodes.UPDATE_ACCOUNT_FAILED);
-        }
-    }
-
-
-    private String cache_key (String input) throws KustvaktException {
-        try {
-            return crypto.secureHash(KEY + "@" + input);
-        }
-        catch (Exception e) {
-            jlog.error("illegal cache key input '{}'", input);
-            throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
-                    "missing or illegal cache key", input);
         }
     }
 }

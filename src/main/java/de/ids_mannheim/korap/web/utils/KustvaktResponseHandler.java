@@ -69,13 +69,13 @@ public class KustvaktResponseHandler {
     }
 
 
-    public static WebApplicationException throwAuthenticationException () {
+    public static WebApplicationException throwAuthenticationException (String username) {
         return new WebApplicationException(Response
                 .status(Response.Status.UNAUTHORIZED)
                 .header(HttpHeaders.WWW_AUTHENTICATE,
                         "Basic realm=Kustvakt Authentication Service")
                 .entity(buildNotification(StatusCodes.BAD_CREDENTIALS,
-                        "Unauthorized access", "")).build());
+                        "Unauthorized access", username)).build());
     }
 
 

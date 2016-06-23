@@ -4,8 +4,6 @@ import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import de.ids_mannheim.korap.config.*;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.web.service.BootableBeanInterface;
 import lombok.Getter;
 import lombok.Setter;
 import org.eclipse.jetty.server.Connector;
@@ -16,19 +14,18 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
  * @author hanl
  * @date 01/06/2015
  */
 public abstract class KustvaktBaseServer {
 
+    public KustvaktBaseServer () {
+        KustvaktConfiguration.loadLogger();
+    }
+
+
     public static void main (String[] args) throws Exception {
-        KustvaktConfiguration.loadLog4jLogger();
         KustvaktBaseServer server = new KustvaktBaseServer() {
             @Override
             protected void setup () {}
@@ -39,8 +36,6 @@ public abstract class KustvaktBaseServer {
             BeansFactory.loadFileContext(kargs.config);
         else
             BeansFactory.loadClasspathContext();
-
-        KustvaktCacheManager.init();
 
         kargs.setRootPackages(new String[] { "de.ids_mannheim.korap.web.service.light" });
 

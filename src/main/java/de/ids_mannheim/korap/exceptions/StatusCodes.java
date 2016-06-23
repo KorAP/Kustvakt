@@ -1,5 +1,12 @@
 package de.ids_mannheim.korap.exceptions;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.ids_mannheim.korap.config.ConfigLoader;
+
+import java.io.IOException;
+import java.util.Properties;
+
 /**
  * @author hanl
  * @date 07/09/2014
@@ -23,7 +30,7 @@ public class StatusCodes {
     public static final int NOT_SUPPORTED = 110;
 
     /**
-     * 400 status codes for account/authentication relevant components
+     * 200 status codes for account/authentication relevant components
      */
 
     public static final int ACCOUNT_DEACTIVATED = 200;
@@ -31,6 +38,7 @@ public class StatusCodes {
     public static final int ALREADY_LOGGED_IN = 202;
     public static final int EXPIRED = 204;
     public static final int BAD_CREDENTIALS = 205;
+    @Deprecated // fixme: duplicate to account deactivated
     public static final int UNCONFIRMED_ACCOUNT = 206;
     public static final int NAME_EXISTS = 207;
     public static final int PASSWORD_RESET_FAILED = 208;
@@ -48,7 +56,11 @@ public class StatusCodes {
     public static final int CLIENT_AUTHORIZATION_FAILURE = 216;
 
 
+    /**
+     *  400 status codes for authorization and rewrite functions
+     */
 
+    // fixme: use unsupported resource and include type in return message
     public static final int PERMISSION_DENIED = 401;
     public static final int UNSUPPORTED_RESOURCE = 402;
     public static final int UNSUPPORTED_FOUNDRY = 403;
@@ -105,5 +117,11 @@ public class StatusCodes {
      */
 
     public static final int NO_QUERY = 301;
+
+
+
+    private StatusCodes() {
+
+    }
 
 }

@@ -44,9 +44,7 @@ import java.util.Locale;
 public class AdminService {
 
     private static Logger jlog = LoggerFactory.getLogger(AdminService.class);
-    // todo: map in timeutils
-    private static DateTimeFormatter dtf = DateTimeFormat
-            .forPattern("dd/MM/yyyy");
+
     private AuthenticationManagerIface controller;
     private AuditingIface auditingController;
     private DocumentDao documentDao;
@@ -71,13 +69,13 @@ public class AdminService {
         DateTime from_date, until_date;
 
         if (from == null)
-            from_date = new DateTime();
+            from_date = TimeUtils.getNow();
         else
-            from_date = DateTime.parse(from, dtf);
+            from_date = TimeUtils.getTime(from);
         if (until == null)
-            until_date = new DateTime();
+            until_date = TimeUtils.getNow();
         else
-            until_date = DateTime.parse(until, dtf);
+            until_date = TimeUtils.getTime(until);
 
         int integer_limit;
         boolean dayOnly = Boolean.valueOf(day);

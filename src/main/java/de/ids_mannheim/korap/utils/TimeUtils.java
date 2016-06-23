@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.utils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
@@ -26,6 +27,8 @@ import java.util.Locale;
 public class TimeUtils {
 
     private static DecimalFormat df = new DecimalFormat("#.#############");
+    private static DateTimeFormatter dtf = DateTimeFormat
+            .forPattern("dd/MM/yyyy");
     private static final DateTimeZone dtz = DateTimeZone.forID("Europe/Berlin");
     private static Logger jlog = LoggerFactory.getLogger(TimeUtils.class);
 
@@ -53,12 +56,17 @@ public class TimeUtils {
 
     }
 
-
-    //todo: time zone is wrong!
     public static DateTime getNow () {
-        return DateTime.now().withZone(dtz);
+        return DateTime.now(dtz);
     }
 
+    public static DateTime getTime(String time) {
+        return DateTime.parse(time).withZone(dtz);
+    }
+
+    public static DateTime getTime(long time) {
+        return new DateTime(time).withZone(dtz);
+    }
 
     //returns difference in milliseconds
     public static long calcDiff (DateTime now, DateTime future) {
@@ -68,14 +76,9 @@ public class TimeUtils {
     }
 
 
-    public static boolean isPassed (long time) {
+    public static boolean isExpired(long time) {
         return getNow().isAfter(time);
 
-    }
-
-
-    public static boolean isPassed (DateTime time) {
-        return isPassed(time.getMillis());
     }
 
 
@@ -125,13 +128,13 @@ public class TimeUtils {
      */
     public static String format (DateTime time) {
         DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-        return fmt.print(time);
+        return fmt.withZone(dtz).print(time);
     }
 
 
     public static String format (long time) {
         DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-        return fmt.print(time);
+        return fmt.withZone(dtz).print(time);
     }
 
 
@@ -213,20 +216,5 @@ public class TimeUtils {
     }
 
     private static final List<DateTime> times = new ArrayList<>();
-
-
-    @Deprecated
-    public static float benchmark (boolean getFinal) {
-        float value = 0;
-        times.add(getNow());
-        if (getFinal && times.size() > 1) {
-            value = floating(times.get(0), times.get(times.size() - 1));
-            times.clear();
-        }
-        else if (times.size() > 1)
-            value = floating(times.get(times.size() - 2),
-                    times.get(times.size() - 1));
-        return value;
-    }
 
 }

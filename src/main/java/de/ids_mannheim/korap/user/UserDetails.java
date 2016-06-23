@@ -9,11 +9,16 @@ import de.ids_mannheim.korap.config.Attributes;
  */
 public class UserDetails extends Userdata {
 
-    public UserDetails (Integer userid) {
+
+    public UserDetails() {
+
+    }
+
+    public UserDetails(Integer userid) {
         super(userid);
     }
 
-
+    //todo: make configurable!
     @Override
     public String[] requiredFields () {
         return new String[] { Attributes.EMAIL, Attributes.ADDRESS,

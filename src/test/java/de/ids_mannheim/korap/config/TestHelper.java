@@ -14,7 +14,9 @@ import de.ids_mannheim.korap.security.auth.APIAuthentication;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.security.auth.KustvaktAuthenticationManager;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.service.BootableBeanInterface;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.flywaydb.core.Flyway;
 import org.joda.time.DateTime;
@@ -47,11 +49,21 @@ import static org.junit.Assert.*;
 public class TestHelper {
 
     private static Logger jlog = LoggerFactory.getLogger(TestHelper.class);
-    private static final String[] credentials = new String[] { "test1",
-            "testPass2015" };
+    private static final Map<String, Object> data = new HashMap<>();
+    static  {
+        data.put(Attributes.ID, 2);
+        data.put(Attributes.USERNAME, "testUser1");
+        data.put(Attributes.PASSWORD, "testPass2015");
+        data.put(Attributes.FIRSTNAME, "test");
+        data.put(Attributes.LASTNAME, "user");
+        data.put(Attributes.EMAIL, "test@ids-mannheim.de");
+        data.put(Attributes.ADDRESS, "Mannheim");
+        data.put(Attributes.DEFAULT_LEMMA_FOUNDRY, "test_l");
+        data.put(Attributes.DEFAULT_POS_FOUNDRY, "test_p");
+        data.put(Attributes.DEFAULT_CONST_FOUNDRY, "test_const");
+    }
 
     private ContextHolder beansHolder;
-
 
     public static TestHelper newInstance (ApplicationContext ctx)
             throws Exception {
@@ -90,18 +102,7 @@ public class TestHelper {
             // do nothing and continue
         }
 
-        Map m = new HashMap<>();
-        m.put(Attributes.ID, 2);
-        m.put(Attributes.USERNAME, credentials[0]);
-        m.put(Attributes.PASSWORD, credentials[1]);
-        m.put(Attributes.FIRSTNAME, "test");
-        m.put(Attributes.LASTNAME, "user");
-        m.put(Attributes.EMAIL, "test@ids-mannheim.de");
-        m.put(Attributes.ADDRESS, "Mannheim");
-        m.put(Attributes.DEFAULT_LEMMA_FOUNDRY, "test_l");
-        m.put(Attributes.DEFAULT_POS_FOUNDRY, "test_p");
-        m.put(Attributes.DEFAULT_CONST_FOUNDRY, "test_const");
-
+        Map m = getUserCredentials();
         assertNotNull("userdatabase handler must not be null", dao);
 
         try {
@@ -109,6 +110,7 @@ public class TestHelper {
         }
         catch (KustvaktException e) {
             // do nothing
+            jlog.error("Error: {}", e.string());
             assertNotNull("Test user could not be set up", null);
         }
         assertNotEquals(0, dao.size());
@@ -148,7 +150,7 @@ public class TestHelper {
 
             int i = edao.createAccount(User.UserFactory.toKorAPUser(m));
             assert BeansFactory.getKustvaktContext().getUserDBHandler()
-                    .getAccount(credentials[0]) != null;
+                    .getAccount((String) data.get(Attributes.USERNAME)) != null;
             assertEquals(1, i);
         }
         catch (KustvaktException e) {
@@ -162,7 +164,7 @@ public class TestHelper {
     public User getUser () {
         try {
             return ((EntityHandlerIface) getBean(ContextHolder.KUSTVAKT_USERDB))
-                    .getAccount(credentials[0]);
+                    .getAccount((String) data.get(Attributes.USERNAME));
         }
         catch (KustvaktException e) {
             // do nothing
@@ -213,8 +215,8 @@ public class TestHelper {
     }
 
 
-    public static final String[] getUserCredentials () {
-        return Arrays.copyOf(credentials, 2);
+    public static Map<String, Object> getUserCredentials () {
+        return new HashMap<>(data);
     }
 
 
@@ -322,7 +324,7 @@ public class TestHelper {
             throws InterruptedException {
         SingleConnectionDataSource dataSource = new SingleConnectionDataSource();
         dataSource.setDriverClassName("org.sqlite.JDBC");
-        DateTime t = new DateTime();
+        DateTime t = TimeUtils.getNow();
         //String name = testclass != null ? testclass.getSimpleName() + "_" : "";
 
         if (memory)
@@ -354,7 +356,7 @@ public class TestHelper {
         dataSource.setInitialSize(1);
         dataSource.setMaxIdle(1);
         dataSource.addConnectionProperty("lazy-init", "true");
-        DateTime t = new DateTime();
+        DateTime t = TimeUtils.getNow();
         if (memory)
             dataSource.setUrl("jdbc:sqlite::memory:");
         else {
@@ -419,8 +421,7 @@ public class TestHelper {
         @Override
         public KustvaktConfiguration getConfig () {
             KustvaktConfiguration c = new KustvaktConfiguration();
-            InputStream s = TestHelper.class.getClassLoader()
-                    .getResourceAsStream("kustvakt.conf");
+            InputStream s = ConfigLoader.loadConfigStream("kustvakt.conf");
             if (s != null)
                 c.setPropertiesAsStream(s);
             else {

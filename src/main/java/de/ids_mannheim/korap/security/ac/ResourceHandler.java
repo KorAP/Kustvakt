@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.security.ac;
 
+import de.ids_mannheim.korap.config.KustvaktCacheable;
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.NotAuthorizedException;
@@ -23,15 +24,18 @@ import java.util.Collection;
 //todo: use interface (maybe a cachable interface?) and bean instanceing
 // todo: if cachable, data integrity needs to be checked! either remove caching or check integrity!
 @SuppressWarnings("all")
-public class ResourceHandler {
+public class ResourceHandler extends KustvaktCacheable {
 
     private static Logger jlog = LoggerFactory.getLogger(ResourceHandler.class);
 
 
-    public ResourceHandler () {}
+    public ResourceHandler () {
+        super("resources", "key:resources");
+    }
 
 
-    public <T extends KustvaktResource> T getCache (Object id, Class<T> clazz) {
+    @Deprecated
+    public <T extends KustvaktResource> T getCache (Object id, Class<T> cz) {
         Element e = CacheManager.getInstance().getCache("resources").get(id);
         if (e != null)
             return (T) e.getObjectValue();
@@ -40,6 +44,7 @@ public class ResourceHandler {
     }
 
 
+    @Deprecated
     public <R extends KustvaktResource> void cache (R resource) {
         CacheManager.getInstance().getCache("resources")
                 .put(new Element(resource.getPersistentID(), resource));

@@ -59,17 +59,15 @@ public class RewriteHandlerTest extends BeanConfigTest {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         QuerySerializer s = new QuerySerializer();
-        s.setQuery("[(base=laufen | base=gehen) & tt/pos=VVFIN]", "poliqarp");
+        s.setQuery("[base=laufen | tt/pos=VVFIN]", "poliqarp");
         assertTrue(handler.add(FoundryInject.class));
         String res = handler.processQuery(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(res);
         assertNotNull(node);
-
-        assertEquals("tt", node.at("/query/wrap/operands/0/operands/0/foundry")
+        assertEquals("tt", node.at("/query/wrap/operands/0/foundry")
                 .asText());
-        assertEquals("tt", node.at("/query/wrap/operands/0/operands/1/foundry")
+        assertEquals("tt", node.at("/query/wrap/operands/1/foundry")
                 .asText());
-        assertEquals("tt", node.at("/query/wrap/operands/1/foundry").asText());
     }
 
 
@@ -78,17 +76,15 @@ public class RewriteHandlerTest extends BeanConfigTest {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         QuerySerializer s = new QuerySerializer();
-        s.setQuery("[(base=laufen | base=gehen) & tt/pos=VVFIN]", "poliqarp");
+        s.setQuery("[base=laufen|tt/pos=VFIN]", "poliqarp");
         assertTrue(handler.add(FoundryInject.class));
         String res = handler.processQuery(s.toJSON(), helper().getUser());
         JsonNode node = JsonUtils.readTree(res);
         assertNotNull(node);
         assertEquals("tt_test",
-                node.at("/query/wrap/operands/0/operands/0/foundry").asText());
-        assertEquals("tt_test",
-                node.at("/query/wrap/operands/0/operands/1/foundry").asText());
-        assertNotEquals("tt_test", node.at("/query/wrap/operands/1/foundry")
-                .asText());
+                node.at("/query/wrap/operands/0/foundry").asText());
+        assertNotEquals("tt_test",
+                node.at("/query/wrap/operands/1/foundry").asText());
     }
 
 

@@ -10,13 +10,13 @@ import java.util.Set;
  */
 public class KustvaktMap {
 
-    private boolean mono;
+    private boolean monoTyped;
     private Map<String, Object> values;
 
 
     public KustvaktMap () {
         this.values = new HashMap<>();
-        this.mono = false;
+        this.monoTyped = false;
     }
 
 
@@ -27,13 +27,13 @@ public class KustvaktMap {
 
 
     public void setMap (Map<String, Object> m) {
-        if (!isGeneric(m) | !this.mono)
+        if (!isGeneric(m) | !this.monoTyped)
             this.values.putAll(m);
     }
 
 
     public boolean isGeneric () {
-        return !this.mono && isGeneric(this.values);
+        return !this.monoTyped && isGeneric(this.values);
     }
 
 
@@ -48,7 +48,7 @@ public class KustvaktMap {
 
 
     public void setMonoValue (boolean monovalue) {
-        this.mono = monovalue;
+        this.monoTyped = monovalue;
     }
 
 

@@ -3,11 +3,14 @@ package de.ids_mannheim.korap.config;
 import de.ids_mannheim.korap.interfaces.AuthenticationIface;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.interfaces.db.*;
+import de.ids_mannheim.korap.interfaces.defaults.ApacheValidator;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 
+import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -120,7 +123,15 @@ public abstract class ContextHolder {
     }
 
 
-    private void finish () {
+    public ValidatorIface getValidator()  {
+        try {
+            return new ApacheValidator();
+        } catch (IOException e) {
+            throw new RuntimeException("validator could not be loaded!");
+        }
+    }
+
+    private void close () {
         this.getAuditingProvider().finish();
         this.context = null;
     }

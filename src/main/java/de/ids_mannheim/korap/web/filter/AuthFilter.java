@@ -43,7 +43,7 @@ public class AuthFilter implements ContainerRequestFilter, ResourceFilter {
                         ua);
             }
             catch (KustvaktException e) {
-                throw KustvaktResponseHandler.throwAuthenticationException();
+                throw KustvaktResponseHandler.throwAuthenticationException("");
             }
             // fixme: give reason why access is not granted?
             if (context != null
@@ -52,7 +52,7 @@ public class AuthFilter implements ContainerRequestFilter, ResourceFilter {
                             .isSecureRequired()))
                 request.setSecurityContext(new KustvaktContext(context));
             else
-                throw KustvaktResponseHandler.throwAuthenticationException();
+                throw KustvaktResponseHandler.throwAuthenticationException("");
         }
         return request;
     }

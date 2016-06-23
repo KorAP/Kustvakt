@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.handlers;
 
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.KustvaktClassLoader;
 import de.ids_mannheim.korap.config.TestHelper;
@@ -88,7 +89,7 @@ public class ResourceDaoTest extends BeanConfigTest {
         c.addField("key_2", 2);
 
         User user = User.UserFactory
-                .getUser(TestHelper.getUserCredentials()[0]);
+                .getUser((String) TestHelper.getUserCredentials().get(Attributes.USERNAME));
 
         int id = dao.storeResource(c, user);
 
@@ -109,7 +110,7 @@ public class ResourceDaoTest extends BeanConfigTest {
         c.addField("key_2", 2);
 
         User user = User.UserFactory
-                .getUser(TestHelper.getUserCredentials()[0]);
+                .getUser((String) TestHelper.getUserCredentials().get(Attributes.USERNAME));
 
         int id = dao.storeResource(c, user);
 

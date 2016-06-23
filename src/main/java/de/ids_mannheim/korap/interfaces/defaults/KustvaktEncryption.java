@@ -10,12 +10,8 @@ import de.ids_mannheim.korap.web.utils.KustvaktMap;
 import edu.emory.mathcs.backport.java.util.Collections;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.RandomStringUtils;
 import org.mindrot.jbcrypt.BCrypt;
-import org.owasp.esapi.ESAPI;
-import org.owasp.esapi.Randomizer;
-import org.owasp.esapi.Validator;
-import org.owasp.esapi.errors.ValidationException;
-import org.owasp.esapi.reference.DefaultValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,17 +32,11 @@ public class KustvaktEncryption implements EncryptionIface {
     private static Logger jlog = LoggerFactory
             .getLogger(KustvaktEncryption.class);
 
-    private final boolean nullable;
-    private final Validator validator;
-    private final Randomizer randomizer;
     private final KustvaktConfiguration config;
 
 
     public KustvaktEncryption (KustvaktConfiguration config) {
         jlog.info("initializing KorAPEncryption implementation");
-        this.nullable = false;
-        this.validator = DefaultValidator.getInstance();
-        this.randomizer = ESAPI.randomizer();
         this.config = config;
     }
 
@@ -86,17 +76,6 @@ public class KustvaktEncryption implements EncryptionIface {
         String hashString = "";
         switch (config.getEncryption()) {
             case ESAPICYPHER:
-                try {
-                    hashString = hash(input, salt);
-                }
-                catch (NoSuchAlgorithmException e) {
-                    jlog.error("there was an encryption error!", e);
-                    return null;
-                }
-                catch (Exception e) {
-                    jlog.error("there was an error!", e);
-                    return null;
-                }
                 break;
             case SIMPLE:
                 try {
@@ -123,30 +102,11 @@ public class KustvaktEncryption implements EncryptionIface {
 
 
 
-    public String hash (String text, String salt) throws Exception {
-        byte[] bytes;
-
-        MessageDigest md = MessageDigest.getInstance(ALGORITHM);
-        md.reset();
-        md.update(ESAPI.securityConfiguration().getMasterSalt());
-        md.update(salt.getBytes());
-        md.update(text.getBytes());
-
-        bytes = md.digest();
-        for (int i = 0; i < 234; ++i) {
-            md.reset();
-            bytes = md.digest(bytes);
-        }
-        String coding = ESAPI.encoder().encodeForBase64(bytes, false);
-        return coding;
-    }
-
-
     public String hash (String input) {
         String hashString = "";
         MessageDigest md;
         try {
-            md = MessageDigest.getInstance("SHA-256");
+            md = MessageDigest.getInstance(ALGORITHM);
             md.update(input.getBytes("UTF-8"));
         }
         catch (NoSuchAlgorithmException e) {
@@ -188,6 +148,12 @@ public class KustvaktEncryption implements EncryptionIface {
     }
 
 
+    /**
+     * does this need to be equal for every iteration?!
+     * @param hash
+     * @param obj
+     * @return
+     */
     @Override
     public String createToken (boolean hash, Object ... obj) {
         StringBuffer b = new StringBuffer();
@@ -211,9 +177,7 @@ public class KustvaktEncryption implements EncryptionIface {
     @Override
     public String createToken () {
         String encoded;
-        String v = randomizer.getRandomString(
-                SecureRGenerator.TOKEN_RANDOM_SIZE,
-                SecureRGenerator.toHex(createSecureRandom(64)).toCharArray());
+        String v = RandomStringUtils.randomAlphanumeric(64);
         encoded = hash(v);
         jlog.trace("creating new token {}", encoded);
         return encoded;
@@ -224,12 +188,7 @@ public class KustvaktEncryption implements EncryptionIface {
     public String createRandomNumber (Object ... obj) {
         final byte[] rNumber = SecureRGenerator
                 .getNextSecureRandom(SecureRGenerator.CORPUS_RANDOM_SIZE);
-        if (obj.length != 0) {
-            ArrayList s = new ArrayList();
-            Collections.addAll(s, obj);
-            obj = s.toArray();
-        }
-        else {
+        if (obj.length == 0) {
             obj = new Object[1];
             obj[0] = rNumber;
         }
@@ -275,166 +234,6 @@ public class KustvaktEncryption implements EncryptionIface {
                 return hash(plain).equals(hash);
         }
         return false;
-    }
-
-
-    // todo: where applied?
-    @Override
-    public Map<String, Object> validateMap (Map<String, Object> map)
-            throws KustvaktException {
-        Map<String, Object> safeMap = new HashMap<>();
-        KustvaktMap kmap = new KustvaktMap(map);
-
-        if (map != null) {
-            if (!kmap.isGeneric()) {
-                for (String key : kmap.keySet()) {
-                    String value = validateEntry(kmap.get(key), key);
-                    safeMap.put(key, value);
-                }
-            }
-            else {
-                for (String key : kmap.keySet()) {
-                    Object value = kmap.getRaw(key);
-                    if (value instanceof String) {
-                        value = validateEntry((String) value, key);
-
-                    }
-                    else if (value instanceof List) {
-                        List list = (List) value;
-                        for (Object v : list) {
-                            if (v instanceof String)
-                                validateEntry((String) v, key);
-                        }
-
-                        if (list.size() == 1)
-                            value = list.get(0);
-                        else
-                            value = list;
-                    }
-                    safeMap.put(key, value);
-                }
-            }
-        }
-        return safeMap;
-    }
-
-
-    @Deprecated
-    private String validateString (String descr, String input, String type,
-            int length, boolean nullable) throws KustvaktException {
-        String s;
-        try {
-            s = validator.getValidInput(descr, input, type, length, nullable);
-        }
-        catch (ValidationException e) {
-            jlog.error(
-                    "String value did not validate ('{}') with validation type {}",
-                    new Object[] { input, type, e.getMessage() });
-            throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
-                    "invalid string of type " + type, input);
-        }
-        return s;
-    }
-
-
-    @Override
-    public String validateEntry (String input, String type)
-            throws KustvaktException {
-        try {
-            if (type != null) {
-                type = type.toLowerCase();
-                if (type.equals(Attributes.EMAIL)) {
-                    jlog.debug("validating email entry '{}'", input.hashCode());
-                    return validator.getValidInput("Email", input, "email",
-                            config.getValidationEmaillength(), false);
-                }
-                else if (type.equals(Attributes.USERNAME)) {
-                    jlog.debug("validating username entry '{}'",
-                            input.hashCode());
-                    return validator.getValidInput("Username", input,
-                            "username", config.getValidationEmaillength(),
-                            false);
-                }
-                else if (type.equals(Attributes.IP_RANG)) {
-                    jlog.debug("validating ip address entry '{}'",
-                            input.hashCode());
-                    return validator.getValidInput("IP Address", input,
-                            "ipaddress", config.getValidationStringLength(),
-                            nullable);
-                }
-                else if (type.equals(Attributes.PASSWORD)) {
-                    jlog.debug("validating password entry '{}'",
-                            input.hashCode());
-                    return validator.getValidInput("Password", input,
-                            "password", config.getValidationStringLength(),
-                            nullable);
-                }
-            }
-            jlog.debug("validating string entry '{}'", input.hashCode());
-            return validator.getValidInput("Safe String", input, "SafeString",
-                    config.getValidationStringLength(), nullable);
-        }
-        catch (ValidationException ex) {
-            jlog.error("Validation failed! Value '{}' with type '{}'",
-                    new Object[] { input, type });
-            throw new KustvaktException(StatusCodes.PARAMETER_VALIDATION_ERROR,
-                    "invalid value of type " + type, input);
-        }
-    }
-
-
-    public void validate (Object instance) throws KustvaktException {
-        if (instance == null)
-            return;
-        try {
-            validateStringField(instance.getClass().getDeclaredFields(),
-                    instance);
-            validateStringField(instance.getClass().getSuperclass()
-                    .getDeclaredFields(), instance);
-        }
-        catch (IllegalAccessException e) {
-            jlog.error("object value did not validate", e.getMessage());
-            throw new KustvaktException(StatusCodes.PARAMETER_VALIDATION_ERROR,
-                    "object could not be validated", instance.toString());
-        }
-    }
-
-
-    //FIXME: currently all sets are skipped during validation (since users should not be allowed to edit those sets anyway,
-    //I think we will be safe here
-    @Deprecated
-    private void validateStringField (Field[] fields, Object instance)
-            throws KustvaktException, IllegalAccessException {
-        for (Field field : fields) {
-            boolean priv = false;
-            if (field.getType().isAssignableFrom(String.class)) {
-                if (Modifier.isPrivate(field.getModifiers())) {
-                    priv = true;
-                    field.setAccessible(true);
-                }
-                if (field.getName().equals("password")
-                        | Modifier.isFinal(field.getModifiers()))
-                    continue;
-                String val = (String) field.get(instance);
-                if (val != null) {
-                    String[] set = val.split(";");
-                    if (set.length > 1)
-                        continue;
-                }
-                String safe;
-                if (!field.getName().equals("email"))
-                    safe = validateString("Safe String", val, "SafeString",
-                            config.getValidationStringLength(), true);
-                else
-                    safe = validateString("User Email", val, "Email",
-                            config.getValidationEmaillength(), true);
-                field.set(instance, safe == null ? "" : safe);
-
-                if (priv) {
-                    field.setAccessible(false);
-                }
-            }
-        }
     }
 
 

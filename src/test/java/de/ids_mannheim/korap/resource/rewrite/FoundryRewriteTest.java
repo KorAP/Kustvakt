@@ -13,6 +13,7 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserSettings;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -194,11 +195,32 @@ public class FoundryRewriteTest extends BeanConfigTest {
         QuerySerializer s = new QuerySerializer();
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
-        s.setQuery("[(base=laufen | base=gehen) & tt/pos=VVFIN]", "poliqarp");
+        s.setQuery("[(base=laufen | tt/pos=VVFIN)]", "poliqarp");
         assertTrue(handler.add(FoundryInject.class));
         String result = handler.processQuery(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
+        System.out.println("NODDE "+ node);
+        assertNotNull(node);
+        assertEquals("koral:termGroup", node.at("/query/wrap/@type").asText());
+        assertFalse(node.at("/query/wrap/operands/0/foundry")
+                .isMissingNode());
+        assertFalse(node.at("/query/wrap/operands/0/rewrites")
+                .isMissingNode());
+        assertFalse(node.at("/query/wrap/operands/1/foundry").isMissingNode());
+        assertTrue(node.at("/query/wrap/operands/1/rewrites").isMissingNode());
+    }
 
+    @Test
+    @Ignore
+    public void testFoundyBaseRewrite() throws KustvaktException {
+        QuerySerializer s = new QuerySerializer();
+        RewriteHandler handler = new RewriteHandler();
+        handler.insertBeans(helper().getContext());
+        s.setQuery("[orth=laufen]", "poliqarp");
+        assertTrue(handler.add(FoundryInject.class));
+        String result = handler.processQuery(s.toJSON(), null);
+        JsonNode node = JsonUtils.readTree(result);
+        System.out.println("NODDE "+ node);
         assertNotNull(node);
         assertEquals("koral:termGroup", node.at("/query/wrap/@type").asText());
         assertFalse(node.at("/query/wrap/operands/0/operands/0/foundry")

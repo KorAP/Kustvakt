@@ -19,6 +19,7 @@ import org.junit.BeforeClass;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
 import java.net.BindException;
 import java.net.URI;
 

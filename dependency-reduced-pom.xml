@@ -4,7 +4,7 @@
   <groupId>de.ids_mannheim.korap</groupId>
   <artifactId>Kustvakt-core</artifactId>
   <name>Kustvakt core</name>
-  <version>0.59.5</version>
+  <version>0.59.6</version>
   <description>Kustvakt core, basic rest api for testing purposes and default
         interfaces</description>
   <build>
@@ -16,6 +16,7 @@
           <include>**/*.info</include>
           <include>**/*.xml</include>
           <include>**/*.conf</include>
+          <include>**/*.kustvakt</include>
           <include>**/*.properties</include>
           <include>**/*.sql</include>
         </includes>
@@ -47,13 +48,6 @@
         <groupId>com.googlecode.maven-java-formatter-plugin</groupId>
         <artifactId>maven-java-formatter-plugin</artifactId>
         <version>0.4</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>format</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
           <configFile>${project.basedir}/Format.xml</configFile>
           <overrideConfigCompilerVersion>true</overrideConfigCompilerVersion>
@@ -153,7 +147,7 @@
                   <goal>shade</goal>
                 </goals>
                 <configuration>
-                  <finalName>Kustvakt-core-0.59.5-light</finalName>
+                  <finalName>Kustvakt-core-${project.version}-light</finalName>
                   <transformers>
                     <transformer>
                       <mainClass>de.ids_mannheim.korap.web.KustvaktBaseServer</mainClass>

@@ -8,9 +8,14 @@ import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author hanl
@@ -21,17 +26,10 @@ public class OAuth2EndpointTest extends FastJerseyTest {
 
     @BeforeClass
     public static void configure () throws Exception {
-        FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service",
+        FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.full",
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");
     }
-
-
-    @Test
-    public void init () {
-
-    }
-
 
     @Override
     public void initMethod () throws KustvaktException {
@@ -40,26 +38,34 @@ public class OAuth2EndpointTest extends FastJerseyTest {
 
 
     @Test
-    @Ignore
     public void testAuthorizeClient () {
-        ClientResponse response = resource().path("v0.1").path("oauth2")
+        String auth = BasicHttpAuth.encode(helper().getUser().getUsername(),
+                (String) TestHelper.getUserCredentials().get(Attributes.PASSWORD));
+        ClientResponse response = resource().path(getAPIVersion()).path("oauth2")
                 .path("register")
                 .queryParam("redirect_url", "korap.ids-mannheim.de/redirect")
                 .header("Host", "korap.ids-mannheim.de")
+                .header(Attributes.AUTHORIZATION, auth)
                 .post(ClientResponse.class);
-        assert response.getStatus() == ClientResponse.Status.OK.getStatusCode();
+
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        System.out.println(node);
+
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
     }
 
 
     @Test
     @Ignore
     public void testRevokeClient () {
-        ClientResponse response = resource().path("v0.1").path("oauth2")
+        ClientResponse response = resource().path(getAPIVersion()).path("oauth2")
                 .path("register")
                 .queryParam("redirect_url", "korap.ids-mannheim.de/redirect")
                 .header("Host", "korap.ids-mannheim.de")
                 .post(ClientResponse.class);
-        assert response.getStatus() == ClientResponse.Status.OK.getStatusCode();
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
 
     }
@@ -68,22 +74,24 @@ public class OAuth2EndpointTest extends FastJerseyTest {
     @Test
     @Ignore
     public void authenticate () {
-        String[] cred = TestHelper.getUserCredentials();
-        String enc = BasicHttpAuth.encode(cred[0], cred[1]);
-        ClientResponse response = resource().path("v0.1").path("oauth2")
+        Map<String, Object> cred = TestHelper.getUserCredentials();
+        String enc = BasicHttpAuth.encode((String) cred.get(Attributes.USERNAME), (String) cred.get(Attributes.PASSWORD));
+        ClientResponse response = resource().path(getAPIVersion()).path("oauth2")
                 .path("register")
                 .queryParam("redirect_url", "korap.ids-mannheim.de/redirect")
                 .header("Host", "korap.ids-mannheim.de")
                 .header(Attributes.AUTHORIZATION, enc)
                 .post(ClientResponse.class);
-        assert response.getStatus() == ClientResponse.Status.OK.getStatusCode();
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+
         String e = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(e);
 
         String cl_s = node.path("client_secret").asText();
         String cl_id = node.path("client_id").asText();
 
-        response = resource().path("v0.1").path("oauth2").path("authorize")
+        response = resource().path(getAPIVersion()).path("oauth2").path("authorize")
                 .queryParam("client_id", cl_id)
                 .queryParam("client_secret", cl_s)
                 .queryParam("response_type", "code")
@@ -93,16 +101,19 @@ public class OAuth2EndpointTest extends FastJerseyTest {
                 .post(ClientResponse.class);
 
         e = response.getEntity(String.class);
-        assert response.getStatus() == ClientResponse.Status.OK.getStatusCode();
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+
         node = JsonUtils.readTree(e);
 
-        response = resource().path("v0.1").path("oauth2").path("authorize")
+        response = resource().path(getAPIVersion()).path("oauth2").path("authorize")
                 .queryParam("code", node.path("authorization_code").asText())
                 .queryParam("grant_type", "authorization_code")
                 .queryParam("client_id", cl_id)
                 .queryParam("client_secret", cl_s).post(ClientResponse.class);
 
-        assert response.getStatus() == ClientResponse.Status.OK.getStatusCode();
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
     }
 
 }

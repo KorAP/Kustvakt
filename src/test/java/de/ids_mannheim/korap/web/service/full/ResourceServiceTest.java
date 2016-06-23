@@ -2,7 +2,6 @@ package de.ids_mannheim.korap.web.service.full;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jmx.snmp.SnmpOidTable;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;

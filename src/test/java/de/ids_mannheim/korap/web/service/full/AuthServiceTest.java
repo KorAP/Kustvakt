@@ -31,6 +31,10 @@ public class AuthServiceTest extends FastJerseyTest {
     public void testBasicHttp () {
         User user = helper().getUser();
 
+    }
+
+    @Test
+    public void testBlockingFilterFail() {
 
     }
 

@@ -9,11 +9,11 @@ import de.ids_mannheim.korap.handlers.OAuth2Handler;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.user.TokenContext;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author hanl
@@ -37,6 +37,7 @@ public class OAuth2HandlerTest extends BeanConfigTest {
         OAuth2Handler handler = new OAuth2Handler(helper().getContext()
                 .getPersistenceClient());
         handler.authorize(codeInfo, helper().getUser());
+        assertTrue("couldn't find entry in cache", handler.hasCacheEntry(codeInfo.getCode()));
         codeInfo = handler.getAuthorization(auth_code);
         assertNotNull("client is null!", codeInfo);
     }
@@ -56,7 +57,7 @@ public class OAuth2HandlerTest extends BeanConfigTest {
         String refresh = helper().getContext().getEncryption().createToken();
         handler.addToken(codeInfo.getCode(), t, refresh, 7200);
 
-        TokenContext ctx = handler.getContext(t);
+        TokenContext ctx = handler.getPersistenceHandler().getContext(t);
         assertNotNull("context is null", ctx);
 
         AuthCodeInfo c2 = handler.getAuthorization(codeInfo.getCode());
@@ -116,6 +117,6 @@ public class OAuth2HandlerTest extends BeanConfigTest {
         info.setRedirect_uri("testwebsite/login");
         PersistenceClient cl = helper().getBean(ContextHolder.KUSTVAKT_DB);
         OAuth2Handler handler = new OAuth2Handler(cl);
-        handler.registerClient(info, helper().getUser());
+        handler.getPersistenceHandler().registerClient(info, helper().getUser());
     }
 }

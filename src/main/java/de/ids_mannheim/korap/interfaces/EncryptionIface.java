@@ -10,6 +10,7 @@ import java.util.Map;
 public interface EncryptionIface {
 
     public enum Encryption {
+                @Deprecated
         SIMPLE, ESAPICYPHER, BCRYPT
     }
 
@@ -66,11 +67,13 @@ public interface EncryptionIface {
     public String encodeBase ();
 
 
-    public Map<String, Object> validateMap (Map<String, Object> map)
-            throws KustvaktException;
+   // @Deprecated
+    //public Map<String, Object> validateMap (Map<String, Object> map)
+    //        throws KustvaktException;
 
 
-    public String validateEntry (String input, String type)
-            throws KustvaktException;
+    //@Deprecated
+    //public String validateEntry (String input, String type)
+    //        throws KustvaktException;
 
 }

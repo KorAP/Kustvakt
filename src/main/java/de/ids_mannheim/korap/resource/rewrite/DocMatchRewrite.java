@@ -3,28 +3,22 @@ package de.ids_mannheim.korap.resource.rewrite;
 import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.config.*;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.handlers.DocumentDao;
 import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
 import de.ids_mannheim.korap.resources.Document;
 import de.ids_mannheim.korap.user.User;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 
 /**
  * @author hanl
  * @date 12/11/2015
  */
 //todo : test
-public class DocMatchRewrite implements RewriteTask.IterableRewritePath,
+public class DocMatchRewrite extends KustvaktCacheable implements RewriteTask.IterableRewritePath,
         BeanInjectable {
 
     private ResourceOperationIface<Document> docDao;
-    private Cache cache;
-
 
     public DocMatchRewrite () {
-        this.cache = CacheManager.getInstance().getCache("documents");
+        super("documents", "key:doc");
     }
 
 
@@ -44,14 +38,14 @@ public class DocMatchRewrite implements RewriteTask.IterableRewritePath,
 
         if (node.has(Attributes.TEXT_SIGLE)) {
             String textSigle = node.get(Attributes.TEXT_SIGLE);
-            Element e = this.cache.get(textSigle);
-            if (e == null) {
+            Object o = this.getCacheValue(textSigle);
+            if (o == null) {
                 doc = docDao.findbyId(textSigle, null);
                 if (doc != null)
-                    this.cache.put(new Element(textSigle, doc));
+                    this.storeInCache(textSigle, doc);
             }
             else
-                doc = (Document) e.getObjectValue();
+                doc = (Document) o;
 
             if (doc != null && doc.isDisabled())
                 node.removeNode(new KoralNode.RewriteIdentifier(

@@ -117,7 +117,6 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
             jlog.error(
                     "Could not update user account for user: " + user.getId(),
                     e);
-            //            throw new KorAPException(e, StatusCodes.CONNECTION_ERROR);
             throw new dbException(user.getId(), "korap_users",
                     StatusCodes.DB_UPDATE_FAILED, user.toString());
         }

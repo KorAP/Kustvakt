@@ -49,7 +49,7 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
             }
         }
         else
-            throw KustvaktResponseHandler.throwAuthenticationException();
+            throw KustvaktResponseHandler.throwAuthenticationException("");
         return cr;
     }
 

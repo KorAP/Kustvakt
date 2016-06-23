@@ -8,7 +8,11 @@ import de.ids_mannheim.korap.config.Attributes;
  */
 public class UserSettings extends Userdata {
 
-    public UserSettings (Integer userid) {
+    public UserSettings() {
+
+    }
+
+    public UserSettings(Integer userid) {
         super(userid);
     }
 

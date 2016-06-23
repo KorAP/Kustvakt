@@ -49,7 +49,7 @@ public class SessionAuthentication implements AuthenticationIface {
 
 
     @Override
-    public TokenContext getUserStatus (String authenticationToken)
+    public TokenContext getTokenContext(String authenticationToken)
             throws KustvaktException {
         jlog.debug("retrieving user session for user '{}'", authenticationToken);
         if (authenticationToken == null)
@@ -59,7 +59,7 @@ public class SessionAuthentication implements AuthenticationIface {
 
 
     @Override
-    public TokenContext createUserSession (User user, Map<String, Object> attr)
+    public TokenContext createTokenContext(User user, Map<String, Object> attr)
             throws KustvaktException {
         DateTime now = TimeUtils.getNow();
         DateTime ex = TimeUtils.getExpiration(now.getMillis(),

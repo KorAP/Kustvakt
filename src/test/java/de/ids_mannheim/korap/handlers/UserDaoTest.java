@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.handlers;
 
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.TestHelper;
@@ -27,7 +28,7 @@ public class UserDaoTest extends BeanConfigTest {
     @Test
     public void userput () throws KustvaktException {
         User user1 = helper().getContext().getUserDBHandler()
-                .getAccount(TestHelper.getUserCredentials()[0]);
+                .getAccount((String) TestHelper.getUserCredentials().get(Attributes.USERNAME));
         assertEquals("user creation failed", true, user1.getId() != -1);
     }
 
@@ -41,9 +42,9 @@ public class UserDaoTest extends BeanConfigTest {
     @Test
     public void userget () throws KustvaktException {
         User user1 = helper().getContext().getUserDBHandler()
-                .getAccount(TestHelper.getUserCredentials()[0]);
+                .getAccount((String) TestHelper.getUserCredentials().get(Attributes.USERNAME));
         assertEquals("User Retrieval does not work",
-                TestHelper.getUserCredentials()[0], user1.getUsername());
+                TestHelper.getUserCredentials().get(Attributes.USERNAME), user1.getUsername());
     }
 
 
@@ -85,7 +86,7 @@ public class UserDaoTest extends BeanConfigTest {
     @Ignore
     public void updateUsername () throws KustvaktException {
         User user1 = helper().getContext().getUserDBHandler()
-                .getAccount(TestHelper.getUserCredentials()[0]);
+                .getAccount((String) TestHelper.getUserCredentials().get(Attributes.USERNAME));
         user1.setUsername("new_user");
         helper().getContext().getUserDBHandler().updateAccount(user1);
         User u2 = helper().getContext().getUserDBHandler()
@@ -97,7 +98,8 @@ public class UserDaoTest extends BeanConfigTest {
     @Test
     public void userupdate () throws KustvaktException {
         EntityHandlerIface dao = helper().getContext().getUserDBHandler();
-        User user1 = dao.getAccount(TestHelper.getUserCredentials()[0]);
+        User user1 = dao.getAccount((String) TestHelper.getUserCredentials()
+                .get(Attributes.USERNAME));
         user1.setAccountLocked(true);
         dao.updateAccount(user1);
         assertEquals("not valid", true, dao.getAccount(user1.getUsername())

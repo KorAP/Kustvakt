@@ -42,6 +42,7 @@
            memoryStoreEvictionPolicy="LRU"
            maxEntriesLocalHeap="100"
            overflowToDisk='false'/>
+
     <cache name='resources'
            eternal='false'
            overflowToDisk='false'

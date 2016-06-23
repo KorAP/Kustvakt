@@ -1,2 +1,36 @@
-[{code=100, message=}
-]
+# generic non localized messages for API error codes
+
+# standard system errors #
+100 : "No Entry found!"
+101 : "The request could not be processed!"
+102 : "Entry exists already!"
+103 : "Status ok!"
+104 : "Unsupported Overation!"
+105 : "Illegal argument found. Request could not be processed!"
+106 : "Connection Error"
+107 : "No changes"
+108 : "Parameter Validation failed!"
+109 : ""
+110 : "Not supported!"
+
+
+# 200 codes for user account/ authenticaation services
+200 : "Account deactivated. Please verify account before using this API"
+201 : "Account confirmation failed. Please contact an adminstrator"
+202 : "Already logged in!"
+203 : ""
+204 : "Authentication credentials expired!"
+205 : "Bad credentials!"
+206 : ""
+207 : "Username already exists"
+208 : "Password reset failed"
+209 : ""
+210 : "Login successful!"
+211 : "Login failed!"
+212 : "Logout successful!"
+213 : "Logout failed!"
+214 : "Client registration failed!"
+215 : "Deleting client information failed!"
+216 : "Client could not be authorized!"
+
+

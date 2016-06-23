@@ -7,8 +7,12 @@ import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
 import org.eclipse.jetty.server.Response;
+import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author hanl
@@ -31,18 +35,19 @@ public class FilterTest extends FastJerseyTest {
                 .path("user/info")
                 .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode(
-                                TestHelper.getUserCredentials()[0],
-                                TestHelper.getUserCredentials()[1]))
+                                (String) TestHelper.getUserCredentials().get(Attributes.USERNAME),
+                                (String) TestHelper.getUserCredentials().get(Attributes.PASSWORD)))
                 .get(ClientResponse.class);
         assert resp.getStatus() == Response.SC_OK;
     }
 
 
     @Test
+    @Ignore
     public void testDemoAuth () {
         ClientResponse resp = resource().path(getAPIVersion())
                 .path("user/info").get(ClientResponse.class);
-        assert resp.getStatus() == Response.SC_OK;
+        assertEquals(ClientResponse.Status.OK.getStatusCode(), resp.getStatus());
     }
 
 
@@ -54,7 +59,7 @@ public class FilterTest extends FastJerseyTest {
                 .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
-        assert resp.getStatus() == Response.SC_UNAUTHORIZED;
+        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(), resp.getStatus());
     }
 
 

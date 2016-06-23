@@ -4,6 +4,7 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
+import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 import javax.ws.rs.ext.Provider;
@@ -20,12 +21,17 @@ public class BlockingFilter implements ContainerRequestFilter, ResourceFilter {
 
     @Override
     public ContainerRequest filter (ContainerRequest request) {
+        TokenContext context;
         try {
-            request.getUserPrincipal();
+            context = (TokenContext) request.getUserPrincipal();
         }
         catch (UnsupportedOperationException e) {
-            throw KustvaktResponseHandler.throwAuthenticationException();
+            throw KustvaktResponseHandler.throwAuthenticationException("");
         }
+
+        if(context == null)
+            throw KustvaktResponseHandler.throwAuthenticationException("");
+
         return request;
     }
 

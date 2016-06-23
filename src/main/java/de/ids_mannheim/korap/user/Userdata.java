@@ -2,7 +2,7 @@ package de.ids_mannheim.korap.user;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,12 +22,16 @@ public abstract class Userdata {
     @Setter(AccessLevel.PRIVATE)
     private Object data;
     @Getter
-    @Setter(AccessLevel.PRIVATE)
-    private Integer userID;
+    @Setter
+    private Integer userId;
 
 
-    public Userdata (Integer userid) {
-        this.userID = userid;
+    public Userdata () {
+        this(-1);
+    }
+
+    public Userdata(Integer userid) {
+        this.userId = userid;
         this.id = -1;
         this.data = DataFactory.getFactory().convertData(null);
     }
@@ -64,9 +68,9 @@ public abstract class Userdata {
 
 
     public void checkRequired () throws KustvaktException {
-        if (!isValid()) {
-            String[] fields = missing();
-            throw new KustvaktException(userID, StatusCodes.MISSING_ARGUMENTS,
+        String[] fields = missing();
+        if (missing().length != 0) {
+            throw new KustvaktException(userId, StatusCodes.MISSING_ARGUMENTS,
                     "User data object not valid. Object has missing fields!",
                     Arrays.asList(fields).toString());
         }
@@ -106,10 +110,9 @@ public abstract class Userdata {
         DataFactory.getFactory().addValue(this.data, key, value);
     }
 
-
-    // todo:
-    public void validate (EncryptionIface crypto) throws KustvaktException {
-        //this.fields = crypto.validateMap(this.fields);
+    // todo: test
+    public void validate (ValidatorIface validator) throws KustvaktException {
+        DataFactory.getFactory().validate(this.data, validator);
     }
 
 
