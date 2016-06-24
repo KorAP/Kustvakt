@@ -89,7 +89,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                     "token type not defined or found", "token_type");
 
         TokenContext context = provider.getTokenContext(token);
-        System.out.println("CONTEXT "+ context.toResponse());
         if (context != null && TimeUtils.isExpired(context.getExpirationTime()))
             throw new KustvaktException(StatusCodes.EXPIRED);
 

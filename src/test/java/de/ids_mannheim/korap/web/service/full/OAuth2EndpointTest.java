@@ -44,12 +44,13 @@ public class OAuth2EndpointTest extends FastJerseyTest {
         ClientResponse response = resource().path(getAPIVersion()).path("oauth2")
                 .path("register")
                 .queryParam("redirect_url", "korap.ids-mannheim.de/redirect")
+                .queryParam("application_name", "Kustvakt test")
                 .header("Host", "korap.ids-mannheim.de")
                 .header(Attributes.AUTHORIZATION, auth)
                 .post(ClientResponse.class);
 
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
-        System.out.println(node);
+
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
