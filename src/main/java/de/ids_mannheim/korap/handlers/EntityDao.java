@@ -204,7 +204,7 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
             jlog.error("Could not create user account with username: {}",
                     user.getUsername());
             throw new dbException(user.getUsername(), "korap_users",
-                    StatusCodes.NAME_EXISTS, user.getUsername());
+                    StatusCodes.ENTRY_EXISTS, user.getUsername());
         }
     }
 

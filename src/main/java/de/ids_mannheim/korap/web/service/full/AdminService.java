@@ -102,18 +102,15 @@ public class AdminService {
             @QueryParam("perm") List<String> permissions,
             @QueryParam("loc") String loc, @QueryParam("expire") String duration) {
 
-        KustvaktResource resource = ResourceFactory.getResource(type);
-        resource.setPersistentID(persistentid);
-        resource.setDescription(description);
-        resource.setName(name);
-
-        Permissions.Permission[] p = new Permissions.Permission[permissions
-                .size()];
-        for (int idx = 0; idx < permissions.size(); idx++)
-            p[idx] = Permissions.Permission.valueOf(permissions.get(idx)
-                    .toUpperCase());
-
         try {
+            KustvaktResource resource = ResourceFactory.getResource(type);
+            resource.setPersistentID(persistentid);
+            resource.setDescription(description);
+            resource.setName(name);
+
+            Permissions.Permission[] p = Permissions.read(permissions
+                    .toArray(new String[0]));
+
             PolicyBuilder cr = new PolicyBuilder(User.UserFactory.getAdmin())
                     .setConditions(new PolicyCondition(group)).setResources(
                             resource);

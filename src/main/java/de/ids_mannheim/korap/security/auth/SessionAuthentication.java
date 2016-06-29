@@ -52,8 +52,6 @@ public class SessionAuthentication implements AuthenticationIface {
     public TokenContext getTokenContext(String authenticationToken)
             throws KustvaktException {
         jlog.debug("retrieving user session for user '{}'", authenticationToken);
-        if (authenticationToken == null)
-            throw new KustvaktException(StatusCodes.PERMISSION_DENIED);
         return this.sessions.getSession(authenticationToken);
     }
 

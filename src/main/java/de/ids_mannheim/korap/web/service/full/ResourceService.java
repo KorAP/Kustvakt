@@ -27,12 +27,11 @@ import de.ids_mannheim.korap.web.SearchKrill;
 import de.ids_mannheim.korap.web.TRACE;
 import de.ids_mannheim.korap.web.filter.AuthFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
-import de.ids_mannheim.korap.web.filter.DefaultFilter;
+import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -43,8 +42,7 @@ import java.util.*;
  * @date 29/01/2014
  */
 @Path(KustvaktServer.API_VERSION + "/")
-@ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class,
-        BlockingFilter.class })
+@ResourceFilters({ AuthFilter.class, DemoUserFilter.class, PiwikFilter.class})
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ResourceService {
 
@@ -90,13 +88,13 @@ public class ResourceService {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         Set<KustvaktResource> resources = new HashSet<>();
         type = StringUtils.normalize(type);
-        Class cl_type = ResourceFactory.getResourceClass(type);
-        if (cl_type == null) {
-            throw KustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID,
-                    "Resource type not available!", "");
-        }
 
         try {
+            Class cl_type = ResourceFactory.getResourceClass(type);
+            if (cl_type == null)
+                throw KustvaktResponseHandler.throwit(StatusCodes.MISSING_ARGUMENT,
+                        "Resource type not available!", "");
+
             User user = controller.getUser(ctx.getUsername());
 
             resources = ResourceFinder.search(user,
@@ -137,28 +135,34 @@ public class ResourceService {
             @PathParam("id") String id) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         type = StringUtils.normalize(type);
-        Class cl_type = ResourceFactory.getResourceClass(type);
         KustvaktResource resource;
         try {
-            User user = controller.getUser(ctx.getUsername());
-            if (StringUtils.isInteger(id))
-                resource = resourceHandler.findbyIntId(Integer.valueOf(id),
-                        user);
-            else
-                resource = resourceHandler.findbyStrId(id, user,
-                        ResourceFactory.getResourceClass(type));
-        }
-        catch (KustvaktException e) {
-            if (e.getStatusCode() != StatusCodes.PERMISSION_DENIED)
-                throw KustvaktResponseHandler.throwit(e);
+            Class cl_type = ResourceFactory.getResourceClass(type);
 
-            try {
+            if (ctx.isDemo()) {
                 Set set = ResourceFinder.searchPublicFiltered(cl_type, id);
                 resource = (KustvaktResource) set.toArray()[0];
+            } else {
+                User user = controller.getUser(ctx.getUsername());
+                if (StringUtils.isInteger(id))
+                    resource = resourceHandler.findbyIntId(Integer.valueOf(id),
+                            user);
+                else
+                    resource = resourceHandler.findbyStrId(id, user,
+                            cl_type);
             }
-            catch (KustvaktException e1) {
-                throw KustvaktResponseHandler.throwit(e);
-            }
+        }
+        catch (KustvaktException e) {
+            //if (e.getStatusCode() != StatusCodes.ACCESS_DENIED)
+            throw KustvaktResponseHandler.throwit(e);
+
+            //try {
+            //    Set set = ResourceFinder.searchPublicFiltered(cl_type, id);
+             //   resource = (KustvaktResource) set.toArray()[0];
+            //}
+            //catch (KustvaktException e1) {
+            //    throw KustvaktResponseHandler.throwit(e);
+            //}
         }
         return Response.ok(JsonUtils.toJSON(resource.toMap())).build();
     }
@@ -378,29 +382,25 @@ public class ResourceService {
         String query = "";
         KustvaktResource resource;
         try {
-            User user = controller.getUser(ctx.getUsername());
 
-            if (StringUtils.isInteger(id))
-                resource = this.resourceHandler.findbyIntId(
-                        Integer.valueOf(id), user);
-            else
-                resource = this.resourceHandler.findbyStrId(id, user,
-                        ResourceFactory.getResourceClass(type));
-        }
-        //todo: instead of throwing exception, build notification and rewrites into result query
-        catch (KustvaktException e) {
-            if (e.getStatusCode() != StatusCodes.PERMISSION_DENIED) {
-                jlog.error("Exception encountered: {}", e.string());
-                throw KustvaktResponseHandler.throwit(e);
-            }
-            try {
+            if (ctx.isDemo()) {
                 Set set = ResourceFinder.searchPublicFiltered(
                         ResourceFactory.getResourceClass(type), id);
                 resource = (KustvaktResource) set.toArray()[0];
+            } else {
+                User user = controller.getUser(ctx.getUsername());
+                if (StringUtils.isInteger(id))
+                    resource = this.resourceHandler.findbyIntId(
+                            Integer.valueOf(id), user);
+                else
+                    resource = this.resourceHandler.findbyStrId(id, user,
+                            ResourceFactory.getResourceClass(type));
             }
-            catch (KustvaktException e1) {
-                throw KustvaktResponseHandler.throwit(e);
-            }
+        }
+        //todo: instead of throwing exception, build notification and rewrites into result query
+        catch (KustvaktException e) {
+            jlog.error("Exception encountered: {}", e.string());
+            throw KustvaktResponseHandler.throwit(e);
         }
 
         if (resource != null) {
@@ -639,7 +639,7 @@ public class ResourceService {
         String stats = searchKrill.getStatistics(builder.toJSON());
 
         if (stats.contains("-1"))
-            throw KustvaktResponseHandler.throwit(StatusCodes.EMPTY_RESULTS);
+            throw KustvaktResponseHandler.throwit(StatusCodes.NO_VALUE_FOUND);
 
         return Response.ok(stats).build();
     }
@@ -664,12 +664,13 @@ public class ResourceService {
         type = StringUtils.normalize(type);
         id = StringUtils.decodeHTML(id);
 
-        Class sl = ResourceFactory.getResourceClass(type);
-        if (!VirtualCollection.class.equals(sl) & !Corpus.class.equals(sl))
-            throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
-                    "Requested Resource type not supported", type);
 
         try {
+            Class sl = ResourceFactory.getResourceClass(type);
+            if (!VirtualCollection.class.equals(sl) & !Corpus.class.equals(sl))
+                throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+                        "Requested Resource type not supported", type);
+
             User user = controller.getUser(ctx.getUsername());
             KustvaktResource resource;
             if (StringUtils.isInteger(id))
@@ -796,15 +797,17 @@ public class ResourceService {
         reference = StringUtils.decodeHTML(reference);
         Map vals = new HashMap();
         User user;
+        Class ctype;
         try {
+            ctype = ResourceFactory
+                    .getResourceClass(type);
             user = controller.getUser(ctx.getUsername());
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
-        if (VirtualCollection.class.equals(ResourceFactory
-                .getResourceClass(type))) {
+        if (VirtualCollection.class.equals(ctype)) {
             VirtualCollection cachetmp, collection;
 
             JsonNode base;
@@ -885,16 +888,19 @@ public class ResourceService {
         reference = StringUtils.decodeHTML(reference);
         Map vals = new HashMap();
         User user;
+        Class ctype;
         try {
+            ctype = ResourceFactory
+                    .getResourceClass(type);
+
             user = controller.getUser(ctx.getUsername());
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
-        if (VirtualCollection.class.equals(ResourceFactory
-                .getResourceClass(type))) {
 
+        if (VirtualCollection.class.equals(ctype)) {
             VirtualCollection cachetmp, collection;
 
             KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
@@ -1031,12 +1037,12 @@ public class ResourceService {
                 }
                 catch (EmptyResultException e) {
                     throw KustvaktResponseHandler.throwit(
-                            StatusCodes.EMPTY_RESULTS, "Resource not found!",
+                            StatusCodes.NO_VALUE_FOUND, "Resource not found!",
                             id);
                 }
                 catch (NotAuthorizedException e) {
                     throw KustvaktResponseHandler.throwit(
-                            StatusCodes.PERMISSION_DENIED, "Permission denied",
+                            StatusCodes.ACCESS_DENIED, "Permission denied",
                             id);
                 }
 

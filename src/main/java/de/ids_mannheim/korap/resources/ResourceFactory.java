@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.resources;
 
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.ArrayList;
@@ -48,7 +50,7 @@ public class ResourceFactory {
     }
 
 
-    public static KustvaktResource getResource (String type) {
+    public static KustvaktResource getResource (String type) throws KustvaktException {
         return getResource(getResourceClass(type));
     }
 
@@ -71,7 +73,7 @@ public class ResourceFactory {
 
 
     public static <T extends KustvaktResource> Class<T> getResourceClass (
-            String type) {
+            String type) throws KustvaktException {
         for (Class value : subTypes) {
             if (value == VirtualCollection.class
                     && type.equalsIgnoreCase("collection"))
@@ -83,7 +85,8 @@ public class ResourceFactory {
                 return value;
             }
         }
-        return null;
+        // todo: throw exception in case of missing parameter!
+        throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT, "resource type could not be identified!");
     }
 
 

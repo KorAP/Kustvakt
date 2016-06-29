@@ -16,68 +16,37 @@ public class StatusCodes {
     /**
      * 100 status codes for standard system errors
      */
-    public static final int EMPTY_RESULTS = 100;
-    public static final int REQUEST_INVALID = 101;
-    //fixme: redundancy?!
+    public static final int DEFAULT_ERROR = 100;
+    public static final int NO_VALUE_FOUND = 101;
     public static final int ENTRY_EXISTS = 102;
-    public static final int STATUS_OK = 103;
-    public static final int UNSUPPORTED_OPERATION = 104;
-    public static final int ILLEGAL_ARGUMENT = 105;
+    public static final int UNSUPPORTED_OPERATION = 103;
+    public static final int ILLEGAL_ARGUMENT = 104;
+    public static final int MISSING_ARGUMENT = 105;
     public static final int CONNECTION_ERROR = 106;
-    public static final int NOTHING_CHANGED = 107;
-    public static final int PARAMETER_VALIDATION_ERROR = 108;
-    public static final int DEFAULT_ERROR = 109;
-    public static final int NOT_SUPPORTED = 110;
-
-    /**
-     * 200 status codes for account/authentication relevant components
-     */
-
-    public static final int ACCOUNT_DEACTIVATED = 200;
-    public static final int ACCOUNT_CONFIRMATION_FAILED = 201;
-    public static final int ALREADY_LOGGED_IN = 202;
-    public static final int EXPIRED = 204;
-    public static final int BAD_CREDENTIALS = 205;
-    @Deprecated // fixme: duplicate to account deactivated
-    public static final int UNCONFIRMED_ACCOUNT = 206;
-    public static final int NAME_EXISTS = 207;
-    public static final int PASSWORD_RESET_FAILED = 208;
-    // fixme: ?!
-    @Deprecated
-    public static final int AUTHENTICATION_DENIED = 209;
-
-    public static final int LOGIN_SUCCESSFUL = 210;
-    public static final int LOGIN_FAILED = 211;
-    public static final int LOGOUT_SUCCESSFUL = 212;
-    public static final int LOGOUT_FAILED = 213;
-
-    public static final int CLIENT_REGISTRATION_FAILURE = 214;
-    public static final int CLIENT_REMOVAL_FAILURE = 215;
-    public static final int CLIENT_AUTHORIZATION_FAILURE = 216;
-
+    public static final int PARAMETER_VALIDATION_ERROR = 107;
+    public static final int NOT_SUPPORTED = 108;
 
     /**
      *  400 status codes for authorization and rewrite functions
      */
 
     // fixme: use unsupported resource and include type in return message
-    public static final int PERMISSION_DENIED = 401;
+    public static final int POLICY_ERROR_DEFAULT = 400;
     public static final int UNSUPPORTED_RESOURCE = 402;
-    public static final int UNSUPPORTED_FOUNDRY = 403;
-    public static final int UNSUPPORTED_CORPUS = 404;
-    public static final int UNSUPPORTED_LAYER = 405;
+    public static final int FAILED_REWRITE = 403;
+    //public static final int UNSUPPORTED_FOUNDRY = 403;
+    //public static final int UNSUPPORTED_CORPUS = 404;
+    //public static final int UNSUPPORTED_LAYER = 405;
     // make a distinction between no and invalid vc?
-    public static final int UNSUPPORTED_COLLECTION = 406;
-    public static final int CORPUS_REWRITE = 407;
-    public static final int FOUNDRY_REWRITE = 408;
-    public static final int FOUNDRY_INJECTION = 409;
-    public static final int MISSING_ARGUMENTS = 410;
-    public static final int MISSING_VIRTUALCOLLECTION = 411;
-    public static final int MISSING_POLICY_TARGET = 412;
-    public static final int MISSING_POLICY_CONDITIONS = 413;
-    public static final int MISSING_POLICY_PERMISSION = 414;
-    public static final int RESOURCE_NOT_FOUND = 415;
-    public static final int ACCESS_DENIED_NO_RESOURCES = 416;
+    //public static final int UNSUPPORTED_COLLECTION = 406;
+    //public static final int CORPUS_REWRITE = 407;
+    //public static final int FOUNDRY_REWRITE = 408;
+    //public static final int FOUNDRY_INJECTION = 409;
+    public static final int MISSING_RESOURCE = 405;
+    public static final int NO_POLICY_TARGET = 406;
+    public static final int NO_POLICY_CONDITION = 407;
+    public static final int NO_POLICY_PERMISSION = 408;
+    public static final int NO_POLICIES = 409;
 
 
     /**
@@ -86,20 +55,62 @@ public class StatusCodes {
      */
     // todo: extend according to policy rewrite possible!
     // policy errors
-    public static final int POLICY_ERROR_DEFAULT = 500;
-    public static final int POLICY_CREATE_ERROR = 501;
-    public static final int NO_POLICIES = 502;
+
 
     // database codes
-    public static final int DB_GET_FAILED = 601;
-    public static final int DB_INSERT_FAILED = 602;
-    public static final int DB_DELETE_FAILED = 603;
-    public static final int DB_UPDATE_FAILED = 604;
+    public static final int DB_GET_FAILED = 500;
+    public static final int DB_INSERT_FAILED = 501;
+    public static final int DB_DELETE_FAILED = 502;
+    public static final int DB_UPDATE_FAILED = 503;
 
-    public static final int DB_GET_SUCCESSFUL = 605;
-    public static final int DB_INSERT_SUCCESSFUL = 606;
-    public static final int DB_DELETE_SUCCESSFUL = 607;
-    public static final int DB_UPDATE_SUCCESSFUL = 608;
+    public static final int DB_GET_SUCCESSFUL = 504;
+    public static final int DB_INSERT_SUCCESSFUL = 505;
+    public static final int DB_DELETE_SUCCESSFUL = 506;
+    public static final int DB_UPDATE_SUCCESSFUL = 507;
+
+
+    public static final int ARGUMENT_VALIDATION_FAILURE = 700;
+    // public static final int ARGUMENT_VALIDATION_FAILURE = 701;
+
+
+    /**
+     * 300 status codes for query language and serialization
+     */
+
+    public static final int NO_QUERY = 301;
+
+
+
+    public static final int STATUS_OK = 1000;
+    public static final int NOTHING_CHANGED = 1001;
+    public static final int REQUEST_INVALID = 1002;
+    public static final int ACCESS_DENIED = 1003;
+
+    /**
+     * 2000 status and error codes for service level messages and callbacks
+     */
+
+
+    public static final int ACCOUNT_DEACTIVATED = 2000;
+    public static final int ACCOUNT_CONFIRMATION_FAILED = 2001;
+    public static final int ALREADY_LOGGED_IN = 2002;
+
+    public static final int EXPIRED = 2003;
+    public static final int BAD_CREDENTIALS = 2004;
+    public static final int ACCOUNT_NOT_CONFIRMED = 2005;
+
+    public static final int PASSWORD_RESET_FAILED = 2006;
+
+    public static final int LOGIN_SUCCESSFUL = 2007;
+    public static final int LOGIN_FAILED = 2008;
+    public static final int LOGOUT_SUCCESSFUL = 2009;
+    public static final int LOGOUT_FAILED = 2010;
+
+    public static final int CLIENT_REGISTRATION_FAILURE = 2011;
+    public static final int CLIENT_REMOVAL_FAILURE = 2012;
+    public static final int CLIENT_AUTHORIZATION_FAILURE = 2013;
+
+
 
     // service status codes
     public static final int CREATE_ACCOUNT_SUCCESSFUL = 700;
@@ -112,16 +123,24 @@ public class StatusCodes {
     public static final int GET_ACCOUNT_SUCCESSFUL = 706;
     public static final int GET_ACCOUNT_FAILED = 707;
 
-    /**
-     * 300 status codes for query language and serialization
-     */
 
-    public static final int NO_QUERY = 301;
+    private static StatusCodes codes;
 
-
+    private final Properties props;
 
     private StatusCodes() {
+        this.props = ConfigLoader.loadProperties("codes.info");
+    }
 
+
+    public static final String getMessage(int code) {
+        return getCodes().props.getProperty(String.valueOf(code));
+    }
+
+    public static StatusCodes getCodes() {
+            if (codes == null)
+                codes = new StatusCodes();
+        return codes;
     }
 
 }

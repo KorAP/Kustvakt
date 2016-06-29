@@ -1,36 +1,93 @@
-# generic non localized messages for API error codes
+# generic non localized messages for API error and message codes
+# below 500 generic status codes for low level function
+# 501 - 999 specific section codes for database, validation, 
+# upper 1000 service messages as feedback for user (partially masking low level codes) with optional descriptin of low level error
 
-# standard system errors #
-100 : "No Entry found!"
-101 : "The request could not be processed!"
+
+# standard system errors
+100 : "Default Kustvakt failure!"
+101 : "No Entry found!"
 102 : "Entry exists already!"
-103 : "Status ok!"
-104 : "Unsupported Overation!"
-105 : "Illegal argument found. Request could not be processed!"
-106 : "Connection Error"
-107 : "No changes"
-108 : "Parameter Validation failed!"
-109 : ""
-110 : "Not supported!"
+103 : "Unsupported operation!"
+104 : "Illegal argument found. Request could not be processed!"
+105 : "Missing argument!"
+106 : "Connection Error!"
+107 : "Missing arguments!"
+108 : "Function Not supported!"
 
 
-# 200 codes for user account/ authenticaation services
-200 : "Account deactivated. Please verify account before using this API"
-201 : "Account confirmation failed. Please contact an adminstrator"
-202 : "Already logged in!"
-203 : ""
-204 : "Authentication credentials expired!"
-205 : "Bad credentials!"
-206 : ""
-207 : "Username already exists"
-208 : "Password reset failed"
-209 : ""
-210 : "Login successful!"
-211 : "Login failed!"
-212 : "Logout successful!"
-213 : "Logout failed!"
-214 : "Client registration failed!"
-215 : "Deleting client information failed!"
-216 : "Client could not be authorized!"
+# 400 codes for authorization and rewrite functions
 
+400 : "Policy failure!"
+# permission denied is a service code, here it should be more 
+# specific about the nature of the error/message
+401 : ""
+402 : "Unsupported resource"
+403 : "Failed rewrite!"
+404 : ""
+405 : "Resource could not be found" --> missing resource
+406 : "No target for resource policy!"
+407 : "No condition for resource policy!"
+408 : "No permission for resource policy!"
+409 : "No policies for resource!"
+
+# 500 database errors
+
+500 : ""
+501 : "Database retrieval failure!"
+502 : "Database insert failure!"
+503 : "Database delete failure!"
+504 : "Database update failure!"
+505 : ""
+506 : ""
+507 : ""
+508 : ""
+509 : ""
+510 : ""
+511 : ""
+512 : ""
+513 : ""
+
+# validation messages
+
+600 : ""
+601 : ""
+602 : ""
+603 : ""
+604 : ""
+605 : ""
+
+
+
+# 1000 service status message codes for logging
+
+1000 : "Status Ok!"
+1001 : "Nothing changed!"
+1002 : "Request could not be processed!"
+1003 : "Access denied!"
+1004 : ""
+1005 : ""
+1006 : ""
+1007 : ""
+1008 : ""
+1009 : ""
+1010 : ""
+
+
+# 2000 codes for REST API services
+2000 : "Account deactivated. Please verify account before using this API"
+2001 : "Account confirmation failed. Please contact an adminstrator"
+2002 : "Already logged in!"
+2003 : "Authentication credentials expired!"
+2004 : "Bad credentials!"
+2005 : ""
+2006 : "Password reset failed"
+
+2007 : "Login successful!"
+2008 : "Login failed!"
+2009 : "Logout successful!"
+2010 : "Logout failed!"
+2011 : "Client registration failed!"
+2012 : "Deleting client information failed!"
+2013 : "Client could not be authorized!"
 

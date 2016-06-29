@@ -69,7 +69,7 @@ public class ResourceHandler extends KustvaktCacheable {
             p = SecurityManager.findbyId(id, user);
         }
         catch (EmptyResultException e) {
-            throw new NotAuthorizedException(StatusCodes.EMPTY_RESULTS,
+            throw new NotAuthorizedException(StatusCodes.NO_VALUE_FOUND,
                     String.valueOf(id));
         }
         return p.getResource();
@@ -87,20 +87,15 @@ public class ResourceHandler extends KustvaktCacheable {
     public <T extends KustvaktResource> T findbyStrId (String persistent_id,
             User user, Class<T> type) throws KustvaktException,
             NotAuthorizedException {
-        //T cache = (T) getCache(persistent_id, type);
-        //if (cache != null)
-        //    return cache;
-        //else {
         SecurityManager<T> p;
         try {
             p = SecurityManager.findbyId(persistent_id, user, type);
         }
         catch (EmptyResultException e) {
-            throw new NotAuthorizedException(StatusCodes.EMPTY_RESULTS,
+            throw new NotAuthorizedException(StatusCodes.NO_VALUE_FOUND,
                     persistent_id);
         }
         return p.getResource();
-        //}
     }
 
 

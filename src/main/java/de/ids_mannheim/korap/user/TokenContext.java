@@ -135,11 +135,12 @@ public class TokenContext implements java.security.Principal, Serializable {
     }
 
 
+    @Deprecated
     public String toJSON () {
         return JsonUtils.toJSON(this.statusMap());
     }
 
-
+    @Deprecated
     public String toResponse () {
         ObjectNode node = JsonUtils.createObjectNode();
         node.put("token", this.getToken());
@@ -147,6 +148,12 @@ public class TokenContext implements java.security.Principal, Serializable {
         node.put("token_type", this.getTokenType());
         return JsonUtils.toJSON(node);
     }
+
+
+    public boolean isDemo() {
+        return User.UserFactory.isDemo(this.username);
+    }
+
 
 
     @Override

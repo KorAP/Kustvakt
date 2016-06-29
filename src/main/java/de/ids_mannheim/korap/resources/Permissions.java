@@ -30,6 +30,14 @@ public class Permissions {
         }
     }
 
+
+    public static Permission[] read(String ... strings) {
+        Permission[] p = new Permission[strings.length];
+        for (int i = 0; i<strings.length; i++)
+            p[i] = Permission.valueOf(strings[i]);
+        return p;
+    }
+
     private static final byte READ = 1;
     private static final byte WRITE = 2;
     private static final byte DELETE = 4;

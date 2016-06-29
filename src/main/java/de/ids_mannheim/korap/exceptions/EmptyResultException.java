@@ -9,12 +9,12 @@ package de.ids_mannheim.korap.exceptions;
 public class EmptyResultException extends KustvaktException {
 
     public EmptyResultException (String message, String entity) {
-        super(StatusCodes.EMPTY_RESULTS, message, entity);
+        super(StatusCodes.NO_VALUE_FOUND, message, entity);
     }
 
 
     public EmptyResultException (String entity) {
-        super(StatusCodes.EMPTY_RESULTS, "No entity found for id", entity);
+        super(StatusCodes.NO_VALUE_FOUND, "No entity found for id", entity);
     }
 
 }

@@ -14,7 +14,7 @@ import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.web.KustvaktServer;
 import de.ids_mannheim.korap.web.filter.AuthFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
-import de.ids_mannheim.korap.web.filter.DefaultFilter;
+import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
@@ -118,7 +118,7 @@ public class OAuthService {
 
     @GET
     @Path("info")
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class })
+    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class, PiwikFilter.class })
     public Response getStatus (@Context SecurityContext context,
             @QueryParam("scope") String scopes) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();

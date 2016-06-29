@@ -41,9 +41,10 @@ public class PublicCollection implements RewriteTask.RewriteQuery {
             Set resources = ResourceFinder.search(user, Corpus.class);
             ArrayList<KustvaktResource> list = new ArrayList(resources);
 
+            // fixme: throw exception in resourcefinder to indicate if no resource or no permission!
             if (list.isEmpty())
                 throw new KustvaktException(
-                        StatusCodes.ACCESS_DENIED_NO_RESOURCES,
+                        StatusCodes.NO_POLICY_PERMISSION,
                         "Resources could not be loaded for user ",
                         user.getUsername());
 

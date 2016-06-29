@@ -13,9 +13,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.ServiceInfo;
 import de.ids_mannheim.korap.web.KustvaktServer;
-import de.ids_mannheim.korap.web.filter.AuthFilter;
-import de.ids_mannheim.korap.web.filter.DefaultFilter;
-import de.ids_mannheim.korap.web.filter.PiwikFilter;
+import de.ids_mannheim.korap.web.filter.*;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.slf4j.Logger;
 
@@ -79,7 +77,7 @@ public class AuthService {
     // fixme: moved to user
     @GET
     @Path("status")
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class })
+    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class, BlockingFilter.class })
     public Response getStatus (@Context SecurityContext context,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
@@ -91,6 +89,7 @@ public class AuthService {
 
     @GET
     @Path("apiToken")
+    @ResourceFilters({HeaderFilter.class})
     public Response requestAPIToken (@Context HttpHeaders headers,
             @Context Locale locale,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
@@ -100,15 +99,16 @@ public class AuthService {
         List<String> auth = headers
                 .getRequestHeader(ContainerRequest.AUTHORIZATION);
 
-        if (auth == null)
-            throw KustvaktResponseHandler
-                    .throwit(StatusCodes.PERMISSION_DENIED);
+
+       // if (auth == null)
+        //    throw KustvaktResponseHandler
+        //            .throwit(StatusCodes.ACCESS_DENIED);
         String[] values = BasicHttpAuth.decode(auth.get(0));
 
         // "Invalid syntax for username and password"
         if (values == null)
             throw KustvaktResponseHandler
-                    .throwit(StatusCodes.PERMISSION_DENIED);
+                    .throwit(StatusCodes.ACCESS_DENIED);
 
         if (values[0].equalsIgnoreCase("null")
                 | values[1].equalsIgnoreCase("null"))
@@ -169,7 +169,7 @@ public class AuthService {
 
         if (auth == null)
             throw KustvaktResponseHandler
-                    .throwit(StatusCodes.PERMISSION_DENIED);
+                    .throwit(StatusCodes.ACCESS_DENIED);
 
         String[] values = BasicHttpAuth.decode(auth.get(0));
         //        authentication = StringUtils.stripTokenType(authentication);
@@ -180,7 +180,7 @@ public class AuthService {
         // "Invalid syntax for username and password"
         if (values == null)
             throw KustvaktResponseHandler
-                    .throwit(StatusCodes.PERMISSION_DENIED);
+                    .throwit(StatusCodes.BAD_CREDENTIALS);
 
         if (values[0].equalsIgnoreCase("null")
                 | values[1].equalsIgnoreCase("null"))
@@ -238,7 +238,7 @@ public class AuthService {
     //fixme: moved from userservice
     @GET
     @Path("logout")
-    @ResourceFilters({ AuthFilter.class, DefaultFilter.class, PiwikFilter.class })
+    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class, PiwikFilter.class })
     public Response logout (@Context SecurityContext ctx, @Context Locale locale) {
         TokenContext context = (TokenContext) ctx.getUserPrincipal();
         try {

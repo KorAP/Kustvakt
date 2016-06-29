@@ -66,15 +66,15 @@ public class PolicyDao implements PolicyHandlerIface {
 
         if (policy.getTarget() == null)
             throw new dbException(user.getId(), "policy_store",
-                    StatusCodes.MISSING_POLICY_TARGET, policy.toString());
+                    StatusCodes.NO_POLICY_TARGET, policy.toString());
 
         if (policy.getConditions().isEmpty())
             throw new dbException(user.getId(), "policy_store",
-                    StatusCodes.MISSING_POLICY_CONDITIONS);
+                    StatusCodes.NO_POLICY_CONDITION);
 
         if (policy.getPermissionByte() == 0)
             throw new dbException(user.getId(), "policy_store",
-                    StatusCodes.MISSING_POLICY_PERMISSION);
+                    StatusCodes.NO_POLICY_PERMISSION);
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource np = new MapSqlParameterSource();

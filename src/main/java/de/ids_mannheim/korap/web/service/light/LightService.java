@@ -284,7 +284,7 @@ public class LightService {
         // todo: policy override in extension!
         String stats = searchKrill.getStatistics(builder.toJSON());
         if (stats.contains("-1"))
-            throw KustvaktResponseHandler.throwit(StatusCodes.EMPTY_RESULTS);
+            throw KustvaktResponseHandler.throwit(StatusCodes.NO_VALUE_FOUND);
 
         return Response.ok(stats).build();
     }

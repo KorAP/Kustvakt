@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.security.ac;
 
 import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.BeansFactory;
+import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
@@ -117,6 +118,9 @@ public class ResourceFinder {
                 sets.add(r);
             }
         }
+
+        if (sets.isEmpty())
+            throw new EmptyResultException(Arrays.asList(ids).toString());
         return sets;
     }
 
@@ -145,6 +149,7 @@ public class ResourceFinder {
     }
 
 
+    // fixme: only return field --> extra git repo!
     public <T extends KustvaktResource> Set<T> getResources () {
         return evaluateResources();
     }

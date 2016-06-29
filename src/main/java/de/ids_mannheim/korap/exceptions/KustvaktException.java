@@ -47,6 +47,14 @@ public class KustvaktException extends Exception {
         this.userid = String.valueOf(userid);
     }
 
+    public KustvaktException (Object userid, int status,
+                              String entity) {
+        super(StatusCodes.getMessage(status));
+        this.statusCode = status;
+        this.entity = entity;
+        this.userid = String.valueOf(userid);
+    }
+
 
     public KustvaktException (int status, String message, String entity) {
         super(message);

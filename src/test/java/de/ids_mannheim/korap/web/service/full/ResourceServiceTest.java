@@ -4,8 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
+import de.ids_mannheim.korap.resources.Corpus;
+import de.ids_mannheim.korap.resources.KustvaktResource;
+import de.ids_mannheim.korap.security.ac.ResourceHandler;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
 import org.junit.BeforeClass;
@@ -13,6 +17,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -240,6 +245,7 @@ public class ResourceServiceTest extends FastJerseyTest {
 
     // todo:
     @Test
+    @Ignore
     public void testCollecionGet () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("collection").path("id").get(ClientResponse.class);
@@ -249,7 +255,6 @@ public class ResourceServiceTest extends FastJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.size());
-
     }
 
 
@@ -257,9 +262,10 @@ public class ResourceServiceTest extends FastJerseyTest {
     public void testCorpusGet () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus").path("WPD").get(ClientResponse.class);
+        String ent = response.getEntity(String.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertTrue(node.isObject());
@@ -299,10 +305,11 @@ public class ResourceServiceTest extends FastJerseyTest {
     @Test
     public void testFoundryGet () {
         ClientResponse response = resource().path(getAPIVersion())
-                .path("foundry").path("id").get(ClientResponse.class);
+                .path("foundry").path("tt").get(ClientResponse.class);
+        String ent = response.getEntity(String.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.size());
@@ -327,9 +334,12 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .path("corpus/WPD/search").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp").queryParam("context", "base/s:s")
                 .method("TRACE", ClientResponse.class);
+        String ent = response.getEntity(String.class);
+        System.out.println(" entity "+ ent);
+        System.out.println(response);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        //String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("corpusSigle", node.at("/collection/key").asText());

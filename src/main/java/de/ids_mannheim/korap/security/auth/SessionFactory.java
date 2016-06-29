@@ -63,16 +63,15 @@ public class SessionFactory implements Runnable {
         jlog.debug("logged in users: {}", loggedInRecord);
         TokenContext context = sessionsObject.get(token);
         if (context != null) {
+            // fixme: set context to respecitve expiratin interval and return context. handler checks expiration later!
             if (isUserSessionValid(token)) {
                 resetInterval(token);
-                return context;
             }
             else
                 throw new KustvaktException(StatusCodes.EXPIRED);
 
         }
-        else
-            throw new KustvaktException(StatusCodes.PERMISSION_DENIED);
+         return context;
     }
 
 

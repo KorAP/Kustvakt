@@ -78,6 +78,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
     @Override
     public TokenContext getTokenStatus (String token, String host,
             String useragent) throws KustvaktException {
+        if (token == null)
+            throw new KustvaktException(StatusCodes.MISSING_ARGUMENT, "authorization header");
+
         jlog.info("getting session status of token type '{}'",
                 token.split(" ")[0]);
         AuthenticationIface provider = getProvider(
@@ -91,6 +94,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         TokenContext context = provider.getTokenContext(token);
         if (context != null && TimeUtils.isExpired(context.getExpirationTime()))
             throw new KustvaktException(StatusCodes.EXPIRED);
+        else if (context == null)
+            throw new KustvaktException(StatusCodes.NO_VALUE_FOUND);
 
         //        if (!matchStatus(host, useragent, context))
         //            provider.removeUserSession(token);
@@ -284,12 +289,12 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                         deleteAccount(user);
                         throw new WrappedException(new KustvaktException(
                                 unknown.getId(), StatusCodes.EXPIRED,
-                                "account confirmation uri has expired",
+                                "account confirmation uri has expired!",
                                 param.getUriFragment()),
                                 StatusCodes.LOGIN_FAILED, username);
                     }
                     throw new WrappedException(new KustvaktException(
-                            unknown.getId(), StatusCodes.UNCONFIRMED_ACCOUNT),
+                            unknown.getId(), StatusCodes.ACCOUNT_NOT_CONFIRMED),
                             StatusCodes.LOGIN_FAILED, username);
                 }
                 jlog.error("ACCESS DENIED: account not active for '{}'",
@@ -756,7 +761,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
             if (data == null)
                 throw new KustvaktException(user.getId(),
-                        StatusCodes.EMPTY_RESULTS, "No data found!",
+                        StatusCodes.NO_VALUE_FOUND, "No data found!",
                         clazz.getSimpleName());
             return data;
         }

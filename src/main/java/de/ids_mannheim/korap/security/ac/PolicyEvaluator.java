@@ -19,6 +19,7 @@ import java.util.Map;
 /**
  * Created by hanl on 5/22/14.
  */
+@Deprecated
 public class PolicyEvaluator {
 
     private static final Logger jlog = LoggerFactory
@@ -91,11 +92,11 @@ public class PolicyEvaluator {
                         idx++;
                     }
                 }
-                // fixme: what is that?
+                // checks that there are valid policies on higher level resources, so that user is
                 if (idx == 0) {
                     relationError = i;
                     throw new NotAuthorizedException(
-                            StatusCodes.PERMISSION_DENIED, this.getResourceID());
+                            StatusCodes.ACCESS_DENIED, this.getResourceID());
                 }
             }
             this.processed = true;

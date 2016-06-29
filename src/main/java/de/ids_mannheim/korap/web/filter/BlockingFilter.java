@@ -29,7 +29,7 @@ public class BlockingFilter implements ContainerRequestFilter, ResourceFilter {
             throw KustvaktResponseHandler.throwAuthenticationException("");
         }
 
-        if(context == null)
+        if(context == null || context.isDemo())
             throw KustvaktResponseHandler.throwAuthenticationException("");
 
         return request;

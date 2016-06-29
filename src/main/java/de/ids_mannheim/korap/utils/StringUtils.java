@@ -113,6 +113,7 @@ public class StringUtils {
     }
 
 
+    // todo: move to parameter utils
     public static boolean isInteger (String value) {
         try {
             Integer.valueOf(value);

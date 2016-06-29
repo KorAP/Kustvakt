@@ -44,9 +44,13 @@ public class ConfigLoader {
     }
 
 
-    public static Properties loadProperties (String name) throws IOException {
+    public static Properties loadProperties (String name){
         Properties p = new Properties();
-        p.load(loadConfigStream(name));
+        try {
+            p.load(loadConfigStream(name));
+        } catch (IOException e) {
+            throw new RuntimeException("Properties from config file '"+name+"' could not be loaded ...");
+        }
         return p;
     }
 
