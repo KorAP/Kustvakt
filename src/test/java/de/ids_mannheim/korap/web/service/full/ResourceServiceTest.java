@@ -335,8 +335,6 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .queryParam("ql", "poliqarp").queryParam("context", "base/s:s")
                 .method("TRACE", ClientResponse.class);
         String ent = response.getEntity(String.class);
-        System.out.println(" entity "+ ent);
-        System.out.println(response);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         //String ent = response.getEntity(String.class);
