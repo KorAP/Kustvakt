@@ -27,13 +27,13 @@ public abstract class AuthenticationManagerIface extends KustvaktCacheable {
 
     public void setProviders (Set<AuthenticationIface> providers) {
         for (AuthenticationIface i : providers)
-            this.providers.put(i.getIdentifier().toUpperCase(), i);
+            this.providers.put(i.getIdentifier().toLowerCase(), i);
     }
 
 
     protected AuthenticationIface getProvider (String key, String default_iface) {
         AuthenticationIface iface = this.providers.get(key != null ? key
-                .toUpperCase() : "NONE");
+                .toLowerCase() : "none");
         // todo: configurable authentication schema
         if (iface == null)
             iface = this.providers.get(default_iface);

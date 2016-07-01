@@ -41,7 +41,6 @@ public class OpenIDconnectAuthentication implements AuthenticationIface {
     @Override
     public TokenContext getTokenContext(String authToken)
             throws KustvaktException {
-        authToken = StringUtils.stripTokenType(authToken);
         return this.database.getContext(authToken);
     }
 

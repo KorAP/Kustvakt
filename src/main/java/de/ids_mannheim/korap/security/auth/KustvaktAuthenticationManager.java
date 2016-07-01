@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.security.auth;
 
+import com.sun.org.apache.xpath.internal.SourceTree;
 import de.ids_mannheim.korap.auditing.AuditRecord;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeansFactory;
@@ -81,10 +82,12 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         if (token == null)
             throw new KustvaktException(StatusCodes.MISSING_ARGUMENT, "authorization header");
 
+        String token_type = StringUtils.getTokenType(token);
+        token = StringUtils.stripTokenType(token);
         jlog.info("getting session status of token type '{}'",
                 token.split(" ")[0]);
         AuthenticationIface provider = getProvider(
-                StringUtils.getTokenType(token), null);
+                token_type, null);
 
         if (provider == null)
             // throw exception for missing type parameter
@@ -529,7 +532,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         user.setAccountLocked(confirmation_required);
         if (confirmation_required) {
             URIParam param = new URIParam(crypto.createToken(), TimeUtils
-                    .plusSeconds(config.getExpiration()).getMillis());
+                    .plusSeconds(config.getTokenTTL()).getMillis());
             user.addField(param);
         }
         user.setPassword(hash);

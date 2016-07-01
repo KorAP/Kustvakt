@@ -408,13 +408,13 @@ public class UserService {
 
 
     @DELETE
-    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class,
+    @ResourceFilters({ AuthFilter.class,
             PiwikFilter.class, BlockingFilter.class })
     public Response deleteUser (@Context SecurityContext context) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         try {
             User user = controller.getUser(ctx.getUsername());
-            if (User.UserFactory.isDemo(ctx.getUsername()))
+            if (ctx.isDemo())
                 return Response.notModified().build();
             controller.deleteAccount(user);
         }

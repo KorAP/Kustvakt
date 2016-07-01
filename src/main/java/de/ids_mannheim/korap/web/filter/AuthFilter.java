@@ -43,7 +43,7 @@ public class AuthFilter implements ContainerRequestFilter, ResourceFilter {
                         ua);
             }
             catch (KustvaktException e) {
-                throw KustvaktResponseHandler.throwAuthenticationException("");
+                throw KustvaktResponseHandler.throwAuthenticationException(authentication);
             }
             // fixme: give reason why access is not granted?
             if (context != null

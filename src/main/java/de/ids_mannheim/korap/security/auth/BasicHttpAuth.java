@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.security.auth;
 
+import com.sun.org.apache.xpath.internal.SourceTree;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.Scopes;
@@ -25,6 +26,7 @@ import java.util.Map;
  * @author hanl
  * @date 28/04/2015
  */
+// todo: bean injection!
 public class BasicHttpAuth implements AuthenticationIface {
 
     private KustvaktConfiguration config;
@@ -39,7 +41,28 @@ public class BasicHttpAuth implements AuthenticationIface {
 
 
     public static String[] decode (String token) {
-        return OAuthUtils.decodeClientAuthenticationHeader(token);
+        //return OAuthUtils.decodeClientAuthenticationHeader(token);
+        String[] tokens = token.split(" ");
+        String encodedCred = null;
+        if (!token.equals(tokens[0])) {
+            if (tokens[0] != null && !tokens[0].isEmpty()) {
+                if (!tokens[0].toLowerCase().equalsIgnoreCase("basic")) {
+                    return null;
+                }
+                encodedCred = tokens[1];
+            }
+        } else {
+            encodedCred = tokens[0];
+        }
+            if(encodedCred != null && !"".equals(encodedCred)) {
+                String decodedCreds = new String(Base64.decodeBase64(encodedCred));
+                if(decodedCreds.contains(":") && decodedCreds.split(":").length == 2) {
+                    String[] creds = decodedCreds.split(":");
+                    if ((creds[0] != null && !creds[0].isEmpty()) && (creds[1] != null && !creds[1].isEmpty()))
+                        return decodedCreds.split(":");
+                }
+            }
+        return null;
     }
 
 
@@ -53,7 +76,7 @@ public class BasicHttpAuth implements AuthenticationIface {
     @Override
     public TokenContext getTokenContext(String authToken)
             throws KustvaktException {
-        //fixme: handled via constructor
+        //fixme: handle via constructor
         this.config = BeansFactory.getKustvaktContext().getConfiguration();
         EncryptionIface crypto = BeansFactory.getKustvaktContext()
                 .getEncryption();
@@ -71,7 +94,7 @@ public class BasicHttpAuth implements AuthenticationIface {
                     return null;
             }
             c.setUsername(values[0]);
-            c.setExpirationTime(TimeUtils.plusSeconds(this.config.getExpiration()).getMillis());
+            c.setExpirationTime(TimeUtils.plusSeconds(this.config.getTokenTTL()).getMillis());
             c.setTokenType(Attributes.BASIC_AUTHENTICATION);
             // todo: for production mode, set true
             c.setSecureRequired(false);

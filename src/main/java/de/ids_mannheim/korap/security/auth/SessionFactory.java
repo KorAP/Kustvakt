@@ -13,6 +13,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -53,11 +54,12 @@ public class SessionFactory implements Runnable {
     public boolean hasSession (TokenContext context) {
         if (context.getUsername().equalsIgnoreCase(DemoUser.DEMOUSER_NAME))
             return false;
-        return loggedInRecord.containsKey(context.getUsername())
-                && !loggedInRecord.get(context.getUsername()).isEmpty();
+
+        List<String> value = loggedInRecord.get(context.getUsername());
+        return value != null && !value.isEmpty();
     }
 
-
+    // todo: remove this!
     @Cacheable("session")
     public TokenContext getSession (String token) throws KustvaktException {
         jlog.debug("logged in users: {}", loggedInRecord);

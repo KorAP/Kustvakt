@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class SessionAuthentication implements AuthenticationIface {
 
-    private static Logger jlog = LoggerFactory
+    private static final Logger jlog = LoggerFactory
             .getLogger(SessionAuthentication.class);
     private SessionFactory sessions;
     private ScheduledThreadPoolExecutor scheduled;
@@ -61,7 +61,7 @@ public class SessionAuthentication implements AuthenticationIface {
             throws KustvaktException {
         DateTime now = TimeUtils.getNow();
         DateTime ex = TimeUtils.getExpiration(now.getMillis(),
-                config.getExpiration());
+                config.getShortTokenTTL());
         String token = crypto.createToken(true, user.getUsername(),
                 now.getMillis());
         TokenContext ctx = new TokenContext();

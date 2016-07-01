@@ -10,9 +10,7 @@ import de.ids_mannheim.korap.interfaces.db.*;
 import de.ids_mannheim.korap.interfaces.defaults.KustvaktEncryption;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.security.ac.PolicyDao;
-import de.ids_mannheim.korap.security.auth.APIAuthentication;
-import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
-import de.ids_mannheim.korap.security.auth.KustvaktAuthenticationManager;
+import de.ids_mannheim.korap.security.auth.*;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.service.BootableBeanInterface;
@@ -475,6 +473,8 @@ public class TestHelper {
             Set<AuthenticationIface> pro = new HashSet<>();
             pro.add(new BasicHttpAuth());
             pro.add(new APIAuthentication(getConfig()));
+            pro.add(new SessionAuthentication(getConfig(), getCrypto()));
+            pro.add(new OpenIDconnectAuthentication(getConfig(), getDataSource()));
             manager.setProviders(pro);
             return manager;
         }

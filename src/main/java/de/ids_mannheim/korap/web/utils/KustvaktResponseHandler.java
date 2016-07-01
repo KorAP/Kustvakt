@@ -69,6 +69,7 @@ public class KustvaktResponseHandler {
     }
 
 
+    //todo:  if exception, make exception message and error code available if not masked!
     public static WebApplicationException throwAuthenticationException (String username) {
         return new WebApplicationException(Response
                 .status(Response.Status.UNAUTHORIZED)
@@ -77,6 +78,7 @@ public class KustvaktResponseHandler {
                 .entity(buildNotification(StatusCodes.BAD_CREDENTIALS,
                         "Unauthorized access", username)).build());
     }
+
 
 
     private static Response.Status getStatus (int code) {

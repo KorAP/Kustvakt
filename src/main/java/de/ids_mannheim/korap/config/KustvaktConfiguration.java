@@ -62,7 +62,6 @@ public class KustvaktConfiguration {
     private int loginAttemptTTL;
     private long loginAttemptNum;
     private boolean allowMultiLogIn;
-    private int expiration;
     private int loadFactor;
     @Deprecated
     private int validationStringLength;
@@ -124,8 +123,6 @@ public class KustvaktConfiguration {
                 "opennlp");
 
         // security configuration
-        expiration = TimeUtils.convertTimeToSeconds(properties.getProperty(
-                "security.absoluteTimeoutDuration", "25M"));
         inactiveTime = TimeUtils.convertTimeToSeconds(properties.getProperty(
                 "security.idleTimeoutDuration", "10M"));
         allowMultiLogIn = Boolean.valueOf(properties

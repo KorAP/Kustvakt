@@ -43,7 +43,6 @@ public class APIAuthentication implements AuthenticationIface {
         TokenContext context;
         //Element ein = invalided.get(authToken);
             try {
-                authToken = StringUtils.stripTokenType(authToken);
                 context = signedToken.getTokenContext(authToken);
                 context.setTokenType(Attributes.API_AUTHENTICATION);
             }

@@ -31,11 +31,11 @@ public class JWTSigner {
     private final int defaultttl;
 
 
-    public JWTSigner (final byte[] secret, URL issuer, final int defaultttl) {
+    public JWTSigner (final byte[] secret, URL issuer, final int defaulttl) {
         this.issuer = issuer;
         this.signer = new MACSigner(secret);
         this.verifier = new MACVerifier(secret);
-        this.defaultttl = defaultttl;
+        this.defaultttl = defaulttl;
     }
 
 

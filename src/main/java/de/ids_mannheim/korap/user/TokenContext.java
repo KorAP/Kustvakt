@@ -54,8 +54,9 @@ public class TokenContext implements java.security.Principal, Serializable {
         if (username != null && !username.isEmpty())
             m.put(Attributes.USERNAME, username);
         m.put(Attributes.TOKEN_EXPIRATION,
-                new DateTime(expirationTime).toString());
+                TimeUtils.format(this.expirationTime));
         m.put(Attributes.TOKEN, this.token);
+        m.put(Attributes.TOKEN_TYPE, this.tokenType);
         return m;
     }
 
@@ -135,18 +136,8 @@ public class TokenContext implements java.security.Principal, Serializable {
     }
 
 
-    @Deprecated
-    public String toJSON () {
+    public String toJson() {
         return JsonUtils.toJSON(this.statusMap());
-    }
-
-    @Deprecated
-    public String toResponse () {
-        ObjectNode node = JsonUtils.createObjectNode();
-        node.put("token", this.getToken());
-        node.put("expires", TimeUtils.format(this.getExpirationTime()));
-        node.put("token_type", this.getTokenType());
-        return JsonUtils.toJSON(node);
     }
 
 

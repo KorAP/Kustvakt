@@ -83,7 +83,7 @@ public class AuthService {
             @HeaderParam(ContainerRequest.HOST) String host,
             @Context Locale locale) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        return Response.ok(ctx.toJSON()).build();
+        return Response.ok(ctx.toJson()).build();
     }
 
 
@@ -99,10 +99,6 @@ public class AuthService {
         List<String> auth = headers
                 .getRequestHeader(ContainerRequest.AUTHORIZATION);
 
-
-       // if (auth == null)
-        //    throw KustvaktResponseHandler
-        //            .throwit(StatusCodes.ACCESS_DENIED);
         String[] values = BasicHttpAuth.decode(auth.get(0));
 
         // "Invalid syntax for username and password"
@@ -134,7 +130,7 @@ public class AuthService {
             throw KustvaktResponseHandler.throwit(e);
         }
 
-        return Response.ok(context.toResponse()).build();
+        return Response.ok(context.toJson()).build();
     }
 
 
@@ -160,16 +156,13 @@ public class AuthService {
 
     @GET
     @Path("sessionToken")
+    @ResourceFilters({HeaderFilter.class})
     public Response requestSession (@Context HttpHeaders headers,
             @Context Locale locale,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host) {
         List<String> auth = headers
                 .getRequestHeader(ContainerRequest.AUTHORIZATION);
-
-        if (auth == null)
-            throw KustvaktResponseHandler
-                    .throwit(StatusCodes.ACCESS_DENIED);
 
         String[] values = BasicHttpAuth.decode(auth.get(0));
         //        authentication = StringUtils.stripTokenType(authentication);
@@ -198,7 +191,7 @@ public class AuthService {
         catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
-        return Response.ok().entity(context.toJSON()).build();
+        return Response.ok().entity(context.toJson()).build();
     }
 
 
@@ -231,7 +224,7 @@ public class AuthService {
         catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
-        return Response.ok().entity(context.toJSON()).build();
+        return Response.ok().entity(context.toJson()).build();
     }
 
 
