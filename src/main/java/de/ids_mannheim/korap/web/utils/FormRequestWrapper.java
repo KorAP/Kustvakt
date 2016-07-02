@@ -68,6 +68,8 @@ public class FormRequestWrapper extends HttpServletRequestWrapper {
      */
     public static Map<String, Object> toMap (
             MultivaluedMap<String, Object> form, boolean strict) {
+        if (form == null)
+            return null;
         HashMap<String, Object> map = new HashMap<>();
         for (String key : form.keySet()) {
             if (strict && form.get(key).size() > 1)

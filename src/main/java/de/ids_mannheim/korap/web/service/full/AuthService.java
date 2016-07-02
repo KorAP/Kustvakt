@@ -198,7 +198,7 @@ public class AuthService {
     // fixme: security issues: setup shibboleth compatible authentication system
     // todo: will be purged with token authentication --> shib is client side
     @POST
-    @Consumes("application/x-www-form-urlencoded")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces("application/json")
     @Path("shibboleth")
     public Response loginshib (@Context HttpHeaders headers,

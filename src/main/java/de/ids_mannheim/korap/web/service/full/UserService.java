@@ -55,24 +55,21 @@ public class UserService {
     // fixme: should also collect service exception, not just db exception!
     @POST
     @Path("register")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response signUp (
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
-            @Context Locale locale, MultivaluedMap form_values) {
-        Map<String, Object> wrapper = FormRequestWrapper.toMap(form_values,
-                true);
+            @Context Locale locale, Map values) {
 
-        wrapper.put(Attributes.HOST, host);
-        wrapper.put(Attributes.USER_AGENT, agent);
+        values.put(Attributes.HOST, host);
+        values.put(Attributes.USER_AGENT, agent);
         UriBuilder uriBuilder;
         User user;
         try {
             uriBuilder = info.getBaseUriBuilder();
             uriBuilder.path(KustvaktServer.API_VERSION).path("user")
                     .path("confirm");
-
-            user = controller.createUserAccount(wrapper, true);
+            user = controller.createUserAccount(values, true);
         }
         catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
@@ -83,7 +80,7 @@ public class UserService {
                     uri.getUriFragment()).queryParam(
                     Attributes.QUERY_PARAM_USER, user.getUsername());
             jlog.info("registration was successful for user '{}'",
-                    form_values.get(Attributes.USERNAME));
+                    values.get(Attributes.USERNAME));
             Map object = new HashMap();
             object.put("confirm_uri", uriBuilder.build());
             object.put("uri_expiration",
@@ -102,8 +99,8 @@ public class UserService {
     //todo: password update in special function? --> password reset only!
     @POST
     @Path("update")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class,
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ResourceFilters({ AuthFilter.class,
             PiwikFilter.class, BlockingFilter.class })
     public Response updateAccount (@Context SecurityContext ctx, String json) {
         TokenContext context = (TokenContext) ctx.getUserPrincipal();
@@ -152,7 +149,7 @@ public class UserService {
     @POST
     @Path("requestReset")
     @Produces(MediaType.TEXT_HTML)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED})
     public Response requestPasswordReset (@Context Locale locale, String json) {
         JsonNode node = JsonUtils.readTree(json);
         StringBuilder builder = new StringBuilder();
@@ -195,7 +192,7 @@ public class UserService {
     @POST
     @Path("reset")
     @Produces(MediaType.TEXT_HTML)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED})
     public Response resetPassword (
             @QueryParam(Attributes.QUERY_PARAM_URI) String uri,
             @QueryParam(Attributes.QUERY_PARAM_USER) String username,
@@ -211,6 +208,7 @@ public class UserService {
     }
 
 
+    // todo: refactor and make something out of if --> needs to give some sort of feedback!
     @GET
     @Path("info")
     @ResourceFilters({ AuthFilter.class,
@@ -258,16 +256,17 @@ public class UserService {
     }
 
 
-    // todo: test
     @POST
     @Path("settings")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class,
+    @Consumes({MediaType.APPLICATION_JSON})
+    @ResourceFilters({ AuthFilter.class,
             PiwikFilter.class, BlockingFilter.class })
     public Response updateSettings (@Context SecurityContext context,
-            @Context Locale locale, MultivaluedMap form) {
+            @Context Locale locale, Map settings) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        Map<String, Object> settings = FormRequestWrapper.toMap(form, false);
+
+        if (settings == null)
+            return Response.notModified().build();
 
         try {
             User user = controller.getUser(ctx.getUsername());
@@ -282,7 +281,7 @@ public class UserService {
             //            SecurityManager.findbyId(us.getDefaultPOSfoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultRelfoundry(), user, Foundry.class);
             Userdata new_data = new UserSettings(user.getId());
-            new_data.readQuietly(settings, false);
+            new_data.readQuietly((Map<String, Object>) settings, false);
             data.update(new_data);
             controller.updateUserData(data);
         }
@@ -322,14 +321,15 @@ public class UserService {
 
     @POST
     @Path("details")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class,
+    @Consumes({MediaType.APPLICATION_JSON})
+    @ResourceFilters({ AuthFilter.class,
             PiwikFilter.class, BlockingFilter.class })
     public Response updateDetails (@Context SecurityContext context,
-            @Context Locale locale, MultivaluedMap form) {
+            @Context Locale locale, Map details) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
 
-        Map<String, Object> new_details = FormRequestWrapper.toMap(form, true);
+        if (details == null)
+            return Response.notModified().build();
 
         try {
             User user = controller.getUser(ctx.getUsername());
@@ -337,7 +337,7 @@ public class UserService {
                 return Response.notModified().build();
 
             UserDetails new_data = new UserDetails(user.getId());
-            new_data.readQuietly(new_details, false);
+            new_data.readQuietly((Map<String, Object>) details, false);
 
             UserDetails det = controller.getUserData(user, UserDetails.class);
             det.update(new_data);
@@ -347,7 +347,6 @@ public class UserService {
             jlog.error("Exception encountered!", e);
             throw KustvaktResponseHandler.throwit(e);
         }
-
         return Response.ok().build();
     }
 
@@ -355,7 +354,7 @@ public class UserService {
     //fixme: if policy allows, foreign user might be allowed to change search!
     @POST
     @Path("queries")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Consumes(MediaType.APPLICATION_JSON)
     @ResourceFilters({ AuthFilter.class, DemoUserFilter.class,
             PiwikFilter.class, BlockingFilter.class })
     public Response updateQueries (@Context SecurityContext context, String json) {
@@ -414,8 +413,7 @@ public class UserService {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         try {
             User user = controller.getUser(ctx.getUsername());
-            if (ctx.isDemo())
-                return Response.notModified().build();
+            //todo: test that demo user cannot be deleted!
             controller.deleteAccount(user);
         }
         catch (KustvaktException e) {
