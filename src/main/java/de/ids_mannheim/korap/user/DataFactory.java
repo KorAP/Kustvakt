@@ -67,6 +67,7 @@ public abstract class DataFactory {
 
     public abstract String toStringValue (Object data);
 
+    public abstract Object filter(Object data, String ... keys);
 
     public boolean checkDataType (Object data) {
         throw new RuntimeException("Wrong data type for factory setting!");
@@ -208,6 +209,15 @@ public abstract class DataFactory {
             if (data instanceof JsonNode)
                 return JsonUtils.toJSON(data);
             return data.toString();
+        }
+
+        @Override
+        public Object filter(Object data, String... keys) {
+            if (checkDataType(data) && ((JsonNode) data).isObject()) {
+                ObjectNode node = ((JsonNode) data).deepCopy();
+                return node.retain(keys);
+            }
+            return JsonUtils.createObjectNode();
         }
 
 

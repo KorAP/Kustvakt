@@ -46,6 +46,10 @@ public abstract class Userdata {
         return DataFactory.getFactory().getValue(this.data, key);
     }
 
+    public Object filter(String ... keys) {
+        return DataFactory.getFactory().filter(this.data, keys);
+    }
+
 
     /**
      * 

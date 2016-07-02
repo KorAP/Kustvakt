@@ -355,7 +355,7 @@ public class UserService {
     @POST
     @Path("queries")
     @Consumes(MediaType.APPLICATION_JSON)
-    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class,
+    @ResourceFilters({ AuthFilter.class,
             PiwikFilter.class, BlockingFilter.class })
     public Response updateQueries (@Context SecurityContext context, String json) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
