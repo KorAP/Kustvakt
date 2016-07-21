@@ -89,7 +89,7 @@ public class AuthService {
 
     @GET
     @Path("apiToken")
-    @ResourceFilters({HeaderFilter.class})
+    //@ResourceFilters({HeaderFilter.class})
     public Response requestAPIToken (@Context HttpHeaders headers,
             @Context Locale locale,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
@@ -156,7 +156,7 @@ public class AuthService {
 
     @GET
     @Path("sessionToken")
-    @ResourceFilters({HeaderFilter.class})
+    //@ResourceFilters({HeaderFilter.class})
     public Response requestSession (@Context HttpHeaders headers,
             @Context Locale locale,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
