@@ -290,10 +290,16 @@ public class LightService {
     }
 
 
+	/*
+	 * TODO: The problem here is, that the matchinfo path makes no
+	 * distinction between docs and texts - unlike DeReKo, the backend
+	 * and the frontend. Luckily there is a convenient method
+	 * "getMatchID()" for a workaround, but this should be fixed.
+	 */
     @GET
     @Path("/corpus/{id}/{docid}/{rest}/matchInfo")
     public Response getMatchInfo (@PathParam("id") String id,
-            @PathParam("docid") String docid, @PathParam("rest") String rest,
+								  @PathParam("docid") String docid, @PathParam("rest") String rest,
             @QueryParam("foundry") Set<String> foundries,
             @QueryParam("layer") Set<String> layers,
             @QueryParam("spans") Boolean spans) {

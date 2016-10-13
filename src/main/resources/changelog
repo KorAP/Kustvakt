@@ -1,6 +1,9 @@
 === CHANGELOG FILE ===
 
+13/10/2016
+    - MOD: updated search to use new siglen (diewald)
+
 05/05/2015
-    - ADD: rest test suite for user service
-    - MOD: setup parameter modification
-    - ADD: oauth2 client unique constraint
+    - ADD: rest test suite for user service (hanl)
+    - MOD: setup parameter modification (hanl)
+    - ADD: oauth2 client unique constraint (hanl)

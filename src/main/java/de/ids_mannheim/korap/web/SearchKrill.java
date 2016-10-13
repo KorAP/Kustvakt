@@ -27,7 +27,8 @@ public class SearchKrill {
     private final static Logger qlog = KustvaktLogger.getLogger("queryLogger");
     private final static Logger jlog = LoggerFactory
             .getLogger(SearchKrill.class);
-    // Temporary
+
+    // Temporary - shouldn't be here.
     String indexDir = "/data/prep_corpus/index/";
     String i = "/Users/hanl/Projects/prep_corpus";
     String klinux10 = "/vol/work/hanl/indices";
@@ -56,14 +57,12 @@ public class SearchKrill {
         catch (IOException e) {
             jlog.error("Unable to loadSubTypes index: {}", e.getMessage());
         };
-    }
+    };
 
 
     public KrillIndex getIndex () {
         return this.index;
-    }
-
-    ;
+    };
 
 
     /**
@@ -80,9 +79,7 @@ public class SearchKrill {
         Result kr = new Result();
         kr.addError(601, "Unable to find index");
         return kr.toJsonString();
-    }
-
-    ;
+    };
 
 
     /**
@@ -100,9 +97,7 @@ public class SearchKrill {
         Result kr = new Result();
         kr.addError(601, "Unable to find index");
         return kr.toJsonString();
-    }
-
-    ;
+    };
 
 
     /**
@@ -126,9 +121,7 @@ public class SearchKrill {
         Match km = new Match();
         km.addError(601, "Unable to find index");
         return km.toJsonString();
-    }
-
-    ;
+    };
 
 
     public String getMatch (String id, List<String> foundries,
@@ -151,9 +144,7 @@ public class SearchKrill {
         Match km = new Match();
         km.addError(601, "Unable to find index");
         return km.toJsonString();
-    }
-
-    ;
+    };
 
 
     /**
@@ -201,9 +192,7 @@ public class SearchKrill {
         Match km = new Match();
         km.addError(601, "Unable to find index");
         return km.toJsonString();
-    }
-
-    ;
+    };
 
 
     /**
@@ -239,16 +228,26 @@ public class SearchKrill {
                 .append(tokens).append(",\"sentences\":").append(sentences)
                 .append(",\"paragraphs\":").append(paragraphs).append("}");
         return sb.toString();
-    }
+    };
 
-    ;
+    /**
+	 * Return the match identifier as a string.
+	 * This is a convenient method to deal with legacy instantiation of the
+	 * code.
+	 */
+    public String getMatchId (String corpusID, String docID, String matchID) {
+		String docIDtextID [] = docID.split("\\.", 2);
 
+		// Create a string representation of the match 
+		StringBuilder sb = new StringBuilder()
+			.append("match-")
+			.append(corpusID).append('/')
+			.append(docIDtextID[0]);
 
-    public String getMatchId (String type, String docid, String tofrom) {
-        return new StringBuilder().append("match-").append(type).append("!")
-                .append(type).append("_").append(docid).append("-")
-                .append(tofrom).toString();
-    }
+		// The docID was split
+		if (docIDtextID.length == 2)
+			sb.append('/').append(docIDtextID[1]);
 
-    ;
+		return sb.append('-').append(matchID).toString();
+    };
 };
