@@ -31,7 +31,6 @@ public class SearchKrillTest extends BeanConfigTest {
     @Test
     public void testInit () {
         KustvaktConfiguration config = helper().getContext().getConfiguration();
-        System.out.println("'" + config.getIndexDir() + "'");
         SearchKrill krill = new SearchKrill(config.getIndexDir());
         assertNotNull(krill);
     }
@@ -56,6 +55,15 @@ public class SearchKrillTest extends BeanConfigTest {
         assertNotEquals(0, krill.getIndex().numberOf("documents"));
     }
 
+	@Test
+    public void testMatchInfo () {
+        KustvaktConfiguration config = helper().getContext().getConfiguration();
+        SearchKrill krill = new SearchKrill(config.getIndexDir());
+        assertNotNull(krill);
+		String matchinfo = krill.getMatch("WPD/AAA.00002/p169-197");
+		JsonNode node = JsonUtils.readTree(matchinfo);
+		assertEquals("Invalid match identifier", node.at("/errors/0/1").asText());
+	}
 
     @Test
     public void testSearch () {

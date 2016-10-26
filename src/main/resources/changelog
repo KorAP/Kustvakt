@@ -2,6 +2,7 @@
 
 13/10/2016
     - MOD: updated search to use new siglen (diewald)
+    - MOD: fixed matchinfo retrieval in light service (diewald)
 
 05/05/2015
     - ADD: rest test suite for user service (hanl)

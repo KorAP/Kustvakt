@@ -427,7 +427,7 @@ public class ResourceServiceTest extends FastJerseyTest {
         assertEquals(response.getStatus(),
                 ClientResponse.Status.OK.getStatusCode());
         String ent = response.getEntity(String.class);
-        JsonNode node = JsonUtils.readTree(ent);
+		JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("koral:docGroup", node.at("/collection/@type").asText());
         assertEquals("operation:or", node.at("/collection/operation").asText());
@@ -451,7 +451,6 @@ public class ResourceServiceTest extends FastJerseyTest {
 
     @Test
     public void testMatchInfoGet () {
-
     }
 
 

@@ -1007,6 +1007,7 @@ public class ResourceService {
             user = controller.getUser(tokenContext.getUsername());
         }
         catch (KustvaktException e) {
+
             jlog.error("Exception encountered: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
@@ -1030,7 +1031,7 @@ public class ResourceService {
                     if (spl != null) {
                         f_list.add(sep[0]);
                         l_list.add(sep[1]);
-                    }
+                    };
                     results = searchKrill.getMatch(matchid, new ArrayList<>(
                             f_list), new ArrayList<>(l_list), spans, false,
                             true);

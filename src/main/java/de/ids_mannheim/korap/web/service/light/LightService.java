@@ -313,6 +313,8 @@ public class LightService {
                 && !foundries.contains("*"))
             f_list = new ArrayList<>(foundries);
 
+        spans = spans != null ? spans : false;
+		
         boolean match_only = foundries == null || foundries.isEmpty();
         String results;
         if (match_only)
