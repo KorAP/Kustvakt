@@ -1,5 +1,18 @@
 package de.ids_mannheim.korap.handlers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.KustvaktClassLoader;
@@ -8,15 +21,6 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.user.User;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertNotEquals;
 
 /**
  * @author hanl
@@ -26,20 +30,28 @@ public class ResourceDaoTest extends BeanConfigTest {
 
     private static List<Integer> ids = new ArrayList<>();
 
+//    @Autowired
+//    private TransactionTemplate txTemplate;
+//    
+//    @Autowired
+//    private ResourceDao<KustvaktResource> resourceDao;
 
     @Override
     public void initMethod () {
         helper().setupAccount();
 
-        List classes = new ArrayList<>(
+        List<Class<? extends KustvaktResource>> classes = new ArrayList<>(
                 KustvaktClassLoader.loadSubTypes(KustvaktResource.class));
         int size = classes.size();
         for (int i = 0; i < size; i++) {
-            Class s = (Class) classes.get(i < classes.size() ? i : 0);
+            Class<? extends KustvaktResource> s = classes.get(i < classes.size() ? i : 0);
             try {
                 KustvaktResource r = (KustvaktResource) s.newInstance();
                 r.setName("resource_" + i);
                 r.setPersistentID(r.getName());
+                Map<String, Object> map = new HashMap<>();
+                map.put("testVar", "testVal_" + i);
+				r.setFields(map);
                 int id = helper().setupResource(r);
                 ids.add(id);
                 assertNotEquals(0, new ResourceDao<>(helper().getContext()
@@ -55,7 +67,6 @@ public class ResourceDaoTest extends BeanConfigTest {
         }
     }
 
-
     @Test
     public void testBatchGetResources () throws KustvaktException {
         ResourceDao dao = new ResourceDao(helper().getContext()
@@ -68,7 +79,7 @@ public class ResourceDaoTest extends BeanConfigTest {
 
     @Test
     public void testGetResource () throws KustvaktException {
-        ResourceDao dao = new ResourceDao(helper().getContext()
+        ResourceDao<?> dao = new ResourceDao<>(helper().getContext()
                 .getPersistenceClient());
         assertEquals("sqlite", helper().getContext().getPersistenceClient()
                 .getDatabase());
@@ -77,6 +88,7 @@ public class ResourceDaoTest extends BeanConfigTest {
         KustvaktResource res = dao.findbyId(ids.get(0),
                 User.UserFactory.getDemoUser());
         assertNotNull(res);
+        Assert.assertEquals("testVal_0", res.getField("testVar"));
     }
 
 

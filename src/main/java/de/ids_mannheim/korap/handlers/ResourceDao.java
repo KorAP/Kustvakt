@@ -1,15 +1,9 @@
 package de.ids_mannheim.korap.handlers;
 
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.exceptions.dbException;
-import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
-import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
-import de.ids_mannheim.korap.resources.KustvaktResource;
-import de.ids_mannheim.korap.resources.ResourceFactory;
-import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.SqlBuilder;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -19,9 +13,16 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.exceptions.dbException;
+import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
+import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
+import de.ids_mannheim.korap.resources.KustvaktResource;
+import de.ids_mannheim.korap.resources.ResourceFactory;
+import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.SqlBuilder;
 
 /**
  * Created by hanl on 7/21/14.
@@ -189,7 +190,7 @@ public class ResourceDao<T extends KustvaktResource> implements
         source.addValue("type",
                 ResourceFactory.getResourceMapping(resource.getClass()));
         source.addValue("created", System.currentTimeMillis());
-        source.addValue("data", resource.getData());
+        source.addValue("data", resource.getStringData());
 
         try {
             this.jdbcTemplate
