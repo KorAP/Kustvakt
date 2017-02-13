@@ -213,7 +213,7 @@ public class PolicyDao implements PolicyHandlerIface {
         param.addValue("target", target);
         param.addValue("userid", user.getId());
         param.addValue("perm", perm);
-        param.addValue("en", new Timestamp(TimeUtils.getNow().getMillis()));
+        param.addValue("en", TimeUtils.getNow().getMillis());
 
         String sql_new = "select pv.*, pv.perm & :perm as allowed, rh.depth, (select max(depth) from resource_tree \n"
                 + "where child_id=rh.child_id) as max_depth from policy_view as pv "
@@ -252,7 +252,7 @@ public class PolicyDao implements PolicyHandlerIface {
         param.addValue("cond", condition.getSpecifier());
         param.addValue("perm", perm);
         param.addValue("type", ResourceFactory.getResourceMapping(clazz));
-        param.addValue("en", new Timestamp(TimeUtils.getNow().getMillis()));
+        param.addValue("en", TimeUtils.getNow().getMillis());
         String sql_new = "select pv.*, pv.perm & :perm as allowed, "
                 + "rh.depth, (select max(depth) from resource_tree "
                 + "where child_id=rh.child_id) as max_depth from policy_view as pv "
@@ -290,7 +290,7 @@ public class PolicyDao implements PolicyHandlerIface {
         param.addValue("target", target);
         param.addValue("userid", user.getId());
         param.addValue("perm", perm);
-        param.addValue("en", new Timestamp(TimeUtils.getNow().getMillis()));
+        param.addValue("en",TimeUtils.getNow().getMillis());
 
         String sql_new = "select pv.*, pv.perm & :perm as allowed, "
                 + "rh.depth, (select max(depth) from resource_tree "
@@ -331,7 +331,7 @@ public class PolicyDao implements PolicyHandlerIface {
         param.addValue("path", StringUtils.buildSQLRegex(path));
         param.addValue("userid", user.getId());
         param.addValue("perm", perm);
-        param.addValue("en", new Timestamp(TimeUtils.getNow().getMillis()));
+        param.addValue("en", TimeUtils.getNow().getMillis());
 
         String sql_new = "select pv.*, pv.perm & :perm as allowed, "
                 + "rh.depth, (select max(depth) from resource_tree "
