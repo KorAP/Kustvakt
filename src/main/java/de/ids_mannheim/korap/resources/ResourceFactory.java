@@ -2,6 +2,8 @@ package de.ids_mannheim.korap.resources;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.utils.JsonUtils;
+
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.ArrayList;
@@ -65,9 +67,9 @@ public class ResourceFactory {
 
 
     public static <T extends KustvaktResource> T createID (T resource) {
-        if (resource.getData() != null && !resource.getStringData().isEmpty())
-            resource.setPersistentID(DigestUtils.sha1Hex(resource
-                    .getStringData()));
+        if (resource.getData() != null && !resource.getStringData().isEmpty()){
+        	resource.setPersistentID(DigestUtils.sha1Hex(JsonUtils.toJSON(resource)));        	
+        }
         return resource;
     }
 

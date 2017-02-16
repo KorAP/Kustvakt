@@ -1,25 +1,26 @@
 package de.ids_mannheim.korap.web.service.full;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientResponse;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.query.serialize.QuerySerializer;
-import de.ids_mannheim.korap.resources.Corpus;
-import de.ids_mannheim.korap.resources.KustvaktResource;
-import de.ids_mannheim.korap.security.ac.ResourceHandler;
-import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
-import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.service.FastJerseyTest;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Iterator;
+
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.Iterator;
-import java.util.Set;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.sun.jersey.api.client.ClientResponse;
 
-import static org.junit.Assert.*;
+import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.query.serialize.QuerySerializer;
+import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
+import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.service.FastJerseyTest;
 
 /**
  * @author hanl
@@ -319,6 +320,26 @@ public class ResourceServiceTest extends FastJerseyTest {
     @Test
     public void testResourceStore () {
 
+        ClientResponse response = resource()
+                .path(getAPIVersion())
+                .path("virtualcollection")
+                .queryParam("filter", "false")
+                .queryParam("name", "Goethe")
+                .queryParam("description", "Goethe corpus")
+                .header(Attributes.AUTHORIZATION,
+                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                .post(ClientResponse.class);
+        
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        
+        String ent = response.getEntity(String.class);
+        
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertTrue(node.isObject());
+        assertEquals("Goethe", node.path("name").asText());
+        assertEquals("Goethe corpus", node.path("description").asText());
     }
 
 
