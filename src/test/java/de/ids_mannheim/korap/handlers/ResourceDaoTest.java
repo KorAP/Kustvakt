@@ -88,7 +88,7 @@ public class ResourceDaoTest extends BeanConfigTest {
         KustvaktResource res = dao.findbyId(ids.get(0),
                 User.UserFactory.getDemoUser());
         assertNotNull(res);
-        Assert.assertEquals("testVal_0", res.getField("testVar"));
+        Assert.assertEquals(true,res.getField("testVar").toString().startsWith("testVal_"));
     }
 
 

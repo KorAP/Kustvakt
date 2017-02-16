@@ -83,6 +83,10 @@ public class KustvaktConfiguration {
     private String default_token;
     private String default_dep;
     private String default_const;
+    
+    private String defaultVirtualCollectionId;
+    private String defaultVirtualCollectionName;
+    private String defaultVirtualCollectionDescription;
 
     // deprec?!
     private final BACKENDS DEFAULT_ENGINE = BACKENDS.LUCENE;
@@ -154,6 +158,11 @@ public class KustvaktConfiguration {
 
         passcodeSaltField = properties.getProperty("security.passcode.salt",
                 "accountCreation");
+        
+        defaultVirtualCollectionId = properties.getProperty("virtual.collection.default.id");
+        defaultVirtualCollectionName = properties.getProperty("virtual.collection.default.name");
+        defaultVirtualCollectionDescription = properties.getProperty("virtual.collection.default.description");
+        
 
         return properties;
     }

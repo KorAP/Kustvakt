@@ -102,7 +102,8 @@ public class ResourceDao<T extends KustvaktResource> implements
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("pid", id);
         String sql = "SELECT rs.*, rt.name_path FROM resource_store as rs inner join resource_tree as rt"
-                + " on rs.id=rt.child_id WHERE rs.persistent_id=:pid group by rs.id;";
+                + " on rs.id=rt.child_id WHERE rs.persistent_id=:pid";
+        //group by rs.id;";
         try {
             return (T) this.jdbcTemplate.queryForObject(sql, source,
                     new RowMapperFactory.ResourceMapper());
