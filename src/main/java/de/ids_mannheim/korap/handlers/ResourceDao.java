@@ -109,6 +109,7 @@ public class ResourceDao<T extends KustvaktResource> implements
                     new RowMapperFactory.ResourceMapper());
         }
         catch (DataAccessException e) {
+        	// empty results
             return null;
         }
     }

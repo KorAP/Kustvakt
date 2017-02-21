@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,8 +18,11 @@ import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.handlers.ResourceDao;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
+import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
+import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
 
@@ -318,8 +322,8 @@ public class ResourceServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testResourceStore () {
-
+    public void testResourceStoreAndDelete () throws KustvaktException {
+    	// resource store service
         ClientResponse response = resource()
                 .path(getAPIVersion())
                 .path("virtualcollection")
@@ -340,12 +344,39 @@ public class ResourceServiceTest extends FastJerseyTest {
         assertTrue(node.isObject());
         assertEquals("Goethe", node.path("name").asText());
         assertEquals("Goethe corpus", node.path("description").asText());
-    }
+        
+        // check if the resource is in the db
+        ResourceDao<?> dao = new ResourceDao<>(helper().getContext()
+                .getPersistenceClient());
+        assertEquals("sqlite", helper().getContext().getPersistenceClient()
+                .getDatabase());
 
+        assertNotEquals(0, dao.size());
+        KustvaktResource res = dao.findbyId(node.path("id").asText(),
+                User.UserFactory.getDemoUser());
+        assertNotNull(res);
+        Assert.assertEquals("Goethe",res.getName().toString());
+    
+        // delete resource service
+        response = resource()
+                .path(getAPIVersion())
+                .path("virtualcollection/"+node.path("id").asText())
+                .header(Attributes.AUTHORIZATION,
+                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                .delete(ClientResponse.class);
+        
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        
+        // check if the resource is *not* in the db anymore
+        dao = new ResourceDao<>(helper().getContext()
+                .getPersistenceClient());
+        assertEquals("sqlite", helper().getContext().getPersistenceClient()
+                .getDatabase());
 
-    @Test
-    public void testResourceDelete () {
-
+        res = dao.findbyId(node.path("id").asText(),
+                User.UserFactory.getDemoUser());
+        assertEquals(null,res);
     }
 
 
@@ -381,6 +412,7 @@ public class ResourceServiceTest extends FastJerseyTest {
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
+        System.out.println("NODE "+node.asText());
         assertEquals("koral:doc", node.at("/collection/@type").asText());
         assertEquals("corpusSigle", node.at("/collection/key").asText());
     }
