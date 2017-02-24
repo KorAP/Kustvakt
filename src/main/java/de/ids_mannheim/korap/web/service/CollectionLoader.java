@@ -29,7 +29,7 @@ public class CollectionLoader implements BootableBeanInterface {
 
         KustvaktConfiguration config = beans.getConfiguration();
         
-        KoralCollectionQueryBuilder bui = new KoralCollectionQueryBuilder();
+//        KoralCollectionQueryBuilder bui = new KoralCollectionQueryBuilder();
 //        bui.with("creationDate since 1775 & corpusSigle=GOE");
 //
 //        VirtualCollection c1 = new VirtualCollection();

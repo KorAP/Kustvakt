@@ -31,12 +31,14 @@ import de.ids_mannheim.korap.web.service.FastJerseyTest;
  * @date 14/01/2016
  */
 public class ResourceServiceTest extends FastJerseyTest {
-
+	
     @BeforeClass
     public static void configure () throws Exception {
         FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.full",
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");
+        
+        //containerURI = "https://localhost/";
     }
 
 
@@ -262,67 +264,8 @@ public class ResourceServiceTest extends FastJerseyTest {
         assertNotEquals(0, node.size());
     }
 
-
     @Test
-    public void testCorpusGet () {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").path("WPD").get(ClientResponse.class);
-        String ent = response.getEntity(String.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
-                response.getStatus());
-
-        JsonNode node = JsonUtils.readTree(ent);
-        assertNotNull(node);
-        assertTrue(node.isObject());
-        assertEquals("WPD", node.path("id").asText());
-    }
-
-
-    @Test
-    public void testCorpusGet2 () {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").path("GOE").get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
-                response.getStatus());
-        String ent = response.getEntity(String.class);
-        JsonNode node = JsonUtils.readTree(ent);
-        assertNotNull(node);
-        assertTrue(node.isObject());
-        assertEquals("GOE", node.path("id").asText());
-    }
-
-
-    @Test
-    @Ignore
-    public void testCorpusGetUnauthorized () {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").path("BRZ20").get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
-                response.getStatus());
-        String ent = response.getEntity(String.class);
-        JsonNode node = JsonUtils.readTree(ent);
-        assertNotNull(node);
-        assertTrue(node.isObject());
-        assertNotNull(node);
-    }
-
-
-    @Test
-    public void testFoundryGet () {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("foundry").path("tt").get(ClientResponse.class);
-        String ent = response.getEntity(String.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
-                response.getStatus());
-
-        JsonNode node = JsonUtils.readTree(ent);
-        assertNotNull(node);
-        assertNotEquals(0, node.size());
-    }
-
-
-    @Test
-    public void testResourceStoreAndDelete () throws KustvaktException {
+    public void testResourceStore() throws KustvaktException {
     	// resource store service
         ClientResponse response = resource()
                 .path(getAPIVersion())
@@ -344,7 +287,9 @@ public class ResourceServiceTest extends FastJerseyTest {
         assertTrue(node.isObject());
         assertEquals("Goethe", node.path("name").asText());
         assertEquals("Goethe corpus", node.path("description").asText());
-        
+
+        String id = node.path("id").asText();
+        		
         // check if the resource is in the db
         ResourceDao<?> dao = new ResourceDao<>(helper().getContext()
                 .getPersistenceClient());
@@ -352,15 +297,16 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .getDatabase());
 
         assertNotEquals(0, dao.size());
-        KustvaktResource res = dao.findbyId(node.path("id").asText(),
+        KustvaktResource res = dao.findbyId(id,
                 User.UserFactory.getDemoUser());
         assertNotNull(res);
         Assert.assertEquals("Goethe",res.getName().toString());
     
         // delete resource service
-        response = resource()
+    	response = resource()
                 .path(getAPIVersion())
-                .path("virtualcollection/"+node.path("id").asText())
+                .path("virtualcollection")
+                .path(id)
                 .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
                 .delete(ClientResponse.class);
@@ -374,16 +320,104 @@ public class ResourceServiceTest extends FastJerseyTest {
         assertEquals("sqlite", helper().getContext().getPersistenceClient()
                 .getDatabase());
 
-        res = dao.findbyId(node.path("id").asText(),
+        res = dao.findbyId(id,
                 User.UserFactory.getDemoUser());
         assertEquals(null,res);
     }
 
 
     @Test
+    public void testCorpusGet () {
+        ClientResponse response = resource().path(getAPIVersion())
+                .path("corpus").path("WPD15").get(ClientResponse.class);
+        String ent = response.getEntity(String.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertTrue(node.isObject());
+        assertEquals("WPD15", node.path("id").asText());
+    }
+
+    
+
+//    @Test
+//    public void testCreatePolicyForResource() {
+//    	ClientResponse response = resource()
+//                .path(getAPIVersion())
+//                .path("admin")
+//                .path("createPolicies")
+//                .path(UUID.randomUUID().toString())
+//                .queryParam("type", "virtualcollection")
+//                .queryParam("name", "Goethe")
+//                .queryParam("description", "Goethe corpus")
+//                .queryParam("group", "public")
+//                .queryParam("perm", Permission.READ.name())
+//                .queryParam("loc", "")
+//                .queryParam("expire", "")
+//                .header(Attributes.AUTHORIZATION,
+//                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+//                .post(ClientResponse.class);
+//        
+//        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+//                response.getStatus());
+//        
+//        String ent = response.getEntity(String.class);
+//        JsonNode node = JsonUtils.readTree(ent);
+//        assertNotNull(node);
+//        assertTrue(node.isObject());
+//        assertEquals("GOE", node.path("id").asText());
+//	}
+    
+    @Test
+    public void testCorpusGet2 () {
+    	ClientResponse response = resource().path(getAPIVersion())
+                .path("corpus").path("GOE").get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String ent = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertTrue(node.isObject());
+        assertEquals("GOE", node.path("id").asText());
+    }
+    
+    
+    @Test
+    @Ignore
+    public void testCorpusGetUnauthorized () {
+        ClientResponse response = resource().path(getAPIVersion())
+                .path("corpus").path("BRZ20").get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
+                response.getStatus());
+        String ent = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertTrue(node.isObject());
+        assertNotNull(node);
+    }
+
+    @Test
+    public void testFoundryGet () {
+        ClientResponse response = resource().path(getAPIVersion())
+                .path("foundry").path("tt").get(ClientResponse.class);
+        String ent = response.getEntity(String.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertNotEquals(0, node.size());
+    }
+
+
+    
+
+    @Test
     public void testSerializationQueryWithCorpusThroughFilteredPublic () {
         ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus/WPD/search").queryParam("q", "[orth=der]")
+                .path("corpus/WPD15/search").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp").queryParam("context", "base/s:s")
                 .method("TRACE", ClientResponse.class);
         String ent = response.getEntity(String.class);
@@ -393,7 +427,7 @@ public class ResourceServiceTest extends FastJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("corpusSigle", node.at("/collection/key").asText());
-        assertEquals("WPD", node.at("/collection/value").asText());
+        assertEquals("WPD15", node.at("/collection/value").asText());
     }
 
 
@@ -401,7 +435,7 @@ public class ResourceServiceTest extends FastJerseyTest {
     public void testSerializationQueryWithCorpus () {
         ClientResponse response = resource()
                 .path(getAPIVersion())
-                .path("corpus/WPD/search")
+                .path("corpus/WPD15/search")
                 .queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
@@ -412,15 +446,35 @@ public class ResourceServiceTest extends FastJerseyTest {
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        System.out.println("NODE "+node.asText());
         assertEquals("koral:doc", node.at("/collection/@type").asText());
         assertEquals("corpusSigle", node.at("/collection/key").asText());
     }
 
-
     @Test
     public void testSerializationQueryWithCollection () {
-        ClientResponse response = resource()
+    	// Add Virtual Collection
+    	ClientResponse response = resource()
+                .path(getAPIVersion())
+                .path("virtualcollection")
+                .queryParam("filter", "false")
+                .queryParam("name", "Weimarer Werke")
+                .queryParam("description", "Goethe-Werke in Weimar (seit 1775)")
+                .header(Attributes.AUTHORIZATION,
+                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                .post(ClientResponse.class, "creationDate since 1775 & corpusSigle=GOE");
+        
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        
+        String ent = response.getEntity(String.class);
+        
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertTrue(node.isObject());
+        assertEquals("Weimarer Werke", node.path("name").asText());
+
+        // Get virtual collections
+        response = resource()
                 .path(getAPIVersion())
                 .path("collection")
                 .header(Attributes.AUTHORIZATION,
@@ -428,8 +482,8 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
-        JsonNode node = JsonUtils.readTree(ent);
+        ent = response.getEntity(String.class);
+        node = JsonUtils.readTree(ent);
         assertNotNull(node);
 
         Iterator it = node.elements();

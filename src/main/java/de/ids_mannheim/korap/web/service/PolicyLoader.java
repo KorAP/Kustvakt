@@ -4,6 +4,8 @@ import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.resources.Corpus;
+import de.ids_mannheim.korap.resources.Foundry;
+import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.Permissions;
 import de.ids_mannheim.korap.security.ac.PolicyBuilder;
 import de.ids_mannheim.korap.security.ac.ResourceFinder;
@@ -25,25 +27,26 @@ public class PolicyLoader implements BootableBeanInterface {
                 .toUser(KustvaktConfiguration.KUSTVAKT_USER);
         KustvaktConfiguration config =beans.getConfiguration();
         PolicyBuilder builder = new PolicyBuilder(user);
-//        builder.addCondition("public");
-//        builder.setResources(new Corpus("GOE"));
-//        builder.setPermissions(Permissions.Permission.READ);
-//        builder.create();
-
         builder = new PolicyBuilder(user);
         builder.addCondition("public");
         builder.setResources(new Corpus(config.getDefaultVirtualCollectionId()));
         builder.setPermissions(Permissions.Permission.READ);
         builder.create();
 
-//        KustvaktResource tt = new Foundry("tt");
-//        tt.setName("TreeTagger");
-//        tt.setDescription("todo ...");
-//        builder = new PolicyBuilder(user);
-//        builder.addCondition("public");
-//        builder.setResources(tt);
-//        builder.setPermissions(Permissions.Permission.READ);
-//        builder.create();
+        // FIX ME: the following policies are used in test cases and should not be hard coded here.
+        builder.addCondition("public");
+        builder.setResources(new Corpus("GOE"));
+        builder.setPermissions(Permissions.Permission.READ);
+        builder.create();
+        
+        KustvaktResource tt = new Foundry("tt");
+        tt.setName("TreeTagger");
+        tt.setDescription("todo ...");
+        builder = new PolicyBuilder(user);
+        builder.addCondition("public");
+        builder.setResources(tt);
+        builder.setPermissions(Permissions.Permission.READ);
+        builder.create();
     }
 
 

@@ -842,16 +842,18 @@ public class ResourceService {
 				cquery.with(query);
 
 			cachetmp = ResourceFactory.getCachedCollection(cquery.toJSON());
-
+			
 			// see if vc was cached!
 			VirtualCollection tmp = resourceHandler.getCache(cachetmp.getId(), VirtualCollection.class);
-
+			
 			// if not cached, fill with stats values
 			if (tmp == null) {
 				String stats = searchKrill.getStatistics(cquery.toJSON());
 				cachetmp.setStats(JsonUtils.readSimple(stats, Map.class));
+				if (query != null && !query.isEmpty())
+					cachetmp.setFields(cquery.toJSON());
 			}
-
+			
 			if (!cache && !User.UserFactory.isDemo(ctx.getUsername())) {
 				collection = ResourceFactory.getPermanentCollection(cachetmp, name, description);
 				vals = collection.toMap();
