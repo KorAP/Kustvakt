@@ -103,6 +103,9 @@
                     <include>**/*.info</include>
                     <include>**/*.properties</include>
                 </includes>
+                <excludes>
+                	<exclude>**/ResouceServiceServerTest.java</exclude>
+                </excludes>
             </testResource>
             <testResource>
                 <directory>src/main/resources</directory>

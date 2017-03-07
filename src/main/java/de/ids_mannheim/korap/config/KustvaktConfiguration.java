@@ -28,17 +28,17 @@ public class KustvaktConfiguration {
 
     public static final Map<String, Object> KUSTVAKT_USER = new HashMap<>();
 
-    static {
-        KUSTVAKT_USER.put(Attributes.ID, 1000);
-        KUSTVAKT_USER.put(Attributes.USERNAME, "kustvakt");
-        KUSTVAKT_USER.put(Attributes.PASSWORD, "kustvakt2015");
-        KUSTVAKT_USER.put(Attributes.EMAIL, "kustvakt@ids-mannheim.de");
-        KUSTVAKT_USER.put(Attributes.COUNTRY, "Germany");
-        KUSTVAKT_USER.put(Attributes.ADDRESS, "Mannheim");
-        KUSTVAKT_USER.put(Attributes.FIRSTNAME, "Kustvakt");
-        KUSTVAKT_USER.put(Attributes.LASTNAME, "KorAP");
-        KUSTVAKT_USER.put(Attributes.INSTITUTION, "IDS Mannheim");
-    }
+//    static {
+//        KUSTVAKT_USER.put(Attributes.ID, 1000);
+//        KUSTVAKT_USER.put(Attributes.USERNAME, "kustvakt");
+//        KUSTVAKT_USER.put(Attributes.PASSWORD, "kustvakt2015");
+//        KUSTVAKT_USER.put(Attributes.EMAIL, "kustvakt@ids-mannheim.de");
+//        KUSTVAKT_USER.put(Attributes.COUNTRY, "Germany");
+//        KUSTVAKT_USER.put(Attributes.ADDRESS, "Mannheim");
+//        KUSTVAKT_USER.put(Attributes.FIRSTNAME, "Kustvakt");
+//        KUSTVAKT_USER.put(Attributes.LASTNAME, "KorAP");
+//        KUSTVAKT_USER.put(Attributes.INSTITUTION, "IDS Mannheim");
+//    }
 
     private static final Logger jlog = LoggerFactory
             .getLogger(KustvaktConfiguration.class);
@@ -84,9 +84,7 @@ public class KustvaktConfiguration {
     private String default_dep;
     private String default_const;
     
-    private String defaultVirtualCollectionId;
-    private String defaultVirtualCollectionName;
-    private String defaultVirtualCollectionDescription;
+    private String policyConfig;
 
     // deprec?!
     private final BACKENDS DEFAULT_ENGINE = BACKENDS.LUCENE;
@@ -159,10 +157,17 @@ public class KustvaktConfiguration {
         passcodeSaltField = properties.getProperty("security.passcode.salt",
                 "accountCreation");
         
-        defaultVirtualCollectionId = properties.getProperty("virtual.collection.default.id");
-        defaultVirtualCollectionName = properties.getProperty("virtual.collection.default.name");
-        defaultVirtualCollectionDescription = properties.getProperty("virtual.collection.default.description");
+        policyConfig = properties.getProperty("policies.config");
         
+        KUSTVAKT_USER.put(Attributes.ID, Integer.parseInt(properties.getProperty("kustvakt.init.user.id")));
+        KUSTVAKT_USER.put(Attributes.USERNAME, properties.getProperty("kustvakt.init.user.username"));
+        KUSTVAKT_USER.put(Attributes.PASSWORD, properties.getProperty("kustvakt.init.user.password"));
+        KUSTVAKT_USER.put(Attributes.EMAIL, properties.getProperty("kustvakt.init.user.email"));
+        KUSTVAKT_USER.put(Attributes.COUNTRY, properties.getProperty("kustvakt.init.user.country"));
+        KUSTVAKT_USER.put(Attributes.ADDRESS, properties.getProperty("kustvakt.init.user.address"));
+        KUSTVAKT_USER.put(Attributes.FIRSTNAME, properties.getProperty("kustvakt.init.user.firstname"));
+        KUSTVAKT_USER.put(Attributes.LASTNAME, properties.getProperty("kustvakt.init.user.lastname"));
+        KUSTVAKT_USER.put(Attributes.INSTITUTION, properties.getProperty("kustvakt.init.user.institution"));
 
         return properties;
     }

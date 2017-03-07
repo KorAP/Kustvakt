@@ -24,7 +24,7 @@ public class ResourceFinderTest extends BeanConfigTest {
         Set<VirtualCollection> resources = ResourceFinder
                 .searchPublic(VirtualCollection.class);
         assertFalse(resources.isEmpty());
-        assertEquals(3, resources.size());
+        assertEquals(1, resources.size());
     }
 
 
@@ -38,11 +38,11 @@ public class ResourceFinderTest extends BeanConfigTest {
     @Test
     public void testResourcesDemoFiltered () throws KustvaktException {
         Set<Corpus> resources = ResourceFinder.searchPublicFiltered(
-                Corpus.class, "WPD");
+                Corpus.class, "WPD15");
         assertNotEquals(0, resources.size());
         assertEquals(1, resources.size());
 
-        resources = ResourceFinder.searchPublicFiltered(Corpus.class, "WPD",
+        resources = ResourceFinder.searchPublicFiltered(Corpus.class, "WPD15",
                 "GOE");
         assertNotEquals(0, resources.size());
         assertEquals(2, resources.size());
