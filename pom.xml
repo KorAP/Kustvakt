@@ -103,9 +103,6 @@
                     <include>**/*.info</include>
                     <include>**/*.properties</include>
                 </includes>
-                <excludes>
-                	<exclude>**/ResouceServiceServerTest.java</exclude>
-                </excludes>
             </testResource>
             <testResource>
                 <directory>src/main/resources</directory>
@@ -179,6 +176,8 @@
                     <excludes>
                         <exclude>**/*APITest.java</exclude>
                         <exclude>de/ids_mannheim/korap/suites/*.java</exclude>
+                		<exclude>**/ResouceServiceServerTest.java</exclude>
+                		<exclude>**/PolicyServiceTest.java</exclude>
                     </excludes>
                     <includes>
                         <include>de/ids_mannheim/korap/**/*.java</include>
