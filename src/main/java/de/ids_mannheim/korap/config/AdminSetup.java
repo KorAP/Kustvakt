@@ -1,10 +1,9 @@
 package de.ids_mannheim.korap.config;
 
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import java.io.File;
+import java.io.FileOutputStream;
 
-import java.io.*;
-import java.security.NoSuchAlgorithmException;
+import de.ids_mannheim.korap.interfaces.EncryptionIface;
 
 /**
  * Created by hanl on 30.05.16.

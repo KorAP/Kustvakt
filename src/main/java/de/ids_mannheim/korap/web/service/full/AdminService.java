@@ -1,39 +1,49 @@
 package de.ids_mannheim.korap.web.service.full;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
+
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sun.jersey.spi.container.ResourceFilters;
+
 import de.ids_mannheim.korap.auditing.AuditRecord;
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.handlers.DocumentDao;
-import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
+import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.resources.Document;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.Permissions;
 import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.security.PolicyCondition;
 import de.ids_mannheim.korap.security.ac.PolicyBuilder;
+import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.KustvaktServer;
 import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by hanl on 6/11/14.
@@ -45,7 +55,7 @@ public class AdminService {
 
     private static Logger jlog = LoggerFactory.getLogger(AdminService.class);
 
-    private AuthenticationManagerIface controller;
+    private AuthenticationManagerIface authManager;
     private AuditingIface auditingController;
     private DocumentDao documentDao;
 
@@ -53,7 +63,7 @@ public class AdminService {
     public AdminService () {
         this.auditingController = BeansFactory.getKustvaktContext()
                 .getAuditingProvider();
-        this.controller = BeansFactory.getKustvaktContext()
+        this.authManager = BeansFactory.getKustvaktContext()
                 .getAuthenticationManager();
         this.documentDao = new DocumentDao(BeansFactory.getKustvaktContext()
                 .getPersistenceClient());
@@ -100,7 +110,8 @@ public class AdminService {
             @QueryParam("description") String description,
             @QueryParam("group") String group,
             @QueryParam("perm") List<String> permissions,
-            @QueryParam("loc") String loc, @QueryParam("expire") String duration) {
+            @QueryParam("loc") String loc, @QueryParam("expire") String duration, 
+            @Context SecurityContext context) {
 
         try {
             KustvaktResource resource = ResourceFactory.getResource(type);
@@ -110,18 +121,34 @@ public class AdminService {
 
             Permissions.Permission[] p = Permissions.read(permissions
                     .toArray(new String[0]));
-
-            PolicyBuilder cr = new PolicyBuilder(User.UserFactory.getAdmin())
-                    .setConditions(new PolicyCondition(group)).setResources(
-                            resource);
+          
+            TokenContext tc = (TokenContext) context.getUserPrincipal();
+            Map<String, Object> attributes = new HashMap<>();
+            attributes.put(Attributes.HOST, tc.getHostAddress());
+            attributes.put(Attributes.USER_AGENT, tc.getUserAgent());
+            
+            User user = null;
+            int tokenType = 0;
+     	   	// EM: Use enum for the authentication types
+        	if(!tc.getTokenType().equals("basic")){
+        		tokenType = 1;
+        	}
+        	
+        	user = authManager.authenticate(tokenType, tc.getUsername(), tc.getToken(), attributes);
+            
+            PolicyBuilder pb = new PolicyBuilder(user)
+                    .setConditions(new PolicyCondition(group))
+                    .setResources(resource);
+            
             if (loc != null && !loc.isEmpty())
-                cr.setLocation(loc);
+                pb.setLocation(loc);
 
-            if (duration != null && duration.isEmpty())
-                cr.setContext(TimeUtils.getNow().getMillis(),
+            if (duration != null && !duration.isEmpty())
+                pb.setContext(TimeUtils.getNow().getMillis(),
                         TimeUtils.convertTimeToSeconds(duration));
 
-            cr.setPermissions(p).create();
+            pb.setPermissions(p);
+            pb.create();
         }
         catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
