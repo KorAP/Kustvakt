@@ -103,7 +103,7 @@ public class ResourcesTest extends BeanConfigTest {
         Set s = ResourceFinder.searchPublic(Corpus.class);
         assertEquals(2, s.size());
         s = ResourceFinder.searchPublic(Foundry.class);
-        assertEquals(7, s.size());
+        assertEquals(10, s.size());
     }
 
 
