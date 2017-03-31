@@ -37,11 +37,12 @@ public abstract class FastJerseyTest extends BeanConfigTest {
 
     private static TestContainer testContainer;
 
-    private static Client client;
+    protected static Client client;
     private static String[] classPackages = null;
 
     private static int PORT = 9000;
     private static int PORT_IT = 1;
+    protected static String containerURI = "http://localhost/";
 
 
     public static void addClass (Class<?> resourceClass) {
@@ -108,7 +109,7 @@ public abstract class FastJerseyTest extends BeanConfigTest {
                 tcf = new GrizzlyWebTestContainerFactory();
         }
 
-        testContainer = tcf.create(UriBuilder.fromUri("http://localhost/")
+        testContainer = tcf.create(UriBuilder.fromUri(containerURI)
                 .port(port).build(), ad);
         client = testContainer.getClient();
         if (client == null) {

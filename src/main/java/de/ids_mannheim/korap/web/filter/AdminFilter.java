@@ -57,7 +57,7 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
 //                        .getConfiguration().getAdminToken())) {
         
 //        EM: to do ssl
-//        if (authentication != null && cr.isSecure()) {
+        if (authentication != null && cr.isSecure()) {
 //            String token = StringUtils.stripTokenType(authentication);
 //            EncryptionIface crypto = BeansFactory.getKustvaktContext()
 //                    .getEncryption();
@@ -73,9 +73,9 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
                 cr.setSecurityContext(new KustvaktContext(c));
                 
 //            }
-//        }
-//        else
-//            throw KustvaktResponseHandler.throwAuthenticationException("");
+        }
+        else
+            throw KustvaktResponseHandler.throwAuthenticationException("Unsecure connection.");
         return cr;
     }
 
