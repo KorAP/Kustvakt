@@ -14,6 +14,13 @@ CREATE TABLE IF NOT EXISTS korap_users (
     account_link VARCHAR(100)
 );
 
+CREATE TABLE IF NOT EXISTS admin_users (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    user_id INTEGER NOT NULL UNIQUE,
+    foreign key (user_id)
+    references korap_users (id)
+);
+
 CREATE TABLE IF NOT EXISTS shib_users (
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(100) NOT NULL UNIQUE,

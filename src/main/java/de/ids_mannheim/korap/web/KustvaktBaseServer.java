@@ -107,15 +107,15 @@ public abstract class KustvaktBaseServer {
 
             server.setHandler(contextHandler);
 
-            if (kargs.sslContext != null) {
-                SslSocketConnector sslConnector = new SslSocketConnector(
-                        kargs.sslContext);
-                sslConnector.setPort(8443);
-                sslConnector.setMaxIdleTime(60000);
-                server.setConnectors(new Connector[] { connector, sslConnector });
-            }
-            else
-                server.setConnectors(new Connector[] { connector });
+//            if (kargs.sslContext != null) {
+//                SslSocketConnector sslConnector = new SslSocketConnector(
+//                        kargs.sslContext);
+//                sslConnector.setPort(8443);
+//                sslConnector.setMaxIdleTime(60000);
+//                server.setConnectors(new Connector[] { connector, sslConnector });
+//            }
+//            else
+            server.setConnectors(new Connector[] { connector });
 
             server.start();
             server.join();

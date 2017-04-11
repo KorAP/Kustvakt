@@ -20,6 +20,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.auditing.AuditRecord;
@@ -111,7 +112,7 @@ public class AdminService {
             @QueryParam("group") String group,
             @QueryParam("perm") List<String> permissions,
             @QueryParam("loc") String loc, @QueryParam("expire") String duration, 
-            @Context SecurityContext context) {
+            @Context HttpContext context) {
 
         try {
             KustvaktResource resource = ResourceFactory.getResource(type);
@@ -122,20 +123,8 @@ public class AdminService {
             Permissions.Permission[] p = Permissions.read(permissions
                     .toArray(new String[0]));
           
-            TokenContext tc = (TokenContext) context.getUserPrincipal();
-            Map<String, Object> attributes = new HashMap<>();
-            attributes.put(Attributes.HOST, tc.getHostAddress());
-            attributes.put(Attributes.USER_AGENT, tc.getUserAgent());
-            
-            User user = null;
-            int tokenType = 0;
-     	   	// EM: Use enum for the authentication types
-        	if(!tc.getTokenType().equals("basic")){
-        		tokenType = 1;
-        	}
+            User user = (User) context.getProperties().get("user");
         	
-        	user = authManager.authenticate(tokenType, tc.getUsername(), tc.getToken(), attributes);
-            
             PolicyBuilder pb = new PolicyBuilder(user)
                     .setConditions(new PolicyCondition(group))
                     .setResources(resource);

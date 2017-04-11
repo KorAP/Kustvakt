@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.config;
 
 public class Attributes {
 
+	// EM: Use enum for the authentication types
     public static final String AUTHORIZATION = "Authorization";
     public static final String SESSION_AUTHENTICATION = "session_token";
     public static final String API_AUTHENTICATION = "api_token";
@@ -44,7 +45,8 @@ public class Attributes {
     public static final String ADDRESS = "address";
     public static final String COUNTRY = "country";
     public static final String IPADDRESS = "ipaddress";
-    // deprcated, use created
+    public static final String IS_ADMIN = "admin";
+    // deprecated, use created
     public static final String ACCOUNT_CREATION = "account_creation";
     public static final String ACCOUNTLOCK = "account_lock";
     public static final String ACCOUNTLINK = "account_link";

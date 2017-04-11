@@ -172,7 +172,8 @@ public class PolicyEvaluator {
 
 
     public boolean isManaged () {
-        return getOwner(this.policies[0]) == KorAPUser.ADMINISTRATOR_ID;
+        //return getOwner(this.policies[0]) == KorAPUser.ADMINISTRATOR_ID;
+    	return false;
     }
 
 

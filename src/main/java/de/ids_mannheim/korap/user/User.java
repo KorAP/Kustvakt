@@ -21,8 +21,8 @@ import java.util.Map;
 @Data
 public abstract class User implements Serializable {
 
-    public static final int ADMINISTRATOR_ID = 34349733;
-    public static final String ADMINISTRATOR_NAME = "admin";
+//    public static final int ADMINISTRATOR_ID = 34349733;
+//    public static final String ADMINISTRATOR_NAME = "admin";
 
     private Integer id;
     // in local its username, in shib it's edupersonPrincipalName
@@ -44,6 +44,7 @@ public abstract class User implements Serializable {
 
     private List<Userdata> userdata;
 
+    private boolean isAdmin;
 
     protected User () {
         this.fields = new ParamFields();
@@ -134,10 +135,9 @@ public abstract class User implements Serializable {
         return true;
     }
 
-
-    public boolean isAdmin () {
-        return this.getUsername().equals(ADMINISTRATOR_ID);
-    }
+//    public boolean isAdmin () {
+//        return this.getUsername().equals(ADMINISTRATOR_ID);
+//    }
 
 
     protected abstract User clone ();
@@ -164,10 +164,9 @@ public abstract class User implements Serializable {
             return user;
         }
 
-
-        public static KorAPUser getAdmin () {
-            return new KorAPUser(ADMINISTRATOR_ID, ADMINISTRATOR_NAME);
-        }
+//        public static KorAPUser getAdmin () {
+//            return new KorAPUser(ADMINISTRATOR_ID, ADMINISTRATOR_NAME);
+//        }
 
 
         public static DemoUser getDemoUser () {

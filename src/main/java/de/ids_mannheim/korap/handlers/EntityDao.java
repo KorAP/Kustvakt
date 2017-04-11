@@ -38,7 +38,6 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
     private static Logger jlog = LoggerFactory.getLogger(EntityDao.class);
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-
     public EntityDao (PersistenceClient client) {
         this.jdbcTemplate = (NamedParameterJdbcTemplate) client.getSource();
     }
@@ -194,11 +193,11 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
 
         KeyHolder holder = new GeneratedKeyHolder();
 
+        int r;
         try {
-            int r = this.jdbcTemplate.update(query, np, holder,
+            r = this.jdbcTemplate.update(query, np, holder,
                     new String[] { "id" });
             user.setId(holder.getKey().intValue());
-            return r;
         }
         catch (DataAccessException e) {
             jlog.error("Could not create user account with username: {}",
@@ -206,6 +205,8 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
             throw new dbException(user.getUsername(), "korap_users",
                     StatusCodes.ENTRY_EXISTS, user.getUsername());
         }
+        
+        return r;
     }
 
 

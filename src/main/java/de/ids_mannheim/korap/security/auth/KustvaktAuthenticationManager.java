@@ -11,6 +11,7 @@ import de.ids_mannheim.korap.interfaces.AuthenticationIface;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.ValidatorIface;
+import de.ids_mannheim.korap.interfaces.db.AdminHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
@@ -41,18 +42,21 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             .getLogger(KustvaktAuthenticationManager.class);
     private EncryptionIface crypto;
     private EntityHandlerIface entHandler;
+    private AdminHandlerIface adminHandler;
     private AuditingIface auditing;
     private KustvaktConfiguration config;
     private Collection userdatadaos;
     private LoginCounter counter;
     private ValidatorIface validator;
 
-    public KustvaktAuthenticationManager (EntityHandlerIface userdb,
+    public KustvaktAuthenticationManager (EntityHandlerIface userdb, 
+    									  AdminHandlerIface admindb,
                                           EncryptionIface crypto,
                                           KustvaktConfiguration config,
                                           AuditingIface auditer,
                                           Collection<UserDataDbIface> userdatadaos) {
         this.entHandler = userdb;
+        this.adminHandler = admindb;
         this.config = config;
         this.crypto = crypto;
         this.auditing = auditer;
@@ -258,7 +262,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
                         attributes.toString());
             }
         }
+        
+        boolean isAdmin = adminHandler.isAdmin(unknown.getId());
+        unknown.setAdmin(isAdmin);
         jlog.trace("Authentication: found username " + unknown.getUsername());
+        
         if (unknown instanceof KorAPUser) {
             if (password == null || password.isEmpty())
                 throw new WrappedException(new KustvaktException(
@@ -536,6 +544,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             user.addField(param);
         }
         user.setPassword(hash);
+        
+        String o = (String) attributes.get(Attributes.IS_ADMIN);
+		boolean b = Boolean.parseBoolean(o);
+		user.setAdmin(b);
+        
         try {
             UserDetails details = new UserDetails();
             details.read(safeMap, true);
@@ -546,6 +559,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             jlog.info("Creating new user account for user {}",
                     user.getUsername());
             entHandler.createAccount(user);
+            if (user.isAdmin() && user instanceof KorAPUser){
+            	adminHandler.addAccount(user);
+            }
             details.setUserId(user.getId());
             settings.setUserId(user.getId());
 

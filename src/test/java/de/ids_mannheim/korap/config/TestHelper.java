@@ -414,7 +414,12 @@ public class TestHelper {
             return new EntityDao(this.dataSource);
         }
 
-
+        @Bean(name = ContextHolder.KUSTVAKT_ADMINDB)
+        @Override
+        public AdminHandlerIface getAdminDao () {
+            return new AdminDao(this.dataSource);
+        }
+        
         @Bean(name = ContextHolder.KUSTVAKT_CONFIG)
         @Override
         public KustvaktConfiguration getConfig () {
@@ -468,7 +473,7 @@ public class TestHelper {
         @Override
         public AuthenticationManagerIface getAuthManager () {
             AuthenticationManagerIface manager = new KustvaktAuthenticationManager(
-                    getUserDao(), getCrypto(), getConfig(), getAuditingDao(),
+                    getUserDao(), getAdminDao(), getCrypto(), getConfig(), getAuditingDao(),
                     getUserdataDaos());
             Set<AuthenticationIface> pro = new HashSet<>();
             pro.add(new BasicHttpAuth());

@@ -1,11 +1,8 @@
 package de.ids_mannheim.korap.config;
 
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import net.jcip.annotations.NotThreadSafe;
+import static org.junit.Assert.assertNotNull;
+
 import org.apache.log4j.Logger;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.InitializationError;
@@ -15,10 +12,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.annotation.PostConstruct;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * @author hanl

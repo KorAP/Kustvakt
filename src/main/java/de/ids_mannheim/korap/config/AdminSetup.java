@@ -8,6 +8,7 @@ import de.ids_mannheim.korap.interfaces.EncryptionIface;
 /**
  * Created by hanl on 30.05.16.
  */
+@Deprecated
 public class AdminSetup {
 
     private final String token_hash;

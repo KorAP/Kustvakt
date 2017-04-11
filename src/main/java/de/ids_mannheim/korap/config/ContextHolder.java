@@ -29,6 +29,7 @@ public abstract class ContextHolder {
     public static final String KUSTVAKT_AUTHENTICATION_MANAGER = "kustvakt_authenticationmanager";
     public static final String KUSTVAKT_AUTHPROVIDERS = "kustvakt_authproviders";
     public static final String KUSTVAKT_USERDB = "kustvakt_userdb";
+    public static final String KUSTVAKT_ADMINDB = "kustvakt_admindb";
     public static final String KUSTVAKT_POLICIES = "kustvakt_policies";
 
     private ApplicationContext context = null;
@@ -104,6 +105,10 @@ public abstract class ContextHolder {
 
     public EntityHandlerIface getUserDBHandler () {
         return getBean(KUSTVAKT_USERDB);
+    }
+    
+    public AdminHandlerIface getAdminDBHandler () {
+        return getBean(KUSTVAKT_ADMINDB);
     }
 
 

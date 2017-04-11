@@ -28,18 +28,6 @@ public class KustvaktConfiguration {
 
     public static final Map<String, Object> KUSTVAKT_USER = new HashMap<>();
 
-//    static {
-//        KUSTVAKT_USER.put(Attributes.ID, 1000);
-//        KUSTVAKT_USER.put(Attributes.USERNAME, "kustvakt");
-//        KUSTVAKT_USER.put(Attributes.PASSWORD, "kustvakt2015");
-//        KUSTVAKT_USER.put(Attributes.EMAIL, "kustvakt@ids-mannheim.de");
-//        KUSTVAKT_USER.put(Attributes.COUNTRY, "Germany");
-//        KUSTVAKT_USER.put(Attributes.ADDRESS, "Mannheim");
-//        KUSTVAKT_USER.put(Attributes.FIRSTNAME, "Kustvakt");
-//        KUSTVAKT_USER.put(Attributes.LASTNAME, "KorAP");
-//        KUSTVAKT_USER.put(Attributes.INSTITUTION, "IDS Mannheim");
-//    }
-
     private static final Logger jlog = LoggerFactory
             .getLogger(KustvaktConfiguration.class);
     private String indexDir;
@@ -168,7 +156,7 @@ public class KustvaktConfiguration {
         KUSTVAKT_USER.put(Attributes.FIRSTNAME, properties.getProperty("kustvakt.init.user.firstname"));
         KUSTVAKT_USER.put(Attributes.LASTNAME, properties.getProperty("kustvakt.init.user.lastname"));
         KUSTVAKT_USER.put(Attributes.INSTITUTION, properties.getProperty("kustvakt.init.user.institution"));
-
+        KUSTVAKT_USER.put(Attributes.IS_ADMIN, properties.getProperty("kustvakt.init.user.admin"));
         return properties;
     }
 
