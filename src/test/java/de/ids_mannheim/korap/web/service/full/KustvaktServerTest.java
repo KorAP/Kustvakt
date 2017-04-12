@@ -7,10 +7,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -31,12 +34,14 @@ import org.apache.http.config.Registry;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.io.Files;
 import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.config.Attributes;
@@ -59,37 +64,17 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * @author margaretha
  *
  */
-public class ResouceServiceServerTest extends BeanConfigTest {
+public class KustvaktServerTest extends BeanConfigTest {
 	@Test
 	public void testCreatePolicy() throws IOException, URISyntaxException {
-		String pwd ="password";
-		InputStream stream = new FileInputStream(new File(
-                "/home/elma/korap-keystore"));
 		
-        SSLContext sslcontext = null;
-		try {
-			KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-			ks.load(stream, pwd.toCharArray());
-			sslcontext = SSLContexts.custom()
-	                .loadTrustMaterial(ks)
-	                .loadKeyMaterial(ks, pwd.toCharArray())
-	                .build();
-		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException 
-				| KeyManagementException | UnrecoverableKeyException e) {
-			e.printStackTrace();
-		}
-		
-		SSLConnectionSocketFactory factory = new SSLConnectionSocketFactory(sslcontext,
-		         SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
-        HttpClient httpclient = HttpClients.custom()
-                .setSSLSocketFactory(factory)
-                .build();
+		HttpClient httpClient = HttpClients.createDefault();;
 		
         String id = UUID.randomUUID().toString();
 		URIBuilder builder = new URIBuilder();
-		builder.setScheme("https")
-			.setHost("korap.ids-mannheim.de")
-			.setPort(8443).setPath("/api/v0.1/admin/createPolicies/" + id)
+		builder.setScheme("http")
+			.setHost("localhost")
+			.setPort(8089).setPath("/api/v0.1/admin/createPolicies/" + id)
 			.setParameter("type", "virtualcollection")
 			.setParameter("name", "Goethe VC")
 			.setParameter("description", "Goethe corpus")
@@ -100,8 +85,9 @@ public class ResouceServiceServerTest extends BeanConfigTest {
 
 		URI uri = builder.build();
 		HttpPost httppost = new HttpPost(uri);
+		
 		httppost.addHeader(Attributes.AUTHORIZATION, BasicHttpAuth.encode("kustvakt", "kustvakt2015"));
-		HttpResponse response = httpclient.execute(httppost);
+		HttpResponse response = httpClient.execute(httppost);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatusLine().getStatusCode());
 

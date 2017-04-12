@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS korap_users (
 
 CREATE TABLE IF NOT EXISTS admin_users (
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    user_id INTEGER NOT NULL UNIQUE,
+    user_id INTEGER NOT NULL,
     foreign key (user_id)
     references korap_users (id)
 );
