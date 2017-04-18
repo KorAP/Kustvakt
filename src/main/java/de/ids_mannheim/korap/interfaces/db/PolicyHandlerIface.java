@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.interfaces.db;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.resources.Foundry;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.security.Parameter;
 import de.ids_mannheim.korap.security.PolicyCondition;
@@ -36,7 +37,9 @@ public interface PolicyHandlerIface {
 
     List<SecurityPolicy> getPolicies (PolicyCondition condition,
             Class<? extends KustvaktResource> clazz, Byte perm);
-
+    
+    List<SecurityPolicy> getPoliciesByPersistentId (PolicyCondition policyCondition,
+            Class<? extends KustvaktResource> clazz, byte perm, String id);
 
     /**
      * @param policy
@@ -195,5 +198,6 @@ public interface PolicyHandlerIface {
 
 
     int size ();
+
 
 }

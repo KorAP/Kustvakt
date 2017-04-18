@@ -18,6 +18,7 @@ import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.handlers.ResourceDao;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.resources.KustvaktResource;
@@ -301,7 +302,35 @@ public class ResourceServiceTest extends FastJerseyTest {
                 User.UserFactory.getDemoUser());
         assertNotNull(res);
         Assert.assertEquals("Goethe",res.getName().toString());
-    
+        
+        // no update resource service
+        response = resource()
+                .path(getAPIVersion())
+                .path("virtualcollection")
+                .path(id)
+                .queryParam("name", "Goethe")
+                .header(Attributes.AUTHORIZATION,
+                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                .post(ClientResponse.class);
+        
+        assertEquals(StatusCodes.NOTHING_CHANGED, response.getStatus());
+        
+        // update resource service
+        response = resource()
+                .path(getAPIVersion())
+                .path("virtualcollection")
+                .path(id)
+                .queryParam("name", "Goethe collection")
+                .header(Attributes.AUTHORIZATION,
+                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                .post(ClientResponse.class);
+        
+        res = dao.findbyId(id,
+                User.UserFactory.getDemoUser());
+        assertNotNull(res);
+        Assert.assertEquals("Goethe collection",res.getName().toString());
+        
+        
         // delete resource service
     	response = resource()
                 .path(getAPIVersion())
@@ -340,36 +369,6 @@ public class ResourceServiceTest extends FastJerseyTest {
         assertEquals("WPD15", node.path("id").asText());
     }
 
-    
-
-//    @Test
-//    public void testCreatePolicyForResource() {
-//    	ClientResponse response = resource()
-//                .path(getAPIVersion())
-//                .path("admin")
-//                .path("createPolicies")
-//                .path(UUID.randomUUID().toString())
-//                .queryParam("type", "virtualcollection")
-//                .queryParam("name", "Goethe")
-//                .queryParam("description", "Goethe corpus")
-//                .queryParam("group", "public")
-//                .queryParam("perm", Permission.READ.name())
-//                .queryParam("loc", "")
-//                .queryParam("expire", "")
-//                .header(Attributes.AUTHORIZATION,
-//                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
-//                .post(ClientResponse.class);
-//        
-//        assertEquals(ClientResponse.Status.OK.getStatusCode(),
-//                response.getStatus());
-//        
-//        String ent = response.getEntity(String.class);
-//        JsonNode node = JsonUtils.readTree(ent);
-//        assertNotNull(node);
-//        assertTrue(node.isObject());
-//        assertEquals("GOE", node.path("id").asText());
-//	}
-    
     @Test
     public void testCorpusGet2 () {
     	ClientResponse response = resource().path(getAPIVersion())

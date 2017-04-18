@@ -55,105 +55,184 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
- * This class tests services of a running Kustvakt server with a MySQL database.
- * Please check the database configuration in src/main/resources/jdbc.properties
+ * This class tests services of a running Kustvakt server with a MySQL
+ * database.
+ * Please check the database configuration in
+ * src/main/resources/jdbc.properties
  * and run the server before running the tests.
  * 
- * See {@link ResourceServiceTest} for tests using an in-memory database.
+ * See {@link ResourceServiceTest} for tests using an in-memory
+ * database.
  * 
  * @author margaretha
  *
  */
 public class KustvaktServerTest extends BeanConfigTest {
-	@Test
-	public void testCreatePolicy() throws IOException, URISyntaxException {
-		
-		HttpClient httpClient = HttpClients.createDefault();;
-		
-        String id = UUID.randomUUID().toString();
-		URIBuilder builder = new URIBuilder();
-		builder.setScheme("http")
-			.setHost("localhost")
-			.setPort(8089).setPath("/api/v0.1/admin/createPolicies/" + id)
-			.setParameter("type", "virtualcollection")
-			.setParameter("name", "Goethe VC")
-			.setParameter("description", "Goethe corpus")
-			.setParameter("group", "public")
-			.setParameter("perm", Permission.READ.name())
-			.setParameter("loc", "")
-			.setParameter("expire", "");
+    @Test
+    public void testCreatePolicy () throws IOException, URISyntaxException {
 
-		URI uri = builder.build();
-		HttpPost httppost = new HttpPost(uri);
-		
-		httppost.addHeader(Attributes.AUTHORIZATION, BasicHttpAuth.encode("kustvakt", "kustvakt2015"));
-		HttpResponse response = httpClient.execute(httppost);
-		assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        HttpClient httpClient = HttpClients.createDefault();;
+
+        String id = UUID.randomUUID().toString();
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme("http").setHost("localhost").setPort(8089)
+                .setPath("/api/v0.1/admin/createPolicies/" + id)
+                .setParameter("type", "virtualcollection")
+                .setParameter("name", "Goethe VC")
+                .setParameter("description", "Goethe corpus")
+                .setParameter("group", "public")
+                .setParameter("perm", Permission.READ.name())
+                .setParameter("loc", "")
+                .setParameter("expire", "");
+
+        URI uri = builder.build();
+        HttpPost httppost = new HttpPost(uri);
+
+        httppost.addHeader(Attributes.AUTHORIZATION,
+                BasicHttpAuth.encode("kustvakt", "kustvakt2015"));
+        HttpResponse response = httpClient.execute(httppost);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatusLine().getStatusCode());
 
-	}
+    }
 
-	@Test
-	public void testWrongAuthorization() throws IOException, URISyntaxException {
-		HttpResponse response = testResourceStore("wezrowerowj");
-		assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(), response.getStatusLine().getStatusCode());
-	}
 
-	@Test
-	public void testCorrectAuthorization() throws IOException, URISyntaxException, KustvaktException {
+    @Test
+    public void testCreatePolicyForFoundry ()
+            throws IOException, URISyntaxException {
 
-		HttpResponse response = testResourceStore("kustvakt2015");
-		HttpEntity entity = response.getEntity();
-		String content = null;
+        HttpClient httpClient = HttpClients.createDefault();;
 
-		if (entity != null) {
-			InputStream is = entity.getContent();
-			try {
-				content = IOUtils.toString(is, "UTF-8");
-			} finally {
-				is.close();
-			}
-		}
+        String id = UUID.randomUUID().toString();
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme("http").setHost("localhost").setPort(8089)
+                .setPath("/api/v0.1/admin/createPolicies/" + id)
+                .setParameter("type", "foundry")
+                .setParameter("name", "stanford")
+                .setParameter("description", "stanford parser")
+                .setParameter("group", "public")
+                .setParameter("perm", Permission.READ.name())
+                .setParameter("loc", "255.255.255.0")
+                .setParameter("expire", "30D");
 
-		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatusLine().getStatusCode());
+        URI uri = builder.build();
+        HttpPost httppost = new HttpPost(uri);
 
-		JsonNode node = JsonUtils.readTree(content);
-		assertNotNull(node);
-		assertTrue(node.isObject());
-		assertEquals("Goethe", node.path("name").asText());
-		assertEquals("Goethe corpus", node.path("description").asText());
+        httppost.addHeader(Attributes.AUTHORIZATION,
+                BasicHttpAuth.encode("kustvakt", "kustvakt2015"));
+        HttpResponse response = httpClient.execute(httppost);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatusLine().getStatusCode());
 
-		// checkResourceInDB(node.path("id").asText());
-	}
+    }
 
-	public HttpResponse testResourceStore(String password) throws IOException, URISyntaxException {
 
-		HttpClient httpclient = HttpClients.createDefault();
-		URIBuilder builder = new URIBuilder();
-		builder.setScheme("http").setHost("localhost").setPort(8089).setPath("/api/v0.1/virtualcollection")
-				.setParameter("filter", "httpclient").setParameter("name", "Goethe")
-				.setParameter("description", "Goethe corpus");
-		URI uri = builder.build();
-		HttpPost httppost = new HttpPost(uri);
-		httppost.addHeader(Attributes.AUTHORIZATION, BasicHttpAuth.encode("kustvakt", password));
-		return httpclient.execute(httppost);
+    @Test
+    public void testCreatePolicyWithMultiplePermissions ()
+            throws IOException, URISyntaxException {
 
-	}
+        HttpClient httpClient = HttpClients.createDefault();;
 
-	private void checkResourceInDB(String id) throws KustvaktException {
+        String id = UUID.randomUUID().toString();
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme("http").setHost("localhost").setPort(8089)
+                .setPath("/api/v0.1/admin/createPolicies/" + id)
+                .setParameter("type", "corpus").setParameter("name", "Brown")
+                .setParameter("description", "Brown corpus")
+                .setParameter("group", "public")
+                .setParameter("perm", Permission.READ.name())
+                .setParameter("perm", Permission.WRITE.name())
+                .setParameter("perm", Permission.DELETE.name())
+                .setParameter("loc", "255.255.255.0")
+                .setParameter("expire", "30D");
 
-		ResourceDao<?> dao = new ResourceDao<>(helper().getContext().getPersistenceClient());
-		assertEquals("sqlite", helper().getContext().getPersistenceClient().getDatabase());
+        URI uri = builder.build();
+        HttpPost httppost = new HttpPost(uri);
 
-		assertNotEquals(0, dao.size());
-		KustvaktResource res = dao.findbyId(id, User.UserFactory.getDemoUser());
-		assertNotNull(res);
-		Assert.assertEquals(true, res.getField("testVar").toString().startsWith("testVal_"));
-	}
+        httppost.addHeader(Attributes.AUTHORIZATION,
+                BasicHttpAuth.encode("kustvakt", "kustvakt2015"));
+        HttpResponse response = httpClient.execute(httppost);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatusLine().getStatusCode());
 
-	@Override
-	public void initMethod() throws KustvaktException {
-		// TODO Auto-generated method stub
+    }
 
-	}
+
+    @Test
+    public void testWrongAuthorization ()
+            throws IOException, URISyntaxException {
+        HttpResponse response = testResourceStore("wezrowerowj");
+        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
+                response.getStatusLine().getStatusCode());
+    }
+
+
+    @Test
+    public void testCorrectAuthorization ()
+            throws IOException, URISyntaxException, KustvaktException {
+
+        HttpResponse response = testResourceStore("kustvakt2015");
+        HttpEntity entity = response.getEntity();
+        String content = null;
+
+        if (entity != null) {
+            InputStream is = entity.getContent();
+            try {
+                content = IOUtils.toString(is, "UTF-8");
+            }
+            finally {
+                is.close();
+            }
+        }
+
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatusLine().getStatusCode());
+
+        JsonNode node = JsonUtils.readTree(content);
+        assertNotNull(node);
+        assertTrue(node.isObject());
+        assertEquals("Goethe", node.path("name").asText());
+        assertEquals("Goethe corpus", node.path("description").asText());
+    }
+
+
+    public HttpResponse testResourceStore (String password)
+            throws IOException, URISyntaxException {
+
+        HttpClient httpclient = HttpClients.createDefault();
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme("http").setHost("localhost").setPort(8089)
+                .setPath("/api/v0.1/virtualcollection")
+                .setParameter("filter", "httpclient")
+                .setParameter("name", "Goethe")
+                .setParameter("description", "Goethe corpus");
+        URI uri = builder.build();
+        HttpPost httppost = new HttpPost(uri);
+        httppost.addHeader(Attributes.AUTHORIZATION,
+                BasicHttpAuth.encode("kustvakt", password));
+        return httpclient.execute(httppost);
+
+    }
+
+
+    private void checkResourceInDB (String id) throws KustvaktException {
+
+        ResourceDao<?> dao = new ResourceDao<>(
+                helper().getContext().getPersistenceClient());
+        assertEquals("sqlite",
+                helper().getContext().getPersistenceClient().getDatabase());
+
+        assertNotEquals(0, dao.size());
+        KustvaktResource res = dao.findbyId(id, User.UserFactory.getDemoUser());
+        assertNotNull(res);
+        Assert.assertEquals(true,
+                res.getField("testVar").toString().startsWith("testVal_"));
+    }
+
+
+    @Override
+    public void initMethod () throws KustvaktException {
+        // TODO Auto-generated method stub
+
+    }
 }

@@ -13,7 +13,7 @@ account_link VARCHAR(100)
 
 CREATE TABLE IF NOT EXISTS admin_users (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
-user_id INTEGER NOT NULL UNIQUE,
+user_id INTEGER NOT NULL,
 foreign key (user_id)
 references korap_users (id)
 );
