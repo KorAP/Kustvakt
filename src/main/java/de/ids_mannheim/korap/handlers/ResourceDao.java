@@ -16,7 +16,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.exceptions.dbException;
+import de.ids_mannheim.korap.exceptions.DatabaseException;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
 import de.ids_mannheim.korap.resources.KustvaktResource;
@@ -62,7 +62,7 @@ public class ResourceDao<T extends KustvaktResource>
             log.error(
                     "Exception during database retrieval for ids '" + ids + "'",
                     e);
-            throw new dbException(user.getId(), "resource_store",
+            throw new DatabaseException(user.getId(), "resource_store",
                     StatusCodes.DB_GET_FAILED,
                     "Exception during database retrieval for ids '" + ids,
                     ids.toString());
@@ -85,7 +85,7 @@ public class ResourceDao<T extends KustvaktResource>
         catch (DataAccessException e) {
             log.error("Exception during database update for id '"
                     + resource.getPersistentID() + "'", e);
-            throw new dbException(user.getId(), "resource_store",
+            throw new DatabaseException(user.getId(), "resource_store",
                     StatusCodes.DB_UPDATE_FAILED, "Exception during database update for id '"
                             + resource.getPersistentID(), resource.toString());
         }
@@ -205,7 +205,7 @@ public class ResourceDao<T extends KustvaktResource>
         catch (DataAccessException e) {
             log.error("Exception during database store for id '"
                     + resource.getPersistentID() + "'", e);
-            throw new dbException(user.getId(), "resource_store",
+            throw new DatabaseException(user.getId(), "resource_store",
                     StatusCodes.DB_INSERT_FAILED,
                     "Exception during database store for id '"
                             + resource.getPersistentID(),
@@ -225,7 +225,7 @@ public class ResourceDao<T extends KustvaktResource>
             return this.jdbcTemplate.update(sql, source);
         }
         catch (DataAccessException e) {
-            throw new dbException(user.getId(), "resource_store",
+            throw new DatabaseException(user.getId(), "resource_store",
                     StatusCodes.DB_DELETE_FAILED, "Operation DELETE failed.",
                     id);
         }

@@ -6,7 +6,7 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.dbException;
+import de.ids_mannheim.korap.exceptions.DatabaseException;
 import de.ids_mannheim.korap.handlers.UserDetailsDao;
 import de.ids_mannheim.korap.handlers.UserSettingsDao;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;

@@ -8,15 +8,15 @@ import java.util.Arrays;
  * @author hanl
  * @date 08/04/2015
  */
-public class dbException extends KustvaktException {
+public class DatabaseException extends KustvaktException {
 
-    private dbException (Object userid, Integer status, String message,
+    private DatabaseException (Object userid, Integer status, String message,
                          String args) {
         super(String.valueOf(userid), status, message, args);
     }
 
 
-    public dbException (Object userid, String target, Integer status, String message,
+    public DatabaseException (Object userid, String target, Integer status, String message,
                         String ... args) {
         this(userid, status, message, Arrays.asList(args).toString());
         AuditRecord record = new AuditRecord(AuditRecord.CATEGORY.DATABASE);
@@ -28,7 +28,7 @@ public class dbException extends KustvaktException {
     }
 
 
-    public dbException (KustvaktException e, Integer status, String ... args) {
+    public DatabaseException (KustvaktException e, Integer status, String ... args) {
         this(e.getUserid(), e.getStatusCode(), e.getMessage(), e.getEntity());
         AuditRecord record = AuditRecord.dbRecord(e.getUserid(), status, args);
         record.setField_1(e.string());

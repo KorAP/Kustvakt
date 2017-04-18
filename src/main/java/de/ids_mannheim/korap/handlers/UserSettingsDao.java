@@ -2,7 +2,7 @@ package de.ids_mannheim.korap.handlers;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.exceptions.dbException;
+import de.ids_mannheim.korap.exceptions.DatabaseException;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.user.User;
@@ -76,7 +76,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
 
 
     @Override
-    public UserSettings get (Integer id) throws dbException {
+    public UserSettings get (Integer id) throws DatabaseException {
         String sql = "SELECT * FROM user_settings WHERE id=:id;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("id", id);
@@ -101,7 +101,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
             return null;
         }
         catch (DataAccessException e) {
-            throw new dbException(-1, "userSettings",
+            throw new DatabaseException(-1, "userSettings",
                     StatusCodes.REQUEST_INVALID, "The request is invalid.",
                     String.valueOf(id));
         }
@@ -109,7 +109,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
 
 
     @Override
-    public UserSettings get (User user) throws dbException {
+    public UserSettings get (User user) throws DatabaseException {
         String sql = "SELECT * FROM user_settings WHERE user_id=:userid;";
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("userid", user.getId());
@@ -134,7 +134,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
             return null;
         }
         catch (DataAccessException e) {
-            throw new dbException(-1, "userSettings",
+            throw new DatabaseException(-1, "userSettings",
                     StatusCodes.REQUEST_INVALID, "The request is invalid.");
         }
     }

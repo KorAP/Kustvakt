@@ -6,7 +6,7 @@ import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.exceptions.dbException;
+import de.ids_mannheim.korap.exceptions.DatabaseException;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.user.KorAPUser;
@@ -62,7 +62,7 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
         }
         catch (DataAccessException e) {
             jlog.error("Could not retrieve user for name: " + username, e);
-            throw new dbException(username, "korap_users",
+            throw new DatabaseException(username, "korap_users",
                     StatusCodes.DB_GET_FAILED,
                     "Could not retrieve the user with username: " + username,
                     username);
@@ -120,7 +120,7 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
             jlog.error(
                     "Could not update user account for user: " + user.getId(),
                     e);
-            throw new dbException(user.getId(), "korap_users",
+            throw new DatabaseException(user.getId(), "korap_users",
                     StatusCodes.DB_UPDATE_FAILED,
                     "Could not update user account for user: " + user.getId(),
                     user.toString());
@@ -208,12 +208,12 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
         catch (DuplicateKeyException e) {
             jlog.error("Could not create user account with username: {}",
                     user.getUsername());
-            throw new dbException(user.getUsername(), "korap_users",
+            throw new DatabaseException(user.getUsername(), "korap_users",
                     StatusCodes.ENTRY_EXISTS, "Username exists.",
                     user.getUsername());
         }
         catch (DataAccessException e) {
-            throw new dbException(user.getUsername(), "korap_users",
+            throw new DatabaseException(user.getUsername(), "korap_users",
                     StatusCodes.ENTRY_EXISTS, "Username exists.",
                     user.getUsername());
         }
@@ -246,7 +246,7 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
         catch (DataAccessException e) {
             jlog.error("Could not delete account for user: " + userid, e);
             //            throw new KorAPException(e, StatusCodes.CONNECTION_ERROR);
-            throw new dbException(userid, "korap_users",
+            throw new DatabaseException(userid, "korap_users",
                     StatusCodes.DB_DELETE_FAILED,
                     "Could not delete account for user: " + userid,
                     userid.toString());
@@ -283,7 +283,7 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
         }
         catch (DataAccessException e) {
             jlog.error("Could not reset password for name: " + username, e);
-            throw new dbException(username, "korap_users",
+            throw new DatabaseException(username, "korap_users",
                     StatusCodes.DB_UPDATE_FAILED,
                     "Could not reset password for username: " + username,
                     username, uriToken, passphrase);
@@ -308,7 +308,7 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
         catch (DataAccessException e) {
             jlog.error("Could not confirm registration for name " + username,
                     e);
-            throw new dbException(username, "korap_users",
+            throw new DatabaseException(username, "korap_users",
                     StatusCodes.DB_UPDATE_FAILED,
                     "Could not confirm registration for username " + username,
                     username, uriToken);
