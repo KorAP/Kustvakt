@@ -96,7 +96,8 @@ public class UserDetailsDao implements UserDataDbIface<UserDetails> {
         }
         catch (DataAccessException e) {
             throw new dbException(-1, "userDetails",
-                    StatusCodes.REQUEST_INVALID, String.valueOf(id));
+                    StatusCodes.REQUEST_INVALID, "The request is invalid.",
+                    String.valueOf(id));
         }
     }
 
@@ -127,7 +128,7 @@ public class UserDetailsDao implements UserDataDbIface<UserDetails> {
         }
         catch (DataAccessException e) {
             throw new dbException(user.getId(), "userDetails",
-                    StatusCodes.REQUEST_INVALID);
+                    StatusCodes.REQUEST_INVALID, "The request is invalid.");
         }
     }
 

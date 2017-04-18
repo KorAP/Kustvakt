@@ -16,9 +16,9 @@ public class dbException extends KustvaktException {
     }
 
 
-    public dbException (Object userid, String target, Integer status,
+    public dbException (Object userid, String target, Integer status, String message,
                         String ... args) {
-        this(userid, status, "", Arrays.asList(args).toString());
+        this(userid, status, message, Arrays.asList(args).toString());
         AuditRecord record = new AuditRecord(AuditRecord.CATEGORY.DATABASE);
         record.setUserid(String.valueOf(userid));
         record.setStatus(status);

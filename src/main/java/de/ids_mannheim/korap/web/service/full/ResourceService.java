@@ -799,32 +799,33 @@ public class ResourceService {
             if (name != null && !name.isEmpty()) {
                 if (description == null) {
                     if (name.equals(resource.getName())) {
-                        return Response.notModified("No change has found.")
-                                .build();
+                        throw new KustvaktException(StatusCodes.NOTHING_CHANGED,
+                                "No change has found.");
                     }
+                    resource.setName(name);
                 }
                 else if (name.equals(resource.getName())
                         && description.equals(resource.getDescription())) {
-                    return Response.notModified("No change has found.").build();
+                    throw new KustvaktException(StatusCodes.NOTHING_CHANGED,
+                            "No change has found.");
                 }
                 else {
                     resource.setName(name);
+                    resource.setDescription(description);
                 }
             }
             else if (description != null && !description.isEmpty()) {
                 resource.setDescription(description);
             }
             else {
-                Response.notModified(
-                        "New name and description are not specified.").build();
+                throw new KustvaktException(StatusCodes.NOTHING_CHANGED,
+                        "The given resource name and description are the same as already stored.");
             }
 
 
             this.resourceHandler.updateResources(user, resource);
         }
-        catch (
-
-        KustvaktException e) {
+        catch (KustvaktException e) {
             jlog.error("Exception encountered: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }

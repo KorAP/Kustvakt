@@ -6,19 +6,22 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.Iterator;
 
+import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.handlers.ResourceDao;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.resources.KustvaktResource;
@@ -32,7 +35,8 @@ import de.ids_mannheim.korap.web.service.FastJerseyTest;
  * @date 14/01/2016
  */
 public class ResourceServiceTest extends FastJerseyTest {
-	
+    private static ObjectMapper mapper = new ObjectMapper();
+    
     @BeforeClass
     public static void configure () throws Exception {
         FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.full",
@@ -266,7 +270,7 @@ public class ResourceServiceTest extends FastJerseyTest {
     }
 
     @Test
-    public void testResourceStore() throws KustvaktException {
+    public void testResourceStore() throws KustvaktException, JsonProcessingException, IOException {
     	// resource store service
         ClientResponse response = resource()
                 .path(getAPIVersion())
@@ -303,7 +307,7 @@ public class ResourceServiceTest extends FastJerseyTest {
         assertNotNull(res);
         Assert.assertEquals("Goethe",res.getName().toString());
         
-        // no update resource service
+//         no update resource service
         response = resource()
                 .path(getAPIVersion())
                 .path("virtualcollection")
@@ -313,7 +317,11 @@ public class ResourceServiceTest extends FastJerseyTest {
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
         
-        assertEquals(StatusCodes.NOTHING_CHANGED, response.getStatus());
+        assertEquals(HttpStatus.SC_BAD_REQUEST, response.getStatus());
+        JsonNode errorNode = mapper.readTree(response.getEntityInputStream());
+        assertEquals(
+                "[No change has found.]",
+                errorNode.get("errors").get(0).get(2).asText());
         
         // update resource service
         response = resource()
@@ -324,6 +332,9 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
+        
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
         
         res = dao.findbyId(id,
                 User.UserFactory.getDemoUser());

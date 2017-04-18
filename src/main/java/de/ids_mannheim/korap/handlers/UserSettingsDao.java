@@ -88,8 +88,8 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
                         @Override
                         public UserSettings mapRow (ResultSet rs, int rowNum)
                                 throws SQLException {
-                            UserSettings details = new UserSettings(rs
-                                    .getInt("user_id"));
+                            UserSettings details = new UserSettings(
+                                    rs.getInt("user_id"));
                             details.setId(rs.getInt("id"));
                             details.setData(rs.getString("data"));
                             return details;
@@ -102,7 +102,8 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
         }
         catch (DataAccessException e) {
             throw new dbException(-1, "userSettings",
-                    StatusCodes.REQUEST_INVALID, String.valueOf(id));
+                    StatusCodes.REQUEST_INVALID, "The request is invalid.",
+                    String.valueOf(id));
         }
     }
 
@@ -120,8 +121,8 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
                         @Override
                         public UserSettings mapRow (ResultSet rs, int rowNum)
                                 throws SQLException {
-                            UserSettings details = new UserSettings(rs
-                                    .getInt("user_id"));
+                            UserSettings details = new UserSettings(
+                                    rs.getInt("user_id"));
                             details.setId(rs.getInt("id"));
                             details.setData(rs.getString("data"));
                             return details;
@@ -134,7 +135,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
         }
         catch (DataAccessException e) {
             throw new dbException(-1, "userSettings",
-                    StatusCodes.REQUEST_INVALID);
+                    StatusCodes.REQUEST_INVALID, "The request is invalid.");
         }
     }
 

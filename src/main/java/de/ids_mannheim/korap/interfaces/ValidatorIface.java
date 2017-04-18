@@ -10,7 +10,7 @@ import java.util.Map;
 public interface ValidatorIface {
 
 
-    Map<String, Object> validateMap (Map<String, Object> map);
+    Map<String, Object> validateMap (Map<String, Object> map) throws KustvaktException;
 
 
     String validateEntry (String input, String type)

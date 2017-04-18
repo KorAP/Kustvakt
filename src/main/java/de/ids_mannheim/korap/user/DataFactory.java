@@ -50,7 +50,7 @@ public abstract class DataFactory {
 
     public abstract Collection<Object> values (Object data);
 
-    public abstract Object validate(Object data, ValidatorIface validator);
+    public abstract Object validate(Object data, ValidatorIface validator) throws KustvaktException;
 
     @Deprecated
     public abstract Map<String, Object> fields (Object data);
@@ -123,7 +123,7 @@ public abstract class DataFactory {
         }
 
         @Override
-        public Object validate(Object data, ValidatorIface validator) {
+        public Object validate(Object data, ValidatorIface validator) throws KustvaktException {
             if (checkDataType(data) && ((JsonNode) data).isObject()) {
                 try {
                     Map mdata = JsonUtils.read(toStringValue(data), HashMap.class);
