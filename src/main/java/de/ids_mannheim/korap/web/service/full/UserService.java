@@ -20,7 +20,6 @@ import de.ids_mannheim.korap.web.filter.AuthFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
-import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +29,8 @@ import javax.ws.rs.core.*;
 import java.util.*;
 
 /**
- * @author hanl
- * @date 29/01/2014
+ * @author hanl, margaretha
+ * @lastUpdate 04/2017
  */
 @Path(KustvaktServer.API_VERSION + "/user")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -51,6 +50,9 @@ public class UserService {
 
 
     // fixme: json contains password in clear text. Encrypt request?
+    // EM: no encryption is needed for communications over https. 
+    // It should not be necessary in IDS internal network. 
+    
     // fixme: should also collect service exception, not just db exception!
     @POST
     @Path("register")
@@ -81,17 +83,18 @@ public class UserService {
                     .queryParam(Attributes.QUERY_PARAM_USER,
                             user.getUsername());
             jlog.info("registration was successful for user '{}'",
-                    values.get(Attributes.USERNAME));
-            Map object = new HashMap();
+                    user.getUsername());
+            Map<String, Object> object = new HashMap<String, Object>();
             object.put("confirm_uri", uriBuilder.build());
             object.put("uri_expiration",
                     TimeUtils.format(uri.getUriExpiration()));
             return Response.ok(JsonUtils.toJSON(object)).build();
         }
         else {
-            // todo: return error or warning
+            jlog.error("Failed creating confirmation and expiry tokens.");
+            // EM: why illegal argument when uri fragment/param is self-generated 
             throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
-                    "failed to validate uri paramter", "confirmation fragment");
+                    "failed to validate uri parameter", "confirmation fragment");
         }
 
     }

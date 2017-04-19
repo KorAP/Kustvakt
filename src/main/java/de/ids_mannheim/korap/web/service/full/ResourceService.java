@@ -66,7 +66,7 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 /**
  * @author hanl, margaretha
  * @date 29/01/2014
- *       update 04/2017
+ * @lastUpdate 04/2017
  */
 @Path(KustvaktServer.API_VERSION + "/")
 @ResourceFilters({ AuthFilter.class, DemoUserFilter.class, PiwikFilter.class })
@@ -310,13 +310,6 @@ public class ResourceService {
         return Response.ok(result).build();
     }
 
-
-    @Deprecated
-    public Response postMatchFavorite () {
-        return Response.ok().build();
-    }
-
-
     // ref query parameter removed!
     @TRACE
     @Path("search")
@@ -330,17 +323,7 @@ public class ResourceService {
             @QueryParam("page") Integer startPage,
             @QueryParam("cq") String cq) {
         TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
-        QuerySerializer ss;
-
-        // User user;
-        // try {
-        // user = controller.getUser(ctx.getUsername());
-        // }
-        // catch (KustvaktException e) {
-        // throw KustvaktResponseHandler.throwit(e);
-        // }
-
-        ss = new QuerySerializer().setQuery(q, ql, v);
+        QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
         if (cq != null)
             ss.setCollection(cq);
 
@@ -362,10 +345,8 @@ public class ResourceService {
 
     /**
      * currently only supports either no reference at all in which
-     * case all
-     * corpora are retrieved or a corpus name like "WPD". No virtual
-     * collections
-     * supported!
+     * case all corpora are retrieved or a corpus name like "WPD". 
+     * No virtual collections supported!
      * 
      * @param locale
      * @param q
@@ -381,14 +362,17 @@ public class ResourceService {
     @TRACE
     @Path("{type}/{id}/search")
     public Response buildQueryWithId (@Context Locale locale,
-            @Context SecurityContext securityContext, @QueryParam("q") String q,
-            @QueryParam("ql") String ql, @QueryParam("v") String v,
+            @Context SecurityContext securityContext, 
+            @QueryParam("q") String q,
+            @QueryParam("ql") String ql, 
+            @QueryParam("v") String v,
             @QueryParam("context") String context,
             @QueryParam("cutoff") Boolean cutoff,
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
             @QueryParam("page") Integer startPage,
-            @PathParam("type") String type, @PathParam("id") String id) {
+            @PathParam("type") String type, 
+            @PathParam("id") String id) {
         TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
         type = StringUtils.normalize(type);
         id = StringUtils.decodeHTML(id);

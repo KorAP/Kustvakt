@@ -19,7 +19,7 @@ import java.util.*;
  * if configuration class is extended, loadSubTypes method should be
  * overriden
  * 
- * @author hanl
+ * @author hanl, margaretha
  * @date 05/02/2014
  */
 

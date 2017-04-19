@@ -76,6 +76,12 @@ public class ResourceFactory {
 
     public static <T extends KustvaktResource> Class<T> getResourceClass (
             String type) throws KustvaktException {
+        
+        if (type == null || type.isEmpty()){
+            throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT, 
+                    "resource type could not be identified!");
+        }
+        
         for (Class value : subTypes) {
             if (value == VirtualCollection.class
                     && type.equalsIgnoreCase("collection"))
@@ -88,7 +94,8 @@ public class ResourceFactory {
             }
         }
         // todo: throw exception in case of missing parameter!
-        throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT, "resource type could not be identified!");
+        throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT, 
+                "resource type could not be identified!");
     }
 
 
