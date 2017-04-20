@@ -145,11 +145,10 @@ public class LightServiceTest extends FastJerseyTest {
 
 	@Test
 	public void testMatchInfoGet1 () {
-		// match-WPD_AAA.00001-p4-5
         ClientResponse response = resource()
 			.path(getAPIVersion())
-			//.path("corpus/GOE/AGI.00200/p13576-13577/matchInfo")
-			.path("corpus/WPD/AAA.00001/p4-5/matchInfo")
+			.path("corpus/GOE/AGI/04846/p36875-36876/matchInfo")
+			//.path("corpus/WPD/AAA.00001/p4-5/matchInfo")
 			.queryParam("foundry", "*")
 			.queryParam("spans", "false")
 			.get(ClientResponse.class);
@@ -158,16 +157,16 @@ public class LightServiceTest extends FastJerseyTest {
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        assertEquals("WPD/AAA/00001", node.at("/textSigle").asText());
+        assertEquals("GOE/AGI/04846", node.at("/textSigle").asText());
+        assertEquals("Zweiter römischer Aufenthalt", node.at("/title").asText());
 	};
 
 	@Test
 	public void testMatchInfoGet2 () {
-		// match-WPD_AAA.00001-p4-5
         ClientResponse response = resource()
 			.path(getAPIVersion())
-			//.path("corpus/GOE/AGI.00200/p13576-13577/matchInfo")
-			.path("corpus/WPD/AAA.00001/p4-5/matchInfo")
+			.path("corpus/GOE/AGI/04846/p36875-36876/matchInfo")
+			//.path("corpus/WPD/AAA.00001/p4-5/matchInfo")
 			.queryParam("foundry", "*")
 			.get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -175,7 +174,8 @@ public class LightServiceTest extends FastJerseyTest {
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        assertEquals("WPD/AAA/00001", node.at("/textSigle").asText());
+        assertEquals("GOE/AGI/04846", node.at("/textSigle").asText());
+        assertEquals("Zweiter römischer Aufenthalt", node.at("/title").asText());
 	};
 
     @Test

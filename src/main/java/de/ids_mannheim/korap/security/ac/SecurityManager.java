@@ -131,8 +131,7 @@ public class SecurityManager<T extends KustvaktResource> {
 
 
     public static SecurityManager findbyPath (String path, User user,
-            Permissions.Permission ... perms) throws NotAuthorizedException,
-            EmptyResultException {
+            Permissions.Permission ... perms) throws KustvaktException {
         SecurityManager manager = new SecurityManager(user);
         manager.findPolicies(path, true, perms);
         //fixme: need a match count. if match not unique, exception. also, does parent -child relation match hold up here?
@@ -141,8 +140,7 @@ public class SecurityManager<T extends KustvaktResource> {
 
 
     public static SecurityManager init (String id, User user,
-            Permissions.Permission ... perms) throws NotAuthorizedException,
-            EmptyResultException {
+            Permissions.Permission ... perms) throws KustvaktException  {
         SecurityManager p = new SecurityManager(user);
         p.findPolicies(id, false, perms);
         return p;
@@ -216,7 +214,7 @@ public class SecurityManager<T extends KustvaktResource> {
 
     // todo: type should be deprecated and return type of policies should be containers!
     private boolean findPolicies (Object id, boolean path,
-            Permissions.Permission ... perms) throws EmptyResultException {
+            Permissions.Permission ... perms) throws KustvaktException {
         PermissionsBuffer b = new PermissionsBuffer();
         if (perms.length == 0)
             b.addPermission(Permissions.Permission.READ.toByte());
@@ -231,12 +229,14 @@ public class SecurityManager<T extends KustvaktResource> {
         if (id instanceof Integer)
             this.policies = policydao.getPolicies((Integer) id, this.user,
                     b.getPbyte());
+        
         this.evaluator = new PolicyEvaluator(this.user, this.policies);
 
         if (this.policies == null) {
             jlog.error("No policies found for resource id '{}' for user '{}'",
                     id, user.getId());
-            throw new EmptyResultException(String.valueOf(id));
+            throw new KustvaktException(StatusCodes.NO_VALUE_FOUND, "Resource not found!",
+                    String.valueOf(id));
         }
         return true;
     }

@@ -1030,17 +1030,21 @@ public class ResourceService {
 
     // fixme: only allowed for corpus?!
     @GET
-    @Path("/corpus/{id}/{docid}/{rest}/matchInfo")
+    @Path("/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
     public Response getMatchInfo (@Context SecurityContext ctx,
-            @Context Locale locale, @PathParam("id") String id,
-            @PathParam("docid") String docid, @PathParam("rest") String rest,
+            @Context Locale locale, 
+            @PathParam("corpusId") String corpusId,
+            @PathParam("docId") String docId,
+            @PathParam("textId") String textId, 
+            @PathParam("matchId") String matchId,
             @QueryParam("foundry") Set<String> foundries,
             @QueryParam("layer") Set<String> layers,
-            @QueryParam("spans") Boolean spans) {
+            @QueryParam("spans") Boolean spans) throws KustvaktException {
+        
         TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
         spans = spans != null ? spans : false;
-        String matchid = searchKrill.getMatchId(id, docid, rest);
-
+        
+        String matchid = searchKrill.getMatchId(corpusId, docId, textId, matchId);
         if (layers == null || layers.isEmpty())
             layers = new HashSet<>();
 
@@ -1051,8 +1055,7 @@ public class ResourceService {
             user = controller.getUser(tokenContext.getUsername());
         }
         catch (KustvaktException e) {
-
-            jlog.error("Exception encountered: {}", e.string());
+            jlog.error("Failed getting user in the matchInfo service: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
 
@@ -1066,7 +1069,7 @@ public class ResourceService {
 
             for (String spl : new ArrayList<>(foundries)) {
                 try {
-                    de.ids_mannheim.korap.security.ac.SecurityManager manager = SecurityManager
+                    SecurityManager<?> manager = SecurityManager
                             .init(spl, user, Permissions.Permission.READ);
                     if (!manager.isAllowed())
                         continue;
@@ -1080,14 +1083,9 @@ public class ResourceService {
                             new ArrayList<>(f_list), new ArrayList<>(l_list),
                             spans, false, true);
                 }
-                catch (EmptyResultException e) {
-                    throw KustvaktResponseHandler.throwit(
-                            StatusCodes.NO_VALUE_FOUND, "Resource not found!",
-                            id);
-                }
                 catch (NotAuthorizedException e) {
                     throw KustvaktResponseHandler.throwit(
-                            StatusCodes.ACCESS_DENIED, "Permission denied", id);
+                            StatusCodes.ACCESS_DENIED, "Permission denied", matchid);
                 }
 
             }

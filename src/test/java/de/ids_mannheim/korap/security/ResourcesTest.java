@@ -109,7 +109,7 @@ public class ResourcesTest extends BeanConfigTest {
 
     @Test
     public void getDemoResourceFiltered () throws KustvaktException {
-        Set s = ResourceFinder.searchPublicFiltered(Corpus.class, "WPD15");
+        Set s = ResourceFinder.searchPublicFiltered(Corpus.class, "WPD13");
         assertEquals(1, s.size());
     }
 

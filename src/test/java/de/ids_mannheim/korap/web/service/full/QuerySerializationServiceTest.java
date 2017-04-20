@@ -12,7 +12,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Iterator;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,7 +42,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
     public void testQuerySerializationFilteredPublic () {
         ClientResponse response = resource()
                 .path(getAPIVersion())
-                .path("corpus/WPD15/search")
+                .path("corpus/WPD13/search")
                 .queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp")
                 .queryParam("context", "base/s:s")
@@ -54,7 +53,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("corpusSigle", node.at("/collection/key").asText());
-        assertEquals("WPD15", node.at("/collection/value").asText());
+        assertEquals("WPD13", node.at("/collection/value").asText());
     }
     
     

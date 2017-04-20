@@ -1,13 +1,11 @@
 package de.ids_mannheim.korap.web.service.full;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
@@ -17,13 +15,11 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.ResourceDao;
-import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.user.User;
@@ -35,7 +31,6 @@ import de.ids_mannheim.korap.web.service.FastJerseyTest;
  * @date 14/01/2016
  */
 public class ResourceServiceTest extends FastJerseyTest {
-    private static ObjectMapper mapper = new ObjectMapper();
     
     @BeforeClass
     public static void configure () throws Exception {
@@ -81,8 +76,6 @@ public class ResourceServiceTest extends FastJerseyTest {
         assertTrue(docs < 15);
     }
 
-    
-
     // EM: The test covers multiple operations because it deals with 
     // the same resource and needs an order to operate (store followed by
     // update followed by delete).
@@ -104,7 +97,6 @@ public class ResourceServiceTest extends FastJerseyTest {
                 response.getStatus());
         
         String ent = response.getEntity(String.class);
-        
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertTrue(node.isObject());
@@ -136,10 +128,11 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .post(ClientResponse.class);
         
         assertEquals(HttpStatus.SC_BAD_REQUEST, response.getStatus());
-        JsonNode errorNode = mapper.readTree(response.getEntityInputStream());
+        
+        node = JsonUtils.readTree(response.getEntity(String.class));
         assertEquals(
                 "[No change has found.]",
-                errorNode.get("errors").get(0).get(2).asText());
+                node.get("errors").get(0).get(2).asText());
         
         // update resource service
         response = resource()
@@ -182,31 +175,6 @@ public class ResourceServiceTest extends FastJerseyTest {
                 User.UserFactory.getDemoUser());
         assertEquals(null,res);
     }
-
-
-    
-    @Test
-    public void testMatchInfoGet () {
-    }
-
-
-    @Test
-    public void testMatchInfoSave () {
-
-    }
-
-
-    @Test
-    public void testMatchInfoDelete () {
-
-    }
-
-
-    @Test
-    public void testGetMatches () {
-
-    }
-
 
     @Override
     public void initMethod () throws KustvaktException {

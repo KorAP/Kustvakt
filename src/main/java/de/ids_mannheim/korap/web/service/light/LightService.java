@@ -297,13 +297,15 @@ public class LightService {
 	 * "getMatchID()" for a workaround, but this should be fixed.
 	 */
     @GET
-    @Path("/corpus/{id}/{docid}/{rest}/matchInfo")
-    public Response getMatchInfo (@PathParam("id") String id,
-								  @PathParam("docid") String docid, @PathParam("rest") String rest,
+    @Path("/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
+    public Response getMatchInfo (@PathParam("corpusId") String corpusId,
+            @PathParam("docId") String docId,
+            @PathParam("textId") String textId, 
+            @PathParam("matchId") String matchId,
             @QueryParam("foundry") Set<String> foundries,
             @QueryParam("layer") Set<String> layers,
             @QueryParam("spans") Boolean spans) {
-        String matchid = searchKrill.getMatchId(id, docid, rest);
+        String matchid = searchKrill.getMatchId(corpusId, docId, textId, matchId);
         List<String> f_list = null;
         List<String> l_list = null;
         if (layers != null && !layers.isEmpty())
