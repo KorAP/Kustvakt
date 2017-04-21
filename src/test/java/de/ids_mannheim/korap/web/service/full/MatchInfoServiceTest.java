@@ -68,7 +68,7 @@ public class MatchInfoServiceTest extends FastJerseyTest {
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String entity = response.getEntity(String.class);
-        System.out.println(entity);
+//        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
         assertEquals("WPD15/B07/51608", node.at("/textSigle").asText());

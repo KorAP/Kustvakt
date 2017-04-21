@@ -31,6 +31,7 @@ import com.sun.jersey.spi.container.ResourceFilters;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.config.KustvaktConfiguration.BACKENDS;
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.NotAuthorizedException;
@@ -48,8 +49,10 @@ import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.security.ac.ResourceFinder;
 import de.ids_mannheim.korap.security.ac.ResourceHandler;
 import de.ids_mannheim.korap.security.ac.SecurityManager;
+import de.ids_mannheim.korap.user.DemoUser;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.user.User.UserFactory;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
@@ -310,6 +313,7 @@ public class ResourceService {
         return Response.ok(result).build();
     }
 
+
     // ref query parameter removed!
     @TRACE
     @Path("search")
@@ -345,7 +349,7 @@ public class ResourceService {
 
     /**
      * currently only supports either no reference at all in which
-     * case all corpora are retrieved or a corpus name like "WPD". 
+     * case all corpora are retrieved or a corpus name like "WPD".
      * No virtual collections supported!
      * 
      * @param locale
@@ -362,17 +366,14 @@ public class ResourceService {
     @TRACE
     @Path("{type}/{id}/search")
     public Response buildQueryWithId (@Context Locale locale,
-            @Context SecurityContext securityContext, 
-            @QueryParam("q") String q,
-            @QueryParam("ql") String ql, 
-            @QueryParam("v") String v,
+            @Context SecurityContext securityContext, @QueryParam("q") String q,
+            @QueryParam("ql") String ql, @QueryParam("v") String v,
             @QueryParam("context") String context,
             @QueryParam("cutoff") Boolean cutoff,
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
             @QueryParam("page") Integer startPage,
-            @PathParam("type") String type, 
-            @PathParam("id") String id) {
+            @PathParam("type") String type, @PathParam("id") String id) {
         TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
         type = StringUtils.normalize(type);
         id = StringUtils.decodeHTML(id);
@@ -461,6 +462,7 @@ public class ResourceService {
     }
 
 
+    @SuppressWarnings("unchecked")
     @GET
     @Path("search")
     public Response searchbyNameAll (@Context SecurityContext securityContext,
@@ -480,16 +482,37 @@ public class ResourceService {
             user = controller.getUser(context.getUsername());
         }
         catch (KustvaktException e) {
-            jlog.error("Exception encountered: {}", e.string());
+            jlog.error("Failed retrieving user in the search service: {}",
+                    e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
-        String result;
+
         QuerySerializer serializer = new QuerySerializer();
         serializer.setQuery(q, ql, v);
-
         if (cq != null)
             serializer.setCollection(cq);
 
+        MetaQueryBuilder meta = createMetaQuery(pageIndex, pageInteger, ctx,
+                pageLength, cutoff);
+        serializer.setMeta(meta.raw());
+
+        String query;
+        try {
+            query = this.processor.processQuery(serializer.toJSON(), user);
+            jlog.info("the serialized query {}", query);
+        }
+        catch (KustvaktException e) {
+            throw KustvaktResponseHandler.throwit(e);
+        }
+
+        String result = doSearch(eng, query, pageLength, meta);
+        return Response.ok(result).build();
+    }
+
+
+    private MetaQueryBuilder createMetaQuery (Integer pageIndex,
+            Integer pageInteger, String ctx, Integer pageLength,
+            Boolean cutoff) {
         MetaQueryBuilder meta = new MetaQueryBuilder();
         meta.addEntry("startIndex", pageIndex);
         meta.addEntry("startPage", pageInteger);
@@ -500,39 +523,47 @@ public class ResourceService {
         // meta.addMeta(pageIndex, pageInteger, pageLength, ctx, cutoff);
         // fixme: should only apply to CQL queries per default!
         // meta.addEntry("itemsPerResource", 1);
-        serializer.setMeta(meta.raw());
-        String query;
+        return meta;
+    }
+
+
+    private String doSearch (BACKENDS eng, String query, Integer pageLength,
+            MetaQueryBuilder meta) {
+        String result;
+        if (eng.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
+            result = searchNeo4J(query, pageLength, meta,false);
+        }
+        else {
+            result = searchKrill.search(query);
+        }
+        KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
+        return result;
+
+    }
+
+    private String searchNeo4J (String query, int pageLength,
+            MetaQueryBuilder meta, boolean raw) {
+        
+        if (raw){
+            throw KustvaktResponseHandler.throwit(
+                    StatusCodes.ILLEGAL_ARGUMENT,
+                    "raw not supported!", null);
+        }
+        
+        MultivaluedMap<String, String> map = new MultivaluedMapImpl();
+        map.add("q", query);
+        map.add("count", String.valueOf(pageLength));
+        map.add("lctxs", String.valueOf(meta.getSpanContext().getLeftSize()));
+        map.add("rctxs", String.valueOf(meta.getSpanContext().getRightSize()));
         try {
-            query = this.processor.processQuery(serializer.toJSON(), user);
+            return this.graphDBhandler.getResponse(map, "distKwic");
         }
         catch (KustvaktException e) {
+            jlog.error("Failed searching in Neo4J: {}", e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
 
-        jlog.info("the serialized query {}", query);
-
-        if (eng.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
-            MultivaluedMap map = new MultivaluedMapImpl();
-            map.add("q", query);
-            map.add("count", String.valueOf(pageLength));
-            map.add("lctxs",
-                    String.valueOf(meta.getSpanContext().getLeftSize()));
-            map.add("rctxs",
-                    String.valueOf(meta.getSpanContext().getRightSize()));
-            try {
-                result = this.graphDBhandler.getResponse(map, "distKwic");
-            }
-            catch (KustvaktException e) {
-                jlog.error("Exception encountered: {}", e.string());
-                throw KustvaktResponseHandler.throwit(e);
-            }
-        }
-        else
-            result = searchKrill.search(query);
-        KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
-        return Response.ok(result).build();
     }
-
 
     /**
      * String search, String ql, List<String> parents, String cli,
@@ -573,74 +604,37 @@ public class ResourceService {
 
         try {
             User user = controller.getUser(context.getUsername());
-            MetaQueryBuilder meta = new MetaQueryBuilder();
+            MetaQueryBuilder meta;
 
+            // EM: shouldnt this be the same as buildQueryWithId() ?
             if (!raw) {
+                meta = createMetaQuery(pageIndex, pageInteger, ctx, pageLength,
+                        cutoff);
+                
                 QuerySerializer s = new QuerySerializer();
                 s.setQuery(query, ql, v);
-
+                
+                // add collection query
                 KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
-
-                KustvaktResource resource;
-                if (StringUtils.isInteger(id))
-                    resource = this.resourceHandler
-                            .findbyIntId(Integer.valueOf(id), user);
-                else
-                    resource = this.resourceHandler.findbyStrId(id, user,
-                            ResourceFactory.getResourceClass(type));
-
-                if (resource instanceof VirtualCollection)
-                    builder.setBaseQuery(resource.getData());
-                else if (resource instanceof Corpus)
-                    builder.with(Attributes.CORPUS_SIGLE
-                            + resource.getPersistentID());
-                else
-                    throw KustvaktResponseHandler.throwit(
-                            StatusCodes.ILLEGAL_ARGUMENT,
-                            "Type parameter not supported", type);
-
-                meta.addEntry("startIndex", pageIndex);
-                meta.addEntry("startPage", pageInteger);
-                meta.setSpanContext(ctx);
-                meta.addEntry("count", pageLength);
-                // todo: what happened to cutoff?
-                meta.addEntry("cutoff", cutoff);
-                // should only apply to CQL queries
-                // meta.addEntry("itemsPerResource", 1);
-                s.setMeta(meta.raw());
-
-                query = s.toJSON();
+                builder.setBaseQuery(s.toJSON());
+                query = createQuery(user, type, id, builder);
+                
             }
-            String result;
-            try {
+            else {
+                meta = new MetaQueryBuilder();
+            }
 
+            try {
                 // rewrite process
                 query = this.processor.processQuery(query, user);
-
-                if (eng.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
-                    if (raw)
-                        throw KustvaktResponseHandler.throwit(
-                                StatusCodes.ILLEGAL_ARGUMENT,
-                                "raw not supported!", null);
-                    MultivaluedMap map = new MultivaluedMapImpl();
-                    map.add("q", query);
-                    map.add("count", String.valueOf(pageLength));
-                    map.add("lctxs", String
-                            .valueOf(meta.getSpanContext().getLeftSize()));
-                    map.add("rctxs", String
-                            .valueOf(meta.getSpanContext().getRightSize()));
-                    result = this.graphDBhandler.getResponse(map, "distKwic");
-                }
-                else
-                    result = searchKrill.search(query);
-
             }
-            catch (Exception e) {
-                jlog.error("Exception for serialized query: " + query, e);
+            catch (KustvaktException e) {
+                jlog.error("Failed in rewriting query: " + query, e);
                 throw KustvaktResponseHandler.throwit(500, e.getMessage(),
                         null);
             }
 
+            String result = doSearch(eng, query, pageLength, meta);
             KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
             return Response.ok(result).build();
         }
@@ -649,6 +643,59 @@ public class ResourceService {
             throw KustvaktResponseHandler.throwit(e);
         }
 
+    }
+
+
+    private String createQuery (User user, String type, String id,
+            KoralCollectionQueryBuilder builder) {
+        KustvaktResource resource = null;
+        try {
+            // EM: this doesn't look like very useful since the id is :
+            // 1. auto-generated 
+            // 2. random
+            // 3. not really known.
+            if (user instanceof DemoUser) {
+                Set<KustvaktResource> set = null;
+                if (StringUtils.isInteger(id)) {
+                    set = ResourceFinder.searchPublicFilteredIntId(
+                            ResourceFactory.getResourceClass(type),
+                            Integer.parseInt(id));
+                }
+                else {
+                    set = ResourceFinder.searchPublicFiltered(
+                            ResourceFactory.getResourceClass(type), id);
+                }
+                resource = (KustvaktResource) set.toArray()[0];
+            }
+            else if (StringUtils.isInteger(id)) {
+                resource = this.resourceHandler.findbyIntId(Integer.valueOf(id),
+                        user);
+            }
+            else {
+                resource = this.resourceHandler.findbyStrId(id, user,
+                        ResourceFactory.getResourceClass(type));
+            }
+        }
+        catch (KustvaktException e) {
+            jlog.error("Failed retrieving resource: {}", e.string());
+            throw KustvaktResponseHandler.throwit(e);
+        }
+
+        if (resource instanceof VirtualCollection) {
+            // test this
+            //builder.setBaseQuery(resource.getData());
+            return JsonUtils
+                    .toJSON(builder.and().mergeWith(resource.getData()));
+        }
+        else if (resource instanceof Corpus) {
+            builder.and().with(Attributes.CORPUS_SIGLE, "=",
+                    resource.getPersistentID());
+            return builder.toJSON();
+        }
+        else {
+            throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+                    "Type parameter not supported", type);
+        }
     }
 
 
@@ -1032,19 +1079,19 @@ public class ResourceService {
     @GET
     @Path("/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
     public Response getMatchInfo (@Context SecurityContext ctx,
-            @Context Locale locale, 
-            @PathParam("corpusId") String corpusId,
+            @Context Locale locale, @PathParam("corpusId") String corpusId,
             @PathParam("docId") String docId,
-            @PathParam("textId") String textId, 
+            @PathParam("textId") String textId,
             @PathParam("matchId") String matchId,
             @QueryParam("foundry") Set<String> foundries,
             @QueryParam("layer") Set<String> layers,
             @QueryParam("spans") Boolean spans) throws KustvaktException {
-        
+
         TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
         spans = spans != null ? spans : false;
-        
-        String matchid = searchKrill.getMatchId(corpusId, docId, textId, matchId);
+
+        String matchid = searchKrill.getMatchId(corpusId, docId, textId,
+                matchId);
         if (layers == null || layers.isEmpty())
             layers = new HashSet<>();
 
@@ -1055,7 +1102,8 @@ public class ResourceService {
             user = controller.getUser(tokenContext.getUsername());
         }
         catch (KustvaktException e) {
-            jlog.error("Failed getting user in the matchInfo service: {}", e.string());
+            jlog.error("Failed getting user in the matchInfo service: {}",
+                    e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
 
@@ -1069,8 +1117,8 @@ public class ResourceService {
 
             for (String spl : new ArrayList<>(foundries)) {
                 try {
-                    SecurityManager<?> manager = SecurityManager
-                            .init(spl, user, Permissions.Permission.READ);
+                    SecurityManager<?> manager = SecurityManager.init(spl, user,
+                            Permissions.Permission.READ);
                     if (!manager.isAllowed())
                         continue;
 
@@ -1085,7 +1133,8 @@ public class ResourceService {
                 }
                 catch (NotAuthorizedException e) {
                     throw KustvaktResponseHandler.throwit(
-                            StatusCodes.ACCESS_DENIED, "Permission denied", matchid);
+                            StatusCodes.ACCESS_DENIED, "Permission denied",
+                            matchid);
                 }
 
             }

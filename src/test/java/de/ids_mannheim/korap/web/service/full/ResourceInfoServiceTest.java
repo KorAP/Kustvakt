@@ -43,8 +43,8 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
                 .path("collection").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
-
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
         assertEquals(1, node.size());
     }
@@ -63,27 +63,41 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         assertNotNull(node);
         assertTrue(node.isArray());
-        assertEquals(2, node.size());
+        assertEquals(3, node.size());
     }
 
 
     @Test
     public void testGetVirtualCollectionInfoById () {
         ClientResponse response = resource().path(getAPIVersion())
-                .path("collection").path("WPD15-VC").get(ClientResponse.class);
+                .path("collection").path("GOE-VC").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.size());
-        assertEquals("Wikipedia Virtual Collection",
+        assertEquals("Goethe Virtual Collection",
                 node.path("name").asText());
-        assertEquals("German Wikipedia 2015",
+        assertEquals("Goethe works from 1810",
                 node.path("description").asText());
     }
-
-
+    
+    @Test
+    public void testGetVirtualCollectionInfoByIdUnauthorized () {
+        ClientResponse response = resource().path(getAPIVersion())
+                .path("collection").path("WPD15-VC").get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+                response.getStatus());
+        String ent = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertNotEquals(0, node.size());
+        assertEquals(101, node.at("/errors/0/0").asInt());
+        assertEquals("[Cannot found public resources with ids: [WPD15-VC]]",
+                node.at("/errors/0/2").asText());
+    }
+    
     @Test
     public void testGetPublicCorporaInfo () {
         ClientResponse response = resource().path(getAPIVersion())
@@ -106,7 +120,7 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
-        System.out.println(ent);
+//        System.out.println(ent);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertTrue(node.isObject());
@@ -163,10 +177,12 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
-        JsonNode error = JsonUtils.readTree(ent).get("errors").get(0);
-        assertEquals(101, error.get(0).asInt());
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertNotEquals(0, node.size());
+        assertEquals(101, node.at("/errors/0/0").asInt());
         assertEquals("[Cannot found public resources with ids: [ZUW19]]",
-                error.get(2).asText());
+                node.at("/errors/0/2").asText());
     }
 
 
@@ -179,10 +195,12 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
-        JsonNode error = JsonUtils.readTree(ent).get("errors").get(0);
-        assertEquals(101, error.get(0).asInt());
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertNotEquals(0, node.size());
+        assertEquals(101, node.at("/errors/0/0").asInt());
         assertEquals("[Cannot found public resources with ids: [BRZ10]]",
-                error.get(2).asText());
+                node.at("/errors/0/2").asText());
     }
 
 
