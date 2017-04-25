@@ -121,17 +121,17 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
                 .path(getAPIVersion())
                 .path("virtualcollection")
                 .queryParam("filter", "false")
+                .queryParam("query", "creationDate since 1775 & corpusSigle=GOE")
                 .queryParam("name", "Weimarer Werke")
                 .queryParam("description", "Goethe-Werke in Weimar (seit 1775)")
                 .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
-                .post(ClientResponse.class, "creationDate since 1775 & corpusSigle=GOE");
+                .post(ClientResponse.class);
         
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         
         String ent = response.getEntity(String.class);
-        
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertTrue(node.isObject());
@@ -177,7 +177,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
         ent = response.getEntity(String.class);
         node = JsonUtils.readTree(ent);
         assertNotNull(node);
-
+        System.out.println("NODE "+ent);
         assertEquals("koral:docGroup", node.at("/collection/@type").asText());
         assertEquals("koral:doc", node.at("/collection/operands/0/@type")
                 .asText());

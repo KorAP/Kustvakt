@@ -340,7 +340,8 @@ public class KustvaktServerTest extends BeanConfigTest {
         HttpClient httpclient = HttpClients.createDefault();
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http").setHost("localhost").setPort(8089)
-                .setPath("/api/v0.1/virtualcollection/00df953b-2227-4c23-84c1-5532c07bf8ce")
+                //.setPath("/api/v0.1/virtualcollection/00df953b-2227-4c23-84c1-5532c07bf8ce")
+                .setPath("/api/v0.1/virtualcollection/GOE-VC")
                 .setParameter("name", "Goethe collection")
                 .setParameter("description", "Goethe collection");
         URI uri = builder.build();
@@ -348,7 +349,18 @@ public class KustvaktServerTest extends BeanConfigTest {
         httppost.addHeader(Attributes.AUTHORIZATION,
                 BasicHttpAuth.encode("kustvakt", "kustvakt2015"));
         HttpResponse response = httpclient.execute(httppost);
-
+        
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatusLine().getStatusCode());
+        
+//        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+//                response.getStatusLine().getStatusCode());
+        
+//        JsonNode errorNode = mapper.readTree(response.getEntity().getContent());
+//        assertEquals(
+//                "Resource not found!",
+//                errorNode.get("errors").get(0).get(1).asText());
+        
     }
 
 

@@ -140,7 +140,7 @@ public class SecurityManager<T extends KustvaktResource> {
 
 
     public static SecurityManager init (String id, User user,
-            Permissions.Permission ... perms) throws KustvaktException  {
+            Permissions.Permission ... perms) throws KustvaktException {
         SecurityManager p = new SecurityManager(user);
         p.findPolicies(id, false, perms);
         return p;
@@ -158,8 +158,7 @@ public class SecurityManager<T extends KustvaktResource> {
             return this.resource;
         }
         else {
-            jlog.error(
-                    "Reading the resource '{}' is not allowed for user '{}'",
+            jlog.error("Reading the resource '{}' is not allowed for user '{}'",
                     this.resource.getPersistentID(), this.user.getUsername());
             throw new NotAuthorizedException(StatusCodes.NO_POLICY_PERMISSION,
                     evaluator.getResourceID());
@@ -167,8 +166,8 @@ public class SecurityManager<T extends KustvaktResource> {
     }
 
 
-    public void updateResource (T resource) throws NotAuthorizedException,
-            KustvaktException {
+    public void updateResource (T resource)
+            throws NotAuthorizedException, KustvaktException {
         if (evaluator.isAllowed(Permissions.Permission.WRITE)) {
             ResourceOperationIface iface = handlers.get(resource.getClass());
             if (iface != null)
@@ -193,11 +192,11 @@ public class SecurityManager<T extends KustvaktResource> {
      * @throws KustvaktException
      */
     // todo: delete only works with find, not with init constructor!
-    public void deleteResource () throws NotAuthorizedException,
-            KustvaktException {
+    public void deleteResource ()
+            throws NotAuthorizedException, KustvaktException {
         if (evaluator.isAllowed(Permissions.Permission.DELETE)) {
-            ResourceOperationIface iface = handlers.get(this.resource
-                    .getClass());
+            ResourceOperationIface iface = handlers
+                    .get(this.resource.getClass());
             if (iface != null)
                 iface.deleteResource(this.evaluator.getResourceID(), this.user);
             else
@@ -229,27 +228,28 @@ public class SecurityManager<T extends KustvaktResource> {
         if (id instanceof Integer)
             this.policies = policydao.getPolicies((Integer) id, this.user,
                     b.getPbyte());
-        
+
         this.evaluator = new PolicyEvaluator(this.user, this.policies);
 
         if (this.policies == null) {
             jlog.error("No policies found for resource id '{}' for user '{}'",
                     id, user.getId());
-            throw new KustvaktException(StatusCodes.NO_VALUE_FOUND, "Resource not found!",
-                    String.valueOf(id));
+            throw new KustvaktException(StatusCodes.NO_VALUE_FOUND,
+                    "Resource not found!", String.valueOf(id));
         }
         return true;
     }
 
 
     // todo:  security log shows id 'null' --> better way?
-    private T findResource (Class type) throws NotAuthorizedException,
-            KustvaktException {
+    private T findResource (Class type) throws KustvaktException {
         if (!evaluator.isAllowed()) {
             jlog.error("Permission denied for resource id '{}' for user '{}'",
                     this.evaluator.getResourceID(), user.getId());
-            throw new NotAuthorizedException(StatusCodes.NO_POLICY_PERMISSION,
-                    this.evaluator.getResourceID());
+            throw new KustvaktException(StatusCodes.NO_POLICY_PERMISSION,
+                    "Permission denied for resource id "
+                            + this.evaluator.getResourceID() + " for the user.",
+                            user.getUsername());
         }
 
         ResourceOperationIface iface = handlers.get(type);
@@ -257,6 +257,16 @@ public class SecurityManager<T extends KustvaktResource> {
             iface = handlers.get(KustvaktResource.class);
         T resource = (T) iface.findbyId(this.evaluator.getResourceID(),
                 this.user);
+        
+        if(type != null && !resource.getClass().equals(type)) {
+            throw new KustvaktException(StatusCodes.NO_VALUE_FOUND,
+                    "Resource with id " + this.evaluator.getResourceID()
+                            + " and type " + type.getSimpleName()
+                            + " is not found. Found resource with id "
+                            + this.evaluator.getResourceID() + " and type "
+                            + resource.getClass().getSimpleName() + ".");
+        }
+
         // fixme: this
         // fixme: deprecated!
         resource.setManaged(this.evaluator.isManaged());
@@ -272,8 +282,8 @@ public class SecurityManager<T extends KustvaktResource> {
     }
 
 
-    public static SecurityManager register (KustvaktResource resource, User user)
-            throws KustvaktException, NotAuthorizedException {
+    public static SecurityManager register (KustvaktResource resource,
+            User user) throws KustvaktException, NotAuthorizedException {
         SecurityManager p = new SecurityManager(user);
         if (!User.UserFactory.isDemo(user.getUsername())) {
             if (resource.getParentID() != null) {
@@ -306,8 +316,8 @@ public class SecurityManager<T extends KustvaktResource> {
                         + resource.getPersistentID() + "@" + resource.getId()
                         + "', name: " + resource.getName());
                 // storing resource is called twice. first when this is register and later in idsbootstrap to create cstorage entry. how to unify this?
-                ResourceOperationIface iface = p.handlers.get(resource
-                        .getClass());
+                ResourceOperationIface iface = p.handlers
+                        .get(resource.getClass());
                 if (iface != null)
                     resource.setId(iface.storeResource(resource, user));
                 else
@@ -330,7 +340,8 @@ public class SecurityManager<T extends KustvaktResource> {
                         resource.getPersistentID(), user.getId());
                 throw new KustvaktException(user.getId(),
                         StatusCodes.POLICY_ERROR_DEFAULT,
-                        "Resource could not be registered", resource.toString());
+                        "Resource could not be registered",
+                        resource.toString());
             }
         }
         return p;
@@ -422,8 +433,8 @@ public class SecurityManager<T extends KustvaktResource> {
     }
 
 
-    public void deletePolicies () throws NotAuthorizedException,
-            KustvaktException {
+    public void deletePolicies ()
+            throws NotAuthorizedException, KustvaktException {
         for (SecurityPolicy p : new ArrayList<>(this.policies[0]))
             deletePolicy(p);
     }
@@ -439,8 +450,8 @@ public class SecurityManager<T extends KustvaktResource> {
 
 
     // todo:
-    public void deletePolicy (SecurityPolicy policy) throws KustvaktException,
-            NotAuthorizedException {
+    public void deletePolicy (SecurityPolicy policy)
+            throws KustvaktException, NotAuthorizedException {
         // todo: get rid of this: use sql to match policy id and target according to evaluator!
         if (!matchTarget(policy.getTarget()))
             // adjust message
@@ -453,8 +464,8 @@ public class SecurityManager<T extends KustvaktResource> {
             throw new KustvaktException(user.getId(), StatusCodes.NO_POLICIES,
                     this.evaluator.getResourceID());
         }
-        if (contains(policy)
-                && (evaluator.isAllowed(Permissions.Permission.DELETE_POLICY))) {
+        if (contains(policy) && (evaluator
+                .isAllowed(Permissions.Permission.DELETE_POLICY))) {
             policydao.deletePolicy(policy, this.user);
         }
         else if (silent) {
@@ -470,8 +481,8 @@ public class SecurityManager<T extends KustvaktResource> {
     }
 
 
-    public void modifyPolicy (SecurityPolicy policy) throws KustvaktException,
-            NotAuthorizedException {
+    public void modifyPolicy (SecurityPolicy policy)
+            throws KustvaktException, NotAuthorizedException {
         if (!matchTarget(policy.getTarget()))
             throw new NotAuthorizedException(StatusCodes.ILLEGAL_ARGUMENT);
 
@@ -484,8 +495,8 @@ public class SecurityManager<T extends KustvaktResource> {
                     this.evaluator.getResourceID());
         }
 
-        if (contains(policy)
-                && (evaluator.isAllowed(Permissions.Permission.MODIFY_POLICY))) {
+        if (contains(policy) && (evaluator
+                .isAllowed(Permissions.Permission.MODIFY_POLICY))) {
             policydao.updatePolicy(policy, this.user);
         }
         else if (silent) {

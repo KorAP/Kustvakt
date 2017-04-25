@@ -4,7 +4,6 @@ import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.NotAuthorizedException;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.resources.*;
 import de.ids_mannheim.korap.security.ac.ResourceFinder;
@@ -12,10 +11,14 @@ import de.ids_mannheim.korap.security.ac.ResourceHandler;
 import de.ids_mannheim.korap.security.ac.SecurityManager;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.TimeUtils;
+
+import org.hamcrest.core.StringStartsWith;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.Set;
 
@@ -24,7 +27,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * @author hanl
+ * @author hanl, margaretha
  * @date 20/11/2015
  */
 // todo: run functions without data to check for nullpointers!
@@ -32,6 +35,8 @@ public class ResourcesTest extends BeanConfigTest {
 
     private static Corpus c1;
 
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testCreate () throws KustvaktException {
@@ -89,8 +94,12 @@ public class ResourcesTest extends BeanConfigTest {
 
 
     // securitymanager does not allow for anonymous retrieval, only resourcefinder!
-    @Test(expected = NotAuthorizedException.class)
+    @Test 
     public void getResource () throws KustvaktException {
+        
+        exception.expect(KustvaktException.class);
+        exception.expectMessage(StringStartsWith.startsWith("Permission denied"));
+        
         User user = User.UserFactory.getDemoUser();
         SecurityManager m = SecurityManager.findbyId(2, user,
                 Permissions.Permission.READ);

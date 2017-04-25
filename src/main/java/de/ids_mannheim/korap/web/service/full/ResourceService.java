@@ -424,9 +424,10 @@ public class ResourceService {
         }
 
         if (resource != null) {
-            if (resource instanceof VirtualCollection)
-                query = JsonUtils
-                        .toJSON(cquery.and().mergeWith(resource.getData()));
+            if (resource instanceof VirtualCollection) {
+                JsonNode node = cquery.and().mergeWith(resource.getData());
+                query = JsonUtils.toJSON(node);
+            }
             else if (resource instanceof Corpus) {
                 cquery.and().with(Attributes.CORPUS_SIGLE, "=",
                         resource.getPersistentID());
@@ -531,7 +532,7 @@ public class ResourceService {
             MetaQueryBuilder meta) {
         String result;
         if (eng.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
-            result = searchNeo4J(query, pageLength, meta,false);
+            result = searchNeo4J(query, pageLength, meta, false);
         }
         else {
             result = searchKrill.search(query);
@@ -541,15 +542,15 @@ public class ResourceService {
 
     }
 
+
     private String searchNeo4J (String query, int pageLength,
             MetaQueryBuilder meta, boolean raw) {
-        
-        if (raw){
-            throw KustvaktResponseHandler.throwit(
-                    StatusCodes.ILLEGAL_ARGUMENT,
+
+        if (raw) {
+            throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     "raw not supported!", null);
         }
-        
+
         MultivaluedMap<String, String> map = new MultivaluedMapImpl();
         map.add("q", query);
         map.add("count", String.valueOf(pageLength));
@@ -564,6 +565,7 @@ public class ResourceService {
         }
 
     }
+
 
     /**
      * String search, String ql, List<String> parents, String cli,
@@ -606,19 +608,18 @@ public class ResourceService {
             User user = controller.getUser(context.getUsername());
             MetaQueryBuilder meta;
 
-            // EM: shouldnt this be the same as buildQueryWithId() ?
             if (!raw) {
                 meta = createMetaQuery(pageIndex, pageInteger, ctx, pageLength,
                         cutoff);
-                
+
                 QuerySerializer s = new QuerySerializer();
                 s.setQuery(query, ql, v);
-                
+
                 // add collection query
                 KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
                 builder.setBaseQuery(s.toJSON());
                 query = createQuery(user, type, id, builder);
-                
+
             }
             else {
                 meta = new MetaQueryBuilder();
@@ -814,6 +815,20 @@ public class ResourceService {
     }
 
 
+    // EM: this handles layer id containing a slash. 
+    // Probably better to restrict the id not to contain any slash instead.
+    @POST
+    @Path("{type}/{id}/{child}")
+    public Response updateResource (@Context SecurityContext context,
+            @Context Locale locale, @PathParam("type") String type,
+            @PathParam("id") String id, @PathParam("child") String child,
+            @QueryParam("name") String name,
+            @QueryParam("description") String description) {
+        return updateResource(context, locale, type,
+                StringUtils.joinResources(id, child), name, description);
+    }
+
+
     @POST
     @Path("{type}/{id}")
     public Response updateResource (@Context SecurityContext context,
@@ -947,13 +962,8 @@ public class ResourceService {
 
 
     /**
-     * EM: store a virtual collection in a database, but
-     * /virtualcollection
-     * service (@see
-     * {@link #getResource(SecurityContext, Locale, String, String)})
-     * does not
-     * list it because the collection is not stored in the
-     * policy_store table as well.
+     * EM: store a virtual collection in resource_store, but
+     * not in the policy_store table as well.
      * 
      * Retrieve cached entry first and then store collection
      * 
@@ -961,6 +971,7 @@ public class ResourceService {
      * @param locale
      * @param query
      * @return
+     * @throws KustvaktException
      */
     @POST
     @Path("{type}")
@@ -970,7 +981,8 @@ public class ResourceService {
             @QueryParam("name") String name,
             @QueryParam("description") String description,
             @QueryParam("ref") String reference,
-            @QueryParam("cache") Boolean cache, String query) {
+            @QueryParam("cache") Boolean cache,
+            @QueryParam("query") String query) throws KustvaktException {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         filter = filter != null ? filter : false;
         cache = cache != null ? cache : false;
@@ -978,7 +990,7 @@ public class ResourceService {
         reference = StringUtils.decodeHTML(reference);
         Map vals = new HashMap();
         User user;
-        Class ctype;
+        Class<KustvaktResource> ctype;
         try {
             ctype = ResourceFactory.getResourceClass(type);
 
@@ -1036,6 +1048,12 @@ public class ResourceService {
                 resourceHandler.cache(cachetmp);
                 vals = cachetmp.toMap();
             }
+        }
+        else {
+            throw KustvaktResponseHandler.throwit(
+                    new KustvaktException(StatusCodes.UNSUPPORTED_RESOURCE,
+                            "Unsupported operation for the given resource type.",
+                            type));
         }
         return Response.ok(JsonUtils.toJSON(vals)).build();
     }

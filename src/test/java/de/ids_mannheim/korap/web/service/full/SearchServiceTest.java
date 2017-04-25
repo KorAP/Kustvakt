@@ -15,11 +15,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.resources.Corpus;
 import de.ids_mannheim.korap.security.ac.ResourceFinder;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
+import de.ids_mannheim.korap.security.auth.KustvaktAuthenticationManager;
+import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
 
@@ -214,14 +218,17 @@ public class SearchServiceTest extends FastJerseyTest {
     
     @Test
     public void testSearchForOwnersCorpusWithIntegerId () throws KustvaktException {
-        Set<Corpus> publicCorpora = ResourceFinder.searchPublic(Corpus.class);
-        Iterator<Corpus> i = publicCorpora.iterator();
+        
+        User kustvaktUser =  ((EntityHandlerIface) helper().getBean(ContextHolder.KUSTVAKT_USERDB))
+            .getAccount("kustvakt");
+        Set<Corpus> userCorpora = ResourceFinder.search(kustvaktUser, Corpus.class);
+        Iterator<Corpus> i = userCorpora.iterator();
         String id = null;
         while (i.hasNext()){
             Corpus c = i.next();
             if (c.getPersistentID().equals("WPD15")){
                 id =c.getId().toString();
-                System.out.println(id);
+//                System.out.println("Corpus "+id);
             }
         }
         ClientResponse response = resource().path(getAPIVersion())
