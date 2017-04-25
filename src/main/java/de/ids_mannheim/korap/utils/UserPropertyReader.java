@@ -21,6 +21,8 @@ import java.util.Properties;
 /**
  * @author hanl
  * @date 30/09/2014
+ * 
+ * EM: where is this used?
  */
 public class UserPropertyReader extends PropertyReader {
 
@@ -70,23 +72,23 @@ public class UserPropertyReader extends PropertyReader {
     private User createUser (String username, Properties p)
             throws KustvaktException {
         KorAPUser user;
-        if (username.equals(User.ADMINISTRATOR_NAME)) {
-            user = User.UserFactory.getAdmin();
-
-            String pass = p.getProperty(username + ".password", null);
-            if (pass == null)
-                throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);
-
-            try {
-                pass = crypto.secureHash(pass);
-            }
-            catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-                throw new KustvaktException(StatusCodes.REQUEST_INVALID);
-            }
-            user.setPassword(pass);
-            iface.createAccount(user);
-        }
-        else {
+//        if (username.equals(User.ADMINISTRATOR_NAME)) {
+//            user = User.UserFactory.getAdmin();
+//
+//            String pass = p.getProperty(username + ".password", null);
+//            if (pass == null)
+//                throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);
+//
+//            try {
+//                pass = crypto.secureHash(pass);
+//            }
+//            catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+//                throw new KustvaktException(StatusCodes.REQUEST_INVALID);
+//            }
+//            user.setPassword(pass);
+//            iface.createAccount(user);
+//        }
+//        else {
             user = User.UserFactory.getUser(username);
             Map<String, Object> vals = new HashMap<>();
             for (Map.Entry e : p.entrySet()) {
@@ -132,7 +134,7 @@ public class UserPropertyReader extends PropertyReader {
                     BeansFactory.getKustvaktContext().getUserDataProviders(),
                     UserSettings.class);
             dao.store(set);
-        }
+//        }
 
         jlog.info("successfully created account for user {}",
                 user.getUsername());

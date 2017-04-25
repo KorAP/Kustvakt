@@ -4,6 +4,7 @@ import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
 import de.ids_mannheim.korap.resources.KustvaktResource;
@@ -101,7 +102,37 @@ public class ResourceFinder {
         return searchPublicFiltered(clazz);
     }
 
-
+    public static <T extends KustvaktResource> Set<T> searchPublicFilteredIntId (
+            Class<T> clazz, int ... ids) throws KustvaktException {
+        
+        overrideProviders(null);
+        Set<T> sets = new HashSet<>();
+       
+        List<SecurityPolicy> policies = policydao.getPolicies(
+                new PolicyCondition(Attributes.PUBLIC_GROUP), clazz,
+                Permissions.Permission.READ.toByte());
+        ArrayList<Integer> id_set = new ArrayList<>(ids.length);
+        for(int id : ids){
+            id_set.add(id);
+        }
+        
+        for (SecurityPolicy policy : policies) {
+            jlog.debug("PolicyID retrieved: "+policy.getID()+" "+policy.getTarget());
+            if (id_set.isEmpty() || id_set.contains(policy.getID())) {
+                @SuppressWarnings("unchecked")
+                T r = (T) resourcedaos.get(KustvaktResource.class).findbyId(
+                        policy.getID(), User.UserFactory.getDemoUser());
+                sets.add(r);
+            }
+        }
+        
+        if (sets.isEmpty()){
+            throw new KustvaktException(StatusCodes.NO_VALUE_FOUND, 
+                    "Cannot found public resources with ids: "+id_set.toString());
+        }
+        return sets;
+    }
+    
     public static <T extends KustvaktResource> Set<T> searchPublicFiltered (
             Class<T> clazz, String ... ids) throws KustvaktException {
         overrideProviders(null);
@@ -113,14 +144,17 @@ public class ResourceFinder {
         List<String> id_set = Arrays.asList(ids);
         for (SecurityPolicy policy : policies) {
             if (id_set.isEmpty() || id_set.contains(policy.getTarget())) {
+                @SuppressWarnings("unchecked")
                 T r = (T) resourcedaos.get(KustvaktResource.class).findbyId(
                         policy.getTarget(), User.UserFactory.getDemoUser());
                 sets.add(r);
             }
         }
 
-        if (sets.isEmpty())
-            throw new EmptyResultException(Arrays.asList(ids).toString());
+        if (sets.isEmpty()){
+            throw new KustvaktException(StatusCodes.NO_VALUE_FOUND, 
+                    "Cannot found public resources with ids: "+id_set.toString());
+        }
         return sets;
     }
 

@@ -1,21 +1,21 @@
 // Connector to the Lucene Backend
 package de.ids_mannheim.korap.web;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.List;
+
+import org.apache.lucene.store.MMapDirectory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.ids_mannheim.korap.Krill;
 import de.ids_mannheim.korap.KrillCollection;
 import de.ids_mannheim.korap.KrillIndex;
 import de.ids_mannheim.korap.response.Match;
 import de.ids_mannheim.korap.response.Result;
 import de.ids_mannheim.korap.util.QueryException;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
-import org.apache.lucene.store.MMapDirectory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.nio.file.Paths;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * The SearchKrill class allows for searching in the
@@ -24,7 +24,6 @@ import java.util.List;
  * @author Nils Diewald
  */
 public class SearchKrill {
-    private final static Logger qlog = KustvaktLogger.getLogger("queryLogger");
     private final static Logger jlog = LoggerFactory
             .getLogger(SearchKrill.class);
 
@@ -33,7 +32,6 @@ public class SearchKrill {
     String i = "/Users/hanl/Projects/prep_corpus";
     String klinux10 = "/vol/work/hanl/indices";
     private KrillIndex index;
-
 
     /**
      * Constructor
@@ -61,7 +59,6 @@ public class SearchKrill {
         };
     };
 
-
     public KrillIndex getIndex () {
         return this.index;
     };
@@ -75,7 +72,7 @@ public class SearchKrill {
      *            filters.
      */
     public String search (String json) {
-        qlog.trace(json);
+        jlog.trace(json);
         if (this.index != null)
             return new Krill(json).apply(this.index).toJsonString();
         Result kr = new Result();
@@ -93,7 +90,7 @@ public class SearchKrill {
      */
     @Deprecated
     public String searchTokenList (String json) {
-        qlog.trace(json);
+        jlog.trace(json);
         if (this.index != null)
             return new Krill(json).apply(this.index).toTokenListJsonString();
         Result kr = new Result();
@@ -205,7 +202,7 @@ public class SearchKrill {
      */
     @Deprecated
     public String getStatistics (String json) {
-        qlog.trace(json);
+        jlog.trace(json);
         if (this.index == null) {
             return "{\"documents\" : -1, error\" : \"No index given\" }";
         };
@@ -232,24 +229,19 @@ public class SearchKrill {
         return sb.toString();
     };
 
+
     /**
-	 * Return the match identifier as a string.
-	 * This is a convenient method to deal with legacy instantiation of the
-	 * code.
-	 */
-    public String getMatchId (String corpusID, String docID, String matchID) {
-		String docIDtextID [] = docID.split("\\.", 2);
-
-		// Create a string representation of the match 
-		StringBuilder sb = new StringBuilder()
-			.append("match-")
-			.append(corpusID).append('/')
-			.append(docIDtextID[0]);
-
-		// The docID was split
-		if (docIDtextID.length == 2)
-			sb.append('/').append(docIDtextID[1]);
-
-		return sb.append('-').append(matchID).toString();
+     * Return the match identifier as a string.
+     * This is a convenient method to deal with legacy instantiation
+     * of the
+     * code.
+     */
+    public String getMatchId (String corpusID, String docID, String textID,
+            String matchID) {
+        // Create a string representation of the match 
+        StringBuilder sb = new StringBuilder();
+        sb.append("match-").append(corpusID).append('/').append(docID)
+                .append('/').append(textID).append('-').append(matchID);
+        return sb.toString();
     };
 };

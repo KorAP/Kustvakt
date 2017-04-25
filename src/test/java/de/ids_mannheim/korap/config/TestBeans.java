@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.config;
 
+import de.ids_mannheim.korap.handlers.AdminDao;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.db.*;
@@ -13,35 +14,29 @@ import java.util.List;
  */
 public abstract class TestBeans {
 
-    protected PersistenceClient dataSource;
+	protected PersistenceClient dataSource;
 
+	public abstract PolicyHandlerIface getPolicyDao();
 
-    public abstract PolicyHandlerIface getPolicyDao ();
+	public abstract KustvaktConfiguration getConfig();
 
+	public abstract EntityHandlerIface getUserDao();
+	
+	public abstract AdminHandlerIface getAdminDao();
 
-    public abstract KustvaktConfiguration getConfig ();
+	public abstract AuditingIface getAuditingDao();
 
+	public abstract List<ResourceOperationIface> getResourceDaos();
 
-    public abstract EntityHandlerIface getUserDao ();
+	public abstract List<UserDataDbIface> getUserdataDaos();
 
+	public abstract EncryptionIface getCrypto();
 
-    public abstract AuditingIface getAuditingDao ();
+	public abstract AuthenticationManagerIface getAuthManager();
 
+	@Bean(name = "kustvakt_db")
+	public PersistenceClient getDataSource() {
+		return this.dataSource;
+	}
 
-    public abstract List<ResourceOperationIface> getResourceDaos ();
-
-
-    public abstract List<UserDataDbIface> getUserdataDaos ();
-
-
-    public abstract EncryptionIface getCrypto ();
-
-
-    public abstract AuthenticationManagerIface getAuthManager ();
-
-
-    @Bean(name = "kustvakt_db")
-    public PersistenceClient getDataSource () {
-        return this.dataSource;
-    }
 }

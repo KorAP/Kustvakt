@@ -1,15 +1,9 @@
 package de.ids_mannheim.korap.handlers;
 
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.exceptions.dbException;
-import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
-import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
-import de.ids_mannheim.korap.resources.KustvaktResource;
-import de.ids_mannheim.korap.resources.ResourceFactory;
-import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.SqlBuilder;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -19,16 +13,23 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.exceptions.DatabaseException;
+import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
+import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
+import de.ids_mannheim.korap.resources.KustvaktResource;
+import de.ids_mannheim.korap.resources.ResourceFactory;
+import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.SqlBuilder;
 
 /**
  * Created by hanl on 7/21/14.
  */
 //todo: auditing // testing
-public class ResourceDao<T extends KustvaktResource> implements
-        ResourceOperationIface<T> {
+public class ResourceDao<T extends KustvaktResource>
+        implements ResourceOperationIface<T> {
 
     private static Logger log = LoggerFactory.getLogger(ResourceDao.class);
     protected final NamedParameterJdbcTemplate jdbcTemplate;
@@ -58,10 +59,13 @@ public class ResourceDao<T extends KustvaktResource> implements
                     new RowMapperFactory.ResourceMapper());
         }
         catch (DataAccessException e) {
-            log.error("Exception during database retrieval for ids '" + ids
-                    + "'", e);
-            throw new dbException(user.getId(), "resource_store",
-                    StatusCodes.DB_GET_FAILED, ids.toString());
+            log.error(
+                    "Exception during database retrieval for ids '" + ids + "'",
+                    e);
+            throw new DatabaseException(user.getId(), "resource_store",
+                    StatusCodes.DB_GET_FAILED,
+                    "Exception during database retrieval for ids '" + ids,
+                    ids.toString());
         }
 
     }
@@ -73,17 +77,17 @@ public class ResourceDao<T extends KustvaktResource> implements
         source.addValue("id", resource.getPersistentID());
         source.addValue("name", resource.getName());
         source.addValue("desc", resource.getDescription());
-        source.addValue("data", resource.getData());
+        source.addValue("data", resource.getStringData());
         final String sql = "UPDATE resource_store set name=:name, data=:data, description=:desc where persistent_id=:id;";
         try {
             return this.jdbcTemplate.update(sql, source);
         }
         catch (DataAccessException e) {
-            log.error(
-                    "Exception during database update for id '"
-                            + resource.getPersistentID() + "'", e);
-            throw new dbException(user.getId(), "resource_store",
-                    StatusCodes.DB_UPDATE_FAILED, resource.toString());
+            log.error("Exception during database update for id '"
+                    + resource.getPersistentID() + "'", e);
+            throw new DatabaseException(user.getId(), "resource_store",
+                    StatusCodes.DB_UPDATE_FAILED, "Exception during database update for id '"
+                            + resource.getPersistentID(), resource.toString());
         }
     }
 
@@ -101,12 +105,14 @@ public class ResourceDao<T extends KustvaktResource> implements
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("pid", id);
         String sql = "SELECT rs.*, rt.name_path FROM resource_store as rs inner join resource_tree as rt"
-                + " on rs.id=rt.child_id WHERE rs.persistent_id=:pid group by rs.id;";
+                + " on rs.id=rt.child_id WHERE rs.persistent_id=:pid";
+        //group by rs.id;";
         try {
             return (T) this.jdbcTemplate.queryForObject(sql, source,
                     new RowMapperFactory.ResourceMapper());
         }
         catch (DataAccessException e) {
+            // empty results
             return null;
         }
     }
@@ -167,7 +173,8 @@ public class ResourceDao<T extends KustvaktResource> implements
         b.insert(Attributes.NAME, Attributes.PARENT_ID,
                 Attributes.PERSISTENT_ID, Attributes.DESCRIPTION,
                 Attributes.CREATOR, Attributes.TYPE, Attributes.CREATED);
-        b.params(":name, :parent, :pid, :desc, :ow, :type, :created, :dtype, :data");
+        b.params(
+                ":name, :parent, :pid, :desc, :ow, :type, :created, :dtype, :data");
 
         if (resource.getParentID() == null) {
             sql = "INSERT INTO resource_store (name, parent_id, persistent_id, description, creator, type, created, data) "
@@ -189,18 +196,20 @@ public class ResourceDao<T extends KustvaktResource> implements
         source.addValue("type",
                 ResourceFactory.getResourceMapping(resource.getClass()));
         source.addValue("created", System.currentTimeMillis());
-        source.addValue("data", resource.getData());
+        source.addValue("data", resource.getStringData());
 
         try {
-            this.jdbcTemplate
-                    .update(sql, source, holder, new String[] { "id" });
+            this.jdbcTemplate.update(sql, source, holder,
+                    new String[] { "id" });
         }
         catch (DataAccessException e) {
-            log.error(
+            log.error("Exception during database store for id '"
+                    + resource.getPersistentID() + "'", e);
+            throw new DatabaseException(user.getId(), "resource_store",
+                    StatusCodes.DB_INSERT_FAILED,
                     "Exception during database store for id '"
-                            + resource.getPersistentID() + "'", e);
-            throw new dbException(user.getId(), "resource_store",
-                    StatusCodes.DB_INSERT_FAILED, resource.toString());
+                            + resource.getPersistentID(),
+                    resource.toString());
         }
         resource.setId(holder.getKey().intValue());
         return resource.getId();
@@ -216,8 +225,9 @@ public class ResourceDao<T extends KustvaktResource> implements
             return this.jdbcTemplate.update(sql, source);
         }
         catch (DataAccessException e) {
-            throw new dbException(user.getId(), "resource_store",
-                    StatusCodes.DB_DELETE_FAILED, id);
+            throw new DatabaseException(user.getId(), "resource_store",
+                    StatusCodes.DB_DELETE_FAILED, "Operation DELETE failed.",
+                    id);
         }
     }
 

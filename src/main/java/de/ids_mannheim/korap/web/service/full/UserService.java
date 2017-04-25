@@ -20,7 +20,6 @@ import de.ids_mannheim.korap.web.filter.AuthFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
-import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +29,8 @@ import javax.ws.rs.core.*;
 import java.util.*;
 
 /**
- * @author hanl
- * @date 29/01/2014
+ * @author hanl, margaretha
+ * @lastUpdate 04/2017
  */
 @Path(KustvaktServer.API_VERSION + "/user")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -41,8 +40,7 @@ public class UserService {
     private static Logger jlog = LoggerFactory.getLogger(UserService.class);
     private AuthenticationManagerIface controller;
 
-    private @Context
-    UriInfo info;
+    private @Context UriInfo info;
 
 
     public UserService () {
@@ -52,6 +50,9 @@ public class UserService {
 
 
     // fixme: json contains password in clear text. Encrypt request?
+    // EM: no encryption is needed for communications over https. 
+    // It should not be necessary in IDS internal network. 
+    
     // fixme: should also collect service exception, not just db exception!
     @POST
     @Path("register")
@@ -76,21 +77,24 @@ public class UserService {
         }
         URIParam uri = user.getField(URIParam.class);
         if (uri.hasValues()) {
-            uriBuilder.queryParam(Attributes.QUERY_PARAM_URI,
-                    uri.getUriFragment()).queryParam(
-                    Attributes.QUERY_PARAM_USER, user.getUsername());
+            uriBuilder
+                    .queryParam(Attributes.QUERY_PARAM_URI,
+                            uri.getUriFragment())
+                    .queryParam(Attributes.QUERY_PARAM_USER,
+                            user.getUsername());
             jlog.info("registration was successful for user '{}'",
-                    values.get(Attributes.USERNAME));
-            Map object = new HashMap();
+                    user.getUsername());
+            Map<String, Object> object = new HashMap<String, Object>();
             object.put("confirm_uri", uriBuilder.build());
             object.put("uri_expiration",
                     TimeUtils.format(uri.getUriExpiration()));
             return Response.ok(JsonUtils.toJSON(object)).build();
         }
         else {
-            // todo: return error or warning
+            jlog.error("Failed creating confirmation and expiry tokens.");
+            // EM: why illegal argument when uri fragment/param is self-generated 
             throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
-                    "failed to validate uri paramter", "confirmation fragment");
+                    "failed to validate uri parameter", "confirmation fragment");
         }
 
     }
@@ -100,8 +104,8 @@ public class UserService {
     @POST
     @Path("update")
     @Consumes(MediaType.APPLICATION_JSON)
-    @ResourceFilters({ AuthFilter.class,
-            PiwikFilter.class, BlockingFilter.class })
+    @ResourceFilters({ AuthFilter.class, PiwikFilter.class,
+            BlockingFilter.class })
     public Response updateAccount (@Context SecurityContext ctx, String json) {
         TokenContext context = (TokenContext) ctx.getUserPrincipal();
         try {
@@ -149,7 +153,8 @@ public class UserService {
     @POST
     @Path("requestReset")
     @Produces(MediaType.TEXT_HTML)
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED})
+    @Consumes({ MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_FORM_URLENCODED })
     public Response requestPasswordReset (@Context Locale locale, String json) {
         JsonNode node = JsonUtils.readTree(json);
         StringBuilder builder = new StringBuilder();
@@ -192,7 +197,8 @@ public class UserService {
     @POST
     @Path("reset")
     @Produces(MediaType.TEXT_HTML)
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED})
+    @Consumes({ MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_FORM_URLENCODED })
     public Response resetPassword (
             @QueryParam(Attributes.QUERY_PARAM_URI) String uri,
             @QueryParam(Attributes.QUERY_PARAM_USER) String username,
@@ -211,8 +217,8 @@ public class UserService {
     // todo: refactor and make something out of if --> needs to give some sort of feedback!
     @GET
     @Path("info")
-    @ResourceFilters({ AuthFilter.class,
-            PiwikFilter.class, BlockingFilter.class })
+    @ResourceFilters({ AuthFilter.class, PiwikFilter.class,
+            BlockingFilter.class })
     public Response getStatus (@Context SecurityContext context,
             @QueryParam("scopes") String scopes) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
@@ -228,7 +234,8 @@ public class UserService {
             m = Scopes.mapScopes(scopes, data);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwAuthenticationException(ctx.getUsername());
+            throw KustvaktResponseHandler
+                    .throwAuthenticationException(ctx.getUsername());
         }
         return Response.ok(m.toEntity()).build();
     }
@@ -258,9 +265,9 @@ public class UserService {
 
     @POST
     @Path("settings")
-    @Consumes({MediaType.APPLICATION_JSON})
-    @ResourceFilters({ AuthFilter.class,
-            PiwikFilter.class, BlockingFilter.class })
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @ResourceFilters({ AuthFilter.class, PiwikFilter.class,
+            BlockingFilter.class })
     public Response updateSettings (@Context SecurityContext context,
             @Context Locale locale, Map settings) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
@@ -321,9 +328,9 @@ public class UserService {
 
     @POST
     @Path("details")
-    @Consumes({MediaType.APPLICATION_JSON})
-    @ResourceFilters({ AuthFilter.class,
-            PiwikFilter.class, BlockingFilter.class })
+    @Consumes({ MediaType.APPLICATION_JSON })
+    @ResourceFilters({ AuthFilter.class, PiwikFilter.class,
+            BlockingFilter.class })
     public Response updateDetails (@Context SecurityContext context,
             @Context Locale locale, Map details) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
@@ -355,9 +362,10 @@ public class UserService {
     @POST
     @Path("queries")
     @Consumes(MediaType.APPLICATION_JSON)
-    @ResourceFilters({ AuthFilter.class,
-            PiwikFilter.class, BlockingFilter.class })
-    public Response updateQueries (@Context SecurityContext context, String json) {
+    @ResourceFilters({ AuthFilter.class, PiwikFilter.class,
+            BlockingFilter.class })
+    public Response updateQueries (@Context SecurityContext context,
+            String json) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         Collection<UserQuery> add = new HashSet<>();
         try {
@@ -407,8 +415,8 @@ public class UserService {
 
 
     @DELETE
-    @ResourceFilters({ AuthFilter.class,
-            PiwikFilter.class, BlockingFilter.class })
+    @ResourceFilters({ AuthFilter.class, PiwikFilter.class,
+            BlockingFilter.class })
     public Response deleteUser (@Context SecurityContext context) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         try {

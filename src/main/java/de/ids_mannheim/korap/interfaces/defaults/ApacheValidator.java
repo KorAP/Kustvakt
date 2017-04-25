@@ -21,13 +21,15 @@ public class ApacheValidator implements ValidatorIface {
 
     private static Logger jlog = LoggerFactory.getLogger(ApacheValidator.class);
 
-    private static final String STRING_PATTERN ="^[\\.;:,&\\|@\\[\\]\\=\\*\\/\\/_()\\-0-9\\p{L}\\p{Space}]{0,1024}$";
+    private static final String STRING_PATTERN = "^[\\.;:,&\\|@\\[\\]\\=\\*\\/\\/_()\\-0-9\\p{L}\\p{Space}]{0,1024}$";
 
     private Map<String, RegexValidator> validators;
+
 
     public ApacheValidator () throws IOException {
         this.validators = load();
     }
+
 
     private static Map<String, RegexValidator> load () throws IOException {
         Map<String, RegexValidator> validatorMap = new HashMap<>();
@@ -36,7 +38,8 @@ public class ApacheValidator implements ValidatorIface {
         for (String property : p.stringPropertyNames()) {
             if (property.startsWith("Validator")) {
                 String name = property.replace("Validator.", "");
-                RegexValidator v = new RegexValidator(p.get(property).toString());
+                RegexValidator v = new RegexValidator(
+                        p.get(property).toString());
                 validatorMap.put(name, v);
             }
         }
@@ -46,31 +49,38 @@ public class ApacheValidator implements ValidatorIface {
 
 
     @Override
-    public Map<String, Object> validateMap (Map<String, Object> map) {
+    public Map<String, Object> validateMap (Map<String, Object> map)
+            throws KustvaktException {
         Map<String, Object> safeMap = new HashMap<>();
         KustvaktMap kmap = new KustvaktMap(map);
 
         if (map != null) {
-                loop : for (String key : kmap.keySet()) {
-                    Object value = kmap.getRaw(key);
-                    if (value instanceof List) {
-                        List list = (List) value;
-                        for (int i =0;i<list.size();i++) {
-                            if (!isValid(String.valueOf(list.get(i)), key))
-                                list.remove(i);
+            loop: for (String key : kmap.keySet()) {
+                Object value = kmap.getRaw(key);
+                if (value instanceof List) {
+                    List list = (List) value;
+                    for (int i = 0; i < list.size(); i++) {
+                        if (!isValid(String.valueOf(list.get(i)), key)) {
+                            //                                list.remove(i);
+                            throw new KustvaktException(
+                                    StatusCodes.ILLEGAL_ARGUMENT,
+                                    "The value for the parameter " + key
+                                            + " is not valid or acceptable.");
                         }
-
-                        if (list.size() == 1)
-                            value = list.get(0);
-                        else
-                            value = list;
-                    } else {
-                        if (!isValid(kmap.get(key), key))
-                          continue loop;
                     }
-                    safeMap.put(key, value);
+
+                    if (list.size() == 1)
+                        value = list.get(0);
+                    else
+                        value = list;
                 }
+                else {
+                    if (!isValid(kmap.get(key), key))
+                        continue loop;
+                }
+                safeMap.put(key, value);
             }
+        }
         return safeMap;
     }
 
@@ -84,26 +94,31 @@ public class ApacheValidator implements ValidatorIface {
         return input;
     }
 
+
     @Override
-    public boolean isValid(String input, String type) {
+    public boolean isValid (String input, String type) {
         boolean valid = false;
         RegexValidator validator = this.validators.get(type);
         if (validator != null) {
             valid = validator.isValid(input);
-        } else {
+        }
+        else {
             if (Attributes.EMAIL.equals(type)) {
                 valid = EmailValidator.getInstance().isValid(input);
-            } else if ("date".equals(type)) {
+            }
+            else if ("date".equals(type)) {
                 valid = DateValidator.getInstance().isValid(input);
-            } else if ("string".equals(type) && !this.validators.containsKey("string")) {
+            }
+            else if ("string".equals(type)
+                    && !this.validators.containsKey("string")) {
                 RegexValidator regex = new RegexValidator(STRING_PATTERN);
                 valid = regex.isValid(input);
             }
             else
                 return this.isValid(input, "string");
         }
-        jlog.debug("validating entry '{}' of type '{}': {}",
-                input, type, valid ? "Is valid!" : "Is not valid!");
+        jlog.debug("validating entry '{}' of type '{}': {}", input, type,
+                valid ? "Is valid!" : "Is not valid!");
         return valid;
     }
 }

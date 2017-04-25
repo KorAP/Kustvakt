@@ -2,9 +2,10 @@ package de.ids_mannheim.korap.security.ac;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.exceptions.dbException;
+import de.ids_mannheim.korap.exceptions.DatabaseException;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
+import de.ids_mannheim.korap.resources.Foundry;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.security.Parameter;
@@ -65,16 +66,19 @@ public class PolicyDao implements PolicyHandlerIface {
                 + " SELECT id, :creator, :cr, :posix, :en, :exp, :ip FROM resource_store WHERE persistent_id=:target;";
 
         if (policy.getTarget() == null)
-            throw new dbException(user.getId(), "policy_store",
-                    StatusCodes.NO_POLICY_TARGET, policy.toString());
+            throw new DatabaseException(user.getId(), "policy_store",
+                    StatusCodes.NO_POLICY_TARGET, "Persistent id is missing.",
+                    policy.toString());
 
         if (policy.getConditions().isEmpty())
-            throw new dbException(user.getId(), "policy_store",
-                    StatusCodes.NO_POLICY_CONDITION);
+            throw new DatabaseException(user.getId(), "policy_store",
+                    StatusCodes.NO_POLICY_CONDITION,
+                    "Policy conditions are missing.");
 
         if (policy.getPermissionByte() == 0)
-            throw new dbException(user.getId(), "policy_store",
-                    StatusCodes.NO_POLICY_PERMISSION);
+            throw new DatabaseException(user.getId(), "policy_store",
+                    StatusCodes.NO_POLICY_PERMISSION,
+                    "Policy permissions are missing.");
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource np = new MapSqlParameterSource();
@@ -98,10 +102,9 @@ public class PolicyDao implements PolicyHandlerIface {
         }
         catch (DataAccessException e) {
             e.printStackTrace();
-            jlog.error(
-                    "Operation (INSERT) not possible for '{}' for user '{}'",
+            jlog.error("Operation (INSERT) not possible for '{}' for user '{}'",
                     policy.toString(), user.getId());
-            throw new dbException(user.getId(), "policy_store",
+            throw new DatabaseException(user.getId(), "policy_store",
                     StatusCodes.DB_INSERT_FAILED, policy.toString());
         }
     }
@@ -117,7 +120,8 @@ public class PolicyDao implements PolicyHandlerIface {
      */
     // benchmark this!
     @Override
-    public void mapConstraints (SecurityPolicy policy) throws KustvaktException {
+    public void mapConstraints (SecurityPolicy policy)
+            throws KustvaktException {
         final String cond = "INSERT INTO group_ref (group_id, policy_id) VALUES (:group, :policyID);";
         final String remove = "DELETE FROM group_ref WHERE group_id=:group and policy_id=:policyID;";
         try {
@@ -128,8 +132,8 @@ public class PolicyDao implements PolicyHandlerIface {
                         .getRemoved().size()];
                 for (Integer toremove : policy.getRemoved()) {
                     MapSqlParameterSource source = new MapSqlParameterSource();
-                    source.addValue("group", conditions.get(toremove)
-                            .getSpecifier());
+                    source.addValue("group",
+                            conditions.get(toremove).getSpecifier());
                     source.addValue("policyID", policy.getID());
                     sources_removed[idx++] = source;
                 }
@@ -143,7 +147,8 @@ public class PolicyDao implements PolicyHandlerIface {
                         .getAdded().size()];
                 for (Integer add : policy.getAdded()) {
                     MapSqlParameterSource source = new MapSqlParameterSource();
-                    source.addValue("group", conditions.get(add).getSpecifier());
+                    source.addValue("group",
+                            conditions.get(add).getSpecifier());
                     source.addValue("policyID", policy.getID());
                     sources[idx++] = source;
                 }
@@ -173,17 +178,17 @@ public class PolicyDao implements PolicyHandlerIface {
 
             try {
                 final Integer[] results = new Integer[2];
-                jdbcTemplate
-                        .query("SELECT COUNT(*) as total, (select count(*) from group_users where user_id=:userid and "
+                jdbcTemplate.query(
+                        "SELECT COUNT(*) as total, (select count(*) from group_users where user_id=:userid and "
                                 + "group_id=:name) as users FROM group_store WHERE name=:name",
-                                param, new RowCallbackHandler() {
-                                    @Override
-                                    public void processRow (ResultSet rs)
-                                            throws SQLException {
-                                        results[0] = rs.getInt("total");
-                                        results[1] = rs.getInt("users");
-                                    }
-                                });
+                        param, new RowCallbackHandler() {
+                            @Override
+                            public void processRow (ResultSet rs)
+                                    throws SQLException {
+                                results[0] = rs.getInt("total");
+                                results[1] = rs.getInt("users");
+                            }
+                        });
 
                 boolean admin = false;
                 if (results[0] == 0) {
@@ -191,15 +196,19 @@ public class PolicyDao implements PolicyHandlerIface {
                     this.createCondition(cond, user);
                 }
                 if (results[1] == 0)
-                    this.addToCondition(Arrays.asList(user.getUsername()),
-                            cond, admin);
+                    this.addToCondition(Arrays.asList(user.getUsername()), cond,
+                            admin);
             }
             catch (DataAccessException e) {
                 jlog.error(
                         "Operation (SELECT) not possible for '{}' for user '{}'",
                         policy.getTarget(), user.getId());
-                throw new dbException(user.getId(), "policy_store",
-                        StatusCodes.DB_GET_FAILED, policy.toString());
+                throw new DatabaseException(user.getId(), "policy_store",
+                        StatusCodes.DB_GET_FAILED,
+                        "Operation (SELECT) is not possible for "
+                                + policy.getTarget() + " for user "
+                                + user.getUsername(),
+                        policy.toString());
             }
         }
     }
@@ -213,7 +222,7 @@ public class PolicyDao implements PolicyHandlerIface {
         param.addValue("target", target);
         param.addValue("userid", user.getId());
         param.addValue("perm", perm);
-        param.addValue("en", new Timestamp(TimeUtils.getNow().getMillis()));
+        param.addValue("en", TimeUtils.getNow().getMillis());
 
         String sql_new = "select pv.*, pv.perm & :perm as allowed, rh.depth, (select max(depth) from resource_tree \n"
                 + "where child_id=rh.child_id) as max_depth from policy_view as pv "
@@ -252,7 +261,7 @@ public class PolicyDao implements PolicyHandlerIface {
         param.addValue("cond", condition.getSpecifier());
         param.addValue("perm", perm);
         param.addValue("type", ResourceFactory.getResourceMapping(clazz));
-        param.addValue("en", new Timestamp(TimeUtils.getNow().getMillis()));
+        param.addValue("en", TimeUtils.getNow().getMillis());
         String sql_new = "select pv.*, pv.perm & :perm as allowed, "
                 + "rh.depth, (select max(depth) from resource_tree "
                 + "where child_id=rh.child_id) as max_depth from policy_view as pv "
@@ -283,6 +292,50 @@ public class PolicyDao implements PolicyHandlerIface {
     }
 
 
+    // EM: should only return one policy
+    @Override
+    public List<SecurityPolicy> getPoliciesByPersistentId (
+            PolicyCondition condition, Class<? extends KustvaktResource> clazz,
+            byte perm, String persistentId) {
+
+        MapSqlParameterSource param = new MapSqlParameterSource();
+        param.addValue("cond", condition.getSpecifier());
+        param.addValue("perm", perm);
+        param.addValue("type", ResourceFactory.getResourceMapping(clazz));
+        param.addValue("en", TimeUtils.getNow().getMillis());
+        param.addValue("persistentId", persistentId);
+        String sql_new = "select pv.*, pv.perm & :perm as allowed, "
+                + "rh.depth, (select max(depth) from resource_tree "
+                + "where child_id=rh.child_id) as max_depth from policy_view as pv "
+                + "inner join resource_tree as rh on rh.parent_id=pv.id "
+                + "where " + "pv.persistent_id =:persistentId and "
+                + "pv.enable <= :en and (pv.expire > :en or pv.expire is NULL) and "
+                + "pv.group_id=:cond and pv.type=:type";
+
+        try {
+            return this.jdbcTemplate.query(sql_new, param,
+                    new ResultSetExtractor<List<SecurityPolicy>>() {
+
+                        @Override
+                        public List<SecurityPolicy> extractData (ResultSet rs)
+                                throws SQLException, DataAccessException {
+                            List<SecurityPolicy> policies = SecurityRowMappers
+                                    .mapConditionPolicies(rs);
+                            if (policies.size() > 1)
+                                jlog.warn(
+                                        "Policy ids are not uniques. Found more than one policy for id:"
+                                                + policies.get(0).getID());
+                            return policies;
+                        }
+                    });
+        }
+        catch (DataAccessException e) {
+            jlog.error(e.getLocalizedMessage());
+            return Collections.emptyList();
+        }
+    }
+
+
     @Override
     public List<SecurityPolicy>[] getPolicies (String target, final User user,
             Byte perm) {
@@ -290,7 +343,7 @@ public class PolicyDao implements PolicyHandlerIface {
         param.addValue("target", target);
         param.addValue("userid", user.getId());
         param.addValue("perm", perm);
-        param.addValue("en", new Timestamp(TimeUtils.getNow().getMillis()));
+        param.addValue("en", TimeUtils.getNow().getMillis());
 
         String sql_new = "select pv.*, pv.perm & :perm as allowed, "
                 + "rh.depth, (select max(depth) from resource_tree "
@@ -331,7 +384,7 @@ public class PolicyDao implements PolicyHandlerIface {
         param.addValue("path", StringUtils.buildSQLRegex(path));
         param.addValue("userid", user.getId());
         param.addValue("perm", perm);
-        param.addValue("en", new Timestamp(TimeUtils.getNow().getMillis()));
+        param.addValue("en", TimeUtils.getNow().getMillis());
 
         String sql_new = "select pv.*, pv.perm & :perm as allowed, "
                 + "rh.depth, (select max(depth) from resource_tree "
@@ -424,8 +477,11 @@ public class PolicyDao implements PolicyHandlerIface {
             jlog.error(
                     "Permission Denied for retrieval for path '{}' for user '{}'",
                     path, user.getId());
-            throw new dbException(user.getId(), "policy_store",
-                    StatusCodes.DB_GET_FAILED, path, clazz.toString());
+            throw new DatabaseException(user.getId(), "policy_store",
+                    StatusCodes.DB_GET_FAILED,
+                    "Permission is denied for retrieval for path " + path
+                            + " for user " + user.getUsername(),
+                    path, clazz.toString());
         }
     }
 
@@ -481,8 +537,11 @@ public class PolicyDao implements PolicyHandlerIface {
             jlog.error(
                     "Permission Denied for retrieval for path '{}' for user '{}'",
                     name, user.getId());
-            throw new dbException(user.getId(), "policy_store",
-                    StatusCodes.DB_GET_FAILED, name, clazz.toString());
+            throw new DatabaseException(user.getId(), "policy_store",
+                    StatusCodes.DB_GET_FAILED,
+                    "Permission is denied for retrieval for path " + name
+                            + "for user" + user.getUsername() + ".",
+                    name, clazz.toString());
         }
     }
 
@@ -490,6 +549,7 @@ public class PolicyDao implements PolicyHandlerIface {
     // todo: return all resources or only leave nodes? --> currently only leaves are returned
     // todo: access to leave node also means that the path to the root for that permission is allowed,
     // todo: thus all upper resource access is as well allowed
+
 
     //todo: remove not used context?! --> who is allowed to do so?
     @Override
@@ -499,17 +559,18 @@ public class PolicyDao implements PolicyHandlerIface {
         param.addValue("id", policy.getID());
 
         try {
-            this.jdbcTemplate.update(
-                    "DELETE FROM group_ref WHERE policy_id=:id", param);
-            return this.jdbcTemplate.update(
-                    "DELETE FROM policy_store WHERE id=:id", param);
+            this.jdbcTemplate
+                    .update("DELETE FROM group_ref WHERE policy_id=:id", param);
+            return this.jdbcTemplate
+                    .update("DELETE FROM policy_store WHERE id=:id", param);
         }
         catch (DataAccessException e) {
-            jlog.error(
-                    "Operation (DELETE) not possible for '{}' for user '{}'",
+            jlog.error("Operation (DELETE) not possible for '{}' for user '{}'",
                     policy.toString(), user.getId());
-            throw new dbException(user.getId(), "policy_store, group_ref",
-                    StatusCodes.DB_DELETE_FAILED, policy.toString());
+            throw new DatabaseException(user.getId(), "policy_store, group_ref",
+                    StatusCodes.DB_DELETE_FAILED,
+                    "Operation (DELETE) is not possible for user.",
+                    policy.toString());
         }
     }
 
@@ -524,11 +585,13 @@ public class PolicyDao implements PolicyHandlerIface {
             return this.jdbcTemplate.update(sql, param);
         }
         catch (DataAccessException e) {
-            jlog.error(
-                    "Operation (DELETE) not possible for '{}' for user '{}'",
+            jlog.error("Operation (DELETE) not possible for '{}' for user '{}'",
                     id, user.getId());
-            throw new dbException(user.getId(), "policy_store",
-                    StatusCodes.DB_DELETE_FAILED, id);
+            throw new DatabaseException(user.getId(), "policy_store",
+                    StatusCodes.DB_DELETE_FAILED,
+                    "Operation (DELETE) is not possible for user "
+                            + user.getUsername(),
+                    id);
         }
     }
 
@@ -549,11 +612,13 @@ public class PolicyDao implements PolicyHandlerIface {
             return result;
         }
         catch (DataAccessException e) {
-            jlog.error(
-                    "Operation (UPDATE) not possible for '{}' for user '{}'",
+            jlog.error("Operation (UPDATE) not possible for '{}' for user '{}'",
                     policy.toString(), user.getId());
-            throw new dbException(user.getId(), "policy_store",
-                    StatusCodes.DB_UPDATE_FAILED, policy.toString());
+            throw new DatabaseException(user.getId(), "policy_store",
+                    StatusCodes.DB_UPDATE_FAILED,
+                    "Operation (UPDATE) on " + policy.toString()
+                            + " is not possible for user" + user.getUsername(),
+                    policy.toString());
         }
     }
 
@@ -572,11 +637,13 @@ public class PolicyDao implements PolicyHandlerIface {
             return this.jdbcTemplate.queryForObject(sql1, param, Integer.class);
         }
         catch (DataAccessException e) {
-            jlog.error(
-                    "Operation (SELECT) not possible for '{}' for user '{}'",
+            jlog.error("Operation (SELECT) not possible for '{}' for user '{}'",
                     policy.getTarget(), user.getId());
-            throw new dbException(user.getId(), "policy_store",
-                    StatusCodes.DB_GET_FAILED, policy.toString());
+            throw new DatabaseException(user.getId(), "policy_store",
+                    StatusCodes.DB_GET_FAILED,
+                    "Operation (SELECT) on " + policy.getTarget()
+                            + " is not possible for user " + user.getUsername(),
+                    policy.toString());
         }
     }
 
@@ -614,11 +681,13 @@ public class PolicyDao implements PolicyHandlerIface {
             return this.jdbcTemplate.queryForObject(sql, param, Integer.class);
         }
         catch (DataAccessException e) {
-            jlog.error(
-                    "Operation (SELECT) not possible for '{}' for user '{}'",
+            jlog.error("Operation (SELECT) not possible for '{}' for user '{}'",
                     group, user.getId());
-            throw new dbException(user.getId(), "policy_store",
-                    StatusCodes.DB_GET_FAILED, group);
+            throw new DatabaseException(user.getId(), "policy_store",
+                    StatusCodes.DB_GET_FAILED,
+                    "Operation (SELECT) is not possible for user "
+                            + user.getUsername(),
+                    group);
         }
     }
 
@@ -633,15 +702,17 @@ public class PolicyDao implements PolicyHandlerIface {
         param.addValue("sy", condition.getFlags().get(Attributes.SYM_USE));
         param.addValue("ex", condition.getFlags().get(Attributes.LICENCE));
         try {
-            this.jdbcTemplate.update(
-                    "INSERT INTO group_store (name, sym_use, export, commercial) "
+            this.jdbcTemplate
+                    .update("INSERT INTO group_store (name, sym_use, export, commercial) "
                             + "VALUES (:name, :sy, :ex, :com);", param);
         }
         catch (DataAccessException e) {
             jlog.error("Operation (INSERT) not possible for '{}'",
                     condition.toString());
-            throw new dbException(user.getId(), "group_store",
-                    StatusCodes.DB_INSERT_FAILED, condition.toString());
+            throw new DatabaseException(user.getId(), "group_store",
+                    StatusCodes.DB_INSERT_FAILED,
+                    "Operation (INSERT) is not possible for",
+                    condition.toString());
         }
     }
 
@@ -662,12 +733,16 @@ public class PolicyDao implements PolicyHandlerIface {
         }
         catch (DataAccessException e) {
             //todo: test with mysql
-            if (!e.getMessage().toLowerCase().contains("UNIQUE".toLowerCase())) {
+            if (!e.getMessage().toLowerCase()
+                    .contains("UNIQUE".toLowerCase())) {
                 jlog.error(
                         "Operation (INSERT) not possible for '{}' for user '{}'",
                         condition.toString(), username);
-                throw new dbException(null, "group_store",
-                        StatusCodes.DB_INSERT_FAILED, condition.toString());
+                throw new DatabaseException(null, "group_store",
+                        StatusCodes.DB_INSERT_FAILED,
+                        "Operation (INSERT) on " + condition.toString()
+                                + " is not possible for user " + username,
+                        condition.toString());
             }
             return 0;
         }
@@ -731,8 +806,8 @@ public class PolicyDao implements PolicyHandlerIface {
                 throw new KustvaktException(
                         "Operation (INSERT) not possible for '"
                                 + condition.toString() + "' for user '"
-                                + usernames + "'", e,
-                        StatusCodes.CONNECTION_ERROR);
+                                + usernames + "'",
+                        e, StatusCodes.CONNECTION_ERROR);
             }
             return null;
         }
@@ -759,8 +834,7 @@ public class PolicyDao implements PolicyHandlerIface {
             this.jdbcTemplate.batchUpdate(del, sources);
         }
         catch (DataAccessException e) {
-            jlog.error(
-                    "Operation (DELETE) not possible for '{}' for user '{}'",
+            jlog.error("Operation (DELETE) not possible for '{}' for user '{}'",
                     condition.toString(), usernames);
             throw new KustvaktException(e, StatusCodes.CONNECTION_ERROR);
         }
@@ -813,7 +887,8 @@ public class PolicyDao implements PolicyHandlerIface {
         MapSqlParameterSource source = new MapSqlParameterSource();
         source.addValue("key", key);
         final String select = "SELECT COUNT(*) FROM param_store WHERE p_key=:key;";
-        return this.jdbcTemplate.queryForObject(select, source, Integer.class) == 1;
+        return this.jdbcTemplate.queryForObject(select, source,
+                Integer.class) == 1;
     }
 
 
@@ -859,5 +934,4 @@ public class PolicyDao implements PolicyHandlerIface {
             return 0;
         }
     }
-
 }

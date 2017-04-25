@@ -3,7 +3,7 @@ package de.ids_mannheim.korap.handlers;
 import de.ids_mannheim.korap.config.ClientInfo;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.exceptions.dbException;
+import de.ids_mannheim.korap.exceptions.DatabaseException;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.TokenContext;
@@ -245,7 +245,7 @@ public class OAuthDb {
         catch (DataAccessException e) {
             e.printStackTrace();
             jlog.error("removing client '{}' failed", info.getClient_id());
-            throw new dbException(new KustvaktException(user.getId(),
+            throw new DatabaseException(new KustvaktException(user.getId(),
                     StatusCodes.ILLEGAL_ARGUMENT, "arguments given not valid",
                     info.toJSON()), StatusCodes.CLIENT_REMOVAL_FAILURE,
                     info.toJSON());
@@ -271,7 +271,7 @@ public class OAuthDb {
         catch (DataAccessException e) {
             e.printStackTrace();
             jlog.error("registering client '{}' failed", info.getClient_id());
-            throw new dbException(new KustvaktException(user.getId(),
+            throw new DatabaseException(new KustvaktException(user.getId(),
                     StatusCodes.ILLEGAL_ARGUMENT, "arguments given not valid",
                     info.toJSON()), StatusCodes.CLIENT_REGISTRATION_FAILURE,
                     info.toJSON());

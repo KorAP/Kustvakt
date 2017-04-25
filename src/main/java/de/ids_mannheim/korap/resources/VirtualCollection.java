@@ -38,8 +38,9 @@ public class VirtualCollection extends KustvaktResource {
         if (resource == null | !(resource instanceof VirtualCollection))
             return;
         VirtualCollection other = (VirtualCollection) resource;
-        this.setFields(this.getFields() == null ? other.getFields() : this
-                .getFields());
+        if (this.getFields() == null || this.getFields().isEmpty()){
+        	setFields(other.getFields());
+        }
     }
 
 

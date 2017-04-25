@@ -25,7 +25,7 @@ public class BeanInjectTest {
 
     @Test
     public void testUserBeans () {
-        BeansFactory.loadClasspathContext("default-config.xml");
+        BeansFactory.loadClasspathContext("test-default-config.xml");
         Collection coll = BeansFactory.getKustvaktContext()
                 .getUserDataProviders();
         assertFalse(coll.isEmpty());
@@ -42,7 +42,7 @@ public class BeanInjectTest {
 
     @Test
     public void testResourceBeans () {
-        BeansFactory.loadClasspathContext("default-config.xml");
+        BeansFactory.loadClasspathContext("test-default-config.xml");
         Collection coll = BeansFactory.getKustvaktContext()
                 .getResourceProviders();
         assertFalse(coll.isEmpty());

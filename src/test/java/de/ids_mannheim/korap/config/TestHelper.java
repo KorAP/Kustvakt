@@ -1,31 +1,9 @@
 package de.ids_mannheim.korap.config;
 
-import de.ids_mannheim.korap.exceptions.EmptyResultException;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.handlers.*;
-import de.ids_mannheim.korap.interfaces.AuthenticationIface;
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
-import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.interfaces.db.*;
-import de.ids_mannheim.korap.interfaces.defaults.KustvaktEncryption;
-import de.ids_mannheim.korap.resources.KustvaktResource;
-import de.ids_mannheim.korap.security.ac.PolicyDao;
-import de.ids_mannheim.korap.security.auth.*;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.TimeUtils;
-import de.ids_mannheim.korap.web.service.BootableBeanInterface;
-import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.dbcp2.BasicDataSource;
-import org.flywaydb.core.Flyway;
-import org.joda.time.DateTime;
-import org.junit.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,9 +12,56 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import static org.junit.Assert.*;
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.flywaydb.core.Flyway;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+
+import de.ids_mannheim.korap.exceptions.EmptyResultException;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.handlers.AdminDao;
+import de.ids_mannheim.korap.handlers.DocumentDao;
+import de.ids_mannheim.korap.handlers.EntityDao;
+import de.ids_mannheim.korap.handlers.JDBCAuditing;
+import de.ids_mannheim.korap.handlers.JDBCClient;
+import de.ids_mannheim.korap.handlers.ResourceDao;
+import de.ids_mannheim.korap.handlers.UserDetailsDao;
+import de.ids_mannheim.korap.handlers.UserSettingsDao;
+import de.ids_mannheim.korap.interfaces.AuthenticationIface;
+import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
+import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.interfaces.db.AdminHandlerIface;
+import de.ids_mannheim.korap.interfaces.db.AuditingIface;
+import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
+import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
+import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
+import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
+import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
+import de.ids_mannheim.korap.interfaces.defaults.KustvaktEncryption;
+import de.ids_mannheim.korap.resources.KustvaktResource;
+import de.ids_mannheim.korap.security.ac.PolicyDao;
+import de.ids_mannheim.korap.security.auth.APIAuthentication;
+import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
+import de.ids_mannheim.korap.security.auth.KustvaktAuthenticationManager;
+import de.ids_mannheim.korap.security.auth.OpenIDconnectAuthentication;
+import de.ids_mannheim.korap.security.auth.SessionAuthentication;
+import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.TimeUtils;
+import de.ids_mannheim.korap.web.service.BootableBeanInterface;
 
 /**
  * creates a test user that can be used to access protected functions
@@ -46,6 +71,7 @@ import static org.junit.Assert.*;
  */
 public class TestHelper {
 
+    private static String mainConfigurationFile = "kustvakt-test.conf";
     private static Logger jlog = LoggerFactory.getLogger(TestHelper.class);
     private static final Map<String, Object> data = new HashMap<>();
     static  {
@@ -414,12 +440,17 @@ public class TestHelper {
             return new EntityDao(this.dataSource);
         }
 
-
+        @Bean(name = ContextHolder.KUSTVAKT_ADMINDB)
+        @Override
+        public AdminHandlerIface getAdminDao () {
+            return new AdminDao(this.dataSource);
+        }
+        
         @Bean(name = ContextHolder.KUSTVAKT_CONFIG)
         @Override
         public KustvaktConfiguration getConfig () {
             KustvaktConfiguration c = new KustvaktConfiguration();
-            InputStream s = ConfigLoader.loadConfigStream("kustvakt.conf");
+            InputStream s = ConfigLoader.loadConfigStream(mainConfigurationFile);
             if (s != null)
                 c.setPropertiesAsStream(s);
             else {
@@ -468,7 +499,7 @@ public class TestHelper {
         @Override
         public AuthenticationManagerIface getAuthManager () {
             AuthenticationManagerIface manager = new KustvaktAuthenticationManager(
-                    getUserDao(), getCrypto(), getConfig(), getAuditingDao(),
+                    getUserDao(), getAdminDao(), getCrypto(), getConfig(), getAuditingDao(),
                     getUserdataDaos());
             Set<AuthenticationIface> pro = new HashSet<>();
             pro.add(new BasicHttpAuth());

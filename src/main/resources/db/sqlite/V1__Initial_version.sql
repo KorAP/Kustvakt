@@ -11,6 +11,13 @@ uri_expiration BIGINT,
 account_link VARCHAR(100)
 );
 
+CREATE TABLE IF NOT EXISTS admin_users (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+user_id INTEGER NOT NULL,
+foreign key (user_id)
+references korap_users (id)
+);
+
 CREATE TABLE IF NOT EXISTS shib_users (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
 username VARCHAR(150) NOT NULL UNIQUE,

@@ -2,6 +2,8 @@ package de.ids_mannheim.korap.resources;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.utils.JsonUtils;
+
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.ArrayList;
@@ -65,15 +67,21 @@ public class ResourceFactory {
 
 
     public static <T extends KustvaktResource> T createID (T resource) {
-        if (resource.getData() != null && !resource.getStringData().isEmpty())
-            resource.setPersistentID(DigestUtils.sha1Hex(resource
-                    .getStringData()));
+        if (resource.getData() != null && !resource.getStringData().isEmpty()){
+        	resource.setPersistentID(DigestUtils.sha1Hex(JsonUtils.toJSON(resource)));        	
+        }
         return resource;
     }
 
 
     public static <T extends KustvaktResource> Class<T> getResourceClass (
             String type) throws KustvaktException {
+        
+        if (type == null || type.isEmpty()){
+            throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT, 
+                    "resource type could not be identified!");
+        }
+        
         for (Class value : subTypes) {
             if (value == VirtualCollection.class
                     && type.equalsIgnoreCase("collection"))
@@ -86,7 +94,8 @@ public class ResourceFactory {
             }
         }
         // todo: throw exception in case of missing parameter!
-        throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT, "resource type could not be identified!");
+        throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT, 
+                "resource type could not be identified!");
     }
 
 

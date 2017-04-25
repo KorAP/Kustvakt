@@ -84,9 +84,9 @@ public class KustvaktResponseHandler {
     private static Response.Status getStatus (int code) {
         Response.Status status = Response.Status.BAD_REQUEST;
         switch (code) {
-            case StatusCodes.NO_VALUE_FOUND:
-                status = Response.Status.NO_CONTENT;
-                break;
+//            case StatusCodes.NO_VALUE_FOUND:
+//                status = Response.Status.NO_CONTENT;
+//                break;
             case StatusCodes.ILLEGAL_ARGUMENT:
                 status = Response.Status.NOT_ACCEPTABLE;
                 break;
