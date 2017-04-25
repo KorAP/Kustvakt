@@ -49,8 +49,8 @@ public class TestHelper {
     private static Logger jlog = LoggerFactory.getLogger(TestHelper.class);
     private static final Map<String, Object> data = new HashMap<>();
     static  {
-        data.put(Attributes.ID, 2);
-        data.put(Attributes.USERNAME, "testUser1");
+        data.put(Attributes.ID, 3); // 2);
+        data.put(Attributes.USERNAME, "testUser1"); // bodmer funktioniert noch nicht
         data.put(Attributes.PASSWORD, "testPass2015");
         data.put(Attributes.FIRSTNAME, "test");
         data.put(Attributes.LASTNAME, "user");

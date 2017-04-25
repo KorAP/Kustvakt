@@ -35,8 +35,8 @@ public class OAuth2Handler extends KustvaktCacheable {
     }
 
 
-    public void authorize (AuthCodeInfo info, User user)
-            throws KustvaktException {
+    public void authorize (AuthCodeInfo info, User user)  throws KustvaktException {
+    	
         info.setUserId(user.getId());
         this.storeInCache(info.getCode(), info);
     }

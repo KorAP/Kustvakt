@@ -105,7 +105,7 @@ public abstract class KustvaktBaseServer {
             contextHandler.addServlet(new ServletHolder(
                     new ServletContainer(rc)), "/api/*");
 
-            server.setHandler(contextHandler);
+	            server.setHandler(contextHandler);
 
             if (kargs.sslContext != null) {
                 SslSocketConnector sslConnector = new SslSocketConnector(

@@ -171,8 +171,7 @@ public class OAuthDb {
                 @Override
                 public ClientInfo mapRow (ResultSet rs, int rowNum)
                         throws SQLException {
-                    ClientInfo info = new ClientInfo(rs.getString("client_id"),
-                            "*****");
+                    ClientInfo info = new ClientInfo(rs.getString("client_id"), "*****");
                     info.setConfidential(rs.getBoolean("is_confidential"));
                     info.setUrl(rs.getString("url"));
                     info.setId(rs.getInt("id"));

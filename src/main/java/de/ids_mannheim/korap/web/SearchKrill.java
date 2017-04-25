@@ -40,6 +40,8 @@ public class SearchKrill {
      */
     // todo: use korap.config to get index location
     public SearchKrill (String path) {
+    	
+    	System.out.println("Debug: SearchKrill: path='" + path + "'.");
         try {
             if (path.equals(":temp:")) {
                 this.index = new KrillIndex();
@@ -48,7 +50,7 @@ public class SearchKrill {
                 File f = new File(path);
                 jlog.info("Loading index from " + path);
                 if (!f.exists()) {
-                    jlog.error("Index not found!");
+                    jlog.error("Index not found: " + path + "!");
                     System.exit(-1);
                 }
                 this.index = new KrillIndex(new MMapDirectory(Paths.get(path)));

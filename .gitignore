@@ -7,3 +7,4 @@ cache_store
 *.iml
 dependency-reduced-pom.xml
 admin_token
+/bin/

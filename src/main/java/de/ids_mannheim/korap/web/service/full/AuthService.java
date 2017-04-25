@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.web.service.full;
 
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ResourceFilters;
+
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -15,14 +16,21 @@ import de.ids_mannheim.korap.utils.ServiceInfo;
 import de.ids_mannheim.korap.web.KustvaktServer;
 import de.ids_mannheim.korap.web.filter.*;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
+
 import org.slf4j.Logger;
 
+import javax.servlet.http.HttpServletRequest; // FB
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+import javax.xml.ws.WebServiceContext; // FB
+import javax.xml.ws.handler.MessageContext; // FB
+import javax.annotation.Resource; // FB
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Iterator; // 07.02.17/FB
 
 //import com.sun.xml.internal.messaging.saaj.util.Base64;
 
@@ -35,12 +43,13 @@ import java.util.Map;
 @Produces(MediaType.TEXT_HTML + ";charset=utf-8")
 public class AuthService {
 
+	private static Boolean DEBUG_LOG = false;
+	
     //todo: bootstrap function to transmit certain default configuration settings and examples (example user queries,
     // default usersettings, etc.)
     private static Logger jlog = KustvaktLogger.getLogger(AuthService.class);
 
     private AuthenticationManagerIface controller;
-
 
     //    private SendMail mail;
 
@@ -51,7 +60,7 @@ public class AuthService {
         //        this.mail = new SendMail(ExtConfiguration.getMailProperties());
     }
 
-
+  
     /**
      * represents json string with data. All GUI clients can access
      * this method to get certain default values
@@ -90,16 +99,55 @@ public class AuthService {
     @GET
     @Path("apiToken")
     //@ResourceFilters({HeaderFilter.class})
-    public Response requestAPIToken (@Context HttpHeaders headers,
+    public Response requestAPIToken (
+    		@Context HttpHeaders headers,
             @Context Locale locale,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
             @HeaderParam("referer-url") String referer,
-            @QueryParam("scope") String scopes) {
+            @QueryParam("scope") String scopes,
+         //   @Context WebServiceContext wsContext, // FB
+            @Context SecurityContext secCtx) {
+    	
         List<String> auth = headers
                 .getRequestHeader(ContainerRequest.AUTHORIZATION);
 
         String[] values = BasicHttpAuth.decode(auth.get(0));
+
+        if( DEBUG_LOG == true )
+        	{
+            System.out.printf("Debug: AuthService.requestAPIToken...:\n");
+	        System.out.printf("Debug: auth.size=%d\n",  auth.size());
+	        System.out.printf("auth.get(0)='%s'\n", auth.get(0));
+	        System.out.printf("Debug: values.length=%d\n",  values.length);
+	        if( auth.size() > 0 )
+	        	{
+	        	Iterator it = auth.iterator();
+	        	while( it.hasNext() )
+	        		System.out.printf(" header '%s'\n",  it.next());
+	        	}
+	        if( values.length > 0 )
+	        	{
+	        	for(int i=0; i< values.length; i++)
+	        		{
+	        		System.out.printf(" values[%d]='%s'\n",  i, values[i]);
+	        		}
+	        	}
+
+	        MultivaluedMap<String,String> headerMap = headers.getRequestHeaders();
+	        if( headerMap != null && headerMap.size() > 0 )
+	        {
+	        	Iterator<String> it = headerMap.keySet().iterator();
+	        	while( it.hasNext() )
+	        	{
+	        		String key = (String)it.next();
+	        		List<String> vals= headerMap.get(key);
+	        		System.out.printf("Debug: requestAPIToken: '%s' = '%s'\n", key, vals);	
+	        	}
+	        	
+	        }
+	        System.out.printf("Debug: requestAPIToken: isSecure = %s.\n", secCtx.isSecure() ? "yes" : "no");
+	        } // DEBUG_LOG        
 
         // "Invalid syntax for username and password"
         if (values == null)
@@ -118,13 +166,12 @@ public class AuthService {
         attr.put(Attributes.USER_AGENT, agent);
         TokenContext context;
         try {
-            User user = controller.authenticate(0, values[0], values[1], attr);
-            Userdata data = this.controller
-                    .getUserData(user, UserDetails.class);
+            // User user = controller.authenticate(0, values[0], values[1], attr); Implementation by Hanl
+            User user = controller.authenticate(2, values[0], values[1], attr); // Implementation with IdM/LDAP
+            // Userdata data = this.controller.getUserData(user, UserDetails.class); // Implem. by Hanl
             // todo: is this necessary?
             //            attr.putAll(data.fields());
-            context = controller.createTokenContext(user, attr,
-                    Attributes.API_AUTHENTICATION);
+            context = controller.createTokenContext(user, attr, Attributes.API_AUTHENTICATION);
         }
         catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
@@ -175,8 +222,11 @@ public class AuthService {
             throw KustvaktResponseHandler
                     .throwit(StatusCodes.BAD_CREDENTIALS);
 
+        // Implementation Hanl mit '|'. 16.02.17/FB
+        //if (values[0].equalsIgnoreCase("null")
+        //        | values[1].equalsIgnoreCase("null"))
         if (values[0].equalsIgnoreCase("null")
-                | values[1].equalsIgnoreCase("null"))
+                || values[1].equalsIgnoreCase("null"))
             throw KustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
 
         Map<String, Object> attr = new HashMap<>();

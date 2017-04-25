@@ -40,7 +40,7 @@ public abstract class FastJerseyTest extends BeanConfigTest {
     private static Client client;
     private static String[] classPackages = null;
 
-    private static int PORT = 9000;
+    private static int PORT = 8089; // FB, was: 9000;
     private static int PORT_IT = 1;
 
 

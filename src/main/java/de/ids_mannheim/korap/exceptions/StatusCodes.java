@@ -27,6 +27,13 @@ public class StatusCodes {
     public static final int NOT_SUPPORTED = 108;
 
     /**
+     * 300 status codes for query language and serialization
+     */
+
+    public static final int NO_QUERY = 301;
+
+
+    /**
      *  400 status codes for authorization and rewrite functions
      */
 
@@ -72,15 +79,18 @@ public class StatusCodes {
     public static final int ARGUMENT_VALIDATION_FAILURE = 700;
     // public static final int ARGUMENT_VALIDATION_FAILURE = 701;
 
+    // service status codes
+    public static final int CREATE_ACCOUNT_SUCCESSFUL = 700;
+    public static final int CREATE_ACCOUNT_FAILED = 701;
+    public static final int DELETE_ACCOUNT_SUCCESSFUL = 702;
+    public static final int DELETE_ACCOUNT_FAILED = 703;
+    public static final int UPDATE_ACCOUNT_SUCCESSFUL = 704;
+    public static final int UPDATE_ACCOUNT_FAILED = 705;
 
-    /**
-     * 300 status codes for query language and serialization
-     */
-
-    public static final int NO_QUERY = 301;
-
-
-
+    public static final int GET_ACCOUNT_SUCCESSFUL = 706;
+    public static final int GET_ACCOUNT_FAILED = 707;
+    
+    
     public static final int STATUS_OK = 1000;
     public static final int NOTHING_CHANGED = 1001;
     public static final int REQUEST_INVALID = 1002;
@@ -89,7 +99,6 @@ public class StatusCodes {
     /**
      * 2000 status and error codes for service level messages and callbacks
      */
-
 
     public static final int ACCOUNT_DEACTIVATED = 2000;
     public static final int ACCOUNT_CONFIRMATION_FAILED = 2001;
@@ -110,20 +119,10 @@ public class StatusCodes {
     public static final int CLIENT_REMOVAL_FAILURE = 2012;
     public static final int CLIENT_AUTHORIZATION_FAILURE = 2013;
 
-
-
-    // service status codes
-    public static final int CREATE_ACCOUNT_SUCCESSFUL = 700;
-    public static final int CREATE_ACCOUNT_FAILED = 701;
-    public static final int DELETE_ACCOUNT_SUCCESSFUL = 702;
-    public static final int DELETE_ACCOUNT_FAILED = 703;
-    public static final int UPDATE_ACCOUNT_SUCCESSFUL = 704;
-    public static final int UPDATE_ACCOUNT_FAILED = 705;
-
-    public static final int GET_ACCOUNT_SUCCESSFUL = 706;
-    public static final int GET_ACCOUNT_FAILED = 707;
-
-
+    // 2020 - 2029 reserviert für LDAP-Fehlercodes - 21.04.17/FB
+    public static final int LDAP_BASE_ERRCODE = 2020;
+    
+    /**/
     private static StatusCodes codes;
 
     private final Properties props;

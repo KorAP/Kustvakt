@@ -21,7 +21,9 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
 
     @BeforeClass
     public static void configure () {
-        FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.light",
+        
+    	// FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.light", version hanl
+        FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.full", // volle Version FB
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");
     }
