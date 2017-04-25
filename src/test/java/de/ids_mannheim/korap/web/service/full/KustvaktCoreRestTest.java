@@ -19,10 +19,16 @@ import java.util.Map;
  */
 public class KustvaktCoreRestTest extends FastJerseyTest {
 
+	@Override
+    public void initMethod () throws KustvaktException {
+//        helper().setupAccount();
+        helper().runBootInterfaces();
+    }
+	
     @BeforeClass
     public static void configure () {
         
-    	// FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.light", version hanl
+//    	FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.light", // version hanl
         FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.full", // volle Version FB
                 "de.ids_mannheim.korap.web.filter",
                 "de.ids_mannheim.korap.web.utils");
@@ -117,10 +123,5 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
                 .queryParam("page", "1").get(ClientResponse.class);
         System.out.println("RESPONSE " + response.getEntity(String.class));
     }
-
-
-    @Override
-    public void initMethod () throws KustvaktException {
-        helper().setupAccount();
-    }
+    
 }

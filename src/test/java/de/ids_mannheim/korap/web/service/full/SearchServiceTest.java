@@ -221,10 +221,11 @@ public class SearchServiceTest extends FastJerseyTest {
             Corpus c = i.next();
             if (c.getPersistentID().equals("WPD15")){
                 id =c.getId().toString();
+                System.out.println(id);
             }
         }
         ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").path("5").path("search")
+                .path("corpus").path(id).path("search")
                 .queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
