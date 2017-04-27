@@ -75,7 +75,7 @@
         <!--<property name="poolPreparedStatements" value="true"/>-->
     </bean>
     
-    <bean id="flywayDataSource"	
+    <bean id="sqliteDataSource"	
           class="org.springframework.jdbc.datasource.SingleConnectionDataSource"
           lazy-init="true">
         <property name="driverClassName" value="${jdbc.driverClassName}"/>
@@ -95,7 +95,7 @@
         <property name="baselineOnMigrate" value="false"/>
         <property name="locations"
                   value="${jdbc.schemaPath}"/>
-        <property name="dataSource" ref="flywayDataSource"/>
+        <property name="dataSource" ref="sqliteDataSource"/>
     </bean>
 
     <bean id="kustvakt_db"
