@@ -1,5 +1,5 @@
 <ehcache xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-         xsi:noNamespaceSchemaLocation='http://ehcache.org/ehcache.xsd'>
+       xsi:schemaLocation='http://ehcache.org/ehcache.xsd'>
     <defaultCache eternal='true' overflowToDisk='false'/>
     <!--maxBytesLocalHeap="200M"-->
     <diskStore path="./cache_store"/>
