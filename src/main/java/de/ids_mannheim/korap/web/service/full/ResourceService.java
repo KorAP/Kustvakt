@@ -1092,7 +1092,29 @@ public class ResourceService {
         return Response.ok().build();
     }
 
-
+    // EM: legacy support
+    // should be deprecated after a while
+    @GET
+    @Path("/corpus/{corpusId}/{docId}/{matchId}/matchInfo")
+    public Response getMatchInfo (@Context SecurityContext ctx,
+            @Context Locale locale, @PathParam("corpusId") String corpusId,
+            @PathParam("docId") String docId,
+            @PathParam("matchId") String matchId,
+            @QueryParam("foundry") Set<String> foundries,
+            @QueryParam("layer") Set<String> layers,
+            @QueryParam("spans") Boolean spans) throws KustvaktException {
+    	
+    	String[] ids = docId.split("\\.");
+    	if (ids.length !=2){
+    		throw KustvaktResponseHandler.throwit(
+    				new KustvaktException(StatusCodes.PARAMETER_VALIDATION_ERROR, 
+    				docId + " format is wrong. Expected a fullstop between doc id "
+					+ "and text id"));
+    	}		
+    	return getMatchInfo(ctx, locale, corpusId, ids[0], ids[1], matchId, foundries, layers, spans);
+    	
+    }
+    
     // fixme: only allowed for corpus?!
     @GET
     @Path("/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
@@ -1122,6 +1144,13 @@ public class ResourceService {
         catch (KustvaktException e) {
             jlog.error("Failed getting user in the matchInfo service: {}",
                     e.string());
+            throw KustvaktResponseHandler.throwit(e);
+        }
+        
+        try {
+            ResourceFinder.searchPublicFiltered(Corpus.class, corpusId);
+        }
+        catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
 

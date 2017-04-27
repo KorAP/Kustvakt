@@ -39,7 +39,7 @@ public class SearchKrill {
     // todo: use korap.config to get index location
     public SearchKrill (String path) {
     	
-    	System.out.println("Debug: SearchKrill: path='" + path + "'.");
+//    	System.out.println("Debug: SearchKrill: path='" + path + "'.");
         try {
             if (path.equals(":temp:")) {
                 this.index = new KrillIndex();
