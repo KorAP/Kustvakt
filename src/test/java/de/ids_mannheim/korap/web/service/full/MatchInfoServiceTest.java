@@ -65,10 +65,11 @@ public class MatchInfoServiceTest extends FastJerseyTest {
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
-                response.getStatus());
         String entity = response.getEntity(String.class);
 //        System.out.println(entity);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
         assertEquals("WPD15/B07/51608", node.at("/textSigle").asText());

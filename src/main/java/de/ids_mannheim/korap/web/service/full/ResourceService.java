@@ -1146,14 +1146,14 @@ public class ResourceService {
                     e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
-        
-        try {
-            ResourceFinder.searchPublicFiltered(Corpus.class, corpusId);
+        if (user instanceof DemoUser){
+	        try {
+	            ResourceFinder.searchPublicFiltered(Corpus.class, corpusId);
+	        }
+	        catch (KustvaktException e) {
+	            throw KustvaktResponseHandler.throwit(e);
+	        }
         }
-        catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
-        }
-
         String results;
         // fixme: checks for policy matching
         // fixme: currently disabled, due to mishab in foundry/layer spec
