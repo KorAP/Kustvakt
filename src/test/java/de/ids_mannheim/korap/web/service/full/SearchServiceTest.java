@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.web.service.full;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -65,6 +66,30 @@ public class SearchServiceTest extends FastJerseyTest {
         assertEquals(6218, node.at("/meta/totalResults").asInt());
     }
 
+
+    @Test
+    public void testSearchQueryWithMeta () {
+        ClientResponse response = resource().path(getAPIVersion())
+                .path("search").queryParam("q", "[orth=der]")
+                .queryParam("ql", "poliqarp").queryParam("cutoff", "true")
+                .queryParam("count", "5")
+                .queryParam("page", "1")
+                .queryParam("context", "40-t,30-t").get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String ent = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertTrue(node.at("/meta/cutOff").asBoolean());
+        assertEquals(5, node.at("/meta/count").asInt());
+        assertEquals(0, node.at("/meta/startIndex").asInt());
+        assertEquals("token", node.at("/meta/context/left/0").asText());
+        assertEquals(40, node.at("/meta/context/left/1").asInt());
+        assertEquals(30, node.at("/meta/context/right/1").asInt());
+        assertEquals(-1,node.at("/meta/totalResults").asInt());
+    }
+
+
     @Test
     public void testSearchQueryAuthorized () {
         ClientResponse response = resource().path(getAPIVersion())
@@ -107,6 +132,7 @@ public class SearchServiceTest extends FastJerseyTest {
         assertEquals("koral:token", node.at("/query/@type").asText());
     }
 
+
     @Test
     public void testSearchForPublicCorpusWithStringId () {
         ClientResponse response = resource().path(getAPIVersion())
@@ -124,7 +150,8 @@ public class SearchServiceTest extends FastJerseyTest {
         assertNotEquals(0, node.path("matches").size());
         assertEquals(32, node.at("/meta/totalResults").asInt());
     }
-    
+
+
     @Test
     public void testSearchForVirtualCollectionWithStringId () {
         ClientResponse response = resource().path(getAPIVersion())
@@ -138,12 +165,12 @@ public class SearchServiceTest extends FastJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("koral:docGroup", node.at("/collection/@type").asText());
-        assertEquals("operation:and", node.at("/collection/operation").asText());
+        assertEquals("operation:and",
+                node.at("/collection/operation").asText());
         assertNotEquals(0, node.at("/collection/operands").size());
         assertEquals("corpusSigle",
                 node.at("/collection/operands/0/key").asText());
-        assertEquals("GOE",
-                node.at("/collection/operands/0/value").asText());
+        assertEquals("GOE", node.at("/collection/operands/0/value").asText());
         assertEquals("creationDate",
                 node.at("/collection/operands/1/key").asText());
         assertEquals("1810-01-01",
@@ -151,28 +178,28 @@ public class SearchServiceTest extends FastJerseyTest {
         assertEquals(1, node.at("/meta/totalResults").asInt());
     }
 
-    
+
     @Test
-    public void testSearchForPublicCorpusWithIntegerId () throws KustvaktException {
+    public void testSearchForPublicCorpusWithIntegerId ()
+            throws KustvaktException {
         Set<Corpus> publicCorpora = ResourceFinder.searchPublic(Corpus.class);
         Iterator<Corpus> i = publicCorpora.iterator();
         String id = null;
-        while (i.hasNext()){
+        while (i.hasNext()) {
             Corpus c = i.next();
-            if (c.getName().equals("Goethe")){
-                id =c.getId().toString();
+            if (c.getName().equals("Goethe")) {
+                id = c.getId().toString();
             }
         }
-            
+
         ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").path(id).path("search")
-                .queryParam("q", "blau").queryParam("ql", "poliqarp")
-                .get(ClientResponse.class);
-        
+                .path("corpus").path(id).path("search").queryParam("q", "blau")
+                .queryParam("ql", "poliqarp").get(ClientResponse.class);
+
         String ent = response.getEntity(String.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
-        
+
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("koral:doc", node.at("/collection/@type").asText());
@@ -180,7 +207,8 @@ public class SearchServiceTest extends FastJerseyTest {
         assertEquals("GOE", node.at("/collection/value").asText());
         assertNotEquals(0, node.path("matches").size());
     }
-    
+
+
     @Test
     public void testSearchForCorpusWithStringIdUnauthorized () {
         ClientResponse response = resource().path(getAPIVersion())
@@ -195,13 +223,13 @@ public class SearchServiceTest extends FastJerseyTest {
         assertEquals("[Cannot found public resources with ids: [WPD15]]",
                 error.get(2).asText());
     }
-    
+
+
     @Test
     public void testSearchForOwnersCorpusWithStringId () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus").path("WPD15").path("search")
-                .queryParam("q", "[orth=das]")
-                .queryParam("ql", "poliqarp")
+                .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
@@ -215,26 +243,28 @@ public class SearchServiceTest extends FastJerseyTest {
         assertEquals("WPD15", node.at("/collection/value").asText());
         assertNotEquals(0, node.path("matches").size());
     }
-    
+
+
     @Test
-    public void testSearchForOwnersCorpusWithIntegerId () throws KustvaktException {
-        
-        User kustvaktUser =  ((EntityHandlerIface) helper().getBean(ContextHolder.KUSTVAKT_USERDB))
-            .getAccount("kustvakt");
-        Set<Corpus> userCorpora = ResourceFinder.search(kustvaktUser, Corpus.class);
+    public void testSearchForOwnersCorpusWithIntegerId ()
+            throws KustvaktException {
+
+        User kustvaktUser = ((EntityHandlerIface) helper()
+                .getBean(ContextHolder.KUSTVAKT_USERDB)).getAccount("kustvakt");
+        Set<Corpus> userCorpora = ResourceFinder.search(kustvaktUser,
+                Corpus.class);
         Iterator<Corpus> i = userCorpora.iterator();
         String id = null;
-        while (i.hasNext()){
+        while (i.hasNext()) {
             Corpus c = i.next();
-            if (c.getPersistentID().equals("WPD15")){
-                id =c.getId().toString();
-//                System.out.println("Corpus "+id);
+            if (c.getPersistentID().equals("WPD15")) {
+                id = c.getId().toString();
+                //                System.out.println("Corpus "+id);
             }
         }
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus").path(id).path("search")
-                .queryParam("q", "[orth=das]")
-                .queryParam("ql", "poliqarp")
+                .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
@@ -248,6 +278,7 @@ public class SearchServiceTest extends FastJerseyTest {
         assertEquals("WPD15", node.at("/collection/value").asText());
         assertNotEquals(0, node.path("matches").size());
     }
+
 
     @Test
     public void testSearchSentenceMeta () {

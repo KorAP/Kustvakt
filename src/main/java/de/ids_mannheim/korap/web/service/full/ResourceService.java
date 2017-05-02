@@ -520,7 +520,7 @@ public class ResourceService {
         meta.setSpanContext(ctx);
         meta.addEntry("count", pageLength);
         // todo: what happened to cutoff?
-        meta.addEntry("cutoff", cutoff);
+        meta.addEntry("cutOff", cutoff);
         // meta.addMeta(pageIndex, pageInteger, pageLength, ctx, cutoff);
         // fixme: should only apply to CQL queries per default!
         // meta.addEntry("itemsPerResource", 1);
