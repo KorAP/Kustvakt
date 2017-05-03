@@ -475,7 +475,8 @@ public class ResourceService {
             @QueryParam("offset") Integer pageIndex,
             @QueryParam("page") Integer pageInteger,
             @QueryParam("cq") String cq, @QueryParam("engine") String engine) {
-        TokenContext context = (TokenContext) securityContext
+
+    	TokenContext context = (TokenContext) securityContext
                 .getUserPrincipal();
         KustvaktConfiguration.BACKENDS eng = this.config.chooseBackend(engine);
         User user;

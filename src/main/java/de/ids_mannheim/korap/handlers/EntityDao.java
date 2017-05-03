@@ -53,10 +53,28 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
     // usersettings are fetched plus basic account info, no details, since i rarely use them anyway!
     @Override
     public User getAccount (String username) throws KustvaktException {
+    	
+    	Boolean bDEBUG = true;
         Map<String, String> namedParameters = Collections
                 .singletonMap("username", username);
         final String sql = "select a.* from korap_users as a where a.username=:username;";
         User user;
+        
+        // Debug by FB
+        if ( bDEBUG == true )
+        {	// User cannot be found in SQL DB since LDAP Authentication,
+        	// so create a User Object here.
+        	// TODO: what more data should be stored into it?
+        	// 28.04.17/FB
+        	user = new KorAPUser();
+        	user.setUsername(username);
+        	return user;
+        }
+        if( username.equalsIgnoreCase("bodmer") == true )
+        {
+        	return null;
+        }
+        //
         try {
             user = this.jdbcTemplate.queryForObject(sql, namedParameters,
                     new RowMapperFactory.UserMapper());

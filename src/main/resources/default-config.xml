@@ -83,9 +83,9 @@
         <property name="username" value="${jdbc.username}"/>
         <property name="password" value="${jdbc.password}"/>
         <!-- relevant for single connection datasource and sqlite -->
-        <!-- <property name="suppressClose">
+        <property name="suppressClose">
             <value>true</value>
-        </property> -->
+        </property>
         <!--<property name="initialSize" value="2"/>-->
         <!--<property name="poolPreparedStatements" value="true"/>-->
     </bean>

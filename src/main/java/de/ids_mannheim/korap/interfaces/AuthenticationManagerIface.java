@@ -32,6 +32,15 @@ public abstract class AuthenticationManagerIface extends KustvaktCacheable {
 
 
     protected AuthenticationIface getProvider (String key, String default_iface) {
+    	
+    	// Debug FB: loop a Map
+    	/*
+    	 for (Map.Entry<String, AuthenticationIface> entry : this.providers.entrySet()) 
+    		{
+    		System.out.println("Debug: provider: Key : " + entry.getKey() + " Value : " + entry.getValue());
+    		}
+    	*/	
+    		
         AuthenticationIface iface = this.providers.get(key != null ? key
                 .toLowerCase() : "none");
         // todo: configurable authentication schema
