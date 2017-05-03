@@ -521,7 +521,7 @@ public class ResourceService {
         meta.setSpanContext(ctx);
         meta.addEntry("count", pageLength);
         // todo: what happened to cutoff?
-        meta.addEntry("cutoff", cutoff);
+        meta.addEntry("cutOff", cutoff);
         // meta.addMeta(pageIndex, pageInteger, pageLength, ctx, cutoff);
         // fixme: should only apply to CQL queries per default!
         // meta.addEntry("itemsPerResource", 1);
@@ -1093,7 +1093,29 @@ public class ResourceService {
         return Response.ok().build();
     }
 
-
+    // EM: legacy support
+    // should be deprecated after a while
+    @GET
+    @Path("/corpus/{corpusId}/{docId}/{matchId}/matchInfo")
+    public Response getMatchInfo (@Context SecurityContext ctx,
+            @Context Locale locale, @PathParam("corpusId") String corpusId,
+            @PathParam("docId") String docId,
+            @PathParam("matchId") String matchId,
+            @QueryParam("foundry") Set<String> foundries,
+            @QueryParam("layer") Set<String> layers,
+            @QueryParam("spans") Boolean spans) throws KustvaktException {
+    	
+    	String[] ids = docId.split("\\.");
+    	if (ids.length !=2){
+    		throw KustvaktResponseHandler.throwit(
+    				new KustvaktException(StatusCodes.PARAMETER_VALIDATION_ERROR, 
+    				docId + " format is wrong. Expected a fullstop between doc id "
+					+ "and text id"));
+    	}		
+    	return getMatchInfo(ctx, locale, corpusId, ids[0], ids[1], matchId, foundries, layers, spans);
+    	
+    }
+    
     // fixme: only allowed for corpus?!
     @GET
     @Path("/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
@@ -1125,7 +1147,14 @@ public class ResourceService {
                     e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
-
+        if (user instanceof DemoUser){
+	        try {
+	            ResourceFinder.searchPublicFiltered(Corpus.class, corpusId);
+	        }
+	        catch (KustvaktException e) {
+	            throw KustvaktResponseHandler.throwit(e);
+	        }
+        }
         String results;
         // fixme: checks for policy matching
         // fixme: currently disabled, due to mishab in foundry/layer spec
