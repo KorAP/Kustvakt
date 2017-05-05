@@ -8,3 +8,4 @@ cache_store
 dependency-reduced-pom.xml
 admin_token
 /bin/
+/db.sqlite
