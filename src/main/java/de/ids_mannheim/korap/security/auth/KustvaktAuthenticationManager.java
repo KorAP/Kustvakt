@@ -412,6 +412,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             }
 
         // Create a User
+        // TODO: KorAPUser für solche mit einem bestehenden Account
+        //       DefaultUser sonst.
         User user = new KorAPUser();
         user.setUsername(username);
         unknown = user;
