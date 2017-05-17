@@ -72,7 +72,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(101, node.at("/errors/0/0").asInt());
-        assertEquals("[Cannot found public resources with ids: [ZUW19]]",
+        assertEquals("[Cannot found public Corpus with ids: [ZUW19]]",
                 node.at("/errors/0/2").asText());
     }
     
@@ -90,7 +90,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(101, node.at("/errors/0/0").asInt());
-        assertEquals("[Cannot found public resources with ids: [BRZ10]]",
+        assertEquals("[Cannot found public Corpus with ids: [BRZ10]]",
                 node.at("/errors/0/2").asText());
     }
 

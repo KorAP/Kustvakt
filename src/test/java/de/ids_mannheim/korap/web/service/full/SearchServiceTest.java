@@ -220,7 +220,7 @@ public class SearchServiceTest extends FastJerseyTest {
         String ent = response.getEntity(String.class);
         JsonNode error = JsonUtils.readTree(ent).get("errors").get(0);
         assertEquals(101, error.get(0).asInt());
-        assertEquals("[Cannot found public resources with ids: [WPD15]]",
+        assertEquals("[Cannot found public Corpus with ids: [WPD15]]",
                 error.get(2).asText());
     }
 

@@ -13,6 +13,7 @@ import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.ShibUser;
 import de.ids_mannheim.korap.user.DemoUser;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.user.User.UserFactory;
 import de.ids_mannheim.korap.utils.BooleanUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import org.slf4j.Logger;
@@ -55,52 +56,53 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
      * getAccount(): KorAPUser:  Account muss vorhanden sein.
      *               DemoUser, DefaultUser: Account nicht vorhanden.
      */
-    @Override
-    public User getAccount (String username) throws KustvaktException {
-    	
-    	Map<String, String> namedParameters = Collections.singletonMap("username", username);
-        final String sql = "select a.* from korap_users as a where a.username=:username;";
-        User user = null;
-        
-        try {
-            user = this.jdbcTemplate.queryForObject(sql, namedParameters,
-                    new RowMapperFactory.UserMapper());
-            return user;
-        	}
-        catch (EmptyResultDataAccessException ae) {
-            jlog.warn("No user found for name '{}'", username);
-            // if no username, so return a DemoUser , FB.
-            // return User.UserFactory.getDemoUser();
-        	}
-        catch (DataAccessException e) {
-            jlog.warn("Could not retrieve user for name: " + username, e);
-            
-            /* DemoUser and DefaultUser have no account,
-             * so it's ok they are not found.
-            throw new DatabaseException(username, "korap_users",
-                    StatusCodes.DB_GET_FAILED,
-                    "Could not retrieve the user with username: " + username,
-                    username);
-             */
-            }
-
-        // DemoUser or DefaultUser?
-        
-        {	// User cannot be found in SQL DB since LDAP Authentication,
-        	// so create a User Object here.
-        	// TODO: what more data should be stored into it?
-        	// 28.04.17/FB
-        	user = new KorAPUser(); // oder eigentlich new DemoUser oder new DefaultUser.
-        	user.setUsername(username);
-        	return user;
-        }
-        
-        
-    }
+//    @Override
+//    public User getAccount (String username) throws KustvaktException {
+//    	
+//    	Map<String, String> namedParameters = Collections.singletonMap("username", username);
+//        final String sql = "select a.* from korap_users as a where a.username=:username;";
+//        User user = null;
+//        
+//        try {
+//            user = this.jdbcTemplate.queryForObject(sql, namedParameters,
+//                    new RowMapperFactory.UserMapper());
+//            return user;
+//        	}
+//        catch (EmptyResultDataAccessException ae) {
+//            jlog.warn("No user found for name '{}'", username);
+//            // if no username, so return a DemoUser , FB.
+//            // return User.UserFactory.getDemoUser();
+//            	return UserFactory.getDemoUser();
+//        	}
+//        catch (DataAccessException e) {
+//            jlog.warn("Could not retrieve user for name: " + username, e);
+//            
+//            /* DemoUser and DefaultUser have no account,
+//             * so it's ok they are not found.
+//            throw new DatabaseException(username, "korap_users",
+//                    StatusCodes.DB_GET_FAILED,
+//                    "Could not retrieve the user with username: " + username,
+//                    username);
+//             */
+//            }
+//
+//        // DemoUser or DefaultUser?
+//        
+//        {	// User cannot be found in SQL DB since LDAP Authentication,
+//        	// so create a User Object here.
+//        	// TODO: what more data should be stored into it?
+//        	// 28.04.17/FB
+//        	user = new KorAPUser(); // oder eigentlich new DemoUser oder new DefaultUser.
+//        	user.setUsername(username);
+//        	return user;
+//        }
+//        
+//        
+//    }
 
     // usersettings are fetched plus basic account info, no details, since i rarely use them anyway! (by Hanl)
     /* Version before LDAP Authentication - 09.05.17/FB
-    @Deprecated
+    @Deprecated */
     @Override
     public User getAccount (String username) throws KustvaktException {
     	
@@ -127,7 +129,7 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
         }
         return user;
     }
-	*/
+	
 
     @Override
     public int updateAccount (User user) throws KustvaktException {
