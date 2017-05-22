@@ -17,6 +17,7 @@ import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.interfaces.defaults.ApacheValidator;
 import de.ids_mannheim.korap.user.*;
+import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.security.auth.LdapAuth3;
@@ -719,6 +720,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             entHandler.createAccount(user);
             if (user.isAdmin() && user instanceof KorAPUser){
             	adminHandler.addAccount(user);
+            	user.setCorpusAccess(CorpusAccess.ALL);
             }
             details.setUserId(user.getId());
             settings.setUserId(user.getId());

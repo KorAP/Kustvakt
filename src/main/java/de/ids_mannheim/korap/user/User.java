@@ -45,7 +45,16 @@ public abstract class User implements Serializable {
     private List<Userdata> userdata;
 
     private boolean isAdmin;
-
+    
+    private CorpusAccess corpusAccess = CorpusAccess.FREE;
+    
+    public enum CorpusAccess	 {
+        FREE, // without login   
+        PUBLIC, // extern
+        ALL; // intern
+    }
+   
+    
     protected User () {
         this.fields = new ParamFields();
         this.accountCreation = TimeUtils.getNow().getMillis();
@@ -53,6 +62,7 @@ public abstract class User implements Serializable {
         this.username = "";
         this.id = -1;
         this.userdata = new ArrayList<>();
+        this.corpusAccess = CorpusAccess.FREE;
     }
 
 
