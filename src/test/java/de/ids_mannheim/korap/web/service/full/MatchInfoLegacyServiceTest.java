@@ -44,12 +44,10 @@ public class MatchInfoLegacyServiceTest extends FastJerseyTest {
                 node.at("/subTitle").asText());
         assertEquals("Goethe, Johann Wolfgang von",
                 node.at("/author").asText());
-        assertTrue(node.at("/snippet").asText()
-                .startsWith("<span class=\"context-left\"></span>"
-                        + "<span class=\"match\"><span title=\"corenlp/p:ADV\">"
-                        + "<span title=\"opennlp/p:ADV\">"
-                        + "<span title=\"tt/l:fern\">"
-                        ));
+		assertTrue(node.at("/snippet").asText()
+				   .startsWith("<span class=\"context-left\"></span>"
+							   + "<span class=\"match\">"
+					   ));
     }
     
     @Test

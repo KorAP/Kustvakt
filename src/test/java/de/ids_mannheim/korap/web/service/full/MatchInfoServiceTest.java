@@ -49,10 +49,8 @@ public class MatchInfoServiceTest extends FastJerseyTest {
                 node.at("/author").asText());
         assertTrue(node.at("/snippet").asText()
                 .startsWith("<span class=\"context-left\"></span>"
-                        + "<span class=\"match\"><span title=\"corenlp/p:ADV\">"
-                        + "<span title=\"opennlp/p:ADV\">"
-                        + "<span title=\"tt/l:fern\">"
-                        ));
+                        + "<span class=\"match\">"
+					));
     }
 
     @Test
