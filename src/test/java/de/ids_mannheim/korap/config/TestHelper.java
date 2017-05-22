@@ -62,6 +62,7 @@ import de.ids_mannheim.korap.security.auth.SessionAuthentication;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.service.BootableBeanInterface;
+import de.ids_mannheim.korap.web.service.CollectionLoader;
 
 /**
  * creates a test user that can be used to access protected functions
@@ -253,14 +254,16 @@ public class TestHelper {
             BootableBeanInterface iface;
             try {
                 iface = (BootableBeanInterface) cl.newInstance();
-                list.add(iface);
+                if (!(iface instanceof CollectionLoader)){
+                	list.add(iface);	
+                }
             }
             catch (InstantiationException | IllegalAccessException e) {
                 // do nothing
             }
         }
         jlog.debug("Found boot loading interfaces: " + list);
-        while (!set.isEmpty()) {
+        while (!list.isEmpty()) {
             out_loop: for (BootableBeanInterface iface : new ArrayList<>(list)) {
                 try {
                     jlog.debug("Running boot instructions from class "

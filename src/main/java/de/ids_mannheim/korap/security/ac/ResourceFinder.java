@@ -128,7 +128,7 @@ public class ResourceFinder {
         
         if (sets.isEmpty()){
             throw new KustvaktException(StatusCodes.NO_VALUE_FOUND, 
-                    "Cannot found public resources with ids: "+id_set.toString());
+            		"Cannot found public "+clazz.getSimpleName()+" with ids: "+id_set.toString());
         }
         return sets;
     }

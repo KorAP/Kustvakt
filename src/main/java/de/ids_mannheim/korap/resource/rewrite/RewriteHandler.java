@@ -49,7 +49,8 @@ public class RewriteHandler implements BeanInjectable {
 
     public void defaultRewriteConstraints () {
         this.add(FoundryInject.class);
-        this.add(PublicCollection.class);
+        //this.add(PublicCollection.class);
+        this.add(CollectionRewrite.class);
         this.add(IdWriter.class);
         this.add(DocMatchRewrite.class);
         this.add(CollectionCleanRewrite.class);
