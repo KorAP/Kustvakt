@@ -96,6 +96,8 @@ public class Attributes {
     public static final String DOC_SIGLE = "docSigle";
     public static final String TEXT_SIGLE = "textSigle";
 
+    public static final String AVAILABILITY = "availability";
+    
     public static final String REF_CORPUS = "refCorpus";
     public static final String QUERY = "query";
     public static final String CACHE = "cache";

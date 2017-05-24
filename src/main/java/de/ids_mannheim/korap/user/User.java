@@ -66,6 +66,7 @@ public abstract class User implements Serializable {
     @Getter
     @Setter
     private Location location = Location.EXTERN;
+
     
     protected User () {
         this.fields = new ParamFields();

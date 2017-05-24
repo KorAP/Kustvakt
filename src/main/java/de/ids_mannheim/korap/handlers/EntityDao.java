@@ -13,6 +13,7 @@ import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.ShibUser;
 import de.ids_mannheim.korap.user.DemoUser;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.user.User.UserFactory;
 import de.ids_mannheim.korap.utils.BooleanUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import org.slf4j.Logger;
@@ -71,6 +72,7 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
             jlog.warn("No user found for name '{}'", username);
             // if no username, so return a DemoUser , FB.
             // return User.UserFactory.getDemoUser();
+            	return UserFactory.getDemoUser();
         	}
         catch (DataAccessException e) {
             jlog.warn("Could not retrieve user for name: " + username, e);
@@ -96,7 +98,7 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
         }
         
         
-    }
+    } // getAccount()
 
     // usersettings are fetched plus basic account info, no details, since i rarely use them anyway! (by Hanl)
     /* Version before LDAP Authentication - 09.05.17/FB

@@ -10,6 +10,7 @@ import de.ids_mannheim.korap.exceptions.DatabaseException;
 import de.ids_mannheim.korap.handlers.UserDetailsDao;
 import de.ids_mannheim.korap.handlers.UserSettingsDao;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
+import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -59,6 +60,7 @@ public class UserdataTest extends BeanConfigTest {
         String val = "value1;value_data";
         User user = new KorAPUser();
         user.setId(1);
+        
         UserDetailsDao dao = new UserDetailsDao(helper().getContext()
                 .getPersistenceClient());
         UserDetails d = new UserDetails(1);

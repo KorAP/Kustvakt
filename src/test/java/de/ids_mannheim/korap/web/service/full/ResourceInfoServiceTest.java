@@ -94,7 +94,7 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
         assertNotNull(node);
         assertNotEquals(0, node.size());
         assertEquals(101, node.at("/errors/0/0").asInt());
-        assertEquals("[Cannot found public resources with ids: [WPD15-VC]]",
+        assertEquals("[Cannot found public VirtualCollection with ids: [WPD15-VC]]",
                 node.at("/errors/0/2").asText());
     }
     
@@ -181,7 +181,7 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
         assertNotNull(node);
         assertNotEquals(0, node.size());
         assertEquals(101, node.at("/errors/0/0").asInt());
-        assertEquals("[Cannot found public resources with ids: [ZUW19]]",
+        assertEquals("[Cannot found public Corpus with ids: [ZUW19]]",
                 node.at("/errors/0/2").asText());
     }
 
@@ -199,7 +199,7 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
         assertNotNull(node);
         assertNotEquals(0, node.size());
         assertEquals(101, node.at("/errors/0/0").asInt());
-        assertEquals("[Cannot found public resources with ids: [BRZ10]]",
+        assertEquals("[Cannot found public Corpus with ids: [BRZ10]]",
                 node.at("/errors/0/2").asText());
     }
 

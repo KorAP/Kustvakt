@@ -796,6 +796,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
             entHandler.createAccount(user);
             if (user.isAdmin() && user instanceof KorAPUser){
             	adminHandler.addAccount(user);
+            	user.setCorpusAccess(CorpusAccess.ALL);
             }
             details.setUserId(user.getId());
             settings.setUserId(user.getId());

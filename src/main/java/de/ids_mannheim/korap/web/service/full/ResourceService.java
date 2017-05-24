@@ -344,7 +344,9 @@ public class ResourceService {
         meta.addEntry("cutOff", cutoff);
 
         ss.setMeta(meta.raw());
-        return Response.ok(ss.toJSON()).build();
+        String result = ss.toJSON();
+        jlog.debug("Query result: "+result);
+        return Response.ok(result).build();
     }
 
 
@@ -513,6 +515,7 @@ public class ResourceService {
         }
 
         String result = doSearch(eng, query, pageLength, meta);
+        jlog.debug("Query result: "+result);
         return Response.ok(result).build();
     }
 
@@ -1233,6 +1236,7 @@ public class ResourceService {
             throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     e.getMessage(), "");
         }
+        jlog.debug("MatchInfo results: "+results);
         return Response.ok(results).build();
     }
 

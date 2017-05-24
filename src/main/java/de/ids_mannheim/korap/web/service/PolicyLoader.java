@@ -14,11 +14,13 @@ import de.ids_mannheim.korap.resources.Corpus;
 import de.ids_mannheim.korap.resources.Foundry;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.Layer;
+import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.resources.Permissions.Permission;
 import de.ids_mannheim.korap.security.ac.PolicyBuilder;
 import de.ids_mannheim.korap.security.ac.ResourceFinder;
 import de.ids_mannheim.korap.security.ac.SecurityManager;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 
 /**
  * @author hanl
@@ -48,7 +50,9 @@ public class PolicyLoader implements BootableBeanInterface {
 		String[] permissions;
 		try {
 			while ((policy = br.readLine()) != null) {
-				if (policy.startsWith("#") || policy.isEmpty()) continue;
+				if (policy.startsWith("#") || policy.isEmpty()){
+					continue;
+				}
 				
 				policyData = policy.split("\t");
 				type = policyData[0];
@@ -57,6 +61,10 @@ public class PolicyLoader implements BootableBeanInterface {
 				description = policyData[3];
 				condition = policyData[4];
 				permissions = policyData[5].split(",");
+				
+				String collectionQuery = null;
+				if (policyData.length > 6)
+					collectionQuery = policyData[6];
 
 				Permission[] permissionArr = new Permission[permissions.length];
 				for (int i = 0; i < permissions.length; i++) {
@@ -64,7 +72,7 @@ public class PolicyLoader implements BootableBeanInterface {
 						permissionArr[i] = Permission.READ;
 					}
 				}
-				KustvaktResource resource = createResource(type, id, name, description);
+				KustvaktResource resource = createResource(type, id, name, description, collectionQuery);
 				if (resource != null) {
 					builder.addCondition(condition);
 					builder.setResources(resource);
@@ -78,8 +86,8 @@ public class PolicyLoader implements BootableBeanInterface {
 		}
 	}
 
-	private KustvaktResource createResource(String type, String id, String name, String description) {
-
+	private KustvaktResource createResource(String type, String id, String name, String description, String docQuery) {
+		
 		KustvaktResource resource = null;
 		if (type.equals("corpus")) {
 			resource = new Corpus(id);
@@ -87,11 +95,15 @@ public class PolicyLoader implements BootableBeanInterface {
 			resource = new Foundry(id);
 		} else if (type.equals("layer")) {
 			resource = new Layer(id);
-		}
-//			else if (type.equals("virtualcollection")) {
-//			resource = new VirtualCollection(id);
-//		}
-		else{
+		} else if (type.equals("virtualcollection")) {
+			KoralCollectionQueryBuilder builder;
+			resource = new VirtualCollection(id);
+			if (docQuery != null && !docQuery.isEmpty()) {
+				builder = new KoralCollectionQueryBuilder();
+				builder.with(docQuery);
+				resource.setFields(builder.toJSON());
+			}
+		} else {
 			return resource;
 		}
 

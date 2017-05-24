@@ -65,7 +65,7 @@ public class MatchInfoLegacyServiceTest extends FastJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
         assertEquals(101, node.at("/errors/0/0").asInt());
-        assertEquals("[Cannot found public resources with ids: [WPD15]]",
+        assertEquals("[Cannot found public Corpus with ids: [WPD15]]",
                 node.at("/errors/0/2").asText());
     }
 
