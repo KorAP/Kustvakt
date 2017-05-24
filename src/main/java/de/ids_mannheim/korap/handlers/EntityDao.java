@@ -70,9 +70,6 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
         	}
         catch (EmptyResultDataAccessException ae) {
             jlog.warn("No user found for name '{}'", username);
-            // if no username, so return a DemoUser , FB.
-            // return User.UserFactory.getDemoUser();
-            	return UserFactory.getDemoUser();
         	}
         catch (DataAccessException e) {
             jlog.warn("Could not retrieve user for name: " + username, e);
