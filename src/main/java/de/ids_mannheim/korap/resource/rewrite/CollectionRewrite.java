@@ -33,10 +33,9 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
 			if (subnode.has("collection")) {
 				builder.setBaseQuery(JsonUtils.toJSON(subnode));
 			}
-			// EM 
-			// fix me: later store the collection queries as KoralQuery in the database
+
 			switch (user.getCorpusAccess()) {
-			case PUBLIC:
+			case PUB:
 				builder = new KoralCollectionQueryBuilder();
 				builder.with("availability = /CC-BY.*/ | availablity = /ACA.*/");
 				break;

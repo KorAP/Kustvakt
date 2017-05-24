@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.security.auth;
 
 import com.sun.org.apache.xpath.internal.SourceTree;
+
 import de.ids_mannheim.korap.auditing.AuditRecord;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeansFactory;
@@ -17,22 +18,36 @@ import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.interfaces.defaults.ApacheValidator;
 import de.ids_mannheim.korap.user.*;
+import de.ids_mannheim.korap.user.User.Location;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.security.auth.LdapAuth3;
+
+import javax.ws.rs.core.HttpHeaders;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+
 // import com.novell.ldap.*; search() funktioniert nicht korrekt, ausgewechselt gegen unboundID's Bibliothek 20.04.17/FB
 //Using JAR from unboundID:
 import com.unboundid.ldap.sdk.LDAPException;
 
 
+
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
  * contains the logic to authentication and registration processes.
@@ -190,7 +205,60 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         return user;
     }
 
-
+    // a. set location depending on X-Forwarded-For.
+    // X-Forwarded-For: clientIP, ProxyID, ProxyID...
+    // the following private address spaces may be used to define intranet spaces:
+    // 10.0.0.0        -   10.255.255.255  (10/8 prefix)
+    // 172.16.0.0      -   172.31.255.255  (172.16/12 prefix)
+    // 192.168.0.0     -   192.168.255.255 (192.168/16 prefix)
+    // b. set corpusAccess depending on location:
+    // 16.05.17/FB
+    
+    @Override
+    public void setAccessAndLocation(User user, HttpHeaders headers)
+    
+    {
+    Boolean DEBUG_LOG = true;
+    MultivaluedMap<String,String> headerMap = headers.getRequestHeaders();
+    Location location = Location.INTERN;
+    CorpusAccess corpusAccess = CorpusAccess.FREE;
+    
+    if( headerMap != null && headerMap.size() > 0 )
+    	{
+    	Iterator<String> it = headerMap.keySet().iterator();
+    	while( it.hasNext() )
+    		{
+    		String key = (String)it.next();
+    		if( key.equals("X-Forwarded-For"))
+        		{
+        		List<String> vals = new ArrayList<String>(Arrays.asList(headerMap.getFirst(key).split(",")));
+        		String clientAddress = vals.get(0);
+        		
+        		if( clientAddress.startsWith("10.0.") || clientAddress.startsWith("172.16.") || clientAddress.startsWith("192.168."))
+        			location = Location.INTERN;
+        		else
+        			location = Location.EXTERN;
+        		if( location == Location.EXTERN )
+        			corpusAccess = CorpusAccess.PUB;
+        		else
+        			corpusAccess = CorpusAccess.ALL;
+        		
+        		if( DEBUG_LOG == true )
+        			{
+	        		System.out.printf("Debug: X-Forwarded-For : '%s' (%d values) -> %s\n", vals, vals.size(), vals.get(0));
+	        		System.out.printf("Debug: X-Forwarded-For : location = %s corpusAccess = %s\n", 
+	        				location == Location.INTERN ? "INTERN" : "EXTERN",
+	        				corpusAccess == CorpusAccess.ALL ? "ALL" : corpusAccess == CorpusAccess.PUB ? "PUB" : "FREE"); 
+	        		}
+        		}	
+    		}
+    	}
+    
+    user.setLocation(location);
+    user.setCorpusAccess(corpusAccess);
+        
+    } // getAccess
+    
     @Override
     public TokenContext createTokenContext (User user,
             Map<String, Object> attr, String provider_key)
@@ -417,6 +485,14 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
         //       DefaultUser sonst.
         User user = new KorAPUser();
         user.setUsername(username);
+        /* folgender Code funktioniert hier noch nicht, da die Headers noch nicht ausgewertet
+         * worden sind - 23.05.17/FB
+        Object o = attr.get(Attributes.LOCATION);
+        String loc = (String)o.toString();
+        int location = Integer.parseInt(loc);
+        user.setLocation(location); 
+        user.setCorpusAccess(Integer.parseInt(attr.get(Attributes.CORPUS_ACCESS).toString()));
+         */
         unknown = user;
         
         jlog.trace("Authentication: found username " + unknown.getUsername());

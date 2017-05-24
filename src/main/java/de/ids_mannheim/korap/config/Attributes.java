@@ -10,6 +10,9 @@ public class Attributes {
     public static final String OPENID_AUTHENTICATION = "id_token";
     public static final String BASIC_AUTHENTICATION = "basic";
 
+    public static final String LOCATION = "location"; // location of Client: User.INTERN/EXTERN
+    public static final String CORPUS_ACCESS = "corpusAccess"; // User.ALL/PUB/FREE.
+    
     public static final String CLIENT_ID = "client_id";
     public static final String CLIENT_SECRET = "client_secret";
     public static final String SCOPES = "scopes";

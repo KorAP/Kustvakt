@@ -17,6 +17,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -468,11 +469,14 @@ public class ResourceService {
     }
 
 
+    // was heißt search by name all? FB
     @SuppressWarnings("unchecked")
     @GET
     @Path("search")
-    public Response searchbyNameAll (@Context SecurityContext securityContext,
-            @Context Locale locale, @QueryParam("q") String q,
+    public Response searchbyNameAll (
+    		@Context SecurityContext securityContext,
+    		@Context HttpHeaders headers,
+    		@Context Locale locale, @QueryParam("q") String q,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
             @QueryParam("context") String ctx,
             @QueryParam("cutoff") Boolean cutoff,
@@ -487,8 +491,8 @@ public class ResourceService {
         User user;
         try {
             user = controller.getUser(context.getUsername());
-            // EM: set user.corpusAccess, default is CorpusAccess.FREE
-        }
+            controller.setAccessAndLocation(user, headers);
+        	}
         catch (KustvaktException e) {
             jlog.error("Failed retrieving user in the search service: {}",
                     e.string());
@@ -1102,6 +1106,7 @@ public class ResourceService {
 
     // EM: legacy support
     // should be deprecated after a while
+    /*
     @GET
     @Path("/corpus/{corpusId}/{docId}/{matchId}/matchInfo")
     public Response getMatchInfo (@Context SecurityContext ctx,
@@ -1122,12 +1127,16 @@ public class ResourceService {
     	return getMatchInfo(ctx, locale, corpusId, ids[0], ids[1], matchId, foundries, layers, spans);
     	
     }
+    */
     
     // fixme: only allowed for corpus?!
     @GET
     @Path("/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
-    public Response getMatchInfo (@Context SecurityContext ctx,
-            @Context Locale locale, @PathParam("corpusId") String corpusId,
+    public Response getMatchInfo (
+    		@Context SecurityContext ctx,
+    		@Context HttpHeaders headers,
+            @Context Locale locale, 
+            @PathParam("corpusId") String corpusId,
             @PathParam("docId") String docId,
             @PathParam("textId") String textId,
             @PathParam("matchId") String matchId,
@@ -1138,31 +1147,31 @@ public class ResourceService {
         TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
         spans = spans != null ? spans : false;
 
-        String matchid = searchKrill.getMatchId(corpusId, docId, textId,
-                matchId);
+        String matchid = searchKrill.getMatchId(corpusId, docId, textId, matchId);
         if (layers == null || layers.isEmpty())
             layers = new HashSet<>();
 
         boolean match_only = foundries == null || foundries.isEmpty();
 
-//        User user;
-//        try {
-//            user = controller.getUser(tokenContext.getUsername());
-//        }
-//        catch (KustvaktException e) {
-//            jlog.error("Failed getting user in the matchInfo service: {}",
-//                    e.string());
-//            throw KustvaktResponseHandler.throwit(e);
-//        }
-//        if (user instanceof DemoUser){
-//	        try {
-//	            ResourceFinder.searchPublicFiltered(Corpus.class, corpusId);
-//	        }
-//	        catch (KustvaktException e) {
-//	            throw KustvaktResponseHandler.throwit(e);
-//	        }
-//        }
-//        
+        User user;
+        try {
+            user = controller.getUser(tokenContext.getUsername());
+            controller.setAccessAndLocation(user, headers);
+            System.out.println("Debug: getMatchInfo: setting Access & Location: done.");
+            }
+        catch (KustvaktException e) {
+            jlog.error("Failed getting user in the matchInfo service: {}",
+                    e.string());
+            throw KustvaktResponseHandler.throwit(e);
+        }
+        if (user instanceof DemoUser){
+	        try {
+	            ResourceFinder.searchPublicFiltered(Corpus.class, corpusId);
+	        }
+	        catch (KustvaktException e) {
+	            throw KustvaktResponseHandler.throwit(e);
+	        }
+        }
         String results;
 //        // fixme: checks for policy matching
 //        // fixme: currently disabled, due to mishab in foundry/layer spec
@@ -1223,7 +1232,7 @@ public class ResourceService {
         CorpusAccess corpusAccess = CorpusAccess.FREE;
         Pattern p;
         switch (corpusAccess) {
-		case PUBLIC:
+		case PUB:
 			p = config.getPublicLicensePattern();
 			break;
 		case ALL:
@@ -1263,7 +1272,6 @@ public class ResourceService {
                     e.getMessage(), "");
         }
         jlog.debug("MatchInfo results: "+results);
-        
         return Response.ok(results).build();
     }
 
