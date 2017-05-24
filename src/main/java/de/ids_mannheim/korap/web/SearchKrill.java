@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.lucene.store.MMapDirectory;
 import org.slf4j.Logger;
@@ -13,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import de.ids_mannheim.korap.Krill;
 import de.ids_mannheim.korap.KrillCollection;
 import de.ids_mannheim.korap.KrillIndex;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.response.Match;
 import de.ids_mannheim.korap.response.Result;
 import de.ids_mannheim.korap.util.QueryException;
@@ -105,43 +109,66 @@ public class SearchKrill {
      * 
      * @param id
      *            match id
+     * @param availabilityList 
+     * @throws KustvaktException 
      */
-    public String getMatch (String id) {
+    public String getMatch (String id, Pattern licensePattern) {
+    	Match km;
         if (this.index != null) {
             try {
-                return this.index.getMatch(id).toJsonString();
+            	km = this.index.getMatch(id);
+            	String availability = km.getAvailability();
+            	if (availability != null){
+            		Matcher m = licensePattern.matcher(availability);
+            		if (!m.matches()){
+            			km.addError(StatusCodes.ACCESS_DENIED, 
+            				"Retrieving match info with ID "+id+" is not allowed.");
+            		}
+            	}
             }
             catch (QueryException qe) {
-                Match km = new Match();
+                km = new Match();
                 km.addError(qe.getErrorCode(), qe.getMessage());
-                return km.toJsonString();
             }
-        };
-        Match km = new Match();
-        km.addError(601, "Unable to find index");
+        }
+        else{
+        	km = new Match();
+        	km.addError(601, "Unable to find index");
+        }
         return km.toJsonString();
     };
 
 
     public String getMatch (String id, List<String> foundries,
             List<String> layers, boolean includeSpans,
-            boolean includeHighlights, boolean sentenceExpansion) {
+            boolean includeHighlights, boolean sentenceExpansion, 
+            Pattern licensePattern) {
+    	 Match km;
         if (this.index != null) {
             try {
-
-                return this.index.getMatchInfo(id, "tokens", true, foundries,
+            	km = this.index.getMatchInfo(id, "tokens", true, foundries,
                         layers, includeSpans, includeHighlights,
-                        sentenceExpansion).toJsonString();
+                        sentenceExpansion);
+            	String availability = km.getAvailability();
+//            	String availability = "QAO-NC";
+            	if (availability != null){
+            		Matcher m = licensePattern.matcher(availability);
+            		if (!m.matches()){
+            			km.addError(StatusCodes.ACCESS_DENIED, 
+            					"Retrieving match info with ID "+id+" is not allowed.");
+            		}
+            	}
+            	
             }
             catch (QueryException qe) {
-                Match km = new Match();
+                km = new Match();
                 km.addError(qe.getErrorCode(), qe.getMessage());
-                return km.toJsonString();
             }
-        };
-
-        Match km = new Match();
-        km.addError(601, "Unable to find index");
+        }
+        else{
+        	km = new Match();
+        	km.addError(601, "Unable to find index");
+        }
         return km.toJsonString();
     };
 

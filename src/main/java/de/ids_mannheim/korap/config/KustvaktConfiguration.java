@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.config;
 
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.Getter;
@@ -7,13 +8,17 @@ import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * if configuration class is extended, loadSubTypes method should be
@@ -73,7 +78,18 @@ public class KustvaktConfiguration {
     private String default_const;
     
     private String policyConfig;
-
+    private ArrayList<String> foundries;
+    private ArrayList<String> layers;
+    
+//    private List<String> publicLicenses;
+//    private List<String> freeLicenses;
+//    private List<String> allLicenses;
+    
+    private Pattern publicLicensePattern;
+    private Pattern freeLicensePattern;
+    private Pattern allLicensePattern;
+    
+    
     // deprec?!
     private final BACKENDS DEFAULT_ENGINE = BACKENDS.LUCENE;
 
@@ -83,9 +99,11 @@ public class KustvaktConfiguration {
      * 
      * @param properties
      * @return
+     * @throws IOException 
+     * @throws KustvaktException 
      */
     protected Properties load (Properties properties)
-            throws MalformedURLException {
+            throws IOException {
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));
         returnhits = new Integer(properties.getProperty("returnhits", "50000"));
         indexDir = properties.getProperty("krill.indexDir", "");
@@ -145,7 +163,16 @@ public class KustvaktConfiguration {
         passcodeSaltField = properties.getProperty("security.passcode.salt",
                 "accountCreation");
         
+//        freeLicenses = Arrays.asList(license.split("|"));
+//        publicLicenses = Arrays.asList(properties.getProperty("kustvakt.availability.public","").split("|"));
+//        allLicenses = Arrays.asList(properties.getProperty("kustvakt.availability.all","").split("|"));
+        
+        freeLicensePattern = Pattern.compile(properties.getProperty("kustvakt.availability.free",""));
+        publicLicensePattern = Pattern.compile(properties.getProperty("kustvakt.availability.public",""));
+        allLicensePattern = Pattern.compile(properties.getProperty("kustvakt.availability.all",""));
+        
         policyConfig = properties.getProperty("policies.config");
+        setFoundriesAndLayers(policyConfig);
         
         KUSTVAKT_USER.put(Attributes.ID, Integer.parseInt(properties.getProperty("kustvakt.init.user.id")));
         KUSTVAKT_USER.put(Attributes.USERNAME, properties.getProperty("kustvakt.init.user.username"));
@@ -160,13 +187,40 @@ public class KustvaktConfiguration {
         return properties;
     }
 
-
+    public void setFoundriesAndLayers(String config) throws IOException {
+    	foundries = new ArrayList<String>();
+    	layers = new ArrayList<String>();
+    	
+    	BufferedReader br;
+		File f = new File(config);
+		br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+		String policy = null;
+		String[] policyData = null;
+		String type, layer;
+			while ((policy = br.readLine()) != null) {
+				if (policy.startsWith("#") || policy.isEmpty()){
+					continue;
+				}
+				policyData = policy.split("\t");
+				type = policyData[0];
+				if (type.equals("foundry")){
+					foundries.add(policyData[1]);
+				}
+				else if (type.equals("layer")){
+					layer = policyData[1].split("/")[1];
+					layers.add(layer);
+				}
+			}
+	}
+    
+    
     /**
      * set properties
      * 
      * @param props
+     * @throws IOException 
      */
-    public void setProperties (Properties props) throws MalformedURLException {
+    public void setProperties (Properties props) throws IOException {
         this.load(props);
     }
 

@@ -304,7 +304,7 @@ public class LightService {
             @PathParam("matchId") String matchId,
             @QueryParam("foundry") Set<String> foundries,
             @QueryParam("layer") Set<String> layers,
-            @QueryParam("spans") Boolean spans) {
+            @QueryParam("spans") Boolean spans) throws KustvaktException {
         String matchid = searchKrill.getMatchId(corpusId, docId, textId, matchId);
         List<String> f_list = null;
         List<String> l_list = null;
@@ -320,10 +320,10 @@ public class LightService {
         boolean match_only = foundries == null || foundries.isEmpty();
         String results;
         if (match_only)
-            results = searchKrill.getMatch(matchid);
+            results = searchKrill.getMatch(matchid, config.getFreeLicensePattern());
         else
             results = searchKrill.getMatch(matchid, f_list, l_list, spans,
-                    false, true);
+                    false, true, config.getFreeLicensePattern());
 
         return Response.ok(results).build();
     }

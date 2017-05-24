@@ -50,6 +50,7 @@ public class MatchInfoLegacyServiceTest extends FastJerseyTest {
 					   ));
     }
     
+    // EM: need reimplementation
     @Test
     public void testGetMatchOnlyUnauthorizeCorpus () {
         ClientResponse response = resource().path(getAPIVersion())
@@ -59,7 +60,7 @@ public class MatchInfoLegacyServiceTest extends FastJerseyTest {
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
         String entity = response.getEntity(String.class);
-        System.out.println(entity);
+       // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
         assertEquals(101, node.at("/errors/0/0").asInt());

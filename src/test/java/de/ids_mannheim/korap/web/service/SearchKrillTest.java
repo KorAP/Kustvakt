@@ -56,11 +56,11 @@ public class SearchKrillTest extends BeanConfigTest {
     }
 
 	@Test
-    public void testMatchInfo () {
+    public void testMatchInfo () throws KustvaktException {
         KustvaktConfiguration config = helper().getContext().getConfiguration();
         SearchKrill krill = new SearchKrill(config.getIndexDir());
         assertNotNull(krill);
-		String matchinfo = krill.getMatch("WPD/AAA.00002/p169-197");
+		String matchinfo = krill.getMatch("WPD/AAA.00002/p169-197", config.getFreeLicensePattern());
 		JsonNode node = JsonUtils.readTree(matchinfo);
 		assertEquals("Invalid match identifier", node.at("/errors/0/1").asText());
 	}

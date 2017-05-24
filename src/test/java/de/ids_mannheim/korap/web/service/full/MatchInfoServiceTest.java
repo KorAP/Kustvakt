@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -53,6 +54,7 @@ public class MatchInfoServiceTest extends FastJerseyTest {
 					));
     }
 
+    // EM: Cannot be tested yet
     @Test
     public void testGetMatchInfoWithAuthentication () {
         ClientResponse response = resource().path(getAPIVersion())

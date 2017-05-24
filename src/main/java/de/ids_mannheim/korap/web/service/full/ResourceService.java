@@ -3,9 +3,11 @@ package de.ids_mannheim.korap.web.service.full;//package de.ids_mannheim.korap.e
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -52,6 +54,7 @@ import de.ids_mannheim.korap.security.ac.SecurityManager;
 import de.ids_mannheim.korap.user.DemoUser;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.user.User.UserFactory;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
@@ -1142,91 +1145,125 @@ public class ResourceService {
 
         boolean match_only = foundries == null || foundries.isEmpty();
 
-        User user;
-        try {
-            user = controller.getUser(tokenContext.getUsername());
-        }
-        catch (KustvaktException e) {
-            jlog.error("Failed getting user in the matchInfo service: {}",
-                    e.string());
-            throw KustvaktResponseHandler.throwit(e);
-        }
-        if (user instanceof DemoUser){
-	        try {
-	            ResourceFinder.searchPublicFiltered(Corpus.class, corpusId);
-	        }
-	        catch (KustvaktException e) {
-	            throw KustvaktResponseHandler.throwit(e);
-	        }
-        }
+//        User user;
+//        try {
+//            user = controller.getUser(tokenContext.getUsername());
+//        }
+//        catch (KustvaktException e) {
+//            jlog.error("Failed getting user in the matchInfo service: {}",
+//                    e.string());
+//            throw KustvaktResponseHandler.throwit(e);
+//        }
+//        if (user instanceof DemoUser){
+//	        try {
+//	            ResourceFinder.searchPublicFiltered(Corpus.class, corpusId);
+//	        }
+//	        catch (KustvaktException e) {
+//	            throw KustvaktResponseHandler.throwit(e);
+//	        }
+//        }
+//        
         String results;
-        // fixme: checks for policy matching
-        // fixme: currently disabled, due to mishab in foundry/layer spec
-        // fixme:
-        if (foundries != null && foundries.size() > 1000) {
-            Set<String> f_list = new HashSet<>();
-            Set<String> l_list = new HashSet<>();
-
-            for (String spl : new ArrayList<>(foundries)) {
-                try {
-                    SecurityManager<?> manager = SecurityManager.init(spl, user,
-                            Permissions.Permission.READ);
-                    if (!manager.isAllowed())
-                        continue;
-
-                    String[] sep = StringUtils.splitAnnotations(spl);
-                    if (spl != null) {
-                        f_list.add(sep[0]);
-                        l_list.add(sep[1]);
-                    };
-                    results = searchKrill.getMatch(matchid,
-                            new ArrayList<>(f_list), new ArrayList<>(l_list),
-                            spans, false, true);
-                }
-                catch (NotAuthorizedException e) {
-                    throw KustvaktResponseHandler.throwit(
-                            StatusCodes.ACCESS_DENIED, "Permission denied",
-                            matchid);
-                }
-
-            }
-            // all foundries shall be returned
-        }
-        else if (foundries != null && foundries.contains("*")) {
-            Set<Layer> resources;
-            try {
-                resources = ResourceFinder.search(user, Layer.class);
-            }
-            catch (KustvaktException e) {
-                jlog.error("Exception encountered: {}", e.string());
-                throw KustvaktResponseHandler.throwit(e);
-            }
-            // returns foundries and layers.
-            // todo: needs testing!
-            foundries = new HashSet<>();
-            layers = new HashSet<>();
-            for (Layer r : resources) {
-                String[] spl = StringUtils.splitAnnotations(r.getName());
-                if (spl != null) {
-                    foundries.add(spl[0]);
-                    layers.add(spl[1]);
-                }
-            }
-        }
+//        // fixme: checks for policy matching
+//        // fixme: currently disabled, due to mishab in foundry/layer spec
+//        // fixme:
+//        if (foundries != null && foundries.size() > 1000) {
+//            Set<String> f_list = new HashSet<>();
+//            Set<String> l_list = new HashSet<>();
+//
+//            for (String spl : new ArrayList<>(foundries)) {
+//                try {
+//                    SecurityManager<?> manager = SecurityManager.init(spl, user,
+//                            Permissions.Permission.READ);
+//                    if (!manager.isAllowed())
+//                        continue;
+//
+//                    String[] sep = StringUtils.splitAnnotations(spl);
+//                    if (spl != null) {
+//                        f_list.add(sep[0]);
+//                        l_list.add(sep[1]);
+//                    };
+//                    results = searchKrill.getMatch(matchid,
+//                            new ArrayList<>(f_list), new ArrayList<>(l_list),
+//                            spans, false, true);
+//                }
+//                catch (NotAuthorizedException e) {
+//                    throw KustvaktResponseHandler.throwit(
+//                            StatusCodes.ACCESS_DENIED, "Permission denied",
+//                            matchid);
+//                }
+//
+//            }
+//            // all foundries shall be returned
+//        }
+//        else if (foundries != null && foundries.contains("*")) {
+//            Set<Layer> resources;
+//            try {
+//                resources = ResourceFinder.search(user, Layer.class);
+//            }
+//            catch (KustvaktException e) {
+//                jlog.error("Exception encountered: {}", e.string());
+//                throw KustvaktResponseHandler.throwit(e);
+//            }
+//            // returns foundries and layers.
+//            // todo: needs testing!
+//            foundries = new HashSet<>();
+//            layers = new HashSet<>();
+//            for (Layer r : resources) {
+//                String[] spl = StringUtils.splitAnnotations(r.getName());
+//                if (spl != null) {
+//                    foundries.add(spl[0]);
+//                    layers.add(spl[1]);
+//                }
+//            }
+//        }
+        
+        
+        //EM: CorpusAccess corpusAccess = tokenContext.getCorpusAccess();
+        CorpusAccess corpusAccess = CorpusAccess.FREE;
+        Pattern p;
+        switch (corpusAccess) {
+		case PUBLIC:
+			p = config.getPublicLicensePattern();
+			break;
+		case ALL:
+			p = config.getAllLicensePattern();
+			break;
+		default: // FREE
+			p = config.getFreeLicensePattern();
+			break;
+		}
         try {
-            if (!match_only)
+            if (!match_only){
+            	
+            	ArrayList<String> foundryList = new ArrayList<String>();
+                ArrayList<String> layerList = new ArrayList<String>();
+                
+                // EM: now without user, just list all foundries and layers
+                if (foundries.contains("*")) {
+                	foundryList = config.getFoundries();
+                	layerList = config.getLayers();
+                }
+                else{
+                	foundryList.addAll(foundries);
+                	layerList.addAll(layers);
+                }
+                
                 results = searchKrill.getMatch(matchid,
-                        new ArrayList<>(foundries), new ArrayList<>(layers),
-                        spans, false, true);
-            else
-                results = searchKrill.getMatch(matchid);
+                        foundryList, layerList,
+                        spans, false, true, p);
+            }
+            else{
+                results = searchKrill.getMatch(matchid, p);
+            }
         }
         catch (Exception e) {
-            jlog.error("Exception encountered!", e);
+            jlog.error("Exception in the MatchInfo service encountered!", e);
             throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     e.getMessage(), "");
         }
         jlog.debug("MatchInfo results: "+results);
+        
         return Response.ok(results).build();
     }
 
