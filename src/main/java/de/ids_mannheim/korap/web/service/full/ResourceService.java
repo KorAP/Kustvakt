@@ -1228,8 +1228,8 @@ public class ResourceService {
 //        }
         
         
-        //EM: CorpusAccess corpusAccess = tokenContext.getCorpusAccess();
-        CorpusAccess corpusAccess = CorpusAccess.FREE;
+        //EM: I dont need user here just corpusAccess
+        CorpusAccess corpusAccess = user.getCorpusAccess();
         Pattern p;
         switch (corpusAccess) {
 		case PUB:
