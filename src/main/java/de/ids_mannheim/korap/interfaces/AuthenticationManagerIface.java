@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.interfaces;
 
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.KustvaktCacheable;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.TokenContext;
@@ -9,6 +10,8 @@ import de.ids_mannheim.korap.user.Userdata;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import javax.ws.rs.core.HttpHeaders;
 
 /**
  * @author hanl
@@ -68,6 +71,7 @@ public abstract class AuthenticationManagerIface extends KustvaktCacheable {
             Map<String, Object> attr, String provider_key)
             throws KustvaktException;
 
+    public abstract void setAccessAndLocation(User user, HttpHeaders headers);
 
     public abstract void logout (TokenContext context) throws KustvaktException;
 

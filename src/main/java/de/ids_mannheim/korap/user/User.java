@@ -46,6 +46,27 @@ public abstract class User implements Serializable {
 
     private boolean isAdmin;
 
+    // Values for corpusAccess:
+    public enum CorpusAccess	 {
+    	FREE, 	// Access to licence free corpora only, without login   
+        PUB,	// Access to public (= öffentliche Korpora) only, externes Login.
+        ALL 	// Access to all corpora, internes Login.
+    	};
+    	
+    @Getter
+    @Setter
+    private CorpusAccess corpusAccess = CorpusAccess.FREE;
+        
+    // values for location (set using the X-forwarded-for Header):
+    public enum Location  {
+        INTERN, 	// KorAP accessed by internal Client (inside intranet).
+        EXTERN		// KorAP accessed by external Client (outside intranet).
+    };
+        
+    @Getter
+    @Setter
+    private Location location = Location.EXTERN;
+    
     protected User () {
         this.fields = new ParamFields();
         this.accountCreation = TimeUtils.getNow().getMillis();
@@ -53,6 +74,8 @@ public abstract class User implements Serializable {
         this.username = "";
         this.id = -1;
         this.userdata = new ArrayList<>();
+        this.location 		= Location.EXTERN;
+        this.corpusAccess 	= CorpusAccess.FREE;
     }
 
 

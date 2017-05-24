@@ -26,10 +26,12 @@ import javax.xml.ws.WebServiceContext; // FB
 import javax.xml.ws.handler.MessageContext; // FB
 import javax.annotation.Resource; // FB
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.Iterator; // 07.02.17/FB
 
 //import com.sun.xml.internal.messaging.saaj.util.Base64;
@@ -43,7 +45,7 @@ import java.util.Iterator; // 07.02.17/FB
 @Produces(MediaType.TEXT_HTML + ";charset=utf-8")
 public class AuthService {
 
-	private static Boolean DEBUG_LOG = false;
+	private static Boolean DEBUG_LOG = true;
 	
     //todo: bootstrap function to transmit certain default configuration settings and examples (example user queries,
     // default usersettings, etc.)
@@ -148,7 +150,7 @@ public class AuthService {
 	        }
 	        System.out.printf("Debug: requestAPIToken: isSecure = %s.\n", secCtx.isSecure() ? "yes" : "no");
 	        } // DEBUG_LOG        
-
+        
         // "Invalid syntax for username and password"
         if (values == null)
             throw KustvaktResponseHandler
@@ -164,6 +166,7 @@ public class AuthService {
             attr.put(Attributes.SCOPES, scopes);
         attr.put(Attributes.HOST, host);
         attr.put(Attributes.USER_AGENT, agent);
+        
         TokenContext context;
         try {
             // User user = controller.authenticate(0, values[0], values[1], attr); Implementation by Hanl
@@ -171,6 +174,10 @@ public class AuthService {
             // Userdata data = this.controller.getUserData(user, UserDetails.class); // Implem. by Hanl
             // todo: is this necessary?
             //            attr.putAll(data.fields());
+            controller.setAccessAndLocation(user, headers);
+            
+            attr.put(Attributes.LOCATION, user.getLocation());
+            attr.put(Attributes.CORPUS_ACCESS,  user.getCorpusAccess());
             context = controller.createTokenContext(user, attr, Attributes.API_AUTHENTICATION);
         }
         catch (KustvaktException e) {
