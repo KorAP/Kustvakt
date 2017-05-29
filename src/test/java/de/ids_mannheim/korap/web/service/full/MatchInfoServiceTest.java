@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.eclipse.jetty.http.HttpHeaders;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -56,6 +57,7 @@ public class MatchInfoServiceTest extends FastJerseyTest {
 
     // EM: Cannot be tested yet
     @Test
+    @Ignore
     public void testGetMatchInfoWithAuthentication () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus").path("WPD15").path("B07").path("51608")
@@ -63,6 +65,7 @@ public class MatchInfoServiceTest extends FastJerseyTest {
                 .queryParam("foundry", "*")
                 .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "172.27.0.32")
                 .get(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
