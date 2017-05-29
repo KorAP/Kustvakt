@@ -71,6 +71,7 @@ public class MatchInfoServiceTest extends FastJerseyTest {
         assertEquals("Retrieving match info with ID "
         		+ "match-GOE/AGI/04846-p36875-36876 is not allowed.", 
         		node.at("/errors/0/1").asText());
+        assertTrue(node.at("/snippet").isMissingNode());
     }
 
     @Test
