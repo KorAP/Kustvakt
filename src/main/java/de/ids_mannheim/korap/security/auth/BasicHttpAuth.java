@@ -86,7 +86,7 @@ public class BasicHttpAuth implements AuthenticationIface {
         if (values != null) {
             TokenContext c = new TokenContext();
             User user = dao.getAccount(values[0]);
-            if (user instanceof KorAPUser) {
+            if (user instanceof KorAPUser && ((KorAPUser) user).getPassword() != null) {
                 boolean check = crypto.checkHash(values[1],
                         ((KorAPUser) user).getPassword());
 

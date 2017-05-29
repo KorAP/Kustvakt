@@ -59,6 +59,8 @@ public class FilterTest extends FastJerseyTest {
                 .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
+        String entity = resp.getEntity(String.class);
+        System.out.println(entity);
         assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(), resp.getStatus());
     }
 

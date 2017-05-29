@@ -119,9 +119,11 @@ public class TestHelper {
         KustvaktAuthenticationManager manager = getBean(ContextHolder.KUSTVAKT_AUTHENTICATION_MANAGER);
 
         try {
-            getUser();
+            User user = getUser();
             jlog.debug("found user, skipping setup ...");
-            return this;
+            if (!user.getUsername().equals(data.get(Attributes.USERNAME))){
+            	return this;
+            }
         }
         catch (RuntimeException e) {
             // do nothing and continue

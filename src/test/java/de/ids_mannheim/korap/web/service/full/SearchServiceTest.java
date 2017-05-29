@@ -8,8 +8,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.eclipse.jetty.http.HttpHeaders;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -47,7 +47,6 @@ public class SearchServiceTest extends FastJerseyTest {
                 "de.ids_mannheim.korap.web.utils");
     }
 
-    // FIX ME: asserts
     @Test
     public void testSearchQueryPublicCorpora () {
         ClientResponse response = resource().path(getAPIVersion())
@@ -61,12 +60,8 @@ public class SearchServiceTest extends FastJerseyTest {
         assertEquals("koral:doc", node.at("/collection/@type").asText());
         assertEquals("availability", node.at("/collection/key").asText());
         assertEquals("CC-BY.*", node.at("/collection/value").asText());
-//        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
-//        assertEquals("operation:or", node.at("/collection/operation").asText());
-//        assertNotEquals(0, node.at("/collection/operands").size());
-//        assertEquals("corpusSigle([GOE, WPD13])",
-//                node.at("/collection/rewrites/0/scope").asText());
-//        assertEquals(6218, node.at("/meta/totalResults").asInt());
+        assertEquals("availability(\"CC-BY.*\")",
+                node.at("/collection/rewrites/0/scope").asText());
     }
 
 
@@ -92,7 +87,6 @@ public class SearchServiceTest extends FastJerseyTest {
         assertEquals(-1,node.at("/meta/totalResults").asInt());
     }
 
-    // FIX ME: asserts
     @Test
     public void testSearchQueryAuthorized () {
         ClientResponse response = resource().path(getAPIVersion())
@@ -100,18 +94,45 @@ public class SearchServiceTest extends FastJerseyTest {
                 .queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
-//        assertNotEquals(0, node.path("matches").size());
-//        assertEquals("corpusSigle([GOE, WPD13, WPD15, BRZ10])",
-//                node.at("/collection/rewrites/0/scope").asText());
-//        assertEquals(7665, node.at("/meta/totalResults").asInt());
+        assertNotEquals(0, node.path("matches").size());
+        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
+        assertEquals("CC-BY.*", node.at("/collection/operands/0/value").asText());
+        assertEquals("ACA.*", node.at("/collection/operands/1/value").asText());
+        assertEquals("operation:or", node.at("/collection/operation").asText());
+        assertEquals("availability()",
+                node.at("/collection/rewrites/0/scope").asText());
     }
 
+    @Test
+    public void testSearchQueryAuthorizedALL () {
+        ClientResponse response = resource().path(getAPIVersion())
+                .path("search").queryParam("q", "[orth=die]")
+                .queryParam("ql", "poliqarp")
+                .header(Attributes.AUTHORIZATION,
+                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "172.27.0.32")
+                .get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertNotNull(node);
+        assertNotEquals(0, node.path("matches").size());
+        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
+        assertEquals("QAO.*", node.at("/collection/operands/0/value").asText());
+        assertEquals("ACA.*", node.at("/collection/operands/1/operands/0/value").asText());
+        assertEquals("CC-BY.*", node.at("/collection/operands/1/operands/1/value").asText());
+        assertEquals("operation:or", node.at("/collection/operation").asText());
+        assertEquals("availability()",
+                node.at("/collection/rewrites/0/scope").asText());
+    }
 
     @Test
     public void testSearchQueryWithCollectionQueryAuthorized () {

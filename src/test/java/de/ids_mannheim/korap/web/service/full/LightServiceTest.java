@@ -144,11 +144,10 @@ public class LightServiceTest extends FastJerseyTest {
     }
 
 	@Test
-	public void testMatchInfoGet1 () {
+	public void testMatchInfoGetWithoutSpans () {
         ClientResponse response = resource()
 			.path(getAPIVersion())
-			.path("corpus/GOE/AGI/04846/p36875-36876/matchInfo")
-			//.path("corpus/WPD/AAA.00001/p4-5/matchInfo")
+			.path("corpus/GOE/AGA/01784/p36-46/matchInfo")
 			.queryParam("foundry", "*")
 			.queryParam("spans", "false")
 			.get(ClientResponse.class);
@@ -157,16 +156,15 @@ public class LightServiceTest extends FastJerseyTest {
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        assertEquals("GOE/AGI/04846", node.at("/textSigle").asText());
-        assertEquals("Zweiter römischer Aufenthalt", node.at("/title").asText());
+        assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
+        assertEquals("Belagerung von Mainz", node.at("/title").asText());
 	};
 
 	@Test
 	public void testMatchInfoGet2 () {
         ClientResponse response = resource()
 			.path(getAPIVersion())
-			.path("corpus/GOE/AGI/04846/p36875-36876/matchInfo")
-			//.path("corpus/WPD/AAA.00001/p4-5/matchInfo")
+			.path("corpus/GOE/AGA/01784/p36-46/matchInfo")
 			.queryParam("foundry", "*")
 			.get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -174,8 +172,8 @@ public class LightServiceTest extends FastJerseyTest {
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        assertEquals("GOE/AGI/04846", node.at("/textSigle").asText());
-        assertEquals("Zweiter römischer Aufenthalt", node.at("/title").asText());
+        assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
+        assertEquals("Belagerung von Mainz", node.at("/title").asText());
 	};
 
     @Test

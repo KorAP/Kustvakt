@@ -93,6 +93,8 @@ public class KustvaktConfiguration {
     // deprec?!
     private final BACKENDS DEFAULT_ENGINE = BACKENDS.LUCENE;
 
+	private String ldapConfig;
+
 
     /**
      * loading of the properties and mapping to parameter variables
@@ -162,6 +164,8 @@ public class KustvaktConfiguration {
 
         passcodeSaltField = properties.getProperty("security.passcode.salt",
                 "accountCreation");
+        
+        ldapConfig = properties.getProperty("ldap.config");
         
 //        freeLicenses = Arrays.asList(license.split("|"));
 //        publicLicenses = Arrays.asList(properties.getProperty("kustvakt.availability.public","").split("|"));

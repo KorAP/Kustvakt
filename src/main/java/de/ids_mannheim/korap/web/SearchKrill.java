@@ -150,10 +150,10 @@ public class SearchKrill {
                         layers, includeSpans, includeHighlights,
                         sentenceExpansion);
             	String availability = km.getAvailability();
-//            	String availability = "QAO-NC";
             	if (availability != null){
             		Matcher m = licensePattern.matcher(availability);
             		if (!m.matches()){
+            			km = new Match();
             			km.addError(StatusCodes.ACCESS_DENIED, 
             					"Retrieving match info with ID "+id+" is not allowed.");
             		}

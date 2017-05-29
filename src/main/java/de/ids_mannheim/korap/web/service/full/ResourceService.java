@@ -503,7 +503,7 @@ public class ResourceService {
         serializer.setQuery(q, ql, v);
         if (cq != null)
             serializer.setCollection(cq);
-
+        	// combine cq with availability CQ according to corpusAccess 
         MetaQueryBuilder meta = createMetaQuery(pageIndex, pageInteger, ctx,
                 pageLength, cutoff);
         serializer.setMeta(meta.raw());

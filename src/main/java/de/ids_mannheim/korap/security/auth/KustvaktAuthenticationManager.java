@@ -404,7 +404,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 		// LDAP Access:
 		try {
 			// todo: unknown = ...
-			int ret = LdapAuth3.login(username, password);
+			int ret = LdapAuth3.login(username, password, config.getLdapConfig());
 			System.out.printf("Debug: autenticationIdM: Ldap.login(%s) returns: %d.\n", username, ret);
 			if (ret != LdapAuth3.LDAP_AUTH_ROK) {
 				jlog.error("LdapAuth3.login(username='{}') returns '{}'='{}'!", username, ret,

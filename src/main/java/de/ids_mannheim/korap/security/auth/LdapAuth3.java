@@ -114,11 +114,10 @@ public class LdapAuth3
 	 *  17.02.17/FB
 	 */
 	
-	static String loadProp() throws IOException
+	static String loadProp(String sConfFile) throws IOException
 	
 	{
 		String sPwd = null;
-		String sConfFile = System.getProperty("user.home") + "/.config/ldap.conf";
 		FileInputStream in;
 		Properties prop;
 		
@@ -188,7 +187,7 @@ public class LdapAuth3
 	 *  idsStatus = 3 -> Nutzer ist LDAP-weit gesperrt
 	 */
 
-	public static int login(String sUserDN, String sUserPwd) throws LDAPException
+	public static int login(String sUserDN, String sUserPwd, String ldapConfig) throws LDAPException
 
 	{
 
@@ -200,7 +199,7 @@ public class LdapAuth3
 	SearchResult srchRes = null;
 
 	try{
-		sPwd = loadProp();
+		sPwd = loadProp(ldapConfig);
 		}
 	catch( IOException e )
 		{

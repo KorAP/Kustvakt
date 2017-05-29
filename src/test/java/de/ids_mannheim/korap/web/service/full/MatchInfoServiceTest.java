@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.jetty.http.HttpHeaders;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -32,6 +31,32 @@ public class MatchInfoServiceTest extends FastJerseyTest {
     public void testGetMatchInfoPublicCorpus () {
 
         ClientResponse response = resource().path(getAPIVersion())
+                .path("corpus").path("GOE").path("AGA").path("01784")
+                .path("p36-100").path("matchInfo")
+                .queryParam("foundry", "*")
+                .get(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        
+        assertNotNull(node);
+        assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
+        assertEquals("Belagerung von Mainz",
+                node.at("/title").asText());
+        assertEquals("Goethe, Johann Wolfgang von",
+                node.at("/author").asText());
+        assertTrue(node.at("/snippet").asText()
+                .startsWith("<span class=\"context-left\"></span>"
+                        + "<span class=\"match\">"
+					));
+    }
+    
+    @Test
+    public void testGetMatchInfoNotAllowed () {
+
+        ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus").path("GOE").path("AGI").path("04846")
                 .path("p36875-36876").path("matchInfo")
                 .queryParam("foundry", "*")
@@ -40,6 +65,29 @@ public class MatchInfoServiceTest extends FastJerseyTest {
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        
+        assertEquals("1003", node.at("/errors/0/0").asText());
+        assertEquals("Retrieving match info with ID "
+        		+ "match-GOE/AGI/04846-p36875-36876 is not allowed.", 
+        		node.at("/errors/0/1").asText());
+    }
+
+    @Test
+    public void testGetMatchInfoWithAuthentication () {
+        ClientResponse response = resource().path(getAPIVersion())
+                .path("corpus").path("GOE").path("AGI").path("04846")
+                .path("p36875-36876").path("matchInfo")
+                .queryParam("foundry", "*")
+                .header(Attributes.AUTHORIZATION,
+                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "172.27.0.32")
+                .get(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
         assertEquals("GOE/AGI/04846", node.at("/textSigle").asText());
@@ -53,34 +101,7 @@ public class MatchInfoServiceTest extends FastJerseyTest {
                 .startsWith("<span class=\"context-left\"></span>"
                         + "<span class=\"match\">"
 					));
-    }
-
-    // EM: Cannot be tested yet
-    @Test
-    @Ignore
-    public void testGetMatchInfoWithAuthentication () {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").path("WPD15").path("B07").path("51608")
-                .path("p46-57").path("matchInfo")
-                .queryParam("foundry", "*")
-                .header(Attributes.AUTHORIZATION,
-                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "172.27.0.32")
-                .get(ClientResponse.class);
-
-        String entity = response.getEntity(String.class);
-//        System.out.println(entity);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
-                response.getStatus());
-        
-        JsonNode node = JsonUtils.readTree(entity);
-        assertNotNull(node);
-        assertEquals("WPD15/B07/51608", node.at("/textSigle").asText());
-        assertEquals("Betty Allen",
-                node.at("/title").asText());
-        assertEquals("Monsieurbecker, u.a.",
-                node.at("/author").asText());
-        assertTrue(!node.at("/snippet").asText().isEmpty());
+        assertEquals("QAO-NC-LOC:ids", node.at("/availability").asText());
     }
 //    @Test
 //    public void testMatchInfoSave () {
