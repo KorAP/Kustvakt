@@ -205,7 +205,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 		MultivaluedMap<String, String> headerMap = headers.getRequestHeaders();
 		Location location = Location.EXTERN;
 		CorpusAccess corpusAccess = CorpusAccess.FREE;
-
+		
+		// EM: There is no check for a demo user in intranet?
+		// EM: LDAP user without IP gets CorpusAccess.FREE ?
+		
 		if (headerMap != null && headerMap.containsKey(org.eclipse.jetty.http.HttpHeaders.X_FORWARDED_FOR)) {
 
 			String[] vals = headerMap.getFirst(org.eclipse.jetty.http.HttpHeaders.X_FORWARDED_FOR).split(",");
@@ -217,17 +220,12 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 //				if (clientAddress.startsWith("10.0.") || clientAddress.startsWith("172.16.")
 //						|| clientAddress.startsWith("192.168."))
 					location = Location.INTERN;
-				}
-				else{
-					location = Location.EXTERN;
-				}
-				
-				if (location == Location.EXTERN) {
-					corpusAccess = CorpusAccess.PUB;
-				} 
-				else {
 					corpusAccess = CorpusAccess.ALL;
 				}
+				else{
+					corpusAccess = CorpusAccess.PUB;
+				}
+				
 				if (DEBUG_LOG == true) {
 					System.out.printf("Debug: X-Forwarded-For : '%s' (%d values) -> %s\n", vals, vals.length, vals[0]);
 					System.out.printf("Debug: X-Forwarded-For : location = %s corpusAccess = %s\n",

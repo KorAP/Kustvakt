@@ -470,6 +470,8 @@ public class ResourceService {
 
 
     // was heißt search by name all? FB
+    // EM: ich glaube es ist ALL corpora gemeint (ohne spezifische name), 
+    // weil es searchbyName() auch gibt.
     @SuppressWarnings("unchecked")
     @GET
     @Path("search")
@@ -503,7 +505,7 @@ public class ResourceService {
         serializer.setQuery(q, ql, v);
         if (cq != null)
             serializer.setCollection(cq);
-        	// combine cq with availability CQ according to corpusAccess 
+
         MetaQueryBuilder meta = createMetaQuery(pageIndex, pageInteger, ctx,
                 pageLength, cutoff);
         serializer.setMeta(meta.raw());
@@ -595,8 +597,9 @@ public class ResourceService {
      * @return
      */
     // todo: remove raw
-    @GET
-    @Path("/{type}/{id}/search")
+//    @GET
+//    @Path("/{type}/{id}/search")
+    @Deprecated //EM
     public Response searchbyName (@Context SecurityContext securityContext,
             @Context Locale locale, @QueryParam("q") String query,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
@@ -630,7 +633,9 @@ public class ResourceService {
                 // add collection query
                 KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
                 builder.setBaseQuery(s.toJSON());
-                query = createQuery(user, type, id, builder);
+                //query = createQuery(user, type, id, builder);
+                builder.with(Attributes.CORPUS_SIGLE, "=", id);
+                builder.toJSON();
 
             }
             else {
@@ -648,7 +653,7 @@ public class ResourceService {
             }
 
             String result = doSearch(eng, query, pageLength, meta);
-            KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
+            jlog.debug("The result set: {}", result);
             return Response.ok(result).build();
         }
         catch (KustvaktException e) {
@@ -659,6 +664,7 @@ public class ResourceService {
     }
 
 
+    @Deprecated
     private String createQuery (User user, String type, String id,
             KoralCollectionQueryBuilder builder) {
         KustvaktResource resource = null;

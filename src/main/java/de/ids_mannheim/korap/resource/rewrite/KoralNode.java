@@ -100,7 +100,20 @@ public abstract class KoralNode {
             this.rewrites.add("override", name);
         }
     }
+    
+    public void replaceAt (String path, Object value, RewriteIdentifier ident) {
+        if (this.node.isObject() && !this.node.at(path).isMissingNode()) {
+            ObjectNode n = (ObjectNode) this.node.at(path);
+            n.removeAll();
+            n.putAll((ObjectNode)value);
 
+            String name = path;
+            if (ident != null)
+                name = ident.toString();
+
+            this.rewrites.add("override", name);
+        }
+    }
 
     public void set (String name, Object value, RewriteIdentifier ident) {
         if (this.node.isObject()) {

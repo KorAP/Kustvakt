@@ -290,7 +290,7 @@
         <dependency>
             <groupId>de.ids_mannheim.korap</groupId>
             <artifactId>Koral</artifactId>
-            <version>0.25</version>
+            <version>0.26</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty</groupId>
