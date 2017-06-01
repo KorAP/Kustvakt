@@ -288,10 +288,10 @@ public class LdapAuth3
 				System.out.printf(" att: '%s'='%s'.\n", attr.getName(), attr.getValue());
 
 			// checking pertinent attribut/value pairs:
-			// "idsStatus": values 0=OK, 1-3 = locked account.
+			// "idsStatus": values 0=OK, 1=inaktiv=OK, 2-3 = locked account.
 			if( attr.getName().equals(attStatus) )
 				{
-				if( (val = attr.getValueAsInteger()) == null || val != 0 )
+				if( (val = attr.getValueAsInteger()) == null || (val != 0 && val != 1) )
 					{
 					if( DEBUGLOG ) System.out.printf("idsStatus = '%s' -> User locked!\n", attr.getValue());
 					return ldapTerminate(lc, LDAP_AUTH_RLOCKED);

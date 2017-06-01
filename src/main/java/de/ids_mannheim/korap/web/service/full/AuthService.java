@@ -45,7 +45,7 @@ import java.util.Iterator; // 07.02.17/FB
 @Produces(MediaType.TEXT_HTML + ";charset=utf-8")
 public class AuthService {
 
-	private static Boolean DEBUG_LOG = true;
+	private static Boolean DEBUG_LOG = false;
 	
     //todo: bootstrap function to transmit certain default configuration settings and examples (example user queries,
     // default usersettings, etc.)
@@ -122,7 +122,8 @@ public class AuthService {
 	        System.out.printf("Debug: auth.size=%d\n",  auth.size());
 	        System.out.printf("auth.get(0)='%s'\n", auth.get(0));
 	        System.out.printf("Debug: values.length=%d\n",  values.length);
-	        if( auth.size() > 0 )
+	        /* hide password etc. - FB
+	         if( auth.size() > 0 )
 	        	{
 	        	Iterator it = auth.iterator();
 	        	while( it.hasNext() )
@@ -135,7 +136,7 @@ public class AuthService {
 	        		System.out.printf(" values[%d]='%s'\n",  i, values[i]);
 	        		}
 	        	}
-
+	         */
 	        MultivaluedMap<String,String> headerMap = headers.getRequestHeaders();
 	        if( headerMap != null && headerMap.size() > 0 )
 	        {

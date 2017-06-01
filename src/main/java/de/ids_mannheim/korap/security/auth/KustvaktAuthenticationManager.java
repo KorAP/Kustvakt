@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Arrays;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
@@ -197,6 +198,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	// 172.16.0.0 - 172.31.255.255 (172.16/12 prefix)
 	// 192.168.0.0 - 192.168.255.255 (192.168/16 prefix)
 	// b. set corpusAccess depending on location:
+	// c. DemoUser only gets corpusAccess=FREE.
 	// 16.05.17/FB
 
 	@Override
@@ -206,8 +208,14 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 		Location location = Location.EXTERN;
 		CorpusAccess corpusAccess = CorpusAccess.FREE;
 		
-		// EM: There is no check for a demo user in intranet?
-		// EM: LDAP user without IP gets CorpusAccess.FREE ?
+	    if( user instanceof DemoUser )
+	    {
+	    	// to be absolutely sure:
+	    	user.setCorpusAccess(User.CorpusAccess.FREE);
+	    	if( DEBUG_LOG == true )
+	    		System.out.println("setAccessAndLocation: DemoUser.");
+	     	return;
+	    }
 		
 		if (headerMap != null && headerMap.containsKey(org.eclipse.jetty.http.HttpHeaders.X_FORWARDED_FOR)) {
 
@@ -217,8 +225,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 			try {
 				InetAddress ip = InetAddress.getByName(clientAddress);
 				if (ip.isSiteLocalAddress()){
-//				if (clientAddress.startsWith("10.0.") || clientAddress.startsWith("172.16.")
-//						|| clientAddress.startsWith("192.168."))
 					location = Location.INTERN;
 					corpusAccess = CorpusAccess.ALL;
 				}
@@ -227,7 +233,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 				}
 				
 				if (DEBUG_LOG == true) {
-					System.out.printf("Debug: X-Forwarded-For : '%s' (%d values) -> %s\n", vals, vals.length, vals[0]);
+					System.out.printf("Debug: X-Forwarded-For : '%s' (%d values) -> %s\n", 
+							Arrays.toString(vals), vals.length, vals[0]);
 					System.out.printf("Debug: X-Forwarded-For : location = %s corpusAccess = %s\n",
 							location == Location.INTERN ? "INTERN" : "EXTERN", corpusAccess == CorpusAccess.ALL ? "ALL"
 									: corpusAccess == CorpusAccess.PUB ? "PUB" : "FREE");
