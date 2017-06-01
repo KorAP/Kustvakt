@@ -81,10 +81,6 @@ public class KustvaktConfiguration {
     private ArrayList<String> foundries;
     private ArrayList<String> layers;
     
-//    private List<String> publicLicenses;
-//    private List<String> freeLicenses;
-//    private List<String> allLicenses;
-    
     private Pattern publicLicensePattern;
     private Pattern freeLicensePattern;
     private Pattern allLicensePattern;
@@ -167,14 +163,12 @@ public class KustvaktConfiguration {
         
         ldapConfig = properties.getProperty("ldap.config");
         
-//        freeLicenses = Arrays.asList(license.split("|"));
-//        publicLicenses = Arrays.asList(properties.getProperty("kustvakt.availability.public","").split("|"));
-//        allLicenses = Arrays.asList(properties.getProperty("kustvakt.availability.all","").split("|"));
+        // EM: replace this later with KoralQuery
+        freeLicensePattern = Pattern.compile(properties.getProperty("kustvakt.regex.free",""));
+        publicLicensePattern = Pattern.compile(properties.getProperty("kustvakt.regex.public",""));
+        allLicensePattern = Pattern.compile(properties.getProperty("kustvakt.regex.all",""));
         
-        freeLicensePattern = Pattern.compile(properties.getProperty("kustvakt.availability.free",""));
-        publicLicensePattern = Pattern.compile(properties.getProperty("kustvakt.availability.public",""));
-        allLicensePattern = Pattern.compile(properties.getProperty("kustvakt.availability.all",""));
-        
+        // EM: not use in the future
         policyConfig = properties.getProperty("policies.config");
         setFoundriesAndLayers(policyConfig);
         

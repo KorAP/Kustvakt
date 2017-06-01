@@ -64,6 +64,8 @@ public class SearchServiceTest extends FastJerseyTest {
         assertEquals("CC-BY.*", node.at("/collection/value").asText());
         assertEquals("availability(FREE)",
                 node.at("/collection/rewrites/0/scope").asText());
+        assertEquals("operation:insertion",
+                node.at("/collection/rewrites/0/operation").asText());
     }
 
 
@@ -88,7 +90,51 @@ public class SearchServiceTest extends FastJerseyTest {
         assertEquals(-1, node.at("/meta/totalResults").asInt());
     }
 
-
+    @Test
+    public void testSearchQueryFreeExtern () {
+        ClientResponse response = resource().path(getAPIVersion())
+                .path("search").queryParam("q", "[orth=die]")
+                .queryParam("ql", "poliqarp")
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertNotNull(node);
+        assertNotEquals(0, node.path("matches").size());
+        assertEquals("koral:doc", node.at("/collection/@type").asText());
+        assertEquals("availability", node.at("/collection/key").asText());
+        assertEquals("CC-BY.*", node.at("/collection/value").asText());
+        assertEquals("availability(FREE)",
+                node.at("/collection/rewrites/0/scope").asText());
+        assertEquals("operation:insertion",
+                node.at("/collection/rewrites/0/operation").asText());
+    }
+    
+    @Test
+    public void testSearchQueryFreeIntern () {
+        ClientResponse response = resource().path(getAPIVersion())
+                .path("search").queryParam("q", "[orth=die]")
+                .queryParam("ql", "poliqarp")
+                .header(HttpHeaders.X_FORWARDED_FOR, "172.27.0.32")
+                .get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertNotNull(node);
+        assertNotEquals(0, node.path("matches").size());
+        assertEquals("koral:doc", node.at("/collection/@type").asText());
+        assertEquals("availability", node.at("/collection/key").asText());
+        assertEquals("CC-BY.*", node.at("/collection/value").asText());
+        assertEquals("availability(FREE)",
+                node.at("/collection/rewrites/0/scope").asText());
+        assertEquals("operation:insertion",
+                node.at("/collection/rewrites/0/operation").asText());
+    }
+    
+    
     @Test
     public void testSearchQueryExternAuthorized () {
         ClientResponse response = resource().path(getAPIVersion())
@@ -111,8 +157,9 @@ public class SearchServiceTest extends FastJerseyTest {
         assertEquals("operation:or", node.at("/collection/operation").asText());
         assertEquals("availability(PUB)",
                 node.at("/collection/rewrites/0/scope").asText());
+        assertEquals("operation:insertion",
+                node.at("/collection/rewrites/0/operation").asText());
     }
-
 
     @Test
     public void testSearchQueryInternAuthorized () {
@@ -129,20 +176,23 @@ public class SearchServiceTest extends FastJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
-        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
-        assertEquals("QAO.*", node.at("/collection/operands/0/value").asText());
-        assertEquals("ACA.*",
-                node.at("/collection/operands/1/operands/0/value").asText());
-        assertEquals("CC-BY.*",
-                node.at("/collection/operands/1/operands/1/value").asText());
-        assertEquals("operation:or", node.at("/collection/operation").asText());
-        assertEquals("availability(ALL)",
-                node.at("/collection/rewrites/0/scope").asText());
+        //EM: no rewrite is needed
+//        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
+//        assertEquals("QAO.*", node.at("/collection/operands/0/value").asText());
+//        assertEquals("ACA.*",
+//                node.at("/collection/operands/1/operands/0/value").asText());
+//        assertEquals("CC-BY.*",
+//                node.at("/collection/operands/1/operands/1/value").asText());
+//        assertEquals("operation:or", node.at("/collection/operation").asText());
+//        assertEquals("availability(ALL)",
+//                node.at("/collection/rewrites/0/scope").asText());
+//        assertEquals("operation:insertion",
+//                node.at("/collection/rewrites/0/operation").asText());
     }
 
-
+ // EM: shouldn't this case gets CorpusAccess.PUB ? 
     @Test
-    public void testSearchQueryWithCollectionQueryAuthorizedNoIP () {
+    public void testSearchQueryWithCollectionQueryAuthorizedWithoutIP () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp")
@@ -160,110 +210,40 @@ public class SearchServiceTest extends FastJerseyTest {
         assertEquals("availability(PUB)",
                 node.at("/collection/rewrites/0/scope").asText());
         // EM: double AND operations
-        assertEquals("availability", node.at("/collection/operands/0/key").asText());
-        assertEquals("CC-BY.*", node.at("/collection/operands/0/value").asText());
+        assertEquals("availability",
+                node.at("/collection/operands/0/key").asText());
+        assertEquals("CC-BY.*",
+                node.at("/collection/operands/0/value").asText());
         assertEquals("textClass",
                 node.at("/collection/operands/1/operands/0/key").asText());
         assertEquals("corpusSigle",
                 node.at("/collection/operands/1/operands/1/key").asText());
     }
-
-
-    @Test
-    public void testSearchQueryWithCollectionQueryUnauthorized () {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("search").queryParam("q", "[orth=das]")
-                .queryParam("ql", "poliqarp")
-                .queryParam("cq", "availability != /CC-BY.*/")
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
-                response.getStatus());
-
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
-        assertNotNull(node);
-        assertEquals("availability", node.at("/collection/key").asText());
-        assertEquals("CC-BY.*", node.at("/collection/value").asText());
-        assertEquals("operation:override",
-                node.at("/collection/rewrites/0/operation").asText());
-        assertEquals("availability(FREE)",
-                node.at("/collection/rewrites/0/scope").asText());
-        assertEquals("koral:token", node.at("/query/@type").asText());
-    }
     
     @Test
-    public void testSearchQueryWithComplexCollectionQueryUnauthorized () {
+    public void testSearchQueryAuthorizedWithoutIP () {
         ClientResponse response = resource().path(getAPIVersion())
-                .path("search").queryParam("q", "[orth=das]")
+                .path("search").queryParam("q", "[orth=die]")
                 .queryParam("ql", "poliqarp")
-                .queryParam("cq", "textClass=politik & availability != /CC-BY.*/")
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
-                response.getStatus());
-
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
-        assertNotNull(node);
-        assertEquals("textClass", node.at("/collection/operands/0/key").asText());
-        assertEquals("politik", node.at("/collection/operands/0/value").asText());
-        assertEquals("match:eq", node.at("/collection/operands/1/match").asText());
-        assertEquals("availability", node.at("/collection/operands/1/key").asText());
-        assertEquals("CC-BY.*", node.at("/collection/operands/1/value").asText());
-        assertEquals("operation:override",
-                node.at("/collection/rewrites/0/operation").asText());
-        assertEquals("availability(FREE)",
-                node.at("/collection/rewrites/0/scope").asText());
-    }
-    
-    @Test
-    public void testSearchQueryWithComplexCollectionQueryUnauthorized2 () {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("search").queryParam("q", "[orth=das]")
-                .queryParam("ql", "poliqarp")
-                .queryParam("cq", "textClass=politik & availability=ACA-NC")
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
-                response.getStatus());
-
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
-        assertNotNull(node);
-        assertEquals("textClass", node.at("/collection/operands/0/key").asText());
-        assertEquals("politik", node.at("/collection/operands/0/value").asText());
-        assertEquals("match:eq", node.at("/collection/operands/1/match").asText());
-        assertEquals("availability", node.at("/collection/operands/1/key").asText());
-        assertEquals("CC-BY.*", node.at("/collection/operands/1/value").asText());
-        assertEquals("operation:override",
-                node.at("/collection/rewrites/0/operation").asText());
-        assertEquals("availability(FREE)",
-                node.at("/collection/rewrites/0/scope").asText());
-    }
-
-    @Test
-    public void testSearchQueryWithComplexCollectionQueryPublicOverride () {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("search").queryParam("q", "[orth=das]")
-                .queryParam("ql", "poliqarp")
-                .queryParam("cq", "textClass=politik & availability=QAO-NC-LOC:ids")
                 .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
-
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
-        assertEquals("textClass", node.at("/collection/operands/0/key").asText());
-        assertEquals("politik", node.at("/collection/operands/0/value").asText());
-        assertEquals("match:eq", node.at("/collection/operands/1/operands/0/match").asText());
-        assertEquals("availability", node.at("/collection/operands/1/operands/0/key").asText());
-        assertEquals("CC-BY.*", node.at("/collection/operands/1/operands/0/value").asText());
-        assertEquals("match:eq", node.at("/collection/operands/1/operands/1/match").asText());
-        assertEquals("ACA.*", node.at("/collection/operands/1/operands/1/value").asText());
-        assertEquals("operation:override",
-                node.at("/collection/rewrites/0/operation").asText());
+        assertNotEquals(0, node.path("matches").size());
+        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
+        assertEquals("CC-BY.*",
+                node.at("/collection/operands/0/value").asText());
+        assertEquals("ACA.*", node.at("/collection/operands/1/value").asText());
+        assertEquals("operation:or", node.at("/collection/operation").asText());
         assertEquals("availability(PUB)",
                 node.at("/collection/rewrites/0/scope").asText());
     }
-
+    
+    
 
     @Test
     @Ignore

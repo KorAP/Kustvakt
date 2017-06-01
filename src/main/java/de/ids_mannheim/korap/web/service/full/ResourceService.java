@@ -1171,63 +1171,7 @@ public class ResourceService {
                     e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
-        String results;
-//        // fixme: checks for policy matching
-//        // fixme: currently disabled, due to mishab in foundry/layer spec
-//        // fixme:
-//        if (foundries != null && foundries.size() > 1000) {
-//            Set<String> f_list = new HashSet<>();
-//            Set<String> l_list = new HashSet<>();
-//
-//            for (String spl : new ArrayList<>(foundries)) {
-//                try {
-//                    SecurityManager<?> manager = SecurityManager.init(spl, user,
-//                            Permissions.Permission.READ);
-//                    if (!manager.isAllowed())
-//                        continue;
-//
-//                    String[] sep = StringUtils.splitAnnotations(spl);
-//                    if (spl != null) {
-//                        f_list.add(sep[0]);
-//                        l_list.add(sep[1]);
-//                    };
-//                    results = searchKrill.getMatch(matchid,
-//                            new ArrayList<>(f_list), new ArrayList<>(l_list),
-//                            spans, false, true);
-//                }
-//                catch (NotAuthorizedException e) {
-//                    throw KustvaktResponseHandler.throwit(
-//                            StatusCodes.ACCESS_DENIED, "Permission denied",
-//                            matchid);
-//                }
-//
-//            }
-//            // all foundries shall be returned
-//        }
-//        else if (foundries != null && foundries.contains("*")) {
-//            Set<Layer> resources;
-//            try {
-//                resources = ResourceFinder.search(user, Layer.class);
-//            }
-//            catch (KustvaktException e) {
-//                jlog.error("Exception encountered: {}", e.string());
-//                throw KustvaktResponseHandler.throwit(e);
-//            }
-//            // returns foundries and layers.
-//            // todo: needs testing!
-//            foundries = new HashSet<>();
-//            layers = new HashSet<>();
-//            for (Layer r : resources) {
-//                String[] spl = StringUtils.splitAnnotations(r.getName());
-//                if (spl != null) {
-//                    foundries.add(spl[0]);
-//                    layers.add(spl[1]);
-//                }
-//            }
-//        }
         
-        
-        //EM: I dont need user here just corpusAccess
         CorpusAccess corpusAccess = user.getCorpusAccess();
         Pattern p;
         switch (corpusAccess) {
@@ -1241,6 +1185,8 @@ public class ResourceService {
 			p = config.getFreeLicensePattern();
 			break;
 		}
+        
+        String results;
         try {
             if (!match_only){
             	
