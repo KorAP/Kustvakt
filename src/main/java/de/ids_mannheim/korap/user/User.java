@@ -175,6 +175,30 @@ public abstract class User implements Serializable {
         return sb.toString();
     }
 
+    public String locationtoString()
+    
+    {
+    	if( this.location == Location.INTERN)
+    		return "INTERN";
+    	else if( this.location == Location.EXTERN )
+    		return "EXTERN";
+    	else
+    		return "???";
+    }
+    
+    public String accesstoString()
+    
+    {
+    	if( this.corpusAccess == CorpusAccess.ALL )
+    		return "ALL";
+    	else if( this.corpusAccess == CorpusAccess.PUB )
+    		return "PUB";
+    	else if( this.corpusAccess == CorpusAccess.FREE )
+    		return "FREE";
+    	else
+    		return "???";
+    }
+    
     public static class UserFactory {
 
         public static KorAPUser getUser (String username) {

@@ -45,7 +45,7 @@ import java.util.Iterator; // 07.02.17/FB
 @Produces(MediaType.TEXT_HTML + ";charset=utf-8")
 public class AuthService {
 
-	private static Boolean DEBUG_LOG = false;
+	private static Boolean DEBUG_LOG = true;
 	
     //todo: bootstrap function to transmit certain default configuration settings and examples (example user queries,
     // default usersettings, etc.)
@@ -176,7 +176,8 @@ public class AuthService {
             // todo: is this necessary?
             //            attr.putAll(data.fields());
             controller.setAccessAndLocation(user, headers);
-            
+            if( DEBUG_LOG == true )
+            		System.out.printf("Debug: /apiToken/: location=%s, access='%s'.\n", user.locationtoString(), user.accesstoString());
             attr.put(Attributes.LOCATION, user.getLocation());
             attr.put(Attributes.CORPUS_ACCESS,  user.getCorpusAccess());
             context = controller.createTokenContext(user, attr, Attributes.API_AUTHENTICATION);

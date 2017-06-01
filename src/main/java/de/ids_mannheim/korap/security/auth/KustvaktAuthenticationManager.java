@@ -213,7 +213,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	    	// to be absolutely sure:
 	    	user.setCorpusAccess(User.CorpusAccess.FREE);
 	    	if( DEBUG_LOG == true )
-	    		System.out.println("setAccessAndLocation: DemoUser.");
+	    		System.out.printf("setAccessAndLocation: DemoUser: location=%s, access=%s.\n", user.locationtoString(), user.accesstoString());
 	     	return;
 	    }
 		
@@ -247,6 +247,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
 			user.setLocation(location);
 			user.setCorpusAccess(corpusAccess);
+	    	if( DEBUG_LOG == true )
+	    		System.out.printf("setAccessAndLocation: KorAPUser: location=%s, access=%s.\n", user.locationtoString(), user.accesstoString());
+
 		}
 	} // getAccess
 

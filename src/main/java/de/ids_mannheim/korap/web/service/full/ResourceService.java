@@ -494,6 +494,7 @@ public class ResourceService {
         try {
             user = controller.getUser(context.getUsername());
             controller.setAccessAndLocation(user, headers);
+            System.out.printf("Debug: /search/: location=%s, access='%s'.\n", user.locationtoString(), user.accesstoString());
         	}
         catch (KustvaktException e) {
             jlog.error("Failed retrieving user in the search service: {}",
@@ -1163,7 +1164,7 @@ public class ResourceService {
         try {
             user = controller.getUser(tokenContext.getUsername());
             controller.setAccessAndLocation(user, headers);
-            System.out.println("Debug: getMatchInfo: setting Access & Location: done.");
+            System.out.printf("Debug: /getMatchInfo/: location=%s, access='%s'.\n", user.locationtoString(), user.accesstoString());
             }
         catch (KustvaktException e) {
             jlog.error("Failed getting user in the matchInfo service: {}",
