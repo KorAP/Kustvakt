@@ -67,6 +67,35 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
                 node.at("/collection/rewrites/0/scope").asText());
     }
     
+    private void checkAndPublicWithoutACA (String json) {
+        JsonNode node = JsonUtils.readTree(json);
+        assertNotNull(node);
+        assertEquals("operation:and",
+                node.at("/collection/operation").asText());
+        assertEquals("match:eq",
+                node.at("/collection/operands/0/match").asText());
+        assertEquals("type:regex",
+                node.at("/collection/operands/0/type").asText());
+        assertEquals("availability",
+                node.at("/collection/operands/0/key").asText());
+        assertEquals("CC-BY.*",
+                node.at("/collection/operands/0/value").asText());
+        
+        assertEquals("match:eq",
+                node.at("/collection/operands/1/match").asText());
+        assertEquals("type:regex",
+                node.at("/collection/operands/1/type").asText());
+        assertEquals("availability",
+                node.at("/collection/operands/1/key").asText());
+        assertEquals("ACA.*",
+                node.at("/collection/operands/1/value").asText());
+        
+        assertEquals("operation:insertion",
+                node.at("/collection/rewrites/0/operation").asText());
+        assertEquals("availability(PUB)",
+                node.at("/collection/rewrites/0/scope").asText());
+    }
+    
     private void checkAndAll (String json) {
         JsonNode node = JsonUtils.readTree(json);
         assertNotNull(node);
@@ -90,7 +119,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
                 node.at("/operands/0/type").asText());
         assertEquals("availability",
                 node.at("/operands/0/key").asText());
-        assertEquals("QAO.*",
+        assertEquals("CC-BY.*",
                 node.at("/operands/0/value").asText());
         
         node = node.at("/operands/1");
@@ -102,11 +131,35 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
                 node.at("/operands/0/value").asText());
         assertEquals("match:eq",
                 node.at("/operands/1/match").asText());
-        assertEquals("CC-BY.*",
+        assertEquals("QAO.*",
                 node.at("/operands/1/value").asText());
         
     }
 
+    private void checkAndAllWithoutACA (String json) {
+        JsonNode node = JsonUtils.readTree(json);
+        assertNotNull(node);
+        assertEquals("operation:and",
+                node.at("/collection/operation").asText());
+        assertEquals("match:eq",
+                node.at("/collection/operands/0/operands/0/match").asText());
+        assertEquals("type:regex",
+                node.at("/collection/operands/0/operands/0/type").asText());
+        assertEquals("availability",
+                node.at("/collection/operands/0/operands/0/key").asText());
+        assertEquals("CC-BY.*",
+                node.at("/collection/operands/0/operands/0/value").asText());
+        assertEquals("match:eq",
+                node.at("/collection/operands/0/operands/1/match").asText());
+        assertEquals("QAO.*",
+                node.at("/collection/operands/0/operands/1/value").asText());
+        assertEquals("operation:insertion",
+                node.at("/collection/rewrites/0/operation").asText());
+        assertEquals("availability(ALL)",
+                node.at("/collection/rewrites/0/scope").asText());
+    }
+    
+    
 
     private ClientResponse builtSimpleClientResponse (String collectionQuery) {
         return resource().path(getAPIVersion()).path("search")
@@ -269,7 +322,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndPublic(response.getEntity(String.class));
+        checkAndPublicWithoutACA(response.getEntity(String.class));
     }
 
 
@@ -327,7 +380,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndAll(response.getEntity(String.class));
+        checkAndAllWithoutACA(response.getEntity(String.class));
     }
     
 }
