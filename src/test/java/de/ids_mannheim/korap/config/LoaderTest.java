@@ -38,6 +38,8 @@ public class LoaderTest extends BeanConfigTest {
 
 
     @Test
+    @Ignore
+    @Deprecated
     public void runBootInterfaces () {
         Set<Class<? extends BootableBeanInterface>> set = new HashSet<>();
         set.add(CollectionLoader.class);

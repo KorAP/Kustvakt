@@ -38,7 +38,7 @@ public class ResourceDaoTest extends BeanConfigTest {
 
     @Override
     public void initMethod () {
-        helper().setupAccount();
+//        helper().setupAccount();
 
         List<Class<? extends KustvaktResource>> classes = new ArrayList<>(
                 KustvaktClassLoader.loadSubTypes(KustvaktResource.class));

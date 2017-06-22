@@ -46,7 +46,6 @@ public abstract class BeanConfigTest {
         BeansFactory.closeApplication();
     }
 
-
     public abstract void initMethod () throws KustvaktException;
 
 

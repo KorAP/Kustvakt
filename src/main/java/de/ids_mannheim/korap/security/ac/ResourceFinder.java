@@ -96,7 +96,7 @@ public class ResourceFinder {
                 Permissions.Permission.READ);
     }
 
-
+    @Deprecated
     public static <T extends KustvaktResource> Set<T> searchPublic (
             Class<T> clazz) throws KustvaktException {
         return searchPublicFiltered(clazz);
@@ -133,6 +133,7 @@ public class ResourceFinder {
         return sets;
     }
     
+    @Deprecated
     public static <T extends KustvaktResource> Set<T> searchPublicFiltered (
             Class<T> clazz, String ... ids) throws KustvaktException {
         overrideProviders(null);

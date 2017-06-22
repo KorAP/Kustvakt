@@ -5,6 +5,8 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.resources.Corpus;
 import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.security.ac.ResourceFinder;
+
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Set;
@@ -17,6 +19,8 @@ import static org.junit.Assert.assertNotEquals;
  * @author hanl
  * @date 06/02/2016
  */
+@Deprecated
+@Ignore
 public class ResourceFinderTest extends BeanConfigTest {
 
     @Test
@@ -36,6 +40,7 @@ public class ResourceFinderTest extends BeanConfigTest {
 
 
     @Test
+    @Deprecated
     public void testResourcesDemoFiltered () throws KustvaktException {
         Set<Corpus> resources = ResourceFinder.searchPublicFiltered(
                 Corpus.class, "WPD13");
@@ -52,6 +57,6 @@ public class ResourceFinderTest extends BeanConfigTest {
     @Override
     public void initMethod () throws KustvaktException {
         helper().setupAccount();
-        helper().runBootInterfaces();
+//        helper().runBootInterfaces();
     }
 }

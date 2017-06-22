@@ -26,9 +26,11 @@ import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
  * @date 12/01/2016
  * @lastupdate 19/04/2017
  */
+@Deprecated
 public class CollectionLoader implements BootableBeanInterface {
 
     @Override
+    @Deprecated
     public void load (ContextHolder beans) throws KustvaktException {
         SecurityManager.overrideProviders(beans);
         ResourceFinder.overrideProviders(beans);
@@ -37,33 +39,6 @@ public class CollectionLoader implements BootableBeanInterface {
                 .toUser(KustvaktConfiguration.KUSTVAKT_USER);
 
         KustvaktConfiguration config = beans.getConfiguration();
-
-        //        KoralCollectionQueryBuilder bui = new KoralCollectionQueryBuilder();
-        //        bui.with("creationDate since 1775 & corpusSigle=GOE");
-        //
-        //        VirtualCollection c1 = new VirtualCollection();
-        //        c1.setName("Weimarer Werke");
-        //
-        //        c1.setFields(bui.toJSON());
-        //
-        //        c1.setDescription("Goethe-Werke in Weimar (seit 1775)");
-        //
-        //        bui = new KoralCollectionQueryBuilder();
-        //        bui.with("textType=Aphorismus");
-        //
-        //        VirtualCollection c2 = new VirtualCollection();
-        //        c2.setName("Aphorismen");
-        //        c2.setFields(bui.toJSON());
-        //        c2.setDescription("Aphorismentexte Goethes");
-        //
-        //        bui = new KoralCollectionQueryBuilder();
-        //        bui.with("title ~ \"Werther\"");
-        //
-        //        VirtualCollection c3 = new VirtualCollection();
-        //        c3.setName("Werther");
-        //        c3.setFields(bui.toJSON());
-        //        c3.setDescription("Goethe - Die Leiden des jungen Werther");
-
         PolicyBuilder builder = new PolicyBuilder(user);
         String result = null;
         BufferedReader br;

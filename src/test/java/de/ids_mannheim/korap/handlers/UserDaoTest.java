@@ -110,6 +110,6 @@ public class UserDaoTest extends BeanConfigTest {
     @Override
     public void initMethod () throws KustvaktException {
         helper().setupAccount();
-        helper().runBootInterfaces();
+//        helper().runBootInterfaces();
     }
 }

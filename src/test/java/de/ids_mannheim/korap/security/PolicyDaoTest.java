@@ -31,7 +31,7 @@ public class PolicyDaoTest extends BeanConfigTest {
     @Override
     public void initMethod () throws KustvaktException {
         helper().setupAccount();
-        helper().runBootInterfaces();
+//        helper().runBootInterfaces();
         helper().setupResource(new Corpus("WPD_1"));
     }
 

@@ -76,7 +76,7 @@ public class KustvaktConfiguration {
     private String default_token;
     private String default_dep;
     private String default_const;
-    
+    @Deprecated    
     private String policyConfig;
     private ArrayList<String> foundries;
     private ArrayList<String> layers;
@@ -163,14 +163,14 @@ public class KustvaktConfiguration {
         
         ldapConfig = properties.getProperty("ldap.config");
         
-        // EM: replace this later with KoralQuery
+        // EM: regex for matching availability in Krill matches
         freeLicensePattern = Pattern.compile(properties.getProperty("kustvakt.regex.free",""));
         publicLicensePattern = Pattern.compile(properties.getProperty("kustvakt.regex.public",""));
         allLicensePattern = Pattern.compile(properties.getProperty("kustvakt.regex.all",""));
         
         // EM: not use in the future
-        policyConfig = properties.getProperty("policies.config");
-        setFoundriesAndLayers(policyConfig);
+        //policyConfig = properties.getProperty("policies.config");
+        //setFoundriesAndLayers(policyConfig);
         
         KUSTVAKT_USER.put(Attributes.ID, Integer.parseInt(properties.getProperty("kustvakt.init.user.id")));
         KUSTVAKT_USER.put(Attributes.USERNAME, properties.getProperty("kustvakt.init.user.username"));

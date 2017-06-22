@@ -10,13 +10,17 @@ import org.junit.Test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 
+import org.junit.Ignore;
+
 /**
  * @author hanl
  * @date 11/02/2016
  */
+@Deprecated
 public class PolicyLoaderTest extends BeanConfigTest {
 
     @Test
+    @Ignore
     public void testPolicyLoader () {
         boolean error = false;
         UserLoader u = new UserLoader();

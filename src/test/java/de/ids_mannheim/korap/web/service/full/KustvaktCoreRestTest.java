@@ -21,8 +21,8 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
 
 	@Override
     public void initMethod () throws KustvaktException {
-//        helper().setupAccount();
-        helper().runBootInterfaces();
+        helper().setupAccount();
+//        helper().runBootInterfaces();
     }
 	
     @BeforeClass

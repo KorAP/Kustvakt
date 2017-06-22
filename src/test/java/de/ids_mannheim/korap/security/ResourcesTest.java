@@ -108,6 +108,8 @@ public class ResourcesTest extends BeanConfigTest {
 
 
     @Test
+    @Deprecated
+    @Ignore
     public void getDemoResources () throws KustvaktException {
         Set s = ResourceFinder.searchPublic(Corpus.class);
         assertEquals(2, s.size());
@@ -117,6 +119,8 @@ public class ResourcesTest extends BeanConfigTest {
 
 
     @Test
+    @Deprecated
+    @Ignore
     public void getDemoResourceFiltered () throws KustvaktException {
         Set s = ResourceFinder.searchPublicFiltered(Corpus.class, "WPD13");
         assertEquals(1, s.size());
@@ -127,7 +131,7 @@ public class ResourcesTest extends BeanConfigTest {
     public void initMethod () throws KustvaktException {
         helper().setupAccount();
         c1 = new Corpus("WPD_test");
-        helper().runBootInterfaces();
+//        helper().runBootInterfaces();
         helper().setupResource(c1);
     }
 }

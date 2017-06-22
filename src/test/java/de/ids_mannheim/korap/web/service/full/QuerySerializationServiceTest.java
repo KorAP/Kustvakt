@@ -2,7 +2,7 @@ package de.ids_mannheim.korap.web.service.full;
 /**
  * @author hanl, margaretha
  * @lastUpdate 19/04/2017
- *
+ * EM: FIX ME: Database restructure
  */
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -27,7 +27,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
 
     @Override
     public void initMethod () throws KustvaktException {
-        helper().runBootInterfaces();
+//        helper().runBootInterfaces();
     }
 
 

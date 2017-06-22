@@ -155,7 +155,7 @@ public class UserServiceTest extends FastJerseyTest {
 
 	// EM: This test require VPN / IDS Intranet
 	@Test
-//	@Ignore
+	@Ignore
 	public void loginJWT() {
 		String en = BasicHttpAuth.encode(credentials[0], credentials[1]);
 		/* lauffähige Version von Hanl: */

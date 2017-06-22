@@ -369,6 +369,8 @@ public class ResourceService {
 
     // todo: does cq have any sensible worth here? --> would say no! --> is
     // useful in non type/id scenarios
+    
+    // EM: build query using the given virtual collection id
     @TRACE
     @Path("{type}/{id}/search")
     public Response buildQueryWithId (@Context Locale locale,
@@ -406,13 +408,14 @@ public class ResourceService {
         String query = "";
         KustvaktResource resource;
         try {
-
             if (ctx.isDemo()) {
+                // EM: FIX ME: add CollectionRewrite? Is there public VCs? 
                 Set set = ResourceFinder.searchPublicFiltered(
                         ResourceFactory.getResourceClass(type), id);
                 resource = (KustvaktResource) set.toArray()[0];
             }
             else {
+                // EM: FIX ME: search in user VC
                 User user = controller.getUser(ctx.getUsername());
                 if (StringUtils.isInteger(id))
                     resource = this.resourceHandler
