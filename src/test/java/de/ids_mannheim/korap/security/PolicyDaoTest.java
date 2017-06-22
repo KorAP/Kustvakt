@@ -21,10 +21,12 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-/**
+/** EM: needs reimplementation
+ * 
  * @author hanl
  * @date 09/02/2016
  */
+@Ignore
 public class PolicyDaoTest extends BeanConfigTest {
 
 
@@ -181,6 +183,8 @@ public class PolicyDaoTest extends BeanConfigTest {
 
 
     @Test
+    @Deprecated
+    @Ignore
     public void testPoliciesPublic () {
         PolicyHandlerIface dao = helper().getContext().getPolicyDbProvider();
         Collection<SecurityPolicy> policies = dao.getPolicies(
