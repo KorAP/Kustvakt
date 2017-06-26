@@ -46,8 +46,7 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
                 && node.at("/key").asText().equals("availability")) {
             String queryAvailability = node.at("/value").asText();
             String matchOp = node.at("/match").asText();
-            if (userAvailabilities.contains(queryAvailability) && matchOp.
-                    equals(KoralMatchOperator.EQUALS.toString())){
+            if (!userAvailabilities.contains(queryAvailability)){
                 userAvailabilities.remove(queryAvailability);
             }
         }
