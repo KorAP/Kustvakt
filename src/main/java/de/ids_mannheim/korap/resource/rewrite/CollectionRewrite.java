@@ -48,8 +48,7 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
                 && node.at("/key").asText().equals("availability")) {
             String queryAvailability = node.at("/value").asText();
             String matchOp = node.at("/match").asText();
-            if (userAvailabilities.contains(queryAvailability) && matchOp.
-                    equals(KoralMatchOperator.EQUALS.toString())){
+            if (!userAvailabilities.contains(queryAvailability)){
                 userAvailabilities.remove(queryAvailability);
             }
         }
@@ -91,7 +90,9 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
 
         if (jsonNode.has("collection")) {
             userAvailabilities = checkAvailability(jsonNode.at("/collection"), userAvailabilities);
-            builder.with(buildAvailability(userAvailabilities));
+            if (!userAvailabilities.isEmpty()){
+                builder.with(buildAvailability(userAvailabilities));
+            }
             builder.setBaseQuery(builder.toJSON());
             rewrittesNode = builder.mergeWith(jsonNode).at("/collection");
             node.set("collection", rewrittesNode, identifier);
