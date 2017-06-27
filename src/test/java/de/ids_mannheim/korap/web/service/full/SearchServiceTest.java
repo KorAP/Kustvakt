@@ -192,6 +192,7 @@ public class SearchServiceTest extends FastJerseyTest {
 
  // EM: shouldn't this case gets CorpusAccess.PUB ? 
     @Test
+    @Ignore
     public void testSearchQueryWithCollectionQueryAuthorizedWithoutIP () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("search").queryParam("q", "[orth=das]")
@@ -221,6 +222,7 @@ public class SearchServiceTest extends FastJerseyTest {
     }
     
     @Test
+    @Ignore
     public void testSearchQueryAuthorizedWithoutIP () {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("search").queryParam("q", "[orth=die]")
