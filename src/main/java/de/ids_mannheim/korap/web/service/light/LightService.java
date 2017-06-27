@@ -320,10 +320,10 @@ public class LightService {
         boolean match_only = foundries == null || foundries.isEmpty();
         String results;
         if (match_only)
-            results = searchKrill.getMatch(matchid, config.getFreeLicensePattern());
+            results = searchKrill.getMatch(matchid,null);
         else
             results = searchKrill.getMatch(matchid, f_list, l_list, spans,
-                    false, true, config.getFreeLicensePattern());
+                    false, true,null);
 
         return Response.ok(results).build();
     }

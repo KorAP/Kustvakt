@@ -118,7 +118,7 @@ public class SearchKrill {
             try {
             	km = this.index.getMatch(id);
             	String availability = km.getAvailability();
-            	if (availability != null){
+            	if (licensePattern!=null && availability != null){
             		Matcher m = licensePattern.matcher(availability);
             		if (!m.matches()){
             			km = new Match();
@@ -151,7 +151,7 @@ public class SearchKrill {
                         layers, includeSpans, includeHighlights,
                         sentenceExpansion);
             	String availability = km.getAvailability();
-            	if (availability != null){
+            	if (licensePattern !=null && availability != null){
             		Matcher m = licensePattern.matcher(availability);
             		if (!m.matches()){
             			km = new Match();
