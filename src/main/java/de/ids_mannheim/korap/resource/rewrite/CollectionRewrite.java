@@ -91,10 +91,10 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
             userAvailabilities = checkAvailability(jsonNode.at("/collection"), userAvailabilities);
             if (!userAvailabilities.isEmpty()){
                 builder.with(buildAvailability(userAvailabilities));
+                builder.setBaseQuery(builder.toJSON());
+                rewrittesNode = builder.mergeWith(jsonNode).at("/collection");
+                node.set("collection", rewrittesNode, identifier);
             }
-            builder.setBaseQuery(builder.toJSON());
-            rewrittesNode = builder.mergeWith(jsonNode).at("/collection");
-            node.set("collection", rewrittesNode, identifier);
         }
         else {
             builder.with(buildAvailability(userAvailabilities));
