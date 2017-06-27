@@ -3,7 +3,6 @@ package de.ids_mannheim.korap.resource.rewrite;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +16,6 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.object.KoralMatchOperator;
 import de.ids_mannheim.korap.resource.rewrite.KoralNode.RewriteIdentifier;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 
@@ -93,10 +91,10 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
             userAvailabilities = checkAvailability(jsonNode.at("/collection"), userAvailabilities);
             if (!userAvailabilities.isEmpty()){
                 builder.with(buildAvailability(userAvailabilities));
+                builder.setBaseQuery(builder.toJSON());
+                rewrittesNode = builder.mergeWith(jsonNode).at("/collection");
+                node.set("collection", rewrittesNode, identifier);
             }
-            builder.setBaseQuery(builder.toJSON());
-            rewrittesNode = builder.mergeWith(jsonNode).at("/collection");
-            node.set("collection", rewrittesNode, identifier);
         }
         else {
             builder.with(buildAvailability(userAvailabilities));

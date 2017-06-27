@@ -224,9 +224,34 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
         checkAndFree(response.getEntity(String.class));
     }
 
+    @Test
+    public void testAvailabilityRegexNoRewrite () {
+        ClientResponse response = builtSimpleClientResponse(
+                "availability = /CC-BY.*/ & availability = /ACA.*/");
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+
+        String json = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(json);
+        assertEquals("operation:and",
+                node.at("/collection/operation").asText());
+        assertEquals("match:eq",
+                node.at("/collection/operands/0/match").asText());
+        assertEquals("type:regex",
+                node.at("/collection/operands/0/type").asText());
+        assertEquals("availability",
+                node.at("/collection/operands/0/key").asText());
+        assertEquals("CC-BY.*",
+                node.at("/collection/operands/0/value").asText());
+        assertEquals("match:eq",
+                node.at("/collection/operands/1/match").asText());
+        assertEquals("ACA.*", node.at("/collection/operands/1/value").asText());
+        
+    }
+
 
     @Test
-    public void testAvailabilityRegexFreeUnauthorized2 () {
+    public void testAvailabilityRegexFreeUnauthorized3 () {
         ClientResponse response = builtSimpleClientResponse(
                 "availability = /.*NC.*/");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
