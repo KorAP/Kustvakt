@@ -123,7 +123,7 @@ public class SearchKrill {
             		if (!m.matches()){
             			km = new Match();
             			km.addError(StatusCodes.ACCESS_DENIED, 
-            				"Retrieving match info with ID "+id+" is not allowed.");
+            				"Retrieving match info with ID "+id+" is not allowed.", id);
             		}
             	}
             }
@@ -156,7 +156,7 @@ public class SearchKrill {
             		if (!m.matches()){
             			km = new Match();
             			km.addError(StatusCodes.ACCESS_DENIED, 
-            					"Retrieving match info with ID "+id+" is not allowed.");
+            					"Retrieving match info with ID "+id+" is not allowed.", id);
             		}
             	}
             	

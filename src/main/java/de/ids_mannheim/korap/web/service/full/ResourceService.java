@@ -494,7 +494,7 @@ public class ResourceService {
         try {
             user = controller.getUser(context.getUsername());
             controller.setAccessAndLocation(user, headers);
-            System.out.printf("Debug: /search/: location=%s, access='%s'.\n", user.locationtoString(), user.accesstoString());
+//            System.out.printf("Debug: /search/: location=%s, access='%s'.\n", user.locationtoString(), user.accesstoString());
         	}
         catch (KustvaktException e) {
             jlog.error("Failed retrieving user in the search service: {}",
