@@ -31,6 +31,7 @@ public class StatusCodes {
      */
 
     public static final int NO_QUERY = 301;
+    public static final int SERIALIZATION_FAILED = 302;
 
 
     /**
@@ -40,7 +41,7 @@ public class StatusCodes {
     // fixme: use unsupported resource and include type in return message
     public static final int POLICY_ERROR_DEFAULT = 400;
     public static final int UNSUPPORTED_RESOURCE = 402;
-    public static final int FAILED_REWRITE = 403;
+    public static final int REWRITE_FAILED = 403;
     //public static final int UNSUPPORTED_FOUNDRY = 403;
     //public static final int UNSUPPORTED_CORPUS = 404;
     //public static final int UNSUPPORTED_LAYER = 405;

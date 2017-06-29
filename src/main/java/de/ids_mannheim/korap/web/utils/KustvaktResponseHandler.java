@@ -40,7 +40,6 @@ public class KustvaktResponseHandler {
         return new WebApplicationException(s);
     }
 
-
     public static WebApplicationException throwit (int code) {
         return new WebApplicationException(Response.status(getStatus(code))
                 .entity(buildNotification(code, "", "")).build());
@@ -53,7 +52,11 @@ public class KustvaktResponseHandler {
                 .entity(buildNotification(code, message, entity)).build());
     }
 
-
+    public static WebApplicationException throwit (int code, String notification) {
+        return new WebApplicationException(Response.status(getStatus(code))
+                .entity(notification).build());
+    }
+    
     private static String buildNotification (KustvaktException e) {
         register(e.getRecords());
         return buildNotification(e.getStatusCode(), e.getMessage(),

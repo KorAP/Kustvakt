@@ -753,24 +753,34 @@ public class ResourceService {
         }
     }
 
-
-    @POST
-    @Path("stats")
-    public Response getStats (@Context SecurityContext context,
-            @Context Locale locale, String json) {
+    // EM: changed method POST to GET
+    @GET
+    @Path("statistics")
+    public Response getStatistics (@Context SecurityContext context,
+            @Context Locale locale, @QueryParam("collectionQuery") 
+            String collectionQuery) {
+        
+        if (collectionQuery == null || collectionQuery.isEmpty()){
+         throw KustvaktResponseHandler.throwit(new KustvaktException(
+                 StatusCodes.MISSING_ARGUMENT, "Parameter collectionQuery is missing.", 
+                 "collectionQuery"));
+        }
+        
+        
         KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
-        builder.with(json);
-        String stats = searchKrill.getStatistics(builder.toJSON());
-
+        builder.with(collectionQuery);
+        String json = builder.toJSON();
+        
+        String stats = searchKrill.getStatistics(json);
         if (stats.contains("-1"))
             throw KustvaktResponseHandler.throwit(StatusCodes.NO_VALUE_FOUND);
-
+        jlog.debug("Stats: "+stats);
         return Response.ok(stats).build();
     }
 
-
+    // EM: what is child?
     @GET
-    @Path("{type}/{id}/{child}/stats")
+    @Path("{type}/{id}/{child}/statistics")
     public Response getStatisticsbyIdChild (@Context SecurityContext context,
             @Context Locale locale, @PathParam("type") String type,
             @PathParam("id") String id, @PathParam("child") String child) {
@@ -983,32 +993,32 @@ public class ResourceService {
             KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
             cquery.setBaseQuery(base);
 
-            cachetmp = ResourceFactory.getCachedCollection(cquery.toJSON());
+            try {
+                cachetmp = ResourceFactory.getCachedCollection(cquery.toJSON());
 
-            // see if collection was cached!
-            VirtualCollection tmp = resourceHandler.getCache(cachetmp.getId(),
-                    VirtualCollection.class);
-            // if not cached, fill with stats values
-            if (tmp == null) {
-                String stats = searchKrill.getStatistics(cquery.toJSON());
-                cachetmp.setStats(JsonUtils.readSimple(stats, Map.class));
-            }
-
-            if (!cache) {
-                collection = ResourceFactory.getPermanentCollection(cachetmp,
-                        name, description);
-                vals = collection.toMap();
-                try {
-                    resourceHandler.storeResources(user, collection);
+                // see if collection was cached!
+                VirtualCollection tmp = resourceHandler.getCache(cachetmp.getId(),
+                        VirtualCollection.class);
+                // if not cached, fill with stats values
+                if (tmp == null) {
+                    String stats = searchKrill.getStatistics(cquery.toJSON());
+                    cachetmp.setStats(JsonUtils.readSimple(stats, Map.class));
                 }
-                catch (KustvaktException e) {
-                    jlog.error("Exception encountered: {}", e.string());
-                    throw KustvaktResponseHandler.throwit(e);
+            
+                if (!cache) {
+                    collection = ResourceFactory.getPermanentCollection(cachetmp,
+                            name, description);
+                    vals = collection.toMap();
+                        resourceHandler.storeResources(user, collection);
                 }
+                else {
+                    resourceHandler.cache(cachetmp);
+                    vals = cachetmp.toMap();
+                }
+            
             }
-            else {
-                resourceHandler.cache(cachetmp);
-                vals = cachetmp.toMap();
+            catch (KustvaktException e) {
+                throw KustvaktResponseHandler.throwit(e);
             }
         }
         return Response.ok(JsonUtils.toJSON(vals)).build();

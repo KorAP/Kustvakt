@@ -1,17 +1,14 @@
 package de.ids_mannheim.korap.web.service.full;
 
-import com.sun.jersey.api.client.ClientResponse;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
-import de.ids_mannheim.korap.query.serialize.QuerySerializer;
-import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.service.FastJerseyTest;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import com.sun.jersey.api.client.ClientResponse;
+
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.query.serialize.QuerySerializer;
+import de.ids_mannheim.korap.web.service.FastJerseyTest;
 
 /**
  * @author hanl
@@ -75,35 +72,7 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
         ClientResponse response = resource().path(getAPIVersion()).get(
                 ClientResponse.class);
     }
-
-
-    //    @Test
-    public void testGetStatsThrowsNoException () {
-        CollectionQueryProcessor pr = new CollectionQueryProcessor();
-        pr.process("corpusSigle=WPD & textClass=Sport");
-        Map map = new LinkedHashMap();
-        map.put("collection", pr.getRequestMap());
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("stats")
-                .post(ClientResponse.class, JsonUtils.toJSON(map));
-        assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
-    }
-
-
-    @Test
-    @Ignore
-    public void testGetStats2ThrowsNoException () {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("stats")
-                .post(ClientResponse.class, "creationDate in 1787");
-        String ent = response.getEntity(String.class);
-        assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
-        //        System.out
-        //                .println("___________________________________________________");
-        //        System.out.println("STATS ENTITY " + ent);
-    }
-
-
+   
     //    @Test
     public void testBuildQueryThrowsNoException () {
         ClientResponse response = resource().path(getAPIVersion())

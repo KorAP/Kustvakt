@@ -1,19 +1,22 @@
 package de.ids_mannheim.korap.utils;
 
+import java.util.List;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
-import edu.emory.mathcs.backport.java.util.Arrays;
 
-import java.io.IOError;
-import java.util.Map;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
+import de.ids_mannheim.korap.response.Notifications;
+import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * convenience builder class for collection query
  * 
- * @author hanl
- * @date 16/09/2014
+ * @author hanl, margaretha
+ * @date 29/06/2017
  */
 public class KoralCollectionQueryBuilder {
 
@@ -98,7 +101,7 @@ public class KoralCollectionQueryBuilder {
     }
 
 
-    public Object rebaseCollection () {
+    public Object rebaseCollection (){
         if (this.builder.length() == 0 && this.base == null)
             return null;
 
@@ -107,6 +110,21 @@ public class KoralCollectionQueryBuilder {
             CollectionQueryProcessor tree = new CollectionQueryProcessor(
                     this.verbose);
             tree.process(this.builder.toString());
+            if (tree.getErrors().size() > 0){
+                Notifications notif = new Notifications();
+                int code; 
+                for (List<Object> e : tree.getErrors()){
+                    code = (int) e.get(0);
+                    if (e.get(1) instanceof String){
+                        notif.addError(code, (String) e.get(1));
+                    }
+                    else{
+                        notif.addError(code, (String[]) e.get(1));
+                    }
+                }
+                
+                throw KustvaktResponseHandler.throwit(StatusCodes.SERIALIZATION_FAILED,notif.toJsonString());
+            }
             request = JsonUtils.valueToTree(tree.getRequestMap());
         }
 
