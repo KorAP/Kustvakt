@@ -68,8 +68,8 @@ public class StatisticsServiceTest extends FastJerseyTest {
         assert node.get("documents").asInt() == 7;
         assert node.get("tokens").asInt() == 279402;
         // EM: why zero?
-        assert node.get("sentences").asInt() == 0;
-        assert node.get("paragraphs").asInt() == 0;
+        assertEquals(node.get("sentences").asInt(), 11047);
+        assertEquals(node.get("paragraphs").asInt(), 489);
     }
 
 
