@@ -36,6 +36,23 @@ public class StatisticsServiceTest extends FastJerseyTest {
                 "de.ids_mannheim.korap.web.utils");
     }
 
+    @Test
+    public void testGetStatisticsNoResource ()
+            throws JsonProcessingException, IOException {
+        String collectionQuery = "corpusSigle=WPD15";
+        ClientResponse response = resource().path(getAPIVersion())
+                .path("statistics")
+                .queryParam("collectionQuery", collectionQuery)
+                .get(ClientResponse.class);
+
+        assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
+
+        String ent = response.getEntity(String.class);
+        JsonNode node = mapper.readTree(ent);
+        assertEquals(node.get("documents").asInt(),0);
+        assertEquals(node.get("tokens").asInt(),0);
+    }
+
 
     @Test
     public void testGetStatisticsWithCollectionQuery1 ()
@@ -50,8 +67,8 @@ public class StatisticsServiceTest extends FastJerseyTest {
 
         String ent = response.getEntity(String.class);
         JsonNode node = mapper.readTree(ent);
-        assert node.get("documents").asInt() == 11;
-        assert node.get("tokens").asInt() == 665842;
+        assertEquals(node.get("documents").asInt(),11);
+        assertEquals(node.get("tokens").asInt(),665842);
     }
 
 
@@ -65,8 +82,8 @@ public class StatisticsServiceTest extends FastJerseyTest {
         String ent = response.getEntity(String.class);
         JsonNode node = mapper.readTree(ent);
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
-        assert node.get("documents").asInt() == 7;
-        assert node.get("tokens").asInt() == 279402;
+        assertEquals(node.get("documents").asInt(),7);
+        assertEquals(node.get("tokens").asInt(),279402);
         // EM: why zero?
         assertEquals(node.get("sentences").asInt(), 11047);
         assertEquals(node.get("paragraphs").asInt(), 489);
