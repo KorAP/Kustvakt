@@ -176,6 +176,9 @@
                         <exclude>**/*APITest.java</exclude>
                         <exclude>de/ids_mannheim/korap/suites/*.java</exclude>
                 		<exclude>**/KustvaktServerTest.java</exclude>
+                		<exclude>**/ResourceServiceTest.java</exclude>
+                		<exclude>**/ResourceInfoServiceTest.java</exclude>
+                		<exclude>**/PolicyServiceTest.java</exclude>
                     </excludes>
                     <includes>
                         <include>de/ids_mannheim/korap/**/*.java</include>
