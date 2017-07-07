@@ -28,7 +28,7 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.UserFactory;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
 
-/**
+/** FIX ME: Database restructure
  * @author margaretha
  */
 public class PolicyServiceTest extends FastJerseyTest {
@@ -171,7 +171,7 @@ public class PolicyServiceTest extends FastJerseyTest {
 
     @Override
     public void initMethod () throws KustvaktException {
-        helper().runBootInterfaces();
+//        helper().runBootInterfaces();
     }
 }
 

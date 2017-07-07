@@ -19,13 +19,13 @@ import de.ids_mannheim.korap.web.service.FastJerseyTest;
 /**
  * @author hanl, margaretha
  * @lastUpdate 19/04/2017
- *
+ * EM: FIX ME: Database restructure
  */
 public class ResourceInfoServiceTest extends FastJerseyTest {
 
     @Override
     public void initMethod () throws KustvaktException {
-        helper().runBootInterfaces();
+//        helper().runBootInterfaces();
     }
 
 

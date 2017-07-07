@@ -20,7 +20,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
     @Override
     public void initMethod () throws KustvaktException {
-        helper().runBootInterfaces();
+//        helper().runBootInterfaces();
     }
 
 

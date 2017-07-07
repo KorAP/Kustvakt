@@ -113,11 +113,11 @@ public class TestHelper {
     }
 
 
-    public TestHelper setupAccount () {
+    public TestHelper setupAccount () throws KustvaktException {
         KustvaktBaseDaoInterface dao = getBean(ContextHolder.KUSTVAKT_USERDB);
 
         KustvaktAuthenticationManager manager = getBean(ContextHolder.KUSTVAKT_AUTHENTICATION_MANAGER);
-
+//        manager.createUserAccount(KustvaktConfiguration.KUSTVAKT_USER, false);
         try {
             User user = getUser();
             jlog.debug("found user, skipping setup ...");
@@ -247,6 +247,7 @@ public class TestHelper {
     }
 
 
+    @Deprecated
     public TestHelper runBootInterfaces () {
         Set<Class<? extends BootableBeanInterface>> set = KustvaktClassLoader
                 .loadSubTypes(BootableBeanInterface.class);

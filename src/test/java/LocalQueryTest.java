@@ -73,7 +73,7 @@ public class LocalQueryTest extends BeanConfigTest {
 
     @Override
     public void initMethod () throws KustvaktException {
-        helper().runBootInterfaces();
+//        helper().runBootInterfaces();
         index = helper().getContext().getConfiguration().getIndexDir();
     }
 }

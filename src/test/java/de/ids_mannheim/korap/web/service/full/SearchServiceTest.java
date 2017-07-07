@@ -37,7 +37,8 @@ public class SearchServiceTest extends FastJerseyTest {
 
     @Override
     public void initMethod () throws KustvaktException {
-        helper().runBootInterfaces();
+//        helper().runBootInterfaces();
+        helper().setupAccount();
     }
 
 

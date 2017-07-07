@@ -3,7 +3,6 @@ package de.ids_mannheim.korap.web.service.full;//package de.ids_mannheim.korap.e
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -73,7 +72,7 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 /**
  * @author hanl, margaretha
  * @date 29/01/2014
- * @lastUpdate 04/2017
+ * @lastUpdate 06/2017
  */
 @Path(KustvaktServer.API_VERSION + "/")
 @ResourceFilters({ AuthFilter.class, DemoUserFilter.class, PiwikFilter.class })
@@ -318,10 +317,28 @@ public class ResourceService {
     }
 
 
+    /* EM: potentially an unused service! */
+    /** Builds a json query serialization from the given parameters.
+     * 
+     * @param locale
+     * @param securityContext
+     * @param q query string
+     * @param ql query language
+     * @param v version
+     * @param context
+     * @param cutoff true if the number of results should be limited
+     * @param pageLength number of results per page
+     * @param pageIndex
+     * @param startPage
+     * @param cq collection query
+     * @return
+     */
     // ref query parameter removed!
-    @TRACE
-    @Path("search")
-    public Response buildQuery (@Context Locale locale,
+    // EM: change the HTTP method to from TRACE to GET
+    // EM: change path from search to query
+    @GET
+    @Path("query")
+    public Response serializeQuery (@Context Locale locale,
             @Context SecurityContext securityContext, @QueryParam("q") String q,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
             @QueryParam("context") String context,
@@ -348,7 +365,7 @@ public class ResourceService {
 
         ss.setMeta(meta.raw());
         String result = ss.toJSON();
-        jlog.debug("Query result: "+result);
+        jlog.debug("Query: "+result);
         return Response.ok(result).build();
     }
 
@@ -369,9 +386,15 @@ public class ResourceService {
 
     // todo: does cq have any sensible worth here? --> would say no! --> is
     // useful in non type/id scenarios
-    @TRACE
-    @Path("{type}/{id}/search")
-    public Response buildQueryWithId (@Context Locale locale,
+    
+    /* EM: potentially an unused service! */    
+    // EM: build query using the given virtual collection id
+    // EM: change the HTTP method to from TRACE to GET
+    // EM: change path from search to query
+    // EM: there is no need to check resource licenses since the service just serialize a query serialization
+    @GET
+    @Path("{type}/{id}/query")
+    public Response serializeQueryWithResource (@Context Locale locale,
             @Context SecurityContext securityContext, @QueryParam("q") String q,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
             @QueryParam("context") String context,
@@ -404,32 +427,9 @@ public class ResourceService {
         cquery.setBaseQuery(ss.toJSON());
 
         String query = "";
-        KustvaktResource resource;
-        try {
-
-            if (ctx.isDemo()) {
-                Set set = ResourceFinder.searchPublicFiltered(
-                        ResourceFactory.getResourceClass(type), id);
-                resource = (KustvaktResource) set.toArray()[0];
-            }
-            else {
-                User user = controller.getUser(ctx.getUsername());
-                if (StringUtils.isInteger(id))
-                    resource = this.resourceHandler
-                            .findbyIntId(Integer.valueOf(id), user);
-                else
-                    resource = this.resourceHandler.findbyStrId(id, user,
-                            ResourceFactory.getResourceClass(type));
-            }
-        }
-        // todo: instead of throwing exception, build notification and rewrites
-        // into result query
-        catch (KustvaktException e) {
-            jlog.error("Exception encountered: {}", e.string());
-            throw KustvaktResponseHandler.throwit(e);
-        }
-
-        if (resource != null) {
+        // EM: is this necessary at all?
+        KustvaktResource resource = isCollectionIdValid(ctx.getName(), id);
+        if (resource!=null){
             if (resource instanceof VirtualCollection) {
                 JsonNode node = cquery.and().mergeWith(resource.getData());
                 query = JsonUtils.toJSON(node);
@@ -440,9 +440,43 @@ public class ResourceService {
                 query = cquery.toJSON();
             }
         }
+
+        jlog.debug("Query: "+query);
         return Response.ok(query).build();
     }
 
+    // EM: prototype
+    private KustvaktResource isCollectionIdValid (String username, String collectionId) {
+        
+//        try {
+//            if (ctx.isDemo()) {
+//                // EM: FIX ME: Is there public VCs? set default username 
+                  // for nonlogin user, change demo? 
+//                Set set = ResourceFinder.searchPublicFiltered(
+//                        ResourceFactory.getResourceClass(type), id);
+//                resource = (KustvaktResource) set.toArray()[0];
+//            }
+//            else {
+//                // EM: FIX ME: search in user VC
+//                User user = controller.getUser(ctx.getUsername());
+//                if (StringUtils.isInteger(id))
+//                    resource = this.resourceHandler
+//                            .findbyIntId(Integer.valueOf(id), user);
+//                else
+//                    resource = this.resourceHandler.findbyStrId(id, user,
+//                            ResourceFactory.getResourceClass(type));
+//            }
+//        }
+//        // todo: instead of throwing exception, build notification and rewrites
+//        // into result query
+//        catch (KustvaktException e) {
+//            jlog.error("Exception encountered: {}", e.string());
+//            throw KustvaktResponseHandler.throwit(e);
+//        }
+        
+        return null;
+    }
+    
 
     @POST
     @Path("search")
@@ -718,24 +752,34 @@ public class ResourceService {
         }
     }
 
-
-    @POST
-    @Path("stats")
-    public Response getStats (@Context SecurityContext context,
-            @Context Locale locale, String json) {
+    // EM: changed method POST to GET
+    @GET
+    @Path("statistics")
+    public Response getStatistics (@Context SecurityContext context,
+            @Context Locale locale, @QueryParam("collectionQuery") 
+            String collectionQuery) {
+        
+        if (collectionQuery == null || collectionQuery.isEmpty()){
+         throw KustvaktResponseHandler.throwit(new KustvaktException(
+                 StatusCodes.MISSING_ARGUMENT, "Parameter collectionQuery is missing.", 
+                 "collectionQuery"));
+        }
+        
+        
         KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
-        builder.with(json);
-        String stats = searchKrill.getStatistics(builder.toJSON());
-
+        builder.with(collectionQuery);
+        String json = builder.toJSON();
+        
+        String stats = searchKrill.getStatistics(json);
         if (stats.contains("-1"))
             throw KustvaktResponseHandler.throwit(StatusCodes.NO_VALUE_FOUND);
-
+        jlog.debug("Stats: "+stats);
         return Response.ok(stats).build();
     }
 
-
+    // EM: what is child?
     @GET
-    @Path("{type}/{id}/{child}/stats")
+    @Path("{type}/{id}/{child}/statistics")
     public Response getStatisticsbyIdChild (@Context SecurityContext context,
             @Context Locale locale, @PathParam("type") String type,
             @PathParam("id") String id, @PathParam("child") String child) {
@@ -948,32 +992,32 @@ public class ResourceService {
             KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
             cquery.setBaseQuery(base);
 
-            cachetmp = ResourceFactory.getCachedCollection(cquery.toJSON());
+            try {
+                cachetmp = ResourceFactory.getCachedCollection(cquery.toJSON());
 
-            // see if collection was cached!
-            VirtualCollection tmp = resourceHandler.getCache(cachetmp.getId(),
-                    VirtualCollection.class);
-            // if not cached, fill with stats values
-            if (tmp == null) {
-                String stats = searchKrill.getStatistics(cquery.toJSON());
-                cachetmp.setStats(JsonUtils.readSimple(stats, Map.class));
-            }
-
-            if (!cache) {
-                collection = ResourceFactory.getPermanentCollection(cachetmp,
-                        name, description);
-                vals = collection.toMap();
-                try {
-                    resourceHandler.storeResources(user, collection);
+                // see if collection was cached!
+                VirtualCollection tmp = resourceHandler.getCache(cachetmp.getId(),
+                        VirtualCollection.class);
+                // if not cached, fill with stats values
+                if (tmp == null) {
+                    String stats = searchKrill.getStatistics(cquery.toJSON());
+                    cachetmp.setStats(JsonUtils.readSimple(stats, Map.class));
                 }
-                catch (KustvaktException e) {
-                    jlog.error("Exception encountered: {}", e.string());
-                    throw KustvaktResponseHandler.throwit(e);
+            
+                if (!cache) {
+                    collection = ResourceFactory.getPermanentCollection(cachetmp,
+                            name, description);
+                    vals = collection.toMap();
+                        resourceHandler.storeResources(user, collection);
                 }
+                else {
+                    resourceHandler.cache(cachetmp);
+                    vals = cachetmp.toMap();
+                }
+            
             }
-            else {
-                resourceHandler.cache(cachetmp);
-                vals = cachetmp.toMap();
+            catch (KustvaktException e) {
+                throw KustvaktResponseHandler.throwit(e);
             }
         }
         return Response.ok(JsonUtils.toJSON(vals)).build();

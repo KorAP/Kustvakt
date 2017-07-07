@@ -27,7 +27,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
 
     @Override
     public void initMethod () throws KustvaktException {
-        helper().runBootInterfaces();
+//        helper().runBootInterfaces();
         config = helper().getContext().getConfiguration();
     }
 
@@ -215,7 +215,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
     public void testPublicCollectionRewriteEmptyAdd () throws KustvaktException {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
-        handler.add(PublicCollection.class);
+        handler.add(CollectionRewrite.class);
 
         QuerySerializer s = new QuerySerializer();
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
@@ -223,11 +223,13 @@ public class CollectionRewriteTest extends BeanConfigTest {
         JsonNode node = JsonUtils.readTree(handler.processQuery(org,
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
-        assertEquals("corpusSigle", node.at("/collection/operands/0/key")
+        assertEquals("availability", node.at("/collection/key")
                 .asText());
-        assertEquals("corpusSigle", node.at("/collection/operands/1/key")
+        assertEquals("CC-BY.*", node.at("/collection/value")
                 .asText());
         assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type")
+                .asText());
+        assertEquals("availability(FREE)", node.at("/collection/rewrites/0/scope")
                 .asText());
         //todo:
     }
@@ -238,7 +240,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
             throws KustvaktException {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
-        handler.add(PublicCollection.class);
+        handler.add(CollectionRewrite.class);
 
         QuerySerializer s = new QuerySerializer();
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
@@ -248,11 +250,17 @@ public class CollectionRewriteTest extends BeanConfigTest {
                 User.UserFactory.getUser("test_user")));
         assertNotNull(node);
         assertEquals(2, node.at("/collection/operands").size());
-        assertEquals("corpusSigle",
+        assertEquals("availability",
+                node.at("/collection/operands/0/key").asText());
+        assertEquals("CC-BY.*",
+                node.at("/collection/operands/0/value").asText());
+        assertEquals("docSigle",
                 node.at("/collection/operands/1/operands/0/key").asText());
-        assertEquals("corpusSigle",
+        assertEquals("textClass",
                 node.at("/collection/operands/1/operands/1/key").asText());
         assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type")
+                .asText());
+        assertEquals("availability(FREE)", node.at("/collection/rewrites/0/scope")
                 .asText());
     }
 

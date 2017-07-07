@@ -381,6 +381,6 @@ public class ResourceServiceTest extends FastJerseyTest {
 
     @Override
     public void initMethod () throws KustvaktException {
-        helper().runBootInterfaces();
+//        helper().runBootInterfaces();
     }
 }

@@ -242,9 +242,11 @@ public class SearchKrill {
         // Get numbers from index (currently slow)
         try {
             docs = kc.numberOf("documents");
-            tokens = kc.numberOf("tokens");
-            sentences = kc.numberOf("sentences");
-            paragraphs = kc.numberOf("paragraphs");
+			if (docs > 0) {
+				tokens = kc.numberOf("tokens");
+				sentences = kc.numberOf("base/sentences");
+				paragraphs = kc.numberOf("base/paragraphs");
+			};
         }
         catch (IOException e) {
             e.printStackTrace();

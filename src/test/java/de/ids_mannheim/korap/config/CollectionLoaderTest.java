@@ -5,12 +5,15 @@ import de.ids_mannheim.korap.handlers.ResourceDao;
 import de.ids_mannheim.korap.web.service.CollectionLoader;
 import de.ids_mannheim.korap.web.service.UserLoader;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author hanl
  * @date 11/02/2016
  */
+@Deprecated
+@Ignore
 public class CollectionLoaderTest extends BeanConfigTest {
 
     @Test

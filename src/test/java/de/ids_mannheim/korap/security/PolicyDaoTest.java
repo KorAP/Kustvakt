@@ -21,17 +21,19 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-/**
+/** EM: needs reimplementation
+ * 
  * @author hanl
  * @date 09/02/2016
  */
+@Ignore
 public class PolicyDaoTest extends BeanConfigTest {
 
 
     @Override
     public void initMethod () throws KustvaktException {
         helper().setupAccount();
-        helper().runBootInterfaces();
+//        helper().runBootInterfaces();
         helper().setupResource(new Corpus("WPD_1"));
     }
 
@@ -181,6 +183,8 @@ public class PolicyDaoTest extends BeanConfigTest {
 
 
     @Test
+    @Deprecated
+    @Ignore
     public void testPoliciesPublic () {
         PolicyHandlerIface dao = helper().getContext().getPolicyDbProvider();
         Collection<SecurityPolicy> policies = dao.getPolicies(

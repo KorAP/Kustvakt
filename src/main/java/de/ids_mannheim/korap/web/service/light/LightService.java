@@ -20,12 +20,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -274,20 +277,37 @@ public class LightService {
     }
 
 
-    //todo: switch to new serialization
-    @POST
-    @Path("stats")
-    public Response getStats (String json) {
+//    //todo: switch to new serialization
+//    @POST
+//    @Path("stats")
+//    public Response getStats (String json) {
+//        KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
+//        builder.with(json);
+//
+//        // todo: policy override in extension!
+//        String stats = searchKrill.getStatistics(builder.toJSON());
+//        if (stats.contains("-1"))
+//            throw KustvaktResponseHandler.throwit(StatusCodes.NO_VALUE_FOUND);
+//
+//        return Response.ok(stats).build();
+//    }
+    
+    @GET
+    @Path("statistics")
+    public Response getStatistics (@QueryParam("collectionQuery") 
+            String collectionQuery) {
+        
         KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
-        builder.with(json);
-
-        // todo: policy override in extension!
-        String stats = searchKrill.getStatistics(builder.toJSON());
+        builder.with(collectionQuery);
+        String json = builder.toJSON();
+        
+        String stats = searchKrill.getStatistics(json);
         if (stats.contains("-1"))
             throw KustvaktResponseHandler.throwit(StatusCodes.NO_VALUE_FOUND);
-
+        jlog.debug("Stats: "+stats);
         return Response.ok(stats).build();
     }
+
 
 
 	/*

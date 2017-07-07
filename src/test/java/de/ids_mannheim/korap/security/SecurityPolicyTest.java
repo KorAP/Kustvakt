@@ -142,7 +142,7 @@ public class SecurityPolicyTest extends BeanConfigTest {
 
     @Override
     public void initMethod () throws KustvaktException {
-        helper().runBootInterfaces();
+//        helper().runBootInterfaces();
         helper().setupAccount();
     }
 }

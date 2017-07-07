@@ -20,14 +20,15 @@ import java.util.Set;
  * @author hanl
  * @date 04/07/2015
  */
+// EM: use CollectionRewrite instead
+@Deprecated
 public class PublicCollection implements RewriteTask.RewriteQuery {
 
     public PublicCollection () {
         super();
     }
 
-
-    @Override
+    @Deprecated
     public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) throws KustvaktException {
         JsonNode subnode = node.rawNode();
