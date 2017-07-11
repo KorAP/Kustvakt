@@ -77,9 +77,9 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 @Path(KustvaktServer.API_VERSION + "/")
 @ResourceFilters({ AuthFilter.class, DemoUserFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-public class ResourceService {
+public class SearchService {
 
-    private static Logger jlog = LoggerFactory.getLogger(ResourceService.class);
+    private static Logger jlog = LoggerFactory.getLogger(SearchService.class);
 
     private SearchKrill searchKrill;
     private ResourceHandler resourceHandler;
@@ -89,7 +89,7 @@ public class ResourceService {
     private RewriteHandler processor;
 
 
-    public ResourceService () {
+    public SearchService () {
         this.controller = BeansFactory.getKustvaktContext()
                 .getAuthenticationManager();
         this.config = BeansFactory.getKustvaktContext().getConfiguration();

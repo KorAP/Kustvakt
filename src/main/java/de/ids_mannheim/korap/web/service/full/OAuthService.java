@@ -200,8 +200,9 @@ public class OAuthService {
 
             try {
                 user = controller.getUser(c.getUsername());
-                Userdata data = controller.getUserData(user, UserDetails.class);
-                user.addUserData(data);
+                // EM: not in the new DB
+//                Userdata data = controller.getUserData(user, UserDetails.class);
+//                user.addUserData(data);
             }
             catch (KustvaktException e) {
                 throw KustvaktResponseHandler.throwit(e);

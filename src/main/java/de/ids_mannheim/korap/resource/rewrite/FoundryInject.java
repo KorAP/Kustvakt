@@ -33,13 +33,13 @@ public class FoundryInject implements RewriteTask.IterableRewritePath,
     public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) throws KustvaktException {
         LayerMapper mapper;
-
-        if (user != null && !userdaos.isEmpty()) {
-            UserDataDbIface dao = BeansFactory.getTypeFactory()
-                    .getTypeInterfaceBean(userdaos, UserSettings.class);
-            mapper = new LayerMapper(config, dao.get(user));
-        }
-        else
+        // EM: do not use DB
+//        if (user != null && !userdaos.isEmpty()) {
+//            UserDataDbIface dao = BeansFactory.getTypeFactory()
+//                    .getTypeInterfaceBean(userdaos, UserSettings.class);
+//            mapper = new LayerMapper(config, dao.get(user));
+//        }
+//        else
             mapper = new LayerMapper(config);
 
         if (node.get("@type").equals("koral:term") && !node.has("foundry")) {

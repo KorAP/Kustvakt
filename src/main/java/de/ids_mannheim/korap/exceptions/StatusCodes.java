@@ -77,7 +77,7 @@ public class StatusCodes {
     public static final int DB_UPDATE_SUCCESSFUL = 507;
 
 
-    public static final int ARGUMENT_VALIDATION_FAILURE = 700;
+//    public static final int ARGUMENT_VALIDATION_FAILURE = 700;
     // public static final int ARGUMENT_VALIDATION_FAILURE = 701;
 
     // service status codes

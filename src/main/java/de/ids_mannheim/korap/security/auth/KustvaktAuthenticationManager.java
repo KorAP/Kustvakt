@@ -258,8 +258,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 			throws KustvaktException {
 		AuthenticationIface provider = getProvider(provider_key, Attributes.API_AUTHENTICATION);
 
-		if (attr.get(Attributes.SCOPES) != null)
-			this.getUserData(user, UserDetails.class);
+		// EM: not in the new DB
+//		if (attr.get(Attributes.SCOPES) != null)
+//			this.getUserData(user, UserDetails.class);
 
 		TokenContext context = provider.createTokenContext(user, attr);
 		if (context == null)
@@ -890,9 +891,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 		return new Object[] { uritoken, TimeUtils.format(param.getUriExpiration()) };
 	}
 
+	// EM: not in the new DB
 	@Override
 	public <T extends Userdata> T getUserData(User user, Class<T> clazz) throws WrappedException {
-
 		try {
 			UserDataDbIface<T> dao = BeansFactory.getTypeFactory()
 					.getTypeInterfaceBean(BeansFactory.getKustvaktContext().getUserDataProviders(), clazz);

@@ -105,23 +105,14 @@ public abstract class KustvaktBaseServer {
             contextHandler.addServlet(new ServletHolder(
                     new ServletContainer(rc)), "/api/*");
 
-	            server.setHandler(contextHandler);
-
-//            if (kargs.sslContext != null) {
-//                SslSocketConnector sslConnector = new SslSocketConnector(
-//                        kargs.sslContext);
-//                sslConnector.setPort(8443);
-//                sslConnector.setMaxIdleTime(60000);
-//                server.setConnectors(new Connector[] { connector, sslConnector });
-//            }
-//            else
+	        server.setHandler(contextHandler);
             server.setConnectors(new Connector[] { connector });
-
             server.start();
             server.join();
         }
         catch (Exception e) {
             System.out.println("Server could not be started!");
+            System.out.println(e.getMessage());
             System.exit(-1);
         }
 
