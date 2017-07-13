@@ -1,36 +1,39 @@
 package de.ids_mannheim.korap.dao;
 
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.stereotype.Component;
 
-import de.ids_mannheim.korap.handlers.RowMapperFactory;
-import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
+import de.ids_mannheim.korap.entity.Resource;
 
-/** ResourceDao manages SQL queries regarding resource info and layers.
+/**
+ * ResourceDao manages SQL queries regarding resource info and layers.
  * 
  * @author margaretha
  *
  */
+@Component
 public class ResourceDao {
 
     private static Logger jlog = LoggerFactory.getLogger(ResourceDao.class);
-    private NamedParameterJdbcTemplate jdbcTemplate;
 
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    public ResourceDao (PersistenceClient<?> client) {
-        this.jdbcTemplate = (NamedParameterJdbcTemplate) client.getSource();
+    public List<Resource> getAllResources () {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Resource> query = criteriaBuilder.createQuery(Resource.class);
+        Root<Resource> r = query.from(Resource.class);
+        Query q = entityManager.createQuery(query.select(r));
+        return q.getResultList();
     }
-
-    // EM: use JPA?
-    public void getResourceInfo (String resourceId) {
-        SqlParameterSource namedParameters = new MapSqlParameterSource(
-                "resourceId", resourceId);
-        String sql = "select * from resource where id=:resourceId";
-//        this.jdbcTemplate.queryForObject(sql, namedParameters,
-//                new RowMapperFactory.ResourceMapper());
-    }
-
 }

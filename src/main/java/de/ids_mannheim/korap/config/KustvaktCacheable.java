@@ -97,7 +97,8 @@ public abstract class KustvaktCacheable {
         Cache c = getCache(this.name);
         if (enabled()) {
             c.removeAll();
-            c.clearStatistics();
+//            c.clearStatistics();
+            
         }
     }
 
