@@ -28,12 +28,18 @@ public class ResourceDao {
 
     @PersistenceContext
     private EntityManager entityManager;
-
+    
+    /** Select all from the resource table  
+     *  
+     * @return a list of resources
+     */
     public List<Resource> getAllResources () {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Resource> query = criteriaBuilder.createQuery(Resource.class);
-        Root<Resource> r = query.from(Resource.class);
-        Query q = entityManager.createQuery(query.select(r));
+        Root<Resource> resource = query.from(Resource.class);
+        resource.fetch("layers");
+        query.select(resource);
+        Query q = entityManager.createQuery(query);
         return q.getResultList();
     }
 }

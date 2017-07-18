@@ -29,7 +29,7 @@ public class JsonUtils {
             return mapper.writeValueAsString(values);
         }
         catch (JsonProcessingException e) {
-            return "";
+            return e.getMessage();
         }
     }
 
