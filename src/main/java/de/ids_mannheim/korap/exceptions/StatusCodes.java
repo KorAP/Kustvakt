@@ -23,7 +23,7 @@ public class StatusCodes {
     public static final int ILLEGAL_ARGUMENT = 104;
     public static final int MISSING_ARGUMENT = 105;
     public static final int CONNECTION_ERROR = 106;
-    public static final int PARAMETER_VALIDATION_ERROR = 107;
+    public static final int PARAMETER_INVALID = 107;
     public static final int NOT_SUPPORTED = 108;
 
     /**

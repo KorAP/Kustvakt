@@ -10,13 +10,10 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import org.antlr.v4.parse.ANTLRParser.id_return;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import de.ids_mannheim.korap.entity.Annotation;
 import de.ids_mannheim.korap.entity.AnnotationPair;
 
 
@@ -31,37 +28,22 @@ import de.ids_mannheim.korap.entity.AnnotationPair;
 public class AnnotationDao {
 
     private static Logger jlog = LoggerFactory.getLogger(AnnotationDao.class);
-    private NamedParameterJdbcTemplate jdbcTemplate;
-
     @PersistenceContext
     private EntityManager entityManager;
 
 
     /**
-     * Select all foundry and layer pairs.
+     * Retrieves all foundry-layer pairs.
      * 
-     * @return a list of all foundry and layer pairs.
+     * @return a list of foundry-layer pairs.
      */
     public List<AnnotationPair> getAllFoundryLayerPairs () {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<AnnotationPair> query = criteriaBuilder
-                .createQuery(AnnotationPair.class);
+        CriteriaQuery<AnnotationPair> query =
+                criteriaBuilder.createQuery(AnnotationPair.class);
         Root<AnnotationPair> annotationPair = query.from(AnnotationPair.class);
         annotationPair.fetch("annotation1");
         annotationPair.fetch("annotation2");
-        query.select(annotationPair);
-        Query q = entityManager.createQuery(query);
-        return q.getResultList();
-    }
-    
-    public List<AnnotationPair> getAllAnnotationDescriptions () {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<AnnotationPair> query = criteriaBuilder
-                .createQuery(AnnotationPair.class);
-        Root<AnnotationPair> annotationPair = query.from(AnnotationPair.class);
-        annotationPair.fetch("annotation1");
-        annotationPair.fetch("annotation2");
-        annotationPair.fetch("values");
         query.select(annotationPair);
         Query q = entityManager.createQuery(query);
         return q.getResultList();
@@ -69,22 +51,41 @@ public class AnnotationDao {
 
 
     /**
-     * Select foundry and layer pairs' information of the given foundries.
+     * Retrieves foundry-layer pairs and their values for the given
+     * foundry and layer. If layer is empty, retrieves data for all
+     * layer in the given foundry. If foundry is empty, retrieves data
+     * for all foundry and layer pairs.
      * 
-     * @return a list of foundry and layer pairs.
+     * @param foundry a foundry code
+     * @param layer a layer code
+     * @return a list of foundry-layer pairs.
      */
-    public List<AnnotationPair> getFoundryLayerPairs (List<String> foundries) {
+    public List<AnnotationPair> getAnnotationDescriptions (String foundry,
+            String layer) {
+        
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-
         CriteriaQuery<Object> query = criteriaBuilder.createQuery();
-        Root<Annotation> annotation = query.from(Annotation.class);
         Root<AnnotationPair> annotationPair = query.from(AnnotationPair.class);
-        Predicate foundryPredicate = criteriaBuilder.equal(annotation.get("symbol"),
-                foundries);
-        Predicate valuePredicate =  criteriaBuilder.equal(annotationPair.get("value").get("id"),
-                annotation.get("id"));
-        Predicate wherePredicate = criteriaBuilder.and(foundryPredicate,valuePredicate);
-        query.multiselect(annotation, annotationPair).where(wherePredicate);
+        annotationPair.fetch("annotation1");
+        annotationPair.fetch("annotation2");
+        annotationPair.fetch("values");
+        query = query.select(annotationPair);
+        if (!foundry.isEmpty()) {
+            Predicate foundryPredicate = criteriaBuilder.equal(
+                    annotationPair.get("annotation1").get("code"), foundry);
+            if (layer.isEmpty() || layer.equals("*")) {
+                query.where(foundryPredicate);
+            }
+            else {
+                Predicate layerPredicate = criteriaBuilder.equal(
+                        annotationPair.get("annotation2").get("code"), layer);
+                Predicate andPredicate =
+                        criteriaBuilder.and(foundryPredicate, layerPredicate);
+                query.where(andPredicate);
+            }
+        }
+
+        query.distinct(true); 
         Query q = entityManager.createQuery(query);
         return q.getResultList();
     }

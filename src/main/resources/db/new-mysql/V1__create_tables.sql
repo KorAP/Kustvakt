@@ -1,10 +1,10 @@
 
 CREATE TABLE IF NOT EXISTS annotation(
 	id INTEGER PRIMARY KEY AUTO_INCREMENT,
-	symbol VARCHAR(20) NOT NULL,
+	code VARCHAR(20) NOT NULL,
 	type VARCHAR(20) NOT NULL,	
 	description VARCHAR(100) NOT NULL,
-	UNIQUE INDEX unique_index (symbol, type)
+	UNIQUE INDEX unique_index (code, type)
 );
 
 CREATE TABLE IF NOT EXISTS annotation_pair(

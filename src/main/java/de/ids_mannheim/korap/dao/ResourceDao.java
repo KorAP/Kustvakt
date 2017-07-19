@@ -24,7 +24,7 @@ import de.ids_mannheim.korap.entity.Resource;
 @Component
 public class ResourceDao {
 
-    private static Logger jlog = LoggerFactory.getLogger(ResourceDao.class);
+//    private static Logger jlog = LoggerFactory.getLogger(ResourceDao.class);
 
     @PersistenceContext
     private EntityManager entityManager;

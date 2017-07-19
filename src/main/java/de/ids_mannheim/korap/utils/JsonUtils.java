@@ -20,7 +20,6 @@ import java.util.Map;
 public class JsonUtils {
     private static ObjectMapper mapper = new ObjectMapper();
 
-
     private JsonUtils () {}
 
 
@@ -58,7 +57,10 @@ public class JsonUtils {
         return mapper.valueToTree(value);
     }
 
-
+    public static <T> T convert (JsonNode json, Class<T> cl) throws IOException {
+        return mapper.convertValue(json, cl);
+    }
+    
     public static <T> T read (String json, Class<T> cl) throws IOException {
         return mapper.readValue(json, cl);
     }

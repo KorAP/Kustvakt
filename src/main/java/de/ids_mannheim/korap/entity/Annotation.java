@@ -18,13 +18,13 @@ public class Annotation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String symbol;
+    private String code;
     private String type;
     private String description;
 
     @Override
     public String toString () {
-        return "id=" + id + ", symbol= " + symbol + ", type= " + type
+        return "id=" + id + ", code= " + code + ", type= " + type
                 + ", description=" + description;
     }
 }

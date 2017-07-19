@@ -11,9 +11,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -35,11 +37,13 @@ public class AnnotationPair {
     @Column(name = "description")
     private String englishDescription;
 
-    @OneToOne(fetch=FetchType.LAZY)
+    @Fetch(FetchMode.SELECT)
+    @OneToOne
     @JoinColumn(name = "annotation1", insertable = false, updatable = false)
     private Annotation annotation1;
-
-    @OneToOne(fetch=FetchType.LAZY)
+    
+    @Fetch(FetchMode.SELECT)
+    @OneToOne
     @JoinColumn(name = "annotation2", insertable = false, updatable = false)
     private Annotation annotation2;
 
@@ -56,9 +60,8 @@ public class AnnotationPair {
         return "id=" + id + ", annotation1=" + annotationId1 + ", annotation2="
                 + annotationId1 + ", description=" + englishDescription
                 + ", germanDescription= " + germanDescription 
-                + "annotation1= "+ annotation1
-                + "annotation2= "+ annotation2;
+                + ", annotation1= "+ annotation1
+                + ", annotation2= "+ annotation2;
                 
     }
-
 }
