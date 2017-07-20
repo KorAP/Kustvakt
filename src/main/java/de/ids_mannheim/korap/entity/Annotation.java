@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,10 +22,14 @@ public class Annotation {
     private String code;
     private String type;
     private String description;
+    @Column(name = "de_description")
+    private String germanDescription;
+
 
     @Override
     public String toString () {
         return "id=" + id + ", code= " + code + ", type= " + type
-                + ", description=" + description;
+                + ", description=" + description + ", germanDescription="
+                + germanDescription;
     }
 }

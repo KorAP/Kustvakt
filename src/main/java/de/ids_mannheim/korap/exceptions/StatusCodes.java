@@ -1,11 +1,8 @@
 package de.ids_mannheim.korap.exceptions;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import de.ids_mannheim.korap.config.ConfigLoader;
-
-import java.io.IOException;
 import java.util.Properties;
+
+import de.ids_mannheim.korap.config.ConfigLoader;
 
 /**
  * @author hanl
@@ -23,16 +20,18 @@ public class StatusCodes {
     public static final int ILLEGAL_ARGUMENT = 104;
     public static final int MISSING_ARGUMENT = 105;
     public static final int CONNECTION_ERROR = 106;
-    public static final int PARAMETER_INVALID = 107;
+    public static final int INVALID_ARGUMENT = 107;
     public static final int NOT_SUPPORTED = 108;
-
+    
     /**
      * 300 status codes for query language and serialization
      */
 
     public static final int NO_QUERY = 301;
     public static final int SERIALIZATION_FAILED = 302;
-
+    public static final int MISSING_ATTRIBUTE = 303;
+    public static final int INVALID_ATTRIBUTE = 304;
+    public static final int UNSUPPORTED_VALUE = 305;
 
     /**
      *  400 status codes for authorization and rewrite functions

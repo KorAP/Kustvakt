@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS annotation(
 	code VARCHAR(20) NOT NULL,
 	type VARCHAR(20) NOT NULL,	
 	description VARCHAR(100) NOT NULL,
+	de_description VARCHAR(100),
 	UNIQUE INDEX unique_index (code, type)
 );
 
@@ -12,7 +13,6 @@ CREATE TABLE IF NOT EXISTS annotation_pair(
 	annotation1 INTEGER NOT NULL,
 	annotation2 INTEGER NOT NULL,
 	description VARCHAR(300) NOT NULL,
-	de_description VARCHAR(300),
 	UNIQUE INDEX unique_index (annotation1, annotation2),
 	FOREIGN KEY (annotation1)
 		REFERENCES annotation (id)

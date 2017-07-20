@@ -9,8 +9,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.entity.Resource;
@@ -23,8 +21,6 @@ import de.ids_mannheim.korap.entity.Resource;
  */
 @Component
 public class ResourceDao {
-
-//    private static Logger jlog = LoggerFactory.getLogger(ResourceDao.class);
 
     @PersistenceContext
     private EntityManager entityManager;

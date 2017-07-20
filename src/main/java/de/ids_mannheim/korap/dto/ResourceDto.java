@@ -5,6 +5,11 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Data transfer object for resource description (e.g. for KorapSRU). 
+ * 
+ * @author margaretha
+ *
+ */
 @Setter
 @Getter
 public class ResourceDto {
