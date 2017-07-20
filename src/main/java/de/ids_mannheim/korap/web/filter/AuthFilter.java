@@ -13,20 +13,25 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 import javax.ws.rs.ext.Provider;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 /**
  * @author hanl
  * @date 28/01/2014
  */
+@Component
 @Provider
 public class AuthFilter implements ContainerRequestFilter, ResourceFilter {
 
+    @Autowired
     private AuthenticationManagerIface userController;
 
 
-    public AuthFilter () {
-        this.userController = BeansFactory.getKustvaktContext()
-                .getAuthenticationManager();
-    }
+//    public AuthFilter () {
+//        this.userController = BeansFactory.getKustvaktContext()
+//                .getAuthenticationManager();
+//    }
 
 
     @Override

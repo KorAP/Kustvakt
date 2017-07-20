@@ -9,6 +9,8 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -18,9 +20,11 @@ import java.util.*;
  * @author hanl
  * @date 30/06/2015
  */
+@Component
 // todo: do post processing!
 //todo: load rewritenode and rewritequery automatically from classpath by default, but namespaced from package
-public class RewriteHandler implements BeanInjectable {
+public class RewriteHandler{
+    //implements BeanInjectable {
 
     private static Logger jlog = LoggerFactory.getLogger(RewriteHandler.class);
     private Collection<RewriteTask.IterableRewritePath> node_processors;
@@ -28,6 +32,7 @@ public class RewriteHandler implements BeanInjectable {
     private Collection<RewriteTask> query_processors;
 
     private Set<Class> failed_task_registration;
+    @Autowired
     private KustvaktConfiguration config;
     private ContextHolder beans;
 
@@ -151,7 +156,6 @@ public class RewriteHandler implements BeanInjectable {
     }
 
 
-    @Override
     public <T extends ContextHolder> void insertBeans (T beans) {
         this.beans = beans;
         this.config = beans.getConfiguration();

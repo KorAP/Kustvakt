@@ -54,7 +54,7 @@ public class LightService {
         this.graphDBhandler = new ClientsHandler(builder.build());
         this.processor = new RewriteHandler();
         this.processor.add(FoundryInject.class);
-        this.processor.insertBeans(BeansFactory.getKustvaktContext());
+//        this.processor.insertBeans(BeansFactory.getKustvaktContext());
     }
 
 

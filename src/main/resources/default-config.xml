@@ -18,6 +18,10 @@
 	<context:component-scan base-package="de.ids_mannheim.korap" />
 	<context:annotation-config />
 
+	<!-- <bean id="test" class="de.ids_mannheim.korap.web.Test">
+		<property name="config" ref="kustvakt_config" />
+	</bean> -->
+
 	<bean id="props"
 		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="ignoreResourceNotFound" value="true" />
@@ -37,6 +41,8 @@
 				<value>classpath:jdbc.properties</value>
 				<value>classpath:hibernate.properties</value>
 				<!-- <value>file:./jdbc.properties</value> -->
+				<value>file:./kustvakt.conf</value>
+				<value>classpath:kustvakt.conf</value>
 			</array>
 		</property>
 	</bean>
@@ -136,7 +142,13 @@
 		<constructor-arg ref="transactionManager" />
 	</bean>
 
-	<bean id="resourceDao" class="de.ids_mannheim.korap.dao.ResourceDao">
+	<!-- Data access objects -->
+	<bean id="resourceDao" class="de.ids_mannheim.korap.dao.ResourceDao"/>
+	<!-- <bean id="annotationDao" class="de.ids_mannheim.korap.dao.AnnotationDao"/> -->
+
+	<!-- Krill -->
+	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">
+		<constructor-arg value="${krill.indexDir}"/>
 	</bean>
 
 	<bean id="kustvakt_auditing" class="de.ids_mannheim.korap.handlers.JDBCAuditing">

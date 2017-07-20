@@ -1,14 +1,5 @@
 package de.ids_mannheim.korap.web;
 
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.spi.container.servlet.ServletContainer;
-import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
-
-import de.ids_mannheim.korap.config.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import javax.servlet.ServletContextListener;
 
 import org.eclipse.jetty.server.Connector;
@@ -16,8 +7,14 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.bio.SocketConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.springframework.web.context.ContextLoaderListener;
+
+import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
+
+import de.ids_mannheim.korap.config.BeansFactory;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author hanl
@@ -25,8 +22,8 @@ import org.springframework.web.context.ContextLoaderListener;
  */
 public abstract class KustvaktBaseServer {
     
-    protected static KustvaktConfiguration config;
     protected static String rootPackages;
+    protected static KustvaktArgs kargs;
     
     public KustvaktBaseServer () {
         KustvaktConfiguration.loadLogger();
@@ -38,7 +35,7 @@ public abstract class KustvaktBaseServer {
             @Override
             protected void setup () {}
         };
-        KustvaktArgs kargs = server.readAttributes(args);
+        kargs = server.readAttributes(args);
 
         if (kargs.config != null)
             BeansFactory.loadFileContext(kargs.config);
@@ -48,8 +45,7 @@ public abstract class KustvaktBaseServer {
         kargs.setRootPackages(new String[] { "de.ids_mannheim.korap.web.service.light" });
         rootPackages = "de.ids_mannheim.korap.web.service.light";
         
-        config = BeansFactory.getKustvaktContext().getConfiguration();
-        server.startServer(kargs);
+        server.start();
     }
 
 
@@ -82,21 +78,19 @@ public abstract class KustvaktBaseServer {
         return kargs;
     }
 
-
     protected abstract void setup ();
 
-
-    protected void startServer(KustvaktArgs kargs){
+    protected void start(){
+        KustvaktConfiguration config = BeansFactory.getKustvaktContext().getConfiguration();
+        
         if (kargs.init){
             setup();
         }
         if (kargs.port == -1){
-            kargs.setPort(BeansFactory.getKustvaktContext().getConfiguration().getPort());
+            kargs.setPort(config.getPort());
         }
         
         Server server = new Server();
-//        WebAppContext contextHandler = new WebAppContext();
-//        contextHandler.setWar("src/main/webappkustvakt.war");
         ServletContextHandler contextHandler = new ServletContextHandler(
                 ServletContextHandler.NO_SESSIONS);
         contextHandler.setContextPath("/");
@@ -129,62 +123,18 @@ public abstract class KustvaktBaseServer {
         }
     }
     
-    @Deprecated
-    protected void startServerOld (KustvaktArgs kargs) {
-        if (kargs.init)
-            setup();
-
-        if (kargs.port == -1)
-            kargs.setPort(BeansFactory.getKustvaktContext().getConfiguration()
-                    .getPort());
-
-        System.out.println("Starting Kustvakt Service on port '" + kargs.port
-                + "'");
-        try {
-            // from http://wiki.eclipse.org/Jetty/Tutorial/Embedding_Jetty
-            Server server = new Server();
-            ServletContextHandler contextHandler = new ServletContextHandler(
-                    ServletContextHandler.NO_SESSIONS);
-            contextHandler.setContextPath("/");
-            
-            SocketConnector connector = new SocketConnector();
-            connector.setPort(kargs.port);
-            connector.setMaxIdleTime(60000);
-
-            // http://stackoverflow.com/questions/9670363/how-do-i-programmatically-configure-jersey-to-use-jackson-for-json-deserializa
-            final ResourceConfig rc = new PackagesResourceConfig(
-                    kargs.rootPackages);
-            
-            // from http://stackoverflow.com/questions/7421574/embedded-jetty-with-jersey-or-resteasy
-            contextHandler.addServlet(new ServletHolder(new ServletContainer(rc)), "/api/*");
-
-	        server.setHandler(contextHandler);
-            server.setConnectors(new Connector[] { connector });
-            server.start();
-            server.join();
-        }
-        catch (Exception e) {
-            System.out.println("Server could not be started!");
-            System.out.println(e.getMessage());
-            System.exit(-1);
-        }
-
-    }
-
     @Setter
     public static class KustvaktArgs {
 
         @Getter
         private String config;
         private int port;
-        private SslContextFactory sslContext;
         private String[] rootPackages;
         private boolean init;
 
 
         public KustvaktArgs () {
             this.port = -1;
-            this.sslContext = null;
             this.config = null;
             this.init = false;
         }

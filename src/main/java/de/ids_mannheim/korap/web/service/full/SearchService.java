@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.annotation.PostConstruct;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -25,18 +26,17 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration.BACKENDS;
-import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.NotAuthorizedException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
@@ -44,26 +44,20 @@ import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.resource.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.resources.Corpus;
 import de.ids_mannheim.korap.resources.KustvaktResource;
-import de.ids_mannheim.korap.resources.Layer;
-import de.ids_mannheim.korap.resources.Permissions;
 import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.security.ac.ResourceFinder;
 import de.ids_mannheim.korap.security.ac.ResourceHandler;
-import de.ids_mannheim.korap.security.ac.SecurityManager;
 import de.ids_mannheim.korap.user.DemoUser;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
-import de.ids_mannheim.korap.user.User.UserFactory;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.web.ClientsHandler;
-import de.ids_mannheim.korap.web.KustvaktServer;
 import de.ids_mannheim.korap.web.SearchKrill;
-import de.ids_mannheim.korap.web.TRACE;
 import de.ids_mannheim.korap.web.filter.AuthFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
@@ -74,35 +68,36 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
  * @date 29/01/2014
  * @lastUpdate 06/2017
  */
-@Path(KustvaktServer.API_VERSION + "/")
+@Controller
+@Path("/")
 @ResourceFilters({ AuthFilter.class, DemoUserFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class SearchService {
 
     private static Logger jlog = LoggerFactory.getLogger(SearchService.class);
 
+    @Autowired
     private SearchKrill searchKrill;
     private ResourceHandler resourceHandler;
+    @Autowired
     private AuthenticationManagerIface controller;
     private ClientsHandler graphDBhandler;
+    @Autowired
     private KustvaktConfiguration config;
+    @Autowired
     private RewriteHandler processor;
 
 
     public SearchService () {
-        this.controller = BeansFactory.getKustvaktContext()
-                .getAuthenticationManager();
-        this.config = BeansFactory.getKustvaktContext().getConfiguration();
         this.resourceHandler = new ResourceHandler();
-        this.searchKrill = new SearchKrill(config.getIndexDir());
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
         this.graphDBhandler = new ClientsHandler(builder.build());
-
-        this.processor = new RewriteHandler();
-        this.processor.defaultRewriteConstraints();
-        this.processor.insertBeans(BeansFactory.getKustvaktContext());
     }
-
+    
+    @PostConstruct
+    private void doPostConstruct () {
+        this.processor.defaultRewriteConstraints();
+    }
 
     /**
      * retrieve resources dependent by type. determines based on the
@@ -317,133 +312,133 @@ public class SearchService {
     }
 
 
-    /* EM: potentially an unused service! */
-    /** Builds a json query serialization from the given parameters.
-     * 
-     * @param locale
-     * @param securityContext
-     * @param q query string
-     * @param ql query language
-     * @param v version
-     * @param context
-     * @param cutoff true if the number of results should be limited
-     * @param pageLength number of results per page
-     * @param pageIndex
-     * @param startPage
-     * @param cq collection query
-     * @return
-     */
-    // ref query parameter removed!
-    // EM: change the HTTP method to from TRACE to GET
-    // EM: change path from search to query
-    @GET
-    @Path("query")
-    public Response serializeQuery (@Context Locale locale,
-            @Context SecurityContext securityContext, @QueryParam("q") String q,
-            @QueryParam("ql") String ql, @QueryParam("v") String v,
-            @QueryParam("context") String context,
-            @QueryParam("cutoff") Boolean cutoff,
-            @QueryParam("count") Integer pageLength,
-            @QueryParam("offset") Integer pageIndex,
-            @QueryParam("page") Integer startPage,
-            @QueryParam("cq") String cq) {
-        TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
-        QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
-        if (cq != null)
-            ss.setCollection(cq);
-
-        MetaQueryBuilder meta = new MetaQueryBuilder();
-        if (pageIndex != null)
-            meta.addEntry("startIndex", pageIndex);
-        if (pageIndex == null && startPage != null)
-            meta.addEntry("startPage", startPage);
-        if (pageLength != null)
-            meta.addEntry("count", pageLength);
-        if (context != null)
-            meta.setSpanContext(context);
-        meta.addEntry("cutOff", cutoff);
-
-        ss.setMeta(meta.raw());
-        String result = ss.toJSON();
-        jlog.debug("Query: "+result);
-        return Response.ok(result).build();
-    }
-
-
-    /**
-     * currently only supports either no reference at all in which
-     * case all corpora are retrieved or a corpus name like "WPD".
-     * No virtual collections supported!
-     * 
-     * @param locale
-     * @param q
-     * @param ql
-     * @param v
-     * @param pageLength
-     * @param pageIndex
-     * @return
-     */
-
-    // todo: does cq have any sensible worth here? --> would say no! --> is
-    // useful in non type/id scenarios
-    
-    /* EM: potentially an unused service! */    
-    // EM: build query using the given virtual collection id
-    // EM: change the HTTP method to from TRACE to GET
-    // EM: change path from search to query
-    // EM: there is no need to check resource licenses since the service just serialize a query serialization
-    @GET
-    @Path("{type}/{id}/query")
-    public Response serializeQueryWithResource (@Context Locale locale,
-            @Context SecurityContext securityContext, @QueryParam("q") String q,
-            @QueryParam("ql") String ql, @QueryParam("v") String v,
-            @QueryParam("context") String context,
-            @QueryParam("cutoff") Boolean cutoff,
-            @QueryParam("count") Integer pageLength,
-            @QueryParam("offset") Integer pageIndex,
-            @QueryParam("page") Integer startPage,
-            @PathParam("type") String type, @PathParam("id") String id) {
-        TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
-        type = StringUtils.normalize(type);
-        id = StringUtils.decodeHTML(id);
-
-        QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
-
-        MetaQueryBuilder meta = new MetaQueryBuilder();
-        if (pageIndex != null)
-            meta.addEntry("startIndex", pageIndex);
-        if (pageIndex == null && startPage != null)
-            meta.addEntry("startPage", startPage);
-        if (pageLength != null)
-            meta.addEntry("count", pageLength);
-        if (context != null)
-            meta.setSpanContext(context);
-        if (cutoff != null)
-            meta.addEntry("cutOff", cutoff);
-
-        ss.setMeta(meta.raw());
-
-        KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
-        cquery.setBaseQuery(ss.toJSON());
-
-        String query = "";
-        // EM: is this necessary at all?
-        KustvaktResource resource = isCollectionIdValid(ctx.getName(), id);
-        if (resource!=null){
-            if (resource instanceof VirtualCollection) {
-                JsonNode node = cquery.and().mergeWith(resource.getData());
-                query = JsonUtils.toJSON(node);
-            }
-            else if (resource instanceof Corpus) {
-                cquery.and().with(Attributes.CORPUS_SIGLE, "=",
-                        resource.getPersistentID());
-                query = cquery.toJSON();
-            }
-        }
-
-        jlog.debug("Query: "+query);
-        return Response.ok(query).build();
-    }
+//    /* EM: potentially an unused service! */
+//    /** Builds a json query serialization from the given parameters.
+//     * 
+//     * @param locale
+//     * @param securityContext
+//     * @param q query string
+//     * @param ql query language
+//     * @param v version
+//     * @param context
+//     * @param cutoff true if the number of results should be limited
+//     * @param pageLength number of results per page
+//     * @param pageIndex
+//     * @param startPage
+//     * @param cq collection query
+//     * @return
+//     */
+//    // ref query parameter removed!
+//    // EM: change the HTTP method to from TRACE to GET
+//    // EM: change path from search to query
+//    @GET
+//    @Path("query")
+//    public Response serializeQuery (@Context Locale locale,
+//            @Context SecurityContext securityContext, @QueryParam("q") String q,
+//            @QueryParam("ql") String ql, @QueryParam("v") String v,
+//            @QueryParam("context") String context,
+//            @QueryParam("cutoff") Boolean cutoff,
+//            @QueryParam("count") Integer pageLength,
+//            @QueryParam("offset") Integer pageIndex,
+//            @QueryParam("page") Integer startPage,
+//            @QueryParam("cq") String cq) {
+//        TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
+//        QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
+//        if (cq != null)
+//            ss.setCollection(cq);
+//
+//        MetaQueryBuilder meta = new MetaQueryBuilder();
+//        if (pageIndex != null)
+//            meta.addEntry("startIndex", pageIndex);
+//        if (pageIndex == null && startPage != null)
+//            meta.addEntry("startPage", startPage);
+//        if (pageLength != null)
+//            meta.addEntry("count", pageLength);
+//        if (context != null)
+//            meta.setSpanContext(context);
+//        meta.addEntry("cutOff", cutoff);
+//
+//        ss.setMeta(meta.raw());
+//        String result = ss.toJSON();
+//        jlog.debug("Query: "+result);
+//        return Response.ok(result).build();
+//    }
+//
+//
+//    /**
+//     * currently only supports either no reference at all in which
+//     * case all corpora are retrieved or a corpus name like "WPD".
+//     * No virtual collections supported!
+//     * 
+//     * @param locale
+//     * @param q
+//     * @param ql
+//     * @param v
+//     * @param pageLength
+//     * @param pageIndex
+//     * @return
+//     */
+//
+//    // todo: does cq have any sensible worth here? --> would say no! --> is
+//    // useful in non type/id scenarios
+//    
+//    /* EM: potentially an unused service! */    
+//    // EM: build query using the given virtual collection id
+//    // EM: change the HTTP method to from TRACE to GET
+//    // EM: change path from search to query
+//    // EM: there is no need to check resource licenses since the service just serialize a query serialization
+//    @GET
+//    @Path("{type}/{id}/query")
+//    public Response serializeQueryWithResource (@Context Locale locale,
+//            @Context SecurityContext securityContext, @QueryParam("q") String q,
+//            @QueryParam("ql") String ql, @QueryParam("v") String v,
+//            @QueryParam("context") String context,
+//            @QueryParam("cutoff") Boolean cutoff,
+//            @QueryParam("count") Integer pageLength,
+//            @QueryParam("offset") Integer pageIndex,
+//            @QueryParam("page") Integer startPage,
+//            @PathParam("type") String type, @PathParam("id") String id) {
+//        TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
+//        type = StringUtils.normalize(type);
+//        id = StringUtils.decodeHTML(id);
+//
+//        QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
+//
+//        MetaQueryBuilder meta = new MetaQueryBuilder();
+//        if (pageIndex != null)
+//            meta.addEntry("startIndex", pageIndex);
+//        if (pageIndex == null && startPage != null)
+//            meta.addEntry("startPage", startPage);
+//        if (pageLength != null)
+//            meta.addEntry("count", pageLength);
+//        if (context != null)
+//            meta.setSpanContext(context);
+//        if (cutoff != null)
+//            meta.addEntry("cutOff", cutoff);
+//
+//        ss.setMeta(meta.raw());
+//
+//        KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
+//        cquery.setBaseQuery(ss.toJSON());
+//
+//        String query = "";
+//        // EM: is this necessary at all?
+//        KustvaktResource resource = isCollectionIdValid(ctx.getName(), id);
+//        if (resource!=null){
+//            if (resource instanceof VirtualCollection) {
+//                JsonNode node = cquery.and().mergeWith(resource.getData());
+//                query = JsonUtils.toJSON(node);
+//            }
+//            else if (resource instanceof Corpus) {
+//                cquery.and().with(Attributes.CORPUS_SIGLE, "=",
+//                        resource.getPersistentID());
+//                query = cquery.toJSON();
+//            }
+//        }
+//
+//        jlog.debug("Query: "+query);
+//        return Response.ok(query).build();
+//    }
 
     // EM: prototype
     private KustvaktResource isCollectionIdValid (String username, String collectionId) {
@@ -503,13 +498,10 @@ public class SearchService {
     }
 
 
-    // was heißt search by name all? FB
-    // EM: ich glaube es ist ALL corpora gemeint (ohne spezifische name), 
-    // weil es searchbyName() auch gibt.
     @SuppressWarnings("unchecked")
     @GET
     @Path("search")
-    public Response searchbyNameAll (
+    public Response search (
     		@Context SecurityContext securityContext,
     		@Context HttpHeaders headers,
     		@Context Locale locale, @QueryParam("q") String q,

@@ -25,9 +25,7 @@ import net.jcip.annotations.NotThreadSafe;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class BeanConfigTest {
 
-
     private static Logger jlog = Logger.getLogger(BeanConfigTest.class);
-
     @Autowired
     private ApplicationContext context;
 

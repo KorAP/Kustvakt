@@ -2,21 +2,21 @@
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns="http://www.springframework.org/schema/beans" xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:cache="http://www.springframework.org/schema/cache"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
-                            http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
-                            http://www.springframework.org/schema/tx
-                            http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-4.0.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util-4.0.xsd">
 
-
-                            http://www.springframework.org/schema/aop
-                            http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
-                            http://www.springframework.org/schema/cache
-                            http://www.springframework.org/schema/cache/spring-cache-4.0.xsd
-
-
-                            http://www.springframework.org/schema/util
-                            http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+	<context:component-scan base-package="de.ids_mannheim.korap" />
+	<context:annotation-config />
 
 	<bean id="props"
 		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
@@ -29,13 +29,14 @@
 		</property>
 	</bean>
 
-	<bean id="jdbc_props"
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<bean id="placeholders"
+		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="locations">
 			<array>
 				<value>classpath:jdbc.properties</value>
-				<value>file:./jdbc_tests.properties</value>
+				<value>classpath:hibernate.properties</value>
+				<!-- <value>file:./jdbc.properties</value> -->
 			</array>
 		</property>
 	</bean>
@@ -70,7 +71,6 @@
 			<value>true</value>
 		</property>
 		<!--<property name="initialSize" value="2"/> -->
-		<!--<property name="maxIdle" value="2"/> -->
 		<!--<property name="poolPreparedStatements" value="true"/> -->
 	</bean>
 
@@ -86,13 +86,45 @@
 		<property name="database" value="jdbc:sqlite::memory:" />
 	</bean>
 
-	<bean id="kustvakt_userdetails" class="de.ids_mannheim.korap.handlers.UserDetailsDao">
-		<constructor-arg ref="kustvakt_db" />
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="packagesToScan" value="de.ids_mannheim.korap.entity" />
+		<property name="jpaVendorAdapter">
+			<bean id="jpaVendorAdapter"
+				class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="databasePlatform" value="${hibernate.dialect}" />
+			</bean>
+		</property>
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.cache.use_query_cache">${hibernate.cache.use_query_cache}</prop>
+				<prop key="hibernate.cache.use_second_level_cache">${hibernate.cache.use_second_level_cache}
+				</prop>
+				<prop key="hibernate.cache.provider_class">${hibernate.cache.provider}</prop>
+				<prop key="hibernate.cache.region.factory_class">${hibernate.cache.region.factory}</prop>
+				<!-- <prop key="net.sf.ehcache.configurationResourceName">classpath:ehcache.xml</prop> -->
+			</props>
+		</property>
 	</bean>
 
-	<bean id="kustvakt_usersettings" class="de.ids_mannheim.korap.handlers.UserSettingsDao">
-		<constructor-arg ref="kustvakt_db" />
+	<tx:annotation-driven proxy-target-class="true"
+		transaction-manager="transactionManager" />
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
 	</bean>
+
+	<bean id="transactionTemplate"
+		class="org.springframework.transaction.support.TransactionTemplate">
+		<constructor-arg ref="transactionManager" />
+	</bean>
+
+	<!-- Data access objects -->
+	<bean id="resourceDao" class="de.ids_mannheim.korap.dao.ResourceDao"/>
+	<!-- <bean id="annotationDao" class="de.ids_mannheim.korap.dao.AnnotationDao"/> -->
 
 	<bean id="kustvakt_auditing" class="de.ids_mannheim.korap.handlers.JDBCAuditing">
 		<constructor-arg ref="kustvakt_db" />
@@ -156,13 +188,13 @@
 		<ref bean="openid_auth" />
 	</util:list>
 
+
 	<bean id="userdata_details" class="de.ids_mannheim.korap.handlers.UserDetailsDao">
-		<constructor-arg
-			type="de.ids_mannheim.korap.interfaces.db.PersistenceClient" ref="kustvakt_db" />
+		<constructor-arg ref="kustvakt_db" />
 	</bean>
+
 	<bean id="userdata_settings" class="de.ids_mannheim.korap.handlers.UserSettingsDao">
-		<constructor-arg
-			type="de.ids_mannheim.korap.interfaces.db.PersistenceClient" ref="kustvakt_db" />
+		<constructor-arg ref="kustvakt_db" />
 	</bean>
 
 	<util:list id="kustvakt_userdata"
@@ -176,7 +208,6 @@
 		<ref bean="document_provider" />
 		<ref bean="resource_provider" />
 	</util:list>
-
 
 	<!-- specify type for constructor argument -->
 	<bean id="kustvakt_authenticationmanager"
