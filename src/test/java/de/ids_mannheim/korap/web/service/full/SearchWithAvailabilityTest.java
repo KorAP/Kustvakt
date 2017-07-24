@@ -162,7 +162,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
     
 
     private ClientResponse builtSimpleClientResponse (String collectionQuery) {
-        return resource().path(getAPIVersion()).path("search")
+        return resource().path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("cq", collectionQuery).get(ClientResponse.class);
     }
@@ -170,7 +170,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
     private ClientResponse builtClientResponseWithIP (String collectionQuery,
             String ip) {
-        return resource().path(getAPIVersion()).path("search")
+        return resource().path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("cq", collectionQuery)
                 .header(Attributes.AUTHORIZATION,

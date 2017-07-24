@@ -4,6 +4,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import com.sun.jersey.test.framework.WebAppDescriptor;
@@ -16,6 +17,7 @@ import de.ids_mannheim.korap.config.BeanConfigTest;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.springframework.web.context.ContextLoaderListener;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
@@ -31,7 +33,8 @@ public abstract class FastJerseyTest extends BeanConfigTest {
 
     private final static String API_VERSION = "v0.1";
 
-    private static DefaultResourceConfig resourceConfig = new DefaultResourceConfig();
+    private static DefaultResourceConfig resourceConfig =
+            new DefaultResourceConfig();
 
     private static TestContainerFactory testContainerFactory;
 
@@ -99,7 +102,11 @@ public abstract class FastJerseyTest extends BeanConfigTest {
         if (classPackages == null)
             ad = new LowLevelAppDescriptor.Builder(resourceConfig).build();
         else
-            ad = new WebAppDescriptor.Builder(classPackages).build();
+            ad = new WebAppDescriptor.Builder(classPackages)
+                    .servletClass(SpringServlet.class)
+                    .contextListenerClass(ContextLoaderListener.class)
+                    .contextParam("contextConfigLocation", "classpath:test-default-config.xml")
+                    .build();
 
         TestContainerFactory tcf = testContainerFactory;
         if (tcf == null) {
@@ -109,8 +116,8 @@ public abstract class FastJerseyTest extends BeanConfigTest {
                 tcf = new GrizzlyWebTestContainerFactory();
         }
 
-        testContainer = tcf.create(UriBuilder.fromUri(containerURI)
-                .port(port).build(), ad);
+        testContainer = tcf.create(
+                UriBuilder.fromUri(containerURI).port(port).build(), ad);
         client = testContainer.getClient();
         if (client == null) {
             client = Client.create(ad.getClientConfig());

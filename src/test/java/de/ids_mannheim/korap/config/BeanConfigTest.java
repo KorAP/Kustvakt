@@ -8,6 +8,7 @@ import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.InitializationError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -31,6 +32,7 @@ public abstract class BeanConfigTest {
 
 
     public void init () throws Exception {
+//        context = new ClassPathXmlApplicationContext("test-default-config.xml");
         assertNotNull("Application context must not be null!", this.context);
         jlog.debug("running one-time before init for class "
                 + this.getClass().getSimpleName() + " ...");

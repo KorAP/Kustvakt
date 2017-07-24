@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
@@ -70,6 +71,7 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
  */
 @Controller
 @Path("/")
+@RequestMapping ( "/" )
 @ResourceFilters({ AuthFilter.class, DemoUserFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class SearchService {
@@ -312,133 +314,133 @@ public class SearchService {
     }
 
 
-//    /* EM: potentially an unused service! */
-//    /** Builds a json query serialization from the given parameters.
-//     * 
-//     * @param locale
-//     * @param securityContext
-//     * @param q query string
-//     * @param ql query language
-//     * @param v version
-//     * @param context
-//     * @param cutoff true if the number of results should be limited
-//     * @param pageLength number of results per page
-//     * @param pageIndex
-//     * @param startPage
-//     * @param cq collection query
-//     * @return
-//     */
-//    // ref query parameter removed!
-//    // EM: change the HTTP method to from TRACE to GET
-//    // EM: change path from search to query
-//    @GET
-//    @Path("query")
-//    public Response serializeQuery (@Context Locale locale,
-//            @Context SecurityContext securityContext, @QueryParam("q") String q,
-//            @QueryParam("ql") String ql, @QueryParam("v") String v,
-//            @QueryParam("context") String context,
-//            @QueryParam("cutoff") Boolean cutoff,
-//            @QueryParam("count") Integer pageLength,
-//            @QueryParam("offset") Integer pageIndex,
-//            @QueryParam("page") Integer startPage,
-//            @QueryParam("cq") String cq) {
-//        TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
-//        QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
-//        if (cq != null)
-//            ss.setCollection(cq);
-//
-//        MetaQueryBuilder meta = new MetaQueryBuilder();
-//        if (pageIndex != null)
-//            meta.addEntry("startIndex", pageIndex);
-//        if (pageIndex == null && startPage != null)
-//            meta.addEntry("startPage", startPage);
-//        if (pageLength != null)
-//            meta.addEntry("count", pageLength);
-//        if (context != null)
-//            meta.setSpanContext(context);
-//        meta.addEntry("cutOff", cutoff);
-//
-//        ss.setMeta(meta.raw());
-//        String result = ss.toJSON();
-//        jlog.debug("Query: "+result);
-//        return Response.ok(result).build();
-//    }
-//
-//
-//    /**
-//     * currently only supports either no reference at all in which
-//     * case all corpora are retrieved or a corpus name like "WPD".
-//     * No virtual collections supported!
-//     * 
-//     * @param locale
-//     * @param q
-//     * @param ql
-//     * @param v
-//     * @param pageLength
-//     * @param pageIndex
-//     * @return
-//     */
-//
-//    // todo: does cq have any sensible worth here? --> would say no! --> is
-//    // useful in non type/id scenarios
-//    
-//    /* EM: potentially an unused service! */    
-//    // EM: build query using the given virtual collection id
-//    // EM: change the HTTP method to from TRACE to GET
-//    // EM: change path from search to query
-//    // EM: there is no need to check resource licenses since the service just serialize a query serialization
-//    @GET
-//    @Path("{type}/{id}/query")
-//    public Response serializeQueryWithResource (@Context Locale locale,
-//            @Context SecurityContext securityContext, @QueryParam("q") String q,
-//            @QueryParam("ql") String ql, @QueryParam("v") String v,
-//            @QueryParam("context") String context,
-//            @QueryParam("cutoff") Boolean cutoff,
-//            @QueryParam("count") Integer pageLength,
-//            @QueryParam("offset") Integer pageIndex,
-//            @QueryParam("page") Integer startPage,
-//            @PathParam("type") String type, @PathParam("id") String id) {
-//        TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
-//        type = StringUtils.normalize(type);
-//        id = StringUtils.decodeHTML(id);
-//
-//        QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
-//
-//        MetaQueryBuilder meta = new MetaQueryBuilder();
-//        if (pageIndex != null)
-//            meta.addEntry("startIndex", pageIndex);
-//        if (pageIndex == null && startPage != null)
-//            meta.addEntry("startPage", startPage);
-//        if (pageLength != null)
-//            meta.addEntry("count", pageLength);
-//        if (context != null)
-//            meta.setSpanContext(context);
-//        if (cutoff != null)
-//            meta.addEntry("cutOff", cutoff);
-//
-//        ss.setMeta(meta.raw());
-//
-//        KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
-//        cquery.setBaseQuery(ss.toJSON());
-//
-//        String query = "";
-//        // EM: is this necessary at all?
-//        KustvaktResource resource = isCollectionIdValid(ctx.getName(), id);
-//        if (resource!=null){
-//            if (resource instanceof VirtualCollection) {
-//                JsonNode node = cquery.and().mergeWith(resource.getData());
-//                query = JsonUtils.toJSON(node);
-//            }
-//            else if (resource instanceof Corpus) {
-//                cquery.and().with(Attributes.CORPUS_SIGLE, "=",
-//                        resource.getPersistentID());
-//                query = cquery.toJSON();
-//            }
-//        }
-//
-//        jlog.debug("Query: "+query);
-//        return Response.ok(query).build();
-//    }
+    /* EM: potentially an unused service! */
+    /** Builds a json query serialization from the given parameters.
+     * 
+     * @param locale
+     * @param securityContext
+     * @param q query string
+     * @param ql query language
+     * @param v version
+     * @param context
+     * @param cutoff true if the number of results should be limited
+     * @param pageLength number of results per page
+     * @param pageIndex
+     * @param startPage
+     * @param cq collection query
+     * @return
+     */
+    // ref query parameter removed!
+    // EM: change the HTTP method to from TRACE to GET
+    // EM: change path from search to query
+    @GET
+    @Path("query")
+    public Response serializeQuery (@Context Locale locale,
+            @Context SecurityContext securityContext, @QueryParam("q") String q,
+            @QueryParam("ql") String ql, @QueryParam("v") String v,
+            @QueryParam("context") String context,
+            @QueryParam("cutoff") Boolean cutoff,
+            @QueryParam("count") Integer pageLength,
+            @QueryParam("offset") Integer pageIndex,
+            @QueryParam("page") Integer startPage,
+            @QueryParam("cq") String cq) {
+        TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
+        QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
+        if (cq != null)
+            ss.setCollection(cq);
+
+        MetaQueryBuilder meta = new MetaQueryBuilder();
+        if (pageIndex != null)
+            meta.addEntry("startIndex", pageIndex);
+        if (pageIndex == null && startPage != null)
+            meta.addEntry("startPage", startPage);
+        if (pageLength != null)
+            meta.addEntry("count", pageLength);
+        if (context != null)
+            meta.setSpanContext(context);
+        meta.addEntry("cutOff", cutoff);
+
+        ss.setMeta(meta.raw());
+        String result = ss.toJSON();
+        jlog.debug("Query: "+result);
+        return Response.ok(result).build();
+    }
+
+
+    /**
+     * currently only supports either no reference at all in which
+     * case all corpora are retrieved or a corpus name like "WPD".
+     * No virtual collections supported!
+     * 
+     * @param locale
+     * @param q
+     * @param ql
+     * @param v
+     * @param pageLength
+     * @param pageIndex
+     * @return
+     */
+
+    // todo: does cq have any sensible worth here? --> would say no! --> is
+    // useful in non type/id scenarios
+    
+    /* EM: potentially an unused service! */    
+    // EM: build query using the given virtual collection id
+    // EM: change the HTTP method to from TRACE to GET
+    // EM: change path from search to query
+    // EM: there is no need to check resource licenses since the service just serialize a query serialization
+    @GET
+    @Path("{type}/{id}/query")
+    public Response serializeQueryWithResource (@Context Locale locale,
+            @Context SecurityContext securityContext, @QueryParam("q") String q,
+            @QueryParam("ql") String ql, @QueryParam("v") String v,
+            @QueryParam("context") String context,
+            @QueryParam("cutoff") Boolean cutoff,
+            @QueryParam("count") Integer pageLength,
+            @QueryParam("offset") Integer pageIndex,
+            @QueryParam("page") Integer startPage,
+            @PathParam("type") String type, @PathParam("id") String id) {
+        TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
+        type = StringUtils.normalize(type);
+        id = StringUtils.decodeHTML(id);
+
+        QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
+
+        MetaQueryBuilder meta = new MetaQueryBuilder();
+        if (pageIndex != null)
+            meta.addEntry("startIndex", pageIndex);
+        if (pageIndex == null && startPage != null)
+            meta.addEntry("startPage", startPage);
+        if (pageLength != null)
+            meta.addEntry("count", pageLength);
+        if (context != null)
+            meta.setSpanContext(context);
+        if (cutoff != null)
+            meta.addEntry("cutOff", cutoff);
+
+        ss.setMeta(meta.raw());
+
+        KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
+        cquery.setBaseQuery(ss.toJSON());
+
+        String query = "";
+        // EM: is this necessary at all?
+        KustvaktResource resource = isCollectionIdValid(ctx.getName(), id);
+        if (resource!=null){
+            if (resource instanceof VirtualCollection) {
+                JsonNode node = cquery.and().mergeWith(resource.getData());
+                query = JsonUtils.toJSON(node);
+            }
+            else if (resource instanceof Corpus) {
+                cquery.and().with(Attributes.CORPUS_SIGLE, "=",
+                        resource.getPersistentID());
+                query = cquery.toJSON();
+            }
+        }
+
+        jlog.debug("Query: "+query);
+        return Response.ok(query).build();
+    }
 
     // EM: prototype
     private KustvaktResource isCollectionIdValid (String username, String collectionId) {

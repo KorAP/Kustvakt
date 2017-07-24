@@ -30,7 +30,7 @@ public class MatchInfoServiceTest extends FastJerseyTest {
     @Test
     public void testGetMatchInfoPublicCorpus () {
 
-        ClientResponse response = resource().path(getAPIVersion())
+        ClientResponse response = resource()
                 .path("corpus").path("GOE").path("AGA").path("01784")
                 .path("p36-100").path("matchInfo")
                 .queryParam("foundry", "*")
@@ -56,7 +56,7 @@ public class MatchInfoServiceTest extends FastJerseyTest {
     @Test
     public void testGetMatchInfoNotAllowed () {
 
-        ClientResponse response = resource().path(getAPIVersion())
+        ClientResponse response = resource()
                 .path("corpus").path("GOE").path("AGI").path("04846")
                 .path("p36875-36876").path("matchInfo")
                 .queryParam("foundry", "*")
@@ -76,7 +76,7 @@ public class MatchInfoServiceTest extends FastJerseyTest {
 
     @Test
     public void testGetMatchInfoWithAuthentication () {
-        ClientResponse response = resource().path(getAPIVersion())
+        ClientResponse response = resource()
                 .path("corpus").path("GOE").path("AGI").path("04846")
                 .path("p36875-36876").path("matchInfo")
                 .queryParam("foundry", "*")

@@ -40,7 +40,7 @@ public class StatisticsServiceTest extends FastJerseyTest {
     public void testGetStatisticsNoResource ()
             throws JsonProcessingException, IOException {
         String collectionQuery = "corpusSigle=WPD15";
-        ClientResponse response = resource().path(getAPIVersion())
+        ClientResponse response = resource()
                 .path("statistics")
                 .queryParam("collectionQuery", collectionQuery)
                 .get(ClientResponse.class);
@@ -58,7 +58,7 @@ public class StatisticsServiceTest extends FastJerseyTest {
     public void testGetStatisticsWithCollectionQuery1 ()
             throws JsonProcessingException, IOException {
         String collectionQuery = "corpusSigle=GOE";
-        ClientResponse response = resource().path(getAPIVersion())
+        ClientResponse response = resource()
                 .path("statistics")
                 .queryParam("collectionQuery", collectionQuery)
                 .get(ClientResponse.class);
@@ -75,7 +75,7 @@ public class StatisticsServiceTest extends FastJerseyTest {
     @Test
     public void testGetStatisticsWithCollectionQuery2 ()
             throws JsonProcessingException, IOException {
-        ClientResponse response = resource().path(getAPIVersion())
+        ClientResponse response = resource()
                 .path("statistics")
                 .queryParam("collectionQuery", "creationDate since 1810")
                 .get(ClientResponse.class);
@@ -93,7 +93,7 @@ public class StatisticsServiceTest extends FastJerseyTest {
     @Test
     public void testGetStatisticsWithWrongCollectionQuery ()
             throws JsonProcessingException, IOException {
-        ClientResponse response = resource().path(getAPIVersion())
+        ClientResponse response = resource()
                 .path("statistics")
                 .queryParam("collectionQuery", "creationDate geq 1810")
                 .get(ClientResponse.class);
@@ -113,7 +113,7 @@ public class StatisticsServiceTest extends FastJerseyTest {
     @Test
     public void testGetStatisticsWithWrongCollectionQuery2 ()
             throws JsonProcessingException, IOException {
-        ClientResponse response = resource().path(getAPIVersion())
+        ClientResponse response = resource()
                 .path("statistics")
                 .queryParam("collectionQuery", "creationDate >= 1810")
                 .get(ClientResponse.class);
