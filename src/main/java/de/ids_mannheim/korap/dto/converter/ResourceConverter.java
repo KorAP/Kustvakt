@@ -17,19 +17,18 @@ public class ResourceConverter {
     public List<ResourceDto> convertToResourcesDto (List<Resource> resources) {
         List<ResourceDto> resourceDtoList = new ArrayList<ResourceDto>(resources.size());
         ResourceDto dto;
-        Map<String, String> languages;
+        Map<String, String> titles;
         HashMap<Integer, String> layers;
         for (Resource r: resources){
             dto = new ResourceDto();
             dto.setDescription(r.getEnglishDescription());
-            dto.setEnglishTitle(r.getEnglishTitle());
-            dto.setGermanTitle(r.getGermanTitle());
             dto.setResourceId(r.getId());
+            dto.setLanguages(new String[]{"deu"});
             
-            languages = new HashMap<String, String>();
-            languages.put("en", r.getEnglishTitle());
-            languages.put("de", r.getGermanTitle());
-            dto.setLanguages(languages);
+            titles = new HashMap<String, String>();
+            titles.put("en", r.getEnglishTitle());
+            titles.put("de", r.getGermanTitle());
+            dto.setTitles(titles);
             
             layers = new HashMap<Integer, String>();
             String foundry, layer, code;

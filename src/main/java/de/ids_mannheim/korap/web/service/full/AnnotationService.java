@@ -25,6 +25,7 @@ import de.ids_mannheim.korap.dto.FoundryDto;
 import de.ids_mannheim.korap.dto.LayerDto;
 import de.ids_mannheim.korap.dto.converter.AnnotationConverter;
 import de.ids_mannheim.korap.entity.AnnotationPair;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.filter.AuthFilter;
@@ -85,8 +86,8 @@ public class AnnotationService {
     public Response getFoundryDescriptions (String json) {
         JsonNode node = JsonUtils.readTree(json);
         if (node == null) {
-            throw KustvaktResponseHandler.throwit(StatusCodes.MISSING_ARGUMENT,
-                    "Missing a json string.");
+            throw KustvaktResponseHandler.throwit(new KustvaktException(
+                    StatusCodes.MISSING_ARGUMENT, "Missing a json string.", ""));
         }
 
         String language;
@@ -100,8 +101,8 @@ public class AnnotationService {
             }
             else if (!(language.equals("en") || language.equals("de"))) {
                 throw KustvaktResponseHandler.throwit(
-                        StatusCodes.UNSUPPORTED_VALUE, "Unsupported value:",
-                        language);
+                        new KustvaktException(StatusCodes.UNSUPPORTED_VALUE,
+                                "Unsupported value:", language));
             }
         }
 
@@ -110,14 +111,19 @@ public class AnnotationService {
             codes = JsonUtils.convert(node.get("codes"), List.class);
         }
         catch (IOException | NullPointerException e) {
-            throw KustvaktResponseHandler.throwit(StatusCodes.INVALID_ARGUMENT,
-                    "Bad argument:", json);
+            throw KustvaktResponseHandler.throwit(new KustvaktException(
+                    StatusCodes.INVALID_ARGUMENT, "Bad argument:", json));
         }
         if (codes == null) {
-            throw KustvaktResponseHandler.throwit(StatusCodes.MISSING_ATTRIBUTE,
-                    "Missing attribute:", "codes");
+            throw KustvaktResponseHandler.throwit(
+                    new KustvaktException(StatusCodes.MISSING_ATTRIBUTE,
+                            "Missing attribute:", "codes"));
         }
-
+        else if (codes.isEmpty()) {
+            throw KustvaktResponseHandler.throwit(new KustvaktException(
+                    StatusCodes.NO_VALUE_FOUND, "No result found.","codes:[]"));
+        }
+        
         List<AnnotationPair> annotationPairs = null;
         String foundry = "", layer = "";
         if (codes.contains("*")) {
@@ -140,8 +146,8 @@ public class AnnotationService {
                 else {
                     jlog.error("Annotation code is wrong: " + annotationCode);
                     throw KustvaktResponseHandler.throwit(
-                            StatusCodes.INVALID_ATTRIBUTE, "Bad attribute:",
-                            code);
+                            new KustvaktException(StatusCodes.INVALID_ATTRIBUTE,
+                                    "Bad attribute:", code));
                 }
 
                 annotationPairs.addAll(annotationDao
@@ -152,13 +158,13 @@ public class AnnotationService {
         if (annotationPairs != null && !annotationPairs.isEmpty()) {
             List<FoundryDto> dtos = annotationConverter
                     .convertToFoundryDto(annotationPairs, language);
-            jlog.debug("/layers " + annotationPairs.toString());
+            jlog.debug("/description " + annotationPairs.toString());
             String result = JsonUtils.toJSON(dtos);
             return Response.ok(result).build();
         }
         else {
-            throw KustvaktResponseHandler.throwit(StatusCodes.NO_VALUE_FOUND,
-                    "No result found.");
+            throw KustvaktResponseHandler.throwit(new KustvaktException(
+                    StatusCodes.NO_VALUE_FOUND, "No result found.",""));
         }
     }
 

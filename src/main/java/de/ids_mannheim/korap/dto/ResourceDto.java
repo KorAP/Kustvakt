@@ -1,11 +1,13 @@
 package de.ids_mannheim.korap.dto;
 
+import java.util.List;
 import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
 
-/** Data transfer object for resource description (e.g. for KorapSRU). 
+/**
+ * Data transfer object for resource description (e.g. for KorapSRU).
  * 
  * @author margaretha
  *
@@ -15,18 +17,16 @@ import lombok.Setter;
 public class ResourceDto {
 
     private String resourceId;
-    private String germanTitle;
-    private String englishTitle;
+    private Map<String, String> titles;
     private String description;
+    private String[] languages;
     private Map<Integer, String> layers;
-    private Map<String, String> languages;
 
 
     @Override
     public String toString () {
-        return "resourceId= " + resourceId + ", germanTitle= " + germanTitle
-                + ", englishTitle= " + englishTitle + ", description= "
-                + description + ", languages= " + languages + ", layers= "
-                + layers;
+        return "resourceId= " + resourceId + ", description= " + description
+                + ", titles= " + titles + ", languages= " + languages
+                + ", layers= " + layers;
     }
 }
