@@ -40,7 +40,7 @@ import java.util.Iterator; // 07.02.17/FB
  * @author hanl
  * @date 24/01/2014
  */
-@Path(KustvaktServer.API_VERSION + "/auth")
+@Path("/auth")
 @ResourceFilters({ PiwikFilter.class })
 @Produces(MediaType.TEXT_HTML + ";charset=utf-8")
 public class AuthService {
