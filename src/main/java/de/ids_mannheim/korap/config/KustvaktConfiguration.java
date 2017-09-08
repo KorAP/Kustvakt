@@ -165,25 +165,35 @@ public class KustvaktConfiguration {
         ldapConfig = properties.getProperty("ldap.config");
         
         // EM: regex for matching availability in Krill matches
-        freeLicensePattern = Pattern.compile(properties.getProperty("kustvakt.regex.free",""));
-        publicLicensePattern = Pattern.compile(properties.getProperty("kustvakt.regex.public",""));
-        allLicensePattern = Pattern.compile(properties.getProperty("kustvakt.regex.all",""));
+        setPattern(properties.getProperty("kustvakt.regex.free",""), freeLicensePattern);
+        setPattern(properties.getProperty("kustvakt.regex.public",""), publicLicensePattern);
+        setPattern(properties.getProperty("kustvakt.regex.all",""), allLicensePattern);
         
         // EM: not use in the future
         //policyConfig = properties.getProperty("policies.config");
         //setFoundriesAndLayers(policyConfig);
         
-        KUSTVAKT_USER.put(Attributes.ID, Integer.parseInt(properties.getProperty("kustvakt.init.user.id")));
-        KUSTVAKT_USER.put(Attributes.USERNAME, properties.getProperty("kustvakt.init.user.username"));
-        KUSTVAKT_USER.put(Attributes.PASSWORD, properties.getProperty("kustvakt.init.user.password"));
-        KUSTVAKT_USER.put(Attributes.EMAIL, properties.getProperty("kustvakt.init.user.email"));
-        KUSTVAKT_USER.put(Attributes.COUNTRY, properties.getProperty("kustvakt.init.user.country"));
-        KUSTVAKT_USER.put(Attributes.ADDRESS, properties.getProperty("kustvakt.init.user.address"));
-        KUSTVAKT_USER.put(Attributes.FIRSTNAME, properties.getProperty("kustvakt.init.user.firstname"));
-        KUSTVAKT_USER.put(Attributes.LASTNAME, properties.getProperty("kustvakt.init.user.lastname"));
-        KUSTVAKT_USER.put(Attributes.INSTITUTION, properties.getProperty("kustvakt.init.user.institution"));
-        KUSTVAKT_USER.put(Attributes.IS_ADMIN, properties.getProperty("kustvakt.init.user.admin"));
+//        KUSTVAKT_USER.put(Attributes.ID, Integer.parseInt(properties.getProperty("kustvakt.init.user.id")));
+//        KUSTVAKT_USER.put(Attributes.USERNAME, properties.getProperty("kustvakt.init.user.username"));
+//        KUSTVAKT_USER.put(Attributes.PASSWORD, properties.getProperty("kustvakt.init.user.password"));
+//        KUSTVAKT_USER.put(Attributes.EMAIL, properties.getProperty("kustvakt.init.user.email"));
+//        KUSTVAKT_USER.put(Attributes.COUNTRY, properties.getProperty("kustvakt.init.user.country"));
+//        KUSTVAKT_USER.put(Attributes.ADDRESS, properties.getProperty("kustvakt.init.user.address"));
+//        KUSTVAKT_USER.put(Attributes.FIRSTNAME, properties.getProperty("kustvakt.init.user.firstname"));
+//        KUSTVAKT_USER.put(Attributes.LASTNAME, properties.getProperty("kustvakt.init.user.lastname"));
+//        KUSTVAKT_USER.put(Attributes.INSTITUTION, properties.getProperty("kustvakt.init.user.institution"));
+//        KUSTVAKT_USER.put(Attributes.IS_ADMIN, properties.getProperty("kustvakt.init.user.admin"));
         return properties;
+    }
+
+    private void setPattern (String patternStr, Pattern pattern) {
+        if (!patternStr.isEmpty()){
+            pattern = Pattern.compile(patternStr);    
+        }
+        else{
+            pattern = null;
+        }
+        
     }
 
     public void setFoundriesAndLayers(String config) throws IOException {
