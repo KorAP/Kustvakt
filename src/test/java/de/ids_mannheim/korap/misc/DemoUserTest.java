@@ -1,3 +1,4 @@
+package de.ids_mannheim.korap.misc;
 import com.sun.jersey.api.client.ClientResponse;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;

@@ -1,3 +1,4 @@
+package de.ids_mannheim.korap.misc;
 import org.junit.Test;
 
 /**

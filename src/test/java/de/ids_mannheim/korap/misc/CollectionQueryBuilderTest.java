@@ -1,3 +1,4 @@
+package de.ids_mannheim.korap.misc;
 import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.resources.KustvaktResource;

@@ -1,3 +1,4 @@
+package de.ids_mannheim.korap.misc;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
 import org.junit.BeforeClass;

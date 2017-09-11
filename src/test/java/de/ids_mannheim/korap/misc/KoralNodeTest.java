@@ -1,3 +1,4 @@
+package de.ids_mannheim.korap.misc;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.ids_mannheim.korap.resource.rewrite.KoralNode;
 import de.ids_mannheim.korap.utils.JsonUtils;

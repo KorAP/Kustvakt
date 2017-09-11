@@ -1,3 +1,4 @@
+package de.ids_mannheim.korap.misc;
 import de.ids_mannheim.korap.config.QueryBuilderUtil;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import org.junit.Assert;

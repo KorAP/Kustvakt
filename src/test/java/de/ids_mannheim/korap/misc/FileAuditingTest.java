@@ -1,3 +1,4 @@
+package de.ids_mannheim.korap.misc;
 import de.ids_mannheim.korap.auditing.AuditRecord;
 import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
