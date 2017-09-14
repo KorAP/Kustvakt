@@ -4,12 +4,14 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.EntityDao;
 import de.ids_mannheim.korap.web.service.UserLoader;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author hanl
  * @date 11/02/2016
  */
+@Ignore
 public class UserLoaderTest extends BeanConfigTest {
 
     @Test

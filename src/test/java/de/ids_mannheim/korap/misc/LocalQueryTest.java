@@ -47,6 +47,7 @@ public class LocalQueryTest extends BeanConfigTest {
 
     @Test
     public void testCollQuery () throws IOException {
+        String qstring = "creationDate since 1800 & creationDate until 1820";
         CollectionQueryProcessor processor = new CollectionQueryProcessor();
         processor.process(qstring);
 

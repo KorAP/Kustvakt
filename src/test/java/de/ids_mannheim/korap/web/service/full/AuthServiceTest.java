@@ -2,7 +2,6 @@ package de.ids_mannheim.korap.web.service.full;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.json.JSONUnmarshaller;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -51,7 +50,7 @@ public class AuthServiceTest extends FastJerseyTest {
     @Test
     public void testSessionToken() {
         String auth = BasicHttpAuth.encode(credentials[0], credentials[1]);
-        ClientResponse response = resource().path(getAPIVersion()).path("auth")
+        ClientResponse response = resource().path("auth")
                 .path("sessionToken").header(Attributes.AUTHORIZATION, auth)
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -68,11 +67,18 @@ public class AuthServiceTest extends FastJerseyTest {
         assertNotEquals("", token_type);
         assertFalse(TimeUtils.isExpired(ex.getMillis()));
 
-        response = resource().path(getAPIVersion()).path("user")
+        response = resource().path("user")
                 .path("info").header(Attributes.AUTHORIZATION, token_type + " "+ token)
                 .get(ClientResponse.class);
         en = response.getEntity(String.class);
 
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        
+        response = resource().path("auth")
+                .path("logout").header(Attributes.AUTHORIZATION, token_type + " "+ token)
+                .get(ClientResponse.class);
+        
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
     }
@@ -80,7 +86,7 @@ public class AuthServiceTest extends FastJerseyTest {
     @Test
     public void testSessionTokenExpire() {
         String auth = BasicHttpAuth.encode(credentials[0], credentials[1]);
-        ClientResponse response = resource().path(getAPIVersion()).path("auth")
+        ClientResponse response = resource().path("auth")
                 .path("sessionToken").header(Attributes.AUTHORIZATION, auth)
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -100,7 +106,7 @@ public class AuthServiceTest extends FastJerseyTest {
             if (TimeUtils.isExpired(ex.getMillis()))
                 break;
         }
-        response = resource().path(getAPIVersion()).path("user")
+        response = resource().path("user")
                 .path("info").header(Attributes.AUTHORIZATION, token_type + " "+ token)
                 .get(ClientResponse.class);
         en = response.getEntity(String.class);
@@ -113,53 +119,53 @@ public class AuthServiceTest extends FastJerseyTest {
     }
 
 
-    @Test
-    public void testBlockingFilterFail() {
-
-    }
-
-
-    @Test
-    public void testBasicLogout () {
-
-    }
-
-
-    @Test
-    public void testSessionTokenLogin () {
-
-    }
-
-
-    @Test
-    public void testSessionTokenLogout () {
-
-    }
-
-
-    @Test
-    public void testOpenIDLogin () {
-
-    }
-
-
-    @Test
-    public void testOpenIDLogout () {
-
-    }
-
-
-    // -- are these even right? auth - authorization
-    @Test
-    public void testOAuth2Login () {
-
-    }
-
-
-    @Test
-    public void testOAuth2Logout () {
-
-    }
+//    @Test
+//    public void testBlockingFilterFail() {
+//
+//    }
+//
+//
+//    @Test
+//    public void testBasicLogout () {
+//
+//    }
+//
+//
+//    @Test
+//    public void testSessionTokenLogin () {
+//
+//    }
+//
+//
+//    @Test
+//    public void testSessionTokenLogout () {
+//
+//    }
+//
+//
+//    @Test
+//    public void testOpenIDLogin () {
+//
+//    }
+//
+//
+//    @Test
+//    public void testOpenIDLogout () {
+//
+//    }
+//
+//
+//    // -- are these even right? auth - authorization
+//    @Test
+//    public void testOAuth2Login () {
+//
+//    }
+//
+//
+//    @Test
+//    public void testOAuth2Logout () {
+//
+//    }
 
     //todo: test basicauth via secure connection
 

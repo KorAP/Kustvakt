@@ -28,7 +28,7 @@ public class SessionAuthentication implements AuthenticationIface {
 
     private static final Logger jlog = LoggerFactory
             .getLogger(SessionAuthentication.class);
-    private SessionFactory sessions;
+    public static SessionFactory sessions;
     private ScheduledThreadPoolExecutor scheduled;
     private EncryptionIface crypto;
     private KustvaktConfiguration config;
@@ -68,10 +68,12 @@ public class SessionAuthentication implements AuthenticationIface {
         ctx.setUsername(user.getUsername());
         ctx.setTokenType(Attributes.SESSION_AUTHENTICATION);
         ctx.setToken(token);
-        ctx.setExpirationTime(ex.getMillis());
+        ctx.setExpirationTime(ex.getMillis()+(1000));
         ctx.setHostAddress(attr.get(Attributes.HOST).toString());
         ctx.setUserAgent(attr.get(Attributes.USER_AGENT).toString());
+        jlog.debug(ctx.toJson());
         this.sessions.putSession(token, ctx);
+        jlog.debug("session " +sessions.getSession(token).toString());
         jlog.info("create session for user: " + user.getUsername());
         return ctx;
     }

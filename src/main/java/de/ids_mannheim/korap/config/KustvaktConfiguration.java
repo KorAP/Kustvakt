@@ -165,9 +165,9 @@ public class KustvaktConfiguration {
         ldapConfig = properties.getProperty("ldap.config");
         
         // EM: regex for matching availability in Krill matches
-        setPattern(properties.getProperty("kustvakt.regex.free",""), freeLicensePattern);
-        setPattern(properties.getProperty("kustvakt.regex.public",""), publicLicensePattern);
-        setPattern(properties.getProperty("kustvakt.regex.all",""), allLicensePattern);
+        freeLicensePattern = compilePattern(properties.getProperty("kustvakt.regex.free",""));
+        publicLicensePattern = compilePattern(properties.getProperty("kustvakt.regex.public",""));
+        allLicensePattern = compilePattern(properties.getProperty("kustvakt.regex.all",""));
         
         // EM: not use in the future
         //policyConfig = properties.getProperty("policies.config");
@@ -186,14 +186,13 @@ public class KustvaktConfiguration {
         return properties;
     }
 
-    private void setPattern (String patternStr, Pattern pattern) {
+    private Pattern compilePattern (String patternStr) {
         if (!patternStr.isEmpty()){
-            pattern = Pattern.compile(patternStr);    
+            return Pattern.compile(patternStr);    
         }
         else{
-            pattern = null;
+            return null;
         }
-        
     }
 
     public void setFoundriesAndLayers(String config) throws IOException {

@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,6 +22,7 @@ import de.ids_mannheim.korap.web.service.FastJerseyTest;
  * @lastUpdate 19/04/2017
  * EM: FIX ME: Database restructure
  */
+@Ignore
 public class ResourceInfoServiceTest extends FastJerseyTest {
 
     @Override

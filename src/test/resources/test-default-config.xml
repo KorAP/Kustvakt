@@ -37,8 +37,8 @@
 				<value>classpath:test-jdbc.properties</value>
 				<value>classpath:hibernate.properties</value>
 				<!-- <value>file:./jdbc.properties</value> -->
-				<value>file:./kustvakt.conf</value>
-				<value>classpath:kustvakt.conf</value>
+				<!-- <value>file:./kustvakt-test.conf</value> -->
+				<value>classpath:kustvakt-test.conf</value>
 			</array>
 		</property>
 	</bean>

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.sun.jersey.api.client.ClientResponse;
@@ -31,6 +32,7 @@ import de.ids_mannheim.korap.web.service.FastJerseyTest;
 /** FIX ME: Database restructure
  * @author margaretha
  */
+@Ignore
 public class PolicyServiceTest extends FastJerseyTest {
 
     private User user = UserFactory.getDemoUser();

@@ -24,6 +24,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,6 +144,7 @@ public class SearchService {
     }
 
 
+    @Deprecated
     @GET
     @Path("{type}/{id}/{child}")
     public Response getResource (@Context SecurityContext context,
@@ -160,6 +162,7 @@ public class SearchService {
      * @param type
      * @return
      */
+    @Deprecated
     @GET
     @Path("{type}/{id}")
     public Response getResource (@Context SecurityContext context,

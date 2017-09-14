@@ -25,6 +25,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -55,6 +56,8 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * @author margaretha
  *
  */
+@Ignore
+@Deprecated
 public class KustvaktServerTest extends BeanConfigTest {
     private static ObjectMapper mapper = new ObjectMapper();
 

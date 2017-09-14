@@ -256,7 +256,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
                 "availability = /.*NC.*/");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
-
+//        System.out.println(response.getEntity(String.class));
         checkAndFree(response.getEntity(String.class));
     }
 

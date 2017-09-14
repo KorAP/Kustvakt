@@ -71,7 +71,7 @@ public class UserServiceTest extends FastJerseyTest {
 		map.putSingle("firstName", "test");
 		map.putSingle("lastName", "user");
 
-		ClientResponse response = resource().path(getAPIVersion()).path("user").path("register")
+		ClientResponse response = resource().path("user").path("register")
 				.header("Content-Type", MediaType.APPLICATION_JSON).post(ClientResponse.class, JsonUtils.toJSON(map));
 		assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 		String ent = response.getEntity(String.class);
@@ -82,7 +82,7 @@ public class UserServiceTest extends FastJerseyTest {
 		// map.putSingle("address", "Mannheim");
 
 		String enc = BasicHttpAuth.encode("testuser", "testPassword1234");
-		response = resource().path(getAPIVersion()).path("user").path("info")
+		response = resource().path("user").path("info")
 				.header("Content-Type", MediaType.APPLICATION_JSON).header(Attributes.AUTHORIZATION, enc)
 				.get(ClientResponse.class);
 
@@ -100,14 +100,14 @@ public class UserServiceTest extends FastJerseyTest {
 		map.putSingle("lastName", "user");
 		map.putSingle("address", "Mannheim");
 
-		ClientResponse response = resource().path(getAPIVersion()).path("user").path("register")
+		ClientResponse response = resource().path("user").path("register")
 				.header("Content-Type", MediaType.APPLICATION_JSON).post(ClientResponse.class, map);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
 		// run login/ status --> exception or information about locked account
 		// should appear
 		String enc = BasicHttpAuth.encode("testuser2", "testPassword1234");
-		response = resource().path(getAPIVersion()).path("user").path("info").header(Attributes.AUTHORIZATION, enc)
+		response = resource().path("user").path("info").header(Attributes.AUTHORIZATION, enc)
 				.get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 		String ent = response.getEntity(String.class);
@@ -125,7 +125,7 @@ public class UserServiceTest extends FastJerseyTest {
 		map.putSingle("lastName", "user");
 		map.putSingle("address", "Mannheim");
 
-		ClientResponse response = resource().path(getAPIVersion()).path("user").path("register")
+		ClientResponse response = resource().path("user").path("register")
 				.header("Content-Type", MediaType.APPLICATION_JSON).post(ClientResponse.class, map);
 
 		String ent = response.getEntity(String.class);
@@ -140,7 +140,7 @@ public class UserServiceTest extends FastJerseyTest {
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
 		String enc = BasicHttpAuth.encode("testuser", "testPassword1234");
-		response = resource().path(getAPIVersion()).path("user").path("info").header(Attributes.AUTHORIZATION, enc)
+		response = resource().path("user").path("info").header(Attributes.AUTHORIZATION, enc)
 				.get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 	}
@@ -148,7 +148,7 @@ public class UserServiceTest extends FastJerseyTest {
 	@Test
 	public void loginHTTP() {
 		String enc = BasicHttpAuth.encode(credentials[0], credentials[1]);
-		ClientResponse response = resource().path(getAPIVersion()).path("user").path("info")
+		ClientResponse response = resource().path("user").path("info")
 				.header(Attributes.AUTHORIZATION, enc).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 	}
@@ -159,12 +159,12 @@ public class UserServiceTest extends FastJerseyTest {
 	public void loginJWT() {
 		String en = BasicHttpAuth.encode(credentials[0], credentials[1]);
 		/* lauffähige Version von Hanl: */
-		ClientResponse response = resource().path(getAPIVersion()).path("auth").path("apiToken")
+		ClientResponse response = resource().path("auth").path("apiToken")
 				.header(Attributes.AUTHORIZATION, en).get(ClientResponse.class);
 		/**/
 		/*
 		 * Test : ClientResponse response = null; WebResource webRes =
-		 * resource().path(getAPIVersion()).path("auth") .path("apiToken");
+		 * resource().path("auth") .path("apiToken");
 		 * webRes.header(Attributes.AUTHORIZATION, en);
 		 * 
 		 * System.out.printf("resource: " + webRes.toString());
@@ -188,7 +188,7 @@ public class UserServiceTest extends FastJerseyTest {
 		assertTrue(BeansFactory.getKustvaktContext().getConfiguration().getTokenTTL() < 10);
 
 		String en = BasicHttpAuth.encode(credentials[0], credentials[1]);
-		ClientResponse response = resource().path(getAPIVersion()).path("auth").path("apiToken")
+		ClientResponse response = resource().path("auth").path("apiToken")
 				.header(Attributes.AUTHORIZATION, en).get(ClientResponse.class);
 
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
@@ -207,7 +207,7 @@ public class UserServiceTest extends FastJerseyTest {
 				break;
 		}
 
-		response = resource().path(getAPIVersion()).path("user").path("info")
+		response = resource().path("user").path("info")
 				.header(Attributes.AUTHORIZATION, "api_token " + token).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
@@ -216,7 +216,7 @@ public class UserServiceTest extends FastJerseyTest {
 	@Test
 	public void testGetUserDetails() {
 		String enc = BasicHttpAuth.encode(credentials[0], credentials[1]);
-		ClientResponse response = resource().path(getAPIVersion()).path("user").path("details")
+		ClientResponse response = resource().path("user").path("details")
 				.header(Attributes.AUTHORIZATION, enc).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 	}
@@ -227,12 +227,12 @@ public class UserServiceTest extends FastJerseyTest {
 		Map m = new LinkedMap();
 		m.put("test", "[100, \"error message\", true, \"another message\"]");
 
-		ClientResponse response = resource().path(getAPIVersion()).path("user").path("details")
+		ClientResponse response = resource().path("user").path("details")
 				.header(Attributes.AUTHORIZATION, enc).header("Content-Type", MediaType.APPLICATION_JSON)
 				.post(ClientResponse.class, m);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
-		response = resource().path(getAPIVersion()).path("user").path("details").queryParam("pointer", "test")
+		response = resource().path("user").path("details").queryParam("pointer", "test")
 				.header(Attributes.AUTHORIZATION, enc).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 		String ent = response.getEntity(String.class);
@@ -245,12 +245,12 @@ public class UserServiceTest extends FastJerseyTest {
 		Map m = new LinkedMap();
 		m.put("test", "test value 1");
 
-		ClientResponse response = resource().path(getAPIVersion()).path("user").path("details")
+		ClientResponse response = resource().path("user").path("details")
 				.header(Attributes.AUTHORIZATION, enc).header("Content-Type", MediaType.APPLICATION_JSON)
 				.post(ClientResponse.class, m);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
-		response = resource().path(getAPIVersion()).path("user").path("details").header(Attributes.AUTHORIZATION, enc)
+		response = resource().path("user").path("details").header(Attributes.AUTHORIZATION, enc)
 				.get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 		String ent = response.getEntity(String.class);
@@ -264,7 +264,7 @@ public class UserServiceTest extends FastJerseyTest {
 	@Test
 	public void testGetUserDetailsPointer() {
 		String enc = BasicHttpAuth.encode(credentials[0], credentials[1]);
-		ClientResponse response = resource().path(getAPIVersion()).path("user").path("details")
+		ClientResponse response = resource().path("user").path("details")
 				.queryParam("pointer", "email").header(Attributes.AUTHORIZATION, enc).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 		String ent = response.getEntity(String.class);
@@ -276,7 +276,7 @@ public class UserServiceTest extends FastJerseyTest {
 		helper().setupSimpleAccount("userservicetest", "servicepass");
 
 		String enc = BasicHttpAuth.encode("userservicetest", "servicepass");
-		ClientResponse response = resource().path(getAPIVersion()).path("user").path("details")
+		ClientResponse response = resource().path("user").path("details")
 				.header(Attributes.AUTHORIZATION, enc).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 		String entity = response.getEntity(String.class);
@@ -290,7 +290,7 @@ public class UserServiceTest extends FastJerseyTest {
 	@Test
 	public void testGetUserSettings() {
 		String enc = BasicHttpAuth.encode(credentials[0], credentials[1]);
-		ClientResponse response = resource().path(getAPIVersion()).path("user").path("settings")
+		ClientResponse response = resource().path("user").path("settings")
 				.header(Attributes.AUTHORIZATION, enc).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 	}
@@ -303,12 +303,12 @@ public class UserServiceTest extends FastJerseyTest {
 		m.put("lastName", "newLastName");
 		m.put("email", "newtest@ids-mannheim.de");
 
-		ClientResponse response = resource().path(getAPIVersion()).path("user").path("details")
+		ClientResponse response = resource().path("user").path("details")
 				.header(Attributes.AUTHORIZATION, enc).header("Content-Type", MediaType.APPLICATION_JSON)
 				.post(ClientResponse.class, m);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
-		response = resource().path(getAPIVersion()).path("user").path("details").header(Attributes.AUTHORIZATION, enc)
+		response = resource().path("user").path("details").header(Attributes.AUTHORIZATION, enc)
 				.get(ClientResponse.class);
 
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
@@ -324,7 +324,7 @@ public class UserServiceTest extends FastJerseyTest {
 		m.put("lastName", "user");
 		m.put("email", "test@ids-mannheim.de");
 
-		response = resource().path(getAPIVersion()).path("user").path("details").header(Attributes.AUTHORIZATION, enc)
+		response = resource().path("user").path("details").header(Attributes.AUTHORIZATION, enc)
 				.header("Content-Type", MediaType.APPLICATION_JSON).post(ClientResponse.class, m);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 	}
@@ -337,7 +337,7 @@ public class UserServiceTest extends FastJerseyTest {
 		m.putSingle("queryLanguage", "poliqarp_test");
 		m.putSingle("pageLength", "200");
 
-		ClientResponse response = resource().path(getAPIVersion()).path("user").path("settings")
+		ClientResponse response = resource().path("user").path("settings")
 				.header(Attributes.AUTHORIZATION, enc).header("Content-Type", "application/x-www-form-urlencoded")
 				.get(ClientResponse.class);
 
@@ -351,11 +351,11 @@ public class UserServiceTest extends FastJerseyTest {
 
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
-		response = resource().path(getAPIVersion()).path("user").path("settings").header(Attributes.AUTHORIZATION, enc)
+		response = resource().path("user").path("settings").header(Attributes.AUTHORIZATION, enc)
 				.header("Content-Type", "application/x-www-form-urlencoded").post(ClientResponse.class, m);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
-		response = resource().path(getAPIVersion()).path("user").path("settings").header(Attributes.AUTHORIZATION, enc)
+		response = resource().path("user").path("settings").header(Attributes.AUTHORIZATION, enc)
 				.header("Content-Type", "application/x-www-form-urlencoded").get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
@@ -376,7 +376,7 @@ public class UserServiceTest extends FastJerseyTest {
 		m.put("pageLength", "200");
 		m.put("setting_1", "value_1");
 
-		ClientResponse response = resource().path(getAPIVersion()).path("user").path("settings")
+		ClientResponse response = resource().path("user").path("settings")
 				.header(Attributes.AUTHORIZATION, enc).header("Content-Type", MediaType.APPLICATION_JSON)
 				.get(ClientResponse.class);
 
@@ -390,11 +390,11 @@ public class UserServiceTest extends FastJerseyTest {
 
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
-		response = resource().path(getAPIVersion()).path("user").path("settings").header(Attributes.AUTHORIZATION, enc)
+		response = resource().path("user").path("settings").header(Attributes.AUTHORIZATION, enc)
 				.header("Content-Type", MediaType.APPLICATION_JSON).post(ClientResponse.class, m);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
-		response = resource().path(getAPIVersion()).path("user").path("settings").header(Attributes.AUTHORIZATION, enc)
+		response = resource().path("user").path("settings").header(Attributes.AUTHORIZATION, enc)
 				.get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 

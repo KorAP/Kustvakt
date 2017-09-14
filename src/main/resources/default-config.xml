@@ -101,9 +101,10 @@
 		<!-- <property name="validateOnMigrate" value="false" /> -->
 		<!-- <property name="cleanOnValidationError" value="true" /> -->
 		<property name="locations" value="${jdbc.schemaPath}" />
-		<property name="dataSource" ref="dataSource" />
+		<property name="dataSource" ref="sqliteDataSource" />
 	</bean>
-
+	
+	
 	<bean id="kustvakt_db" class="de.ids_mannheim.korap.handlers.JDBCClient">
 		<constructor-arg index="0" ref="dataSource" />
 		<!-- deprecated property -->

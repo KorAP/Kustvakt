@@ -33,9 +33,9 @@ public class SessionFactory implements Runnable {
 
     private static Logger jlog = LoggerFactory.getLogger(SessionFactory.class);
 
-    private final ConcurrentMap<String, TokenContext> sessionsObject;
-    private final ConcurrentMap<String, DateTime> timeCheck;
-    private final ConcurrentMultiMap<String, String> loggedInRecord;
+    public static ConcurrentMap<String, TokenContext> sessionsObject;
+    public static ConcurrentMap<String, DateTime> timeCheck;
+    public static ConcurrentMultiMap<String, String> loggedInRecord;
     //    private final ConcurrentMultiMap<String, Long> failedLogins;
     private final boolean multipleEnabled;
     private final int inactive;

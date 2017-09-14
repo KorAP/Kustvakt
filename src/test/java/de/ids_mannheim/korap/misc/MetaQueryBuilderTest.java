@@ -1,7 +1,6 @@
 package de.ids_mannheim.korap.misc;
 import de.ids_mannheim.korap.config.QueryBuilderUtil;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Map;
@@ -21,11 +20,10 @@ public class MetaQueryBuilderTest {
         MetaQueryBuilder m = QueryBuilderUtil.defaultMetaBuilder(0, 1, 5,
                 "sentence", false);
         Map map = m.raw();
-
         assertEquals("sentence", map.get("context"));
         assertEquals(1, map.get("startPage"));
         assertEquals(0, map.get("startIndex"));
-        assertEquals(false, map.get("cufOff"));
+        assertEquals(false, map.get("cutOff"));
 
     }
 }

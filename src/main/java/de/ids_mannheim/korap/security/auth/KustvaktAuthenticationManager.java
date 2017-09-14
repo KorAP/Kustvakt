@@ -328,7 +328,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
 		boolean isAdmin = adminHandler.isAdmin(unknown.getId());
 		unknown.setAdmin(isAdmin);
-		jlog.trace("Authentication: found username " + unknown.getUsername());
+		jlog.debug("Authentication: found username " + unknown.getUsername());
 
 		if (unknown instanceof KorAPUser) {
 			if (password == null || password.isEmpty())
@@ -374,7 +374,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 		} else if (unknown instanceof ShibUser) {
 			// todo
 		}
-		jlog.debug("Authentication done: " + username);
+		jlog.debug("Authentication done: "+unknown);
 		return unknown;
 	}
 

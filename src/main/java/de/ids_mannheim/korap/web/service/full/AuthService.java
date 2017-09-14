@@ -17,6 +17,7 @@ import de.ids_mannheim.korap.web.KustvaktServer;
 import de.ids_mannheim.korap.web.filter.*;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
+import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest; // FB
@@ -45,24 +46,25 @@ import java.util.Iterator; // 07.02.17/FB
 @Produces(MediaType.TEXT_HTML + ";charset=utf-8")
 public class AuthService {
 
-	private static Boolean DEBUG_LOG = true;
-	
+    private static Boolean DEBUG_LOG = true;
+
     //todo: bootstrap function to transmit certain default configuration settings and examples (example user queries,
     // default usersettings, etc.)
     private static Logger jlog = KustvaktLogger.getLogger(AuthService.class);
 
     private AuthenticationManagerIface controller;
 
+
     //    private SendMail mail;
 
     public AuthService () {
-        this.controller = BeansFactory.getKustvaktContext()
-                .getAuthenticationManager();
+        this.controller =
+                BeansFactory.getKustvaktContext().getAuthenticationManager();
         //todo: replace with real property values
         //        this.mail = new SendMail(ExtConfiguration.getMailProperties());
     }
 
-  
+
     /**
      * represents json string with data. All GUI clients can access
      * this method to get certain default values
@@ -88,7 +90,8 @@ public class AuthService {
     // fixme: moved to user
     @GET
     @Path("status")
-    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class, BlockingFilter.class })
+    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class,
+            BlockingFilter.class })
     public Response getStatus (@Context SecurityContext context,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
@@ -101,61 +104,65 @@ public class AuthService {
     @GET
     @Path("apiToken")
     //@ResourceFilters({HeaderFilter.class})
-    public Response requestAPIToken (
-    		@Context HttpHeaders headers,
+    public Response requestAPIToken (@Context HttpHeaders headers,
             @Context Locale locale,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
             @HeaderParam("referer-url") String referer,
             @QueryParam("scope") String scopes,
-         //   @Context WebServiceContext wsContext, // FB
+            //   @Context WebServiceContext wsContext, // FB
             @Context SecurityContext secCtx) {
-    	
-        List<String> auth = headers
-                .getRequestHeader(ContainerRequest.AUTHORIZATION);
+
+        List<String> auth =
+                headers.getRequestHeader(ContainerRequest.AUTHORIZATION);
+        if (auth == null || auth.isEmpty()) {
+            throw KustvaktResponseHandler
+                    .throwit(new KustvaktException(StatusCodes.MISSING_ARGUMENT,
+                            "Authorization header is missing.",
+                            "Authorization header"));
+        }
 
         String[] values = BasicHttpAuth.decode(auth.get(0));
 
-        if( DEBUG_LOG == true )
-        	{
+        if (DEBUG_LOG == true) {
             System.out.printf("Debug: AuthService.requestAPIToken...:\n");
-	        System.out.printf("Debug: auth.size=%d\n",  auth.size());
-	        System.out.printf("auth.get(0)='%s'\n", auth.get(0));
-	        System.out.printf("Debug: values.length=%d\n",  values.length);
-	        /* hide password etc. - FB
-	         if( auth.size() > 0 )
-	        	{
-	        	Iterator it = auth.iterator();
-	        	while( it.hasNext() )
-	        		System.out.printf(" header '%s'\n",  it.next());
-	        	}
-	        if( values.length > 0 )
-	        	{
-	        	for(int i=0; i< values.length; i++)
-	        		{
-	        		System.out.printf(" values[%d]='%s'\n",  i, values[i]);
-	        		}
-	        	}
-	         */
-	        MultivaluedMap<String,String> headerMap = headers.getRequestHeaders();
-	        if( headerMap != null && headerMap.size() > 0 )
-	        {
-	        	Iterator<String> it = headerMap.keySet().iterator();
-	        	while( it.hasNext() )
-	        	{
-	        		String key = (String)it.next();
-	        		List<String> vals= headerMap.get(key);
-	        		System.out.printf("Debug: requestAPIToken: '%s' = '%s'\n", key, vals);	
-	        	}
-	        	
-	        }
-	        System.out.printf("Debug: requestAPIToken: isSecure = %s.\n", secCtx.isSecure() ? "yes" : "no");
-	        } // DEBUG_LOG        
-        
+            System.out.printf("Debug: auth.size=%d\n", auth.size());
+            System.out.printf("auth.get(0)='%s'\n", auth.get(0));
+            System.out.printf("Debug: values.length=%d\n", values.length);
+            /* hide password etc. - FB
+             if( auth.size() > 0 )
+            	{
+            	Iterator it = auth.iterator();
+            	while( it.hasNext() )
+            		System.out.printf(" header '%s'\n",  it.next());
+            	}
+            if( values.length > 0 )
+            	{
+            	for(int i=0; i< values.length; i++)
+            		{
+            		System.out.printf(" values[%d]='%s'\n",  i, values[i]);
+            		}
+            	}
+             */
+            MultivaluedMap<String, String> headerMap =
+                    headers.getRequestHeaders();
+            if (headerMap != null && headerMap.size() > 0) {
+                Iterator<String> it = headerMap.keySet().iterator();
+                while (it.hasNext()) {
+                    String key = (String) it.next();
+                    List<String> vals = headerMap.get(key);
+                    System.out.printf("Debug: requestAPIToken: '%s' = '%s'\n",
+                            key, vals);
+                }
+
+            }
+            System.out.printf("Debug: requestAPIToken: isSecure = %s.\n",
+                    secCtx.isSecure() ? "yes" : "no");
+        } // DEBUG_LOG        
+
         // "Invalid syntax for username and password"
         if (values == null)
-            throw KustvaktResponseHandler
-                    .throwit(StatusCodes.ACCESS_DENIED);
+            throw KustvaktResponseHandler.throwit(StatusCodes.ACCESS_DENIED);
 
         if (values[0].equalsIgnoreCase("null")
                 | values[1].equalsIgnoreCase("null"))
@@ -167,7 +174,7 @@ public class AuthService {
             attr.put(Attributes.SCOPES, scopes);
         attr.put(Attributes.HOST, host);
         attr.put(Attributes.USER_AGENT, agent);
-        
+
         TokenContext context;
         try {
             // User user = controller.authenticate(0, values[0], values[1], attr); Implementation by Hanl
@@ -176,11 +183,13 @@ public class AuthService {
             // todo: is this necessary?
             //            attr.putAll(data.fields());
             controller.setAccessAndLocation(user, headers);
-            if( DEBUG_LOG == true )
-            		System.out.printf("Debug: /apiToken/: location=%s, access='%s'.\n", user.locationtoString(), user.accesstoString());
+            if (DEBUG_LOG == true) System.out.printf(
+                    "Debug: /apiToken/: location=%s, access='%s'.\n",
+                    user.locationtoString(), user.accesstoString());
             attr.put(Attributes.LOCATION, user.getLocation());
-            attr.put(Attributes.CORPUS_ACCESS,  user.getCorpusAccess());
-            context = controller.createTokenContext(user, attr, Attributes.API_AUTHENTICATION);
+            attr.put(Attributes.CORPUS_ACCESS, user.getCorpusAccess());
+            context = controller.createTokenContext(user, attr,
+                    Attributes.API_AUTHENTICATION);
         }
         catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
@@ -217,8 +226,8 @@ public class AuthService {
             @Context Locale locale,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host) {
-        List<String> auth = headers
-                .getRequestHeader(ContainerRequest.AUTHORIZATION);
+        List<String> auth =
+                headers.getRequestHeader(ContainerRequest.AUTHORIZATION);
 
         String[] values = BasicHttpAuth.decode(auth.get(0));
         //        authentication = StringUtils.stripTokenType(authentication);
@@ -228,8 +237,7 @@ public class AuthService {
 
         // "Invalid syntax for username and password"
         if (values == null)
-            throw KustvaktResponseHandler
-                    .throwit(StatusCodes.BAD_CREDENTIALS);
+            throw KustvaktResponseHandler.throwit(StatusCodes.BAD_CREDENTIALS);
 
         // Implementation Hanl mit '|'. 16.02.17/FB
         //if (values[0].equalsIgnoreCase("null")
@@ -242,15 +250,18 @@ public class AuthService {
         attr.put(Attributes.HOST, host);
         attr.put(Attributes.USER_AGENT, agent);
         TokenContext context;
+        String contextJson;
         try {
             User user = controller.authenticate(0, values[0], values[1], attr);
             context = controller.createTokenContext(user, attr,
                     Attributes.SESSION_AUTHENTICATION);
+            contextJson = context.toJson();
+            jlog.debug(contextJson);
         }
         catch (KustvaktException e) {
             throw KustvaktResponseHandler.throwit(e);
         }
-        return Response.ok().entity(context.toJson()).build();
+        return Response.ok().entity(contextJson).build();
     }
 
 
@@ -290,8 +301,10 @@ public class AuthService {
     //fixme: moved from userservice
     @GET
     @Path("logout")
-    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class, PiwikFilter.class })
-    public Response logout (@Context SecurityContext ctx, @Context Locale locale) {
+    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class,
+            PiwikFilter.class })
+    public Response logout (@Context SecurityContext ctx,
+            @Context Locale locale) {
         TokenContext context = (TokenContext) ctx.getUserPrincipal();
         try {
             controller.logout(context);

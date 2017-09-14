@@ -38,6 +38,7 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
 
 
     @Test
+    @Ignore
     public void testCreateUser () throws KustvaktException {
         User user = helper().getContext().getAuthenticationManager()
                 .createUserAccount(KustvaktConfiguration.KUSTVAKT_USER, false);
@@ -61,6 +62,7 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
 
 
     @Test
+    @Ignore
     public void testUserdetailsGet () throws KustvaktException {
         testCreateUser();
         AuthenticationManagerIface manager = helper().getContext()
@@ -76,6 +78,7 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
 
 
     @Test
+    @Ignore
     public void testUsersettingsGet () throws KustvaktException {
         testCreateUser();
         AuthenticationManagerIface manager = helper().getContext()

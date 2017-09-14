@@ -31,7 +31,7 @@ public class FilterTest extends FastJerseyTest {
     @Test
     public void testTestUserAuth () {
         ClientResponse resp = resource()
-                .path(getAPIVersion())
+                
                 .path("user/info")
                 .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode(
@@ -45,7 +45,7 @@ public class FilterTest extends FastJerseyTest {
     @Test
     @Ignore
     public void testDemoAuth () {
-        ClientResponse resp = resource().path(getAPIVersion())
+        ClientResponse resp = resource()
                 .path("user/info").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(), resp.getStatus());
     }
@@ -54,7 +54,7 @@ public class FilterTest extends FastJerseyTest {
     @Test
     public void testUnauthorizedAuth () {
         ClientResponse resp = resource()
-                .path(getAPIVersion())
+                
                 .path("user/info")
                 .header(Attributes.AUTHORIZATION,
                         BasicHttpAuth.encode("kustvakt", "kustvakt2015"))

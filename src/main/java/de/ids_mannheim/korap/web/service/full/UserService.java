@@ -32,7 +32,7 @@ import java.util.*;
  * @author hanl, margaretha
  * @lastUpdate 04/2017
  */
-@Path(KustvaktServer.API_VERSION + "/user")
+@Path("/user")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 @ResourceFilters({ PiwikFilter.class })
 public class UserService {
@@ -68,8 +68,7 @@ public class UserService {
         User user;
         try {
             uriBuilder = info.getBaseUriBuilder();
-            uriBuilder.path(KustvaktServer.API_VERSION).path("user")
-                    .path("confirm");
+            uriBuilder.path("user").path("confirm");
             user = controller.createUserAccount(values, true);
         }
         catch (KustvaktException e) {

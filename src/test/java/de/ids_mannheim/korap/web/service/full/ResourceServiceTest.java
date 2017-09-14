@@ -31,6 +31,8 @@ import de.ids_mannheim.korap.web.service.FastJerseyTest;
  * @date 14/01/2016
  * @update 24/04/2017
  */
+@Ignore
+@Deprecated
 public class ResourceServiceTest extends FastJerseyTest {
 
     @BeforeClass
