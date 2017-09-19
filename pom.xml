@@ -381,7 +381,7 @@
         <dependency>
             <groupId>de.ids_mannheim.korap</groupId>
             <artifactId>Krill</artifactId>
-            <version>0.55.8</version>
+            <version>0.55.9</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.xerial</groupId>
