@@ -119,13 +119,13 @@ public class UserdataTest extends BeanConfigTest {
                         helper().getContext().getUserDataProviders(),
                         UserDetails.class);
         assertNotNull(dao);
-        assertEquals(UserDetailsDao.class, dao.getClass());
+        assertTrue(dao instanceof UserDetailsDao);
 
         dao = BeansFactory.getTypeFactory().getTypeInterfaceBean(
                 helper().getContext().getUserDataProviders(),
                 UserSettings.class);
         assertNotNull(dao);
-        assertEquals(UserSettingsDao.class, dao.getClass());
+        assertTrue(dao instanceof UserSettingsDao);
     }
 
 

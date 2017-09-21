@@ -24,16 +24,14 @@ import net.jcip.annotations.NotThreadSafe;
 @NotThreadSafe
 @RunWith(BeanConfigBaseTest.SpringExtendedSetupListener.class)
 @ContextConfiguration(classes = AppTestConfigBase.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class BeanConfigBaseTest {
 
     private static Logger jlog = Logger.getLogger(BeanConfigBaseTest.class);
-//    @Autowired
+    @Autowired
     protected ApplicationContext context;
 
-    @Before
     public void init () throws Exception {
-        context = new ClassPathXmlApplicationContext("test-default-config.xml");
         assertNotNull("Application context must not be null!", this.context);
         jlog.debug("running one-time before init for class "
                 + this.getClass().getSimpleName() + " ...");

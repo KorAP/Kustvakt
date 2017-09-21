@@ -35,7 +35,7 @@ import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.security.auth.KustvaktAuthenticationManager;
 import de.ids_mannheim.korap.security.auth.OpenIDconnectAuthentication;
 import de.ids_mannheim.korap.security.auth.SessionAuthentication;
-@Configuration
+
 public class AppTestConfig extends AppTestConfigBase implements TestBeans {
 
     protected PersistenceClient dataSource;
