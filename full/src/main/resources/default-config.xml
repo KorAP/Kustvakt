@@ -42,8 +42,8 @@
 		<property name="locations">
 			<array>
 				<value>classpath:jdbc.properties</value>
+				<value>file:./jdbc.properties</value>
 				<value>classpath:hibernate.properties</value>
-				<!-- <value>file:./jdbc.properties</value> -->
 				<value>classpath:kustvakt.conf</value>
 				<value>file:./kustvakt.conf</value>
 			</array>
@@ -101,7 +101,7 @@
 		<!-- <property name="validateOnMigrate" value="false" /> -->
 		<!-- <property name="cleanOnValidationError" value="true" /> -->
 		<property name="locations" value="${jdbc.schemaPath}" />
-		<property name="dataSource" ref="sqliteDataSource" />
+		<property name="dataSource" ref="dataSource" />
 	</bean>
 	
 	
@@ -285,9 +285,4 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 	
-	<!-- Krill -->
-	<bean id="search_krill"
-          class="de.ids_mannheim.korap.web.SearchKrill">
-        <constructor-arg value="${krill.indexDir}"/>
-    </bean>
 </beans>

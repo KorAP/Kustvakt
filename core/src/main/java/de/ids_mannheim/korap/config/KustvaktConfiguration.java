@@ -88,6 +88,8 @@ public class KustvaktConfiguration {
     private Pattern freeLicensePattern;
     private Pattern allLicensePattern;
     
+    private String baseURL;
+    
     
     // deprec?!
     private final BACKENDS DEFAULT_ENGINE = BACKENDS.LUCENE;
@@ -108,6 +110,7 @@ public class KustvaktConfiguration {
      */
     protected Properties load (Properties properties)
             throws IOException {
+        baseURL = properties.getProperty("kustvakt.base.url", "/api/*");
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));
         returnhits = new Integer(properties.getProperty("returnhits", "50000"));
         indexDir = properties.getProperty("krill.indexDir", "");

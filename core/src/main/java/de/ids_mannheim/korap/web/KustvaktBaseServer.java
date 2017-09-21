@@ -84,7 +84,7 @@ public abstract class KustvaktBaseServer {
         servletHolder.setInitParameter("com.sun.jersey.config.property.packages", 
                 rootPackages);
         servletHolder.setInitOrder(1);
-        contextHandler.addServlet(servletHolder, "/api/*");
+        contextHandler.addServlet(servletHolder, config.getBaseURL());
         
         SocketConnector connector = new SocketConnector();
         connector.setPort(kargs.port);
