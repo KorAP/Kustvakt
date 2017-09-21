@@ -24,13 +24,6 @@ import static org.junit.Assert.assertEquals;
 // todo: in combination with other tests, causes failures!
 public class OAuth2EndpointTest extends FastJerseyTest {
 
-    @BeforeClass
-    public static void configure () throws Exception {
-        FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.full",
-                "de.ids_mannheim.korap.web.filter",
-                "de.ids_mannheim.korap.web.utils");
-    }
-
     @Override
     public void initMethod () throws KustvaktException {
         helper().setupAccount();

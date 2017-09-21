@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.ws.rs.ext.Provider;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
@@ -28,8 +30,8 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 @Provider
 public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
 
-	private static AuthenticationManagerIface authManager = BeansFactory.getKustvaktContext()
-			.getAuthenticationManager();
+    @Autowired
+	private AuthenticationManagerIface authManager;
 
 	@Override
 	public ContainerRequest filter(ContainerRequest cr) {

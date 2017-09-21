@@ -29,13 +29,6 @@ public class StatisticsServiceTest extends FastJerseyTest {
 
     }
 
-    @BeforeClass
-    public static void configure () {
-//        FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.light",
-        FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.full",
-                "de.ids_mannheim.korap.web.utils");
-    }
-
     @Test
     public void testGetStatisticsNoResource ()
             throws JsonProcessingException, IOException {

@@ -17,8 +17,8 @@
         <spring-framework.version>4.3.7.RELEASE</spring-framework.version>
         <jersey.version>1.19.4</jersey.version>
     </properties>
-    <profiles>
-        <!-- mvn -Plight builds additionally the light server version with reduced functionality! -->
+    <!-- <profiles>
+        mvn -Plight builds additionally the light server version with reduced functionality!
         <profile>
             <id>light</id>
             <build>
@@ -27,7 +27,7 @@
                         <artifactId>maven-shade-plugin</artifactId>
                         <version>2.1</version>
                         <executions>
-                            <!-- option 1 -->
+                            option 1
                             <execution>
                                 <id>light</id>
                                 <phase>package</phase>
@@ -56,8 +56,8 @@
                                             </resource>
                                         </transformer>
                                     </transformers>
-                                    <!-- Additional configuration. -->
-                                    <!-- apparently there is a securityexception -->
+                                    Additional configuration.
+                                    apparently there is a securityexception
                                     <filters>
                                         <filter>
                                             <artifact>*:*</artifact>
@@ -78,7 +78,8 @@
             </build>
         </profile>
     </profiles>
-    <build>
+     -->
+     <build>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

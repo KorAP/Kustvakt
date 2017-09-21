@@ -1,8 +1,9 @@
 package de.ids_mannheim.korap.web.service.full;
 
+import de.ids_mannheim.korap.server.KustvaktServer;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.ServiceInfo;
-import de.ids_mannheim.korap.web.KustvaktServer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

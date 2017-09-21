@@ -1,0 +1,196 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>de.ids_mannheim.korap</groupId>
+	<artifactId>Kustvakt-full</artifactId>
+	<version>0.1</version>
+	<properties>
+		<java.version>1.7</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<spring-framework.version>4.3.7.RELEASE</spring-framework.version>
+		<jersey.version>1.19.4</jersey.version>
+	</properties>
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.info</include>
+					<include>**/*.xml</include>
+					<include>**/*.conf</include>
+					<include>**/*.kustvakt</include>
+					<include>**/*.properties</include>
+					<include>**/*.sql</include>
+				</includes>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.prop</include>
+					<include>**/*.xml</include>
+					<include>**/*.conf</include>
+					<include>**/*.info</include>
+					<include>**/*.properties</include>
+				</includes>
+			</testResource>
+			<testResource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.info</include>
+					<include>**/*.properties</include>
+				</includes>
+			</testResource>
+		</testResources>
+		<plugins>
+			<!-- Formatter plugin for Eclipse based coding conventions http://maven-java-formatter-plugin.googlecode.com/svn/site/0.4/usage.html -->
+			<plugin>
+				<groupId>com.googlecode.maven-java-formatter-plugin</groupId>
+				<artifactId>maven-java-formatter-plugin</artifactId>
+				<version>0.4</version>
+				<configuration>
+					<configFile>${project.basedir}/Format.xml</configFile>
+					<overrideConfigCompilerVersion>true</overrideConfigCompilerVersion>
+					<compilerSource>${java.version}</compilerSource>
+					<compilerCompliance>${java.version}</compilerCompliance>
+					<compilerTargetPlatform>${java.version}</compilerTargetPlatform>
+				</configuration>
+				<!-- <executions> <execution> <goals> <goal>format</goal> </goals> </execution> 
+					</executions> -->
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.3</version>
+				<configuration>
+					<compilerVersion>${java.version}</compilerVersion>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.19.1</version>
+				<configuration>
+					<reuseForks>false</reuseForks>
+					<forkCount>2</forkCount>
+					<threadCount>10</threadCount>
+
+					<excludes>
+						<exclude>**/*APITest.java</exclude>
+						<exclude>de/ids_mannheim/korap/suites/*.java</exclude>
+						<exclude>**/KustvaktServerTest.java</exclude>
+						<exclude>**/ResourceServiceTest.java</exclude>
+						<exclude>**/ResourceInfoServiceTest.java</exclude>
+						<exclude>**/PolicyServiceTest.java</exclude>
+					</excludes>
+					<includes>
+						<include>de/ids_mannheim/korap/**/*.java</include>
+					</includes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.1</version>
+				<executions>
+					<!-- option 1 -->
+					<execution>
+						<id>full</id>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<finalName>Kustvakt-${project.version}-full</finalName>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>
+										de.ids_mannheim.korap.server.KustvaktServer
+									</mainClass>
+								</transformer>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+									<resource>META-INF/spring.handlers
+									</resource>
+								</transformer>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+									<resource>META-INF/spring.schemas
+									</resource>
+								</transformer>
+							</transformers>
+							<!-- Additional configuration. apparently there is a securityException -->
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA
+										</exclude>
+										<exclude>META-INF/*.RSA
+										</exclude>
+									</excludes>
+								</filter>
+							</filters>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>de.ids_mannheim.korap</groupId>
+			<artifactId>Kustvakt-core</artifactId>
+			<version>0.59.8</version>
+		</dependency>
+		<dependency>
+			<groupId>de.ids_mannheim.korap</groupId>
+			<artifactId>Kustvakt-core</artifactId>
+			<version>0.59.8</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Hibernate -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>5.1.8.Final</version>
+		</dependency>
+
+
+		<!-- Jersey -->
+		<dependency>
+			<groupId>com.sun.jersey.jersey-test-framework</groupId>
+			<artifactId>jersey-test-framework-core</artifactId>
+			<version>${jersey.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey.jersey-test-framework</groupId>
+			<artifactId>jersey-test-framework-grizzly</artifactId>
+			<version>${jersey.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Spring -->
+<!-- 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring-framework.version}</version>
+			<scope>compile</scope>
+		</dependency>
+ -->
+
+	</dependencies>
+</project>

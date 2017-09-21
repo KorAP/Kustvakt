@@ -1,19 +1,20 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientResponse;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.query.serialize.QuerySerializer;
-import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.service.FastJerseyTest;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.apache.lucene.LucenePackage;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.sun.jersey.api.client.ClientResponse;
+
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.query.serialize.QuerySerializer;
+import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
  * EM: FIX ME: Database restructure
@@ -21,13 +22,7 @@ import static org.junit.Assert.assertNotNull;
  * Created by hanl on 29.04.16.
  */
 @Ignore
-public class LightServiceTest extends FastJerseyTest {
-
-    @BeforeClass
-    public static void configure () throws Exception {
-        FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.light");
-    }
-
+public class LightServiceTest extends FastJerseyLightTest {
 
     @Override
     public void initMethod () throws KustvaktException {}

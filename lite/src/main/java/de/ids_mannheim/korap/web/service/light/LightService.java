@@ -1,14 +1,33 @@
 package de.ids_mannheim.korap.web.service.light;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import de.ids_mannheim.korap.config.BeansFactory;
+
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.QueryBuilderUtil;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
-import de.ids_mannheim.korap.resource.rewrite.FoundryInject;
 import de.ids_mannheim.korap.resource.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
@@ -16,45 +35,33 @@ import de.ids_mannheim.korap.web.ClientsHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
 import de.ids_mannheim.korap.web.TRACE;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriBuilder;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
 
 /**
  * @author hanl
  * @date 29/01/2014
+ * 
+ * @author margaretha
+ * @date 21/09/2017
  */
-@Path("v0.1" + "/")
+@Controller
+@Path("/")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class LightService {
 
     private static Logger jlog = LoggerFactory.getLogger(LightService.class);
 
+    @Autowired
     private SearchKrill searchKrill;
     private ClientsHandler graphDBhandler;
+    @Autowired
     private RewriteHandler processor;
+    @Autowired
     private KustvaktConfiguration config;
 
 
     public LightService () {
-        this.config = BeansFactory.getKustvaktContext().getConfiguration();
-        this.searchKrill = new SearchKrill(config.getIndexDir());
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
         this.graphDBhandler = new ClientsHandler(builder.build());
-        this.processor = new RewriteHandler();
-        this.processor.add(FoundryInject.class);
-//        this.processor.insertBeans(BeansFactory.getKustvaktContext());
     }
 
 

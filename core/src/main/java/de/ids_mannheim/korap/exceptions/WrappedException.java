@@ -13,13 +13,13 @@ import java.util.Arrays;
 public class WrappedException extends KustvaktException {
 
     private WrappedException (Object userid, Integer status, String message,
-                              String args) {
-        super(String.valueOf(userid), status, message, args);
+                              String args, Exception rootCause) {
+        super(String.valueOf(userid), status, message, args, rootCause);
     }
 
 
     public WrappedException (Object userid, Integer status, String ... args) {
-        this(userid, status, "", Arrays.asList(args).toString());
+        this(userid, status, "", Arrays.asList(args).toString(), null);
         AuditRecord record = AuditRecord.serviceRecord(userid, status, args);
         this.records.add(record);
     }
@@ -27,7 +27,7 @@ public class WrappedException extends KustvaktException {
 
     public WrappedException (KustvaktException e, Integer status,
                              String ... args) {
-        this(e.getUserid(), e.getStatusCode(), e.getMessage(), e.getEntity());
+        this(e.getUserid(), e.getStatusCode(), e.getMessage(), e.getEntity(), e);
         AuditRecord record = AuditRecord.serviceRecord(e.getUserid(), status,
                 args);
         record.setField_1(e.string());

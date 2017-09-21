@@ -27,9 +27,6 @@ public class AuthServiceTest extends FastJerseyTest {
 
     @BeforeClass
     public static void configure () throws Exception {
-        FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.full",
-                "de.ids_mannheim.korap.web.filter",
-                "de.ids_mannheim.korap.web.utils");
         credentials = new String[2];
         credentials[0] = (String) TestHelper.getUserCredentials().get(Attributes.USERNAME);
         credentials[1] = (String) TestHelper.getUserCredentials().get(Attributes.PASSWORD);

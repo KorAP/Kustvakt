@@ -35,13 +35,6 @@ import de.ids_mannheim.korap.web.service.FastJerseyTest;
 @Deprecated
 public class ResourceServiceTest extends FastJerseyTest {
 
-    @BeforeClass
-    public static void configure () throws Exception {
-        FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.full",
-                "de.ids_mannheim.korap.web.filter",
-                "de.ids_mannheim.korap.web.utils");
-    }
-
 
     // create a simple test collection for user kustvakt, otherwise test fails
     @Test

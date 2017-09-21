@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.config;
 import static org.junit.Assert.assertNotNull;
 
 import org.apache.log4j.Logger;
+import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.InitializationError;
@@ -22,8 +23,8 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @RunWith(BeanConfigTest.SpringExtendedSetupListener.class)
-@ContextConfiguration(classes = TestHelper.AppTestConfig.class)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@ContextConfiguration(classes = AppTestConfig.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public abstract class BeanConfigTest {
 
     private static Logger jlog = Logger.getLogger(BeanConfigTest.class);
@@ -31,8 +32,9 @@ public abstract class BeanConfigTest {
     private ApplicationContext context;
 
 
+    @Before
     public void init () throws Exception {
-//        context = new ClassPathXmlApplicationContext("test-default-config.xml");
+        context = new ClassPathXmlApplicationContext("test-default-config.xml");
         assertNotNull("Application context must not be null!", this.context);
         jlog.debug("running one-time before init for class "
                 + this.getClass().getSimpleName() + " ...");
@@ -62,7 +64,7 @@ public abstract class BeanConfigTest {
     public static class SpringExtendedSetupListener extends
             SpringJUnit4ClassRunner {
 
-        private BeanConfigTest instanceSetupListener;
+        private BeanConfigBaseTest instanceSetupListener;
 
 
         public SpringExtendedSetupListener (Class<?> clazz)
@@ -76,8 +78,8 @@ public abstract class BeanConfigTest {
             Object test = super.createTest();
             // Note that JUnit4 will call this createTest() multiple times for each
             // test method, so we need to ensure to call "beforeClassSetup" only once.
-            if (test instanceof BeanConfigTest && instanceSetupListener == null) {
-                instanceSetupListener = (BeanConfigTest) test;
+            if (test instanceof BeanConfigBaseTest && instanceSetupListener == null) {
+                instanceSetupListener = (BeanConfigBaseTest) test;
                 instanceSetupListener.init();
             }
             return test;

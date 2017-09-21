@@ -1,16 +1,17 @@
 package de.ids_mannheim.korap.misc;
-import de.ids_mannheim.korap.KrillCollection;
-import de.ids_mannheim.korap.config.BeanConfigTest;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
-import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
-import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.SearchKrill;
+import java.io.IOException;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
+import de.ids_mannheim.korap.KrillCollection;
+import de.ids_mannheim.korap.config.BeanConfigTest;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
+import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
+import de.ids_mannheim.korap.web.SearchKrill;
 
 /**
  * @author hanl

@@ -1,6 +1,16 @@
 package de.ids_mannheim.korap.resource.rewrite;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import org.joda.time.DateTime;
+import org.junit.Test;
+import org.springframework.test.annotation.DirtiesContext;
+
 import com.fasterxml.jackson.databind.JsonNode;
+
 import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.TestVariables;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -8,10 +18,6 @@ import de.ids_mannheim.korap.handlers.DocumentDao;
 import de.ids_mannheim.korap.resources.Document;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
-import org.joda.time.DateTime;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by hanl on 30.05.16.

@@ -1,30 +1,34 @@
 package de.ids_mannheim.korap.security;
 
-import de.ids_mannheim.korap.config.BeanConfigTest;
-import de.ids_mannheim.korap.config.ContextHolder;
-import de.ids_mannheim.korap.config.KustvaktConfiguration;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
-import de.ids_mannheim.korap.resources.*;
-import de.ids_mannheim.korap.security.ac.ResourceFinder;
-import de.ids_mannheim.korap.security.ac.ResourceHandler;
-import de.ids_mannheim.korap.security.ac.SecurityManager;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.TimeUtils;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.Set;
 
 import org.hamcrest.core.StringStartsWith;
 import org.joda.time.DateTime;
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import de.ids_mannheim.korap.config.BeanConfigTest;
+import de.ids_mannheim.korap.config.ContextHolder;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
+import de.ids_mannheim.korap.resources.Corpus;
+import de.ids_mannheim.korap.resources.Foundry;
+import de.ids_mannheim.korap.resources.KustvaktResource;
+import de.ids_mannheim.korap.resources.Permissions;
+import de.ids_mannheim.korap.resources.ResourceFactory;
+import de.ids_mannheim.korap.resources.VirtualCollection;
+import de.ids_mannheim.korap.security.ac.ResourceFinder;
+import de.ids_mannheim.korap.security.ac.ResourceHandler;
+import de.ids_mannheim.korap.security.ac.SecurityManager;
+import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.TimeUtils;
 
 /**
  * @author hanl, margaretha

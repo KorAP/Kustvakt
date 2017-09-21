@@ -12,31 +12,26 @@ import java.util.List;
  * @author hanl
  * @date 20/02/2016
  */
-public abstract class TestBeans {
+public interface TestBeans {
 
-	protected PersistenceClient dataSource;
+	public  PolicyHandlerIface getPolicyDao();
 
-	public abstract PolicyHandlerIface getPolicyDao();
+//	public  KustvaktConfiguration getConfig();
 
-	public abstract KustvaktConfiguration getConfig();
-
-	public abstract EntityHandlerIface getUserDao();
+	public  EntityHandlerIface getUserDao();
 	
-	public abstract AdminHandlerIface getAdminDao();
+	public  AdminHandlerIface getAdminDao();
 
-	public abstract AuditingIface getAuditingDao();
+	public  AuditingIface getAuditingDao();
 
-	public abstract List<ResourceOperationIface> getResourceDaos();
+	public  List<ResourceOperationIface> getResourceDaos();
 
-	public abstract List<UserDataDbIface> getUserdataDaos();
+	public  List<UserDataDbIface> getUserdataDaos();
 
-	public abstract EncryptionIface getCrypto();
+	public  EncryptionIface getCrypto();
 
-	public abstract AuthenticationManagerIface getAuthManager();
+	public  AuthenticationManagerIface getAuthManager();
 
-	@Bean(name = "kustvakt_db")
-	public PersistenceClient getDataSource() {
-		return this.dataSource;
-	}
+	
 
 }

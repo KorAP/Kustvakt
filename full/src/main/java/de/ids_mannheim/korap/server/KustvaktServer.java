@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web;
+package de.ids_mannheim.korap.server;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,7 @@ import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.KustvaktClassLoader;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.web.KustvaktBaseServer;
 import de.ids_mannheim.korap.web.service.BootableBeanInterface;
 
 /**
@@ -26,9 +27,10 @@ public class KustvaktServer extends KustvaktBaseServer {
 
         if (kargs.getConfig() != null)
             BeansFactory.loadFileContext(kargs.getConfig());
-        else
+        else{
+            kargs.setConfig("default-config.xml");
             BeansFactory.loadClasspathContext("default-config.xml");
-
+        }
         kargs.setRootPackages(new String[] { "de.ids_mannheim.korap.web.utils",
                 "de.ids_mannheim.korap.web.service.full" });
         rootPackages = "de.ids_mannheim.korap.web.utils;"

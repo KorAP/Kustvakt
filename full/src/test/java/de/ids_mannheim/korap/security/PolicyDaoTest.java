@@ -1,5 +1,18 @@
 package de.ids_mannheim.korap.security;
 
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.junit.Ignore;
+import org.junit.Test;
+
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
@@ -8,18 +21,8 @@ import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.Permissions;
 import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.security.ac.PolicyBuilder;
-import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.User;
 import edu.emory.mathcs.backport.java.util.Arrays;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.Assert.*;
 
 /** EM: needs reimplementation
  * 

@@ -7,6 +7,7 @@ import de.ids_mannheim.korap.web.service.PolicyLoader;
 import de.ids_mannheim.korap.web.service.UserLoader;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.ArrayList;
 import java.util.HashSet;

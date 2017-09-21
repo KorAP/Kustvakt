@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.filter;
+package de.ids_mannheim.korap.filter;
 
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;

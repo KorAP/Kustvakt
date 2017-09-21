@@ -1,17 +1,21 @@
 package de.ids_mannheim.korap.security;
 
-import de.ids_mannheim.korap.config.BeanConfigTest;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
-import de.ids_mannheim.korap.resources.Corpus;
-import de.ids_mannheim.korap.resources.Permissions;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
+
+import de.ids_mannheim.korap.config.BeanConfigTest;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
+import de.ids_mannheim.korap.resources.Corpus;
+import de.ids_mannheim.korap.resources.Permissions;
 
 /**
  * @author hanl

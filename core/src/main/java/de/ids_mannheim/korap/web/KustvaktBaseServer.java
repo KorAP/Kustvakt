@@ -30,25 +30,6 @@ public abstract class KustvaktBaseServer {
     }
 
 
-    public static void main (String[] args) throws Exception {
-        KustvaktBaseServer server = new KustvaktBaseServer() {
-            @Override
-            protected void setup () {}
-        };
-        kargs = server.readAttributes(args);
-
-        if (kargs.config != null)
-            BeansFactory.loadFileContext(kargs.config);
-        else
-            BeansFactory.loadClasspathContext();
-
-        kargs.setRootPackages(new String[] { "de.ids_mannheim.korap.web.service.light" });
-        rootPackages = "de.ids_mannheim.korap.web.service.light";
-        
-        server.start();
-    }
-
-
     protected KustvaktArgs readAttributes (String[] args) {
         KustvaktArgs kargs = new KustvaktArgs();
         for (int i = 0; i < args.length; i++) {
@@ -94,7 +75,7 @@ public abstract class KustvaktBaseServer {
         ServletContextHandler contextHandler = new ServletContextHandler(
                 ServletContextHandler.NO_SESSIONS);
         contextHandler.setContextPath("/");
-        contextHandler.setInitParameter("contextConfigLocation", "classpath:default-config.xml");
+        contextHandler.setInitParameter("contextConfigLocation", "classpath:"+kargs.getConfig());
         
         ServletContextListener listener = new ContextLoaderListener();
         contextHandler.addEventListener(listener);

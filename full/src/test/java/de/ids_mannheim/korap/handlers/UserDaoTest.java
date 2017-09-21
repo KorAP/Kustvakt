@@ -1,8 +1,14 @@
 package de.ids_mannheim.korap.handlers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+import org.junit.Ignore;
+import org.junit.Test;
+
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.BeansFactory;
+import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
@@ -11,11 +17,6 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserDetails;
 import de.ids_mannheim.korap.user.UserSettings;
 import de.ids_mannheim.korap.user.Userdata;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 ;
 

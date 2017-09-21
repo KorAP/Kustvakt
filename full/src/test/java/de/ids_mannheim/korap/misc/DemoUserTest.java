@@ -19,14 +19,6 @@ public class DemoUserTest extends FastJerseyTest {
     }
 
 
-    @BeforeClass
-    public static void setup () throws Exception {
-        FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.full",
-                "de.ids_mannheim.korap.web.filter",
-                "de.ids_mannheim.korap.web.utils");
-    }
-
-
     @Test
     public void testDemoCollectionGet () {
         //        ClientResponse response = resource().path(getVersion())

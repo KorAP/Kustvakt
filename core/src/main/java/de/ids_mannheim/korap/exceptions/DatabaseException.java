@@ -11,14 +11,18 @@ import java.util.Arrays;
 public class DatabaseException extends KustvaktException {
 
     private DatabaseException (Object userid, Integer status, String message,
-                         String args) {
-        super(String.valueOf(userid), status, message, args);
+                         String args, Exception e) {
+        super(String.valueOf(userid), status, message, args, e);
     }
 
-
     public DatabaseException (Object userid, String target, Integer status, String message,
+            String ... args) {
+        this(null, userid, target, status, message);
+    }
+
+    public DatabaseException (Exception e, Object userid, String target, Integer status, String message,
                         String ... args) {
-        this(userid, status, message, Arrays.asList(args).toString());
+        this(userid, status, message, Arrays.asList(args).toString(), e);
         AuditRecord record = new AuditRecord(AuditRecord.CATEGORY.DATABASE);
         record.setUserid(String.valueOf(userid));
         record.setStatus(status);
@@ -29,7 +33,7 @@ public class DatabaseException extends KustvaktException {
 
 
     public DatabaseException (KustvaktException e, Integer status, String ... args) {
-        this(e.getUserid(), e.getStatusCode(), e.getMessage(), e.getEntity());
+        this(e.getUserid(), e.getStatusCode(), e.getMessage(), e.getEntity(), e);
         AuditRecord record = AuditRecord.dbRecord(e.getUserid(), status, args);
         record.setField_1(e.string());
         this.records.addAll(e.getRecords());

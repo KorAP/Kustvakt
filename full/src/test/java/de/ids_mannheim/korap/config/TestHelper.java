@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -136,9 +137,10 @@ public class TestHelper {
             manager.createUserAccount(m, false);
         }
         catch (KustvaktException e) {
-            // do nothing
+            throw new RuntimeException(e);
+            /*// do nothing
             jlog.error("Error: {}", e.string());
-            assertNotNull("Test user could not be set up", null);
+            assertNotNull("Test user could not be set up", null);*/
         }
         assertNotEquals(0, dao.size());
         return this;
@@ -350,7 +352,7 @@ public class TestHelper {
     }
 
 
-    private static PersistenceClient sqlite_db (boolean memory)
+    protected static PersistenceClient sqlite_db (boolean memory)
             throws InterruptedException {
         SingleConnectionDataSource dataSource = new SingleConnectionDataSource();
         dataSource.setDriverClassName("org.sqlite.JDBC");
@@ -425,97 +427,4 @@ public class TestHelper {
         return client;
     }
 
-    public static class AppTestConfig extends TestBeans {
-
-        public AppTestConfig () throws InterruptedException, IOException {
-            this.dataSource = TestHelper.sqlite_db(true);
-            //this.dataSource = TestHelper.mysql_db();
-        }
-
-
-        @Bean(name = ContextHolder.KUSTVAKT_POLICIES)
-        @Override
-        public PolicyHandlerIface getPolicyDao () {
-            return new PolicyDao(this.dataSource);
-        }
-
-
-        @Bean(name = ContextHolder.KUSTVAKT_USERDB)
-        @Override
-        public EntityHandlerIface getUserDao () {
-            return new EntityDao(this.dataSource);
-        }
-
-        @Bean(name = ContextHolder.KUSTVAKT_ADMINDB)
-        @Override
-        public AdminHandlerIface getAdminDao () {
-            return new AdminDao(this.dataSource);
-        }
-        
-        @Bean(name = ContextHolder.KUSTVAKT_CONFIG)
-        @Override
-        public KustvaktConfiguration getConfig () {
-            KustvaktConfiguration c = new KustvaktConfiguration();
-            InputStream s = ConfigLoader.loadConfigStream(mainConfigurationFile);
-            if (s != null)
-                c.setPropertiesAsStream(s);
-            else {
-                System.out.println("No properties found!");
-                System.exit(-1);
-            }
-            return c;
-        }
-
-
-        @Bean(name = ContextHolder.KUSTVAKT_AUDITING)
-        @Override
-        public AuditingIface getAuditingDao () {
-            return new JDBCAuditing(this.dataSource);
-        }
-
-
-        @Bean(name = ContextHolder.KUSTVAKT_RESOURCES)
-        @Override
-        public List<ResourceOperationIface> getResourceDaos () {
-            List<ResourceOperationIface> res = new ArrayList<>();
-            res.add(new ResourceDao(getDataSource()));
-            res.add(new DocumentDao(getDataSource()));
-            return res;
-        }
-
-
-        @Bean(name = ContextHolder.KUSTVAKT_USERDATA)
-        @Override
-        public List<UserDataDbIface> getUserdataDaos () {
-            List<UserDataDbIface> ud = new ArrayList<>();
-            ud.add(new UserSettingsDao(getDataSource()));
-            ud.add(new UserDetailsDao(getDataSource()));
-            return ud;
-        }
-
-
-        @Bean(name = ContextHolder.KUSTVAKT_ENCRYPTION)
-        @Override
-        public EncryptionIface getCrypto () {
-            return new KustvaktEncryption(getConfig());
-        }
-
-
-        @Bean(name = ContextHolder.KUSTVAKT_AUTHENTICATION_MANAGER)
-        @Override
-        public AuthenticationManagerIface getAuthManager () {
-            AuthenticationManagerIface manager = new KustvaktAuthenticationManager(
-                    getUserDao(), getAdminDao(), getCrypto(), getConfig(), getAuditingDao(),
-                    getUserdataDaos());
-            Set<AuthenticationIface> pro = new HashSet<>();
-            pro.add(new BasicHttpAuth());
-            pro.add(new APIAuthentication(getConfig()));
-            pro.add(new SessionAuthentication(getConfig(), getCrypto()));
-            pro.add(new OpenIDconnectAuthentication(getConfig(), getDataSource()));
-            manager.setProviders(pro);
-            return manager;
-        }
-
     }
-
-}

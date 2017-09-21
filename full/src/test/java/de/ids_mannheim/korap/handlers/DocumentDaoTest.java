@@ -1,11 +1,13 @@
 package de.ids_mannheim.korap.handlers;
 
 import de.ids_mannheim.korap.config.BeanConfigTest;
+import de.ids_mannheim.korap.config.BeanConfigBaseTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.resources.Document;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -17,7 +19,8 @@ import static org.junit.Assert.*;
  */
 public class DocumentDaoTest extends BeanConfigTest {
 
-    private static DocumentDao dao;
+    @Autowired
+    private DocumentDao dao;
 
 
     @After

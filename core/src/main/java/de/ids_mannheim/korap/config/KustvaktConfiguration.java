@@ -1,25 +1,27 @@
 package de.ids_mannheim.korap.config;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Pattern;
+
+import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.Getter;
-import org.apache.log4j.PropertyConfigurator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * if configuration class is extended, loadSubTypes method should be
@@ -92,7 +94,10 @@ public class KustvaktConfiguration {
 
 	private String ldapConfig;
 
-
+	public KustvaktConfiguration (Properties properties) throws IOException {
+        load(properties);
+    }
+	
     /**
      * loading of the properties and mapping to parameter variables
      * 
@@ -228,9 +233,9 @@ public class KustvaktConfiguration {
      * @param props
      * @throws IOException 
      */
-    public void setProperties (Properties props) throws IOException {
-        this.load(props);
-    }
+//    public void setProperties (Properties props) throws IOException {
+//        this.load(props);
+//    }
 
 
     /**

@@ -14,8 +14,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.BeanConfigTest;
+import de.ids_mannheim.korap.config.BeanConfigBaseTest;
 import de.ids_mannheim.korap.config.KustvaktClassLoader;
+import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.resources.KustvaktResource;

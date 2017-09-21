@@ -1,19 +1,23 @@
 package de.ids_mannheim.korap.resource.rewrite;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Ignore;
+import org.junit.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
+
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
-import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.UserSettings;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
-
-import org.junit.Ignore;
 
 /**
  * @author hanl

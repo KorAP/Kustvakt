@@ -52,7 +52,7 @@
 
 	<!-- props are injected from default-config.xml -->
 	<bean id="kustvakt_config" class="de.ids_mannheim.korap.config.KustvaktConfiguration">
-		<property name="properties" ref="props" />
+		<constructor-arg name="properties" ref="props" />
 	</bean>
 
 	<!--class="org.apache.commons.dbcp2.BasicDataSource" -->

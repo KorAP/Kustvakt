@@ -10,14 +10,6 @@ import org.junit.Test;
 public class PublicAPITest extends FastJerseyTest {
 
 
-    @BeforeClass
-    public static void setup () {
-        FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.light",
-                "de.ids_mannheim.korap.web.filter",
-                "de.ids_mannheim.korap.web.utils");
-    }
-
-
     @Override
     public void initMethod () throws KustvaktException {}
 

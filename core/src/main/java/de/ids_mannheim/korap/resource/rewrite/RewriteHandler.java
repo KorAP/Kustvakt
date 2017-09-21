@@ -49,11 +49,12 @@ public class RewriteHandler{
         this.query_processors = new HashSet<>();
         this.failed_task_registration = new HashSet<>();
         this.beans = null;
+        this.add(FoundryInject.class);
     }
 
 
     public void defaultRewriteConstraints () {
-        this.add(FoundryInject.class);
+//        this.add(FoundryInject.class);
         //this.add(PublicCollection.class);
         this.add(CollectionRewrite.class);
         this.add(IdWriter.class);

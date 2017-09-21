@@ -1,25 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
        xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-                            http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
-                            http://www.springframework.org/schema/util
-                            http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-4.0.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util-4.0.xsd">
 
 
-    <!--<util:properties id="props" location="classpath:kustvakt.conf"/>-->
+    <context:component-scan base-package="de.ids_mannheim.korap" />
+	<context:annotation-config />
 
-    <bean id="props"
+    <bean id="properties"
           class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="ignoreResourceNotFound" value="true"/>
         <property name="locations">
             <array>
-                <value>classpath:kustvakt.conf</value>
-                <value>file:./kustvakt.conf</value>
+                <value>classpath:kustvakt-lite.conf</value>
+                <value>file:./kustvakt-lite.conf</value>
             </array>
         </property>
     </bean>
+    
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="properties">
+			<ref bean="properties"/>
+		</property>
+	</bean>
 
     <bean id="kustvakt_auditing"
           class="de.ids_mannheim.korap.interfaces.defaults.DefaultAuditing">
@@ -27,10 +37,16 @@
 
     <bean id="kustvakt_config"
           class="de.ids_mannheim.korap.config.KustvaktConfiguration">
-        <property name="properties" ref="props"/>
+        <constructor-arg index="0" name="properties" ref="properties"/>
     </bean>
 
     <bean name="kustvakt_encryption"
           class="de.ids_mannheim.korap.interfaces.defaults.DefaultEncryption">
     </bean>
+    
+    <bean id="search_krill"
+          class="de.ids_mannheim.korap.web.SearchKrill">
+        <constructor-arg value="${krill.indexDir}"/>
+    </bean>
+    
 </beans>

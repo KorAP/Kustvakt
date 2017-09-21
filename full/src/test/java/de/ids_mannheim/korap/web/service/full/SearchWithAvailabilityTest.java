@@ -23,14 +23,6 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 //        helper().runBootInterfaces();
     }
 
-
-    @BeforeClass
-    public static void configure () throws Exception {
-        FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.full",
-                "de.ids_mannheim.korap.web.filter",
-                "de.ids_mannheim.korap.web.utils");
-    }
-
     private void checkAndFree (String json) {
         JsonNode node = JsonUtils.readTree(json);
         assertEquals("availability",

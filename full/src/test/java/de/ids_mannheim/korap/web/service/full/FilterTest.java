@@ -20,14 +20,6 @@ import static org.junit.Assert.assertEquals;
  */
 public class FilterTest extends FastJerseyTest {
 
-    @BeforeClass
-    public static void setup () throws Exception {
-        FastJerseyTest.setPackages("de.ids_mannheim.korap.web.service.full",
-                "de.ids_mannheim.korap.web.filter",
-                "de.ids_mannheim.korap.web.utils");
-    }
-
-
     @Test
     public void testTestUserAuth () {
         ClientResponse resp = resource()

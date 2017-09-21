@@ -1,9 +1,11 @@
 package de.ids_mannheim.korap.security;
 
+import org.junit.Test;
+import org.springframework.test.annotation.DirtiesContext;
+
 import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.security.ac.PolicyBuilder;
-import org.junit.Test;
 
 /**
  * @author hanl
