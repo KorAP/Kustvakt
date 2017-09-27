@@ -1,8 +1,8 @@
-# Kustvakt
+![Kustvakt](https://raw.githubusercontent.com/KorAP/Kustvakt/master/misc/kustvakt.png)
 
-Kustvakt is a user and policy management component for KorAP. It manages user access to resources (i.e. corpus data) that is typically bound with some licensing schemes. The licensing schemes of the IDS resources provided through KorAP (DeReKo) are very complex involving the access location and purposes (Kupietz & Lüngen, 2014). To manage user access to resources, Kustvakt performs query rewriting with document restrictions.
+Kustvakt is a user and policy management component for KorAP (Diewald et al., 2016). It manages user access to resources (i.e. corpus data) that is typically bound with some licensing schemes. The licensing schemes of the IDS resources provided through KorAP (DeReKo) are very complex involving the access location and purposes (Kupietz & Lüngen, 2014). To manage user access to resources, Kustvakt performs query rewriting with document restrictions (Bański et al., 2014).
 
-Kustvakt acts as a middleware in KorAP binding other components, such as Koral a query serializer and Krill a search component, together. As KorAP's API provider, it provides services, e.g. searching and retrieving annotation data of a match/hit, that can be used by a client, e.g. Kalamar (a KorAP web user interface) and KorapSRU (the CLARIN FCS endpoint for KorAP).
+Kustvakt acts as a middleware in KorAP binding other components, such as Koral a query serializer and Krill a search component, together. As KorAP's API provider, it provides services, e.g. searching and retrieving annotation data of a match/hit, that can be used by a client, e.g. [Kalamar](https://github.com/KorAP/Kalamar) (a KorAP web user interface) and [KorapSRU](https://github.com/KorAP/KorapSRU) (the CLARIN FCS endpoint for KorAP).
 
 # Versions
 * <b>Kustvakt lite version</b>
@@ -125,7 +125,8 @@ http://localhost:8089/api/annotation/layers
 Retrieve annotation descriptions of a list of foundries (POST request).
 
 <pre>
-curl -H "Content-Type: application/json" "http://localhost:8089/kustvakt/annotation/description" --data '{"codes":["opennlp/*"], "language":"en" }'
+curl -H "Content-Type: application/json" "http://localhost:8089/kustvakt/annotation/description" 
+--data '{"codes":["opennlp/*"], "language":"en" }'
 </pre>
 
 Retrieve descriptions of free resources.
@@ -134,6 +135,9 @@ http://localhost:8089/api/resource/info
 </pre>
 
 # Publication
+
+Diewald, Nils/Hanl, Michael/Margaretha, Eliza/Bingel, Joachim/Kupietz, Marc/Bański, Piotr/Witt, Andreas (2016):
+    KorAP Architecture – Diving in the Deep Sea of Corpus Data. In: Calzolari, Nicoletta/Choukri, Khalid/Declerck, Thierry/Goggi, Sara/Grobelnik, Marko/Maegaard, Bente/Mariani, Joseph/Mazo, Helene/Moreno, Asuncion/Odijk, Jan/Piperidis, Stelios (Hrsg.): Proceedings of the Tenth International Conference on Language Resources and Evaluation (LREC 2016), Portorož, Slovenia. Paris: European Language Resources Association (ELRA), 2016. S. 3586-3591.
 
 Bański, Piotr/Diewald, Nils/Hanl, Michael/Kupietz, Marc/Witt, Andreas (2014):
     Access Control by Query Rewriting. The Case of KorAP. In: Proceedings of the Ninth Conference on International Language Resources and Evaluation (LREC’14). European Language Resources Association (ELRA), 2014. S. 3817-3822.
