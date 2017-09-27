@@ -23,6 +23,7 @@ import java.security.Principal;
 
 /**
  * Created by hanl on 7/15/14.
+ * EM: why would we need this?
  */
 @Provider
 @Component

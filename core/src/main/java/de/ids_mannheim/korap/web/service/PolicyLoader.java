@@ -26,6 +26,7 @@ import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
  * @author hanl
  * @date 15/01/2016
  */
+@Deprecated
 public class PolicyLoader implements BootableBeanInterface {
 
 	@Override

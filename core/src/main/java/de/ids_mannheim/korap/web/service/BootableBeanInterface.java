@@ -7,6 +7,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
  * @author hanl
  * @date 12/01/2016
  */
+@Deprecated
 public interface BootableBeanInterface {
 
     void load (ContextHolder beans) throws KustvaktException;

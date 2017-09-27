@@ -59,7 +59,7 @@ Copy the default Kustvakt configuration file (e.g. ```full/src/main/resources/ku
 Set krill.indexDir in the configuration file to the location of your Krill index (relative path). In Kustvakt root directory, there is a sample index, e.g.
 <pre>krill.indexDir = ../../sample-index</pre>
 
-Set the location of the ldap configuration file for Kustvakt full version. The file should contain an admin password to access an LDAP system.
+Set the location of the ldap configuration file for Kustvakt full version. The file should contain an admin password to access an LDAP system. Without LDAP, user authentication functions and services cannot be used.
 
 <b>Optional custom configuration</b>
 
@@ -79,7 +79,7 @@ By default, Kustvakt service base URI refers to /api/*
 # Running Kustvakt Server
 Requires ```kustvakt.conf``` or ```kustvakt-lite.conf``` in the same folder as the jar file. Otherwise assuming sample-index located in the parent directory of the jar file.
 
-Kustvakt full version requires an LDAP configuration file containing an admin password to access an LDAP system.
+Kustvakt full version requires an LDAP configuration file containing an admin password to access an LDAP system. You can still run Kustvakt full version without an LDAP system, but user authentication functions and services cannot be used. Only services for guest/demo user would work.
 
 <pre>
 cd target/

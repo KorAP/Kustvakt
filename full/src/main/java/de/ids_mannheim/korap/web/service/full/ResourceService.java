@@ -42,6 +42,12 @@ public class ResourceService {
     private ResourceConverter resourceConverter;
 
 
+    /** Returns descriptions of all free resources stored in 
+     * the database.
+     * 
+     * @return a json description of all free resources stored in 
+     * the database. 
+     */
     @GET
     @Path("info")
     public Response getAllResourceInfo () {

@@ -89,12 +89,24 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			<!-- Generate source jar -->
+		    <plugin>
+		      <groupId>org.apache.maven.plugins</groupId>
+		      <artifactId>maven-source-plugin</artifactId>
+		      <executions>
+		        <execution>
+		          <id>attach-sources</id>
+		          <goals>
+		            <goal>jar</goal>
+		          </goals>
+		        </execution>
+		      </executions>
+		    </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.19.1</version>
-				 
+
 				<configuration>
 					<reuseForks>false</reuseForks>
 					<forkCount>2</forkCount>
@@ -113,48 +125,6 @@
 						<include>de/ids_mannheim/korap/**/*.java</include>
 					</includes>
 				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.1</version>
-				<executions>
-					<!-- option 1 -->
-					<execution>
-						<id>full</id>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<finalName>Kustvakt-${project.version}}-core</finalName>
-							<transformers>
-								<transformer
-									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass> de.ids_mannheim.korap.web.KustvaktServer </mainClass>
-								</transformer>
-								<transformer
-									implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-									<resource>META-INF/spring.handlers </resource>
-								</transformer>
-								<transformer
-									implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-									<resource>META-INF/spring.schemas </resource>
-								</transformer>
-							</transformers>
-							<!-- Additional configuration. apparently there is a securityException -->
-							<filters>
-								<filter>
-									<artifact>*:*</artifact>
-									<excludes>
-										<exclude>META-INF/*.SF</exclude>
-										<exclude>META-INF/*.DSA </exclude>
-										<exclude>META-INF/*.RSA </exclude>
-									</excludes>
-								</filter>
-							</filters>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>
@@ -359,7 +329,7 @@
 		</dependency>
 
 		<!-- copied from extension -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
 			<version>${spring-framework.version}</version>
@@ -373,7 +343,7 @@
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
 			<version>4.0</version>
-		</dependency>
+		</dependency> -->
 
 		<!-- <dependency> <groupId>net.sf.ehcache</groupId> <artifactId>ehcache-core</artifactId> 
 			<version>2.6.5</version> </dependency> -->
@@ -418,15 +388,34 @@
 			<version>3.2.1</version>
 		</dependency>
 
-		<!-- not part of public release <dependency> <groupId>KorAP-graphDB</groupId> 
-			<artifactId>KorAP-graphDB</artifactId> <version>1.0-SNAPSHOT</version> <exclusions> 
-			<exclusion> <groupId>org.antlr</groupId> <artifactId>antlr4-runtime</artifactId> 
-			</exclusion> <exclusion> <groupId>org.glassfish.jersey.core</groupId> <artifactId>jersey-client</artifactId> 
-			</exclusion> <exclusion> <groupId>org.glassfish.jersey.containers</groupId> 
-			<artifactId>jersey-container-grizzly2-http</artifactId> </exclusion> <exclusion> 
-			<groupId>org.glassfish.jersey.core</groupId> <artifactId>jersey-common</artifactId> 
-			</exclusion> <exclusion> <groupId>org.glassfish.jersey.core</groupId> <artifactId>jersey-server</artifactId> 
-			</exclusion> </exclusions> </dependency> -->
+		<!-- not part of public release
+		<dependency>
+			<groupId>KorAP-graphDB</groupId>
+			<artifactId>KorAP-graphDB</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.antlr</groupId>
+					<artifactId>antlr4-runtime</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.glassfish.jersey.core</groupId>
+					<artifactId>jersey-client</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.glassfish.jersey.containers</groupId>
+					<artifactId>jersey-container-grizzly2-http</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.glassfish.jersey.core</groupId>
+					<artifactId>jersey-common</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.glassfish.jersey.core</groupId>
+					<artifactId>jersey-server</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency> -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
@@ -437,7 +426,7 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-ehcache</artifactId>

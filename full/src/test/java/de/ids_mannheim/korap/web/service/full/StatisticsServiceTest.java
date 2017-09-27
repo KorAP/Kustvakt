@@ -2,7 +2,6 @@ package de.ids_mannheim.korap.web.service.full;
 
 import java.io.IOException;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
@@ -16,7 +15,7 @@ import de.ids_mannheim.korap.web.service.FastJerseyTest;
 
 /** 
  * @author margaretha
- * @date 29/06/2017
+ * @date 27/09/2017
  *
  */
 public class StatisticsServiceTest extends FastJerseyTest {
@@ -77,7 +76,6 @@ public class StatisticsServiceTest extends FastJerseyTest {
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
         assertEquals(node.get("documents").asInt(),7);
         assertEquals(node.get("tokens").asInt(),279402);
-        // EM: why zero?
         assertEquals(node.get("sentences").asInt(), 11047);
         assertEquals(node.get("paragraphs").asInt(), 489);
     }
@@ -121,4 +119,21 @@ public class StatisticsServiceTest extends FastJerseyTest {
         assertEquals(node.at("/errors/0/2").asText(), ">=");
     }
 
+    
+    @Test
+    public void testGetStatisticsWithoutCollectionQuery ()
+            throws JsonProcessingException, IOException {
+        ClientResponse response = resource()
+                .path("statistics")
+                .get(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+                response.getStatus());
+        String ent = response.getEntity(String.class);
+        JsonNode node = mapper.readTree(ent);
+        assertEquals(node.at("/errors/0/0").asInt(), 105);
+        assertEquals(node.at("/errors/0/1").asText(),
+                "Parameter collectionQuery is missing.");
+        assertEquals(node.at("/errors/0/2").asText(), "collectionQuery");
+    }
 }

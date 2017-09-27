@@ -24,7 +24,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
-import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -749,34 +748,12 @@ public class SearchService {
         }
     }
 
-    // EM: changed method POST to GET
-    @GET
-    @Path("statistics")
-    public Response getStatistics (@Context SecurityContext context,
-            @Context Locale locale, @QueryParam("collectionQuery") 
-            String collectionQuery) {
-        
-        if (collectionQuery == null || collectionQuery.isEmpty()){
-         throw KustvaktResponseHandler.throwit(new KustvaktException(
-                 StatusCodes.MISSING_ARGUMENT, "Parameter collectionQuery is missing.", 
-                 "collectionQuery"));
-        }
-        
-        
-        KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
-        builder.with(collectionQuery);
-        String json = builder.toJSON();
-        
-        String stats = searchKrill.getStatistics(json);
-        if (stats.contains("-1"))
-            throw KustvaktResponseHandler.throwit(StatusCodes.NO_VALUE_FOUND);
-        jlog.debug("Stats: "+stats);
-        return Response.ok(stats).build();
-    }
+    
 
     // EM: what is child?
     @GET
     @Path("{type}/{id}/{child}/statistics")
+    @Deprecated
     public Response getStatisticsbyIdChild (@Context SecurityContext context,
             @Context Locale locale, @PathParam("type") String type,
             @PathParam("id") String id, @PathParam("child") String child) {
@@ -787,6 +764,7 @@ public class SearchService {
 
     @GET
     @Path("{type}/{id}/stats")
+    @Deprecated
     public Response getStatisticsbyId (@Context SecurityContext context,
             @Context Locale locale, @PathParam("type") String type,
             @PathParam("id") String id) {

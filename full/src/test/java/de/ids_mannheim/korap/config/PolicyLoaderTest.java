@@ -17,6 +17,7 @@ import org.junit.Ignore;
  * @date 11/02/2016
  */
 @Deprecated
+@Ignore
 public class PolicyLoaderTest extends BeanConfigTest {
 
     @Test

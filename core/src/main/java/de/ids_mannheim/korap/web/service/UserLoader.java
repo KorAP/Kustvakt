@@ -13,6 +13,7 @@ import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
  * @author hanl
  * @date 12/01/2016
  */
+@Deprecated
 public class UserLoader implements BootableBeanInterface {
 
     @Override
