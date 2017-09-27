@@ -11,11 +11,11 @@ Kustvakt acts as a middleware in KorAP binding other components, such as Koral a
 
 * <b>Kustvakt full version</b>
   
-  provides user and policy management and extended services (e.g. resource and annotation services) in addition to the basic services.
+  provides user and policy management and extended services (e.g. resource and annotation services) in addition to the basic services. This version requires a database (Sqlite is provided) and an LDAP system for user authentication.
   
 
 # Prerequisites
-Jdk 1.7, Git, Maven 3.
+Jdk 1.7, Git, Maven 3, MySQL (optional).
 
 # Setup
 
@@ -54,10 +54,12 @@ mvn clean package -DskipTests=true
 
 # Setting kustvakt configuration file
 
-Copy the default Kustvakt configuration file (e.g. core/src/main/resources/kustvakt.conf or lite/src/main/resources/kustvakt-lite.conf), to the same  folder as the Kustvakt jar files  (/target). Please do not change the name of the configuration file.
+Copy the default Kustvakt configuration file (e.g. ```full/src/main/resources/kustvakt.conf``` or ```lite/src/main/resources/kustvakt-lite.conf```), to the same  folder as the Kustvakt jar files  (/target). Please do not change the name of the configuration file.
 
 Set krill.indexDir in the configuration file to the location of your Krill index (relative path). In Kustvakt root directory, there is a sample index, e.g.
 <pre>krill.indexDir = ../../sample-index</pre>
+
+Set the location of the ldap configuration file for Kustvakt full version. The file should contain an admin password to access an LDAP system.
 
 <b>Optional custom configuration</b>
 
@@ -75,7 +77,9 @@ By default, Kustvakt service base URI refers to /api/*
 
 
 # Running Kustvakt Server
-Requires ```kustvakt.conf``` in the same folder as the jar file. Otherwise assuming sample-index located in the parent directory of the jar file.
+Requires ```kustvakt.conf``` or ```kustvakt-lite.conf``` in the same folder as the jar file. Otherwise assuming sample-index located in the parent directory of the jar file.
+
+Kustvakt full version requires an LDAP configuration file containing an admin password to access an LDAP system.
 
 <pre>
 cd target/
@@ -92,7 +96,36 @@ java -jar lombok-1.16.6.jar
 
 Restart your IDE and clean your project.
 
-In an IDE, you can run KustvaktLiteServer or KustvaktServer as a normal Java application.
+Copy ```kustvakt.conf``` or ```kustvakt-lite.conf``` from  src/main/resources to the full/ or lite folder. Then the properties in the kustvakt.conf or kustvakt-lite.conf file can be customized.
+
+In an IDE, you can run ```KustvaktLiteServer``` or ```KustvaktServer``` as a normal Java application.
+
+## Changing Database
+
+The default Sqlite database can be switch to a MySQL database.
+
+Copy the jdbc.properties from full/src/main/resources to the full/ directory. Do not change the filename.
+<pre>
+cp full/src/main/resources/jdbc.properties full/
+</pre>
+
+Remove or comment the Sqlite Setting.
+
+Uncomment the MySQL Setting and fill in the correct values for the jdbc.url, jdbc.username and jdbc.password.
+
+Save.
+
+You probably would like to git ignore this file to prevent pushing the password to github.
+
+Open ```full/src/main/resource/default-config.xml``` and search for the Spring bean with id="flyway".
+
+Change the dataSource property to refer to the Spring bean with id="dataSource".
+<pre>
+&lt;property name="dataSource" ref="dataSource" /&gt;
+</pre>
+
+While running ```KustvaktServer``` or ```Kustvakt-full-[version].jar```,
+MySQL tables will be created to the specified database from the SQL files in ```full/src/main/resources/db/new-mysql```.
 
 # Known issues
 Tests are verbose - this is no indication for an error.
@@ -103,7 +136,7 @@ Kustvakt service base URI runs by default at
 http://[hostname:port]/api
 </pre>
 
-# Examples
+## Examples
 
 Search
 <pre>
