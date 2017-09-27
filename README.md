@@ -1,0 +1,144 @@
+# Kustvakt
+
+Kustvakt is a user and policy management component for KorAP. It manages user access to resources (i.e. corpus data) that is typically bound with some licensing schemes. The licensing schemes of the IDS resources provided through KorAP (DeReKo) are very complex involving the access location and purposes (Kupietz & Lüngen, 2014). To manage user access to resources, Kustvakt performs query rewriting with document restrictions.
+
+Kustvakt acts as a middleware in KorAP binding other components, such as Koral a query serializer and Krill a search component, together. As KorAP's API provider, it provides services, e.g. searching and retrieving annotation data of a match/hit, that can be used by a client, e.g. Kalamar (a KorAP web user interface) and KorapSRU (the CLARIN FCS endpoint for KorAP).
+
+# Versions
+* <b>Kustvakt lite version</b>
+  
+  provides basic search and match info services without user and policy management.
+
+* <b>Kustvakt full version</b>
+  
+  provides user and policy management and extended services (e.g. resource and annotation services) in addition to the basic services.
+  
+
+# Prerequisites
+Jdk 1.7, Git, Maven 3.
+
+# Setup
+
+Clone the latest version of Kustvakt
+<pre>
+git clone git@github.com:KorAP/Kustvakt.git
+</pre>
+
+Since Kustvakt requires Krill and Koral, please install [Krill](https://github.com/KorAP/Krill) and [Koral](https://github.com/KorAP/Koral) in your maven local repository.
+Adjust the versions of Krill and Koral in Kustvakt/core/pom.xml according to the versions in Koral/pom.xml and Krill/pom.xml.
+
+Install Kustvakt-core in your maven local repository
+<pre>
+cd Kustvakt/core
+mvn clean install
+</pre>
+
+Packaging Kustvakt full version
+<pre>
+cd ../full
+mvn clean package
+</pre>
+The jar file is located in the target/ folder.
+
+Packaging Kustvakt lite version
+<pre>
+cd ../lite
+mvn clean package
+</pre>
+The jar file is located in the target/ folder.
+
+If there are errors regarding tests, please skip the tests.
+<pre>
+mvn clean package -DskipTests=true
+</pre>
+
+# Setting kustvakt configuration file
+
+Copy the default Kustvakt configuration file (e.g. core/src/main/resources/kustvakt.conf or lite/src/main/resources/kustvakt-lite.conf), to the same  folder as the Kustvakt jar files  (/target). Please do not change the name of the configuration file.
+
+Set krill.indexDir in the configuration file to the location of your Krill index (relative path). In Kustvakt root directory, there is a sample index, e.g.
+<pre>krill.indexDir = ../../sample-index</pre>
+
+<b>Optional custom configuration</b>
+
+Changing Kustvakt server port and host
+<pre>
+Server.port = 8089
+Server.host = localhost
+</pre>
+
+Changing Kustvakt service base URI
+<pre>
+kustvakt.base.url=/kustvakt/*
+</pre>
+By default, Kustvakt service base URI refers to /api/*
+
+
+# Running Kustvakt Server
+Requires ```kustvakt.conf``` in the same folder as the jar file. Otherwise assuming sample-index located in the parent directory of the jar file.
+
+<pre>
+cd target/
+java -jar target/Kustvakt-[lite/full]-[version].jar    
+</pre>
+
+
+# Futher Setup for Developer
+
+For working with an IDE, you need to install lombok for your tool. Go to the directory of your lombok.jar, e.g \.m2\repository\org\projectlombok\lombok\1.16.6 and run
+<pre>
+java -jar lombok-1.16.6.jar
+</pre>
+
+Restart your IDE and clean your project.
+
+In an IDE, you can run KustvaktLiteServer or KustvaktServer as a normal Java application.
+
+# Known issues
+Tests are verbose - this is no indication for an error.
+
+# Usage
+Kustvakt service base URI runs by default at
+<pre>
+http://[hostname:port]/api
+</pre>
+
+# Examples
+
+Search
+<pre>
+http://localhost:8089/api/search?q=Buchstabe&ql=poliqarp
+</pre>
+
+Retrieve match annotation information
+<pre>
+http://localhost:8089/api/corpus/GOE/AGA.00000/p865-866/matchInfo?foundry=*&spans=false
+</pre>
+
+## Examples of services in full version only
+
+Retrieve descriptions of all supported annotation layers.
+<pre>
+http://localhost:8089/api/annotation/layers
+</pre>
+
+Retrieve annotation descriptions of a list of foundries (POST request).
+
+<pre>
+curl -H "Content-Type: application/json" "http://localhost:8089/kustvakt/annotation/description" --data '{"codes":["opennlp/*"], "language":"en" }'
+</pre>
+
+Retrieve descriptions of free resources.
+<pre>
+http://localhost:8089/api/resource/info
+</pre>
+
+# Publication
+
+Bański, Piotr/Diewald, Nils/Hanl, Michael/Kupietz, Marc/Witt, Andreas (2014):
+    Access Control by Query Rewriting. The Case of KorAP. In: Proceedings of the Ninth Conference on International Language Resources and Evaluation (LREC’14). European Language Resources Association (ELRA), 2014. S. 3817-3822.
+
+
+# References
+
+Kupietz, Marc/Lüngen, Harald (2014): Recent Developments in DeReKo. In: Calzolari, Nicoletta et al. (eds.): Proceedings of the Ninth International Conference on Language Resources and Evaluation (LREC'14). Reykjavik: ELRA, 2378-2385.
