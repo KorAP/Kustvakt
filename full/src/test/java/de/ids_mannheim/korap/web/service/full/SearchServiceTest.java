@@ -462,6 +462,8 @@ public class SearchServiceTest extends FastJerseyTest {
         s.setQuery("[orth=der]", "poliqarp");
         s.setCollection("corpusSigle=GOE");
 
+        s.setQuery("Wasser", "poliqarp");
+        System.out.println(s.toJSON());
         ClientResponse response = resource()
                 .path("search").post(ClientResponse.class, s.toJSON());
         assertEquals(ClientResponse.Status.OK.getStatusCode(),

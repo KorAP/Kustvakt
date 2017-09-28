@@ -1,20 +1,26 @@
 package de.ids_mannheim.korap.config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+import java.util.Properties;
+
+import org.codehaus.plexus.util.IOUtil;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.utils.ServiceInfo;
 import de.ids_mannheim.korap.utils.TimeUtils;
-import de.ids_mannheim.korap.web.service.BootableBeanInterface;
-import org.codehaus.plexus.util.IOUtil;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.io.*;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
-
-import static org.junit.Assert.*;
 
 /**
  * @author hanl
@@ -81,45 +87,6 @@ public class ConfigTest extends BeanConfigTest {
                                 "kustvakt.conf"));
     }
 
-
-    @Test
-    public void testBootConfigRun () throws KustvaktException {
-//        helper().runBootInterfaces();
-        helper().setupAccount();
-        assertNotNull(helper().getUser());
-
-        Set<Class<? extends BootableBeanInterface>> set = KustvaktClassLoader
-                .loadSubTypes(BootableBeanInterface.class);
-
-        int check = set.size();
-        List<String> tracker = new ArrayList<>();
-        List<BootableBeanInterface> list = new ArrayList<>(set.size());
-        for (Class cl : set) {
-            BootableBeanInterface iface;
-            try {
-                iface = (BootableBeanInterface) cl.newInstance();
-                list.add(iface);
-            }
-            catch (InstantiationException | IllegalAccessException e) {
-                // do nothing
-            }
-        }
-
-        while (!set.isEmpty()) {
-            out_loop: for (BootableBeanInterface iface : new ArrayList<>(list)) {
-                for (Class cl : iface.getDependencies()) {
-                    if (set.contains(cl))
-                        continue out_loop;
-                }
-                tracker.add(iface.getClass().getSimpleName());
-                set.remove(iface.getClass());
-                list.remove(iface);
-            }
-        }
-        assertEquals(check, tracker.size());
-    }
-
-    // todo:
     @Test
     @Ignore
     public void testKustvaktValueValidation() {

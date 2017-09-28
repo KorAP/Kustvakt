@@ -7,18 +7,14 @@ import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -27,43 +23,21 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.handlers.AdminDao;
-import de.ids_mannheim.korap.handlers.DocumentDao;
-import de.ids_mannheim.korap.handlers.EntityDao;
-import de.ids_mannheim.korap.handlers.JDBCAuditing;
 import de.ids_mannheim.korap.handlers.JDBCClient;
 import de.ids_mannheim.korap.handlers.ResourceDao;
-import de.ids_mannheim.korap.handlers.UserDetailsDao;
-import de.ids_mannheim.korap.handlers.UserSettingsDao;
-import de.ids_mannheim.korap.interfaces.AuthenticationIface;
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.interfaces.db.AdminHandlerIface;
-import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
-import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
-import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
-import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
-import de.ids_mannheim.korap.interfaces.defaults.KustvaktEncryption;
 import de.ids_mannheim.korap.resources.KustvaktResource;
-import de.ids_mannheim.korap.security.ac.PolicyDao;
-import de.ids_mannheim.korap.security.auth.APIAuthentication;
-import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.security.auth.KustvaktAuthenticationManager;
-import de.ids_mannheim.korap.security.auth.OpenIDconnectAuthentication;
-import de.ids_mannheim.korap.security.auth.SessionAuthentication;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.TimeUtils;
-import de.ids_mannheim.korap.web.service.BootableBeanInterface;
-import de.ids_mannheim.korap.web.service.CollectionLoader;
 
 /**
  * creates a test user that can be used to access protected functions
@@ -247,52 +221,6 @@ public class TestHelper {
     public static Map<String, Object> getUserCredentials () {
         return new HashMap<>(data);
     }
-
-
-    @Deprecated
-    public TestHelper runBootInterfaces () {
-        Set<Class<? extends BootableBeanInterface>> set = KustvaktClassLoader
-                .loadSubTypes(BootableBeanInterface.class);
-
-        List<BootableBeanInterface> list = new ArrayList<>(set.size());
-        for (Class cl : set) {
-            BootableBeanInterface iface;
-            try {
-                iface = (BootableBeanInterface) cl.newInstance();
-                if (!(iface instanceof CollectionLoader)){
-                	list.add(iface);	
-                }
-            }
-            catch (InstantiationException | IllegalAccessException e) {
-                // do nothing
-            }
-        }
-        jlog.debug("Found boot loading interfaces: " + list);
-        while (!list.isEmpty()) {
-            out_loop: for (BootableBeanInterface iface : new ArrayList<>(list)) {
-                try {
-                    jlog.debug("Running boot instructions from class "
-                            + iface.getClass().getSimpleName());
-                    for (Class cl : iface.getDependencies()) {
-                        if (set.contains(cl))
-                            continue out_loop;
-                    }
-                    set.remove(iface.getClass());
-                    list.remove(iface);
-                    iface.load(beansHolder);
-                }
-                catch (KustvaktException e) {
-                    // don't do anything!
-                    System.out.println("An error occurred in class "
-                            + iface.getClass().getSimpleName() + "!\n" + e);
-                    throw new RuntimeException(
-                            "Boot loading interface failed ...");
-                }
-            }
-        }
-        return this;
-    }
-
 
     public int setupResource (KustvaktResource resource)
             throws KustvaktException {
