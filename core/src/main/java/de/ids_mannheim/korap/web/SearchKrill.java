@@ -225,10 +225,11 @@ public class SearchKrill {
     /**
      * Get statistics on (virtual) collections.
      * 
+     * EM: might be changed later
+     * 
      * @param json
      *            JSON-LD string with potential meta filters.
      */
-    @Deprecated
     public String getStatistics (String json) {
         jlog.trace(json);
         if (this.index == null) {
