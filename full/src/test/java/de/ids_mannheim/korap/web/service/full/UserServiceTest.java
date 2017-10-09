@@ -1,32 +1,9 @@
 package de.ids_mannheim.korap.web.service.full;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.nimbusds.jwt.SignedJWT;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
-
-import de.ids_mannheim.korap.config.BeansFactory;
-import de.ids_mannheim.korap.config.JWTSigner;
-import de.ids_mannheim.korap.config.TestHelper;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
-import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.utils.TimeUtils;
-import de.ids_mannheim.korap.web.service.FastJerseyTest;
-
-import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.collections.map.LinkedMap;
-import org.joda.time.DateTime;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URI;
@@ -34,7 +11,29 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.apache.commons.collections.map.LinkedMap;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.nimbusds.jwt.SignedJWT;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
+
+import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.BeansFactory;
+import de.ids_mannheim.korap.config.JWTSigner;
+import de.ids_mannheim.korap.config.TestHelper;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
+import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.utils.TimeUtils;
+import de.ids_mannheim.korap.web.service.FastJerseyTest;
 
 /**
  * @author hanl

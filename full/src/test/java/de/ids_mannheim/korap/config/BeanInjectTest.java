@@ -21,11 +21,9 @@ import static org.junit.Assert.assertFalse;
  */
 public class BeanInjectTest {
 
-
-
     @Test
     public void testUserBeans () {
-        BeansFactory.loadClasspathContext("test-default-config.xml");
+        BeansFactory.loadClasspathContext("test-config.xml");
         Collection coll = BeansFactory.getKustvaktContext()
                 .getUserDataProviders();
         assertFalse(coll.isEmpty());
@@ -42,7 +40,7 @@ public class BeanInjectTest {
 
     @Test
     public void testResourceBeans () {
-        BeansFactory.loadClasspathContext("test-default-config.xml");
+        BeansFactory.loadClasspathContext("test-config.xml");
         Collection coll = BeansFactory.getKustvaktContext()
                 .getResourceProviders();
         assertFalse(coll.isEmpty());

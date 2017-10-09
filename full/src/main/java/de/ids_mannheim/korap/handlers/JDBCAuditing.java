@@ -1,17 +1,18 @@
 package de.ids_mannheim.korap.handlers;
 
-import de.ids_mannheim.korap.auditing.AuditRecord;
-import de.ids_mannheim.korap.interfaces.db.AuditingIface;
-import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
-import de.ids_mannheim.korap.user.User;
+import java.sql.Timestamp;
+import java.util.List;
+
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
-import java.sql.Timestamp;
-import java.util.List;
+import de.ids_mannheim.korap.auditing.AuditRecord;
+import de.ids_mannheim.korap.interfaces.db.AuditingIface;
+import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
+import de.ids_mannheim.korap.user.User;
 
 /**
  * @author hanl
@@ -20,7 +21,6 @@ import java.util.List;
 public class JDBCAuditing extends AuditingIface {
 
     private NamedParameterJdbcTemplate template;
-
 
     public JDBCAuditing (PersistenceClient client) {
         this.template = (NamedParameterJdbcTemplate) client.getSource();

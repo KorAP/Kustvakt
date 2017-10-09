@@ -47,7 +47,6 @@ import de.ids_mannheim.korap.utils.TimeUtils;
  */
 public class TestHelper {
 
-    private static String mainConfigurationFile = "kustvakt-test.conf";
     private static Logger jlog = LoggerFactory.getLogger(TestHelper.class);
     private static final Map<String, Object> data = new HashMap<>();
     static  {
@@ -261,7 +260,8 @@ public class TestHelper {
 
     }
 
-
+    // EM: use Spring XML config
+    @Deprecated
     private static PersistenceClient mysql_db () throws IOException {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
@@ -279,7 +279,8 @@ public class TestHelper {
         return client;
     }
 
-
+    // EM: use Spring XML config
+    @Deprecated
     protected static PersistenceClient sqlite_db (boolean memory)
             throws InterruptedException {
         SingleConnectionDataSource dataSource = new SingleConnectionDataSource();
@@ -308,7 +309,8 @@ public class TestHelper {
         return client;
     }
 
-
+    // EM: use Spring XML config
+    @Deprecated
     public static PersistenceClient sqlite_db_norm (boolean memory) {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("org.sqlite.JDBC");
@@ -336,7 +338,8 @@ public class TestHelper {
         return client;
     }
 
-
+    // EM: use Spring XML config
+    @Deprecated
     public static PersistenceClient h2_emb () throws SQLException {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setUrl("jdbc:h2:mem:");

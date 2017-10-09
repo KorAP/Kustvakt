@@ -3,13 +3,11 @@ package de.ids_mannheim.korap.config;
 import static org.junit.Assert.assertNotNull;
 
 import org.apache.log4j.Logger;
-import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.InitializationError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -23,14 +21,14 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @RunWith(BeanConfigBaseTest.SpringExtendedSetupListener.class)
-@ContextConfiguration(classes = AppTestConfigBase.class)
+@ContextConfiguration("classpath:test-config.xml")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class BeanConfigBaseTest {
 
     private static Logger jlog = Logger.getLogger(BeanConfigBaseTest.class);
     @Autowired
     protected ApplicationContext context;
-
+    
     public void init () throws Exception {
         assertNotNull("Application context must not be null!", this.context);
         jlog.debug("running one-time before init for class "
@@ -40,26 +38,13 @@ public abstract class BeanConfigBaseTest {
         initMethod();
     }
 
+    protected abstract ContextHolder getContext();
 
-    protected abstract ContextHolder getContext ();
-
-
+    public abstract void initMethod () throws KustvaktException;
+    
     public void close () {
         BeansFactory.closeApplication();
     }
-
-    public abstract void initMethod () throws KustvaktException;
-
-
-//    protected TestHelper helper () {
-//        try {
-//            return TestHelper.newInstance(this.context);
-//        }
-//        catch (Exception e) {
-//            return null;
-//        }
-//    }
-
 
     public static class SpringExtendedSetupListener extends
             SpringJUnit4ClassRunner {
@@ -89,10 +74,9 @@ public abstract class BeanConfigBaseTest {
         @Override
         public void run (RunNotifier notifier) {
             super.run(notifier);
-            if (instanceSetupListener != null)
+            if (instanceSetupListener != null){
                 instanceSetupListener.close();
+            }
         }
-
-
     }
 }

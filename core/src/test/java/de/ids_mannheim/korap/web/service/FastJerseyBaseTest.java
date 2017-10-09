@@ -1,5 +1,14 @@
 package de.ids_mannheim.korap.web.service;
 
+import java.net.URI;
+
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriBuilder;
+
+import org.junit.After;
+import org.junit.BeforeClass;
+import org.springframework.web.context.ContextLoaderListener;
+
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
@@ -9,23 +18,11 @@ import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 import com.sun.jersey.test.framework.spi.container.TestContainer;
-import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
 import com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory;
 import com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory;
+
 import de.ids_mannheim.korap.config.BeanConfigBaseTest;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.springframework.web.context.ContextLoaderListener;
-
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriBuilder;
-import java.io.IOException;
-import java.net.BindException;
-import java.net.URI;
 
 /**
  * @author hanl
@@ -100,7 +97,7 @@ public abstract class FastJerseyBaseTest extends BeanConfigBaseTest {
             ad = new WebAppDescriptor.Builder(classPackages)
                     .servletClass(SpringServlet.class)
                     .contextListenerClass(ContextLoaderListener.class)
-                    .contextParam("contextConfigLocation", "classpath:test-default-config.xml")
+                    .contextParam("contextConfigLocation", "classpath:test-config.xml")
                     .build();
 
         TestContainerFactory tcf = testContainerFactory;
@@ -119,12 +116,9 @@ public abstract class FastJerseyBaseTest extends BeanConfigBaseTest {
         }
     }
 
-
-    
-
-
     @After
     public void stopServer () {
+        
         testContainer.stop();
         testContainer = null;
         client = null;

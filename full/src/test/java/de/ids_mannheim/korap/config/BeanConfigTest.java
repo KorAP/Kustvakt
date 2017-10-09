@@ -1,56 +1,15 @@
 package de.ids_mannheim.korap.config;
 
-import static org.junit.Assert.assertNotNull;
-
-import org.apache.log4j.Logger;
-import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.junit.runner.notification.RunNotifier;
-import org.junit.runners.model.InitializationError;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import net.jcip.annotations.NotThreadSafe;
-
 /**
  * @author hanl
  * @date 09/03/2016
  */
-@NotThreadSafe
-@RunWith(BeanConfigTest.SpringExtendedSetupListener.class)
-//@ContextConfiguration(classes = AppTestConfig.class)
-@ContextConfiguration("classpath:test-default-config.xml")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public abstract class BeanConfigTest {
+public abstract class BeanConfigTest extends BeanConfigBaseTest{
 
-    private static Logger jlog = Logger.getLogger(BeanConfigTest.class);
-    @Autowired
-    private ApplicationContext context;
-
-
-//    @Before
-    public void init () throws Exception {
-//        context = new ClassPathXmlApplicationContext("test-default-config.xml");
-        assertNotNull("Application context must not be null!", this.context);
-        jlog.debug("running one-time before init for class "
-                + this.getClass().getSimpleName() + " ...");
-        BeansFactory.setKustvaktContext(helper().getContext());
-        assertNotNull(BeansFactory.getKustvaktContext());
-        initMethod();
+    @Override
+    protected ContextHolder getContext () {
+        return helper().getContext();
     }
-
-
-    public void close () {
-        BeansFactory.closeApplication();
-    }
-
-    public abstract void initMethod () throws KustvaktException;
-
 
     protected TestHelper helper () {
         try {
@@ -61,39 +20,4 @@ public abstract class BeanConfigTest {
         }
     }
 
-
-    public static class SpringExtendedSetupListener extends
-            SpringJUnit4ClassRunner {
-
-        private BeanConfigTest instanceSetupListener;
-
-
-        public SpringExtendedSetupListener (Class<?> clazz)
-                throws InitializationError {
-            super(clazz);
-        }
-
-
-        @Override
-        protected Object createTest () throws Exception {
-            Object test = super.createTest();
-            // Note that JUnit4 will call this createTest() multiple times for each
-            // test method, so we need to ensure to call "beforeClassSetup" only once.
-            if (test instanceof BeanConfigTest && instanceSetupListener == null) {
-                instanceSetupListener = (BeanConfigTest) test;
-                instanceSetupListener.init();
-            }
-            return test;
-        }
-
-
-        @Override
-        public void run (RunNotifier notifier) {
-            super.run(notifier);
-            if (instanceSetupListener != null)
-                instanceSetupListener.close();
-        }
-
-
-    }
 }
