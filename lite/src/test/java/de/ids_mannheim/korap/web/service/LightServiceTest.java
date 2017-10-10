@@ -5,8 +5,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.apache.lucene.LucenePackage;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,27 +15,47 @@ import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
- * EM: FIX ME: Database restructure
- * 
  * Created by hanl on 29.04.16.
+ * 
+ * @author margaretha
+ * @date 10/10/2017
+ * 
+ * Recent changes:
+ * - updated the service paths and methods of query serialization tests
+ * - added statistic service test
  */
-@Ignore
 public class LightServiceTest extends FastJerseyLightTest {
 
     @Override
     public void initMethod () throws KustvaktException {}
 
-
     @Test
-    public void testQueryTrace () {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("search").queryParam("q", "[orth=das]")
-                .queryParam("ql", "poliqarp").queryParam("context", "sentence")
-                .queryParam("count", "13")
-                .method("TRACE", ClientResponse.class);
+    public void testStatistics () {
+        ClientResponse response = resource()
+                .path("statistics")
+                .queryParam("collectionQuery", "textType=Autobiographie & corpusSigle=GOE")
+                .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String query = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(query);
+        assertEquals(9, node.at("/documents").asInt());
+        assertEquals(527662, node.at("/tokens").asInt());
+        assertEquals(19387, node.at("/sentences").asInt());
+        assertEquals(514, node.at("/paragraphs").asInt());
+    }
+
+    @Test
+    public void testGetJSONQuery () {
+        ClientResponse response = resource()
+                .path("query").queryParam("q", "[orth=das]")
+                .queryParam("ql", "poliqarp").queryParam("context", "sentence")
+                .queryParam("count", "13")
+                .method("GET", ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String query = response.getEntity(String.class);
+        System.out.println(query);
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
         assertEquals("orth", node.at("/query/wrap/layer").asText());
@@ -49,11 +67,11 @@ public class LightServiceTest extends FastJerseyLightTest {
 
     @Test
     public void testbuildAndPostQuery () {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("search").queryParam("q", "[orth=das]")
+        ClientResponse response = resource()
+                .path("query").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp")
                 .queryParam("cq", "corpusSigle=WPD | corpusSigle=GOE")
-                .method("TRACE", ClientResponse.class);
+                .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
@@ -61,7 +79,7 @@ public class LightServiceTest extends FastJerseyLightTest {
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
 
-        response = resource().path(getAPIVersion()).path("search")
+        response = resource().path("search")
                 .post(ClientResponse.class, query);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -74,7 +92,7 @@ public class LightServiceTest extends FastJerseyLightTest {
 
     @Test
     public void testQueryGet () {
-        ClientResponse response = resource().path(getAPIVersion())
+        ClientResponse response = resource()
                 .path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("context", "sentence")
                 .queryParam("count", "13").get(ClientResponse.class);
@@ -92,7 +110,7 @@ public class LightServiceTest extends FastJerseyLightTest {
 
     @Test
     public void testFoundryRewrite () {
-        ClientResponse response = resource().path(getAPIVersion())
+        ClientResponse response = resource()
                 .path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("context", "sentence")
                 .queryParam("count", "13").get(ClientResponse.class);
@@ -111,7 +129,7 @@ public class LightServiceTest extends FastJerseyLightTest {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[orth=das]", "poliqarp");
 
-        ClientResponse response = resource().path(getAPIVersion())
+        ClientResponse response = resource()
                 .path("search").post(ClientResponse.class, s.toJSON());
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -125,7 +143,7 @@ public class LightServiceTest extends FastJerseyLightTest {
 
     @Test
     public void testParameterField () {
-        ClientResponse response = resource().path(getAPIVersion())
+        ClientResponse response = resource()
                 .path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp")
                 .queryParam("fields", "author, docSigle")
@@ -145,7 +163,7 @@ public class LightServiceTest extends FastJerseyLightTest {
 	@Test
 	public void testMatchInfoGetWithoutSpans () {
         ClientResponse response = resource()
-			.path(getAPIVersion())
+			
 			.path("corpus/GOE/AGA/01784/p36-46/matchInfo")
 			.queryParam("foundry", "*")
 			.queryParam("spans", "false")
@@ -162,7 +180,7 @@ public class LightServiceTest extends FastJerseyLightTest {
 	@Test
 	public void testMatchInfoGet2 () {
         ClientResponse response = resource()
-			.path(getAPIVersion())
+			
 			.path("corpus/GOE/AGA/01784/p36-46/matchInfo")
 			.queryParam("foundry", "*")
 			.get(ClientResponse.class);
@@ -176,14 +194,14 @@ public class LightServiceTest extends FastJerseyLightTest {
 	};
 
     @Test
-    public void testCQParameter () {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("search").queryParam("q", "[orth=das]")
+    public void testCollectionQueryParameter () {
+        ClientResponse response = resource()
+                .path("query").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp")
                 .queryParam("fields", "author, docSigle")
                 .queryParam("context", "sentence").queryParam("count", "13")
                 .queryParam("cq", "textClass=Politik & corpus=WPD")
-                .method("TRACE", ClientResponse.class);
+                .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String query = response.getEntity(String.class);
@@ -194,15 +212,15 @@ public class LightServiceTest extends FastJerseyLightTest {
                 .asText());
         assertEquals("WPD", node.at("/collection/operands/1/value").asText());
 
-        response = resource().path(getAPIVersion()).path("search")
+        response = resource().path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("fields", "author, docSigle")
                 .queryParam("context", "sentence").queryParam("count", "13")
                 .queryParam("cq", "textClass=Politik & corpus=WPD")
                 .get(ClientResponse.class);
         String version = LucenePackage.get().getImplementationVersion();;
-        System.out.println("VERSION "+ version);
-        System.out.println("RESPONSE "+ response);
+//        System.out.println("VERSION "+ version);
+//        System.out.println("RESPONSE "+ response);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         query = response.getEntity(String.class);

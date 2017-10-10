@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -33,7 +35,6 @@ import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.web.ClientsHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
-import de.ids_mannheim.korap.web.TRACE;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 /**
@@ -41,7 +42,14 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
  * @date 29/01/2014
  * 
  * @author margaretha
- * @date 21/09/2017
+ * @update 10/10/2017
+ * 
+ * <pre>
+ * Recent changes:
+ * - removed version from service paths
+ * - altered service with path /search and method trace to path
+ * /query and method get
+ * </pre>
  */
 @Controller
 @Path("/")
@@ -90,15 +98,16 @@ public class LightService {
     }
 
 
-    @TRACE
-    @Path("search")
+    @GET
+    @Path("query")
     public Response buildQuery (@QueryParam("q") String q,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
             @QueryParam("context") String context,
             @QueryParam("cutoff") Boolean cutoff,
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
-            @QueryParam("page") Integer startPage, @QueryParam("cq") String cq) {
+            @QueryParam("page") Integer startPage,
+            @QueryParam("cq") String cq) {
         QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
 
         MetaQueryBuilder meta = new MetaQueryBuilder();
@@ -109,8 +118,7 @@ public class LightService {
         meta.setSpanContext(context);
         meta.addEntry("cutOff", cutoff);
         ss.setMeta(meta.raw());
-        if (cq != null)
-            ss.setCollection(cq);
+        if (cq != null) ss.setCollection(cq);
 
         String query;
         try {
@@ -125,7 +133,8 @@ public class LightService {
 
     @POST
     @Path("search")
-    public Response queryRaw (@QueryParam("engine") String engine, String jsonld) {
+    public Response queryRaw (@QueryParam("engine") String engine,
+            String jsonld) {
         try {
             jsonld = processor.processQuery(jsonld, null);
         }
@@ -136,10 +145,10 @@ public class LightService {
         jlog.info("Serialized search: {}", jsonld);
         try {
             String result = searchKrill.search(jsonld);
-            KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
+            jlog.debug("The result set: {}", result);
             return Response.ok(result).build();
-        } catch(Exception e) {
-            System.out.println("_____________________________________" );
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
         return Response.ok().build();
@@ -167,8 +176,7 @@ public class LightService {
         if (fields != null && !fields.isEmpty())
             meta.addEntry("fields", fields);
         serializer.setMeta(meta.raw());
-        if (cq != null)
-            serializer.setCollection(cq);
+        if (cq != null) serializer.setCollection(cq);
 
         String query;
         try {
@@ -225,8 +233,9 @@ public class LightService {
      * @return
      */
     //fixme: search in collection /collection/collection-id/search
+    @Deprecated
     @GET
-    @Path("/{type}/{id}/search")
+    //    @Path("/{type}/{id}/search")
     public Response searchbyName (@PathParam("id") String id,
             @PathParam("type") String type, @QueryParam("q") String query,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
@@ -257,10 +266,9 @@ public class LightService {
         String result;
         try {
             if (eng.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
-                if (raw)
-                    throw KustvaktResponseHandler.throwit(
-                            StatusCodes.ILLEGAL_ARGUMENT, "raw not supported!",
-                            null);
+                if (raw) throw KustvaktResponseHandler.throwit(
+                        StatusCodes.ILLEGAL_ARGUMENT, "raw not supported!",
+                        null);
                 MultivaluedMap map = new MultivaluedMapImpl();
                 map.add("q", query);
                 map.add("count", String.valueOf(pageLength));
@@ -284,55 +292,44 @@ public class LightService {
     }
 
 
-//    //todo: switch to new serialization
-//    @POST
-//    @Path("stats")
-//    public Response getStats (String json) {
-//        KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
-//        builder.with(json);
-//
-//        // todo: policy override in extension!
-//        String stats = searchKrill.getStatistics(builder.toJSON());
-//        if (stats.contains("-1"))
-//            throw KustvaktResponseHandler.throwit(StatusCodes.NO_VALUE_FOUND);
-//
-//        return Response.ok(stats).build();
-//    }
-    
     @GET
     @Path("statistics")
-    public Response getStatistics (@QueryParam("collectionQuery") 
-            String collectionQuery) {
-        
+    public Response getStatistics (
+            @QueryParam("collectionQuery") String collectionQuery) {
+
         KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
         builder.with(collectionQuery);
         String json = builder.toJSON();
-        
+
         String stats = searchKrill.getStatistics(json);
         if (stats.contains("-1"))
             throw KustvaktResponseHandler.throwit(StatusCodes.NO_VALUE_FOUND);
-        jlog.debug("Stats: "+stats);
+        jlog.debug("Stats: " + stats);
         return Response.ok(stats).build();
     }
 
 
 
-	/*
-	 * TODO: The problem here is, that the matchinfo path makes no
-	 * distinction between docs and texts - unlike DeReKo, the backend
-	 * and the frontend. Luckily there is a convenient method
-	 * "getMatchID()" for a workaround, but this should be fixed.
-	 */
+    /*
+     * TODO: The problem here is, that the matchinfo path makes no
+     * distinction between docs and texts - unlike DeReKo, the backend
+     * and the frontend. Luckily there is a convenient method
+     * "getMatchID()" for a workaround, but this should be fixed.
+     */
     @GET
     @Path("/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
     public Response getMatchInfo (@PathParam("corpusId") String corpusId,
             @PathParam("docId") String docId,
-            @PathParam("textId") String textId, 
+            @PathParam("textId") String textId,
             @PathParam("matchId") String matchId,
             @QueryParam("foundry") Set<String> foundries,
             @QueryParam("layer") Set<String> layers,
-            @QueryParam("spans") Boolean spans) throws KustvaktException {
-        String matchid = searchKrill.getMatchId(corpusId, docId, textId, matchId);
+            @QueryParam("spans") Boolean spans,
+            @Context HttpServletRequest request) throws KustvaktException {
+
+        String matchid =
+                searchKrill.getMatchId(corpusId, docId, textId, matchId);
+        
         List<String> f_list = null;
         List<String> l_list = null;
         if (layers != null && !layers.isEmpty())
@@ -343,14 +340,14 @@ public class LightService {
             f_list = new ArrayList<>(foundries);
 
         spans = spans != null ? spans : false;
-		
+
         boolean match_only = foundries == null || foundries.isEmpty();
         String results;
         if (match_only)
-            results = searchKrill.getMatch(matchid,null);
+            results = searchKrill.getMatch(matchid, null);
         else
             results = searchKrill.getMatch(matchid, f_list, l_list, spans,
-                    false, true,null);
+                    false, true, null);
 
         return Response.ok(results).build();
     }

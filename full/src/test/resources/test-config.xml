@@ -36,8 +36,6 @@
 			<array>
 				<value>classpath:test-jdbc.properties</value>
 				<value>classpath:hibernate.properties</value>
-				<!-- <value>file:./jdbc.properties</value> -->
-				<!-- <value>file:./kustvakt-test.conf</value> -->
 				<value>classpath:kustvakt-test.conf</value>
 			</array>
 		</property>
@@ -55,43 +53,49 @@
 		<constructor-arg name="properties" ref="props" />
 	</bean>
 
-	<!--class="org.apache.commons.dbcp2.BasicDataSource" -->
-	<!-- org.springframework.jdbc.datasource.SingleConnectionDataSource -->
 	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
 		lazy-init="true">
 		<property name="driverClassName" value="${jdbc.driverClassName}" />
 		<property name="url" value="${jdbc.url}" />
 		<property name="username" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
-		<!-- relevant for single connection datasource and sqlite -->
-		<!-- <property name="suppressClose"> <value>true</value> </property> -->
-		<!--<property name="initialSize" value="2"/> -->
-		<property name="maxTotal" value="4" />
-		<property name="maxIdle" value="2" />
+		<property name="maxTotal" value="1" />
+		<property name="maxIdle" value="1" />
 		<property name="minIdle" value="1" />
 		<property name="maxWaitMillis" value="15000" />
 		<!--<property name="poolPreparedStatements" value="true"/> -->
 	</bean>
 
+	<!-- use SingleConnection only for testing! -->
 	<bean id="sqliteDataSource"
 		class="org.springframework.jdbc.datasource.SingleConnectionDataSource"
-		lazy-init="true">
-		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		lazy-init="true" destroy-method="destroy">
+		<!-- <property name="driverClassName" value="${jdbc.driverClassName}" /> -->
 		<property name="url" value="${jdbc.url}" />
 		<property name="username" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
-		<!-- relevant for single connection datasource and sqlite -->
+		<!-- Sqlite can only have a single connection -->
 		<property name="suppressClose">
 			<value>true</value>
 		</property>
-		<!--<property name="initialSize" value="2"/> -->
-		<!--<property name="poolPreparedStatements" value="true"/> -->
+	</bean>
+	
+	<bean id="c3p0DataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+	    destroy-method="close">
+	    <property name="driverClass" value="${jdbc.driverClassName}" />
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		<property name="user" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	    <property name="maxPoolSize" value="1" />
+	    <property name="minPoolSize" value="1" />
+	    <property name="maxStatements" value="1" />
+	    <property name="testConnectionOnCheckout" value="true" />
 	</bean>
 
 	<!-- to configure database for sqlite, mysql, etc. migrations -->
 	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
-		<property name="baselineOnMigrate" value="true" />
-		<property name="locations" value="classpath:db.sqlite" />
+		<property name="baselineOnMigrate" value="false" />
+		<property name="locations" value="${jdbc.schemaPath}" />
 		<property name="dataSource" ref="sqliteDataSource" />
 	</bean>
 

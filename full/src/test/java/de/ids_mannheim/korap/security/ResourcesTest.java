@@ -135,7 +135,6 @@ public class ResourcesTest extends BeanConfigTest {
     public void initMethod () throws KustvaktException {
         helper().setupAccount();
         c1 = new Corpus("WPD_test");
-//        helper().runBootInterfaces();
         helper().setupResource(c1);
     }
 }

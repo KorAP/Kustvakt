@@ -1,7 +1,6 @@
 package de.ids_mannheim.korap.web.service;
 
 import org.junit.Before;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.TestHelper;
@@ -13,13 +12,6 @@ public abstract class FastJerseyTest extends FastJerseyBaseTest {
                     "de.ids_mannheim.korap.web.filter",
                     "de.ids_mannheim.korap.web.utils" };
 
-
-    @Override
-    public void close () {
-        super.close();
-        
-    }
-    
     protected TestHelper helper () {
         try {
             return TestHelper.newInstance(this.context);

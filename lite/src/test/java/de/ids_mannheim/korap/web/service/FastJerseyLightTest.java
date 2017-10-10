@@ -23,7 +23,7 @@ public abstract class FastJerseyLightTest extends FastJerseyBaseTest {
     }
 
     @Before
-    public static void startServerBeforeFirstTestRun () {
+    public void startServerBeforeFirstTestRun () {
         if (testContainer == null) {
             initServer(PORT, classPackages);
             startServer();

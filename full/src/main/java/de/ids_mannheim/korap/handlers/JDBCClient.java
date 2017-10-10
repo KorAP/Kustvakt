@@ -1,20 +1,22 @@
 package de.ids_mannheim.korap.handlers;
 
-import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
-import de.ids_mannheim.korap.utils.BooleanUtils;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Setter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.HashMap;
+
+import javax.sql.DataSource;
+
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.HashMap;
+import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
+import de.ids_mannheim.korap.utils.BooleanUtils;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Setter;
 
 /**
  * @author hanl
@@ -25,8 +27,7 @@ public class JDBCClient extends PersistenceClient<NamedParameterJdbcTemplate> {
 
     @Setter(AccessLevel.NONE)
     private DataSource dataSource;
-
-
+    
     public JDBCClient (DataSource datasource) {
         NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(
                 datasource);
