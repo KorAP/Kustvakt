@@ -112,6 +112,7 @@ public class SearchService {
      * @param type
      * @return valid resources in json format
      */
+    @Deprecated
     @GET
     @Path("{type}")
     public Response getResources (@Context Locale locale,
@@ -502,7 +503,6 @@ public class SearchService {
     }
 
 
-    @SuppressWarnings("unchecked")
     @GET
     @Path("search")
     public Response search (
@@ -664,65 +664,6 @@ public class SearchService {
         }
     }
 
-    
-
-    // EM: what is child?
-    @GET
-    @Path("{type}/{id}/{child}/statistics")
-    @Deprecated
-    public Response getStatisticsbyIdChild (@Context SecurityContext context,
-            @Context Locale locale, @PathParam("type") String type,
-            @PathParam("id") String id, @PathParam("child") String child) {
-        return getStatisticsbyId(context, locale, type,
-                StringUtils.joinResources(id, child));
-    }
-
-
-    @GET
-    @Path("{type}/{id}/stats")
-    @Deprecated
-    public Response getStatisticsbyId (@Context SecurityContext context,
-            @Context Locale locale, @PathParam("type") String type,
-            @PathParam("id") String id) {
-        TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        type = StringUtils.normalize(type);
-        id = StringUtils.decodeHTML(id);
-
-        try {
-            Class sl = ResourceFactory.getResourceClass(type);
-            if (!VirtualCollection.class.equals(sl) & !Corpus.class.equals(sl))
-                throw KustvaktResponseHandler.throwit(
-                        StatusCodes.ILLEGAL_ARGUMENT,
-                        "Requested Resource type not supported", type);
-
-            User user = controller.getUser(ctx.getUsername());
-            KustvaktResource resource;
-            if (StringUtils.isInteger(id))
-                resource = this.resourceHandler.findbyIntId(Integer.valueOf(id),
-                        user);
-            else
-                resource = this.resourceHandler.findbyStrId(id, user,
-                        ResourceFactory.getResourceClass(type));
-
-            // todo ?!
-            KoralCollectionQueryBuilder query = new KoralCollectionQueryBuilder();
-            if (resource instanceof VirtualCollection) {
-                query.setBaseQuery(resource.getData());
-            }
-            else if (resource instanceof Corpus) {
-                query.with(Attributes.CORPUS_SIGLE + "=" + resource.getName());
-            }
-            String res = query.toJSON();
-            String qstr = processor.processQuery(res, user);
-            return Response.ok(searchKrill.getStatistics(qstr)).build();
-        }
-        catch (KustvaktException e) {
-            jlog.error("Exception encountered: {}", e.string());
-            throw KustvaktResponseHandler.throwit(e);
-        }
-    }
-
-
     /**
      * @param context
      * @param locale
@@ -771,6 +712,7 @@ public class SearchService {
 
     // EM: this handles layer id containing a slash. 
     // Probably better to restrict the id not to contain any slash instead.
+    @Deprecated
     @POST
     @Path("{type}/{id}/{child}")
     public Response updateResource (@Context SecurityContext context,
@@ -783,6 +725,7 @@ public class SearchService {
     }
 
 
+    @Deprecated
     @POST
     @Path("{type}/{id}")
     public Response updateResource (@Context SecurityContext context,
@@ -832,7 +775,7 @@ public class SearchService {
         return Response.ok().build();
     }
 
-
+    @Deprecated
     // todo: change or deprecate
     @POST
     @Path("nv/{type}")
@@ -927,6 +870,7 @@ public class SearchService {
      * @return
      * @throws KustvaktException
      */
+    @Deprecated
     @POST
     @Path("{type}")
     public Response storeResource (@Context SecurityContext context,
@@ -1022,7 +966,7 @@ public class SearchService {
                 StringUtils.joinResources(id, child));
     }
 
-
+    @Deprecated
     @DELETE
     @Path("{type}/{id}")
     public Response deleteResource (@Context SecurityContext context,
@@ -1046,32 +990,6 @@ public class SearchService {
         return Response.ok().build();
     }
 
-    // EM: legacy support
-    // should be deprecated after a while
-    /*
-    @GET
-    @Path("/corpus/{corpusId}/{docId}/{matchId}/matchInfo")
-    public Response getMatchInfo (@Context SecurityContext ctx,
-            @Context Locale locale, @PathParam("corpusId") String corpusId,
-            @PathParam("docId") String docId,
-            @PathParam("matchId") String matchId,
-            @QueryParam("foundry") Set<String> foundries,
-            @QueryParam("layer") Set<String> layers,
-            @QueryParam("spans") Boolean spans) throws KustvaktException {
-    	
-    	String[] ids = docId.split("\\.");
-    	if (ids.length !=2){
-    		throw KustvaktResponseHandler.throwit(
-    				new KustvaktException(StatusCodes.PARAMETER_VALIDATION_ERROR, 
-    				docId + " format is wrong. Expected a fullstop between doc id "
-					+ "and text id"));
-    	}		
-    	return getMatchInfo(ctx, locale, corpusId, ids[0], ids[1], matchId, foundries, layers, spans);
-    	
-    }
-    */
-    
-    // fixme: only allowed for corpus?!
     @GET
     @Path("/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
     public Response getMatchInfo (

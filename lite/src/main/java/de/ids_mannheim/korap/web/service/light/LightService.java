@@ -32,7 +32,6 @@ import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.resource.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.web.ClientsHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
@@ -68,12 +67,14 @@ public class LightService {
 
 
     public LightService () {
+        // Karang URI
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
         this.graphDBhandler = new ClientsHandler(builder.build());
     }
 
 
-    /**
+    /** Requires Karang (Neo4j search engine)
+     *  
      * @param query
      * @return response
      */
@@ -206,7 +207,7 @@ public class LightService {
         }
         else
             result = searchKrill.search(query);
-        KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
+        jlog.debug("The result set: {}", result);
         return Response.ok(result).build();
     }
 
@@ -287,7 +288,7 @@ public class LightService {
             throw KustvaktResponseHandler.throwit(500, e.getMessage(), null);
         }
 
-        KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
+        jlog.debug("The result set: {}", result);
         return Response.ok(result).build();
     }
 
