@@ -21,11 +21,18 @@ import org.hibernate.annotations.FetchMode;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Describes annotations as a pair, e.g. foundry and layer where 
+ *  foundry denotes where the annotation comes from e.g. Tree tagger 
+ *  parser, and layer denotes the annotation layer e.g. part of speech.
+ * 
+ *  @author margaretha
+ *  @see Annotation
+ */
 @Setter
 @Getter
 @Entity
-@Table(name = "annotation_pair", 
-    uniqueConstraints=@UniqueConstraint(columnNames={"annotation1","annotation2"}))
+@Table(name = "annotation_pair", uniqueConstraints = @UniqueConstraint(
+        columnNames = { "annotation1", "annotation2" }))
 public class AnnotationPair {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,28 +48,29 @@ public class AnnotationPair {
     @ManyToOne //(fetch=FetchType.LAZY) 
     @JoinColumn(name = "annotation1", insertable = false, updatable = false)
     private Annotation annotation1;
-    
+
     @Fetch(FetchMode.SELECT)
     @ManyToOne //(fetch=FetchType.LAZY) 
     @JoinColumn(name = "annotation2", insertable = false, updatable = false)
     private Annotation annotation2;
 
-    @ManyToMany(fetch=FetchType.LAZY) //(fetch=FetchType.EAGER)
-    @JoinTable(
-            name="annotation_pair_value",
-            joinColumns=@JoinColumn(name="pair_id", referencedColumnName="id"),
-            inverseJoinColumns=@JoinColumn(name="value_id", referencedColumnName="id"),
-            uniqueConstraints = @UniqueConstraint(columnNames = {
-                            "pair_id", "value_id" })
-    )
+    @ManyToMany(fetch = FetchType.LAZY) //(fetch=FetchType.EAGER)
+    @JoinTable(name = "annotation_pair_value",
+            joinColumns = @JoinColumn(name = "pair_id",
+                    referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "value_id",
+                    referencedColumnName = "id"),
+            uniqueConstraints = @UniqueConstraint(
+                    columnNames = { "pair_id", "value_id" }))
     private Set<Annotation> values;
+
 
     @Override
     public String toString () {
         return "id=" + id + ", annotation1=" + annotationId1 + ", annotation2="
                 + annotationId1 + ", description=" + description
-                + ", annotation1= "+ annotation1
-                + ", annotation2= "+ annotation2;
-                
+                + ", annotation1= " + annotation1 + ", annotation2= "
+                + annotation2;
+
     }
 }

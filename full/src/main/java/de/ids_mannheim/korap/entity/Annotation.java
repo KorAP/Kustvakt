@@ -10,6 +10,12 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Describes annotation tags available in the system / used in 
+ *  annotating corpus data. 
+ * 
+ *  @author margaretha
+ *
+ */
 @Setter
 @Getter
 @Entity

@@ -1,6 +1,5 @@
 package de.ids_mannheim.korap.dto;
 
-import java.util.List;
 import java.util.Map;
 
 import lombok.Getter;

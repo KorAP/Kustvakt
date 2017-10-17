@@ -5,29 +5,53 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 import lombok.Getter;
 import lombok.Setter;
 
+/** Describes the relationship between virtual corpora and user groups, 
+ *  i.e. which groups may access which virtual corpora, and the history 
+ *  of group-access management.  
+ * 
+ * @author margaretha
+ * @see VirtualCorpus
+ * @see UserGroup
+ */
 @Setter
 @Getter
 @Entity
-@Table(name = "vc_access_group")
+@Table(name = "vc_access_group", indexes = {
+        @Index(unique = true, columnList = "virtual_corpus_id, group_id") })
 public class VirtualCorpusAccessGroup {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column(name = "vc_id")
-    private int virtualCorpusId;
-    @Column(name = "group_id")
-    private int groupId;
+    private String status;
+    @Column(name = "created_by")
+    private String createdBy;
+    @Column(name = "approved_by")
+    private String approvedBy;
+    @Column(name = "deleted_by")
+    private String deletedBy;
+
+    @ManyToOne
+    @PrimaryKeyJoinColumn(name = "virtual_corpus_id",
+            referencedColumnName = "id")
+    private VirtualCorpus virtualCorpus;
+
+    @ManyToOne
+    @PrimaryKeyJoinColumn(name = "group_id", referencedColumnName = "id")
+    private UserGroup userGroup;
 
 
     @Override
     public String toString () {
-        return "id=" + id + ", virtualCorpusId= " + virtualCorpusId + ", groupId= "
-                + groupId;
+        return "id=" + id + ", virtualCorpus= " + virtualCorpus
+                + ", userGroup= " + userGroup;
     }
 }
