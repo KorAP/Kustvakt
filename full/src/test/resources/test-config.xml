@@ -35,6 +35,7 @@
 		<property name="locations">
 			<array>
 				<value>classpath:test-jdbc.properties</value>
+				<value>file:./test-jdbc.properties</value>
 				<value>classpath:hibernate.properties</value>
 				<value>classpath:kustvakt-test.conf</value>
 			</array>

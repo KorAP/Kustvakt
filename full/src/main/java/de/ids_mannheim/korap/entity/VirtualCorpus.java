@@ -4,12 +4,16 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import de.ids_mannheim.korap.constants.VirtualCorpusType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,7 +38,8 @@ public class VirtualCorpus {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private VirtualCorpusType type;
     private String status;
     private String description;
     @Column(name = "required_access")
@@ -45,7 +50,7 @@ public class VirtualCorpus {
     @Column(name = "created_by")
     private String createdBy;
 
-    @OneToMany(mappedBy = "userGroup")
+    @OneToMany(mappedBy = "userGroup", fetch=FetchType.LAZY)
     List<VirtualCorpusAccessGroup> accessGroup;
 
 

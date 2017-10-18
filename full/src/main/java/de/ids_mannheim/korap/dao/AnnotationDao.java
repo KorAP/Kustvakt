@@ -71,7 +71,7 @@ public class AnnotationDao {
 
         // EM: Hibernate bug in join n:m (see AnnotationPair.values). 
         // There should not be any redundant AnnotationPair. 
-        // The redundancy can be alsp avoided with fetch=FetchType.EAGER 
+        // The redundancy can be also avoided with fetch=FetchType.EAGER 
         // because Hibernate does 2 selects.  
         query.distinct(true);
         query = query.select(annotationPair);

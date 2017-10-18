@@ -2,14 +2,17 @@ package de.ids_mannheim.korap.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Index;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
+import de.ids_mannheim.korap.constants.VirtualCorpusAccessStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,14 +27,12 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name = "vc_access_group", indexes = {
-        @Index(unique = true, columnList = "virtual_corpus_id, group_id") })
+@Table(name = "virtual_corpus_access")
 public class VirtualCorpusAccessGroup {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String status;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "approved_by")
@@ -39,13 +40,16 @@ public class VirtualCorpusAccessGroup {
     @Column(name = "deleted_by")
     private String deletedBy;
 
-    @ManyToOne
-    @PrimaryKeyJoinColumn(name = "virtual_corpus_id",
+    @Enumerated(EnumType.STRING)
+    private VirtualCorpusAccessStatus status;
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "virtual_corpus_id",
             referencedColumnName = "id")
     private VirtualCorpus virtualCorpus;
 
-    @ManyToOne
-    @PrimaryKeyJoinColumn(name = "group_id", referencedColumnName = "id")
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "user_group_id", referencedColumnName = "id")
     private UserGroup userGroup;
 
 

@@ -4,6 +4,8 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import de.ids_mannheim.korap.constants.GroupMemberStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,12 +39,14 @@ public class UserGroupMember {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(name = "user_id")
-    private int userId;
-    private String status;
+    private String userId;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "deleted_by")
     private String deletedBy;
+    
+    @Enumerated(EnumType.STRING)
+    private GroupMemberStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
