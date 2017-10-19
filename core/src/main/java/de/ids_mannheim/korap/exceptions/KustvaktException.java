@@ -1,12 +1,12 @@
 package de.ids_mannheim.korap.exceptions;
 
-import de.ids_mannheim.korap.auditing.AuditRecord;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import de.ids_mannheim.korap.auditing.AuditRecord;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author hanl
@@ -25,8 +25,7 @@ public class KustvaktException extends Exception {
     public KustvaktException (int status) {
         this.statusCode = status;
     }
-
-
+    
     public KustvaktException (int status, String ... args) {
         this.statusCode = status;
         this.entity = Arrays.asList(args).toString();
@@ -38,10 +37,12 @@ public class KustvaktException extends Exception {
         this.userid = String.valueOf(userid);
     }
 
+    // add throwable to parameters
     public KustvaktException (Object userid, int status, String message,
-            String entity) {
+                              String entity) {
         this(userid, status, message, entity, null);
     }
+
 
     public KustvaktException (Object userid, int status, String message,
                               String entity, Exception e) {
@@ -51,17 +52,22 @@ public class KustvaktException extends Exception {
         this.userid = String.valueOf(userid);
     }
 
-    public KustvaktException (Object userid, int status,
-                              String entity) {
+
+    public KustvaktException (Object userid, int status, String entity) {
         super(StatusCodes.getMessage(status));
         this.statusCode = status;
         this.entity = entity;
         this.userid = String.valueOf(userid);
     }
 
-
     public KustvaktException (int status, String message, String entity) {
         super(message);
+        this.statusCode = status;
+        this.entity = entity;
+    }
+    
+    public KustvaktException (int status, String message, String entity, Exception e) {
+        super(message, e);
         this.statusCode = status;
         this.entity = entity;
     }

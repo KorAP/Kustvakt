@@ -83,8 +83,8 @@
 					<threadCount>10</threadCount>
 
 					<excludes>
-						<exclude>**/*APITest.java</exclude>
 						<exclude>de/ids_mannheim/korap/suites/*.java</exclude>
+						<exclude>de/ids_mannheim/korap/dao/*.java</exclude>
 						<exclude>**/KustvaktServerTest.java</exclude>
 						<exclude>**/ResourceServiceTest.java</exclude>
 						<exclude>**/ResourceInfoServiceTest.java</exclude>

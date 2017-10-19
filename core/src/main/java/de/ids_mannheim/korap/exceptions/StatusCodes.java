@@ -14,7 +14,7 @@ public class StatusCodes {
      * 100 status codes for standard system errors
      */
     public static final int DEFAULT_ERROR = 100;
-    public static final int NO_VALUE_FOUND = 101;
+    public static final int NO_RESULT_FOUND = 101;
     public static final int ENTRY_EXISTS = 102;
     public static final int UNSUPPORTED_OPERATION = 103;
     public static final int ILLEGAL_ARGUMENT = 104;

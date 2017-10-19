@@ -36,7 +36,7 @@
 			<array>
 				<value>classpath:test-jdbc.properties</value>
 				<value>file:./test-jdbc.properties</value>
-				<value>classpath:hibernate.properties</value>
+				<value>classpath:test-hibernate.properties</value>
 				<value>classpath:kustvakt-test.conf</value>
 			</array>
 		</property>
@@ -95,6 +95,10 @@
 
 	<!-- to configure database for sqlite, mysql, etc. migrations -->
 	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+		<!-- drop existing tables and create new tables -->
+		<property name="validateOnMigrate" value="true" />
+		<property name="cleanOnValidationError" value="true" />
+
 		<property name="baselineOnMigrate" value="false" />
 		<property name="locations" value="${jdbc.schemaPath}" />
 		<property name="dataSource" ref="sqliteDataSource" />

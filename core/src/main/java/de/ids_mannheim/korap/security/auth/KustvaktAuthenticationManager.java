@@ -114,7 +114,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 		if (context != null && TimeUtils.isExpired(context.getExpirationTime()))
 			throw new KustvaktException(StatusCodes.EXPIRED);
 		else if (context == null)
-			throw new KustvaktException(StatusCodes.NO_VALUE_FOUND);
+			throw new KustvaktException(StatusCodes.NO_RESULT_FOUND);
 
 		// if (!matchStatus(host, useragent, context))
 		// provider.removeUserSession(token);
@@ -902,7 +902,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 				data = dao.get(user);
 
 			if (data == null)
-				throw new KustvaktException(user.getId(), StatusCodes.NO_VALUE_FOUND, "No data found!",
+				throw new KustvaktException(user.getId(), StatusCodes.NO_RESULT_FOUND, "No data found!",
 						clazz.getSimpleName());
 			return data;
 		} catch (KustvaktException e) {

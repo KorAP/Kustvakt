@@ -50,7 +50,7 @@ public class UserGroup {
     @OneToMany(mappedBy="group")//, fetch = FetchType.LAZY)
     List<UserGroupMember> members;
 
-    @OneToMany(mappedBy = "virtualCorpus", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "userGroup", fetch = FetchType.LAZY)
     private List<VirtualCorpusAccessGroup> virtualCorpusAccessGroup;
 
 

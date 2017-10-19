@@ -50,7 +50,7 @@ public class VirtualCorpus {
     @Column(name = "created_by")
     private String createdBy;
 
-    @OneToMany(mappedBy = "userGroup", fetch=FetchType.LAZY)
+    @OneToMany(mappedBy = "virtualCorpus", fetch=FetchType.LAZY)
     List<VirtualCorpusAccessGroup> accessGroup;
 
 
@@ -60,5 +60,21 @@ public class VirtualCorpus {
                 + status + ", description=" + description + ", requiredAccess="
                 + requiredAccess + ", collectionQuery= " + collectionQuery
                 + ", definition= " + definition + ", createdBy= " + createdBy;
+    }
+    
+    @Override
+    public int hashCode () {
+        int prime = 37;
+        int result = 1;
+        result = prime * result + id;
+        result = prime * result + name.hashCode();
+        result = prime * result + createdBy.hashCode();
+        return result;
+    }
+    
+    @Override
+    public boolean equals (Object obj) {
+        VirtualCorpus vc = (VirtualCorpus) obj;
+        return (this.id == vc.getId()) ? true : false;
     }
 }

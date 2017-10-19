@@ -97,12 +97,12 @@
 
 	<!-- to configure database for sqlite, mysql, etc. migrations -->
 	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
-		<property name="baselineOnMigrate" value="false" />
+		<property name="baselineOnMigrate" value="true" />
 		<!-- <property name="validateOnMigrate" value="false" /> -->
 		<!-- <property name="cleanOnValidationError" value="true" /> -->
 		<property name="locations" value="${jdbc.schemaPath}" />
-		<!-- <property name="dataSource" ref="dataSource" /> -->
-		<property name="dataSource" ref="sqliteDataSource" />
+		<property name="dataSource" ref="dataSource" />
+		<!-- <property name="dataSource" ref="sqliteDataSource" /> -->
 	</bean>
 	
 	

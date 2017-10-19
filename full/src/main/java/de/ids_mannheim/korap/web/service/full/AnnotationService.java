@@ -121,7 +121,7 @@ public class AnnotationService {
         }
         else if (codes.isEmpty()) {
             throw KustvaktResponseHandler.throwit(new KustvaktException(
-                    StatusCodes.NO_VALUE_FOUND, "No result found.","codes:[]"));
+                    StatusCodes.NO_RESULT_FOUND, "No result found.","codes:[]"));
         }
         
         List<AnnotationPair> annotationPairs = null;
@@ -164,7 +164,7 @@ public class AnnotationService {
         }
         else {
             throw KustvaktResponseHandler.throwit(new KustvaktException(
-                    StatusCodes.NO_VALUE_FOUND, "No result found.",""));
+                    StatusCodes.NO_RESULT_FOUND, "No result found.",""));
         }
     }
 

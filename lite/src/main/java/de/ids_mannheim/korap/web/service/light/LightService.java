@@ -304,7 +304,7 @@ public class LightService {
 
         String stats = searchKrill.getStatistics(json);
         if (stats.contains("-1"))
-            throw KustvaktResponseHandler.throwit(StatusCodes.NO_VALUE_FOUND);
+            throw KustvaktResponseHandler.throwit(StatusCodes.NO_RESULT_FOUND);
         jlog.debug("Stats: " + stats);
         return Response.ok(stats).build();
     }

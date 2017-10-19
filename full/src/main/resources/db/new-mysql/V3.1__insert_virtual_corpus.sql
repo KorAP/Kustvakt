@@ -36,6 +36,11 @@ INSERT INTO user_group_member(user_id, group_id, status, created_by, deleted_by)
 		(SELECT id from user_group where name = "dory group"),
 		"DELETED","dory", "pearl";
 
+INSERT INTO user_group_member(user_id, group_id, status, created_by)
+	SELECT "pearl",
+		(SELECT id from user_group where name = "auto group"),
+		"ACTIVE","system";
+
 		
 -- virtual corpora
 INSERT INTO virtual_corpus(name, type, required_access, created_by, description, status, collection_query) 
@@ -79,6 +84,6 @@ INSERT INTO virtual_corpus_access(virtual_corpus_id, user_group_id, status, crea
 	
 -- Summary user VC Lists
 -- dory: dory VC, group VC, system VC
--- nemo: group VC, published VC, system VC
+-- nemo: group VC, system VC
 -- marlin: published VC, system VC
--- pearl: system VC
+-- pearl: system VC, published VC

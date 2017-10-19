@@ -127,7 +127,7 @@ public class ResourceFinder {
         }
         
         if (sets.isEmpty()){
-            throw new KustvaktException(StatusCodes.NO_VALUE_FOUND, 
+            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND, 
             		"Cannot found public "+clazz.getSimpleName()+" with ids: "+id_set.toString());
         }
         return sets;
@@ -153,7 +153,7 @@ public class ResourceFinder {
         }
 
         if (sets.isEmpty()){
-            throw new KustvaktException(StatusCodes.NO_VALUE_FOUND, 
+            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND, 
                     "Cannot found public "+clazz.getSimpleName()+" with ids: "+id_set.toString());
         }
         return sets;

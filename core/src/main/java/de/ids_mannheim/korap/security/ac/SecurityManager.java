@@ -234,7 +234,7 @@ public class SecurityManager<T extends KustvaktResource> {
         if (this.policies == null) {
             jlog.error("No policies found for resource id '{}' for user '{}'",
                     id, user.getId());
-            throw new KustvaktException(StatusCodes.NO_VALUE_FOUND,
+            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
                     "Resource not found!", String.valueOf(id));
         }
         return true;
@@ -259,7 +259,7 @@ public class SecurityManager<T extends KustvaktResource> {
                 this.user);
         
         if(type != null && !resource.getClass().equals(type)) {
-            throw new KustvaktException(StatusCodes.NO_VALUE_FOUND,
+            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
                     "Resource with id " + this.evaluator.getResourceID()
                             + " and type " + type.getSimpleName()
                             + " is not found. Found resource with id "
@@ -298,7 +298,7 @@ public class SecurityManager<T extends KustvaktResource> {
                     jlog.error(
                             "No policies found for parent '{}' for user '{}'",
                             resource.getParentID(), user.getId());
-                    throw new KustvaktException(StatusCodes.NO_VALUE_FOUND);
+                    throw new KustvaktException(StatusCodes.NO_RESULT_FOUND);
                 }
             }
             boolean newid = false;

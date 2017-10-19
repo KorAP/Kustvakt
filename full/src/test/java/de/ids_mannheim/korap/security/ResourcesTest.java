@@ -99,6 +99,7 @@ public class ResourcesTest extends BeanConfigTest {
 
     // securitymanager does not allow for anonymous retrieval, only resourcefinder!
     @Test 
+    @Ignore
     public void getResource () throws KustvaktException {
         
         exception.expect(KustvaktException.class);

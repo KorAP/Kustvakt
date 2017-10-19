@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS user_group (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
   name varchar(100) NOT NULL,
   status varchar(100) NOT NULL,
-  created_by varchar(100) NOT NULL
+  created_by varchar(100) NOT NULL,
+  INDEX status_index(status)
 );
 
 CREATE TABLE IF NOT EXISTS user_group_member (
@@ -13,15 +14,15 @@ CREATE TABLE IF NOT EXISTS user_group_member (
   created_by varchar(100) NOT NULL,
   deleted_by varchar(100) DEFAULT NULL,
   UNIQUE INDEX unique_index (user_id,group_id),
+  INDEX status_index(status),
   FOREIGN KEY (group_id) 
   	REFERENCES user_group (id)
   	ON DELETE CASCADE
 ); 
 
 CREATE TABLE IF NOT EXISTS role (
-  id varchar(100) NOT NULL,
-  privilege varchar(100) NOT NULL,
-  PRIMARY KEY (id)
+  id varchar(100) PRIMARY KEY NOT NULL,
+  privilege varchar(100) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS group_member_role (
@@ -46,7 +47,9 @@ CREATE TABLE IF NOT EXISTS virtual_corpus (
   description varchar(255) DEFAULT NULL,
   status varchar(100) DEFAULT NULL,
   collection_query varchar(2000) NOT NULL,
-  definition varchar(255) DEFAULT NULL
+  definition varchar(255) DEFAULT NULL,
+  INDEX owner_index (created_by),
+  INDEX type_index (type)
 );
 
 CREATE TABLE IF NOT EXISTS virtual_corpus_access (
@@ -58,6 +61,7 @@ CREATE TABLE IF NOT EXISTS virtual_corpus_access (
   approved_by varchar(100) DEFAULT NULL,
   deleted_by varchar(100) DEFAULT NULL,
   UNIQUE INDEX unique_index (virtual_corpus_id,user_group_id),
+  INDEX status_index(status),
   FOREIGN KEY (user_group_id) 
   	REFERENCES user_group (id)
   	ON DELETE CASCADE,
