@@ -1,12 +1,33 @@
 package de.ids_mannheim.korap.entity;
 
-/** Simple definitions of privileges.
- *  When needed can be adopted into a database table. 
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import de.ids_mannheim.korap.constants.PrivilegeType;
+
+/**  
  * 
  * @author margaretha
  *
  */
-public enum Privilege {
+@Entity
+@Table
+public class Privilege {
     
-    READ, WRITE, DELETE;
+    @Id
+    @Enumerated(EnumType.STRING)
+    private PrivilegeType id;
+    
+    @ManyToOne
+    @JoinColumn
+    private Role role;
+    
+    public String toString () {
+        return "id=" + id + ", role="+ role;
+    }
 }

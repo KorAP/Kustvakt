@@ -39,7 +39,7 @@ public class VirtualCorpusDao {
 
     @PersistenceContext
     private EntityManager entityManager;
-    
+
     public void storeVirtualCorpus (VirtualCorpus virtualCorpus) {
         entityManager.persist(virtualCorpus);
     }
@@ -127,15 +127,21 @@ public class VirtualCorpusDao {
         Join<VirtualCorpus, VirtualCorpusAccessGroup> accessGroup =
                 virtualCorpus.join("accessGroup");
 
-        Predicate corpusStatus = builder.notEqual(accessGroup.get("status"),
-                VirtualCorpusAccessStatus.HIDDEN);
+        Predicate corpusStatus = builder.and(
+                builder.notEqual(accessGroup.get("status"),
+                        VirtualCorpusAccessStatus.HIDDEN),
+                builder.notEqual(accessGroup.get("status"),
+                        VirtualCorpusAccessStatus.DELETED));
+        
         Predicate userGroupStatus =
                 builder.notEqual(accessGroup.get("userGroup").get("status"),
                         UserGroupStatus.DELETED);
         Join<VirtualCorpusAccessGroup, UserGroup> userGroupMembers =
                 accessGroup.join("userGroup").join("members");
+        
         Predicate memberStatus = builder.equal(userGroupMembers.get("status"),
                 GroupMemberStatus.ACTIVE);
+        
         Predicate user = builder.equal(userGroupMembers.get("userId"), userId);
 
         query.select(virtualCorpus);

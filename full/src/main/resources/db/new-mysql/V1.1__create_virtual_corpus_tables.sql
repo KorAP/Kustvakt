@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS user_group (
   name varchar(100) NOT NULL,
   status varchar(100) NOT NULL,
   created_by varchar(100) NOT NULL,
+  deleted_by varchar(100) DEFAULT NULL,
   INDEX status_index(status)
 );
 
@@ -21,8 +22,17 @@ CREATE TABLE IF NOT EXISTS user_group_member (
 ); 
 
 CREATE TABLE IF NOT EXISTS role (
-  id varchar(100) PRIMARY KEY NOT NULL,
-  privilege varchar(100) NOT NULL
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  name varchar(100) NOT NULL,
+  privilege varchar(20) NOT NULL,
+  UNIQUE INDEX unique_index (name,privilege),
+  FOREIGN KEY (privilege) 
+  	REFERENCES privilege (id)
+  	ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS privilege (
+  id varchar(20) PRIMARY KEY NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS group_member_role (

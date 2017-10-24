@@ -19,6 +19,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import de.ids_mannheim.korap.constants.GroupMemberStatus;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -63,6 +64,20 @@ public class UserGroupMember {
     private Set<Role> roles;
 
 
+    public UserGroupMember createMember (String userId, String createdBy,
+            UserGroup userGroup, Set<Role> roles) throws KustvaktException {
+//        checkStringValue(userId, "userId");
+//        checkStringValue(createdBy, "createdBy");
+        
+        UserGroupMember member = new UserGroupMember();
+        member.setUserId(userId);
+        member.setCreatedBy(createdBy);
+        member.setGroup(userGroup);
+        member.setStatus(GroupMemberStatus.PENDING);
+        member.setRoles(roles);
+        return member;
+    }
+    
     @Override
     public String toString () {
         return "id=" + id + ", group= " + group + ", userId= " + userId

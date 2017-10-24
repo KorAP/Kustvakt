@@ -42,6 +42,8 @@ public class UserGroup {
     private String name;
     @Column(name = "created_by")
     private String createdBy;
+    @Column(name = "deleted_by")
+    private String deletedBy;
     
     @Enumerated(EnumType.STRING)
     private UserGroupStatus status;
