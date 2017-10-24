@@ -179,7 +179,13 @@
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>5.1.8.Final</version>
 		</dependency>
-
+		
+		<!-- MySql -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.21</version>
+		</dependency>
 
 		<!-- Jersey -->
 		<dependency>

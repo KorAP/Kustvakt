@@ -60,7 +60,7 @@
 		<property name="url" value="${jdbc.url}" />
 		<property name="username" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
-		<property name="maxTotal" value="1" />
+		<property name="maxTotal" value="4" />
 		<property name="maxIdle" value="1" />
 		<property name="minIdle" value="1" />
 		<property name="maxWaitMillis" value="15000" />
@@ -70,7 +70,7 @@
 	<!-- use SingleConnection only for testing! -->
 	<bean id="sqliteDataSource"
 		class="org.springframework.jdbc.datasource.SingleConnectionDataSource"
-		lazy-init="true" destroy-method="destroy">
+		lazy-init="true">
 		<!-- <property name="driverClassName" value="${jdbc.driverClassName}" /> -->
 		<property name="url" value="${jdbc.url}" />
 		<property name="username" value="${jdbc.username}" />
@@ -87,7 +87,7 @@
 		<property name="jdbcUrl" value="${jdbc.url}" />
 		<property name="user" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
-	    <property name="maxPoolSize" value="1" />
+	    <property name="maxPoolSize" value="4" />
 	    <property name="minPoolSize" value="1" />
 	    <property name="maxStatements" value="1" />
 	    <property name="testConnectionOnCheckout" value="true" />
@@ -102,16 +102,19 @@
 		<property name="baselineOnMigrate" value="false" />
 		<property name="locations" value="${jdbc.schemaPath}" />
 		<property name="dataSource" ref="sqliteDataSource" />
+		<!-- <property name="dataSource" ref="dataSource" /> -->
 	</bean>
 
 	<bean id="kustvakt_db" class="de.ids_mannheim.korap.handlers.JDBCClient">
+		<!-- <constructor-arg index="0" ref="dataSource" /> -->
 		<constructor-arg index="0" ref="sqliteDataSource" />
-		<property name="database" value="sqlite" />
+		<property name="database" value="${jdbc.database}" />
 	</bean>
 
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-		<property name="dataSource" ref="dataSource" />
+		<!-- <property name="dataSource" ref="dataSource" /> -->
+		<property name="dataSource" ref="sqliteDataSource" />
 		<property name="packagesToScan" value="de.ids_mannheim.korap.entity" />
 		<property name="jpaVendorAdapter">
 			<bean id="jpaVendorAdapter"

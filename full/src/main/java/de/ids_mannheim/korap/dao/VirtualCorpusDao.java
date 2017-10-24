@@ -33,25 +33,21 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
  * @author margaretha
  *
  */
+@Transactional
 @Component
 public class VirtualCorpusDao {
 
     @PersistenceContext
     private EntityManager entityManager;
-
-
-    @Transactional
+    
     public void storeVirtualCorpus (VirtualCorpus virtualCorpus) {
         entityManager.persist(virtualCorpus);
     }
 
-
-    @Transactional
     public void deleteVirtualCorpus (int id) throws KustvaktException {
         VirtualCorpus vc = retrieveVCById(id);
         entityManager.remove(vc);
     }
-
 
     public List<VirtualCorpus> retrieveVCByType (VirtualCorpusType type)
             throws KustvaktException {

@@ -1,4 +1,4 @@
-package de.ids_mannheim.de.korap.dao;
+package de.ids_mannheim.korap.dao;
 
 import static org.junit.Assert.assertEquals;
 

@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS annotation(
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	code VARCHAR(20) NOT NULL,
@@ -7,7 +6,7 @@ CREATE TABLE IF NOT EXISTS annotation(
 	de_description VARCHAR(100)
 );
 
-create unique index annotation_index on annotation (code, type);
+CREATE UNIQUE INDEX annotation_index ON annotation (code, type);
 
 CREATE TABLE IF NOT EXISTS annotation_pair(
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -23,7 +22,7 @@ CREATE TABLE IF NOT EXISTS annotation_pair(
 	
 );
 
-create unique index annotation_pair_index on annotation_pair (annotation1, annotation2);
+CREATE UNIQUE INDEX annotation_pair_index ON annotation_pair (annotation1, annotation2);
 
 CREATE TABLE IF NOT EXISTS annotation_pair_value(
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,7 +36,7 @@ CREATE TABLE IF NOT EXISTS annotation_pair_value(
 		ON DELETE CASCADE
 );
 
-create unique index annotation_pair_value_index on annotation_pair_value (pair_id, value_id);
+CREATE UNIQUE INDEX annotation_pair_value_index ON annotation_pair_value (pair_id, value_id);
 
 CREATE TABLE resource(
 	id VARCHAR(100) PRIMARY KEY UNIQUE NOT NULL,
@@ -58,5 +57,5 @@ CREATE TABLE resource_layer(
 		ON DELETE CASCADE	
 );
 
-create unique index resource_layer_index on resource_layer (resource_id, layer_id);
+CREATE UNIQUE INDEX resource_layer_index ON resource_layer (resource_id, layer_id);
 
