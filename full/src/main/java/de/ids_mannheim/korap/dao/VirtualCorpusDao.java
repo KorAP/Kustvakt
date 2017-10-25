@@ -14,7 +14,7 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.constants.GroupMemberStatus;
@@ -34,7 +34,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
  *
  */
 @Transactional
-@Component
+@Repository
 public class VirtualCorpusDao {
 
     @PersistenceContext

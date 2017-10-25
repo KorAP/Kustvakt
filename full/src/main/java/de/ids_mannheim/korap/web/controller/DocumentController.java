@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 import com.sun.jersey.spi.container.ResourceFilters;
 import de.ids_mannheim.korap.config.BeansFactory;
@@ -19,22 +19,25 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**
+ * EM: To Do: restructure codes regarding service and controller layers
+ * 
  * @author hanl
  * @date 19/11/2014
  */
 @Path(KustvaktServer.API_VERSION + "/doc")
 @ResourceFilters({ AdminFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-public class DocumentService {
+public class DocumentController {
 
-    private static Logger jlog = LoggerFactory.getLogger(DocumentService.class);
+    private static Logger jlog =
+            LoggerFactory.getLogger(DocumentController.class);
     private DocumentDao documentDao;
 
 
     // todo: error handling
-    public DocumentService () {
-        this.documentDao = new DocumentDao(BeansFactory.getKustvaktContext()
-                .getPersistenceClient());
+    public DocumentController () {
+        this.documentDao = new DocumentDao(
+                BeansFactory.getKustvaktContext().getPersistenceClient());
     }
 
 
@@ -61,10 +64,8 @@ public class DocumentService {
     public Response get (@PathParam("corpus") String corpus,
             @QueryParam("index") Integer index,
             @QueryParam("offset") Integer length) {
-        if (index == null)
-            index = 1;
-        if (length == null)
-            length = 25;
+        if (index == null) index = 1;
+        if (length == null) length = 25;
         try {
             List docs = this.documentDao.findbyCorpus(corpus, length, index);
             //todo: serialize to document json

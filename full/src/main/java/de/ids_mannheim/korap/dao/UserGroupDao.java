@@ -1,6 +1,5 @@
 package de.ids_mannheim.korap.dao;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -8,21 +7,28 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.ListJoin;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import de.ids_mannheim.korap.constants.GroupMemberStatus;
 import de.ids_mannheim.korap.constants.UserGroupStatus;
 import de.ids_mannheim.korap.constants.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
+import de.ids_mannheim.korap.entity.UserGroupMember_;
+import de.ids_mannheim.korap.entity.UserGroup_;
 import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.entity.VirtualCorpusAccessGroup;
 
 @Transactional
-@Component
+@Repository
 public class UserGroupDao {
+
+    public static final String USER_GROUP_ALL = "all";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -57,23 +63,57 @@ public class UserGroupDao {
 
         Root<UserGroup> root = query.from(UserGroup.class);
         query.select(root);
-        query.where(criteriaBuilder.equal(root.get("id"), groupId));
+        query.where(criteriaBuilder.equal(root.get(UserGroup_.id), groupId));
         Query q = entityManager.createQuery(query);
         return (UserGroup) q.getSingleResult();
     }
 
+    public List<UserGroup> retrieveGroupByUserId (String userId) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<UserGroup> query =
+                criteriaBuilder.createQuery(UserGroup.class);
+
+        Root<UserGroup> root = query.from(UserGroup.class);
+
+        Predicate allUserGroup = criteriaBuilder.and(
+                criteriaBuilder.equal(root.get(UserGroup_.name),
+                        USER_GROUP_ALL),
+                criteriaBuilder.notEqual(root.get(UserGroup_.status),
+                        UserGroupStatus.DELETED));
+
+
+        ListJoin<UserGroup, UserGroupMember> members =
+                root.join(UserGroup_.members);
+        Predicate memberships = criteriaBuilder.and(
+                criteriaBuilder.equal(members.get(UserGroupMember_.userId),
+                        userId),
+                criteriaBuilder.equal(members.get(UserGroupMember_.status),
+                        GroupMemberStatus.ACTIVE));
+
+
+        query.select(root);
+        query.where(criteriaBuilder.and(allUserGroup, memberships));
+        Query q = entityManager.createQuery(query);
+        return q.getResultList();
+    }
+
+    public void addVCToGroup (VirtualCorpus virtualCorpus, String createdBy,
+            VirtualCorpusAccessStatus status, UserGroup group) {
+        VirtualCorpusAccessGroup accessGroup = new VirtualCorpusAccessGroup();
+        accessGroup.setCreatedBy(createdBy);
+        accessGroup.setStatus(status);
+        accessGroup.setUserGroup(group);
+        accessGroup.setVirtualCorpus(virtualCorpus);
+        entityManager.persist(accessGroup);
+    }
+
     public void addVCToGroup (List<VirtualCorpus> virtualCorpora,
-            String createdBy, UserGroup group) {
-        // check role
-        
-        VirtualCorpusAccessGroup accessGroup;
+            String createdBy, UserGroup group,
+            VirtualCorpusAccessStatus status) {
+
         for (VirtualCorpus vc : virtualCorpora) {
-            accessGroup = new VirtualCorpusAccessGroup();
-            accessGroup.setCreatedBy(createdBy);
-            accessGroup.setStatus(VirtualCorpusAccessStatus.ACTIVE);
-            accessGroup.setUserGroup(group);
-            accessGroup.setVirtualCorpus(vc);
-            entityManager.persist(accessGroup);
+            addVCToGroup(vc, createdBy, status, group);
         }
     }
+
 }

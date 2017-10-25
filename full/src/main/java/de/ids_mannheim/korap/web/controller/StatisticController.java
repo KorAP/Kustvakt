@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 import java.util.Locale;
 
@@ -26,7 +26,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 /**
- * Services related to statistics
+ * Web services related to statistics
  * 
  * @author hanl
  * @author margaretha
@@ -38,11 +38,11 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 @Path("statistics/")
 @ResourceFilters({ PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-public class StatisticService {
+public class StatisticController {
 
 
     private static Logger jlog =
-            LoggerFactory.getLogger(StatisticService.class);
+            LoggerFactory.getLogger(StatisticController.class);
 
     @Autowired
     private SearchKrill searchKrill;

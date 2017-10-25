@@ -1,3 +1,17 @@
+CREATE TABLE IF NOT EXISTS privilege (
+  id varchar(20) PRIMARY KEY NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS role (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  name varchar(100) NOT NULL,
+  privilege varchar(20) NOT NULL,
+  UNIQUE INDEX unique_index (name,privilege),
+  FOREIGN KEY (privilege) 
+  	REFERENCES privilege (id)
+  	ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS user_group (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
   name varchar(100) NOT NULL,
@@ -21,24 +35,10 @@ CREATE TABLE IF NOT EXISTS user_group_member (
   	ON DELETE CASCADE
 ); 
 
-CREATE TABLE IF NOT EXISTS role (
-  id INTEGER PRIMARY KEY AUTO_INCREMENT,
-  name varchar(100) NOT NULL,
-  privilege varchar(20) NOT NULL,
-  UNIQUE INDEX unique_index (name,privilege),
-  FOREIGN KEY (privilege) 
-  	REFERENCES privilege (id)
-  	ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS privilege (
-  id varchar(20) PRIMARY KEY NOT NULL
-);
-
 CREATE TABLE IF NOT EXISTS group_member_role (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
   group_member_id int(11) NOT NULL,
-  role_id varchar(100) NOT NULL,
+  role_id int NOT NULL,
   UNIQUE INDEX unique_index (group_member_id,role_id),
   FOREIGN KEY (group_member_id)
   	REFERENCES user_group_member (id)

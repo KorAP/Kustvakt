@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ResourceFilters;
@@ -45,20 +45,20 @@ import java.util.Iterator; // 07.02.17/FB
 @Path("/auth")
 @ResourceFilters({ PiwikFilter.class })
 @Produces(MediaType.TEXT_HTML + ";charset=utf-8")
-public class AuthService {
+public class AuthenticationController {
 
     private static Boolean DEBUG_LOG = true;
 
     //todo: bootstrap function to transmit certain default configuration settings and examples (example user queries,
     // default usersettings, etc.)
-    private static Logger jlog = KustvaktLogger.getLogger(AuthService.class);
+    private static Logger jlog = KustvaktLogger.getLogger(AuthenticationController.class);
 
     private AuthenticationManagerIface controller;
 
 
     //    private SendMail mail;
 
-    public AuthService () {
+    public AuthenticationController () {
         this.controller =
                 BeansFactory.getKustvaktContext().getAuthenticationManager();
         //todo: replace with real property values

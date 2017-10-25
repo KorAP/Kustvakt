@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 import java.util.List;
 import java.util.Locale;
@@ -48,15 +48,15 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 @Path(KustvaktServer.API_VERSION + "/admin")
 @ResourceFilters({ AdminFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-public class AdminService {
+public class AdminController {
 
-    private static Logger jlog = LoggerFactory.getLogger(AdminService.class);
+    private static Logger jlog = LoggerFactory.getLogger(AdminController.class);
 
     private AuditingIface auditingController;
     private DocumentDao documentDao;
 
 
-    public AdminService () {
+    public AdminController () {
         this.auditingController = BeansFactory.getKustvaktContext()
                 .getAuditingProvider();
         this.documentDao = new DocumentDao(

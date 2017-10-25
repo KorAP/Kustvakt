@@ -1,7 +1,6 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -20,14 +19,10 @@ import org.springframework.stereotype.Controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.spi.container.ResourceFilters;
 
-import de.ids_mannheim.korap.dao.AnnotationDao;
-import de.ids_mannheim.korap.dto.FoundryDto;
-import de.ids_mannheim.korap.dto.LayerDto;
-import de.ids_mannheim.korap.dto.converter.AnnotationConverter;
-import de.ids_mannheim.korap.entity.AnnotationPair;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.filter.AuthFilter;
+import de.ids_mannheim.korap.service.AnnotationService;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
@@ -43,17 +38,13 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 @Path("annotation/")
 @ResourceFilters({ AuthFilter.class, DemoUserFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-public class AnnotationService {
+public class AnnotationController {
 
     private static Logger jlog =
-            LoggerFactory.getLogger(AnnotationService.class);
+            LoggerFactory.getLogger(AnnotationController.class);
 
     @Autowired
-    private AnnotationDao annotationDao;
-
-    @Autowired
-    private AnnotationConverter annotationConverter;
-
+    private AnnotationService annotationService;
 
     /**
      * Returns information about all supported layers
@@ -63,10 +54,7 @@ public class AnnotationService {
     @GET
     @Path("layers")
     public Response getLayers () {
-        List<AnnotationPair> layers = annotationDao.getAllFoundryLayerPairs();
-        jlog.debug("/layers " + layers.toString());
-        List<LayerDto> layerDto = annotationConverter.convertToLayerDto(layers);
-        String result = JsonUtils.toJSON(layerDto);
+        String result = JsonUtils.toJSON(annotationService.getLayerDtos());
         return Response.ok(result).build();
     }
 
@@ -80,14 +68,16 @@ public class AnnotationService {
      *            2-letter language code (description language)
      * @return a list of foundry, layer, value information in json
      */
+    @SuppressWarnings("unchecked")
     @POST
     @Path("description")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getFoundryDescriptions (String json) {
         JsonNode node = JsonUtils.readTree(json);
         if (node == null) {
-            throw KustvaktResponseHandler.throwit(new KustvaktException(
-                    StatusCodes.MISSING_ARGUMENT, "Missing a json string.", ""));
+            throw KustvaktResponseHandler
+                    .throwit(new KustvaktException(StatusCodes.MISSING_ARGUMENT,
+                            "Missing a json string.", ""));
         }
 
         String language;
@@ -120,52 +110,20 @@ public class AnnotationService {
                             "Missing attribute:", "codes"));
         }
         else if (codes.isEmpty()) {
-            throw KustvaktResponseHandler.throwit(new KustvaktException(
-                    StatusCodes.NO_RESULT_FOUND, "No result found.","codes:[]"));
-        }
-        
-        List<AnnotationPair> annotationPairs = null;
-        String foundry = "", layer = "";
-        if (codes.contains("*")) {
-            annotationPairs =
-                    annotationDao.getAnnotationDescriptions(foundry, layer);
-        }
-        else {
-            String[] annotationCode;
-            annotationPairs = new ArrayList<AnnotationPair>();
-            for (String code : codes) {
-                jlog.debug("code " + code);
-                annotationCode = code.split("/");
-                if (annotationCode.length == 1) {
-                    foundry = annotationCode[0];
-                }
-                else if (annotationCode.length == 2) {
-                    foundry = annotationCode[0];
-                    layer = annotationCode[1];
-                }
-                else {
-                    jlog.error("Annotation code is wrong: " + annotationCode);
-                    throw KustvaktResponseHandler.throwit(
-                            new KustvaktException(StatusCodes.INVALID_ATTRIBUTE,
-                                    "Bad attribute:", code));
-                }
-
-                annotationPairs.addAll(annotationDao
-                        .getAnnotationDescriptions(foundry, layer));
-            }
+            throw KustvaktResponseHandler
+                    .throwit(new KustvaktException(StatusCodes.NO_RESULT_FOUND,
+                            "No result found.", "codes:[]"));
         }
 
-        if (annotationPairs != null && !annotationPairs.isEmpty()) {
-            List<FoundryDto> dtos = annotationConverter
-                    .convertToFoundryDto(annotationPairs, language);
-            jlog.debug("/description " + annotationPairs.toString());
-            String result = JsonUtils.toJSON(dtos);
-            return Response.ok(result).build();
+        String result;
+        try {
+            result = JsonUtils
+                    .toJSON(annotationService.getFoundryDtos(codes, language));
         }
-        else {
-            throw KustvaktResponseHandler.throwit(new KustvaktException(
-                    StatusCodes.NO_RESULT_FOUND, "No result found.",""));
+        catch (KustvaktException e) {
+            throw KustvaktResponseHandler.throwit(e);
         }
+        return Response.ok(result).build();
     }
 
 }

@@ -1,4 +1,5 @@
-package de.ids_mannheim.korap.web.service.full;//package de.ids_mannheim.korap.ext.web;
+package de.ids_mannheim.korap.web.controller;// package
+                                             // de.ids_mannheim.korap.ext.web;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,18 +66,20 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 /**
+ * EM: To Do: restructure codes regarding service and controller layers
  * @author hanl, margaretha
  * @date 29/01/2014
  * @lastUpdate 06/2017
  */
 @Controller
 @Path("/")
-@RequestMapping ( "/" )
+@RequestMapping("/")
 @ResourceFilters({ AuthFilter.class, DemoUserFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-public class SearchService {
+public class SearchController {
 
-    private static Logger jlog = LoggerFactory.getLogger(SearchService.class);
+    private static Logger jlog =
+            LoggerFactory.getLogger(SearchController.class);
 
     @Autowired
     private SearchKrill searchKrill;
@@ -90,12 +93,12 @@ public class SearchService {
     private RewriteHandler processor;
 
 
-    public SearchService () {
+    public SearchController () {
         this.resourceHandler = new ResourceHandler();
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
         this.graphDBhandler = new ClientsHandler(builder.build());
     }
-    
+
     @PostConstruct
     private void doPostConstruct () {
         this.processor.defaultRewriteConstraints();
@@ -123,10 +126,9 @@ public class SearchService {
 
         try {
             Class cl_type = ResourceFactory.getResourceClass(type);
-            if (cl_type == null)
-                throw KustvaktResponseHandler.throwit(
-                        StatusCodes.MISSING_ARGUMENT,
-                        "Resource type not available!", "");
+            if (cl_type == null) throw KustvaktResponseHandler.throwit(
+                    StatusCodes.MISSING_ARGUMENT,
+                    "Resource type not available!", "");
 
             User user = controller.getUser(ctx.getUsername());
 
@@ -349,23 +351,19 @@ public class SearchService {
             @QueryParam("cq") String cq) {
         TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
         QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
-        if (cq != null)
-            ss.setCollection(cq);
+        if (cq != null) ss.setCollection(cq);
 
         MetaQueryBuilder meta = new MetaQueryBuilder();
-        if (pageIndex != null)
-            meta.addEntry("startIndex", pageIndex);
+        if (pageIndex != null) meta.addEntry("startIndex", pageIndex);
         if (pageIndex == null && startPage != null)
             meta.addEntry("startPage", startPage);
-        if (pageLength != null)
-            meta.addEntry("count", pageLength);
-        if (context != null)
-            meta.setSpanContext(context);
+        if (pageLength != null) meta.addEntry("count", pageLength);
+        if (context != null) meta.setSpanContext(context);
         meta.addEntry("cutOff", cutoff);
 
         ss.setMeta(meta.raw());
         String result = ss.toJSON();
-        jlog.debug("Query: "+result);
+        jlog.debug("Query: " + result);
         return Response.ok(result).build();
     }
 
@@ -386,8 +384,8 @@ public class SearchService {
 
     // todo: does cq have any sensible worth here? --> would say no! --> is
     // useful in non type/id scenarios
-    
-    /* EM: potentially an unused service! */    
+
+    /* EM: potentially an unused service! */
     // EM: build query using the given virtual collection id
     // EM: change the HTTP method to from TRACE to GET
     // EM: change path from search to query
@@ -410,16 +408,12 @@ public class SearchService {
         QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
 
         MetaQueryBuilder meta = new MetaQueryBuilder();
-        if (pageIndex != null)
-            meta.addEntry("startIndex", pageIndex);
+        if (pageIndex != null) meta.addEntry("startIndex", pageIndex);
         if (pageIndex == null && startPage != null)
             meta.addEntry("startPage", startPage);
-        if (pageLength != null)
-            meta.addEntry("count", pageLength);
-        if (context != null)
-            meta.setSpanContext(context);
-        if (cutoff != null)
-            meta.addEntry("cutOff", cutoff);
+        if (pageLength != null) meta.addEntry("count", pageLength);
+        if (context != null) meta.setSpanContext(context);
+        if (cutoff != null) meta.addEntry("cutOff", cutoff);
 
         ss.setMeta(meta.raw());
 
@@ -429,7 +423,7 @@ public class SearchService {
         String query = "";
         // EM: is this necessary at all?
         KustvaktResource resource = isCollectionIdValid(ctx.getName(), id);
-        if (resource!=null){
+        if (resource != null) {
             if (resource instanceof VirtualCollection) {
                 JsonNode node = cquery.and().mergeWith(resource.getData());
                 query = JsonUtils.toJSON(node);
@@ -441,42 +435,43 @@ public class SearchService {
             }
         }
 
-        jlog.debug("Query: "+query);
+        jlog.debug("Query: " + query);
         return Response.ok(query).build();
     }
 
     // EM: prototype
-    private KustvaktResource isCollectionIdValid (String username, String collectionId) {
-        
-//        try {
-//            if (ctx.isDemo()) {
-//                // EM: FIX ME: Is there public VCs? set default username 
-                  // for nonlogin user, change demo? 
-//                Set set = ResourceFinder.searchPublicFiltered(
-//                        ResourceFactory.getResourceClass(type), id);
-//                resource = (KustvaktResource) set.toArray()[0];
-//            }
-//            else {
-//                // EM: FIX ME: search in user VC
-//                User user = controller.getUser(ctx.getUsername());
-//                if (StringUtils.isInteger(id))
-//                    resource = this.resourceHandler
-//                            .findbyIntId(Integer.valueOf(id), user);
-//                else
-//                    resource = this.resourceHandler.findbyStrId(id, user,
-//                            ResourceFactory.getResourceClass(type));
-//            }
-//        }
-//        // todo: instead of throwing exception, build notification and rewrites
-//        // into result query
-//        catch (KustvaktException e) {
-//            jlog.error("Exception encountered: {}", e.string());
-//            throw KustvaktResponseHandler.throwit(e);
-//        }
-        
+    private KustvaktResource isCollectionIdValid (String username,
+            String collectionId) {
+
+        //        try {
+        //            if (ctx.isDemo()) {
+        //                // EM: FIX ME: Is there public VCs? set default username 
+        // for nonlogin user, change demo? 
+        //                Set set = ResourceFinder.searchPublicFiltered(
+        //                        ResourceFactory.getResourceClass(type), id);
+        //                resource = (KustvaktResource) set.toArray()[0];
+        //            }
+        //            else {
+        //                // EM: FIX ME: search in user VC
+        //                User user = controller.getUser(ctx.getUsername());
+        //                if (StringUtils.isInteger(id))
+        //                    resource = this.resourceHandler
+        //                            .findbyIntId(Integer.valueOf(id), user);
+        //                else
+        //                    resource = this.resourceHandler.findbyStrId(id, user,
+        //                            ResourceFactory.getResourceClass(type));
+        //            }
+        //        }
+        //        // todo: instead of throwing exception, build notification and rewrites
+        //        // into result query
+        //        catch (KustvaktException e) {
+        //            jlog.error("Exception encountered: {}", e.string());
+        //            throw KustvaktResponseHandler.throwit(e);
+        //        }
+
         return null;
     }
-    
+
 
     @POST
     @Path("search")
@@ -505,27 +500,25 @@ public class SearchService {
 
     @GET
     @Path("search")
-    public Response search (
-    		@Context SecurityContext securityContext,
-    		@Context HttpHeaders headers,
-    		@Context Locale locale, @QueryParam("q") String q,
-            @QueryParam("ql") String ql, @QueryParam("v") String v,
-            @QueryParam("context") String ctx,
+    public Response search (@Context SecurityContext securityContext,
+            @Context HttpHeaders headers, @Context Locale locale,
+            @QueryParam("q") String q, @QueryParam("ql") String ql,
+            @QueryParam("v") String v, @QueryParam("context") String ctx,
             @QueryParam("cutoff") Boolean cutoff,
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
             @QueryParam("page") Integer pageInteger,
             @QueryParam("cq") String cq, @QueryParam("engine") String engine) {
 
-    	TokenContext context = (TokenContext) securityContext
-                .getUserPrincipal();
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
         KustvaktConfiguration.BACKENDS eng = this.config.chooseBackend(engine);
         User user;
         try {
             user = controller.getUser(context.getUsername());
             controller.setAccessAndLocation(user, headers);
-//            System.out.printf("Debug: /search/: location=%s, access='%s'.\n", user.locationtoString(), user.accesstoString());
-        	}
+            //            System.out.printf("Debug: /search/: location=%s, access='%s'.\n", user.locationtoString(), user.accesstoString());
+        }
         catch (KustvaktException e) {
             jlog.error("Failed retrieving user in the search service: {}",
                     e.string());
@@ -534,8 +527,7 @@ public class SearchService {
 
         QuerySerializer serializer = new QuerySerializer();
         serializer.setQuery(q, ql, v);
-        if (cq != null)
-            serializer.setCollection(cq);
+        if (cq != null) serializer.setCollection(cq);
 
         MetaQueryBuilder meta = createMetaQuery(pageIndex, pageInteger, ctx,
                 pageLength, cutoff);
@@ -551,7 +543,7 @@ public class SearchService {
         }
 
         String result = doSearch(eng, query, pageLength, meta);
-        jlog.debug("Query result: "+result);
+        jlog.debug("Query result: " + result);
         return Response.ok(result).build();
     }
 
@@ -823,32 +815,33 @@ public class SearchService {
                 // todo: throw exception response for no resource to save!
                 return null;
 
-            KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
+            KoralCollectionQueryBuilder cquery =
+                    new KoralCollectionQueryBuilder();
             cquery.setBaseQuery(base);
 
             try {
                 cachetmp = ResourceFactory.getCachedCollection(cquery.toJSON());
 
                 // see if collection was cached!
-                VirtualCollection tmp = resourceHandler.getCache(cachetmp.getId(),
-                        VirtualCollection.class);
+                VirtualCollection tmp = resourceHandler
+                        .getCache(cachetmp.getId(), VirtualCollection.class);
                 // if not cached, fill with stats values
                 if (tmp == null) {
                     String stats = searchKrill.getStatistics(cquery.toJSON());
                     cachetmp.setStats(JsonUtils.readSimple(stats, Map.class));
                 }
-            
+
                 if (!cache) {
-                    collection = ResourceFactory.getPermanentCollection(cachetmp,
-                            name, description);
+                    collection = ResourceFactory.getPermanentCollection(
+                            cachetmp, name, description);
                     vals = collection.toMap();
-                        resourceHandler.storeResources(user, collection);
+                    resourceHandler.storeResources(user, collection);
                 }
                 else {
                     resourceHandler.cache(cachetmp);
                     vals = cachetmp.toMap();
                 }
-            
+
             }
             catch (KustvaktException e) {
                 throw KustvaktResponseHandler.throwit(e);
@@ -902,7 +895,8 @@ public class SearchService {
         if (VirtualCollection.class.equals(ctype)) {
             VirtualCollection cachetmp, collection;
 
-            KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
+            KoralCollectionQueryBuilder cquery =
+                    new KoralCollectionQueryBuilder();
             if (reference != null && !reference.equals("null")) {
                 try {
                     cquery.setBaseQuery(resourceHandler.findbyStrId(reference,
@@ -913,8 +907,7 @@ public class SearchService {
                     throw KustvaktResponseHandler.throwit(e);
                 }
             }
-            if (query != null && !query.isEmpty())
-                cquery.with(query);
+            if (query != null && !query.isEmpty()) cquery.with(query);
 
             cachetmp = ResourceFactory.getCachedCollection(cquery.toJSON());
 
@@ -992,10 +985,8 @@ public class SearchService {
 
     @GET
     @Path("/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
-    public Response getMatchInfo (
-    		@Context SecurityContext ctx,
-    		@Context HttpHeaders headers,
-            @Context Locale locale, 
+    public Response getMatchInfo (@Context SecurityContext ctx,
+            @Context HttpHeaders headers, @Context Locale locale,
             @PathParam("corpusId") String corpusId,
             @PathParam("docId") String docId,
             @PathParam("textId") String textId,
@@ -1007,9 +998,9 @@ public class SearchService {
         TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
         spans = spans != null ? spans : false;
 
-        String matchid = searchKrill.getMatchId(corpusId, docId, textId, matchId);
-        if (layers == null || layers.isEmpty())
-            layers = new HashSet<>();
+        String matchid =
+                searchKrill.getMatchId(corpusId, docId, textId, matchId);
+        if (layers == null || layers.isEmpty()) layers = new HashSet<>();
 
         boolean match_only = foundries == null || foundries.isEmpty();
 
@@ -1017,50 +1008,51 @@ public class SearchService {
         try {
             user = controller.getUser(tokenContext.getUsername());
             controller.setAccessAndLocation(user, headers);
-            System.out.printf("Debug: /getMatchInfo/: location=%s, access='%s'.\n", user.locationtoString(), user.accesstoString());
-            }
+            System.out.printf(
+                    "Debug: /getMatchInfo/: location=%s, access='%s'.\n",
+                    user.locationtoString(), user.accesstoString());
+        }
         catch (KustvaktException e) {
             jlog.error("Failed getting user in the matchInfo service: {}",
                     e.string());
             throw KustvaktResponseHandler.throwit(e);
         }
-        
+
         CorpusAccess corpusAccess = user.getCorpusAccess();
         Pattern p;
         switch (corpusAccess) {
-		case PUB:
-			p = config.getPublicLicensePattern();
-			break;
-		case ALL:
-			p = config.getAllLicensePattern();
-			break;
-		default: // FREE
-			p = config.getFreeLicensePattern();
-			break;
-		}
-        
+            case PUB:
+                p = config.getPublicLicensePattern();
+                break;
+            case ALL:
+                p = config.getAllLicensePattern();
+                break;
+            default: // FREE
+                p = config.getFreeLicensePattern();
+                break;
+        }
+
         String results;
         try {
-            if (!match_only){
-            	
-            	ArrayList<String> foundryList = new ArrayList<String>();
+            if (!match_only) {
+
+                ArrayList<String> foundryList = new ArrayList<String>();
                 ArrayList<String> layerList = new ArrayList<String>();
-                
+
                 // EM: now without user, just list all foundries and layers
                 if (foundries.contains("*")) {
-                	foundryList = config.getFoundries();
-                	layerList = config.getLayers();
+                    foundryList = config.getFoundries();
+                    layerList = config.getLayers();
                 }
-                else{
-                	foundryList.addAll(foundries);
-                	layerList.addAll(layers);
+                else {
+                    foundryList.addAll(foundries);
+                    layerList.addAll(layers);
                 }
-                
-                results = searchKrill.getMatch(matchid,
-                        foundryList, layerList,
+
+                results = searchKrill.getMatch(matchid, foundryList, layerList,
                         spans, false, true, p);
             }
-            else{
+            else {
                 results = searchKrill.getMatch(matchid, p);
             }
         }
@@ -1069,7 +1061,7 @@ public class SearchService {
             throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     e.getMessage(), "");
         }
-        jlog.debug("MatchInfo results: "+results);
+        jlog.debug("MatchInfo results: " + results);
         return Response.ok(results).build();
     }
 

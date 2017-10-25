@@ -1,5 +1,10 @@
-<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="1.0">
-    <persistence-unit name="entityManagerUnit" transaction-type="RESOURCE_LOCAL">
-        <exclude-unlisted-classes/>
-    </persistence-unit>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	version="1.0">
+	<persistence-unit name="entityManagerUnit"
+		transaction-type="RESOURCE_LOCAL">
+		<exclude-unlisted-classes />
+	</persistence-unit>
+	<persistence-unit-metadata>
+		<xml-mapping-metadata-complete />
+	</persistence-unit-metadata>
 </persistence>

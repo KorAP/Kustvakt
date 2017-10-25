@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -35,15 +35,15 @@ import java.util.*;
 @Path("/user")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 @ResourceFilters({ PiwikFilter.class })
-public class UserService {
+public class UserController {
 
-    private static Logger jlog = LoggerFactory.getLogger(UserService.class);
+    private static Logger jlog = LoggerFactory.getLogger(UserController.class);
     private AuthenticationManagerIface controller;
 
     private @Context UriInfo info;
 
 
-    public UserService () {
+    public UserController () {
         this.controller = BeansFactory.getKustvaktContext()
                 .getAuthenticationManager();
     }

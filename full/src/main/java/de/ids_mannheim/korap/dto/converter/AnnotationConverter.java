@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import de.ids_mannheim.korap.dto.FoundryDto;
 import de.ids_mannheim.korap.dto.FoundryDto.Layer;
@@ -21,7 +21,7 @@ import de.ids_mannheim.korap.entity.AnnotationPair;
  * @author margaretha
  *
  */
-@Component
+@Service
 public class AnnotationConverter {
 
     /**

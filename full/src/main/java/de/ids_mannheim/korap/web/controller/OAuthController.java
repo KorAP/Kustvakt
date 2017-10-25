@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ResourceFilters;
@@ -52,7 +52,7 @@ import java.util.Set;
 //todo: only allow oauth2 access_token requests GET methods?
 //todo: allow refresh tokens
 @Path(KustvaktServer.API_VERSION + "/oauth2")
-public class OAuthService {
+public class OAuthController {
 
     private OAuth2Handler handler;
     private AuthenticationManagerIface controller;
@@ -60,7 +60,7 @@ public class OAuthService {
     private KustvaktConfiguration config;
 
 
-    public OAuthService () {
+    public OAuthController () {
         this.handler = new OAuth2Handler(BeansFactory.getKustvaktContext()
                 .getPersistenceClient());
         this.controller = BeansFactory.getKustvaktContext()

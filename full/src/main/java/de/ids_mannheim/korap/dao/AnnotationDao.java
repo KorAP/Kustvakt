@@ -10,9 +10,11 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import de.ids_mannheim.korap.entity.AnnotationPair;
+import de.ids_mannheim.korap.entity.AnnotationPair_;
+import de.ids_mannheim.korap.entity.Annotation_;
 
 
 /**
@@ -22,7 +24,7 @@ import de.ids_mannheim.korap.entity.AnnotationPair;
  * @author margaretha
  *
  */
-@Component
+@Repository
 public class AnnotationDao {
 
     @PersistenceContext
@@ -39,8 +41,8 @@ public class AnnotationDao {
         CriteriaQuery<AnnotationPair> query =
                 criteriaBuilder.createQuery(AnnotationPair.class);
         Root<AnnotationPair> annotationPair = query.from(AnnotationPair.class);
-        annotationPair.fetch("annotation1");
-        annotationPair.fetch("annotation2");
+        annotationPair.fetch(AnnotationPair_.annotation1);
+        annotationPair.fetch(AnnotationPair_.annotation2);
         query.select(annotationPair);
         Query q = entityManager.createQuery(query);
         return q.getResultList();
@@ -65,9 +67,9 @@ public class AnnotationDao {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Object> query = criteriaBuilder.createQuery();
         Root<AnnotationPair> annotationPair = query.from(AnnotationPair.class);
-        annotationPair.fetch("annotation1");
-        annotationPair.fetch("annotation2");
-        annotationPair.fetch("values");
+        annotationPair.fetch(AnnotationPair_.annotation1);
+        annotationPair.fetch(AnnotationPair_.annotation2);
+        annotationPair.fetch(AnnotationPair_.values);
 
         // EM: Hibernate bug in join n:m (see AnnotationPair.values). 
         // There should not be any redundant AnnotationPair. 
@@ -77,14 +79,16 @@ public class AnnotationDao {
         query = query.select(annotationPair);
 
         if (!foundry.isEmpty()) {
-            Predicate foundryPredicate = criteriaBuilder.equal(
-                    annotationPair.get("annotation1").get("code"), foundry);
+            Predicate foundryPredicate = criteriaBuilder.equal(annotationPair
+                    .get(AnnotationPair_.annotation1).get(Annotation_.code),
+                    foundry);
             if (layer.isEmpty() || layer.equals("*")) {
                 query.where(foundryPredicate);
             }
             else {
-                Predicate layerPredicate = criteriaBuilder.equal(
-                        annotationPair.get("annotation2").get("code"), layer);
+                Predicate layerPredicate = criteriaBuilder.equal(annotationPair
+                        .get(AnnotationPair_.annotation2).get(Annotation_.code),
+                        layer);
                 Predicate andPredicate =
                         criteriaBuilder.and(foundryPredicate, layerPredicate);
                 query.where(andPredicate);

@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 import de.ids_mannheim.korap.server.KustvaktServer;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -19,9 +19,9 @@ import java.util.Map;
  */
 @Path("kustvakt")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-public class KustvaktService {
+public class KustvaktController {
 
-    private static Logger jlog = LoggerFactory.getLogger(UserService.class);
+    private static Logger jlog = LoggerFactory.getLogger(UserController.class);
 
 
     @Path("info")
