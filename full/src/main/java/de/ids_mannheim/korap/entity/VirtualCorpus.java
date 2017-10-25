@@ -13,7 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import de.ids_mannheim.korap.constants.VirtualCorpusType;
+import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import lombok.Getter;
 import lombok.Setter;
 

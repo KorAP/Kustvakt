@@ -8,7 +8,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import de.ids_mannheim.korap.constants.PrivilegeType;
+import de.ids_mannheim.korap.constant.PrivilegeType;
 
 /**  
  * 

@@ -14,9 +14,9 @@ import javax.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import de.ids_mannheim.korap.constants.GroupMemberStatus;
-import de.ids_mannheim.korap.constants.UserGroupStatus;
-import de.ids_mannheim.korap.constants.VirtualCorpusAccessStatus;
+import de.ids_mannheim.korap.constant.GroupMemberStatus;
+import de.ids_mannheim.korap.constant.UserGroupStatus;
+import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.entity.UserGroupMember_;

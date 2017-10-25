@@ -12,7 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import de.ids_mannheim.korap.constants.VirtualCorpusAccessStatus;
+import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import lombok.Getter;
 import lombok.Setter;
 

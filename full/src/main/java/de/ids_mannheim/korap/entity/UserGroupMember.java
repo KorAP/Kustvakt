@@ -18,7 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import de.ids_mannheim.korap.constants.GroupMemberStatus;
+import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import lombok.Getter;
 import lombok.Setter;

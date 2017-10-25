@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.constants;
+package de.ids_mannheim.korap.constant;
 
 public enum VirtualCorpusType {
 

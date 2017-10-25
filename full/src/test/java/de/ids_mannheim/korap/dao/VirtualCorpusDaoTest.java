@@ -15,7 +15,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import de.ids_mannheim.korap.constants.VirtualCorpusType;
+import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.dao.VirtualCorpusDao;
 import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -25,7 +25,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 public class VirtualCorpusDaoTest {
 
     @Autowired
-    VirtualCorpusDao dao;
+    private VirtualCorpusDao dao;
     @Autowired
     protected ApplicationContext context;
 
@@ -71,7 +71,7 @@ public class VirtualCorpusDaoTest {
      * @throws KustvaktException
      */
     @Test
-    public void retrieveVirtualCorpusByUserDory () throws KustvaktException {
+    public void retrieveVCByUserDory () throws KustvaktException {
         Set<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("dory");
         assertEquals(3, virtualCorpora.size());
         Iterator<VirtualCorpus> i = virtualCorpora.iterator();
@@ -86,7 +86,7 @@ public class VirtualCorpusDaoTest {
      * @throws KustvaktException
      */
     @Test
-    public void retrieveVirtualCorpusByUserNemo () throws KustvaktException {
+    public void retrieveVCByUserNemo () throws KustvaktException {
         Set<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("nemo");
         assertEquals(2, virtualCorpora.size());
         Iterator<VirtualCorpus> i = virtualCorpora.iterator();
@@ -100,7 +100,7 @@ public class VirtualCorpusDaoTest {
      * @throws KustvaktException
      */
     @Test
-    public void retrieveVirtualCorpusByUserMarlin () throws KustvaktException {
+    public void retrieveVCByUserMarlin () throws KustvaktException {
         Set<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("marlin");
         assertEquals(2, virtualCorpora.size());
         Iterator<VirtualCorpus> i = virtualCorpora.iterator();
@@ -115,7 +115,7 @@ public class VirtualCorpusDaoTest {
      * @throws KustvaktException
      */
     @Test
-    public void retrieveVirtualCorpusByUserPearl () throws KustvaktException {
+    public void retrieveVCByUserPearl () throws KustvaktException {
         Set<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("pearl");
         assertEquals(2, virtualCorpora.size());
         Iterator<VirtualCorpus> i = virtualCorpora.iterator();

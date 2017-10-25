@@ -16,7 +16,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
-import de.ids_mannheim.korap.constants.UserGroupStatus;
+import de.ids_mannheim.korap.constant.UserGroupStatus;
 import lombok.Getter;
 import lombok.Setter;
 
