@@ -1,16 +1,20 @@
-CREATE TABLE IF NOT EXISTS privilege (
-  id varchar(20) PRIMARY KEY NOT NULL
-);
-
 CREATE TABLE IF NOT EXISTS role (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
   name varchar(100) NOT NULL,
-  privilege varchar(20) NOT NULL,
-  UNIQUE INDEX unique_index (name,privilege),
-  FOREIGN KEY (privilege) 
-  	REFERENCES privilege (id)
+  UNIQUE INDEX name_index(name)
+);
+
+
+CREATE TABLE IF NOT EXISTS privilege (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  name varchar(20) NOT NULL,
+  role_id int NOT NULL,
+  UNIQUE INDEX privilege_index(name, role_id),
+  FOREIGN KEY (role_id) 
+  	REFERENCES role (id)
   	ON DELETE CASCADE
 );
+
 
 CREATE TABLE IF NOT EXISTS user_group (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,

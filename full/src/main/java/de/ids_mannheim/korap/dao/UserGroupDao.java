@@ -1,6 +1,8 @@
 package de.ids_mannheim.korap.dao;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -11,12 +13,15 @@ import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
+import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
+import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.entity.UserGroupMember_;
@@ -33,14 +38,27 @@ public class UserGroupDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @Autowired
+    private RoleDao roleDao;
+
     public void createGroup (String name, String createdBy,
-            List<UserGroupMember> members, UserGroupStatus status) {
+            UserGroupStatus status) {
         UserGroup group = new UserGroup();
         group.setName(name);
         group.setStatus(status);
         group.setCreatedBy(createdBy);
-        group.setMembers(members);
         entityManager.persist(group);
+
+        Set<Role> roles = new HashSet<Role>(2);
+        roles.add(roleDao.retrieveRoleById(PredefinedRole.GROUP_ADMIN.getId()));
+        roles.add(roleDao.retrieveRoleById(PredefinedRole.VC_ADMIN.getId()));
+
+        UserGroupMember owner = new UserGroupMember();
+        owner.setCreatedBy(createdBy);
+        owner.setStatus(GroupMemberStatus.ACTIVE);
+        owner.setGroup(group);
+        owner.setRoles(roles);
+        entityManager.persist(owner);
     }
 
     public void deleteGroup (int groupId, String deletedBy,

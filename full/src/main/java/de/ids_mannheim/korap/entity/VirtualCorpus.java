@@ -51,8 +51,7 @@ public class VirtualCorpus {
     private String createdBy;
 
     @OneToMany(mappedBy = "virtualCorpus", fetch=FetchType.LAZY)
-    List<VirtualCorpusAccessGroup> accessGroup;
-
+    private List<VirtualCorpusAccessGroup> accessGroup;
 
     @Override
     public String toString () {

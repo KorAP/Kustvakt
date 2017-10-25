@@ -1,3 +1,22 @@
+CREATE TABLE IF NOT EXISTS role (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name varchar(100) NOT NULL
+);
+
+CREATE UNIQUE INDEX role_index on role(name);
+
+CREATE TABLE IF NOT EXISTS privilege (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name varchar(20) NOT NULL,
+  role_id int NOT NULL,
+  FOREIGN KEY (role_id) 
+  	REFERENCES role (id)
+  	ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX privilege_index on privilege(name, role_id);
+
+
 CREATE TABLE IF NOT EXISTS user_group (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name varchar(100) NOT NULL,
@@ -24,12 +43,6 @@ CREATE UNIQUE INDEX  user_group_member_index
 	ON user_group_member(user_id,group_id);
 CREATE INDEX user_group_member_status_index 
 	ON user_group_member(status);
-
-
-CREATE TABLE IF NOT EXISTS role (
-  id varchar(100) PRIMARY KEY NOT NULL,
-  privilege varchar(100) NOT NULL
-);
 
 CREATE TABLE IF NOT EXISTS group_member_role (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
