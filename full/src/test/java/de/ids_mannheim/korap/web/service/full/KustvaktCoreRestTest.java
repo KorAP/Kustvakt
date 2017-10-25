@@ -1,6 +1,5 @@
 package de.ids_mannheim.korap.web.service.full;
 
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -18,7 +17,7 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
 
 	@Override
     public void initMethod () throws KustvaktException {
-        helper().setupAccount();
+//        helper().setupAccount();
 //        helper().runBootInterfaces();
     }
 	

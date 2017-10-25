@@ -18,12 +18,12 @@ import de.ids_mannheim.korap.user.UserDetails;
 import de.ids_mannheim.korap.user.UserSettings;
 import de.ids_mannheim.korap.user.Userdata;
 
-;
-
-/**
+/** EM: To do: not implemented in the new DB yet
+ * 
  * @author hanl
  * @date 13/02/2015
  */
+@Ignore
 public class UserDaoTest extends BeanConfigTest {
 
     @Test

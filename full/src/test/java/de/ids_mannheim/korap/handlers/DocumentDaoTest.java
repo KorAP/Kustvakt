@@ -1,22 +1,29 @@
 package de.ids_mannheim.korap.handlers;
 
-import de.ids_mannheim.korap.config.BeanConfigTest;
-import de.ids_mannheim.korap.config.BeanConfigBaseTest;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.resources.Document;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import de.ids_mannheim.korap.config.BeanConfigTest;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.resources.Document;
 
 /**
  * @author hanl
  * @date 12/11/2015
  */
+@Ignore
+@Deprecated
 public class DocumentDaoTest extends BeanConfigTest {
 
     @Autowired

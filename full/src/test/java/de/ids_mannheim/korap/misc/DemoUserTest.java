@@ -1,15 +1,21 @@
 package de.ids_mannheim.korap.misc;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import com.sun.jersey.api.client.ClientResponse;
+
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
+ * EM: DemoUser is not saved in the new DB
+ * 
  * @author hanl
  * @date 04/02/2016
  */
+@Deprecated
+@Ignore
 public class DemoUserTest extends FastJerseyTest {
 
     @Override

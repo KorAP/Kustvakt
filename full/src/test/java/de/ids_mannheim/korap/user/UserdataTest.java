@@ -25,10 +25,11 @@ import de.ids_mannheim.korap.handlers.UserSettingsDao;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
-/**
+/**EM: To do: not implemented in the new DB yet
  * @author hanl
  * @date 27/01/2016
  */
+@Ignore
 public class UserdataTest extends BeanConfigTest {
 
     @Before

@@ -34,6 +34,8 @@ import de.ids_mannheim.korap.utils.TimeUtils;
  * @author hanl, margaretha
  * @date 20/11/2015
  */
+@Deprecated
+@Ignore
 // todo: run functions without data to check for nullpointers!
 public class ResourcesTest extends BeanConfigTest {
 

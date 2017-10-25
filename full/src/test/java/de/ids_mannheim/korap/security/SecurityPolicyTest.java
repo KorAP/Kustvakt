@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.ids_mannheim.korap.config.BeanConfigTest;
@@ -17,10 +18,13 @@ import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
 import de.ids_mannheim.korap.resources.Corpus;
 import de.ids_mannheim.korap.resources.Permissions;
 
-/**
+/** EM: Not supported in the current implementation (new DB)
+ * 
  * @author hanl
  * @date 12/02/2016
  */
+@Deprecated
+@Ignore
 public class SecurityPolicyTest extends BeanConfigTest {
 
     @Test
@@ -51,8 +55,8 @@ public class SecurityPolicyTest extends BeanConfigTest {
         PolicyHandlerIface dao = helper().getContext().getPolicyDbProvider();
         dao.createPolicy(policy, helper().getUser());
 
-        List<SecurityPolicy>[] list = dao.getPolicies("WPD_2", helper()
-                .getUser(), Permissions.Permission.READ.toByte());
+        List<SecurityPolicy>[] list = dao.getPolicies("WPD_2",
+                helper().getUser(), Permissions.Permission.READ.toByte());
         assertNotNull(list);
         List<SecurityPolicy> policies = list[0];
         assertNotNull(policies);
@@ -81,8 +85,8 @@ public class SecurityPolicyTest extends BeanConfigTest {
         PolicyHandlerIface dao = helper().getContext().getPolicyDbProvider();
         dao.createPolicy(policy, helper().getUser());
 
-        List<SecurityPolicy>[] list = dao.getPolicies("WPD_3", helper()
-                .getUser(), Permissions.Permission.READ.toByte());
+        List<SecurityPolicy>[] list = dao.getPolicies("WPD_3",
+                helper().getUser(), Permissions.Permission.READ.toByte());
 
         assertNotNull(list);
         List<SecurityPolicy> policies = list[0];
@@ -146,7 +150,7 @@ public class SecurityPolicyTest extends BeanConfigTest {
 
     @Override
     public void initMethod () throws KustvaktException {
-//        helper().runBootInterfaces();
+        //        helper().runBootInterfaces();
         helper().setupAccount();
     }
 }

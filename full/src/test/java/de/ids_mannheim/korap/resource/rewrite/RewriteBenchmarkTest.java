@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.joda.time.DateTime;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.test.annotation.DirtiesContext;
 
@@ -19,9 +20,11 @@ import de.ids_mannheim.korap.resources.Document;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 
-/**
+/** EM: DocumentDao is not available anymore.
  * Created by hanl on 30.05.16.
  */
+@Deprecated
+@Ignore
 public class RewriteBenchmarkTest extends BeanConfigTest {
 
 

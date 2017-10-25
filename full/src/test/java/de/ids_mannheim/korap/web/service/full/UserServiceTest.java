@@ -35,13 +35,14 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
 
-/**
+/** EM: To do: not implemented in the new DB yet
  * @author hanl
  * @date 21/03/2015
  */
 
 // todo: do benchmarks for simple request to check access_token check and user
 // retrieval!
+@Ignore
 public class UserServiceTest extends FastJerseyTest {
 
 	private static String[] credentials;

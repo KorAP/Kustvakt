@@ -42,7 +42,7 @@ public class FoundryRewriteTest extends BeanConfigTest {
     @Override
     public void initMethod () throws KustvaktException {
         config = helper().getContext().getConfiguration();
-        helper().setupAccount();
+//        helper().setupAccount();
     }
 
 
@@ -58,6 +58,8 @@ public class FoundryRewriteTest extends BeanConfigTest {
     }
 
 
+    @Ignore
+    @Deprecated
     @Test
     public void testDefaultFoundryInjectLemmaThrowsNoError ()
             throws KustvaktException {

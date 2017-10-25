@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.BeanConfigBaseTest;
-import de.ids_mannheim.korap.config.KustvaktClassLoader;
 import de.ids_mannheim.korap.config.BeanConfigTest;
+import de.ids_mannheim.korap.config.KustvaktClassLoader;
 import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.resources.KustvaktResource;
@@ -27,6 +27,8 @@ import de.ids_mannheim.korap.user.User;
  * @author hanl
  * @date 26/01/2016
  */
+@Deprecated
+@Ignore
 public class ResourceDaoTest extends BeanConfigTest {
 
     private static List<Integer> ids = new ArrayList<>();
