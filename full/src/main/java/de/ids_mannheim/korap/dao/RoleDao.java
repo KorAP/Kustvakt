@@ -1,12 +1,15 @@
 package de.ids_mannheim.korap.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.ListJoin;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,8 @@ import de.ids_mannheim.korap.constant.PrivilegeType;
 import de.ids_mannheim.korap.entity.Privilege;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.Role_;
+import de.ids_mannheim.korap.entity.UserGroupMember;
+import de.ids_mannheim.korap.entity.UserGroupMember_;
 
 @Transactional
 @Repository
@@ -40,12 +45,12 @@ public class RoleDao {
         entityManager.remove(r);
     }
 
-    public void updateRoleName (int roleId, String name) {
+    public void editRoleName (int roleId, String name) {
         Role r = retrieveRoleById(roleId);
         r.setName(name);
         entityManager.persist(r);
     }
-    
+
     public Role retrieveRoleById (int roleId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Role> query = criteriaBuilder.createQuery(Role.class);
@@ -68,6 +73,21 @@ public class RoleDao {
         query.where(criteriaBuilder.equal(root.get(Role_.name), roleName));
         Query q = entityManager.createQuery(query);
         return (Role) q.getSingleResult();
+    }
+
+    public List<Role> retrieveRoleByGroupMemberId (int userId) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Role> query = criteriaBuilder.createQuery(Role.class);
+
+        Root<Role> root = query.from(Role.class);
+        ListJoin<Role, UserGroupMember> memberRole =
+                root.join(Role_.userGroupMembers);
+
+        query.select(root);
+        query.where(criteriaBuilder.equal(memberRole.get(UserGroupMember_.id),
+                userId));
+        Query q = entityManager.createQuery(query);
+        return q.getResultList();
     }
 
 }

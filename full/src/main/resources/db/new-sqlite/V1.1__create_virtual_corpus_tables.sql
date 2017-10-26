@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS user_group (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name varchar(100) NOT NULL,
   status varchar(100) NOT NULL,
-  created_by varchar(100) NOT NULL
+  created_by varchar(100) NOT NULL,
+  deleted_by varchar(100) DEFAULT NULL
 );
 
 CREATE INDEX user_group_index ON user_group(status);

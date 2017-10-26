@@ -1,8 +1,8 @@
 -- roles
 INSERT INTO role(name) VALUES ("group admin");
 INSERT INTO role(name) VALUES ("group member");
-INSERT INTO role(name) VALUES ("VC admin");
-INSERT INTO role(name) VALUES ("VC member");
+INSERT INTO role(name) VALUES ("vc admin");
+INSERT INTO role(name) VALUES ("vc member");
 
 -- privileges
 INSERT INTO privilege(name,role_id)

@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.user.User.CorpusAccess;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,7 +26,7 @@ import lombok.Setter;
  *   
  * @author margaretha
  *
- * @see VirtualCorpusAccessGroup
+ * @see VirtualCorpusAccess
  * @see UserGroup
  */
 @Setter
@@ -42,8 +43,9 @@ public class VirtualCorpus {
     private VirtualCorpusType type;
     private String status;
     private String description;
+    @Enumerated(EnumType.STRING)
     @Column(name = "required_access")
-    private String requiredAccess;
+    private CorpusAccess requiredAccess;
     @Column(name = "collection_query")
     private String collectionQuery;
     private String definition;
@@ -51,7 +53,7 @@ public class VirtualCorpus {
     private String createdBy;
 
     @OneToMany(mappedBy = "virtualCorpus", fetch=FetchType.LAZY)
-    private List<VirtualCorpusAccessGroup> accessGroup;
+    private List<VirtualCorpusAccess> virtualCorpusAccess;
 
     @Override
     public String toString () {

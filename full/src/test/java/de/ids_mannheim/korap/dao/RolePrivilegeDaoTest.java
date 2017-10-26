@@ -33,7 +33,7 @@ public class RolePrivilegeDaoTest {
 
     @Test
     public void createDeleteRole () {
-        String roleName = "VC editor";
+        String roleName = "vc editor";
 
         List<PrivilegeType> privileges = new ArrayList<PrivilegeType>();
         privileges.add(PrivilegeType.READ);
@@ -50,12 +50,12 @@ public class RolePrivilegeDaoTest {
     @Test
     public void updateRole () {
         Role role = roleDao.retrieveRoleByName("group member");
-        roleDao.updateRoleName(role.getId(), "group member role");
+        roleDao.editRoleName(role.getId(), "group member role");
 
         role = roleDao.retrieveRoleById(role.getId());
         assertEquals("group member role", role.getName());
 
-        roleDao.updateRoleName(role.getId(), "group member");
+        roleDao.editRoleName(role.getId(), "group member");
         role = roleDao.retrieveRoleById(role.getId());
         assertEquals("group member", role.getName());
     }

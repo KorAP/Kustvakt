@@ -23,26 +23,25 @@ import de.ids_mannheim.korap.utils.ParameterChecker;
 
 @Transactional
 @Repository
-public class UserGroupMemberDao<X> {
+public class UserGroupMemberDao {
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public void addMember (UserGroupMember member)
-            throws KustvaktException {
+    public void addMember (UserGroupMember member) throws KustvaktException {
         ParameterChecker.checkObjectValue(member, "userGroupMember");
         entityManager.persist(member);
     }
-    
+
     public void addMembers (List<UserGroupMember> members)
             throws KustvaktException {
         ParameterChecker.checkObjectValue(members, "List<UserGroupMember>");
 
-        for (UserGroupMember member: members){
+        for (UserGroupMember member : members) {
             addMember(member);
         }
     }
-    
+
     public void approveMember (String userId, int groupId)
             throws KustvaktException {
         ParameterChecker.checkStringValue(userId, "userId");
@@ -80,8 +79,10 @@ public class UserGroupMemberDao<X> {
         Root<UserGroupMember> root = query.from(UserGroupMember.class);
 
         Predicate predicate = criteriaBuilder.and(
-                criteriaBuilder.equal(root.get(UserGroupMember_.group), groupId),
-                criteriaBuilder.equal(root.get(UserGroupMember_.userId), userId));
+                criteriaBuilder.equal(root.get(UserGroupMember_.group),
+                        groupId),
+                criteriaBuilder.equal(root.get(UserGroupMember_.userId),
+                        userId));
 
         query.select(root);
         query.where(predicate);
@@ -89,17 +90,35 @@ public class UserGroupMemberDao<X> {
         return (UserGroupMember) q.getSingleResult();
     }
 
-    public List<UserGroupMember> retrieveMemberByRole (int groupId, int roleId) {
+    public List<UserGroupMember> retrieveMemberByRole (int groupId,
+            int roleId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<UserGroupMember> query =
                 criteriaBuilder.createQuery(UserGroupMember.class);
 
         Root<UserGroupMember> root = query.from(UserGroupMember.class);
         Join<UserGroupMember, Role> memberRole = root.join("roles");
-        
+
         Predicate predicate = criteriaBuilder.and(
-                criteriaBuilder.equal(root.get(UserGroupMember_.group), groupId),
+                criteriaBuilder.equal(root.get(UserGroupMember_.group),
+                        groupId),
                 criteriaBuilder.equal(memberRole.get("role_id"), roleId));
+
+        query.select(root);
+        query.where(predicate);
+        Query q = entityManager.createQuery(query);
+        return q.getResultList();
+    }
+
+    public List<UserGroupMember> retrieveMemberByGroupId (int groupId) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<UserGroupMember> query =
+                criteriaBuilder.createQuery(UserGroupMember.class);
+
+        Root<UserGroupMember> root = query.from(UserGroupMember.class);
+
+        Predicate predicate = criteriaBuilder.and(criteriaBuilder
+                .equal(root.get(UserGroupMember_.group), groupId));
 
         query.select(root);
         query.where(predicate);

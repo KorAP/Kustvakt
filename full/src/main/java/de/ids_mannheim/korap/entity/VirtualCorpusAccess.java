@@ -28,7 +28,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "virtual_corpus_access")
-public class VirtualCorpusAccessGroup {
+public class VirtualCorpusAccess {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

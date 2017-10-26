@@ -13,9 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import lombok.Getter;
 import lombok.Setter;
@@ -48,12 +45,11 @@ public class UserGroup {
     @Enumerated(EnumType.STRING)
     private UserGroupStatus status;
 
-    @Fetch(FetchMode.SELECT)
-    @OneToMany(mappedBy="group")//, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy="group", fetch = FetchType.LAZY)
     List<UserGroupMember> members;
 
     @OneToMany(mappedBy = "userGroup", fetch = FetchType.LAZY)
-    private List<VirtualCorpusAccessGroup> virtualCorpusAccessGroup;
+    private List<VirtualCorpusAccess> virtualCorpusAccess;
 
 
     @Override

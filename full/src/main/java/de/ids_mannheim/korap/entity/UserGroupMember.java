@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.entity;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,15 +19,17 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.constant.PredefinedRole;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Describes members of user groups.
+/** Describes members of user groups. Only member of predefined role 
+ *  group admin can see the rest of members.
  * 
  *  @author margaretha
  *  @see UserGroup
  *  @see Role
+ *  @see PredefinedRole
  */
 @Setter
 @Getter
@@ -45,7 +47,7 @@ public class UserGroupMember {
     private String createdBy;
     @Column(name = "deleted_by")
     private String deletedBy;
-    
+
     @Enumerated(EnumType.STRING)
     private GroupMemberStatus status;
 
@@ -53,7 +55,10 @@ public class UserGroupMember {
     @JoinColumn(name = "group_id")
     private UserGroup group;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    /** Information about roles is deemed always necessary to describe a member.
+     * 
+     */
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "group_member_role",
             joinColumns = @JoinColumn(name = "group_member_id",
                     referencedColumnName = "id"),
@@ -61,23 +66,8 @@ public class UserGroupMember {
                     referencedColumnName = "id"),
             uniqueConstraints = @UniqueConstraint(
                     columnNames = { "group_member_id", "role_id" }))
-    private Set<Role> roles;
+    private List<Role> roles;
 
-
-    public UserGroupMember createMember (String userId, String createdBy,
-            UserGroup userGroup, Set<Role> roles) throws KustvaktException {
-//        checkStringValue(userId, "userId");
-//        checkStringValue(createdBy, "createdBy");
-        
-        UserGroupMember member = new UserGroupMember();
-        member.setUserId(userId);
-        member.setCreatedBy(createdBy);
-        member.setGroup(userGroup);
-        member.setStatus(GroupMemberStatus.PENDING);
-        member.setRoles(roles);
-        return member;
-    }
-    
     @Override
     public String toString () {
         return "id=" + id + ", group= " + group + ", userId= " + userId

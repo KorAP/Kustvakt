@@ -11,14 +11,13 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
-import de.ids_mannheim.korap.dao.VirtualCorpusDao;
 import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.user.User;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:test-config.xml")
@@ -26,8 +25,6 @@ public class VirtualCorpusDaoTest {
 
     @Autowired
     private VirtualCorpusDao dao;
-    @Autowired
-    protected ApplicationContext context;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -36,13 +33,9 @@ public class VirtualCorpusDaoTest {
     @Test
     public void testPredefinedVC () throws KustvaktException {
         // insert vc
-        VirtualCorpus vc = new VirtualCorpus();
-        vc.setName("predefined VC");
-        vc.setCreatedBy("test class");
-        vc.setCollectionQuery("corpusSigle=GOE");
-        vc.setRequiredAccess("free");
-        vc.setType(VirtualCorpusType.PREDEFINED);
-        dao.storeVirtualCorpus(vc);
+        int id = dao.createVirtualCorpus("predefined VC", VirtualCorpusType.PREDEFINED,
+                User.CorpusAccess.FREE, "corpusSigle=GOE", "definition",
+                "description", "experimental", "test class");
 
         // select vc
         List<VirtualCorpus> vcList =
@@ -50,11 +43,11 @@ public class VirtualCorpusDaoTest {
         assertEquals(2, vcList.size());
 
         // delete vc
-        dao.deleteVirtualCorpus(vc.getId());
+        dao.deleteVirtualCorpus(id);
 
         // check if vc has been deleted
         thrown.expect(KustvaktException.class);
-        vc = dao.retrieveVCById(vc.getId());
+        dao.retrieveVCById(id);
     }
 
 

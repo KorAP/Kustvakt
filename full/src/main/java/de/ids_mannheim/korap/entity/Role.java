@@ -35,10 +35,10 @@ public class Role {
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private List<UserGroupMember> userGroupMembers;
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "role", fetch = FetchType.EAGER)
     private List<Privilege> privileges;
 
     public String toString () {
-        return "id=" + id + "name=" + name;
+        return "id=" + id + ", name=" + name;
     }
 }

@@ -2,16 +2,16 @@
 
 -- user groups
 INSERT INTO user_group(name,status,created_by) 
-	VALUES ("dory group","active","dory");
+	VALUES ("dory group","ACTIVE","dory");
 
 INSERT INTO user_group(name,status,created_by) 
-	VALUES ("auto group","hidden","system");
+	VALUES ("auto group","HIDDEN","system");
 
 INSERT INTO user_group(name,status,created_by) 
-	VALUES ("all users","hidden","system");
+	VALUES ("all users","HIDDEN","system");
 
 INSERT INTO user_group(name,status,created_by) 
-	VALUES ("deleted group","deleted","dory");
+	VALUES ("deleted group","DELETED","dory");
 
 
 
