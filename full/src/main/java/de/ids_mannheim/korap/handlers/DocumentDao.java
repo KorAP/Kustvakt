@@ -29,6 +29,7 @@ import java.util.Set;
  * @date 05/11/2014
  */
 // todo: error handling
+@Deprecated
 public class DocumentDao implements ResourceOperationIface<Document> {
 
     private NamedParameterJdbcTemplate jdbcTemplate;

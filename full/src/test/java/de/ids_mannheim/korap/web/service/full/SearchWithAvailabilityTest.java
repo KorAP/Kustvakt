@@ -22,7 +22,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 //        helper().runBootInterfaces();
     }
 
-    private void checkAndFree (String json) {
+    private void checkAndFree (String json) throws KustvaktException{
         JsonNode node = JsonUtils.readTree(json);
         assertEquals("availability",
                 node.at("/collection/operands/0/key").asText());
@@ -35,7 +35,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
     }
 
 
-    private void checkAndPublic (String json) {
+    private void checkAndPublic (String json) throws KustvaktException{
         JsonNode node = JsonUtils.readTree(json);
         assertNotNull(node);
         assertEquals("operation:and",
@@ -58,7 +58,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
                 node.at("/collection/rewrites/0/scope").asText());
     }
     
-    private void checkAndPublicWithoutACA (String json) {
+    private void checkAndPublicWithoutACA (String json) throws KustvaktException{
         JsonNode node = JsonUtils.readTree(json);
         assertNotNull(node);
         assertEquals("operation:and",
@@ -87,7 +87,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
                 node.at("/collection/rewrites/0/scope").asText());
     }
     
-    private void checkAndAll (String json) {
+    private void checkAndAll (String json) throws KustvaktException{
         JsonNode node = JsonUtils.readTree(json);
         assertNotNull(node);
         assertEquals("availability(ALL)",
@@ -127,7 +127,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
         
     }
 
-    private void checkAndAllWithoutACA (String json) {
+    private void checkAndAllWithoutACA (String json) throws KustvaktException{
         JsonNode node = JsonUtils.readTree(json);
         assertNotNull(node);
         assertEquals("operation:and",
@@ -172,7 +172,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     @Test
-    public void testAvailabilityFreeAuthorized () {
+    public void testAvailabilityFreeAuthorized () throws KustvaktException{
         ClientResponse response = builtSimpleClientResponse(
                 "availability = CC-BY-SA");
 
@@ -184,7 +184,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     @Test
-    public void testAvailabilityRegexFreeAuthorized () {
+    public void testAvailabilityRegexFreeAuthorized () throws KustvaktException{
         ClientResponse response = builtSimpleClientResponse(
                 "availability = /.*BY.*/");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -195,7 +195,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     @Test
-    public void testAvailabilityFreeUnauthorized () {
+    public void testAvailabilityFreeUnauthorized () throws KustvaktException{
         ClientResponse response = builtSimpleClientResponse(
                 "availability = ACA-NC");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -206,7 +206,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     @Test
-    public void testAvailabilityRegexFreeUnauthorized () {
+    public void testAvailabilityRegexFreeUnauthorized () throws KustvaktException{
         ClientResponse response = builtSimpleClientResponse(
                 "availability = /ACA.*/");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -216,7 +216,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
     }
 
     @Test
-    public void testAvailabilityRegexNoRewrite () {
+    public void testAvailabilityRegexNoRewrite () throws KustvaktException{
         ClientResponse response = builtSimpleClientResponse(
                 "availability = /CC-BY.*/ & availability = /ACA.*/");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -242,7 +242,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     @Test
-    public void testAvailabilityRegexFreeUnauthorized3 () {
+    public void testAvailabilityRegexFreeUnauthorized3 () throws KustvaktException{
         ClientResponse response = builtSimpleClientResponse(
                 "availability = /.*NC.*/");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -254,7 +254,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     @Test
-    public void testNegationAvailabilityFreeUnauthorized () {
+    public void testNegationAvailabilityFreeUnauthorized () throws KustvaktException{
         ClientResponse response = builtSimpleClientResponse(
                 "availability != /CC-BY.*/");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -265,7 +265,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     @Test
-    public void testNegationAvailabilityFreeUnauthorized2 () {
+    public void testNegationAvailabilityFreeUnauthorized2 () throws KustvaktException{
         ClientResponse response = builtSimpleClientResponse(
                 "availability != /.*BY.*/");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -276,7 +276,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     @Test
-    public void testComplexNegationAvailabilityFreeUnauthorized () {
+    public void testComplexNegationAvailabilityFreeUnauthorized () throws KustvaktException{
         ClientResponse response = builtSimpleClientResponse(
                 "textClass=politik & availability != /CC-BY.*/");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -287,7 +287,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     @Test
-    public void testComplexAvailabilityFreeUnauthorized () {
+    public void testComplexAvailabilityFreeUnauthorized () throws KustvaktException{
         ClientResponse response = builtSimpleClientResponse(
                 "textClass=politik & availability=ACA-NC");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -298,7 +298,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     @Test
-    public void testComplexAvailabilityFreeUnauthorized3 () {
+    public void testComplexAvailabilityFreeUnauthorized3 () throws KustvaktException{
         ClientResponse response = builtSimpleClientResponse(
                 "textClass=politik & availability=/.*NC.*/");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -309,7 +309,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     @Test
-    public void testAvailabilityPublicAuthorized () {
+    public void testAvailabilityPublicAuthorized () throws KustvaktException{
         ClientResponse response = builtClientResponseWithIP(
                 "availability=ACA-NC", "149.27.0.32");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -320,7 +320,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     @Test
-    public void testAvailabilityPublicUnauthorized () {
+    public void testAvailabilityPublicUnauthorized () throws KustvaktException{
         ClientResponse response = builtClientResponseWithIP(
                 "availability=QAO-NC-LOC:ids", "149.27.0.32");
 
@@ -332,7 +332,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     @Test
-    public void testAvailabilityRegexPublicAuthorized () {
+    public void testAvailabilityRegexPublicAuthorized () throws KustvaktException{
         ClientResponse response = builtClientResponseWithIP(
                 "availability= /ACA.*/", "149.27.0.32");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -343,7 +343,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     @Test
-    public void testNegationAvailabilityPublicUnauthorized () {
+    public void testNegationAvailabilityPublicUnauthorized () throws KustvaktException{
         ClientResponse response = builtClientResponseWithIP(
                 "availability != ACA-NC", "149.27.0.32");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -354,7 +354,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     @Test
-    public void testNegationAvailabilityRegexPublicUnauthorized () {
+    public void testNegationAvailabilityRegexPublicUnauthorized () throws KustvaktException{
         ClientResponse response = builtClientResponseWithIP(
                 "availability != /ACA.*/", "149.27.0.32");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -365,7 +365,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     @Test
-    public void testComplexAvailabilityPublicUnauthorized () {
+    public void testComplexAvailabilityPublicUnauthorized () throws KustvaktException{
         ClientResponse response = builtClientResponseWithIP(
                 "textClass=politik & availability=QAO-NC-LOC:ids",
                 "149.27.0.32");
@@ -378,7 +378,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     @Test
-    public void testNegationComplexAvailabilityPublicUnauthorized () {
+    public void testNegationComplexAvailabilityPublicUnauthorized () throws KustvaktException{
         ClientResponse response = builtClientResponseWithIP(
                 "textClass=politik & availability!=QAO-NC-LOC:ids",
                 "149.27.0.32");
@@ -390,7 +390,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
     }
 
     @Test
-    public void testAvailabilityRegexAllAuthorized () {
+    public void testAvailabilityRegexAllAuthorized () throws KustvaktException{
         ClientResponse response = builtClientResponseWithIP(
                 "availability= /ACA.*/", "10.27.0.32");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),

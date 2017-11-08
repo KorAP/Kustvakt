@@ -65,7 +65,7 @@ public class SearchKrillTest extends BeanConfigTest {
 	}
 
     @Test
-    public void testSearch () {
+    public void testSearch () throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[orth=der]", "poliqarp");
 

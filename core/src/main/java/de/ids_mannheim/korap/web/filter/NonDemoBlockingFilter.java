@@ -9,6 +9,9 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 import javax.ws.rs.ext.Provider;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 /**
  * @author hanl
  * @date 11/12/2014
@@ -16,10 +19,14 @@ import javax.ws.rs.ext.Provider;
  *       endpoint filter to block access to an endpoint, in case no
  *       anonymous access should be allowed!
  */
+@Component
 @Provider
 public class NonDemoBlockingFilter implements ContainerRequestFilter,
         ResourceFilter {
 
+    @Autowired
+    KustvaktResponseHandler kustvaktResponseHandler;
+    
     @Override
     public ContainerRequest filter (ContainerRequest request) {
         TokenContext context;
@@ -27,11 +34,11 @@ public class NonDemoBlockingFilter implements ContainerRequestFilter,
             context = (TokenContext) request.getUserPrincipal();
         }
         catch (UnsupportedOperationException e) {
-            throw KustvaktResponseHandler.throwAuthenticationException("");
+            throw kustvaktResponseHandler.throwAuthenticationException("");
         }
 
         if (context == null || context.isDemo())
-            throw KustvaktResponseHandler
+            throw kustvaktResponseHandler
                     .throwAuthenticationException("Service not available for non-authenticated "
                             + "or demo account users!");
         return request;

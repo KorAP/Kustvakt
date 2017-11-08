@@ -155,7 +155,7 @@
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Kustvakt-core</artifactId>
-			<version>0.59.8</version>
+			<version>0.59.9</version>
 		</dependency>
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>

@@ -37,7 +37,7 @@ public class LocalQueryTest extends BeanConfigTest {
 
 
     @Test
-    public void testQuery () {
+    public void testQuery () throws KustvaktException {
         SearchKrill krill = new SearchKrill(index);
         KoralCollectionQueryBuilder coll = new KoralCollectionQueryBuilder();
         coll.with(qstring);

@@ -33,6 +33,7 @@ import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.message.types.ResponseType;
 import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.apache.oltu.oauth2.common.utils.OAuthUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,7 +55,11 @@ import java.util.Set;
 @Path(KustvaktServer.API_VERSION + "/oauth2")
 public class OAuthController {
 
+    @Autowired
+    KustvaktResponseHandler kustvaktResponseHandler;
+    
     private OAuth2Handler handler;
+    @Autowired
     private AuthenticationManagerIface controller;
     private EncryptionIface crypto;
     private KustvaktConfiguration config;
@@ -85,7 +90,7 @@ public class OAuthController {
                     this.controller.getUser(ctx.getUsername()));
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -101,7 +106,7 @@ public class OAuthController {
                 crypto.createToken());
         info.setUrl(host);
         if (rurl == null)
-            throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+            throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     "Missing parameter!", "redirect_url");
         info.setRedirect_uri(rurl);
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
@@ -110,7 +115,7 @@ public class OAuthController {
             this.handler.getPersistenceHandler().registerClient(info, user);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok(info.toJSON()).build();
     }
@@ -131,7 +136,7 @@ public class OAuthController {
             scopes = StringUtils.toString(base_scope);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         // json format with scope callback parameter
         // todo: add other scopes as well!
@@ -157,7 +162,7 @@ public class OAuthController {
             return Response.ok(JsonUtils.toJSON(auths)).build();
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
     }
 
@@ -205,7 +210,7 @@ public class OAuthController {
 //                user.addUserData(data);
             }
             catch (KustvaktException e) {
-                throw KustvaktResponseHandler.throwit(e);
+                throw kustvaktResponseHandler.throwit(e);
             }
 
             // register response according to response_type
@@ -281,7 +286,7 @@ public class OAuthController {
                     this.handler.authorize(codeInfo, user);
                 }
                 catch (KustvaktException e) {
-                    throw KustvaktResponseHandler.throwit(e);
+                    throw kustvaktResponseHandler.throwit(e);
                 }
                 builder.setParam(OAuth.OAUTH_RESPONSE_TYPE,
                         ResponseType.CODE.toString());
@@ -316,7 +321,7 @@ public class OAuthController {
                                 new_context.getToken());
                     }
                     catch (KustvaktException e) {
-                        throw KustvaktResponseHandler.throwit(e);
+                        throw kustvaktResponseHandler.throwit(e);
                     }
                 }
                 response = builder.buildBodyMessage();
@@ -501,7 +506,7 @@ public class OAuthController {
                     }
                 }
                 catch (KustvaktException e) {
-                    throw KustvaktResponseHandler.throwit(e);
+                    throw kustvaktResponseHandler.throwit(e);
                 }
                 // todo: errors for invalid scopes or different scopes then during authorization request?
                 //todo ??
@@ -530,7 +535,7 @@ public class OAuthController {
                             oauthRequest.getPassword(), attr);
                 }
                 catch (KustvaktException e) {
-                    throw KustvaktResponseHandler.throwit(e);
+                    throw kustvaktResponseHandler.throwit(e);
                 }
 
                 try {
@@ -552,7 +557,7 @@ public class OAuthController {
 
                 }
                 catch (KustvaktException e) {
-                    throw KustvaktResponseHandler.throwit(e);
+                    throw kustvaktResponseHandler.throwit(e);
                 }
             }
 
@@ -575,7 +580,7 @@ public class OAuthController {
                     builder.setParam(c.getTokenType(), c.getToken());
                 }
                 catch (KustvaktException e) {
-                    throw KustvaktResponseHandler.throwit(e);
+                    throw kustvaktResponseHandler.throwit(e);
                 }
             }
 

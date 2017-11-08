@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.misc;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.VirtualCollection;
@@ -19,7 +21,7 @@ import static org.junit.Assert.assertNotNull;
 public class CollectionQueryBuilderTest {
 
     @Test
-    public void testsimpleAdd () {
+    public void testsimpleAdd () throws KustvaktException {
         KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
         b.with("corpusSigle=WPD");
 
@@ -32,7 +34,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testSimpleConjunction () {
+    public void testSimpleConjunction () throws KustvaktException {
         KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
         b.with("corpusSigle=WPD & textClass=freizeit");
         JsonNode node = JsonUtils.readTree(b.toJSON());
@@ -49,7 +51,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testSimpleDisjunction () {
+    public void testSimpleDisjunction () throws KustvaktException {
         KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
         b.with("corpusSigle=WPD | textClass=freizeit");
         JsonNode node = JsonUtils.readTree(b.toJSON());
@@ -64,7 +66,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testComplexSubQuery () {
+    public void testComplexSubQuery () throws KustvaktException {
         KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
         b.with("(corpusSigle=WPD) | (textClass=freizeit & corpusSigle=BRZ13)");
         JsonNode node = JsonUtils.readTree(b.toJSON());
@@ -80,7 +82,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testAddResourceQueryAfter () {
+    public void testAddResourceQueryAfter () throws KustvaktException {
         KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
         b.with("(textClass=politik & title=\"random title\") | textClass=wissenschaft");
 
@@ -109,7 +111,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testAddComplexResourceQueryAfter () {
+    public void testAddComplexResourceQueryAfter () throws KustvaktException {
         KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
         b.with("(title=\"random title\") | (textClass=wissenschaft)");
 
@@ -135,7 +137,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testBuildQuery () {
+    public void testBuildQuery () throws KustvaktException {
         String coll = "corpusSigle=WPD";
         String query = "[base=Haus]";
         QuerySerializer check = new QuerySerializer();
@@ -171,7 +173,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testBaseQueryBuild () {
+    public void testBaseQueryBuild () throws KustvaktException {
         KoralCollectionQueryBuilder b = new KoralCollectionQueryBuilder();
         b.with("(corpusSigle=ADF) | (textClass=freizeit & corpusSigle=WPD)");
 
@@ -192,7 +194,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testNodeMergeWithBase () {
+    public void testNodeMergeWithBase () throws KustvaktException {
         String coll = "corpusSigle=WPD";
         String query = "[base=Haus]";
         QuerySerializer check = new QuerySerializer();
@@ -214,7 +216,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testNodeMergeWithoutBase () {
+    public void testNodeMergeWithoutBase () throws KustvaktException {
         String query = "[base=Haus]";
         QuerySerializer check = new QuerySerializer();
         check.setQuery(query, "poliqarp");
@@ -235,7 +237,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testNodeMergeWithoutBaseWrongOperator () {
+    public void testNodeMergeWithoutBaseWrongOperator () throws KustvaktException {
         String query = "[base=Haus]";
         QuerySerializer check = new QuerySerializer();
         check.setQuery(query, "poliqarp");
@@ -263,7 +265,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testAddOROperator () {
+    public void testAddOROperator () throws KustvaktException {
         String coll = "corpusSigle=WPD";
         String query = "[base=Haus]";
         QuerySerializer check = new QuerySerializer();
@@ -282,7 +284,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testAddANDOperator () {
+    public void testAddANDOperator () throws KustvaktException {
         String coll = "corpusSigle=WPD";
         String query = "[base=Haus]";
         QuerySerializer check = new QuerySerializer();
@@ -301,7 +303,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testAddDefaultOperator () {
+    public void testAddDefaultOperator () throws KustvaktException {
         String coll = "corpusSigle=WPD";
         String query = "[base=Haus]";
         QuerySerializer check = new QuerySerializer();
@@ -320,7 +322,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testCollectionMergeWithFromResource () {
+    public void testCollectionMergeWithFromResource () throws KustvaktException {
         KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
         builder.with("textClass=politik & corpusSigle=WPD");
         KustvaktResource resource = new VirtualCollection();
@@ -339,7 +341,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testCollectionMergeWithFromResourceNoCollection () {
+    public void testCollectionMergeWithFromResourceNoCollection () throws KustvaktException {
         KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
         builder.with("textClass=politik & corpusSigle=WPD");
         KustvaktResource resource = new VirtualCollection();
@@ -358,7 +360,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testCollectionMergeFromQuerySerializer () {
+    public void testCollectionMergeFromQuerySerializer () throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[base=Haus]", "poliqarp");
         KoralCollectionQueryBuilder total = new KoralCollectionQueryBuilder();
@@ -384,7 +386,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testBaseCollectionNull () {
+    public void testBaseCollectionNull () throws KustvaktException {
         // base is missing collection segment
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[base=Haus]", "poliqarp");
@@ -412,7 +414,7 @@ public class CollectionQueryBuilderTest {
 
 
     @Test
-    public void testMergeCollectionNull () {
+    public void testMergeCollectionNull () throws KustvaktException {
         // merge json is missing collection segment
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[base=Haus]", "poliqarp");

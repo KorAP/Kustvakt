@@ -27,6 +27,8 @@ public class AuthFilter implements ContainerRequestFilter, ResourceFilter {
     @Autowired
     private AuthenticationManagerIface userController;
 
+    @Autowired
+    KustvaktResponseHandler kustvaktResponseHandler;
 
 //    public AuthFilter () {
 //        this.userController = BeansFactory.getKustvaktContext()
@@ -48,7 +50,7 @@ public class AuthFilter implements ContainerRequestFilter, ResourceFilter {
                         ua);
             }
             catch (KustvaktException e) {
-                throw KustvaktResponseHandler.throwAuthenticationException(authentication);
+                throw kustvaktResponseHandler.throwAuthenticationException(authentication);
             }
             // fixme: give reason why access is not granted?
             if (context != null
@@ -57,7 +59,7 @@ public class AuthFilter implements ContainerRequestFilter, ResourceFilter {
                             .isSecureRequired()))
                 request.setSecurityContext(new KustvaktContext(context));
             else
-                throw KustvaktResponseHandler.throwAuthenticationException("");
+                throw kustvaktResponseHandler.throwAuthenticationException("");
         }
         return request;
     }

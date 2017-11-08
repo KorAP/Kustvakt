@@ -12,6 +12,8 @@ import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -24,21 +26,19 @@ import java.util.List;
  * @author hanl
  * @date 19/11/2014
  */
+@Deprecated
+@Controller
 @Path(KustvaktServer.API_VERSION + "/doc")
 @ResourceFilters({ AdminFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class DocumentController {
 
+    @Autowired
+    KustvaktResponseHandler kustvaktResponseHandler;
+    
     private static Logger jlog =
             LoggerFactory.getLogger(DocumentController.class);
     private DocumentDao documentDao;
-
-
-    // todo: error handling
-    public DocumentController () {
-        this.documentDao = new DocumentDao(
-                BeansFactory.getKustvaktContext().getPersistenceClient());
-    }
 
 
     @POST
@@ -51,7 +51,7 @@ public class DocumentController {
             this.documentDao.storeResource(doc, null);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -72,7 +72,7 @@ public class DocumentController {
             return Response.ok(JsonUtils.toJSON(docs)).build();
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
     }
 

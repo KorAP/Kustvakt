@@ -2,6 +2,8 @@ package de.ids_mannheim.korap.resources;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.AccessLevel;
@@ -9,6 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.joda.time.DateTime;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -86,11 +89,15 @@ public abstract class KustvaktResource {
 
 
     public void setFields (String fields) {
-        Map s = JsonUtils.readSimple(fields, Map.class);
-        if (s == null)
+        Map s = null;
+        try {
+            s = JsonUtils.convertToClass(fields, Map.class);
+        }
+        catch (KustvaktException e) {
             throw new RuntimeException(
                     "Fields could not be read for resource '" + persistentID
                             + "'!");
+        }
         this.fields = s;
     }
 

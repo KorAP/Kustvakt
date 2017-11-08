@@ -20,7 +20,7 @@ import de.ids_mannheim.korap.web.service.FastJerseyTest;
 public class MatchInfoServiceTest extends FastJerseyTest {
 
     @Test
-    public void testGetMatchInfoPublicCorpus () {
+    public void testGetMatchInfoPublicCorpus () throws KustvaktException {
 
         ClientResponse response = resource()
                 .path("corpus").path("GOE").path("AGA").path("01784")
@@ -46,7 +46,7 @@ public class MatchInfoServiceTest extends FastJerseyTest {
     }
     
     @Test
-    public void testGetMatchInfoNotAllowed () {
+    public void testGetMatchInfoNotAllowed () throws KustvaktException {
 
         ClientResponse response = resource()
                 .path("corpus").path("GOE").path("AGI").path("04846")
@@ -67,7 +67,7 @@ public class MatchInfoServiceTest extends FastJerseyTest {
     }
 
     @Test
-    public void testGetMatchInfoWithAuthentication () {
+    public void testGetMatchInfoWithAuthentication () throws KustvaktException {
         ClientResponse response = resource()
                 .path("corpus").path("GOE").path("AGI").path("04846")
                 .path("p36875-36876").path("matchInfo")

@@ -37,7 +37,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testQuerySerializationFilteredPublic () {
+    public void testQuerySerializationFilteredPublic () throws KustvaktException {
         ClientResponse response = resource()
 
                 .path("corpus/WPD13/query").queryParam("q", "[orth=der]")
@@ -55,7 +55,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testQuerySerializationUnexistingResource () {
+    public void testQuerySerializationUnexistingResource () throws KustvaktException {
         ClientResponse response = resource()
 
                 .path("corpus/ZUW19/query").queryParam("q", "[orth=der]")
@@ -72,7 +72,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testQuerySerializationWithNonPublicCorpus () {
+    public void testQuerySerializationWithNonPublicCorpus () throws KustvaktException {
         ClientResponse response = resource()
 
                 .path("corpus/BRZ10/query").queryParam("q", "[orth=der]")
@@ -89,7 +89,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testQuerySerializationWithAuthentication () {
+    public void testQuerySerializationWithAuthentication () throws KustvaktException {
         ClientResponse response = resource()
 
                 .path("corpus/BRZ10/query").queryParam("q", "[orth=der]")
@@ -109,7 +109,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testQuerySerializationWithNewCollection () {
+    public void testQuerySerializationWithNewCollection () throws KustvaktException {
         // Add Virtual Collection
         ClientResponse response = resource()
 
@@ -191,7 +191,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testQuerySerializationOfVirtualCollection () {
+    public void testQuerySerializationOfVirtualCollection () throws KustvaktException {
         ClientResponse response = resource()
 
                 .path("collection/GOE-VC/query").queryParam("q", "[orth=der]")
@@ -218,7 +218,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testMetaQuerySerialization () {
+    public void testMetaQuerySerialization () throws KustvaktException {
         ClientResponse response = resource()
 
                 .path("query").queryParam("context", "sentence")
@@ -245,7 +245,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testMetaQuerySerializationWithOffset () {
+    public void testMetaQuerySerializationWithOffset () throws KustvaktException{
         ClientResponse response = resource()
 
                 .path("query").queryParam("context", "sentence")

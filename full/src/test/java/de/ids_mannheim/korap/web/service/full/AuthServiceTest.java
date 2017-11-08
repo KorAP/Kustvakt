@@ -53,7 +53,7 @@ public class AuthServiceTest extends FastJerseyTest {
     }
 
     @Test
-    public void testSessionToken() {
+    public void testSessionToken() throws KustvaktException {
         String auth = BasicHttpAuth.encode(credentials[0], credentials[1]);
         ClientResponse response = resource().path("auth")
                 .path("sessionToken").header(Attributes.AUTHORIZATION, auth)
@@ -89,7 +89,7 @@ public class AuthServiceTest extends FastJerseyTest {
     }
 
     @Test
-    public void testSessionTokenExpire() {
+    public void testSessionTokenExpire() throws KustvaktException {
         String auth = BasicHttpAuth.encode(credentials[0], credentials[1]);
         ClientResponse response = resource().path("auth")
                 .path("sessionToken").header(Attributes.AUTHORIZATION, auth)

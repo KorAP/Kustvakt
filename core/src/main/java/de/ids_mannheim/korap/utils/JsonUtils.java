@@ -1,17 +1,20 @@
 package de.ids_mannheim.korap.utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 
 /**
  * @author hanl
@@ -33,12 +36,13 @@ public class JsonUtils {
     }
 
 
-    public static JsonNode readTree (String s) {
+    public static JsonNode readTree (String json) throws KustvaktException {
         try {
-            return mapper.readTree(s);
+            return mapper.readTree(json);
         }
         catch (IOException e) {
-            return null;
+            throw new KustvaktException(StatusCodes.DESERIALIZATION_FAILED,
+                    "Failed deserializing json object: " + json, json, e);
         }
     }
 
@@ -57,10 +61,11 @@ public class JsonUtils {
         return mapper.valueToTree(value);
     }
 
-    public static <T> T convert (JsonNode json, Class<T> cl) throws IOException {
+    public static <T> T convert (JsonNode json, Class<T> cl)
+            throws IOException {
         return mapper.convertValue(json, cl);
     }
-    
+
     public static <T> T read (String json, Class<T> cl) throws IOException {
         return mapper.readValue(json, cl);
     }
@@ -78,25 +83,28 @@ public class JsonUtils {
     }
 
 
-    public static <T> T readSimple (String json, Class<T> cl) {
+    public static <T> T convertToClass (String json, Class<T> cl) throws KustvaktException {
+        T t = null;
         try {
-            return mapper.readValue(json, cl);
+            t = mapper.readValue(json, cl);
         }
         catch (IOException e) {
-            return null;
+            throw new KustvaktException(StatusCodes.DESERIALIZATION_FAILED,
+                    "Failed deserializing json object: " + json, json, e);
         }
+        return t;
     }
 
 
     public static List<Map<String, Object>> convertToList (String json)
-            throws JsonProcessingException {
+            throws JsonProcessingException, KustvaktException {
         List d = new ArrayList();
         JsonNode node = JsonUtils.readTree(json);
         if (node.isArray()) {
             Iterator<JsonNode> nodes = node.iterator();
             while (nodes.hasNext()) {
-                Map<String, Object> map = mapper.treeToValue(nodes.next(),
-                        Map.class);
+                Map<String, Object> map =
+                        mapper.treeToValue(nodes.next(), Map.class);
                 d.add(map);
             }
         }

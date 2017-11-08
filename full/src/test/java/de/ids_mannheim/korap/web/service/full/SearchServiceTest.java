@@ -46,7 +46,7 @@ public class SearchServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testSearchQueryPublicCorpora () {
+    public void testSearchQueryPublicCorpora () throws KustvaktException{
         ClientResponse response = resource()
                 .path("search").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp")
@@ -68,7 +68,7 @@ public class SearchServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testSearchQueryWithMeta () {
+    public void testSearchQueryWithMeta () throws KustvaktException{
         ClientResponse response = resource()
                 .path("search").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp").queryParam("cutoff", "true")
@@ -89,7 +89,7 @@ public class SearchServiceTest extends FastJerseyTest {
     }
 
     @Test
-    public void testSearchQueryFreeExtern () {
+    public void testSearchQueryFreeExtern () throws KustvaktException{
         ClientResponse response = resource()
                 .path("search").queryParam("q", "[orth=die]")
                 .queryParam("ql", "poliqarp")
@@ -111,7 +111,7 @@ public class SearchServiceTest extends FastJerseyTest {
     }
     
     @Test
-    public void testSearchQueryFreeIntern () {
+    public void testSearchQueryFreeIntern () throws KustvaktException{
         ClientResponse response = resource()
                 .path("search").queryParam("q", "[orth=die]")
                 .queryParam("ql", "poliqarp")
@@ -134,7 +134,7 @@ public class SearchServiceTest extends FastJerseyTest {
     
     
     @Test
-    public void testSearchQueryExternAuthorized () {
+    public void testSearchQueryExternAuthorized () throws KustvaktException{
         ClientResponse response = resource()
                 .path("search").queryParam("q", "[orth=die]")
                 .queryParam("ql", "poliqarp")
@@ -160,7 +160,7 @@ public class SearchServiceTest extends FastJerseyTest {
     }
 
     @Test
-    public void testSearchQueryInternAuthorized () {
+    public void testSearchQueryInternAuthorized () throws KustvaktException{
         ClientResponse response = resource()
                 .path("search").queryParam("q", "[orth=die]")
                 .queryParam("ql", "poliqarp")
@@ -191,7 +191,7 @@ public class SearchServiceTest extends FastJerseyTest {
  // EM: shouldn't this case gets CorpusAccess.PUB ? 
     @Test
     @Ignore
-    public void testSearchQueryWithCollectionQueryAuthorizedWithoutIP () {
+    public void testSearchQueryWithCollectionQueryAuthorizedWithoutIP () throws KustvaktException{
         ClientResponse response = resource()
                 .path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp")
@@ -221,7 +221,7 @@ public class SearchServiceTest extends FastJerseyTest {
     
     @Test
     @Ignore
-    public void testSearchQueryAuthorizedWithoutIP () {
+    public void testSearchQueryAuthorizedWithoutIP () throws KustvaktException{
         ClientResponse response = resource()
                 .path("search").queryParam("q", "[orth=die]")
                 .queryParam("ql", "poliqarp")
@@ -247,7 +247,7 @@ public class SearchServiceTest extends FastJerseyTest {
 
     @Test
     @Ignore
-    public void testSearchForPublicCorpusWithStringId () {
+    public void testSearchForPublicCorpusWithStringId () throws KustvaktException {
         ClientResponse response = resource()
                 .path("corpus").path("GOE").path("search")
                 .queryParam("q", "blau").queryParam("ql", "poliqarp")
@@ -273,7 +273,7 @@ public class SearchServiceTest extends FastJerseyTest {
 
     @Test
     @Ignore
-    public void testSearchForVirtualCollectionWithStringId () {
+    public void testSearchForVirtualCollectionWithStringId () throws KustvaktException{
         ClientResponse response = resource()
                 .path("collection").path("GOE-VC").path("search")
                 .queryParam("q", "blau").queryParam("ql", "poliqarp")
@@ -338,7 +338,7 @@ public class SearchServiceTest extends FastJerseyTest {
 
     @Test
     @Ignore
-    public void testSearchForCorpusWithStringIdUnauthorized () {
+    public void testSearchForCorpusWithStringIdUnauthorized () throws KustvaktException {
         ClientResponse response = resource()
                 .path("corpus").path("WPD15").path("search")
                 .queryParam("q", "blau").queryParam("ql", "poliqarp")
@@ -355,7 +355,7 @@ public class SearchServiceTest extends FastJerseyTest {
 
     @Test
     @Ignore
-    public void testSearchForSpecificCorpus () {
+    public void testSearchForSpecificCorpus () throws KustvaktException{
         ClientResponse response = resource()
                 .path("corpus").path("GOE").path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
@@ -423,7 +423,7 @@ public class SearchServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testSearchSentenceMeta () {
+    public void testSearchSentenceMeta () throws KustvaktException{
         ClientResponse response = resource()
                 .path("search").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp").queryParam("context", "sentence")
@@ -439,7 +439,7 @@ public class SearchServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testSearchSimpleCQL () {
+    public void testSearchSimpleCQL () throws KustvaktException{
         QuerySerializer s = new QuerySerializer();
         s.setQuery("(der) or (das)", "CQL");
 
@@ -457,7 +457,7 @@ public class SearchServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testSearchRawQuery () {
+    public void testSearchRawQuery () throws KustvaktException{
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[orth=der]", "poliqarp");
         s.setCollection("corpusSigle=GOE");

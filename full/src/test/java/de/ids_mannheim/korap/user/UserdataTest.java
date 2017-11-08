@@ -131,7 +131,7 @@ public class UserdataTest extends BeanConfigTest {
 
 
     @Test
-    public void testDataFactoryAdd () {
+    public void testDataFactoryAdd () throws KustvaktException {
         String data = "{}";
         Object node = JsonUtils.readTree(data);
 
@@ -153,7 +153,7 @@ public class UserdataTest extends BeanConfigTest {
 
 
     @Test
-    public void testDataFactoryGet () {
+    public void testDataFactoryGet () throws KustvaktException {
         String data = "{}";
         Object node = JsonUtils.readTree(data);
 
@@ -203,7 +203,7 @@ public class UserdataTest extends BeanConfigTest {
 
 
     @Test
-    public void testDataFactoryEmbeddedProperty () {
+    public void testDataFactoryEmbeddedProperty () throws KustvaktException {
         String data = "{}";
         JsonNode node = JsonUtils.readTree(data);
 
@@ -247,7 +247,7 @@ public class UserdataTest extends BeanConfigTest {
 
 
     @Test
-    public void testDataFactoryMerge () {
+    public void testDataFactoryMerge () throws KustvaktException {
         String data = "{}";
         Object node = JsonUtils.readTree(data);
 
@@ -277,7 +277,7 @@ public class UserdataTest extends BeanConfigTest {
 
     @Test
     @Ignore
-    public void testDataFactoryRemove () {
+    public void testDataFactoryRemove () throws KustvaktException {
         String data = "{}";
         Object node = JsonUtils.readTree(data);
 
@@ -382,7 +382,7 @@ public class UserdataTest extends BeanConfigTest {
 
 
     @Test
-    public void testDataFactoryKeys () {
+    public void testDataFactoryKeys () throws KustvaktException {
         String data = "{}";
         Object node = JsonUtils.readTree(data);
 

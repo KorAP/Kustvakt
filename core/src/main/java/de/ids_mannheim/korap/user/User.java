@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.user;
 import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.ParamFields;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.utils.KustvaktMap;
@@ -293,7 +294,7 @@ public abstract class User implements Serializable {
         }
 
 
-        public static KorAPUser toUser (String value) {
+        public static KorAPUser toUser (String value) throws KustvaktException {
             JsonNode node = JsonUtils.readTree(value);
             KorAPUser user = UserFactory.getUser(node.path(Attributes.USERNAME)
                     .asText());

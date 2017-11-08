@@ -8,7 +8,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.TestHelper;
@@ -32,7 +34,7 @@ public class OAuth2EndpointTest extends FastJerseyTest {
 
 
     @Test
-    public void testAuthorizeClient () {
+    public void testAuthorizeClient () throws ClientHandlerException, UniformInterfaceException, KustvaktException {
         String auth = BasicHttpAuth.encode(helper().getUser().getUsername(),
                 (String) TestHelper.getUserCredentials().get(Attributes.PASSWORD));
         ClientResponse response = resource().path(getAPIVersion()).path("oauth2")
@@ -53,7 +55,7 @@ public class OAuth2EndpointTest extends FastJerseyTest {
 
     @Test
     @Ignore
-    public void testRevokeClient () {
+    public void testRevokeClient () throws ClientHandlerException, UniformInterfaceException, KustvaktException {
         ClientResponse response = resource().path(getAPIVersion()).path("oauth2")
                 .path("register")
                 .queryParam("redirect_url", "korap.ids-mannheim.de/redirect")
@@ -68,7 +70,7 @@ public class OAuth2EndpointTest extends FastJerseyTest {
 
     @Test
     @Ignore
-    public void authenticate () {
+    public void authenticate () throws KustvaktException {
         Map<String, Object> cred = TestHelper.getUserCredentials();
         String enc = BasicHttpAuth.encode((String) cred.get(Attributes.USERNAME), (String) cred.get(Attributes.PASSWORD));
         ClientResponse response = resource().path(getAPIVersion()).path("oauth2")

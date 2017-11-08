@@ -60,7 +60,7 @@ public class UserServiceTest extends FastJerseyTest {
 	}
 
 	@Test
-	public void testRegisterMissingFields() {
+	public void testRegisterMissingFields() throws KustvaktException{
 
 		MultivaluedMap map = new MultivaluedMapImpl();
 		map.putSingle("username", "testuser"); // bodmer funktioniert noch nicht
@@ -114,7 +114,7 @@ public class UserServiceTest extends FastJerseyTest {
 
 	// should be run over https, since password is transmitted in plain text
 	@Test
-	public void testRegisterAndConfirm() {
+	public void testRegisterAndConfirm() throws KustvaktException{
 		MultivaluedMap map = new MultivaluedMapImpl();
 		map.putSingle("username", "testuser");
 		map.putSingle("email", "hanl@ids-mannheim.de");
@@ -154,7 +154,7 @@ public class UserServiceTest extends FastJerseyTest {
 	// EM: This test require VPN / IDS Intranet
 	@Test
 	@Ignore
-	public void loginJWT() {
+	public void loginJWT() throws KustvaktException{
 		String en = BasicHttpAuth.encode(credentials[0], credentials[1]);
 		/* lauffähige Version von Hanl: */
 		ClientResponse response = resource().path("auth").path("apiToken")
@@ -238,7 +238,7 @@ public class UserServiceTest extends FastJerseyTest {
 	}
 
 	@Test
-	public void testUpdateUserDetailsMerge() {
+	public void testUpdateUserDetailsMerge() throws KustvaktException{
 		String enc = BasicHttpAuth.encode(credentials[0], credentials[1]);
 		Map m = new LinkedMap();
 		m.put("test", "test value 1");
@@ -294,7 +294,7 @@ public class UserServiceTest extends FastJerseyTest {
 	}
 
 	@Test
-	public void testUpdateUserDetailsJson() {
+	public void testUpdateUserDetailsJson() throws KustvaktException{
 		String enc = BasicHttpAuth.encode(credentials[0], credentials[1]);
 		Map m = new LinkedMap();
 		m.put("firstName", "newName");
@@ -329,7 +329,7 @@ public class UserServiceTest extends FastJerseyTest {
 
 	@Test
 	@Ignore
-	public void testUpdateUserSettingsForm() throws IOException {
+	public void testUpdateUserSettingsForm() throws IOException, KustvaktException{
 		String enc = BasicHttpAuth.encode(credentials[0], credentials[1]);
 		MultivaluedMap m = new MultivaluedMapImpl();
 		m.putSingle("queryLanguage", "poliqarp_test");
@@ -367,7 +367,7 @@ public class UserServiceTest extends FastJerseyTest {
 	}
 
 	@Test
-	public void testUpdateUserSettingsJson() throws IOException {
+	public void testUpdateUserSettingsJson() throws IOException, KustvaktException {
 		String enc = BasicHttpAuth.encode(credentials[0], credentials[1]);
 		Map m = new HashMap<>();
 		m.put("queryLanguage", "poliqarp_test");

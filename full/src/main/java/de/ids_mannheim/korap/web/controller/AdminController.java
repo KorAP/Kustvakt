@@ -16,17 +16,16 @@ import javax.ws.rs.core.Response;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.auditing.AuditRecord;
-import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.handlers.DocumentDao;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
-import de.ids_mannheim.korap.resources.Document;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.Permissions;
 import de.ids_mannheim.korap.resources.ResourceFactory;
@@ -43,25 +42,22 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 /**
  * @author hanl, margaretha 
  * Created date 6/11/14. 
- * Last update: 04/2017
+ * Last update: 08/11/2017
+ * Last changes:
+ *  removed DocumentDao (EM)
  */
+@Controller
 @Path(KustvaktServer.API_VERSION + "/admin")
 @ResourceFilters({ AdminFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class AdminController {
 
     private static Logger jlog = LoggerFactory.getLogger(AdminController.class);
-
+    @Autowired
     private AuditingIface auditingController;
-    private DocumentDao documentDao;
 
-
-    public AdminController () {
-        this.auditingController = BeansFactory.getKustvaktContext()
-                .getAuditingProvider();
-        this.documentDao = new DocumentDao(
-                BeansFactory.getKustvaktContext().getPersistenceClient());
-    }
+    @Autowired
+    KustvaktResponseHandler kustvaktResponseHandler;
 
     // EM: not documented and tested, not sure what the purpose of the service is
     @GET
@@ -87,7 +83,7 @@ public class AdminController {
             integer_limit = Integer.valueOf(limit);
         }
         catch (NumberFormatException | NullPointerException e) {
-            throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT);
+            throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT);
         }
         String result = JsonUtils.toJSON(auditingController.retrieveRecords(
                 AuditRecord.CATEGORY.valueOf(type.toUpperCase()), from_date,
@@ -112,31 +108,31 @@ public class AdminController {
             KustvaktException e = new KustvaktException(
                     StatusCodes.MISSING_ARGUMENT,
                     "The value of parameter type is missing.");
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         else if (name == null | name.isEmpty()) {
             KustvaktException e = new KustvaktException(
                     StatusCodes.MISSING_ARGUMENT,
                     "The value of parameter name is missing.");
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         else if (description == null | description.isEmpty()) {
             KustvaktException e = new KustvaktException(
                     StatusCodes.MISSING_ARGUMENT,
                     "The value of parameter description is missing.");
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         else if (group == null | group.isEmpty()) {
             KustvaktException e = new KustvaktException(
                     StatusCodes.MISSING_ARGUMENT,
                     "The value of parameter group is missing.");
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         else if (permissions == null | permissions.isEmpty()) {
             KustvaktException e = new KustvaktException(
                     StatusCodes.MISSING_ARGUMENT,
                     "The value of parameter permissions is missing.");
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
 
 
@@ -167,24 +163,9 @@ public class AdminController {
             pb.create();
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
 
-        return Response.ok().build();
-    }
-
-
-    @POST
-    @Path("doc/{id}/add")
-    @Deprecated
-    public Response addDocument (@PathParam("id") String id) {
-        Document document = new Document(id);
-        try {
-            this.documentDao.storeResource(document, null);
-        }
-        catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
-        }
         return Response.ok().build();
     }
 

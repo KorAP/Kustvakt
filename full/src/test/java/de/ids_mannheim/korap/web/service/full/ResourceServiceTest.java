@@ -39,7 +39,7 @@ public class ResourceServiceTest extends FastJerseyTest {
     // create a simple test collection for user kustvakt, otherwise test fails
     @Test
     @Ignore
-    public void testStats () {
+    public void testStats () throws KustvaktException{
         ClientResponse response = resource().path(getAPIVersion())
                 .path("collection")
                 .header(Attributes.AUTHORIZATION,

@@ -18,6 +18,8 @@ import de.ids_mannheim.korap.user.*;
 import net.minidev.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
@@ -29,6 +31,7 @@ import java.util.*;
  * @author hanl
  * @date 13/05/2014
  */
+@Component
 @Provider
 public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
 
@@ -38,12 +41,13 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
     private static Logger jlog = LoggerFactory.getLogger(PiwikFilter.class);
     public static boolean ENABLED = false;
     private Map<String, String> customVars;
+    @Autowired
     private AuthenticationManagerIface controller;
 
 
     public PiwikFilter () {
-        controller = BeansFactory.getKustvaktContext()
-                .getAuthenticationManager();
+//        controller = BeansFactory.getKustvaktContext()
+//                .getAuthenticationManager();
         ClientConfig config = new DefaultClientConfig();
         Client client = Client.create(config);
         if (jlog.isDebugEnabled())

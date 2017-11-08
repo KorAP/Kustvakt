@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.user;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.AccessLevel;
@@ -98,7 +99,7 @@ public class TokenContext implements java.security.Principal, Serializable {
 
 
     //todo: complete
-    public static TokenContext fromJSON (String s) {
+    public static TokenContext fromJSON (String s) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(s);
         TokenContext c = new TokenContext();
         if (node != null) {
@@ -109,7 +110,7 @@ public class TokenContext implements java.security.Principal, Serializable {
     }
 
 
-    public static TokenContext fromOAuth2 (String s) {
+    public static TokenContext fromOAuth2 (String s) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(s);
         TokenContext c = new TokenContext();
         if (node != null) {

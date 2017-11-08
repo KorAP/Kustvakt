@@ -31,7 +31,7 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
     }
 
     @Test
-    public void testGetPublicVirtualCollectionInfo () {
+    public void testGetPublicVirtualCollectionInfo () throws KustvaktException{
         ClientResponse response = resource().path(getAPIVersion())
                 .path("collection").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -44,7 +44,7 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetVirtualCollectionInfoWithAuthentication () {
+    public void testGetVirtualCollectionInfoWithAuthentication () throws KustvaktException{
         ClientResponse response = resource().path(getAPIVersion())
                 .path("collection")
                 .header(Attributes.AUTHORIZATION,
@@ -61,7 +61,7 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetVirtualCollectionInfoById () {
+    public void testGetVirtualCollectionInfoById () throws KustvaktException{
         ClientResponse response = resource().path(getAPIVersion())
                 .path("collection").path("GOE-VC").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -77,7 +77,7 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
     }
     
     @Test
-    public void testGetVirtualCollectionInfoByIdUnauthorized () {
+    public void testGetVirtualCollectionInfoByIdUnauthorized () throws KustvaktException{
         ClientResponse response = resource().path(getAPIVersion())
                 .path("collection").path("WPD15-VC").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
@@ -92,7 +92,7 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
     }
     
     @Test
-    public void testGetPublicCorporaInfo () {
+    public void testGetPublicCorporaInfo () throws KustvaktException{
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -106,7 +106,7 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetCorpusInfoById () {
+    public void testGetCorpusInfoById () throws KustvaktException{
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus").path("WPD13").get(ClientResponse.class);
         
@@ -122,7 +122,7 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetCorpusInfoById2 () {
+    public void testGetCorpusInfoById2 () throws KustvaktException{
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus").path("GOE").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -136,7 +136,7 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetPublicFoundriesInfo () {
+    public void testGetPublicFoundriesInfo () throws KustvaktException{
         ClientResponse response = resource().path(getAPIVersion())
                 .path("foundry").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -150,7 +150,7 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetFoundryInfoById () {
+    public void testGetFoundryInfoById () throws KustvaktException{
         ClientResponse response = resource().path(getAPIVersion())
                 .path("foundry").path("tt").get(ClientResponse.class);
         String ent = response.getEntity(String.class);
@@ -164,7 +164,7 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetUnexistingCorpusInfo () {
+    public void testGetUnexistingCorpusInfo () throws KustvaktException{
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus").path("ZUW19").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
@@ -182,7 +182,7 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
     // EM: queries for an unauthorized corpus get the same responses / treatment as 
     // asking for an unexisting corpus info. Does it need a specific exception instead?
     @Test
-    public void testGetUnauthorizedCorpusInfo () {
+    public void testGetUnauthorizedCorpusInfo () throws KustvaktException{
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus").path("BRZ10").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),

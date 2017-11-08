@@ -93,7 +93,12 @@ public abstract class DataFactory {
         public Object convertData (String data) {
             if (data == null)
                 return JsonUtils.createObjectNode();
-            return JsonUtils.readTree(data);
+            try {
+                return JsonUtils.readTree(data);
+            }
+            catch (KustvaktException e) {
+                return null;
+            }
         }
 
 

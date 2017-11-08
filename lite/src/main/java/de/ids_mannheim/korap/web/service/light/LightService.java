@@ -58,6 +58,8 @@ public class LightService {
     private static Logger jlog = LoggerFactory.getLogger(LightService.class);
 
     @Autowired
+    KustvaktResponseHandler kustvaktResponseHandler;
+    @Autowired
     private SearchKrill searchKrill;
     private ClientsHandler graphDBhandler;
     @Autowired
@@ -86,7 +88,7 @@ public class LightService {
             result = graphDBhandler.getResponse("distCollo", "q", query);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok(result).build();
     }
@@ -126,7 +128,7 @@ public class LightService {
             query = this.processor.processQuery(ss.toJSON(), null);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok(query).build();
     }
@@ -140,7 +142,7 @@ public class LightService {
             jsonld = processor.processQuery(jsonld, null);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         // todo: should be possible to add the meta part to the query serialization
         jlog.info("Serialized search: {}", jsonld);
@@ -184,7 +186,7 @@ public class LightService {
             query = this.processor.processQuery(serializer.toJSON(), null);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         jlog.info("the serialized query {}", query);
 
@@ -202,7 +204,7 @@ public class LightService {
                 result = this.graphDBhandler.getResponse(map, "distKwic");
             }
             catch (KustvaktException e) {
-                throw KustvaktResponseHandler.throwit(e);
+                throw kustvaktResponseHandler.throwit(e);
             }
         }
         else
@@ -261,13 +263,13 @@ public class LightService {
                 query = this.processor.processQuery(s.toJSON(), null);
             }
             catch (KustvaktException e) {
-                throw KustvaktResponseHandler.throwit(e);
+                throw kustvaktResponseHandler.throwit(e);
             }
         }
         String result;
         try {
             if (eng.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
-                if (raw) throw KustvaktResponseHandler.throwit(
+                if (raw) throw kustvaktResponseHandler.throwit(
                         StatusCodes.ILLEGAL_ARGUMENT, "raw not supported!",
                         null);
                 MultivaluedMap map = new MultivaluedMapImpl();
@@ -285,7 +287,7 @@ public class LightService {
         }
         catch (Exception e) {
             jlog.error("Exception for serialized query: " + query, e);
-            throw KustvaktResponseHandler.throwit(500, e.getMessage(), null);
+            throw kustvaktResponseHandler.throwit(500, e.getMessage(), null);
         }
 
         jlog.debug("The result set: {}", result);
@@ -300,11 +302,17 @@ public class LightService {
 
         KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
         builder.with(collectionQuery);
-        String json = builder.toJSON();
+        String json;
+        try {
+            json = builder.toJSON();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
 
         String stats = searchKrill.getStatistics(json);
         if (stats.contains("-1"))
-            throw KustvaktResponseHandler.throwit(StatusCodes.NO_RESULT_FOUND);
+            throw kustvaktResponseHandler.throwit(StatusCodes.NO_RESULT_FOUND);
         jlog.debug("Stats: " + stats);
         return Response.ok(stats).build();
     }

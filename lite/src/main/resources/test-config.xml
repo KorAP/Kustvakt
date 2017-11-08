@@ -34,6 +34,11 @@
     <bean id="kustvakt_auditing"
           class="de.ids_mannheim.korap.interfaces.defaults.DefaultAuditing">
     </bean>
+    
+    <bean id="kustvakt_response"
+          class="de.ids_mannheim.korap.web.utils.KustvaktResponseHandler">
+          <constructor-arg index="0" name="iface" ref="kustvakt_auditing"/>
+    </bean>
 
     <bean id="kustvakt_config"
           class="de.ids_mannheim.korap.config.KustvaktConfiguration">

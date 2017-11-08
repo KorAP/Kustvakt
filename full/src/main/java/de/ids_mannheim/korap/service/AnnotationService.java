@@ -24,6 +24,9 @@ public class AnnotationService {
             LoggerFactory.getLogger(AnnotationService.class);
 
     @Autowired
+    KustvaktResponseHandler kustvaktResponseHandler;
+
+    @Autowired
     private AnnotationDao annotationDao;
 
     @Autowired
@@ -59,7 +62,7 @@ public class AnnotationService {
                 }
                 else {
                     jlog.error("Annotation code is wrong: " + annotationCode);
-                    throw KustvaktResponseHandler.throwit(
+                    kustvaktResponseHandler.throwit(
                             new KustvaktException(StatusCodes.INVALID_ATTRIBUTE,
                                     "Bad attribute:", code));
                 }

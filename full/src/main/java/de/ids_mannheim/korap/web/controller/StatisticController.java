@@ -31,7 +31,7 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
  * @author hanl
  * @author margaretha
  *
- * @date 27/09/2017
+ * @date 08/11/2017
  * 
  */
 @Controller
@@ -43,7 +43,8 @@ public class StatisticController {
 
     private static Logger jlog =
             LoggerFactory.getLogger(StatisticController.class);
-
+    @Autowired
+    private KustvaktResponseHandler kustvaktResponseHandler;
     @Autowired
     private SearchKrill searchKrill;
 
@@ -67,7 +68,7 @@ public class StatisticController {
             @QueryParam("collectionQuery") String collectionQuery) {
 
         if (collectionQuery == null || collectionQuery.isEmpty()) {
-            throw KustvaktResponseHandler
+            throw kustvaktResponseHandler
                     .throwit(new KustvaktException(StatusCodes.MISSING_ARGUMENT,
                             "Parameter collectionQuery is missing.",
                             "collectionQuery"));
@@ -76,11 +77,17 @@ public class StatisticController {
 
         KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
         builder.with(collectionQuery);
-        String json = builder.toJSON();
+        String json = null;
+        try {
+            json = builder.toJSON();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
 
         String stats = searchKrill.getStatistics(json);
         if (stats.contains("-1"))
-            throw KustvaktResponseHandler.throwit(StatusCodes.NO_RESULT_FOUND);
+            throw kustvaktResponseHandler.throwit(StatusCodes.NO_RESULT_FOUND);
         jlog.debug("Stats: " + stats);
         return Response.ok(stats).build();
     }

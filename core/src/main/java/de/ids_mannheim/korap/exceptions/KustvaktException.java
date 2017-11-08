@@ -20,7 +20,8 @@ public class KustvaktException extends Exception {
     private String userid;
     private Integer statusCode;
     private String entity;
-
+    private String notification;
+    private boolean isNotification;
 
     public KustvaktException (int status) {
         this.statusCode = status;
@@ -31,6 +32,15 @@ public class KustvaktException extends Exception {
         this.entity = Arrays.asList(args).toString();
     }
 
+    public KustvaktException (int status, String notification, boolean isNotification) {
+        this.statusCode = status;
+        this.notification = notification;
+        this.isNotification = isNotification;
+    }
+    
+    public boolean hasNotification () {
+        return isNotification;
+    }
 
     public KustvaktException (Object userid, int status) {
         this(status);

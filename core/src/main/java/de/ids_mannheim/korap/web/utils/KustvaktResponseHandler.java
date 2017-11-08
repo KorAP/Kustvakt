@@ -1,32 +1,31 @@
 package de.ids_mannheim.korap.web.utils;
 
+import java.util.List;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+
 import de.ids_mannheim.korap.auditing.AuditRecord;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.response.Notifications;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import java.util.List;
-
 /**
- * @author hanl
+ * @author hanl, margaretha
  * @date 29/01/2014
+ * @last 08/11/2017
  */
 public class KustvaktResponseHandler {
 
-    private static AuditingIface auditing;
+    private AuditingIface auditing;
 
-
-    public static void init (AuditingIface iface) {
-        if (auditing == null)
-            auditing = iface;
+    public KustvaktResponseHandler (AuditingIface iface) {
+        this.auditing = iface;
     }
-
-
-    private static void register (List<AuditRecord> records) {
+    
+    private void register (List<AuditRecord> records) {
         if (auditing != null && !records.isEmpty())
             auditing.audit(records);
         else if (auditing == null)
@@ -34,37 +33,44 @@ public class KustvaktResponseHandler {
     }
 
 
-    public static WebApplicationException throwit (KustvaktException e) {
-        Response s = Response.status(getStatus(e.getStatusCode()))
-                .entity(buildNotification(e)).build();
+    public WebApplicationException throwit (KustvaktException e) {
+        Response s;
+        if (e.hasNotification()){
+            s = Response.status(getStatus(e.getStatusCode()))
+                    .entity(e.getNotification()).build();
+        }
+        else{
+            s = Response.status(getStatus(e.getStatusCode()))
+                    .entity(buildNotification(e)).build();
+        }
         return new WebApplicationException(s);
     }
 
-    public static WebApplicationException throwit (int code) {
+    public WebApplicationException throwit (int code) {
         return new WebApplicationException(Response.status(getStatus(code))
                 .entity(buildNotification(code, "", "")).build());
     }
 
 
-    public static WebApplicationException throwit (int code, String message,
+    public WebApplicationException throwit (int code, String message,
             String entity) {
         return new WebApplicationException(Response.status(getStatus(code))
                 .entity(buildNotification(code, message, entity)).build());
     }
 
-    public static WebApplicationException throwit (int code, String notification) {
+    public WebApplicationException throwit (int code, String notification) {
         return new WebApplicationException(Response.status(getStatus(code))
                 .entity(notification).build());
     }
     
-    private static String buildNotification (KustvaktException e) {
+    private String buildNotification (KustvaktException e) {
         register(e.getRecords());
         return buildNotification(e.getStatusCode(), e.getMessage(),
                 e.getEntity());
     }
 
 
-    public static String buildNotification (int code, String message,
+    public String buildNotification (int code, String message,
             String entity) {
         Notifications notif = new Notifications();
         notif.addError(code, message, entity);
@@ -73,7 +79,7 @@ public class KustvaktResponseHandler {
 
 
     //todo:  if exception, make exception message and error code available if not masked!
-    public static WebApplicationException throwAuthenticationException (String username) {
+    public WebApplicationException throwAuthenticationException (String username) {
         return new WebApplicationException(Response
                 .status(Response.Status.UNAUTHORIZED)
                 .header(HttpHeaders.WWW_AUTHENTICATE,
@@ -84,7 +90,7 @@ public class KustvaktResponseHandler {
 
 
 
-    private static Response.Status getStatus (int code) {
+    private Response.Status getStatus (int code) {
         Response.Status status = Response.Status.BAD_REQUEST;
         switch (code) {
 //            case StatusCodes.NO_VALUE_FOUND:

@@ -30,7 +30,7 @@ public class LightServiceTest extends FastJerseyLightTest {
     public void initMethod () throws KustvaktException {}
 
     @Test
-    public void testStatistics () {
+    public void testStatistics () throws KustvaktException{
         ClientResponse response = resource()
                 .path("statistics")
                 .queryParam("collectionQuery", "textType=Autobiographie & corpusSigle=GOE")
@@ -46,7 +46,7 @@ public class LightServiceTest extends FastJerseyLightTest {
     }
 
     @Test
-    public void testGetJSONQuery () {
+    public void testGetJSONQuery () throws KustvaktException{
         ClientResponse response = resource()
                 .path("query").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("context", "sentence")
@@ -66,7 +66,7 @@ public class LightServiceTest extends FastJerseyLightTest {
 
 
     @Test
-    public void testbuildAndPostQuery () {
+    public void testbuildAndPostQuery () throws KustvaktException{
         ClientResponse response = resource()
                 .path("query").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp")
@@ -91,7 +91,7 @@ public class LightServiceTest extends FastJerseyLightTest {
 
 
     @Test
-    public void testQueryGet () {
+    public void testQueryGet () throws KustvaktException{
         ClientResponse response = resource()
                 .path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("context", "sentence")
@@ -109,7 +109,7 @@ public class LightServiceTest extends FastJerseyLightTest {
 
 
     @Test
-    public void testFoundryRewrite () {
+    public void testFoundryRewrite () throws KustvaktException{
         ClientResponse response = resource()
                 .path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("context", "sentence")
@@ -125,7 +125,7 @@ public class LightServiceTest extends FastJerseyLightTest {
 
 
     @Test
-    public void testQueryPost () {
+    public void testQueryPost () throws KustvaktException{
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[orth=das]", "poliqarp");
 
@@ -142,7 +142,7 @@ public class LightServiceTest extends FastJerseyLightTest {
 
 
     @Test
-    public void testParameterField () {
+    public void testParameterField () throws KustvaktException{
         ClientResponse response = resource()
                 .path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp")
@@ -161,7 +161,7 @@ public class LightServiceTest extends FastJerseyLightTest {
     }
 
 	@Test
-	public void testMatchInfoGetWithoutSpans () {
+	public void testMatchInfoGetWithoutSpans () throws KustvaktException{
         ClientResponse response = resource()
 			
 			.path("corpus/GOE/AGA/01784/p36-46/matchInfo")
@@ -178,7 +178,7 @@ public class LightServiceTest extends FastJerseyLightTest {
 	};
 
 	@Test
-	public void testMatchInfoGet2 () {
+	public void testMatchInfoGet2 () throws KustvaktException{
         ClientResponse response = resource()
 			
 			.path("corpus/GOE/AGA/01784/p36-46/matchInfo")
@@ -194,7 +194,7 @@ public class LightServiceTest extends FastJerseyLightTest {
 	};
 
     @Test
-    public void testCollectionQueryParameter () {
+    public void testCollectionQueryParameter () throws KustvaktException{
         ClientResponse response = resource()
                 .path("query").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp")

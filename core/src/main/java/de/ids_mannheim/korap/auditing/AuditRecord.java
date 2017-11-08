@@ -2,6 +2,8 @@ package de.ids_mannheim.korap.auditing;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
+
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.Getter;
@@ -93,7 +95,7 @@ public class AuditRecord {
     }
 
 
-    public AuditRecord fromJson (String json) {
+    public AuditRecord fromJson (String json) throws KustvaktException {
         JsonNode n = JsonUtils.readTree(json);
         AuditRecord r = new AuditRecord();
         r.setCategory(CATEGORY.valueOf(n.path("category").asText()));

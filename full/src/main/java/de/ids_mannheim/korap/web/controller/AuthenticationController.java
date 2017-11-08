@@ -1,5 +1,29 @@
 package de.ids_mannheim.korap.web.controller;
 
+import java.util.HashMap;
+import java.util.Iterator; // 07.02.17/FB
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
+
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ResourceFilters;
 
@@ -10,31 +34,15 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.filter.AuthFilter;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
-import de.ids_mannheim.korap.server.KustvaktServer;
-import de.ids_mannheim.korap.user.*;
+import de.ids_mannheim.korap.user.TokenContext;
+import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.ServiceInfo;
-import de.ids_mannheim.korap.web.filter.*;
+import de.ids_mannheim.korap.web.filter.BlockingFilter;
+import de.ids_mannheim.korap.web.filter.DemoUserFilter;
+import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
-
-import org.eclipse.jetty.util.log.Log;
-import org.slf4j.Logger;
-
-import javax.servlet.http.HttpServletRequest; // FB
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
-import javax.xml.ws.WebServiceContext; // FB
-import javax.xml.ws.handler.MessageContext; // FB
-import javax.annotation.Resource; // FB
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.Iterator; // 07.02.17/FB
 
 //import com.sun.xml.internal.messaging.saaj.util.Base64;
 
@@ -42,29 +50,25 @@ import java.util.Iterator; // 07.02.17/FB
  * @author hanl
  * @date 24/01/2014
  */
+@Controller
 @Path("/auth")
 @ResourceFilters({ PiwikFilter.class })
 @Produces(MediaType.TEXT_HTML + ";charset=utf-8")
 public class AuthenticationController {
 
+    @Autowired
+    KustvaktResponseHandler kustvaktResponseHandler;
+    
     private static Boolean DEBUG_LOG = true;
 
     //todo: bootstrap function to transmit certain default configuration settings and examples (example user queries,
     // default usersettings, etc.)
     private static Logger jlog = KustvaktLogger.getLogger(AuthenticationController.class);
 
+    @Autowired
     private AuthenticationManagerIface controller;
 
-
     //    private SendMail mail;
-
-    public AuthenticationController () {
-        this.controller =
-                BeansFactory.getKustvaktContext().getAuthenticationManager();
-        //todo: replace with real property values
-        //        this.mail = new SendMail(ExtConfiguration.getMailProperties());
-    }
-
 
     /**
      * represents json string with data. All GUI clients can access
@@ -117,7 +121,7 @@ public class AuthenticationController {
         List<String> auth =
                 headers.getRequestHeader(ContainerRequest.AUTHORIZATION);
         if (auth == null || auth.isEmpty()) {
-            throw KustvaktResponseHandler
+            throw kustvaktResponseHandler
                     .throwit(new KustvaktException(StatusCodes.MISSING_ARGUMENT,
                             "Authorization header is missing.",
                             "Authorization header"));
@@ -163,12 +167,12 @@ public class AuthenticationController {
 
         // "Invalid syntax for username and password"
         if (values == null)
-            throw KustvaktResponseHandler.throwit(StatusCodes.ACCESS_DENIED);
+            throw kustvaktResponseHandler.throwit(StatusCodes.ACCESS_DENIED);
 
         if (values[0].equalsIgnoreCase("null")
                 | values[1].equalsIgnoreCase("null"))
             // is actual an invalid request
-            throw KustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
+            throw kustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
 
         Map<String, Object> attr = new HashMap<>();
         if (scopes != null && !scopes.isEmpty())
@@ -193,7 +197,7 @@ public class AuthenticationController {
                     Attributes.API_AUTHENTICATION);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
 
         return Response.ok(context.toJson()).build();
@@ -238,14 +242,14 @@ public class AuthenticationController {
 
         // "Invalid syntax for username and password"
         if (values == null)
-            throw KustvaktResponseHandler.throwit(StatusCodes.BAD_CREDENTIALS);
+            throw kustvaktResponseHandler.throwit(StatusCodes.BAD_CREDENTIALS);
 
         // Implementation Hanl mit '|'. 16.02.17/FB
         //if (values[0].equalsIgnoreCase("null")
         //        | values[1].equalsIgnoreCase("null"))
         if (values[0].equalsIgnoreCase("null")
                 || values[1].equalsIgnoreCase("null"))
-            throw KustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
+            throw kustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
 
         Map<String, Object> attr = new HashMap<>();
         attr.put(Attributes.HOST, host);
@@ -260,7 +264,7 @@ public class AuthenticationController {
             jlog.debug(contextJson);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().entity(contextJson).build();
     }
@@ -293,7 +297,7 @@ public class AuthenticationController {
             context = controller.createTokenContext(user, attr, null);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().entity(context.toJson()).build();
     }
@@ -312,7 +316,7 @@ public class AuthenticationController {
         }
         catch (KustvaktException e) {
             jlog.error("Logout Exception: {}", e.string());
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }

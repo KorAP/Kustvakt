@@ -106,7 +106,7 @@ public class BeanConfiguration {
             this.handler = new DefaultHandler();
             this.context = context;
             // todo: better method?!
-            KustvaktResponseHandler.init(getAuditingProvider());
+            new KustvaktResponseHandler(getAuditingProvider());
         }
 
 

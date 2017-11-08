@@ -28,19 +28,24 @@ public class StatusCodes {
      */
 
     public static final int NO_QUERY = 301;
-    public static final int SERIALIZATION_FAILED = 302;
+    // EM: e.g. vc type
+    public static final int INVALID_TYPE = 302;
     public static final int MISSING_ATTRIBUTE = 303;
     public static final int INVALID_ATTRIBUTE = 304;
     public static final int UNSUPPORTED_VALUE = 305;
-
+    public static final int SERIALIZATION_FAILED = 306;
+    public static final int DESERIALIZATION_FAILED = 307;
+    
     /**
      *  400 status codes for authorization and rewrite functions
      */
 
     // fixme: use unsupported resource and include type in return message
     public static final int POLICY_ERROR_DEFAULT = 400;
+    public static final int UNAUTHORIZED_OPERATION = 401;
+    
     public static final int UNSUPPORTED_RESOURCE = 402;
-    public static final int REWRITE_FAILED = 403;
+//    public static final int REWRITE_FAILED = 403;
     //public static final int UNSUPPORTED_FOUNDRY = 403;
     //public static final int UNSUPPORTED_CORPUS = 404;
     //public static final int UNSUPPORTED_LAYER = 405;
@@ -49,13 +54,14 @@ public class StatusCodes {
     //public static final int CORPUS_REWRITE = 407;
     //public static final int FOUNDRY_REWRITE = 408;
     //public static final int FOUNDRY_INJECTION = 409;
-    public static final int MISSING_RESOURCE = 405;
+//    public static final int MISSING_RESOURCE = 405;
     public static final int NO_POLICY_TARGET = 406;
     public static final int NO_POLICY_CONDITION = 407;
     public static final int NO_POLICY_PERMISSION = 408;
     public static final int NO_POLICIES = 409;
 
-
+    
+    
     /**
      * 500 status codes for access control related components (also
      * policy rewrite)

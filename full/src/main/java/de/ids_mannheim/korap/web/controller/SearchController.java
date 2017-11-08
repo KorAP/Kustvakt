@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.web.controller;// package
                                              // de.ids_mannheim.korap.ext.web;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.spi.container.ResourceFilters;
@@ -66,7 +69,9 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 /**
- * EM: To Do: restructure codes regarding service and controller layers
+ * EM: To Do: restructure codes regarding service and controller
+ * layers
+ * 
  * @author hanl, margaretha
  * @date 29/01/2014
  * @lastUpdate 06/2017
@@ -81,6 +86,8 @@ public class SearchController {
     private static Logger jlog =
             LoggerFactory.getLogger(SearchController.class);
 
+    @Autowired
+    KustvaktResponseHandler responseHandler;
     @Autowired
     private SearchKrill searchKrill;
     private ResourceHandler resourceHandler;
@@ -102,106 +109,6 @@ public class SearchController {
     @PostConstruct
     private void doPostConstruct () {
         this.processor.defaultRewriteConstraints();
-    }
-
-    /**
-     * retrieve resources dependent by type. determines based on the
-     * user's
-     * permission or resource owner if the user can access the
-     * resource.
-     * 
-     * @param locale
-     * @param context
-     * @param type
-     * @return valid resources in json format
-     */
-    @Deprecated
-    @GET
-    @Path("{type}")
-    public Response getResources (@Context Locale locale,
-            @Context SecurityContext context, @PathParam("type") String type) {
-        TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        Set<KustvaktResource> resources = new HashSet<>();
-        type = StringUtils.normalize(type);
-
-        try {
-            Class cl_type = ResourceFactory.getResourceClass(type);
-            if (cl_type == null) throw KustvaktResponseHandler.throwit(
-                    StatusCodes.MISSING_ARGUMENT,
-                    "Resource type not available!", "");
-
-            User user = controller.getUser(ctx.getUsername());
-
-            resources = ResourceFinder.search(user,
-                    ResourceFactory.getResourceClass(type));
-        }
-        catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
-        }
-
-        Set values = new HashSet();
-        for (KustvaktResource resource : resources)
-            values.add(resource.toMap());
-        return Response.ok(JsonUtils.toJSON(values)).build();
-    }
-
-
-    @Deprecated
-    @GET
-    @Path("{type}/{id}/{child}")
-    public Response getResource (@Context SecurityContext context,
-            @Context Locale locale, @PathParam("type") String type,
-            @PathParam("id") String id, @PathParam("child") String child) {
-        return getResource(context, locale, type,
-                StringUtils.joinResources(id, child));
-    }
-
-
-    /**
-     * @param context
-     * @param locale
-     * @param id
-     * @param type
-     * @return
-     */
-    @Deprecated
-    @GET
-    @Path("{type}/{id}")
-    public Response getResource (@Context SecurityContext context,
-            @Context Locale locale, @PathParam("type") String type,
-            @PathParam("id") String id) {
-        TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        type = StringUtils.normalize(type);
-        KustvaktResource resource;
-        try {
-            Class cl_type = ResourceFactory.getResourceClass(type);
-
-            if (ctx.isDemo()) {
-                Set set = ResourceFinder.searchPublicFiltered(cl_type, id);
-                resource = (KustvaktResource) set.toArray()[0];
-            }
-            else {
-                User user = controller.getUser(ctx.getUsername());
-                if (StringUtils.isInteger(id))
-                    resource = resourceHandler.findbyIntId(Integer.valueOf(id),
-                            user);
-                else
-                    resource = resourceHandler.findbyStrId(id, user, cl_type);
-            }
-        }
-        catch (KustvaktException e) {
-            // if (e.getStatusCode() != StatusCodes.ACCESS_DENIED)
-            throw KustvaktResponseHandler.throwit(e);
-
-            // try {
-            // Set set = ResourceFinder.searchPublicFiltered(cl_type, id);
-            // resource = (KustvaktResource) set.toArray()[0];
-            // }
-            // catch (KustvaktException e1) {
-            // throw KustvaktResponseHandler.throwit(e);
-            // }
-        }
-        return Response.ok(JsonUtils.toJSON(resource.toMap())).build();
     }
 
     // @GET
@@ -313,7 +220,7 @@ public class SearchController {
             result = graphDBhandler.getResponse("distCollo", "q", query);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw responseHandler.throwit(e);
         }
         return Response.ok(result).build();
     }
@@ -418,7 +325,12 @@ public class SearchController {
         ss.setMeta(meta.raw());
 
         KoralCollectionQueryBuilder cquery = new KoralCollectionQueryBuilder();
-        cquery.setBaseQuery(ss.toJSON());
+        try {
+            cquery.setBaseQuery(ss.toJSON());
+        }
+        catch (KustvaktException e1) {
+            throw responseHandler.throwit(e1);
+        }
 
         String query = "";
         // EM: is this necessary at all?
@@ -431,7 +343,12 @@ public class SearchController {
             else if (resource instanceof Corpus) {
                 cquery.and().with(Attributes.CORPUS_SIGLE, "=",
                         resource.getPersistentID());
-                query = cquery.toJSON();
+                try {
+                    query = cquery.toJSON();
+                }
+                catch (KustvaktException e) {
+                   throw responseHandler.throwit(e);
+                }
             }
         }
 
@@ -487,7 +404,7 @@ public class SearchController {
             // jsonld = this.processor.processQuery(jsonld, user);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw responseHandler.throwit(e);
         }
         jlog.info("Serialized search: {}", jsonld);
 
@@ -522,7 +439,7 @@ public class SearchController {
         catch (KustvaktException e) {
             jlog.error("Failed retrieving user in the search service: {}",
                     e.string());
-            throw KustvaktResponseHandler.throwit(e);
+            throw responseHandler.throwit(e);
         }
 
         QuerySerializer serializer = new QuerySerializer();
@@ -539,7 +456,7 @@ public class SearchController {
             jlog.info("the serialized query {}", query);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw responseHandler.throwit(e);
         }
 
         String result = doSearch(eng, query, pageLength, meta);
@@ -584,7 +501,7 @@ public class SearchController {
             MetaQueryBuilder meta, boolean raw) {
 
         if (raw) {
-            throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+            throw responseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     "raw not supported!", null);
         }
 
@@ -598,7 +515,7 @@ public class SearchController {
         }
         catch (KustvaktException e) {
             jlog.error("Failed searching in Neo4J: {}", e.string());
-            throw KustvaktResponseHandler.throwit(e);
+            throw responseHandler.throwit(e);
         }
 
     }
@@ -636,7 +553,7 @@ public class SearchController {
         }
         catch (KustvaktException e) {
             jlog.error("Failed retrieving resource: {}", e.string());
-            throw KustvaktResponseHandler.throwit(e);
+            throw responseHandler.throwit(e);
         }
 
         if (resource instanceof VirtualCollection) {
@@ -648,10 +565,15 @@ public class SearchController {
         else if (resource instanceof Corpus) {
             builder.and().with(Attributes.CORPUS_SIGLE, "=",
                     resource.getPersistentID());
-            return builder.toJSON();
+            try {
+                return builder.toJSON();
+            }
+            catch (KustvaktException e) {
+                throw responseHandler.throwit(e);
+            }
         }
         else {
-            throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+            throw responseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     "Type parameter not supported", type);
         }
     }
@@ -675,7 +597,7 @@ public class SearchController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered: {}", e.string());
-            throw KustvaktResponseHandler.throwit(e);
+            throw responseHandler.throwit(e);
         }
 
         VirtualCollection tmp = resourceHandler.getCache(cache.getId(),
@@ -684,12 +606,12 @@ public class SearchController {
             String query;
             try {
                 query = this.processor.processQuery(cache.getData(), user);
+                String stats = searchKrill.getStatistics(query);
+                cache.setStats(JsonUtils.convertToClass(stats, Map.class));
             }
             catch (KustvaktException e) {
-                throw KustvaktResponseHandler.throwit(e);
+                throw responseHandler.throwit(e);
             }
-            String stats = searchKrill.getStatistics(query);
-            cache.setStats(JsonUtils.readSimple(stats, Map.class));
             resourceHandler.cache(cache);
         }
         else
@@ -762,7 +684,7 @@ public class SearchController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered: {}", e.string());
-            throw KustvaktResponseHandler.throwit(e);
+            throw responseHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -793,24 +715,29 @@ public class SearchController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered: {}", e.string());
-            throw KustvaktResponseHandler.throwit(e);
+            throw responseHandler.throwit(e);
         }
         if (VirtualCollection.class.equals(ctype)) {
             VirtualCollection cachetmp, collection;
 
-            JsonNode base;
+            JsonNode base = null;
             if (reference != null && !reference.equals("null")) {
                 try {
                     base = resourceHandler.findbyStrId(reference, user,
                             VirtualCollection.class).getData();
                 }
                 catch (KustvaktException e) {
-                    throw KustvaktResponseHandler.throwit(e);
+                    throw responseHandler.throwit(e);
                 }
 
             }
             else if (query != null)
-                base = JsonUtils.readTree(query);
+                try {
+                    base = JsonUtils.readTree(query);
+                }
+                catch (KustvaktException e) {
+                  responseHandler.throwit(e);
+                }
             else
                 // todo: throw exception response for no resource to save!
                 return null;
@@ -828,7 +755,8 @@ public class SearchController {
                 // if not cached, fill with stats values
                 if (tmp == null) {
                     String stats = searchKrill.getStatistics(cquery.toJSON());
-                    cachetmp.setStats(JsonUtils.readSimple(stats, Map.class));
+                    cachetmp.setStats(
+                            JsonUtils.convertToClass(stats, Map.class));
                 }
 
                 if (!cache) {
@@ -844,7 +772,7 @@ public class SearchController {
 
             }
             catch (KustvaktException e) {
-                throw KustvaktResponseHandler.throwit(e);
+                throw responseHandler.throwit(e);
             }
         }
         return Response.ok(JsonUtils.toJSON(vals)).build();
@@ -889,7 +817,7 @@ public class SearchController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered: {}", e.string());
-            throw KustvaktResponseHandler.throwit(e);
+            throw responseHandler.throwit(e);
         }
 
         if (VirtualCollection.class.equals(ctype)) {
@@ -904,7 +832,7 @@ public class SearchController {
 
                 }
                 catch (KustvaktException e) {
-                    throw KustvaktResponseHandler.throwit(e);
+                    throw responseHandler.throwit(e);
                 }
             }
             if (query != null && !query.isEmpty()) cquery.with(query);
@@ -918,7 +846,7 @@ public class SearchController {
             // if not cached, fill with stats values
             if (tmp == null) {
                 String stats = searchKrill.getStatistics(cquery.toJSON());
-                cachetmp.setStats(JsonUtils.readSimple(stats, Map.class));
+                cachetmp.setStats(JsonUtils.convertToClass(stats, Map.class));
                 if (query != null && !query.isEmpty())
                     cachetmp.setFields(cquery.toJSON());
             }
@@ -932,7 +860,7 @@ public class SearchController {
                 }
                 catch (KustvaktException e) {
                     jlog.error("Exception encountered: {}", e.string());
-                    throw KustvaktResponseHandler.throwit(e);
+                    throw responseHandler.throwit(e);
                 }
             }
             else {
@@ -941,7 +869,7 @@ public class SearchController {
             }
         }
         else {
-            throw KustvaktResponseHandler.throwit(
+            throw responseHandler.throwit(
                     new KustvaktException(StatusCodes.UNSUPPORTED_RESOURCE,
                             "Unsupported operation for the given resource type.",
                             type));
@@ -977,7 +905,7 @@ public class SearchController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered: {}", e.string());
-            throw KustvaktResponseHandler.throwit(e);
+            throw responseHandler.throwit(e);
         }
 
         return Response.ok().build();
@@ -1015,7 +943,7 @@ public class SearchController {
         catch (KustvaktException e) {
             jlog.error("Failed getting user in the matchInfo service: {}",
                     e.string());
-            throw KustvaktResponseHandler.throwit(e);
+            throw responseHandler.throwit(e);
         }
 
         CorpusAccess corpusAccess = user.getCorpusAccess();
@@ -1058,7 +986,7 @@ public class SearchController {
         }
         catch (Exception e) {
             jlog.error("Exception in the MatchInfo service encountered!", e);
-            throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+            throw responseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     e.getMessage(), "");
         }
         jlog.debug("MatchInfo results: " + results);
@@ -1114,7 +1042,7 @@ public class SearchController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered: {}", e.string());
-            throw KustvaktResponseHandler.throwit(e);
+            throw responseHandler.throwit(e);
         }
 
         return Response.ok().build();

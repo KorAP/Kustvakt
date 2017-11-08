@@ -13,7 +13,6 @@ import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
@@ -32,12 +31,15 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
 
     @Autowired
 	private AuthenticationManagerIface authManager;
+    
+    @Autowired
+    KustvaktResponseHandler kustvaktResponseHandler;
 
 	@Override
 	public ContainerRequest filter(ContainerRequest cr) {
 		String authentication = cr.getHeaderValue(ContainerRequest.AUTHORIZATION);
 		if (authentication == null) {
-			throw KustvaktResponseHandler.throwAuthenticationException("The authorization header value is missing.");
+			throw kustvaktResponseHandler.throwAuthenticationException("The authorization header value is missing.");
 		}
 
 		// decode password
@@ -60,12 +62,12 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
 		try {
 			User user = authManager.authenticate(tokenType, username, token, attributes);
 			if (!user.isAdmin()){
-				throw KustvaktResponseHandler.throwAuthenticationException("Admin authentication failed.");
+				throw kustvaktResponseHandler.throwAuthenticationException("Admin authentication failed.");
 			}
 			Map<String, Object> properties = cr.getProperties();
 			properties.put("user", user);
 		} catch (KustvaktException e) {
-			throw KustvaktResponseHandler.throwAuthenticationException("User authentication failed.");
+			throw kustvaktResponseHandler.throwAuthenticationException("User authentication failed.");
 		}
 
 		TokenContext c = new TokenContext();

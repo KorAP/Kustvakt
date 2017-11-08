@@ -1,19 +1,55 @@
 package de.ids_mannheim.korap.web.controller;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ResourceFilters;
+
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.Scopes;
 import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.filter.AuthFilter;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
-import de.ids_mannheim.korap.server.KustvaktServer;
-import de.ids_mannheim.korap.user.*;
+import de.ids_mannheim.korap.user.KorAPUser;
+import de.ids_mannheim.korap.user.TokenContext;
+import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.user.UserDetails;
+import de.ids_mannheim.korap.user.UserQuery;
+import de.ids_mannheim.korap.user.UserSettings;
+import de.ids_mannheim.korap.user.Userdata;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
@@ -21,32 +57,25 @@ import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
-import java.util.*;
 
 /**
  * @author hanl, margaretha
- * @lastUpdate 04/2017
+ * @lastUpdate 11/2017
  */
+@Controller
 @Path("/user")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 @ResourceFilters({ PiwikFilter.class })
 public class UserController {
 
+    @Autowired
+    KustvaktResponseHandler kustvaktResponseHandler;
+    
     private static Logger jlog = LoggerFactory.getLogger(UserController.class);
+    @Autowired
     private AuthenticationManagerIface controller;
 
     private @Context UriInfo info;
-
-
-    public UserController () {
-        this.controller = BeansFactory.getKustvaktContext()
-                .getAuthenticationManager();
-    }
 
 
     // fixme: json contains password in clear text. Encrypt request?
@@ -72,7 +101,7 @@ public class UserController {
             user = controller.createUserAccount(values, true);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         URIParam uri = user.getField(URIParam.class);
         if (uri.hasValues()) {
@@ -92,7 +121,7 @@ public class UserController {
         else {
             jlog.error("Failed creating confirmation and expiry tokens.");
             // EM: why illegal argument when uri fragment/param is self-generated 
-            throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+            throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     "failed to validate uri parameter", "confirmation fragment");
         }
 
@@ -119,7 +148,7 @@ public class UserController {
             //            controller.updateAccount(user);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -131,10 +160,10 @@ public class UserController {
     public Response confirmRegistration (@QueryParam("uri") String uritoken,
             @Context Locale locale, @QueryParam("user") String username) {
         if (uritoken == null || uritoken.isEmpty())
-            throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+            throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     "parameter missing", "uri parameter");
         if (username == null || username.isEmpty())
-            throw KustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+            throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     "parameter missing", "Username");
 
         try {
@@ -142,7 +171,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             e.printStackTrace();
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -155,7 +184,13 @@ public class UserController {
     @Consumes({ MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_FORM_URLENCODED })
     public Response requestPasswordReset (@Context Locale locale, String json) {
-        JsonNode node = JsonUtils.readTree(json);
+        JsonNode node;
+        try {
+            node = JsonUtils.readTree(json);
+        }
+        catch (KustvaktException e1) {
+            throw kustvaktResponseHandler.throwit(e1);
+        }
         StringBuilder builder = new StringBuilder();
         String username, email;
         username = node.path(Attributes.USERNAME).asText();
@@ -183,7 +218,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             jlog.error("Eoxception encountered!", e.string());
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
 
         ObjectNode obj = JsonUtils.createObjectNode();
@@ -233,7 +268,7 @@ public class UserController {
             m = Scopes.mapScopes(scopes, data);
         }
         catch (KustvaktException e) {
-            throw KustvaktResponseHandler
+            throw kustvaktResponseHandler
                     .throwAuthenticationException(ctx.getUsername());
         }
         return Response.ok(m.toEntity()).build();
@@ -256,7 +291,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok(result).build();
     }
@@ -293,7 +328,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
 
         return Response.ok().build();
@@ -319,7 +354,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered: {}", e.string());
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok(result).build();
     }
@@ -351,7 +386,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -407,7 +442,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok(JsonUtils.toJSON(add)).build();
     }
@@ -425,7 +460,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -449,7 +484,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
-            throw KustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok(queryStr).build();
     }

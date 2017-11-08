@@ -101,8 +101,8 @@
 		<!-- <property name="validateOnMigrate" value="false" /> -->
 		<!-- <property name="cleanOnValidationError" value="true" /> -->
 		<property name="locations" value="${jdbc.schemaPath}" />
-		<property name="dataSource" ref="dataSource" />
-		<!-- <property name="dataSource" ref="sqliteDataSource" /> -->
+		<!-- <property name="dataSource" ref="dataSource" /> -->
+		<property name="dataSource" ref="sqliteDataSource" />
 	</bean>
 	
 	
@@ -114,7 +114,9 @@
 
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-		<property name="dataSource" ref="dataSource" />
+		<!-- <property name="dataSource" ref="dataSource" /> -->
+		<property name="dataSource" ref="sqliteDataSource" />
+		
 		<property name="packagesToScan" value="de.ids_mannheim.korap.entity" />
 		<property name="jpaVendorAdapter">
 			<bean id="jpaVendorAdapter"
@@ -139,6 +141,7 @@
 
 	<tx:annotation-driven proxy-target-class="true"
 		transaction-manager="transactionManager" />
+		
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory" ref="entityManagerFactory" />
 	</bean>
@@ -161,6 +164,11 @@
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
 
+	<bean id="kustvakt_response"
+          class="de.ids_mannheim.korap.web.utils.KustvaktResponseHandler">
+          <constructor-arg index="0" name="iface" ref="kustvakt_auditing"/>
+    </bean>
+    
 	<bean id="kustvakt_userdb" class="de.ids_mannheim.korap.handlers.EntityDao">
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
@@ -283,7 +291,8 @@
 	<!-- similarly, don't forget the PlatformTransactionManager -->
 	<bean id="txManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<property name="dataSource" ref="dataSource" />
+		<!-- <property name="dataSource" ref="dataSource" /> -->
+		<property name="dataSource" ref="sqliteDataSource" />
 	</bean>
 	
 </beans>
