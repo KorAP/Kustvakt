@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.config;
 
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.Userdata;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
@@ -80,7 +81,7 @@ public class Scopes {
     }
 
 
-    public String toEntity () {
+    public String toEntity () throws KustvaktException {
         if (this.values.isEmpty())
             return "";
         return JsonUtils.toJSON(this.values);

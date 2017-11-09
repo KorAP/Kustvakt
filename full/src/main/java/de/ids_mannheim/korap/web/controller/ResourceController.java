@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 
 import com.sun.jersey.spi.container.ResourceFilters;
 
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.service.ResourceService;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
@@ -40,7 +41,14 @@ public class ResourceController {
     @GET
     @Path("info")
     public Response getAllResourceInfo () {
-        String result = JsonUtils.toJSON(resourceService.getResourceDtos());
+        String result = "";
+        try {
+            result = JsonUtils.toJSON(resourceService.getResourceDtos());
+        }
+        catch (KustvaktException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         return Response.ok(result).build();
     }
 }

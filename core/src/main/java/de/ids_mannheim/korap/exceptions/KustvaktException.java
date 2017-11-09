@@ -81,6 +81,11 @@ public class KustvaktException extends Exception {
         this.statusCode = status;
         this.entity = entity;
     }
+    
+    public KustvaktException (int status, String message, Exception e) {
+        super(message, e);
+        this.statusCode = status;
+    }
 
 
     public KustvaktException (Throwable cause, int status) {

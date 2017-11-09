@@ -1,11 +1,14 @@
 package de.ids_mannheim.korap.web.controller;
 
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.server.KustvaktServer;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.ServiceInfo;
+import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -22,6 +25,8 @@ import java.util.Map;
 public class KustvaktController {
 
     private static Logger jlog = LoggerFactory.getLogger(UserController.class);
+    @Autowired
+    private KustvaktResponseHandler kustvaktResponseHandler;
 
 
     @Path("info")
@@ -30,7 +35,12 @@ public class KustvaktController {
         m.put("version", ServiceInfo.getInfo().getVersion());
         m.put("recent_api_version", KustvaktServer.API_VERSION);
         m.put("service_name", ServiceInfo.getInfo().getName());
-        return Response.ok(JsonUtils.toJSON(m)).build();
+        try {
+            return Response.ok(JsonUtils.toJSON(m)).build();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
     }
 
 }

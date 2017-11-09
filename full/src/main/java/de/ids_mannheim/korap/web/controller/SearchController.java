@@ -336,19 +336,20 @@ public class SearchController {
         // EM: is this necessary at all?
         KustvaktResource resource = isCollectionIdValid(ctx.getName(), id);
         if (resource != null) {
-            if (resource instanceof VirtualCollection) {
-                JsonNode node = cquery.and().mergeWith(resource.getData());
-                query = JsonUtils.toJSON(node);
-            }
-            else if (resource instanceof Corpus) {
-                cquery.and().with(Attributes.CORPUS_SIGLE, "=",
-                        resource.getPersistentID());
-                try {
+            try {
+                if (resource instanceof VirtualCollection) {
+                    JsonNode node = cquery.and().mergeWith(resource.getData());
+                    query = JsonUtils.toJSON(node);
+                }
+                else if (resource instanceof Corpus) {
+                    cquery.and().with(Attributes.CORPUS_SIGLE, "=",
+                            resource.getPersistentID());
+
                     query = cquery.toJSON();
                 }
-                catch (KustvaktException e) {
-                   throw responseHandler.throwit(e);
-                }
+            }
+            catch (KustvaktException e) {
+                throw responseHandler.throwit(e);
             }
         }
 
@@ -555,26 +556,28 @@ public class SearchController {
             jlog.error("Failed retrieving resource: {}", e.string());
             throw responseHandler.throwit(e);
         }
+        try {
+            if (resource instanceof VirtualCollection) {
+                // test this
+                //builder.setBaseQuery(resource.getData());
+                return JsonUtils
+                        .toJSON(builder.and().mergeWith(resource.getData()));
+            }
+            else if (resource instanceof Corpus) {
+                builder.and().with(Attributes.CORPUS_SIGLE, "=",
+                        resource.getPersistentID());
 
-        if (resource instanceof VirtualCollection) {
-            // test this
-            //builder.setBaseQuery(resource.getData());
-            return JsonUtils
-                    .toJSON(builder.and().mergeWith(resource.getData()));
-        }
-        else if (resource instanceof Corpus) {
-            builder.and().with(Attributes.CORPUS_SIGLE, "=",
-                    resource.getPersistentID());
-            try {
                 return builder.toJSON();
             }
-            catch (KustvaktException e) {
-                throw responseHandler.throwit(e);
+
+
+            else {
+                throw responseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+                        "Type parameter not supported", type);
             }
         }
-        else {
-            throw responseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
-                    "Type parameter not supported", type);
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
         }
     }
 
@@ -620,7 +623,12 @@ public class SearchController {
         Map vals = new HashMap();
         vals.put("id", cache.getId());
         vals.put("statistics", cache.getStats());
-        return Response.ok(JsonUtils.toJSON(vals)).build();
+        try {
+            return Response.ok(JsonUtils.toJSON(vals)).build();
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
     }
 
 
@@ -736,7 +744,7 @@ public class SearchController {
                     base = JsonUtils.readTree(query);
                 }
                 catch (KustvaktException e) {
-                  responseHandler.throwit(e);
+                    responseHandler.throwit(e);
                 }
             else
                 // todo: throw exception response for no resource to save!
@@ -775,7 +783,12 @@ public class SearchController {
                 throw responseHandler.throwit(e);
             }
         }
-        return Response.ok(JsonUtils.toJSON(vals)).build();
+        try {
+            return Response.ok(JsonUtils.toJSON(vals)).build();
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
     }
 
 

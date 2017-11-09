@@ -85,9 +85,15 @@ public class AdminController {
         catch (NumberFormatException | NullPointerException e) {
             throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT);
         }
-        String result = JsonUtils.toJSON(auditingController.retrieveRecords(
-                AuditRecord.CATEGORY.valueOf(type.toUpperCase()), from_date,
-                until_date, dayOnly, integer_limit));
+        String result="";
+        try {
+            result = JsonUtils.toJSON(auditingController.retrieveRecords(
+                    AuditRecord.CATEGORY.valueOf(type.toUpperCase()), from_date,
+                    until_date, dayOnly, integer_limit));
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
         // limit number of records to return
         return Response.ok(result).build();
     }

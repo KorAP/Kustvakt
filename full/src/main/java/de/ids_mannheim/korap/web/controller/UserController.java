@@ -116,7 +116,12 @@ public class UserController {
             object.put("confirm_uri", uriBuilder.build());
             object.put("uri_expiration",
                     TimeUtils.format(uri.getUriExpiration()));
-            return Response.ok(JsonUtils.toJSON(object)).build();
+            try {
+                return Response.ok(JsonUtils.toJSON(object)).build();
+            }
+            catch (KustvaktException e) {
+                throw kustvaktResponseHandler.throwit(e);
+            }
         }
         else {
             jlog.error("Failed creating confirmation and expiry tokens.");
@@ -224,7 +229,12 @@ public class UserController {
         ObjectNode obj = JsonUtils.createObjectNode();
         obj.put(Attributes.URI, builder.toString());
         obj.put(Attributes.URI_EXPIRATION, objects[1].toString());
-        return Response.ok(JsonUtils.toJSON(obj)).build();
+        try {
+            return Response.ok(JsonUtils.toJSON(obj)).build();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
     }
 
 
@@ -271,7 +281,12 @@ public class UserController {
             throw kustvaktResponseHandler
                     .throwAuthenticationException(ctx.getUsername());
         }
-        return Response.ok(m.toEntity()).build();
+        try {
+            return Response.ok(m.toEntity()).build();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
     }
 
 
@@ -444,7 +459,12 @@ public class UserController {
             jlog.error("Exception encountered!", e);
             throw kustvaktResponseHandler.throwit(e);
         }
-        return Response.ok(JsonUtils.toJSON(add)).build();
+        try {
+            return Response.ok(JsonUtils.toJSON(add)).build();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
     }
 
 

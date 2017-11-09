@@ -88,7 +88,12 @@ public class AuthenticationController {
                 .getQueryLanguages());
         m.put("SortTypes", null); // types of sorting that are supported!
         m.put("version", ServiceInfo.getInfo().getVersion());
-        return Response.ok(JsonUtils.toJSON(m)).build();
+        try {
+            return Response.ok(JsonUtils.toJSON(m)).build();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
     }
 
 
@@ -102,7 +107,12 @@ public class AuthenticationController {
             @HeaderParam(ContainerRequest.HOST) String host,
             @Context Locale locale) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        return Response.ok(ctx.toJson()).build();
+        try {
+            return Response.ok(ctx.toJson()).build();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
     }
 
 
@@ -200,7 +210,12 @@ public class AuthenticationController {
             throw kustvaktResponseHandler.throwit(e);
         }
 
-        return Response.ok(context.toJson()).build();
+        try {
+            return Response.ok(context.toJson()).build();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
     }
 
 
@@ -299,7 +314,12 @@ public class AuthenticationController {
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
-        return Response.ok().entity(context.toJson()).build();
+        try {
+            return Response.ok().entity(context.toJson()).build();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
     }
 
 

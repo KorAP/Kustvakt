@@ -1,6 +1,11 @@
 package de.ids_mannheim.korap.security.auth;
 
-import com.sun.org.apache.xpath.internal.SourceTree;
+import java.util.Map;
+
+import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.Scopes;
@@ -9,18 +14,11 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
-import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.NamingUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.oltu.oauth2.common.utils.OAuthUtils;
-
-import java.beans.Beans;
-import java.util.Map;
 
 /**
  * @author hanl
@@ -29,8 +27,13 @@ import java.util.Map;
 // todo: bean injection!
 public class BasicHttpAuth implements AuthenticationIface {
 
+    @Autowired
     private KustvaktConfiguration config;
-
+    @Autowired
+    private EncryptionIface crypto;
+    @Autowired
+    private EntityHandlerIface dao;
+    
     public BasicHttpAuth() {
 
     }
@@ -77,11 +80,6 @@ public class BasicHttpAuth implements AuthenticationIface {
     public TokenContext getTokenContext(String authToken)
             throws KustvaktException {
         //fixme: handle via constructor
-        this.config = BeansFactory.getKustvaktContext().getConfiguration();
-        EncryptionIface crypto = BeansFactory.getKustvaktContext()
-                .getEncryption();
-        EntityHandlerIface dao = BeansFactory.getKustvaktContext()
-                .getUserDBHandler();
         String[] values = decode(authToken);
         if (values != null) {
             TokenContext c = new TokenContext();

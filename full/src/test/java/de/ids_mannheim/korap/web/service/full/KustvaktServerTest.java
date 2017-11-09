@@ -64,7 +64,7 @@ public class KustvaktServerTest extends BeanConfigTest {
 
     @Test
     public void testRegisterBadPassword ()
-            throws URISyntaxException, ClientProtocolException, IOException {
+            throws URISyntaxException, ClientProtocolException, IOException, KustvaktException {
         HttpClient httpClient = HttpClients.createDefault();
 
         MultivaluedMap<String, String> map = new MultivaluedMapImpl();
@@ -102,7 +102,7 @@ public class KustvaktServerTest extends BeanConfigTest {
 
     @Test
     public void testRegisterExistingUsername ()
-            throws URISyntaxException, ClientProtocolException, IOException {
+            throws URISyntaxException, ClientProtocolException, IOException, KustvaktException {
         HttpClient httpClient = HttpClients.createDefault();
 
         MultivaluedMap<String, String> map = new MultivaluedMapImpl();
@@ -139,7 +139,7 @@ public class KustvaktServerTest extends BeanConfigTest {
 
     @Test
     public void testRegisterUser ()
-            throws URISyntaxException, ClientProtocolException, IOException {
+            throws URISyntaxException, ClientProtocolException, IOException, KustvaktException {
         HttpClient httpClient = HttpClients.createDefault();
 
         MultivaluedMap<String, String> map = new MultivaluedMapImpl();

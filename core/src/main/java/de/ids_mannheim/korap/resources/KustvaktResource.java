@@ -112,7 +112,7 @@ public abstract class KustvaktResource {
     }
 
 
-    public String getStringData () {
+    public String getStringData () throws KustvaktException {
         return JsonUtils.toJSON(this.fields);
     }
 

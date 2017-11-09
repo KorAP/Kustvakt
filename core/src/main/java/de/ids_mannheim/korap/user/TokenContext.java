@@ -137,7 +137,7 @@ public class TokenContext implements java.security.Principal, Serializable {
     }
 
 
-    public String toJson() {
+    public String toJson() throws KustvaktException {
         return JsonUtils.toJSON(this.statusMap());
     }
 

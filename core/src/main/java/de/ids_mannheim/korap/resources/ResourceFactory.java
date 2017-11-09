@@ -66,7 +66,7 @@ public class ResourceFactory {
     }
 
 
-    public static <T extends KustvaktResource> T createID (T resource) {
+    public static <T extends KustvaktResource> T createID (T resource) throws KustvaktException {
         if (resource.getData() != null && !resource.getStringData().isEmpty()){
         	resource.setPersistentID(DigestUtils.sha1Hex(JsonUtils.toJSON(resource)));        	
         }
@@ -110,7 +110,7 @@ public class ResourceFactory {
 
 
     public static VirtualCollection getPermanentCollection (
-            VirtualCollection mergable, String corpusName, String description) {
+            VirtualCollection mergable, String corpusName, String description) throws KustvaktException {
         VirtualCollection v = new VirtualCollection();
         v.merge(mergable);
         v.setName(corpusName);

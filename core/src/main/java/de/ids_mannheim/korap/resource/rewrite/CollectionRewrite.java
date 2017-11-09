@@ -22,6 +22,7 @@ import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 /**
  * @author margaretha
  * @date 2 June 2017
+ * @last 9 Nov 2017
  */
 public class CollectionRewrite implements RewriteTask.RewriteQuery {
 
@@ -63,21 +64,21 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
         List<String> userAvailabilities = new ArrayList<String>();
         switch (user.getCorpusAccess()) {
             case PUB:
-                userAvailabilities.add("CC-BY.*");
-                userAvailabilities.add("ACA.*");
+                userAvailabilities.add(config.getFreeOnlyRegex());
+                userAvailabilities.add(config.getPublicOnlyRegex());
 //                builder.with(
 //                        "availability = /CC-BY.*/ | availability = /ACA.*/");
                 break;
             case ALL:
-                userAvailabilities.add("CC-BY.*");
-                userAvailabilities.add("ACA.*");
-                userAvailabilities.add("QAO.*");
+                userAvailabilities.add(config.getFreeOnlyRegex());
+                userAvailabilities.add(config.getPublicOnlyRegex());
+                userAvailabilities.add(config.getAllOnlyRegex());
 
 //                builder.with("availability = /QAO.*/ | availability = /ACA.*/ |"
 //                        + "  availability = /CC-BY.*/");
                 break;
             case FREE:
-                userAvailabilities.add("CC-BY.*");
+                userAvailabilities.add(config.getFreeOnlyRegex());
 //                builder.with("availability   = /CC-BY.*/");
                 break;
         }

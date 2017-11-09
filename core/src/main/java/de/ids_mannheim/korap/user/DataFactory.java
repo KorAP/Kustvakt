@@ -65,7 +65,7 @@ public abstract class DataFactory {
     public abstract boolean removeValue (Object data, String field);
 
 
-    public abstract String toStringValue (Object data);
+    public abstract String toStringValue (Object data) throws KustvaktException;
 
     public abstract Object filter(Object data, String ... keys);
 
@@ -210,7 +210,7 @@ public abstract class DataFactory {
 
 
         @Override
-        public String toStringValue (Object data) {
+        public String toStringValue (Object data) throws KustvaktException {
             if (data instanceof JsonNode)
                 return JsonUtils.toJSON(data);
             return data.toString();

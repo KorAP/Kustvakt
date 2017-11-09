@@ -110,14 +110,16 @@ public class OAuthController {
                     "Missing parameter!", "redirect_url");
         info.setRedirect_uri(rurl);
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
+        String json = "";
         try {
             User user = this.controller.getUser(ctx.getUsername());
             this.handler.getPersistenceHandler().registerClient(info, user);
+            json = info.toJSON();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
-        return Response.ok(info.toJSON()).build();
+        return Response.ok(json).build();
     }
 
 
@@ -128,20 +130,21 @@ public class OAuthController {
             @QueryParam("scope") String scopes) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         Userdata data;
+        String json= "";
         try {
             User user = this.controller.getUser(ctx.getUsername());
             data = this.controller.getUserData(user, UserDetails.class);
             Set<String> base_scope = StringUtils.toSet(scopes, " ");
             base_scope.retainAll(StringUtils.toSet(scopes));
             scopes = StringUtils.toString(base_scope);
+            json = JsonUtils.toJSON(Scopes.mapScopes(scopes, data));
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
         // json format with scope callback parameter
         // todo: add other scopes as well!
-        return Response.ok(JsonUtils.toJSON(Scopes.mapScopes(scopes, data)))
-                .build();
+        return Response.ok(json).build();
     }
 
 

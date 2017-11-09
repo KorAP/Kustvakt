@@ -1,6 +1,8 @@
 package de.ids_mannheim.korap.config;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import lombok.Data;
 
@@ -28,7 +30,7 @@ public class ClientInfo {
     }
 
 
-    public String toJSON () {
+    public String toJSON () throws KustvaktException {
         ObjectNode node = JsonUtils.createObjectNode();
         node.put("client_id", client_id);
         node.put("client_secret", client_secret);

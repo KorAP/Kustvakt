@@ -26,12 +26,13 @@ public class JsonUtils {
     private JsonUtils () {}
 
 
-    public static String toJSON (Object values) {
+    public static String toJSON (Object values) throws KustvaktException {
         try {
             return mapper.writeValueAsString(values);
         }
         catch (JsonProcessingException e) {
-            return e.getMessage();
+            throw new KustvaktException(StatusCodes.SERIALIZATION_FAILED,
+                    "Failed serializing object in json", e);
         }
     }
 
@@ -90,7 +91,7 @@ public class JsonUtils {
         }
         catch (IOException e) {
             throw new KustvaktException(StatusCodes.DESERIALIZATION_FAILED,
-                    "Failed deserializing json object: " + json, json, e);
+                    e.getMessage(), json, e);
         }
         return t;
     }

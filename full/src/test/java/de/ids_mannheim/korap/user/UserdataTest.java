@@ -227,7 +227,7 @@ public class UserdataTest extends BeanConfigTest {
 
 
     @Test
-    public void testUserDataPointerFunction () {
+    public void testUserDataPointerFunction () throws KustvaktException {
         UserDetails details = new UserDetails(-1);
         Map<String, Object> m = new HashMap<>();
         m.put(Attributes.FIRSTNAME, "first");
@@ -324,7 +324,7 @@ public class UserdataTest extends BeanConfigTest {
 
 
     @Test
-    public void testUserdataRequiredFields () {
+    public void testUserdataRequiredFields () throws KustvaktException {
         UserDetails details = new UserDetails(-1);
         Map<String, Object> m = new HashMap<>();
         m.put(Attributes.FIRSTNAME, "first");

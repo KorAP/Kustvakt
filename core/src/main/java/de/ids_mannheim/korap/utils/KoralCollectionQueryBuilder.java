@@ -2,8 +2,6 @@ package de.ids_mannheim.korap.utils;
 
 import java.util.List;
 
-import javax.ws.rs.WebApplicationException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;

@@ -57,8 +57,12 @@ public class AnnotationController {
     @GET
     @Path("layers")
     public Response getLayers () {
-        String result = JsonUtils.toJSON(annotationService.getLayerDtos());
-        return Response.ok(result).build();
+        try {
+            return Response.ok(JsonUtils.toJSON(annotationService.getLayerDtos())).build();
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
     }
 
 
