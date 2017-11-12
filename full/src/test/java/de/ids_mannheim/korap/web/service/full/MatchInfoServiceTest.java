@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.jetty.http.HttpHeaders;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;

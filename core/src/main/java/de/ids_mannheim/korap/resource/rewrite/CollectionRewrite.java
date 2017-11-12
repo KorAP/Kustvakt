@@ -14,6 +14,7 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.object.KoralMatchOperator;
+import de.ids_mannheim.korap.query.object.KoralOperation;
 import de.ids_mannheim.korap.resource.rewrite.KoralNode.RewriteIdentifier;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -36,7 +37,7 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
     
     private List<String> checkAvailability (JsonNode node, List<String> userAvailabilities) {
 
-        if (node.has("operands")) {
+        if (node.has("operands") && node.at("/operation").asText().equals(KoralOperation.AND.toString())) {
             ArrayList<JsonNode> operands = Lists
                     .newArrayList(node.at("/operands").elements());
             for (int i = 0; i < operands.size(); i++) {

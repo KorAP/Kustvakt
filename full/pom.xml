@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ids_mannheim.korap</groupId>
 	<artifactId>Kustvakt-full</artifactId>
-	<version>0.59.8</version>
+	<version>0.59.9</version>
 	<properties>
 		<java.version>1.7</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
