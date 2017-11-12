@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.web.service.full;
 import static org.junit.Assert.*;
 
 import org.eclipse.jetty.http.HttpHeaders;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -25,6 +26,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
+@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:test-config.xml")
 public class VirtualCorpusServiceTest extends JerseyTest {
