@@ -28,8 +28,7 @@ public class StatusCodes {
      */
 
     public static final int NO_QUERY = 301;
-    // EM: e.g. vc type
-    public static final int INVALID_TYPE = 302;
+//    public static final int INVALID_TYPE = 302;
     public static final int MISSING_ATTRIBUTE = 303;
     public static final int INVALID_ATTRIBUTE = 304;
     public static final int UNSUPPORTED_VALUE = 305;
