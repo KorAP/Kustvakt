@@ -24,7 +24,7 @@
  * - Passwort des Admin verschl�sseln.
  */
  
-package de.ids_mannheim.korap.security.auth;
+package de.ids_mannheim.korap.authentication;
 
 import com.unboundid.ldap.sdk.*;
 

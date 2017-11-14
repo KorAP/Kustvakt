@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.security.auth;
+package de.ids_mannheim.korap.authentication;
 
 import com.nimbusds.jwt.SignedJWT;
 import de.ids_mannheim.korap.config.JWTSigner;

@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.security.auth;
+package de.ids_mannheim.korap.authentication;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -21,6 +21,7 @@ import com.unboundid.ldap.sdk.LDAPException;
 
 import de.ids_mannheim.korap.auditing.AuditRecord;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.URIParam;
@@ -170,15 +171,15 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	 * @throws KustvaktException
 	 */
 	@Override
-	public User authenticate(int type, String username, String password, Map<String, Object> attributes)
+	public User authenticate(AuthenticationType type, String username, String password, Map<String, Object> attributes)
 			throws KustvaktException {
 		User user;
 		switch (type) {
-		case 1:
+		case SHIBBOLETH:
 			// todo:
 			user = authenticateShib(attributes);
 			break;
-		case 2:
+		case LDAP:
 			// IdM/LDAP: (09.02.17/FB)
 			user = authenticateIdM(username, password, attributes);
 			break;

@@ -1,10 +1,11 @@
 package de.ids_mannheim.korap.config;
 
+import de.ids_mannheim.korap.authentication.KustvaktAuthenticationManager;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.JDBCAuditing;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
-import de.ids_mannheim.korap.security.auth.KustvaktAuthenticationManager;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;

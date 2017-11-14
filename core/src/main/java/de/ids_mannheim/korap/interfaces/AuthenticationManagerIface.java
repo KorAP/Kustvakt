@@ -1,17 +1,17 @@
 package de.ids_mannheim.korap.interfaces;
 
-import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.KustvaktCacheable;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.user.TokenContext;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.Userdata;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.HttpHeaders;
+
+import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.KustvaktCacheable;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.user.TokenContext;
+import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.user.Userdata;
 
 /**
  * @author hanl
@@ -62,9 +62,13 @@ public abstract class AuthenticationManagerIface extends KustvaktCacheable {
     public abstract boolean isRegistered(String id);
 
 
-    public abstract User authenticate (int type, String username,
+    public abstract User authenticate (AuthenticationType type, String username,
             String password, Map<String, Object> attributes)
             throws KustvaktException;
+    
+//    public abstract User authenticate (int type, String username,
+//            String password, Map<String, Object> attributes)
+//            throws KustvaktException;
 
 
     public abstract TokenContext createTokenContext (User user,

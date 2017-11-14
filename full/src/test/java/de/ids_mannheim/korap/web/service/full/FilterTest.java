@@ -3,7 +3,7 @@ package de.ids_mannheim.korap.web.service.full;
 import com.sun.jersey.api.client.ClientResponse;
 import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
+import de.ids_mannheim.korap.authentication.BasicHttpAuth;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
 import org.eclipse.jetty.server.Response;

@@ -192,24 +192,24 @@
 	</bean>
 
 	<!-- authentication providers to use -->
-	<bean id="api_auth" class="de.ids_mannheim.korap.security.auth.APIAuthentication">
+	<bean id="api_auth" class="de.ids_mannheim.korap.authentication.APIAuthentication">
 		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
 			ref="kustvakt_config" />
 	</bean>
 
 	<bean id="openid_auth"
-		class="de.ids_mannheim.korap.security.auth.OpenIDconnectAuthentication">
+		class="de.ids_mannheim.korap.authentication.OpenIDconnectAuthentication">
 		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
 			ref="kustvakt_config" />
 		<constructor-arg
 			type="de.ids_mannheim.korap.interfaces.db.PersistenceClient" ref="kustvakt_db" />
 	</bean>
 
-	<bean id="basic_auth" class="de.ids_mannheim.korap.security.auth.BasicHttpAuth" />
+	<bean id="basic_auth" class="de.ids_mannheim.korap.authentication.BasicHttpAuth" />
 
 
 	<bean id="session_auth"
-		class="de.ids_mannheim.korap.security.auth.SessionAuthentication">
+		class="de.ids_mannheim.korap.authentication.SessionAuthentication">
 		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
 			ref="kustvakt_config" />
 		<constructor-arg type="de.ids_mannheim.korap.interfaces.EncryptionIface"
@@ -247,7 +247,7 @@
 
 	<!-- specify type for constructor argument -->
 	<bean id="kustvakt_authenticationmanager"
-		class="de.ids_mannheim.korap.security.auth.KustvaktAuthenticationManager">
+		class="de.ids_mannheim.korap.authentication.KustvaktAuthenticationManager">
 		<constructor-arg
 			type="de.ids_mannheim.korap.interfaces.db.EntityHandlerIface" ref="kustvakt_userdb" />
 		<constructor-arg

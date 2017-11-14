@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.security.auth;
+package de.ids_mannheim.korap.authentication;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * Created by hanl on 5/23/14.
  */
-public class APIAuthentication implements AuthenticationIface {
+public class APIAuthentication implements AuthenticationIface{
 
     private JWTSigner signedToken;
     private Cache invalided = CacheManager.getInstance().getCache(

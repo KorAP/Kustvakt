@@ -4,7 +4,8 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
-import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
+
+import de.ids_mannheim.korap.authentication.BasicHttpAuth;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.web.utils.KustvaktContext;

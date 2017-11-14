@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.security.auth;
+package de.ids_mannheim.korap.authentication;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;

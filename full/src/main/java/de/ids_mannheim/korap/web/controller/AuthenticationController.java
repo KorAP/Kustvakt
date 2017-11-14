@@ -27,12 +27,13 @@ import org.springframework.stereotype.Controller;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ResourceFilters;
 
+import de.ids_mannheim.korap.authentication.BasicHttpAuth;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
-import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -44,7 +45,7 @@ import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
-//import com.sun.xml.internal.messaging.saaj.util.Base64;
+// import com.sun.xml.internal.messaging.saaj.util.Base64;
 
 /**
  * @author hanl
@@ -58,12 +59,13 @@ public class AuthenticationController {
 
     @Autowired
     KustvaktResponseHandler kustvaktResponseHandler;
-    
+
     private static Boolean DEBUG_LOG = true;
 
     //todo: bootstrap function to transmit certain default configuration settings and examples (example user queries,
     // default usersettings, etc.)
-    private static Logger jlog = KustvaktLogger.getLogger(AuthenticationController.class);
+    private static Logger jlog =
+            KustvaktLogger.getLogger(AuthenticationController.class);
 
     @Autowired
     private AuthenticationManagerIface controller;
@@ -193,7 +195,8 @@ public class AuthenticationController {
         TokenContext context;
         try {
             // User user = controller.authenticate(0, values[0], values[1], attr); Implementation by Hanl
-            User user = controller.authenticate(2, values[0], values[1], attr); // Implementation with IdM/LDAP
+            User user = controller.authenticate(AuthenticationType.LDAP,
+                    values[0], values[1], attr); // Implementation with IdM/LDAP
             // Userdata data = this.controller.getUserData(user, UserDetails.class); // Implem. by Hanl
             // todo: is this necessary?
             //            attr.putAll(data.fields());
@@ -204,7 +207,8 @@ public class AuthenticationController {
             attr.put(Attributes.LOCATION, user.getLocation());
             attr.put(Attributes.CORPUS_ACCESS, user.getCorpusAccess());
             context = controller.createTokenContext(user, attr,
-                    Attributes.API_AUTHENTICATION);
+                    AuthenticationType.LDAP.name());
+                    //Attributes.API_AUTHENTICATION);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -272,7 +276,8 @@ public class AuthenticationController {
         TokenContext context;
         String contextJson;
         try {
-            User user = controller.authenticate(0, values[0], values[1], attr);
+            User user = controller.authenticate(AuthenticationType.SESSION,
+                    values[0], values[1], attr);
             context = controller.createTokenContext(user, attr,
                     Attributes.SESSION_AUTHENTICATION);
             contextJson = context.toJson();
@@ -308,7 +313,8 @@ public class AuthenticationController {
 
         try {
             // todo: distinguish type KorAP/Shibusers
-            User user = controller.authenticate(1, null, null, attr);
+            User user = controller.authenticate(AuthenticationType.SHIBBOLETH,
+                    null, null, attr);
             context = controller.createTokenContext(user, attr, null);
         }
         catch (KustvaktException e) {

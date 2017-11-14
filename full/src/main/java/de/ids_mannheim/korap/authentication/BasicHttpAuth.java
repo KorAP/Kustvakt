@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.security.auth;
+package de.ids_mannheim.korap.authentication;
 
 import java.util.Map;
 
@@ -6,7 +6,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.Scopes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -20,7 +19,8 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 
-/**
+/** EM: do not use at the moment, there is no authentication checking
+ * 
  * @author hanl
  * @date 28/04/2015
  */

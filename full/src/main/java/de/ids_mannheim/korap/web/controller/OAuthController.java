@@ -533,7 +533,7 @@ public class OAuthController {
 
                 openid_valid = true;
                 try {
-                    user = controller.authenticate(0,
+                    user = controller.authenticate(AuthenticationType.OAUTH2,
                             oauthRequest.getUsername(),
                             oauthRequest.getPassword(), attr);
                 }
@@ -569,7 +569,7 @@ public class OAuthController {
                             Scopes.Scope.openid.toString())) {
                 try {
                     if (user == null)
-                        user = controller.authenticate(0,
+                        user = controller.authenticate(AuthenticationType.OAUTH2,
                                 oauthRequest.getUsername(),
                                 oauthRequest.getPassword(), attr);
                     Userdata data = controller.getUserData(user,

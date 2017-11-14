@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.config;
 
-import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
+import de.ids_mannheim.korap.authentication.BasicHttpAuth;
 import de.ids_mannheim.korap.utils.StringUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Test;

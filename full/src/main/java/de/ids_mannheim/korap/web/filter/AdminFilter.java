@@ -12,10 +12,11 @@ import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 
+import de.ids_mannheim.korap.authentication.BasicHttpAuth;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
-import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.StringUtils;
@@ -42,11 +43,12 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
 			throw kustvaktResponseHandler.throwAuthenticationException("The authorization header value is missing.");
 		}
 
+		// EM: fix me: authentication header format
 		// decode password
 		String authenticationType = StringUtils.getTokenType(authentication);
 		String authenticationCode = StringUtils.stripTokenType(authentication);
 		String username = null, token = null;
-		int tokenType = 0;
+//		A tokenType = 0;
 		
 		if (authenticationType.equals(Attributes.BASIC_AUTHENTICATION)) {
 			String[] authContent = BasicHttpAuth.decode(authenticationCode);
@@ -60,7 +62,8 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
 		attributes.put(Attributes.HOST, host);
 		attributes.put(Attributes.USER_AGENT, agent);
 		try {
-			User user = authManager.authenticate(tokenType, username, token, attributes);
+		    // EM: fix me: AuthenticationType based on header value
+			User user = authManager.authenticate(AuthenticationType.LDAP, username, token, attributes);
 			if (!user.isAdmin()){
 				throw kustvaktResponseHandler.throwAuthenticationException("Admin authentication failed.");
 			}
