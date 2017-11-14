@@ -21,9 +21,9 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.filter.AuthFilter;
 import de.ids_mannheim.korap.service.AnnotationService;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
@@ -36,7 +36,7 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
  */
 @Controller
 @Path("annotation/")
-@ResourceFilters({ AuthFilter.class, DemoUserFilter.class, PiwikFilter.class })
+@ResourceFilters({ AuthenticationFilter.class, DemoUserFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class AnnotationController {
 

@@ -2,7 +2,6 @@ package de.ids_mannheim.korap.web.service;
 
 import java.net.URI;
 
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
 
 import org.junit.After;
@@ -12,7 +11,6 @@ import org.springframework.web.context.ContextLoaderListener;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
-import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
@@ -46,13 +44,13 @@ public abstract class FastJerseyBaseTest extends BeanConfigBaseTest {
     protected static String containerURI = "http://localhost/";
 
 
-    public static void addClass (Class<?> resourceClass) {
-        resourceConfig.getClasses().add(resourceClass);
-    }
-
-    public static void addSingleton (Object resourceSingleton) {
-        resourceConfig.getSingletons().add(resourceSingleton);
-    }
+//    public static void addClass (Class<?> resourceClass) {
+//        resourceConfig.getClasses().add(resourceClass);
+//    }
+//
+//    public static void addSingleton (Object resourceSingleton) {
+//        resourceConfig.getSingletons().add(resourceSingleton);
+//    }
 
 
     public String getAPIVersion () {
@@ -60,21 +58,21 @@ public abstract class FastJerseyBaseTest extends BeanConfigBaseTest {
     }
 
 
-    public static <T> void addProviderForContext (Class<T> contextClass,
-            T contextObject) {
-        addSingleton(new SingletonTypeInjectableProvider<Context, T>(
-                contextClass, contextObject) {});
-    }
+//    public static <T> void addProviderForContext (Class<T> contextClass,
+//            T contextObject) {
+//        addSingleton(new SingletonTypeInjectableProvider<Context, T>(
+//                contextClass, contextObject) {});
+//    }
 
 
-    public static void addRequestFilter (Object filter) {
-        resourceConfig.getContainerRequestFilters().add(filter);
-    }
-
-
-    public static void addResponseFilter (Object filter) {
-        resourceConfig.getContainerResponseFilters().add(filter);
-    }
+//    public static void addRequestFilter (Object filter) {
+//        resourceConfig.getContainerRequestFilters().add(filter);
+//    }
+//
+//
+//    public static void addResponseFilter (Object filter) {
+//        resourceConfig.getContainerResponseFilters().add(filter);
+//    }
 
 
     public static void setTestContainerFactory (

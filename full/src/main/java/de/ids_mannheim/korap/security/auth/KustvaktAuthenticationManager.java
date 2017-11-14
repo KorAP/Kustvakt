@@ -160,7 +160,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 		}
 	}
 
-	/**
+	/** EM: fix type is not flexible
 	 * @param type
 	 * @param attributes
 	 *            contains username and password to authenticate the user.

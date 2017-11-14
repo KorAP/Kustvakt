@@ -5,7 +5,6 @@ import com.sun.jersey.spi.container.ResourceFilters;
 import de.ids_mannheim.korap.config.*;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.filter.AuthFilter;
 import de.ids_mannheim.korap.handlers.OAuth2Handler;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
@@ -13,6 +12,7 @@ import de.ids_mannheim.korap.server.KustvaktServer;
 import de.ids_mannheim.korap.user.*;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
+import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
@@ -77,7 +77,7 @@ public class OAuthController {
 
     @POST
     @Path("unregister")
-    @ResourceFilters({ AuthFilter.class, BlockingFilter.class })
+    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     public Response unregisterClient (@Context SecurityContext context,
             @HeaderParam("Host") String host,
             @QueryParam("client_secret") String secret,
@@ -98,7 +98,7 @@ public class OAuthController {
 
     @POST
     @Path("register")
-    @ResourceFilters({ AuthFilter.class, BlockingFilter.class })
+    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     public Response registerClient (@Context SecurityContext context,
             @HeaderParam("Host") String host,
             @QueryParam("redirect_url") String rurl) {
@@ -125,7 +125,7 @@ public class OAuthController {
 
     @GET
     @Path("info")
-    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class, PiwikFilter.class })
+    @ResourceFilters({ AuthenticationFilter.class, DemoUserFilter.class, PiwikFilter.class })
     public Response getStatus (@Context SecurityContext context,
             @QueryParam("scope") String scopes) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
@@ -150,7 +150,7 @@ public class OAuthController {
 
     @GET
     @Path("authorizations")
-    @ResourceFilters({ AuthFilter.class, BlockingFilter.class })
+    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     public Response getAuthorizations (@Context SecurityContext context,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host) {

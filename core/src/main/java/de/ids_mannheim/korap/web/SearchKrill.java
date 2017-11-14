@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -121,6 +120,11 @@ public class SearchKrill {
             	if (licensePattern!=null && availability != null){
             		Matcher m = licensePattern.matcher(availability);
             		if (!m.matches()){
+            		    jlog.debug("availability: "+availability);
+                        if (availability.isEmpty()){
+                            km.addError(StatusCodes.MISSING_ATTRIBUTE, 
+                                    "Availability for "+ id +"is empty.", id);
+                        }
             			km = new Match();
             			km.addError(StatusCodes.ACCESS_DENIED, 
             				"Retrieving match info with ID "+id+" is not allowed.", id);
@@ -151,9 +155,15 @@ public class SearchKrill {
                         layers, includeSpans, includeHighlights,
                         sentenceExpansion);
             	String availability = km.getAvailability();
+            	
             	if (licensePattern !=null && availability != null){
+            	    if (availability.isEmpty()){
+            	        km.addError(StatusCodes.MISSING_ATTRIBUTE, 
+                                "Availability for "+ id +"is empty.", id);
+            	    }
             		Matcher m = licensePattern.matcher(availability);
             		if (!m.matches()){
+            		    jlog.debug("pattern: "+ licensePattern.toString() + ", availability: "+availability);
             			km = new Match();
             			km.addError(StatusCodes.ACCESS_DENIED, 
             					"Retrieving match info with ID "+id+" is not allowed.", id);

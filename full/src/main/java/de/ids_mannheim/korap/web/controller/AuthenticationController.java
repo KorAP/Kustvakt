@@ -31,7 +31,6 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.filter.AuthFilter;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.security.auth.BasicHttpAuth;
 import de.ids_mannheim.korap.user.TokenContext;
@@ -39,6 +38,7 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.ServiceInfo;
+import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
@@ -100,7 +100,7 @@ public class AuthenticationController {
     // fixme: moved to user
     @GET
     @Path("status")
-    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class,
+    @ResourceFilters({ AuthenticationFilter.class, DemoUserFilter.class,
             BlockingFilter.class })
     public Response getStatus (@Context SecurityContext context,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
@@ -326,7 +326,7 @@ public class AuthenticationController {
     //fixme: moved from userservice
     @GET
     @Path("logout")
-    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class,
+    @ResourceFilters({ AuthenticationFilter.class, DemoUserFilter.class,
             PiwikFilter.class })
     public Response logout (@Context SecurityContext ctx,
             @Context Locale locale) {

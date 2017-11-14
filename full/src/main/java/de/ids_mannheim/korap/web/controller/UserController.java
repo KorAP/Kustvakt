@@ -41,7 +41,6 @@ import de.ids_mannheim.korap.config.Scopes;
 import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.filter.AuthFilter;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.TokenContext;
@@ -53,6 +52,7 @@ import de.ids_mannheim.korap.user.Userdata;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
+import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
@@ -137,7 +137,7 @@ public class UserController {
     @POST
     @Path("update")
     @Consumes(MediaType.APPLICATION_JSON)
-    @ResourceFilters({ AuthFilter.class, PiwikFilter.class,
+    @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
             BlockingFilter.class })
     public Response updateAccount (@Context SecurityContext ctx, String json) {
         TokenContext context = (TokenContext) ctx.getUserPrincipal();
@@ -261,7 +261,7 @@ public class UserController {
     // todo: refactor and make something out of if --> needs to give some sort of feedback!
     @GET
     @Path("info")
-    @ResourceFilters({ AuthFilter.class, PiwikFilter.class,
+    @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
             BlockingFilter.class })
     public Response getStatus (@Context SecurityContext context,
             @QueryParam("scopes") String scopes) {
@@ -292,7 +292,7 @@ public class UserController {
 
     @GET
     @Path("settings")
-    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class,
+    @ResourceFilters({ AuthenticationFilter.class, DemoUserFilter.class,
             PiwikFilter.class, BlockingFilter.class })
     public Response getUserSettings (@Context SecurityContext context,
             @Context Locale locale) {
@@ -315,7 +315,7 @@ public class UserController {
     @POST
     @Path("settings")
     @Consumes({ MediaType.APPLICATION_JSON })
-    @ResourceFilters({ AuthFilter.class, PiwikFilter.class,
+    @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
             BlockingFilter.class })
     public Response updateSettings (@Context SecurityContext context,
             @Context Locale locale, Map settings) {
@@ -352,7 +352,7 @@ public class UserController {
 
     @GET
     @Path("details")
-    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class,
+    @ResourceFilters({ AuthenticationFilter.class, DemoUserFilter.class,
             PiwikFilter.class, BlockingFilter.class })
     public Response getDetails (@Context SecurityContext context,
             @Context Locale locale, @QueryParam("pointer") String pointer) {
@@ -378,7 +378,7 @@ public class UserController {
     @POST
     @Path("details")
     @Consumes({ MediaType.APPLICATION_JSON })
-    @ResourceFilters({ AuthFilter.class, PiwikFilter.class,
+    @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
             BlockingFilter.class })
     public Response updateDetails (@Context SecurityContext context,
             @Context Locale locale, Map details) {
@@ -411,7 +411,7 @@ public class UserController {
     @POST
     @Path("queries")
     @Consumes(MediaType.APPLICATION_JSON)
-    @ResourceFilters({ AuthFilter.class, PiwikFilter.class,
+    @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
             BlockingFilter.class })
     public Response updateQueries (@Context SecurityContext context,
             String json) {
@@ -469,7 +469,7 @@ public class UserController {
 
 
     @DELETE
-    @ResourceFilters({ AuthFilter.class, PiwikFilter.class,
+    @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
             BlockingFilter.class })
     public Response deleteUser (@Context SecurityContext context) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
@@ -488,7 +488,7 @@ public class UserController {
 
     @GET
     @Path("queries")
-    @ResourceFilters({ AuthFilter.class, DemoUserFilter.class,
+    @ResourceFilters({ AuthenticationFilter.class, DemoUserFilter.class,
             PiwikFilter.class, BlockingFilter.class })
     public Response getQueries (@Context SecurityContext context,
             @Context Locale locale) {

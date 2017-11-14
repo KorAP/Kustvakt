@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.filter;
+package de.ids_mannheim.korap.web.filter;
 
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Provider
-public class AuthFilter implements ContainerRequestFilter, ResourceFilter {
+public class AuthenticationFilter implements ContainerRequestFilter, ResourceFilter {
 
     @Autowired
     private AuthenticationManagerIface userController;

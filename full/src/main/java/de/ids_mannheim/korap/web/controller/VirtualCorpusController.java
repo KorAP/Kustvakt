@@ -17,13 +17,13 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.filter.AuthFilter;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.service.VirtualCorpusService;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.ParameterChecker;
+import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.input.VirtualCorpusFromJson;
@@ -32,7 +32,7 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 @Controller
 @Path("vc")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-@ResourceFilters({ AuthFilter.class, DemoUserFilter.class, PiwikFilter.class })
+@ResourceFilters({ AuthenticationFilter.class, DemoUserFilter.class, PiwikFilter.class })
 public class VirtualCorpusController {
 
     private static Logger jlog =
