@@ -79,16 +79,23 @@ public class KustvaktResponseHandler {
 
 
     //todo:  if exception, make exception message and error code available if not masked!
-    public WebApplicationException throwAuthenticationException (String username) {
+    public WebApplicationException throwAuthenticationException (String message) {
         return new WebApplicationException(Response
                 .status(Response.Status.UNAUTHORIZED)
                 .header(HttpHeaders.WWW_AUTHENTICATE,
-                        "Basic realm=Kustvakt Authentication Service")
-                .entity(buildNotification(StatusCodes.BAD_CREDENTIALS,
-                        "Unauthorized access", username)).build());
+                        "Basic realm=Kustvakt")
+                .entity(buildNotification(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
+                        "Unauthorized access", message)).build());
     }
 
-
+    public WebApplicationException throwAuthenticationException (KustvaktException e) {
+        return new WebApplicationException(Response
+                .status(Response.Status.UNAUTHORIZED)
+                .header(HttpHeaders.WWW_AUTHENTICATE,
+                        "Basic realm=Kustvakt")
+                .entity(buildNotification(e.getStatusCode(),
+                        e.getMessage(), e.getEntity())).build());
+    }
 
     private Response.Status getStatus (int code) {
         Response.Status status = Response.Status.BAD_REQUEST;

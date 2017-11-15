@@ -6,19 +6,24 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.jetty.http.HttpHeaders;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
 
-import de.ids_mannheim.korap.authentication.BasicHttpAuth;
+import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 public class VirtualCorpusServiceTest extends SpringJerseyTest{
-
+    
+    @Autowired
+    HttpAuthorizationHandler handler;
+    
     @Test
     @Ignore
     public void testStoreVC () throws KustvaktException {
@@ -28,7 +33,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest{
 
         ClientResponse response = resource().path("vc").path("store")
                 .header(Attributes.AUTHORIZATION,
-                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .entity(json)
                 .post(ClientResponse.class);

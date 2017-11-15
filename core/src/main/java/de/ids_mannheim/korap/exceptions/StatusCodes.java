@@ -120,9 +120,9 @@ public class StatusCodes {
     public static final int LOGOUT_SUCCESSFUL = 2009;
     public static final int LOGOUT_FAILED = 2010;
 
-    public static final int CLIENT_REGISTRATION_FAILURE = 2011;
+    public static final int CLIENT_REGISTRATION_FAILED = 2011;
     public static final int CLIENT_REMOVAL_FAILURE = 2012;
-    public static final int CLIENT_AUTHORIZATION_FAILURE = 2013;
+    public static final int CLIENT_AUTHORIZATION_FAILED = 2013;
 
     // 2020 - 2029 reserviert für LDAP-Fehlercodes - 21.04.17/FB
     public static final int LDAP_BASE_ERRCODE = 2020;

@@ -5,9 +5,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Arrays;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import com.unboundid.ldap.sdk.LDAPException;
 
 import de.ids_mannheim.korap.auditing.AuditRecord;
+import de.ids_mannheim.korap.authentication.framework.AuthorizationData;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.config.BeansFactory;
@@ -98,21 +99,15 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	 * @throws KustvaktException
 	 */
 	@Override
-	public TokenContext getTokenStatus(String token, String host, String useragent) throws KustvaktException {
-		if (token == null)
-			throw new KustvaktException(StatusCodes.MISSING_ARGUMENT, "authorization header");
+	public TokenContext getTokenStatus(AuthenticationType type, String token, 
+	        String host, String useragent) throws KustvaktException {
 
-		// EM: fix me
-		String token_type = StringUtils.getTokenType(token);
-		AuthenticationType type = AuthenticationType.valueOf(token_type);
-		
-		token = StringUtils.stripTokenType(token);
-		jlog.info("getting session status of token type '{}'", token.split(" ")[0]);
 		AuthenticationIface provider = getProvider(type , null);
 
 		if (provider == null)
 			// throw exception for missing type parameter
-			throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT, "token type not defined or found", "token_type");
+			throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT, 
+			        "token type not defined or found", "token_type");
 
 		TokenContext context = provider.getTokenContext(token);
 		if (context != null && TimeUtils.isExpired(context.getExpirationTime()))

@@ -5,18 +5,24 @@ import static org.junit.Assert.assertNotNull;
 
 import org.eclipse.jetty.http.HttpHeaders;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 
-import de.ids_mannheim.korap.authentication.BasicHttpAuth;
+import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
 
 public class SearchWithAvailabilityTest extends FastJerseyTest {
-
+    @Autowired
+    HttpAuthorizationHandler handler;
+    
     @Override
     public void initMethod () throws KustvaktException {
         //        helper().runBootInterfaces();
@@ -149,11 +155,11 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
 
     private ClientResponse builtClientResponseWithIP (String collectionQuery,
-            String ip) {
+            String ip) throws UniformInterfaceException, ClientHandlerException, KustvaktException {
         return resource().path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("cq", collectionQuery)
                 .header(Attributes.AUTHORIZATION,
-                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, ip)
                 .get(ClientResponse.class);
     }

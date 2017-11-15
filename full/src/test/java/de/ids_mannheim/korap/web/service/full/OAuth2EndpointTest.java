@@ -6,14 +6,17 @@ import java.util.Map;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
-import de.ids_mannheim.korap.authentication.BasicHttpAuth;
+import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.authentication.framework.TransferEncoding;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -26,7 +29,9 @@ import de.ids_mannheim.korap.web.service.FastJerseyTest;
 @Ignore
 // todo: in combination with other tests, causes failures!
 public class OAuth2EndpointTest extends FastJerseyTest {
-
+    @Autowired
+    HttpAuthorizationHandler handler;
+    
     @Override
     public void initMethod () throws KustvaktException {
 //        helper().setupAccount();
@@ -35,7 +40,8 @@ public class OAuth2EndpointTest extends FastJerseyTest {
 
     @Test
     public void testAuthorizeClient () throws ClientHandlerException, UniformInterfaceException, KustvaktException {
-        String auth = BasicHttpAuth.encode(helper().getUser().getUsername(),
+        String auth = handler.createAuthorizationHeader(
+                AuthenticationType.OAUTH2, helper().getUser().getUsername(),
                 (String) TestHelper.getUserCredentials().get(Attributes.PASSWORD));
         ClientResponse response = resource().path(getAPIVersion()).path("oauth2")
                 .path("register")
@@ -72,7 +78,8 @@ public class OAuth2EndpointTest extends FastJerseyTest {
     @Ignore
     public void authenticate () throws KustvaktException {
         Map<String, Object> cred = TestHelper.getUserCredentials();
-        String enc = BasicHttpAuth.encode((String) cred.get(Attributes.USERNAME), (String) cred.get(Attributes.PASSWORD));
+        String enc = handler.createAuthorizationHeader(AuthenticationType.OAUTH2, 
+                (String) cred.get(Attributes.USERNAME), (String) cred.get(Attributes.PASSWORD));
         ClientResponse response = resource().path(getAPIVersion()).path("oauth2")
                 .path("register")
                 .queryParam("redirect_url", "korap.ids-mannheim.de/redirect")
@@ -94,7 +101,7 @@ public class OAuth2EndpointTest extends FastJerseyTest {
                 .queryParam("response_type", "code")
                 .queryParam("redirect_uri", "korap.ids-mannheim.de/redirect")
                 //                .header(Attributes.AUTHORIZATION, enc)
-                .header("Content-Type", "application/x-www-form-urlencoded")
+                .header("Content-Type", "application/x-www-form-urlencodeBase64d")
                 .post(ClientResponse.class);
 
         e = response.getEntity(String.class);

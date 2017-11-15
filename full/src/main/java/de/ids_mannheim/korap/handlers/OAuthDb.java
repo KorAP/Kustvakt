@@ -275,7 +275,7 @@ public class OAuthDb {
             jlog.error("registering client '{}' failed", info.getClient_id());
             throw new DatabaseException(new KustvaktException(user.getId(),
                     StatusCodes.ILLEGAL_ARGUMENT, "arguments given not valid",
-                    info.toJSON()), StatusCodes.CLIENT_REGISTRATION_FAILURE,
+                    info.toJSON()), StatusCodes.CLIENT_REGISTRATION_FAILED,
                     info.toJSON());
         }
     }

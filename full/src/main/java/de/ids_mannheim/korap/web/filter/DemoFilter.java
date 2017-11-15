@@ -1,18 +1,20 @@
 package de.ids_mannheim.korap.web.filter;
 
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.ext.Provider;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 
-import de.ids_mannheim.korap.authentication.BasicHttpAuth;
-import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.web.utils.KustvaktContext;
-
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.ext.Provider;
 
 /**
  * @author hanl
@@ -21,6 +23,9 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class DemoFilter implements ContainerRequestFilter, ResourceFilter {
 
+    @Autowired
+    HttpAuthorizationHandler handler;
+    
     @Override
     public ContainerRequest filter (ContainerRequest request) {
         String authentication = request
@@ -39,7 +44,13 @@ public class DemoFilter implements ContainerRequestFilter, ResourceFilter {
 
     private SecurityContext createContext () {
         TokenContext context = new TokenContext();
-        String token = BasicHttpAuth.encode("demo", "demo2015");
+        String token = null;
+        try {
+            token = handler.createAuthorizationHeader(AuthenticationType.BASIC,"demo", "demo2015");
+        }
+        catch (KustvaktException e) {
+            e.printStackTrace();
+        }
         context.setToken(token);
         context.setAuthenticationType(AuthenticationType.LDAP);
         context.setUsername("demo");

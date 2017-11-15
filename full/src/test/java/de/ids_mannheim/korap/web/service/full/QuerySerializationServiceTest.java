@@ -12,15 +12,16 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
 
-import de.ids_mannheim.korap.authentication.BasicHttpAuth;
+import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
@@ -30,6 +31,9 @@ import de.ids_mannheim.korap.web.service.FastJerseyTest;
 @Ignore
 public class QuerySerializationServiceTest extends FastJerseyTest {
 
+    @Autowired
+    HttpAuthorizationHandler handler;
+    
     @Override
     public void initMethod () throws KustvaktException {
         //        helper().runBootInterfaces();
@@ -95,7 +99,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
                 .path("corpus/BRZ10/query").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
-                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -119,7 +123,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
                 .queryParam("name", "Weimarer Werke")
                 .queryParam("description", "Goethe-Werke in Weimar (seit 1775)")
                 .header(Attributes.AUTHORIZATION,
-                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -136,7 +140,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
 
                 .path("collection")
                 .header(Attributes.AUTHORIZATION,
-                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -161,7 +165,7 @@ public class QuerySerializationServiceTest extends FastJerseyTest {
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("context", "base/s:s")
                 .header(Attributes.AUTHORIZATION,
-                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());

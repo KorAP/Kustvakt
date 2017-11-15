@@ -6,18 +6,23 @@ import static org.junit.Assert.assertTrue;
 
 import org.eclipse.jetty.http.HttpHeaders;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
 
-import de.ids_mannheim.korap.authentication.BasicHttpAuth;
+import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
 
 public class MatchInfoServiceTest extends FastJerseyTest {
 
+    @Autowired
+    HttpAuthorizationHandler handler;
+    
     @Test
     public void testGetMatchInfoPublicCorpus () throws KustvaktException {
 
@@ -72,7 +77,8 @@ public class MatchInfoServiceTest extends FastJerseyTest {
                 .path("p36875-36876").path("matchInfo")
                 .queryParam("foundry", "*")
                 .header(Attributes.AUTHORIZATION,
-                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                        handler.createAuthorizationHeader(
+                                AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "172.27.0.32")
                 .get(ClientResponse.class);
 

@@ -27,14 +27,17 @@ import org.apache.http.impl.client.HttpClients;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-import de.ids_mannheim.korap.authentication.BasicHttpAuth;
+import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.authentication.framework.TransferEncoding;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.ResourceDao;
@@ -60,6 +63,8 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 @Deprecated
 public class KustvaktServerTest extends BeanConfigTest {
     private static ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    private HttpAuthorizationHandler handler;
 
 
     @Test
@@ -170,7 +175,7 @@ public class KustvaktServerTest extends BeanConfigTest {
 
 
     @Test
-    public void testCreatePolicy () throws IOException, URISyntaxException {
+    public void testCreatePolicy () throws IOException, URISyntaxException, KustvaktException {
 
         HttpClient httpClient = HttpClients.createDefault();
 
@@ -189,7 +194,7 @@ public class KustvaktServerTest extends BeanConfigTest {
         HttpPost httppost = new HttpPost(uri);
 
         httppost.addHeader(Attributes.AUTHORIZATION,
-                BasicHttpAuth.encode("kustvakt", "kustvakt2015"));
+                handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"));
         HttpResponse response = httpClient.execute(httppost);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatusLine().getStatusCode());
@@ -199,7 +204,7 @@ public class KustvaktServerTest extends BeanConfigTest {
 
     @Test
     public void testCreatePolicyForFoundry ()
-            throws IOException, URISyntaxException {
+            throws IOException, URISyntaxException, KustvaktException {
 
         HttpClient httpClient = HttpClients.createDefault();
 
@@ -219,7 +224,7 @@ public class KustvaktServerTest extends BeanConfigTest {
         HttpPost httppost = new HttpPost(uri);
 
         httppost.addHeader(Attributes.AUTHORIZATION,
-                BasicHttpAuth.encode("kustvakt", "kustvakt2015"));
+                handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"));
         HttpResponse response = httpClient.execute(httppost);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatusLine().getStatusCode());
@@ -229,7 +234,7 @@ public class KustvaktServerTest extends BeanConfigTest {
 
     @Test
     public void testCreatePolicyWithMultiplePermissions ()
-            throws IOException, URISyntaxException {
+            throws IOException, URISyntaxException, KustvaktException {
 
         HttpClient httpClient = HttpClients.createDefault();
 
@@ -250,7 +255,7 @@ public class KustvaktServerTest extends BeanConfigTest {
         HttpPost httppost = new HttpPost(uri);
 
         httppost.addHeader(Attributes.AUTHORIZATION,
-                BasicHttpAuth.encode("kustvakt", "kustvakt2015"));
+                handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"));
         HttpResponse response = httpClient.execute(httppost);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatusLine().getStatusCode());
@@ -260,7 +265,7 @@ public class KustvaktServerTest extends BeanConfigTest {
 
     @Test
     public void testWrongAuthorization ()
-            throws IOException, URISyntaxException {
+            throws IOException, URISyntaxException, KustvaktException {
         HttpResponse response = testResourceStore("wezrowerowj");
         assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
                 response.getStatusLine().getStatusCode());
@@ -297,7 +302,7 @@ public class KustvaktServerTest extends BeanConfigTest {
 
 
     public HttpResponse testResourceStore (String password)
-            throws IOException, URISyntaxException {
+            throws IOException, URISyntaxException, KustvaktException {
 
         HttpClient httpclient = HttpClients.createDefault();
         URIBuilder builder = new URIBuilder();
@@ -309,14 +314,14 @@ public class KustvaktServerTest extends BeanConfigTest {
         URI uri = builder.build();
         HttpPost httppost = new HttpPost(uri);
         httppost.addHeader(Attributes.AUTHORIZATION,
-                BasicHttpAuth.encode("kustvakt", password));
+                handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", password));
         return httpclient.execute(httppost);
 
     }
     
     @Test
     public void testResourceUpdate ()
-            throws IOException, URISyntaxException {
+            throws IOException, URISyntaxException, KustvaktException {
 
         HttpClient httpclient = HttpClients.createDefault();
         URIBuilder builder = new URIBuilder();
@@ -328,7 +333,7 @@ public class KustvaktServerTest extends BeanConfigTest {
         URI uri = builder.build();
         HttpPost httppost = new HttpPost(uri);
         httppost.addHeader(Attributes.AUTHORIZATION,
-                BasicHttpAuth.encode("kustvakt", "kustvakt2015"));
+                handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"));
         HttpResponse response = httpclient.execute(httppost);
         
         assertEquals(ClientResponse.Status.OK.getStatusCode(),

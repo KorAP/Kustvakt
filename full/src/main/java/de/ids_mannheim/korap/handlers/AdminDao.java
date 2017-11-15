@@ -72,6 +72,7 @@ public class AdminDao implements AdminHandlerIface, KustvaktBaseDaoInterface {
 		return 0;
 	}
 
+	// EM: FIX ME
 	@Override
 	public boolean isAdmin(int userId) {
 		Map<String, String> namedParameters = Collections.singletonMap(

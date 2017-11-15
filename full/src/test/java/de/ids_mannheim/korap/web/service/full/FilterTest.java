@@ -1,18 +1,22 @@
 package de.ids_mannheim.korap.web.service.full;
 
-import com.sun.jersey.api.client.ClientResponse;
-import de.ids_mannheim.korap.config.TestHelper;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.authentication.BasicHttpAuth;
-import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.web.service.FastJerseyTest;
+import static org.junit.Assert.assertEquals;
+
 import org.eclipse.jetty.server.Response;
-import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.assertEquals;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
+
+import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.TestHelper;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.web.service.FastJerseyTest;
 
 /** EM: fix tests. new DB does not save users.
  * @author hanl
@@ -21,13 +25,19 @@ import static org.junit.Assert.assertEquals;
 @Ignore
 public class FilterTest extends FastJerseyTest {
 
+    @Autowired
+    HttpAuthorizationHandler handler;
+
+
     @Test
-    public void testTestUserAuth () {
+    public void testTestUserAuth () throws UniformInterfaceException, ClientHandlerException, 
+        KustvaktException {
+        
         ClientResponse resp = resource()
                 
                 .path("user/info")
                 .header(Attributes.AUTHORIZATION,
-                        BasicHttpAuth.encode(
+                        handler.createAuthorizationHeader(AuthenticationType.BASIC,
                                 (String) TestHelper.getUserCredentials().get(Attributes.USERNAME),
                                 (String) TestHelper.getUserCredentials().get(Attributes.PASSWORD)))
                 .get(ClientResponse.class);
@@ -45,12 +55,14 @@ public class FilterTest extends FastJerseyTest {
 
 
     @Test
-    public void testUnauthorizedAuth () {
+    public void testUnauthorizedAuth () throws UniformInterfaceException, 
+        ClientHandlerException, KustvaktException {
+        
         ClientResponse resp = resource()
-                
                 .path("user/info")
                 .header(Attributes.AUTHORIZATION,
-                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                        handler.createAuthorizationHeader(AuthenticationType.BASIC,
+                                "kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
         String entity = resp.getEntity(String.class);
         System.out.println(entity);

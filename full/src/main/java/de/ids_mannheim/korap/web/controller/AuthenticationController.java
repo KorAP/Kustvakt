@@ -27,7 +27,9 @@ import org.springframework.stereotype.Controller;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ResourceFilters;
 
-import de.ids_mannheim.korap.authentication.BasicHttpAuth;
+import de.ids_mannheim.korap.authentication.framework.AuthorizationData;
+import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.authentication.framework.TransferEncoding;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.config.BeansFactory;
@@ -58,8 +60,14 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 public class AuthenticationController {
 
     @Autowired
-    KustvaktResponseHandler kustvaktResponseHandler;
+    private KustvaktResponseHandler kustvaktResponseHandler;
+    
+    @Autowired
+    private HttpAuthorizationHandler authorizationHandler;
 
+    @Autowired
+    private TransferEncoding transferEncoding;
+    
     private static Boolean DEBUG_LOG = true;
 
     //todo: bootstrap function to transmit certain default configuration settings and examples (example user queries,
@@ -138,14 +146,22 @@ public class AuthenticationController {
                             "Authorization header is missing.",
                             "Authorization header"));
         }
-
-        String[] values = BasicHttpAuth.decode(auth.get(0));
+        
+        String[] values;
+        try {
+            AuthorizationData authorizationData = authorizationHandler.
+                    parseAuthorizationHeader(auth.get(0));
+            values = transferEncoding.decodeBase64(authorizationData.getToken());
+           
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
 
         if (DEBUG_LOG == true) {
             System.out.printf("Debug: AuthService.requestAPIToken...:\n");
             System.out.printf("Debug: auth.size=%d\n", auth.size());
             System.out.printf("auth.get(0)='%s'\n", auth.get(0));
-            System.out.printf("Debug: values.length=%d\n", values.length);
             /* hide password etc. - FB
              if( auth.size() > 0 )
             	{
@@ -168,13 +184,13 @@ public class AuthenticationController {
                 while (it.hasNext()) {
                     String key = (String) it.next();
                     List<String> vals = headerMap.get(key);
-                    System.out.printf("Debug: requestAPIToken: '%s' = '%s'\n",
-                            key, vals);
+//                    System.out.printf("Debug: requestAPIToken: '%s' = '%s'\n",
+//                            key, vals);
                 }
 
             }
-            System.out.printf("Debug: requestAPIToken: isSecure = %s.\n",
-                    secCtx.isSecure() ? "yes" : "no");
+//            System.out.printf("Debug: requestAPIToken: isSecure = %s.\n",
+//                    secCtx.isSecure() ? "yes" : "no");
         } // DEBUG_LOG        
 
         // "Invalid syntax for username and password"
@@ -253,15 +269,22 @@ public class AuthenticationController {
         List<String> auth =
                 headers.getRequestHeader(ContainerRequest.AUTHORIZATION);
 
-        String[] values = BasicHttpAuth.decode(auth.get(0));
+        String[] values;
+        try {
+            AuthorizationData authorizationData = authorizationHandler.
+                    parseAuthorizationHeader(auth.get(0));
+            values = transferEncoding.decodeBase64(authorizationData.getToken());
+           
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
         //        authentication = StringUtils.stripTokenType(authentication);
         //        String[] values = new String(
         //                DatatypeConverter.parseBase64Binary(authentication)).split(":");
         //        String[] values = Base64.base64Decode(authentication).split(":");
 
         // "Invalid syntax for username and password"
-        if (values == null)
-            throw kustvaktResponseHandler.throwit(StatusCodes.BAD_CREDENTIALS);
 
         // Implementation Hanl mit '|'. 16.02.17/FB
         //if (values[0].equalsIgnoreCase("null")

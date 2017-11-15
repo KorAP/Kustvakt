@@ -46,35 +46,35 @@ public abstract class AuthenticationManagerIface extends KustvaktCacheable {
     		
         AuthenticationIface iface = this.providers.get(type);
         // todo: configurable authentication schema
-        if (iface == null)
-            iface = this.providers.get(default_iface);
+        if (iface == null) iface = this.providers.get(default_iface);
         return iface;
     }
 
 
-    public abstract TokenContext getTokenStatus (String token, String host,
-            String useragent) throws KustvaktException;
+    public abstract TokenContext getTokenStatus (AuthenticationType type,
+            String token, String host, String useragent)
+            throws KustvaktException;
 
 
     public abstract User getUser (String username) throws KustvaktException;
 
-    public abstract boolean isRegistered(String id);
+    public abstract boolean isRegistered (String id);
 
 
     public abstract User authenticate (AuthenticationType type, String username,
             String password, Map<String, Object> attributes)
             throws KustvaktException;
-    
-//    public abstract User authenticate (int type, String username,
-//            String password, Map<String, Object> attributes)
-//            throws KustvaktException;
+
+    //    public abstract User authenticate (int type, String username,
+    //            String password, Map<String, Object> attributes)
+    //            throws KustvaktException;
 
 
     public abstract TokenContext createTokenContext (User user,
             Map<String, Object> attr, AuthenticationType type)
             throws KustvaktException;
 
-    public abstract void setAccessAndLocation(User user, HttpHeaders headers);
+    public abstract void setAccessAndLocation (User user, HttpHeaders headers);
 
     public abstract void logout (TokenContext context) throws KustvaktException;
 

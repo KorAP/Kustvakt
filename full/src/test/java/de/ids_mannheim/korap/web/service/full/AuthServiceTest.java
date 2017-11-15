@@ -9,12 +9,15 @@ import org.joda.time.DateTime;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
 
-import de.ids_mannheim.korap.authentication.BasicHttpAuth;
+import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.authentication.framework.TransferEncoding;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -31,8 +34,12 @@ import de.ids_mannheim.korap.web.service.FastJerseyTest;
 @Ignore
 public class AuthServiceTest extends FastJerseyTest {
 
+    @Autowired
+    HttpAuthorizationHandler handler;
+    
     private static String[] credentials;
-
+    
+    
     @BeforeClass
     public static void configure () throws Exception {
         credentials = new String[2];
@@ -54,7 +61,8 @@ public class AuthServiceTest extends FastJerseyTest {
 
     @Test
     public void testSessionToken() throws KustvaktException {
-        String auth = BasicHttpAuth.encode(credentials[0], credentials[1]);
+        String auth = handler.createAuthorizationHeader(AuthenticationType.SESSION, 
+                credentials[0], credentials[1]);
         ClientResponse response = resource().path("auth")
                 .path("sessionToken").header(Attributes.AUTHORIZATION, auth)
                 .get(ClientResponse.class);
@@ -90,7 +98,8 @@ public class AuthServiceTest extends FastJerseyTest {
 
     @Test
     public void testSessionTokenExpire() throws KustvaktException {
-        String auth = BasicHttpAuth.encode(credentials[0], credentials[1]);
+        String auth = handler.createAuthorizationHeader(AuthenticationType.SESSION,
+                credentials[0], credentials[1]);
         ClientResponse response = resource().path("auth")
                 .path("sessionToken").header(Attributes.AUTHORIZATION, auth)
                 .get(ClientResponse.class);

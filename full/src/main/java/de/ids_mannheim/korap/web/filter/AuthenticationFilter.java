@@ -1,20 +1,22 @@
 package de.ids_mannheim.korap.web.filter;
 
+import javax.ws.rs.ext.Provider;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
-import de.ids_mannheim.korap.config.BeansFactory;
+
+import de.ids_mannheim.korap.authentication.framework.AuthorizationData;
+import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.web.utils.KustvaktContext;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
-
-import javax.ws.rs.ext.Provider;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * @author hanl
@@ -22,18 +24,22 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Provider
-public class AuthenticationFilter implements ContainerRequestFilter, ResourceFilter {
+public class AuthenticationFilter
+        implements ContainerRequestFilter, ResourceFilter {
+
+    @Autowired
+    private HttpAuthorizationHandler authorizationHandler;
 
     @Autowired
     private AuthenticationManagerIface userController;
 
     @Autowired
-    KustvaktResponseHandler kustvaktResponseHandler;
+    private KustvaktResponseHandler kustvaktResponseHandler;
 
-//    public AuthFilter () {
-//        this.userController = BeansFactory.getKustvaktContext()
-//                .getAuthenticationManager();
-//    }
+    //    public AuthFilter () {
+    //        this.userController = BeansFactory.getKustvaktContext()
+    //                .getAuthenticationManager();
+    //    }
 
 
     @Override
@@ -41,22 +47,27 @@ public class AuthenticationFilter implements ContainerRequestFilter, ResourceFil
         String host = request.getHeaderValue(ContainerRequest.HOST);
         String ua = request.getHeaderValue(ContainerRequest.USER_AGENT);
 
-        String authentication = request
-                .getHeaderValue(ContainerRequest.AUTHORIZATION);
-        if (authentication != null && !authentication.isEmpty()) {
+        String authorization =
+                request.getHeaderValue(ContainerRequest.AUTHORIZATION);
+
+
+        if (authorization != null && !authorization.isEmpty()) {
             TokenContext context;
             try {
-                context = userController.getTokenStatus(authentication, host,
+                AuthorizationData data = authorizationHandler
+                        .parseAuthorizationHeader(authorization);
+                context = userController.getTokenStatus(
+                        data.getAuthenticationType(), data.getToken(), host,
                         ua);
             }
             catch (KustvaktException e) {
-                throw kustvaktResponseHandler.throwAuthenticationException(authentication);
+                throw kustvaktResponseHandler
+                        .throwAuthenticationException(authorization);
             }
             // fixme: give reason why access is not granted?
-            if (context != null
-                    && context.isValid()
-                    && ((context.isSecureRequired() && request.isSecure()) | !context
-                            .isSecureRequired()))
+            if (context != null && context.isValid()
+                    && ((context.isSecureRequired() && request.isSecure())
+                            | !context.isSecureRequired()))
                 request.setSecurityContext(new KustvaktContext(context));
             else
                 throw kustvaktResponseHandler.throwAuthenticationException("");

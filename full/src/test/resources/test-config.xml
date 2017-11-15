@@ -209,7 +209,7 @@
 			type="de.ids_mannheim.korap.interfaces.db.PersistenceClient" ref="kustvakt_db" />
 	</bean>
 
-	<bean id="basic_auth" class="de.ids_mannheim.korap.authentication.BasicHttpAuth" />
+	<bean id="basic_auth" class="de.ids_mannheim.korap.authentication.BasicAuthentication" />
 
 
 	<bean id="session_auth"

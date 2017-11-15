@@ -6,14 +6,15 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sun.jersey.api.client.ClientResponse;
 
-import de.ids_mannheim.korap.authentication.BasicHttpAuth;
+import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
@@ -35,6 +36,9 @@ import de.ids_mannheim.korap.web.service.FastJerseyTest;
 @Ignore
 public class PolicyServiceTest extends FastJerseyTest {
 
+    @Autowired
+    HttpAuthorizationHandler handler;
+    
     private User user = UserFactory.getDemoUser();
 
 
@@ -51,7 +55,7 @@ public class PolicyServiceTest extends FastJerseyTest {
                 .queryParam("perm", Permission.READ.name())
                 .queryParam("expire", "")
                 .header(Attributes.AUTHORIZATION,
-                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -95,7 +99,7 @@ public class PolicyServiceTest extends FastJerseyTest {
                 .queryParam("loc", "255.255.255.0")
                 .queryParam("expire", "30D")
                 .header(Attributes.AUTHORIZATION,
-                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -133,7 +137,7 @@ public class PolicyServiceTest extends FastJerseyTest {
                 .queryParam("perm", Permission.DELETE.name())
                 .queryParam("expire", "30D")
                 .header(Attributes.AUTHORIZATION,
-                        BasicHttpAuth.encode("kustvakt", "kustvakt2015"))
+                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
