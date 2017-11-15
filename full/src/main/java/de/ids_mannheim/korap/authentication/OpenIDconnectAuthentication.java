@@ -9,6 +9,7 @@ import de.ids_mannheim.korap.handlers.OAuthDb;
 import de.ids_mannheim.korap.interfaces.AuthenticationIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.NamingUtils;
@@ -63,7 +64,7 @@ public class OpenIDconnectAuthentication implements AuthenticationIface {
         catch (ParseException e) {
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);
         }
-        c.setTokenType(Attributes.OPENID_AUTHENTICATION);
+        c.setAuthenticationType(AuthenticationType.OPENID);
         c.setToken(jwt.serialize());
         CacheManager.getInstance().getCache("id_tokens")
                 .put(new Element(c.getToken(), c));
@@ -84,7 +85,7 @@ public class OpenIDconnectAuthentication implements AuthenticationIface {
 
 
     @Override
-    public String getIdentifier () {
-        return Attributes.OPENID_AUTHENTICATION;
+    public AuthenticationType getIdentifier () {
+        return AuthenticationType.OPENID;
     }
 }

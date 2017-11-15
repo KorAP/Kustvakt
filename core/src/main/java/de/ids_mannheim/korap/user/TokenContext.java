@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.user;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
@@ -30,7 +31,7 @@ public class TokenContext implements java.security.Principal, Serializable {
     private String username;
     private long expirationTime;
     // either "session_token " / "api_token
-    private String tokenType;
+    private AuthenticationType authenticationType;
     private String token;
     private boolean secureRequired;
 
@@ -57,7 +58,7 @@ public class TokenContext implements java.security.Principal, Serializable {
         m.put(Attributes.TOKEN_EXPIRATION,
                 TimeUtils.format(this.expirationTime));
         m.put(Attributes.TOKEN, this.token);
-        m.put(Attributes.TOKEN_TYPE, this.tokenType);
+        m.put(Attributes.AUTHENTICATION_TYPE, this.authenticationType);
         return m;
     }
 
@@ -115,7 +116,9 @@ public class TokenContext implements java.security.Principal, Serializable {
         TokenContext c = new TokenContext();
         if (node != null) {
             c.setToken(node.path("token").asText());
-            c.setTokenType(node.path("token_type").asText());
+            // EM: fix me: token_type to authentication type
+            c.setAuthenticationType(AuthenticationType.valueOf(
+                    node.path("token_type").asText()));
             c.setExpirationTime(node.path("expires_in").asLong());
             c.addContextParameter("refresh_token", node.path("refresh_token")
                     .asText());
@@ -128,7 +131,7 @@ public class TokenContext implements java.security.Principal, Serializable {
     public boolean isValid () {
         return (this.username != null && !this.username.isEmpty())
                 && (this.token != null && !this.token.isEmpty())
-                && (this.tokenType != null && !this.tokenType.isEmpty());
+                && (this.authenticationType != null);
     }
 
 

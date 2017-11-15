@@ -19,7 +19,7 @@ import de.ids_mannheim.korap.user.Userdata;
  */
 public abstract class AuthenticationManagerIface extends KustvaktCacheable {
 
-    private Map<String, AuthenticationIface> providers;
+    private Map<AuthenticationType, AuthenticationIface> providers;
 
 
     public AuthenticationManagerIface () {
@@ -30,22 +30,21 @@ public abstract class AuthenticationManagerIface extends KustvaktCacheable {
 
     public void setProviders (Set<AuthenticationIface> providers) {
         for (AuthenticationIface i : providers)
-            this.providers.put(i.getIdentifier().toLowerCase(), i);
+            this.providers.put(i.getIdentifier(), i);
     }
 
 
-    protected AuthenticationIface getProvider (String key, String default_iface) {
+    protected AuthenticationIface getProvider (AuthenticationType type, AuthenticationType default_iface) {
     	
     	// Debug FB: loop a Map
-    	/*
-    	 for (Map.Entry<String, AuthenticationIface> entry : this.providers.entrySet()) 
+    	
+    	 /*for (Map.Entry<String, AuthenticationIface> entry : this.providers.entrySet()) 
     		{
     		System.out.println("Debug: provider: Key : " + entry.getKey() + " Value : " + entry.getValue());
     		}
-    	*/	
+    		*/
     		
-        AuthenticationIface iface = this.providers.get(key != null ? key
-                .toLowerCase() : "none");
+        AuthenticationIface iface = this.providers.get(type);
         // todo: configurable authentication schema
         if (iface == null)
             iface = this.providers.get(default_iface);
@@ -72,7 +71,7 @@ public abstract class AuthenticationManagerIface extends KustvaktCacheable {
 
 
     public abstract TokenContext createTokenContext (User user,
-            Map<String, Object> attr, String provider_key)
+            Map<String, Object> attr, AuthenticationType type)
             throws KustvaktException;
 
     public abstract void setAccessAndLocation(User user, HttpHeaders headers);

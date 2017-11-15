@@ -6,6 +6,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.Scopes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -19,7 +20,11 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 
-/** EM: do not use at the moment, there is no authentication checking
+/** EM: do not use at the moment, there is no authentication 
+ *  checking, formerly used a database. Should separate between
+ *  authentication procedure and the real authentication checking 
+ *  method.
+ * 
  * 
  * @author hanl
  * @date 28/04/2015
@@ -93,7 +98,7 @@ public class BasicHttpAuth implements AuthenticationIface {
             }
             c.setUsername(values[0]);
             c.setExpirationTime(TimeUtils.plusSeconds(this.config.getTokenTTL()).getMillis());
-            c.setTokenType(Attributes.BASIC_AUTHENTICATION);
+            c.setAuthenticationType(AuthenticationType.DATABASE);
             // todo: for production mode, set true
             c.setSecureRequired(false);
             c.setToken(StringUtils.stripTokenType(authToken));
@@ -127,7 +132,7 @@ public class BasicHttpAuth implements AuthenticationIface {
 
 
     @Override
-    public String getIdentifier () {
-        return Attributes.BASIC_AUTHENTICATION;
+    public AuthenticationType getIdentifier () {
+        return AuthenticationType.DATABASE;
     }
 }

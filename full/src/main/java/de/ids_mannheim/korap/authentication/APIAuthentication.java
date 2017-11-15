@@ -1,33 +1,31 @@
 package de.ids_mannheim.korap.authentication;
 
+import java.text.ParseException;
+import java.util.Map;
+
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
+
 import de.ids_mannheim.korap.config.JWTSigner;
-import de.ids_mannheim.korap.config.KustvaktCacheable;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationIface;
-import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.NamingUtils;
-import de.ids_mannheim.korap.utils.StringUtils;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
-import java.text.ParseException;
-import java.util.Map;
-
-/**
+/** EM: there is no authentication here, just implementation for creating token context etc.
+ * 
  * Created by hanl on 5/23/14.
  */
-public class APIAuthentication implements AuthenticationIface{
+public abstract class APIAuthentication implements AuthenticationIface {
 
     private JWTSigner signedToken;
-    private Cache invalided = CacheManager.getInstance().getCache(
-            "id_tokens_inv");
+    private Cache invalided =
+            CacheManager.getInstance().getCache("id_tokens_inv");
     //private Cache id_tokens = CacheManager.getInstance().getCache("id_tokens");
 
 
@@ -38,17 +36,17 @@ public class APIAuthentication implements AuthenticationIface{
 
 
     @Override
-    public TokenContext getTokenContext(String authToken)
+    public TokenContext getTokenContext (String authToken)
             throws KustvaktException {
         TokenContext context;
         //Element ein = invalided.get(authToken);
-            try {
-                context = signedToken.getTokenContext(authToken);
-                context.setTokenType(Attributes.API_AUTHENTICATION);
-            }
-            catch (JOSEException | ParseException ex) {
-                throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);
-            }
+        try {
+            context = signedToken.getTokenContext(authToken);
+            context.setAuthenticationType(getIdentifier());
+        }
+        catch (JOSEException | ParseException ex) {
+            throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);
+        }
         //context = (TokenContext) e.getObjectValue();
         //throw new KustvaktException(StatusCodes.EXPIRED);
         return context;
@@ -56,7 +54,7 @@ public class APIAuthentication implements AuthenticationIface{
 
 
     @Override
-    public TokenContext createTokenContext(User user, Map<String, Object> attr)
+    public TokenContext createTokenContext (User user, Map<String, Object> attr)
             throws KustvaktException {
         TokenContext c = new TokenContext();
         c.setUsername(user.getUsername());
@@ -67,7 +65,7 @@ public class APIAuthentication implements AuthenticationIface{
         catch (ParseException e) {
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);
         }
-        c.setTokenType(Attributes.API_AUTHENTICATION);
+        c.setAuthenticationType(getIdentifier());
         c.setToken(jwt.serialize());
         //id_tokens.put(new Element(c.getToken(), c));
         return c;
@@ -84,14 +82,8 @@ public class APIAuthentication implements AuthenticationIface{
 
 
     @Override
-    public TokenContext refresh (TokenContext context) throws KustvaktException {
+    public TokenContext refresh (TokenContext context)
+            throws KustvaktException {
         return null;
     }
-
-
-    @Override
-    public String getIdentifier () {
-        return Attributes.API_AUTHENTICATION;
-    }
-
 }

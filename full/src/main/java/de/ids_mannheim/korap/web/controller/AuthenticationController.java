@@ -207,7 +207,7 @@ public class AuthenticationController {
             attr.put(Attributes.LOCATION, user.getLocation());
             attr.put(Attributes.CORPUS_ACCESS, user.getCorpusAccess());
             context = controller.createTokenContext(user, attr,
-                    AuthenticationType.LDAP.name());
+                    AuthenticationType.LDAP);
                     //Attributes.API_AUTHENTICATION);
         }
         catch (KustvaktException e) {
@@ -279,7 +279,7 @@ public class AuthenticationController {
             User user = controller.authenticate(AuthenticationType.SESSION,
                     values[0], values[1], attr);
             context = controller.createTokenContext(user, attr,
-                    Attributes.SESSION_AUTHENTICATION);
+                    AuthenticationType.SESSION);
             contextJson = context.toJson();
             jlog.debug(contextJson);
         }

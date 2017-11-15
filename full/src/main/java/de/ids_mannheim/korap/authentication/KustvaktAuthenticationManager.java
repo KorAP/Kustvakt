@@ -102,10 +102,13 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 		if (token == null)
 			throw new KustvaktException(StatusCodes.MISSING_ARGUMENT, "authorization header");
 
+		// EM: fix me
 		String token_type = StringUtils.getTokenType(token);
+		AuthenticationType type = AuthenticationType.valueOf(token_type);
+		
 		token = StringUtils.stripTokenType(token);
 		jlog.info("getting session status of token type '{}'", token.split(" ")[0]);
-		AuthenticationIface provider = getProvider(token_type, null);
+		AuthenticationIface provider = getProvider(type , null);
 
 		if (provider == null)
 			// throw exception for missing type parameter
@@ -147,7 +150,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	}
 
 	public TokenContext refresh(TokenContext context) throws KustvaktException {
-		AuthenticationIface provider = getProvider(context.getTokenType(), null);
+		AuthenticationIface provider = getProvider(context.getAuthenticationType(), null);
 		if (provider == null) {
 			// todo:
 		}
@@ -255,9 +258,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	} // getAccess
 
 	@Override
-	public TokenContext createTokenContext(User user, Map<String, Object> attr, String provider_key)
+	public TokenContext createTokenContext(User user, Map<String, Object> attr, AuthenticationType type)
 			throws KustvaktException {
-		AuthenticationIface provider = getProvider(provider_key, Attributes.API_AUTHENTICATION);
+		AuthenticationIface provider = getProvider(type, AuthenticationType.LDAP);
 
 		// EM: not in the new DB
 //		if (attr.get(Attributes.SCOPES) != null)
@@ -538,11 +541,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
 	public void logout(TokenContext context) throws KustvaktException {
 		try {
-			AuthenticationIface provider = getProvider(context.getTokenType(), null);
+			AuthenticationIface provider = getProvider(context.getAuthenticationType(), null);
 
 			if (provider == null) {
-				throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT, "provider not supported!",
-						context.getTokenType());
+				throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT, "Authentication "
+				        + "provider not supported!", context.getAuthenticationType().name());
 			}
 			provider.removeUserSession(context.getToken());
 		} catch (KustvaktException e) {

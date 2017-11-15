@@ -42,15 +42,15 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
 		if (authentication == null) {
 			throw kustvaktResponseHandler.throwAuthenticationException("The authorization header value is missing.");
 		}
-
+		
 		// EM: fix me: authentication header format
 		// decode password
-		String authenticationType = StringUtils.getTokenType(authentication);
+		AuthenticationType authenticationType = AuthenticationType.valueOf(StringUtils.getTokenType(authentication));
 		String authenticationCode = StringUtils.stripTokenType(authentication);
 		String username = null, token = null;
-//		A tokenType = 0;
+		// String tokenType = 0;
 		
-		if (authenticationType.equals(Attributes.BASIC_AUTHENTICATION)) {
+		if (authenticationType.equals(AuthenticationType.DATABASE)) {
 			String[] authContent = BasicHttpAuth.decode(authenticationCode);
 			username = authContent[0];
 			token = authContent[1];
@@ -75,7 +75,7 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
 
 		TokenContext c = new TokenContext();
 		c.setUsername(username);
-		c.setTokenType(authenticationType);
+		c.setAuthenticationType(authenticationType);
 		c.setToken(token);
 		c.setHostAddress(host);
 		c.setUserAgent(agent);

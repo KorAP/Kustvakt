@@ -320,7 +320,8 @@ public class OAuthController {
                     try {
                         TokenContext new_context = this.controller
                                 .createTokenContext(user, attr, null);
-                        builder.setParam(new_context.getTokenType(),
+                        //builder.setParam(new_context.getTokenType(),
+                        builder.setParam(new_context.getAuthenticationType().name(),
                                 new_context.getToken());
                     }
                     catch (KustvaktException e) {
@@ -579,8 +580,10 @@ public class OAuthController {
                     attr.put(Attributes.CLIENT_SECRET,
                             oauthRequest.getClientSecret());
                     TokenContext c = controller.createTokenContext(user, attr,
-                            Attributes.OPENID_AUTHENTICATION);
-                    builder.setParam(c.getTokenType(), c.getToken());
+                            AuthenticationType.OPENID);
+                            //Attributes.OPENID_AUTHENTICATION);
+                    //EM: why openid, not oauth2?
+                    builder.setParam(c.getAuthenticationType().name(), c.getToken());
                 }
                 catch (KustvaktException e) {
                     throw kustvaktResponseHandler.throwit(e);

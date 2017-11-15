@@ -28,18 +28,22 @@ package de.ids_mannheim.korap.authentication;
 
 import com.unboundid.ldap.sdk.*;
 
+import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
+
 import java.io.*;
 import java.util.*;
 
 
 /**
  * LDAP Login Tests
- *
+ * 
+ * @author bodmer, margaretha
+ * @see APIAuthentication
  */
-public class LdapAuth3
+public class LdapAuth3 extends APIAuthentication {
 
-{
-  /* For SSL Connection to LDAP, see: https://www.novell.com/documentation/developer/jldap/jldapenu/data/cchcbejj.html.
+    /* For SSL Connection to LDAP, see: https://www.novell.com/documentation/developer/jldap/jldapenu/data/cchcbejj.html.
 	* and use DEFAULT_SSL_PORT.
    * For now, plain text connection is used.
 	* FB
@@ -68,6 +72,16 @@ public class LdapAuth3
 	public static final int LDAP_AUTH_RLOCKED	= 3;
 	public static final int LDAP_AUTH_RNOTREG	= 4;
 
+    public LdapAuth3 (KustvaktConfiguration config) {
+        super(config);
+    }	
+    
+	
+	@Override
+	public AuthenticationType getIdentifier () {
+	    return AuthenticationType.LDAP;
+	}
+	 
 	/**
 	 * getErrMessage:
 	 * returns String Message for LDAP_AUTH_Rxxx code.
@@ -75,7 +89,7 @@ public class LdapAuth3
 	 * @param code
 	 * @return Message in string form.
 	 */
-	static String getErrMessage(int code)
+	public static String getErrMessage(int code)
 	
 	{
 	switch(code)

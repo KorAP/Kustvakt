@@ -62,7 +62,7 @@ public class Attributes {
      * token context
      */
     public static final String TOKEN = "token";
-    public static final String TOKEN_TYPE = "token_type";
+    public static final String AUTHENTICATION_TYPE = "authenticationType";
     public static final String TOKEN_EXPIRATION = "expires";
     public static final String TOKEN_CREATION = "tokenCreated";
     public static final String USER_AGENT = "User-Agent";
