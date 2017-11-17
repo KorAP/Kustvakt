@@ -8,6 +8,7 @@ import javax.ws.rs.ext.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.ctc.wstx.util.StringUtil;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
@@ -22,6 +23,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.web.utils.KustvaktContext;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
@@ -51,13 +53,13 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
                 cr.getHeaderValue(ContainerRequest.AUTHORIZATION);
         
         AuthorizationData data;
-        String[] userData;
         try {
             data = authorizationHandler.parseAuthorizationHeader(authorization);
-            userData = transferEncoding.decodeBase64(data.getToken());
+            data = authorizationHandler.parseToken(data);
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwAuthenticationException(e);
+            String authType = StringUtils.stripTokenType(authorization);
+            throw kustvaktResponseHandler.throwAuthenticationException(e, authType);
         }
         
         String host = cr.getHeaderValue(ContainerRequest.HOST);
@@ -68,20 +70,20 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
         try {
             // EM: fix me: AuthenticationType based on header value
             User user = authManager.authenticate(data.getAuthenticationType(),
-                    userData[0], userData[0], attributes);
+                    data.getUsername(), data.getPassword(), attributes);
             if (!user.isAdmin()) {
                 throw kustvaktResponseHandler.throwAuthenticationException(
-                        "Admin authentication failed.");
+                        "Admin authentication failed.", data.getAuthenticationType());
             }
             Map<String, Object> properties = cr.getProperties();
             properties.put("user", user);
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwAuthenticationException(e);
+            throw kustvaktResponseHandler.throwAuthenticationException(e, data.getAuthenticationType());
         }
 
         TokenContext c = new TokenContext();
-        c.setUsername(userData[0]);
+        c.setUsername(data.getUsername());
         c.setAuthenticationType(data.getAuthenticationType());
         // EM: is this secure? Is token context not sent outside Kustvakt?
         c.setToken(data.getToken());

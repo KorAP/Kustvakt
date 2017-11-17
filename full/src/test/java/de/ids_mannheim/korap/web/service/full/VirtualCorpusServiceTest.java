@@ -3,13 +3,17 @@ package de.ids_mannheim.korap.web.service.full;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.eclipse.jetty.http.HttpHeaders;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.spi.container.ContainerRequest;
 
 import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -25,7 +29,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest{
     HttpAuthorizationHandler handler;
     
     @Test
-    @Ignore
+//    @Ignore
     public void testStoreVC () throws KustvaktException {
         String json =
                 "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
@@ -49,8 +53,17 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest{
 
         ClientResponse response = resource().path("vc").path("store")
                 .entity(json).post(ClientResponse.class);
+        
+        Set<Entry<String, List<String>>> headers = response.getHeaders().entrySet();
+        
+        for (Entry<String, List<String>> header: headers){
+            if (header.getKey().equals(ContainerRequest.WWW_AUTHENTICATE)){
+                assertEquals("Basic realm=\"Kustvakt\"", header.getValue().get(0));
+            }
+        }
+//        System.out.println(header);
+        
         String entity = response.getEntity(String.class);
-
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.UNAUTHORIZED_OPERATION,
                 node.at("/errors/0/0").asInt());

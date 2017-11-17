@@ -10,5 +10,7 @@ public class AuthorizationData {
 
     private String token;
     private AuthenticationType authenticationType;
+    private String username;
+    private String password;
 
 }

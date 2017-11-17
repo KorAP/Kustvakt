@@ -279,7 +279,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler
-                    .throwAuthenticationException(ctx.getUsername());
+                    .throwAuthenticationException(ctx.getUsername(), ctx.getAuthenticationType());
         }
         try {
             return Response.ok(m.toEntity()).build();

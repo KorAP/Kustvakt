@@ -4,11 +4,11 @@ public class Attributes {
 
 	// EM: Use enum for the authentication types
     public static final String AUTHORIZATION = "Authorization";
-    public static final String SESSION_AUTHENTICATION = "session_token";
-    public static final String API_AUTHENTICATION = "api_token";
-    public static final String OAUTH2_AUTHORIZATION = "bearer";
-    public static final String OPENID_AUTHENTICATION = "id_token";
-    public static final String BASIC_AUTHENTICATION = "basic";
+//    public static final String SESSION_AUTHENTICATION = "session_token";
+//    public static final String API_AUTHENTICATION = "api_token";
+//    public static final String OAUTH2_AUTHORIZATION = "bearer";
+//    public static final String OPENID_AUTHENTICATION = "id_token";
+//    public static final String BASIC_AUTHENTICATION = "basic";
 
     public static final String LOCATION = "location"; // location of Client: User.INTERN/EXTERN
     public static final String CORPUS_ACCESS = "corpusAccess"; // User.ALL/PUB/FREE.
@@ -62,7 +62,7 @@ public class Attributes {
      * token context
      */
     public static final String TOKEN = "token";
-    public static final String AUTHENTICATION_TYPE = "authenticationType";
+    public static final String TOKEN_TYPE = "token_type";
     public static final String TOKEN_EXPIRATION = "expires";
     public static final String TOKEN_CREATION = "tokenCreated";
     public static final String USER_AGENT = "User-Agent";

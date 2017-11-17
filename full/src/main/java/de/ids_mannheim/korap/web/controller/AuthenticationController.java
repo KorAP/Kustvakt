@@ -29,7 +29,6 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.authentication.framework.AuthorizationData;
 import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
-import de.ids_mannheim.korap.authentication.framework.TransferEncoding;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.config.BeansFactory;
@@ -65,9 +64,6 @@ public class AuthenticationController {
     @Autowired
     private HttpAuthorizationHandler authorizationHandler;
 
-    @Autowired
-    private TransferEncoding transferEncoding;
-    
     private static Boolean DEBUG_LOG = true;
 
     //todo: bootstrap function to transmit certain default configuration settings and examples (example user queries,
@@ -147,11 +143,11 @@ public class AuthenticationController {
                             "Authorization header"));
         }
         
-        String[] values;
+        AuthorizationData authorizationData;
         try {
-            AuthorizationData authorizationData = authorizationHandler.
+            authorizationData = authorizationHandler.
                     parseAuthorizationHeader(auth.get(0));
-            values = transferEncoding.decodeBase64(authorizationData.getToken());
+            authorizationData = authorizationHandler.parseToken(authorizationData);
            
         }
         catch (KustvaktException e) {
@@ -193,12 +189,10 @@ public class AuthenticationController {
 //                    secCtx.isSecure() ? "yes" : "no");
         } // DEBUG_LOG        
 
-        // "Invalid syntax for username and password"
-        if (values == null)
-            throw kustvaktResponseHandler.throwit(StatusCodes.ACCESS_DENIED);
-
-        if (values[0].equalsIgnoreCase("null")
-                | values[1].equalsIgnoreCase("null"))
+        if (authorizationData.getUsername() == null || 
+                authorizationData.getUsername().isEmpty() || 
+                authorizationData.getPassword()== null || 
+                authorizationData.getPassword().isEmpty())
             // is actual an invalid request
             throw kustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
 
@@ -212,7 +206,7 @@ public class AuthenticationController {
         try {
             // User user = controller.authenticate(0, values[0], values[1], attr); Implementation by Hanl
             User user = controller.authenticate(AuthenticationType.LDAP,
-                    values[0], values[1], attr); // Implementation with IdM/LDAP
+                    authorizationData.getUsername(), authorizationData.getPassword(), attr); // Implementation with IdM/LDAP
             // Userdata data = this.controller.getUserData(user, UserDetails.class); // Implem. by Hanl
             // todo: is this necessary?
             //            attr.putAll(data.fields());
@@ -269,28 +263,25 @@ public class AuthenticationController {
         List<String> auth =
                 headers.getRequestHeader(ContainerRequest.AUTHORIZATION);
 
-        String[] values;
+        AuthorizationData authorizationData;
         try {
-            AuthorizationData authorizationData = authorizationHandler.
+            authorizationData = authorizationHandler.
                     parseAuthorizationHeader(auth.get(0));
-            values = transferEncoding.decodeBase64(authorizationData.getToken());
+            authorizationData = authorizationHandler.parseToken(authorizationData);
            
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
-        //        authentication = StringUtils.stripTokenType(authentication);
-        //        String[] values = new String(
-        //                DatatypeConverter.parseBase64Binary(authentication)).split(":");
-        //        String[] values = Base64.base64Decode(authentication).split(":");
-
-        // "Invalid syntax for username and password"
 
         // Implementation Hanl mit '|'. 16.02.17/FB
         //if (values[0].equalsIgnoreCase("null")
         //        | values[1].equalsIgnoreCase("null"))
-        if (values[0].equalsIgnoreCase("null")
-                || values[1].equalsIgnoreCase("null"))
+        if (authorizationData.getUsername() == null || 
+                authorizationData.getUsername().isEmpty() || 
+                authorizationData.getPassword()== null || 
+                authorizationData.getPassword().isEmpty())
+            // is actual an invalid request
             throw kustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
 
         Map<String, Object> attr = new HashMap<>();
@@ -300,7 +291,7 @@ public class AuthenticationController {
         String contextJson;
         try {
             User user = controller.authenticate(AuthenticationType.SESSION,
-                    values[0], values[1], attr);
+                    authorizationData.getUsername(), authorizationData.getPassword(), attr);
             context = controller.createTokenContext(user, attr,
                     AuthenticationType.SESSION);
             contextJson = context.toJson();

@@ -58,7 +58,7 @@ public class TokenContext implements java.security.Principal, Serializable {
         m.put(Attributes.TOKEN_EXPIRATION,
                 TimeUtils.format(this.expirationTime));
         m.put(Attributes.TOKEN, this.token);
-        m.put(Attributes.AUTHENTICATION_TYPE, this.authenticationType);
+        m.put(Attributes.TOKEN_TYPE, this.authenticationType);
         return m;
     }
 

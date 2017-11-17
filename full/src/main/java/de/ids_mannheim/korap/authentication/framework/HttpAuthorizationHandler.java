@@ -3,8 +3,6 @@ package de.ids_mannheim.korap.authentication.framework;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.sun.jersey.api.client.ClientResponse.Status;
-
 import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -53,7 +51,13 @@ public class HttpAuthorizationHandler {
         return data;
     }
 
-    public void parseToken (AuthorizationData data) throws KustvaktException {
-        String[] credentials = transferEncoding.decodeBase64(data.getToken());        
+    public AuthorizationData parseToken (AuthorizationData data) throws KustvaktException {
+        String[] credentials = transferEncoding.decodeBase64(data.getToken());
+        data.setUsername(credentials[0]);
+        data.setPassword(credentials[1]);
+        return data;
     }
+    
+    
+    
 }

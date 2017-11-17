@@ -4,6 +4,9 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
+
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
@@ -25,19 +28,27 @@ public class BlockingFilter implements ContainerRequestFilter, ResourceFilter {
 
     @Autowired
     KustvaktResponseHandler kustvaktResponseHandler;
-    
+
     @Override
     public ContainerRequest filter (ContainerRequest request) {
         TokenContext context;
+
         try {
             context = (TokenContext) request.getUserPrincipal();
         }
         catch (UnsupportedOperationException e) {
-            throw kustvaktResponseHandler.throwAuthenticationException("");
+            throw kustvaktResponseHandler.throwit(new KustvaktException(
+                    StatusCodes.UNAUTHORIZED_OPERATION, e.getMessage(), e));
         }
 
-        if(context == null || context.isDemo())
-            throw kustvaktResponseHandler.throwAuthenticationException("");
+        if (context == null || context.isDemo()) {
+            throw kustvaktResponseHandler.throwit(
+                    new KustvaktException(StatusCodes.UNAUTHORIZED_OPERATION,
+                            "Operation is not permitted for user: "
+                                    + context.getUsername(),
+                            context.getUsername()));
+        }
+
 
         return request;
     }

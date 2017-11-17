@@ -13,8 +13,10 @@ import com.sun.jersey.spi.container.ResourceFilter;
 import de.ids_mannheim.korap.authentication.framework.AuthorizationData;
 import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.TokenContext;
+import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.web.utils.KustvaktContext;
 import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
@@ -53,16 +55,18 @@ public class AuthenticationFilter
 
         if (authorization != null && !authorization.isEmpty()) {
             TokenContext context;
+            AuthorizationData authData;
             try {
-                AuthorizationData data = authorizationHandler
+                authData = authorizationHandler
                         .parseAuthorizationHeader(authorization);
                 context = userController.getTokenStatus(
-                        data.getAuthenticationType(), data.getToken(), host,
+                        authData.getAuthenticationType(), authData.getToken(), host,
                         ua);
             }
             catch (KustvaktException e) {
+                String authType = StringUtils.stripTokenType(authorization);
                 throw kustvaktResponseHandler
-                        .throwAuthenticationException(authorization);
+                        .throwAuthenticationException(e, authType);
             }
             // fixme: give reason why access is not granted?
             if (context != null && context.isValid()
@@ -70,7 +74,9 @@ public class AuthenticationFilter
                             | !context.isSecureRequired()))
                 request.setSecurityContext(new KustvaktContext(context));
             else
-                throw kustvaktResponseHandler.throwAuthenticationException("");
+                throw kustvaktResponseHandler.throwAuthenticationException(
+                        new KustvaktException(StatusCodes.UNAUTHORIZED_OPERATION), 
+                        authData.getAuthenticationType());
         }
         return request;
     }
