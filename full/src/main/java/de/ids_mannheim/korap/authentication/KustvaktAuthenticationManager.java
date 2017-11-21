@@ -231,13 +231,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 					corpusAccess = CorpusAccess.PUB;
 				}
 				
-				if (DEBUG_LOG == true) {
-					System.out.printf("Debug: X-Forwarded-For : '%s' (%d values) -> %s\n", 
-							Arrays.toString(vals), vals.length, vals[0]);
-					System.out.printf("Debug: X-Forwarded-For : location = %s corpusAccess = %s\n",
-							location == Location.INTERN ? "INTERN" : "EXTERN", corpusAccess == CorpusAccess.ALL ? "ALL"
-									: corpusAccess == CorpusAccess.PUB ? "PUB" : "FREE");
-				}
+			    jlog.debug(String.format("X-Forwarded-For : '%s' (%d values) -> %s\n", 
+						Arrays.toString(vals), vals.length, vals[0]));
+			    jlog.debug(String.format("X-Forwarded-For : location = %s corpusAccess = %s\n",
+						location == Location.INTERN ? "INTERN" : "EXTERN", corpusAccess == CorpusAccess.ALL ? "ALL"
+								: corpusAccess == CorpusAccess.PUB ? "PUB" : "FREE"));
 
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block

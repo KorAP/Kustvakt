@@ -64,21 +64,17 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
                 node.at("/collection/rewrites/0/scope").asText());
     }
 
-    private void checkAndPublicWithoutACA (String json)
+    private void checkAndPublicWithACA (String json)
             throws KustvaktException {
         JsonNode node = JsonUtils.readTree(json);
         assertNotNull(node);
         assertEquals("operation:and",
                 node.at("/collection/operation").asText());
-        assertEquals("match:eq",
-                node.at("/collection/operands/0/match").asText());
-        assertEquals("type:regex",
-                node.at("/collection/operands/0/type").asText());
-        assertEquals("availability",
-                node.at("/collection/operands/0/key").asText());
-        assertEquals("CC-BY.*",
-                node.at("/collection/operands/0/value").asText());
-
+        assertEquals("operation:insertion",
+                node.at("/collection/rewrites/0/operation").asText());
+        assertEquals("availability(PUB)",
+                node.at("/collection/rewrites/0/scope").asText());
+        
         assertEquals("match:eq",
                 node.at("/collection/operands/1/match").asText());
         assertEquals("type:regex",
@@ -86,11 +82,26 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
         assertEquals("availability",
                 node.at("/collection/operands/1/key").asText());
         assertEquals("ACA.*", node.at("/collection/operands/1/value").asText());
+        
+        node = node.at("/collection/operands/0");
+        assertEquals("match:eq",
+                node.at("/operands/0/match").asText());
+        assertEquals("type:regex",
+                node.at("/operands/0/type").asText());
+        assertEquals("availability",
+                node.at("/operands/0/key").asText());
+        assertEquals("CC-BY.*",
+                node.at("/operands/0/value").asText());
 
-        assertEquals("operation:insertion",
-                node.at("/collection/rewrites/0/operation").asText());
-        assertEquals("availability(PUB)",
-                node.at("/collection/rewrites/0/scope").asText());
+        assertEquals("match:eq",
+                node.at("/operands/1/match").asText());
+        assertEquals("type:regex",
+                node.at("/operands/1/type").asText());
+        assertEquals("availability",
+                node.at("/operands/1/key").asText());
+        assertEquals("ACA.*", node.at("/operands/1/value").asText());
+
+        
     }
 
     private void checkAndAll (String json) throws KustvaktException {
@@ -122,27 +133,39 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
 
     }
 
-    private void checkAndAllWithoutACA (String json) throws KustvaktException {
+    private void checkAndAllWithACA (String json) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(json);
         assertNotNull(node);
         assertEquals("operation:and",
                 node.at("/collection/operation").asText());
-        assertEquals("match:eq",
-                node.at("/collection/operands/0/operands/0/match").asText());
-        assertEquals("type:regex",
-                node.at("/collection/operands/0/operands/0/type").asText());
-        assertEquals("availability",
-                node.at("/collection/operands/0/operands/0/key").asText());
-        assertEquals("CC-BY.*",
-                node.at("/collection/operands/0/operands/0/value").asText());
-        assertEquals("match:eq",
-                node.at("/collection/operands/0/operands/1/match").asText());
-        assertEquals("QAO.*",
-                node.at("/collection/operands/0/operands/1/value").asText());
         assertEquals("operation:insertion",
                 node.at("/collection/rewrites/0/operation").asText());
         assertEquals("availability(ALL)",
                 node.at("/collection/rewrites/0/scope").asText());
+        
+        assertEquals("match:eq",
+                node.at("/collection/operands/1/match").asText());
+        assertEquals("type:regex",
+                node.at("/collection/operands/1/type").asText());
+        assertEquals("availability",
+                node.at("/collection/operands/1/key").asText());
+        assertEquals("ACA.*", node.at("/collection/operands/1/value").asText());
+        
+        node = node.at("/collection/operands/0");
+        
+        assertEquals("match:eq",
+                node.at("/operands/0/match").asText());
+        assertEquals("type:regex",
+                node.at("/operands/0/type").asText());
+        assertEquals("availability",
+                node.at("/operands/0/key").asText());
+        assertEquals("CC-BY.*",
+                node.at("/operands/0/value").asText());
+        assertEquals("match:eq",
+                node.at("/operands/1/operands/1/match").asText());
+        assertEquals("QAO.*",
+                node.at("/operands/1/operands/1/value").asText());
+        
     }
 
 
@@ -350,7 +373,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndPublicWithoutACA(response.getEntity(String.class));
+        checkAndPublicWithACA(response.getEntity(String.class));
     }
 
 
@@ -412,7 +435,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndAllWithoutACA(response.getEntity(String.class));
+        checkAndAllWithACA(response.getEntity(String.class));
     }
 
 }
