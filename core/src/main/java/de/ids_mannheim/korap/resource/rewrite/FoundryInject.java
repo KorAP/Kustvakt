@@ -1,18 +1,17 @@
 package de.ids_mannheim.korap.resource.rewrite;
 
+import java.util.Collection;
+
 import com.fasterxml.jackson.databind.JsonNode;
+
 import de.ids_mannheim.korap.config.BeanInjectable;
-import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.resource.LayerMapper;
+import de.ids_mannheim.korap.resource.rewrite.KoralNode.RewriteIdentifier;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.UserSettings;
 import edu.emory.mathcs.backport.java.util.Collections;
-
-import java.util.Collection;
 
 /**
  * @author hanl
@@ -41,8 +40,12 @@ public class FoundryInject implements RewriteTask.IterableRewritePath,
 //        }
 //        else
             mapper = new LayerMapper(config);
-
-        if (node.get("@type").equals("koral:term") && !node.has("foundry")) {
+            
+        if (node.get("@type").equals("koral:span")) {
+            JsonNode term = rewriteQuery(node.at("/wrap"), config, user);
+            node.replaceAt("/wrap", term, new RewriteIdentifier("koral:term", "replace"));
+        }
+        else if (node.get("@type").equals("koral:term") && !node.has("foundry")) {
             String layer;
             if (node.has("layer"))
                 layer = node.get("layer");

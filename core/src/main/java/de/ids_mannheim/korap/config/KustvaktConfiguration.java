@@ -136,11 +136,11 @@ public class KustvaktConfiguration {
         issuer = new URL(is);
 
         default_const = properties
-                .getProperty("kustvakt.default.const", "mate");
-        default_dep = properties.getProperty("kustvakt.default.dep", "mate");
-        default_lemma = properties.getProperty("kustvakt.default.lemma", "tt");
-        default_pos = properties.getProperty("kustvakt.default.pos", "tt");
-        default_token = properties.getProperty("kustvakt.default.token",
+                .getProperty("default.layer.c", "mate");
+        default_dep = properties.getProperty("default.layer.d", "mate");
+        default_lemma = properties.getProperty("default.layer.l", "tt");
+        default_pos = properties.getProperty("default.layer.p", "tt");
+        default_token = properties.getProperty("default.layer.o",
                 "opennlp");
 
         // security configuration
@@ -179,9 +179,9 @@ public class KustvaktConfiguration {
         ldapConfig = properties.getProperty("ldap.config");
         
         // EM: regex used for storing vc
-        freeOnlyRegex = properties.getProperty("kustvakt.regex.free","");
-        publicOnlyRegex = properties.getProperty("kustvakt.regex.public","");
-        allOnlyRegex = properties.getProperty("kustvakt.regex.all","");
+        freeOnlyRegex = properties.getProperty("availability.regex.free","");
+        publicOnlyRegex = properties.getProperty("availability.regex.public","");
+        allOnlyRegex = properties.getProperty("availability.regex.all","");
         
         // EM: pattern for matching availability in Krill matches
         freeLicensePattern = compilePattern(freeOnlyRegex);
