@@ -8,8 +8,9 @@ import de.ids_mannheim.korap.resources.Document;
 import de.ids_mannheim.korap.server.KustvaktServer;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.filter.AdminFilter;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ import java.util.List;
 public class DocumentController {
 
     @Autowired
-    KustvaktResponseHandler kustvaktResponseHandler;
+    CoreResponseHandler kustvaktResponseHandler;
     
     private static Logger jlog =
             LoggerFactory.getLogger(DocumentController.class);

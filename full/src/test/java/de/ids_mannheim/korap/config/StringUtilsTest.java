@@ -8,9 +8,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.authentication.BasicAuthentication;
-import de.ids_mannheim.korap.authentication.framework.AuthorizationData;
-import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
-import de.ids_mannheim.korap.authentication.framework.TransferEncoding;
+import de.ids_mannheim.korap.authentication.http.AuthorizationData;
+import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.authentication.http.TransferEncoding;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.StringUtils;
 

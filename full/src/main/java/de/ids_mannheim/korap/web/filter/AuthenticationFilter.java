@@ -10,19 +10,19 @@ import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 
-import de.ids_mannheim.korap.authentication.framework.AuthorizationData;
-import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.authentication.http.AuthorizationData;
+import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.TokenContext;
-import de.ids_mannheim.korap.utils.StringUtils;
+import de.ids_mannheim.korap.web.FullResponseHandler;
 import de.ids_mannheim.korap.web.utils.KustvaktContext;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 /**
- * @author hanl
+ * @author hanl, margaretha
  * @date 28/01/2014
+ * @last update 5/12/2017
  */
 @Component
 @Provider
@@ -36,13 +36,7 @@ public class AuthenticationFilter
     private AuthenticationManagerIface userController;
 
     @Autowired
-    private KustvaktResponseHandler kustvaktResponseHandler;
-
-    //    public AuthFilter () {
-    //        this.userController = BeansFactory.getKustvaktContext()
-    //                .getAuthenticationManager();
-    //    }
-
+    private FullResponseHandler kustvaktResponseHandler;
 
     @Override
     public ContainerRequest filter (ContainerRequest request) {
@@ -60,25 +54,35 @@ public class AuthenticationFilter
                 authData = authorizationHandler
                         .parseAuthorizationHeader(authorization);
                 context = userController.getTokenStatus(
-                        authData.getAuthenticationType(), authData.getToken(), host,
-                        ua);
+                        authData.getAuthenticationType(), authData.getToken(),
+                        host, ua);
+                checkContext(context, request);
             }
             catch (KustvaktException e) {
-                String authType = StringUtils.stripTokenType(authorization);
-                throw kustvaktResponseHandler
-                        .throwAuthenticationException(e, authType);
+                throw kustvaktResponseHandler.throwit(e);
             }
-            // fixme: give reason why access is not granted?
-            if (context != null && context.isValid()
-                    && ((context.isSecureRequired() && request.isSecure())
-                            | !context.isSecureRequired()))
-                request.setSecurityContext(new KustvaktContext(context));
-            else
-                throw kustvaktResponseHandler.throwAuthenticationException(
-                        new KustvaktException(StatusCodes.UNAUTHORIZED_OPERATION), 
-                        authData.getAuthenticationType());
+            
+            request.setSecurityContext(new KustvaktContext(context));
         }
         return request;
+    }
+
+
+    private void checkContext (TokenContext context, ContainerRequest request)
+            throws KustvaktException {
+        if (context == null) {
+            throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
+                    "Context is null.");
+        }
+        else if (!context.isValid()) {
+            throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
+                    "Context is not valid: "
+                            + "missing username, password or authentication scheme.");
+        }
+        else if (context.isSecureRequired() && !request.isSecure()) {
+            throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
+                    "Request is not secure.");
+        }
     }
 
 

@@ -20,11 +20,12 @@ import org.slf4j.LoggerFactory;
 import com.unboundid.ldap.sdk.LDAPException;
 
 import de.ids_mannheim.korap.auditing.AuditRecord;
-import de.ids_mannheim.korap.authentication.framework.AuthorizationData;
+import de.ids_mannheim.korap.authentication.http.AuthorizationData;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -67,13 +68,13 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	private EntityHandlerIface entHandler;
 	private AdminHandlerIface adminHandler;
 	private AuditingIface auditing;
-	private KustvaktConfiguration config;
+	private FullConfiguration config;
 	private Collection userdatadaos;
 	private LoginCounter counter;
 	private ValidatorIface validator;
 
 	public KustvaktAuthenticationManager(EntityHandlerIface userdb, AdminHandlerIface admindb, EncryptionIface crypto,
-			KustvaktConfiguration config, AuditingIface auditer, Collection<UserDataDbIface> userdatadaos) {
+			FullConfiguration config, AuditingIface auditer, Collection<UserDataDbIface> userdatadaos) {
 		this.entHandler = userdb;
 		this.adminHandler = admindb;
 		this.config = config;

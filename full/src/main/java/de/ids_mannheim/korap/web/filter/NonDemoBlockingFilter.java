@@ -1,5 +1,10 @@
 package de.ids_mannheim.korap.web.filter;
 
+import javax.ws.rs.ext.Provider;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
@@ -8,12 +13,7 @@ import com.sun.jersey.spi.container.ResourceFilter;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.user.TokenContext;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
-
-import javax.ws.rs.ext.Provider;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import de.ids_mannheim.korap.web.FullResponseHandler;
 
 /**
  * @author hanl
@@ -24,12 +24,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Provider
-public class NonDemoBlockingFilter implements ContainerRequestFilter,
-        ResourceFilter {
+public class NonDemoBlockingFilter
+        implements ContainerRequestFilter, ResourceFilter {
 
     @Autowired
-    KustvaktResponseHandler kustvaktResponseHandler;
-    
+    private FullResponseHandler kustvaktResponseHandler;
+
     @Override
     public ContainerRequest filter (ContainerRequest request) {
         TokenContext context;
@@ -38,11 +38,11 @@ public class NonDemoBlockingFilter implements ContainerRequestFilter,
         }
         catch (UnsupportedOperationException e) {
             throw kustvaktResponseHandler.throwit(new KustvaktException(
-                    StatusCodes.UNAUTHORIZED_OPERATION, e.getMessage(), e));
+                    StatusCodes.UNSUPPORTED_OPERATION, e.getMessage(), e));
         }
 
-        if (context == null || context.isDemo()){
-            new KustvaktException(StatusCodes.UNAUTHORIZED_OPERATION,
+        if (context == null || context.isDemo()) {
+            new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Operation is not permitted for guest users");
         }
         return request;

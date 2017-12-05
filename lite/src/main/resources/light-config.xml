@@ -36,7 +36,7 @@
     </bean>
     
     <bean id="kustvakt_response"
-          class="de.ids_mannheim.korap.web.utils.KustvaktResponseHandler">
+          class="de.ids_mannheim.korap.web.CoreResponseHandler">
           <constructor-arg index="0" name="iface" ref="kustvakt_auditing"/>
     </bean>
 
@@ -48,6 +48,10 @@
     <bean name="kustvakt_encryption"
           class="de.ids_mannheim.korap.interfaces.defaults.DefaultEncryption">
     </bean>
+    
+    <bean id="kustvakt_rewrite" class="de.ids_mannheim.korap.resource.rewrite.RewriteHandler">
+		<constructor-arg ref="kustvakt_config" />
+	</bean>
     
     <bean id="search_krill"
           class="de.ids_mannheim.korap.web.SearchKrill">

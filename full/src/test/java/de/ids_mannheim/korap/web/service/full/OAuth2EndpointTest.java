@@ -13,8 +13,8 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
-import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
-import de.ids_mannheim.korap.authentication.framework.TransferEncoding;
+import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.authentication.http.TransferEncoding;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.config.TestHelper;

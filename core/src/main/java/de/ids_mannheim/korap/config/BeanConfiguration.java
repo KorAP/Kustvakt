@@ -1,19 +1,23 @@
 package de.ids_mannheim.korap.config;
 
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
-import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.interfaces.ValidatorIface;
-import de.ids_mannheim.korap.interfaces.db.*;
-import de.ids_mannheim.korap.interfaces.defaults.ApacheValidator;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
+import java.io.IOException;
+
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
+import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.interfaces.ValidatorIface;
+import de.ids_mannheim.korap.interfaces.db.AuditingIface;
+import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
+import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
+import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
+import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
+import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
+import de.ids_mannheim.korap.interfaces.defaults.ApacheValidator;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
 
 /**
  * User: hanl
@@ -92,7 +96,7 @@ public class BeanConfiguration {
 
     //todo: set response handler
     @Deprecated
-    public static KustvaktResponseHandler getResponseHandler () {
+    public static CoreResponseHandler getResponseHandler () {
         return null;
     }
 
@@ -106,7 +110,7 @@ public class BeanConfiguration {
             this.handler = new DefaultHandler();
             this.context = context;
             // todo: better method?!
-            new KustvaktResponseHandler(getAuditingProvider());
+            new CoreResponseHandler(getAuditingProvider());
         }
 
 

@@ -1,7 +1,6 @@
 package de.ids_mannheim.korap.web.controller;// package
                                              // de.ids_mannheim.korap.ext.web;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,8 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.spi.container.ResourceFilters;
@@ -41,16 +38,17 @@ import com.sun.jersey.spi.container.ResourceFilters;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration.BACKENDS;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
-import de.ids_mannheim.korap.resource.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.resources.Corpus;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.resources.VirtualCollection;
+import de.ids_mannheim.korap.rewrite.FullRewriteHandler;
 import de.ids_mannheim.korap.security.ac.ResourceFinder;
 import de.ids_mannheim.korap.security.ac.ResourceHandler;
 import de.ids_mannheim.korap.user.DemoUser;
@@ -62,11 +60,11 @@ import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.web.ClientsHandler;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 /**
  * EM: To Do: restructure codes regarding service and controller
@@ -87,7 +85,7 @@ public class SearchController {
             LoggerFactory.getLogger(SearchController.class);
 
     @Autowired
-    KustvaktResponseHandler responseHandler;
+    CoreResponseHandler responseHandler;
     @Autowired
     private SearchKrill searchKrill;
     private ResourceHandler resourceHandler;
@@ -95,9 +93,9 @@ public class SearchController {
     private AuthenticationManagerIface controller;
     private ClientsHandler graphDBhandler;
     @Autowired
-    private KustvaktConfiguration config;
+    private FullConfiguration config;
     @Autowired
-    private RewriteHandler processor;
+    private FullRewriteHandler processor;
 
 
     public SearchController () {

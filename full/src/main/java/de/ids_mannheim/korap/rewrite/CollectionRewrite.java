@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.resource.rewrite;
+package de.ids_mannheim.korap.rewrite;
 
 
 import java.util.ArrayList;
@@ -12,10 +12,13 @@ import com.google.common.collect.Lists;
 
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.object.KoralMatchOperator;
 import de.ids_mannheim.korap.query.object.KoralOperation;
+import de.ids_mannheim.korap.resource.rewrite.KoralNode;
 import de.ids_mannheim.korap.resource.rewrite.KoralNode.RewriteIdentifier;
+import de.ids_mannheim.korap.resource.rewrite.RewriteTask;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -107,20 +110,22 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
     public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) throws KustvaktException {
         JsonNode jsonNode = node.rawNode();
+        
+        FullConfiguration fullConfig = (FullConfiguration) config;
 
         List<String> userAvailabilities = new ArrayList<String>();
         switch (user.getCorpusAccess()) {
             case PUB:
-                userAvailabilities.add(config.getFreeOnlyRegex());
-                userAvailabilities.add(config.getPublicOnlyRegex());
+                userAvailabilities.add(fullConfig.getFreeOnlyRegex());
+                userAvailabilities.add(fullConfig.getPublicOnlyRegex());
                 break;
             case ALL:
-                userAvailabilities.add(config.getFreeOnlyRegex());
-                userAvailabilities.add(config.getPublicOnlyRegex());
-                userAvailabilities.add(config.getAllOnlyRegex());
+                userAvailabilities.add(fullConfig.getFreeOnlyRegex());
+                userAvailabilities.add(fullConfig.getPublicOnlyRegex());
+                userAvailabilities.add(fullConfig.getAllOnlyRegex());
                 break;
             case FREE:
-                userAvailabilities.add(config.getFreeOnlyRegex());
+                userAvailabilities.add(fullConfig.getFreeOnlyRegex());
                 break;
         }
 

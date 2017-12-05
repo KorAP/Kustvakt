@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
 
-import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;

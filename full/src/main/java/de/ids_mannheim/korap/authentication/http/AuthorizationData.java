@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.authentication.framework;
+package de.ids_mannheim.korap.authentication.http;
 
 import de.ids_mannheim.korap.config.AuthenticationType;
 import lombok.Getter;

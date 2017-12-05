@@ -23,11 +23,11 @@ import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.ParameterChecker;
+import de.ids_mannheim.korap.web.FullResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.input.VirtualCorpusFromJson;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 @Controller
 @Path("vc")
@@ -41,7 +41,7 @@ public class VirtualCorpusController {
     @Autowired
     private AuthenticationManagerIface authManager;
     @Autowired
-    private KustvaktResponseHandler responseHandler;
+    private FullResponseHandler responseHandler;
     @Autowired
     private VirtualCorpusService service;
 
@@ -61,7 +61,7 @@ public class VirtualCorpusController {
             TokenContext context =
                     (TokenContext) securityContext.getUserPrincipal();
             if (context.isDemo()) {
-                throw new KustvaktException(StatusCodes.UNAUTHORIZED_OPERATION,
+                throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                         "Operation is not permitted for user: "
                                 + context.getUsername(),
                         context.getUsername());

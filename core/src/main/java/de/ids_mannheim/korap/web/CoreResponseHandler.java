@@ -1,13 +1,11 @@
-package de.ids_mannheim.korap.web.utils;
+package de.ids_mannheim.korap.web;
 
 import java.util.List;
 
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.auditing.AuditRecord;
-import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
@@ -16,13 +14,13 @@ import de.ids_mannheim.korap.response.Notifications;
 /**
  * @author hanl, margaretha
  * @date 29/01/2014
- * @last 08/11/2017
+ * @last 04/12/2017
  */
-public class KustvaktResponseHandler {
+public class CoreResponseHandler {
 
     private AuditingIface auditing;
-
-    public KustvaktResponseHandler (AuditingIface iface) {
+    
+    public CoreResponseHandler (AuditingIface iface) {
         this.auditing = iface;
     }
     
@@ -64,51 +62,20 @@ public class KustvaktResponseHandler {
                 .entity(notification).build());
     }
     
-    private String buildNotification (KustvaktException e) {
+    protected String buildNotification (KustvaktException e) {
         register(e.getRecords());
         return buildNotification(e.getStatusCode(), e.getMessage(),
                 e.getEntity());
     }
 
-
-    public String buildNotification (int code, String message,
+    protected String buildNotification (int code, String message,
             String entity) {
         Notifications notif = new Notifications();
         notif.addError(code, message, entity);
         return notif.toJsonString() + "\n";
     }
 
-
-//    public WebApplicationException throwAuthenticationException (String message){
-//        return throwAuthenticationException(message, AuthenticationType.BASIC);
-//    }
-    
-    //todo:  if exception, make exception message and error code available if not masked!
-    public WebApplicationException throwAuthenticationException (String message, AuthenticationType authType) {
-        return new WebApplicationException(Response
-                .status(Response.Status.UNAUTHORIZED)
-                .header(HttpHeaders.WWW_AUTHENTICATE,
-                        authType.name()+" realm=\"Kustvakt\"")
-                .entity(buildNotification(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
-                        "Unauthorized access", message)).build());
-    }
-
-    public WebApplicationException throwAuthenticationException (KustvaktException e, 
-            AuthenticationType authType) {
-       return throwAuthenticationException(e, authType.name());
-    }
-    
-    public WebApplicationException throwAuthenticationException (KustvaktException e, 
-            String authType) {
-        return new WebApplicationException(Response
-                .status(Response.Status.UNAUTHORIZED)
-                .header(HttpHeaders.WWW_AUTHENTICATE,
-                        authType+" realm=\"Kustvakt\"")
-                .entity(buildNotification(e.getStatusCode(),
-                        e.getMessage(), e.getEntity())).build());
-    }
-
-    private Response.Status getStatus (int code) {
+    protected Response.Status getStatus (int code) {
         Response.Status status = Response.Status.BAD_REQUEST;
         switch (code) {
 //            case StatusCodes.NO_VALUE_FOUND:

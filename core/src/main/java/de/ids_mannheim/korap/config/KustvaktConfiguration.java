@@ -1,18 +1,15 @@
 package de.ids_mannheim.korap.config;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
@@ -84,23 +81,11 @@ public class KustvaktConfiguration {
     private ArrayList<String> foundries;
     private ArrayList<String> layers;
     
-    private Pattern publicLicensePattern;
-    private Pattern freeLicensePattern;
-    private Pattern allLicensePattern;
-    
     private String baseURL;
     
     
     // deprec?!
     private final BACKENDS DEFAULT_ENGINE = BACKENDS.LUCENE;
-
-	private String ldapConfig;
-
-    private String freeOnlyRegex;
-
-    private String publicOnlyRegex;
-
-    private String allOnlyRegex;
 
 	public KustvaktConfiguration (Properties properties) throws IOException {
         load(properties);
@@ -114,7 +99,7 @@ public class KustvaktConfiguration {
      * @throws IOException 
      * @throws KustvaktException 
      */
-    protected Properties load (Properties properties)
+    protected void load (Properties properties)
             throws IOException {
         baseURL = properties.getProperty("kustvakt.base.url", "/api/*");
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));
@@ -176,57 +161,8 @@ public class KustvaktConfiguration {
         passcodeSaltField = properties.getProperty("security.passcode.salt",
                 "accountCreation");
         
-        ldapConfig = properties.getProperty("ldap.config");
-        
-        // EM: regex used for storing vc
-        freeOnlyRegex = properties.getProperty("availability.regex.free","");
-        publicOnlyRegex = properties.getProperty("availability.regex.public","");
-        allOnlyRegex = properties.getProperty("availability.regex.all","");
-        
-        // EM: pattern for matching availability in Krill matches
-        freeLicensePattern = compilePattern(freeOnlyRegex);
-        publicLicensePattern = compilePattern(freeOnlyRegex + "|" + publicOnlyRegex);
-        allLicensePattern = compilePattern(freeOnlyRegex + "|" + publicOnlyRegex + "|"+allOnlyRegex);
-        
-        return properties;
     }
 
-    private Pattern compilePattern (String patternStr) {
-        if (!patternStr.isEmpty()){
-            return Pattern.compile(patternStr);    
-        }
-        else{
-            return null;
-        }
-    }
-
-    public void setFoundriesAndLayers(String config) throws IOException {
-    	foundries = new ArrayList<String>();
-    	layers = new ArrayList<String>();
-    	
-    	BufferedReader br;
-		File f = new File(config);
-		br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
-		String policy = null;
-		String[] policyData = null;
-		String type, layer;
-			while ((policy = br.readLine()) != null) {
-				if (policy.startsWith("#") || policy.isEmpty()){
-					continue;
-				}
-				policyData = policy.split("\t");
-				type = policyData[0];
-				if (type.equals("foundry")){
-					foundries.add(policyData[1]);
-				}
-				else if (type.equals("layer")){
-					layer = policyData[1].split("/")[1];
-					layers.add(layer);
-				}
-			}
-	}
-    
-    
     /**
      * set properties
      * 

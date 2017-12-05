@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.KrillIndex;
 import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -56,7 +57,7 @@ public class SearchKrillTest extends BeanConfigTest {
 
 	@Test
     public void testMatchInfo () throws KustvaktException {
-        KustvaktConfiguration config = helper().getContext().getConfiguration();
+	    FullConfiguration config = helper().getContext().getConfiguration();
         SearchKrill krill = new SearchKrill(config.getIndexDir());
         assertNotNull(krill);
 		String matchinfo = krill.getMatch("WPD/AAA.00002/p169-197", config.getFreeLicensePattern());

@@ -50,7 +50,7 @@
 		p:configLocation='classpath:ehcache.xml' p:shared='true' />
 
 	<!-- props are injected from default-config.xml -->
-	<bean id="kustvakt_config" class="de.ids_mannheim.korap.config.KustvaktConfiguration">
+	<bean id="kustvakt_config" class="de.ids_mannheim.korap.config.FullConfiguration">
 		<constructor-arg name="properties" ref="props" />
 	</bean>
 
@@ -157,12 +157,17 @@
 		<constructor-arg value="${krill.indexDir}"/>
 	</bean>
 
+
+	<bean id="kustvakt_rewrite" class="de.ids_mannheim.korap.rewrite.FullRewriteHandler">
+		<constructor-arg ref="kustvakt_config" />
+	</bean>
+
 	<bean id="kustvakt_auditing" class="de.ids_mannheim.korap.handlers.JDBCAuditing">
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
 	
 	<bean id="kustvakt_response"
-          class="de.ids_mannheim.korap.web.utils.KustvaktResponseHandler">
+          class="de.ids_mannheim.korap.web.FullResponseHandler">
           <constructor-arg index="0" name="iface" ref="kustvakt_auditing"/>
     </bean>
 

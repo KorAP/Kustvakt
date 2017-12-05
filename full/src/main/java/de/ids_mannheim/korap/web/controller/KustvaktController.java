@@ -4,7 +4,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.server.KustvaktServer;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.ServiceInfo;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class KustvaktController {
 
     private static Logger jlog = LoggerFactory.getLogger(UserController.class);
     @Autowired
-    private KustvaktResponseHandler kustvaktResponseHandler;
+    private CoreResponseHandler kustvaktResponseHandler;
 
 
     @Path("info")

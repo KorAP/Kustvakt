@@ -15,7 +15,7 @@ import de.ids_mannheim.korap.dto.converter.AnnotationConverter;
 import de.ids_mannheim.korap.entity.AnnotationPair;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
 
 @Service
 public class AnnotationService {
@@ -24,7 +24,7 @@ public class AnnotationService {
             LoggerFactory.getLogger(AnnotationService.class);
 
     @Autowired
-    KustvaktResponseHandler kustvaktResponseHandler;
+    CoreResponseHandler kustvaktResponseHandler;
 
     @Autowired
     private AnnotationDao annotationDao;

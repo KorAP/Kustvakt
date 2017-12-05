@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.dao.VirtualCorpusDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -34,7 +34,7 @@ public class VirtualCorpusService {
     private SearchKrill krill;
 
     @Autowired
-    private KustvaktConfiguration config;
+    private FullConfiguration config;
 
     public void storeVC (VirtualCorpusFromJson vc, User user)
             throws KustvaktException {
@@ -42,7 +42,7 @@ public class VirtualCorpusService {
         // EM: how about VirtualCorpusType.PUBLISHED?
         if (vc.getType().equals(VirtualCorpusType.PREDEFINED)
                 && !user.isAdmin()) {
-            throw new KustvaktException(StatusCodes.UNAUTHORIZED_OPERATION,
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + user.getUsername(),
                     user.getUsername());
         }

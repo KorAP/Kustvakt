@@ -27,8 +27,8 @@ import org.springframework.stereotype.Controller;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ResourceFilters;
 
-import de.ids_mannheim.korap.authentication.framework.AuthorizationData;
-import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.authentication.http.AuthorizationData;
+import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.config.BeansFactory;
@@ -40,11 +40,11 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.ServiceInfo;
+import de.ids_mannheim.korap.web.FullResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 // import com.sun.xml.internal.messaging.saaj.util.Base64;
 
@@ -59,7 +59,7 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 public class AuthenticationController {
 
     @Autowired
-    private KustvaktResponseHandler kustvaktResponseHandler;
+    private FullResponseHandler kustvaktResponseHandler;
     
     @Autowired
     private HttpAuthorizationHandler authorizationHandler;

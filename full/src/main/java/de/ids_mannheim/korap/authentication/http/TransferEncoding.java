@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.authentication.framework;
+package de.ids_mannheim.korap.authentication.http;
 
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.stereotype.Component;

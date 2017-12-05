@@ -21,9 +21,9 @@ import com.sun.jersey.spi.container.ResourceFilters;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 /**
  * Web services related to statistics
@@ -44,7 +44,7 @@ public class StatisticController {
     private static Logger jlog =
             LoggerFactory.getLogger(StatisticController.class);
     @Autowired
-    private KustvaktResponseHandler kustvaktResponseHandler;
+    private CoreResponseHandler kustvaktResponseHandler;
     @Autowired
     private SearchKrill searchKrill;
 

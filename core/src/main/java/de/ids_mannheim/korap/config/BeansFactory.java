@@ -2,7 +2,8 @@ package de.ids_mannheim.korap.config;
 
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.user.Userdata;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
@@ -97,7 +98,7 @@ public class BeansFactory {
 
     //todo: set response handler
     @Deprecated
-    public static KustvaktResponseHandler getResponseHandler () {
+    public static CoreResponseHandler getResponseHandler () {
         return null;
     }
 

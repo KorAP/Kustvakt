@@ -12,12 +12,13 @@ import de.ids_mannheim.korap.server.KustvaktServer;
 import de.ids_mannheim.korap.user.*;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
+
 import org.apache.oltu.oauth2.as.issuer.MD5Generator;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl;
@@ -56,7 +57,7 @@ import java.util.Set;
 public class OAuthController {
 
     @Autowired
-    KustvaktResponseHandler kustvaktResponseHandler;
+    CoreResponseHandler kustvaktResponseHandler;
     
     private OAuth2Handler handler;
     @Autowired

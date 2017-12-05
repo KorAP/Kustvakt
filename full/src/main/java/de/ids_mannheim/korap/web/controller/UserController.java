@@ -52,11 +52,11 @@ import de.ids_mannheim.korap.user.Userdata;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
+import de.ids_mannheim.korap.web.FullResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 /**
  * @author hanl, margaretha
@@ -69,7 +69,7 @@ import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 public class UserController {
 
     @Autowired
-    KustvaktResponseHandler kustvaktResponseHandler;
+    private FullResponseHandler kustvaktResponseHandler;
     
     private static Logger jlog = LoggerFactory.getLogger(UserController.class);
     @Autowired
@@ -276,12 +276,6 @@ public class UserController {
                 base_scope.retainAll(StringUtils.toSet(scopes));
             scopes = StringUtils.toString(base_scope);
             m = Scopes.mapScopes(scopes, data);
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler
-                    .throwAuthenticationException(ctx.getUsername(), ctx.getAuthenticationType());
-        }
-        try {
             return Response.ok(m.toEntity()).build();
         }
         catch (KustvaktException e) {

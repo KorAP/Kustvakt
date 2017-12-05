@@ -35,9 +35,9 @@ import de.ids_mannheim.korap.server.KustvaktServer;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 /**
  * @author hanl, margaretha 
@@ -57,7 +57,7 @@ public class AdminController {
     private AuditingIface auditingController;
 
     @Autowired
-    KustvaktResponseHandler kustvaktResponseHandler;
+    CoreResponseHandler kustvaktResponseHandler;
 
     // EM: not documented and tested, not sure what the purpose of the service is
     @GET

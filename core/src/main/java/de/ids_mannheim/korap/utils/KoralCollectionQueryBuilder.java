@@ -12,7 +12,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
 import de.ids_mannheim.korap.response.Notifications;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
 import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
@@ -32,7 +32,7 @@ public class KoralCollectionQueryBuilder {
     private StringBuilder builder;
     private String mergeOperator;
     @Autowired
-    private KustvaktResponseHandler responseHandler;
+    private CoreResponseHandler responseHandler;
 
 
     public KoralCollectionQueryBuilder () {

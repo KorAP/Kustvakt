@@ -23,10 +23,10 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.service.AnnotationService;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 /**
  * Provides services regarding annotation related information.
@@ -44,7 +44,7 @@ public class AnnotationController {
             LoggerFactory.getLogger(AnnotationController.class);
 
     @Autowired
-    KustvaktResponseHandler responseHandler;
+    CoreResponseHandler responseHandler;
     
     @Autowired
     private AnnotationService annotationService;

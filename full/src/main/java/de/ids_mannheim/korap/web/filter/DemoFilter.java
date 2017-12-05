@@ -10,7 +10,7 @@ import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 
-import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.TokenContext;
@@ -24,7 +24,7 @@ import de.ids_mannheim.korap.web.utils.KustvaktContext;
 public class DemoFilter implements ContainerRequestFilter, ResourceFilter {
 
     @Autowired
-    HttpAuthorizationHandler handler;
+    private HttpAuthorizationHandler handler;
     
     @Override
     public ContainerRequest filter (ContainerRequest request) {

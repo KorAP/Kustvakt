@@ -6,7 +6,8 @@ import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.interfaces.db.*;
 import de.ids_mannheim.korap.interfaces.defaults.ApacheValidator;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
+
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 
@@ -40,7 +41,7 @@ public abstract class ContextHolder {
         this.handler = new DefaultHandler();
         this.context = context;
         // todo: better method?!
-        new KustvaktResponseHandler(getAuditingProvider());
+        new CoreResponseHandler(getAuditingProvider());
     }
 
 

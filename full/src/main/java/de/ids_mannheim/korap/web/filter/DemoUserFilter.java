@@ -9,8 +9,8 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.TimeUtils;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.utils.KustvaktContext;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;

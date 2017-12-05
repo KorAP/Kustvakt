@@ -41,7 +41,6 @@ public class StatusCodes {
 
     // fixme: use unsupported resource and include type in return message
     public static final int POLICY_ERROR_DEFAULT = 400;
-    public static final int UNAUTHORIZED_OPERATION = 401;
     
     public static final int UNSUPPORTED_RESOURCE = 402;
 //    public static final int REWRITE_FAILED = 403;
@@ -102,28 +101,44 @@ public class StatusCodes {
     public static final int ACCESS_DENIED = 1003;
 
     /**
-     * 2000 status and error codes for service level messages and callbacks
+     * 1800 Oauth2
      */
 
-    public static final int ACCOUNT_DEACTIVATED = 2000;
-    public static final int ACCOUNT_CONFIRMATION_FAILED = 2001;
-    public static final int ALREADY_LOGGED_IN = 2002;
+    public static final int CLIENT_REGISTRATION_FAILED = 1800;
+    public static final int CLIENT_REMOVAL_FAILURE = 1801;
+    
+    /**
+     * 1900 User account and logins
+     */
 
-    public static final int EXPIRED = 2003;
-    public static final int BAD_CREDENTIALS = 2004;
-    public static final int ACCOUNT_NOT_CONFIRMED = 2005;
+    public static final int LOGIN_SUCCESSFUL = 1900;
+    public static final int ALREADY_LOGGED_IN = 1901;
+    
+    public static final int LOGOUT_SUCCESSFUL = 1902;
+    public static final int LOGOUT_FAILED = 1903;
+    
+    public static final int ACCOUNT_CONFIRMATION_FAILED = 1904;
+    public static final int PASSWORD_RESET_FAILED = 1905;
+    
+    /**
+     * 2000 status and error codes concerning authentication
+     * 
+     * Response with WWW-Authenticate header will be created 
+     * for all KustvaktExceptions with status codes 2000 or greater  
+     *  
+     * MH: service level messages and callbacks
+     */
 
-    public static final int PASSWORD_RESET_FAILED = 2006;
+    public static final int AUTHENTICATION_FAILED = 2000;
+    public static final int LOGIN_FAILED = 2001;
+    public static final int EXPIRED = 2002;
+    public static final int BAD_CREDENTIALS = 2003;
+    public static final int ACCOUNT_NOT_CONFIRMED = 2004;
+    public static final int ACCOUNT_DEACTIVATED = 2005;
 
-    public static final int LOGIN_SUCCESSFUL = 2007;
-    public static final int LOGIN_FAILED = 2008;
-    public static final int LOGOUT_SUCCESSFUL = 2009;
-    public static final int LOGOUT_FAILED = 2010;
-
-    public static final int CLIENT_REGISTRATION_FAILED = 2011;
-    public static final int CLIENT_REMOVAL_FAILURE = 2012;
-    public static final int CLIENT_AUTHORIZATION_FAILED = 2013;
-
+//    public static final int CLIENT_AUTHORIZATION_FAILED = 2013;
+    public static final int AUTHORIZATION_FAILED = 2010;
+    
     // 2020 - 2029 reserviert für LDAP-Fehlercodes - 21.04.17/FB
     public static final int LDAP_BASE_ERRCODE = 2020;
     

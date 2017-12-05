@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.authentication.framework;
+package de.ids_mannheim.korap.authentication.http;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ public class HttpAuthorizationHandler {
 
     @Autowired
     private TransferEncoding transferEncoding;
-
+    
     public String createAuthorizationHeader (AuthenticationType type,
             String username, String password) throws KustvaktException {
         ParameterChecker.checkStringValue(username, "username");
@@ -36,7 +36,7 @@ public class HttpAuthorizationHandler {
 
         String[] values = authorizationHeader.split(" ");
         if (values.length != 2) {
-            throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
+            throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
                     "Cannot parse authorization header value "
                             + authorizationHeader
                             + ". Use this format: [authentication "
@@ -51,13 +51,11 @@ public class HttpAuthorizationHandler {
         return data;
     }
 
-    public AuthorizationData parseToken (AuthorizationData data) throws KustvaktException {
+    public AuthorizationData parseToken (AuthorizationData data)
+            throws KustvaktException {
         String[] credentials = transferEncoding.decodeBase64(data.getToken());
         data.setUsername(credentials[0]);
         data.setPassword(credentials[1]);
         return data;
     }
-    
-    
-    
 }

@@ -33,8 +33,8 @@ import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.resource.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.web.ClientsHandler;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 /**
  * @author hanl
@@ -58,7 +58,7 @@ public class LightService {
     private static Logger jlog = LoggerFactory.getLogger(LightService.class);
 
     @Autowired
-    KustvaktResponseHandler kustvaktResponseHandler;
+    CoreResponseHandler kustvaktResponseHandler;
     @Autowired
     private SearchKrill searchKrill;
     private ClientsHandler graphDBhandler;

@@ -1,26 +1,30 @@
 package de.ids_mannheim.korap.resource.rewrite;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.fasterxml.jackson.databind.JsonNode;
+
 import de.ids_mannheim.korap.config.BeanInjectable;
 import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
 
 /**
  * @author hanl
  * @date 30/06/2015
  */
-@Component
 // todo: do post processing!
 //todo: load rewritenode and rewritequery automatically from classpath by default, but namespaced from package
 public class RewriteHandler{
@@ -51,17 +55,6 @@ public class RewriteHandler{
         this.beans = null;
         this.add(FoundryInject.class);
     }
-
-
-    public void defaultRewriteConstraints () {
-//        this.add(FoundryInject.class);
-        //this.add(PublicCollection.class);
-        this.add(CollectionRewrite.class);
-        this.add(IdWriter.class);
-        this.add(DocMatchRewrite.class);
-        this.add(CollectionCleanRewrite.class);
-    }
-
 
     public Set getFailedProcessors () {
         return this.failed_task_registration;

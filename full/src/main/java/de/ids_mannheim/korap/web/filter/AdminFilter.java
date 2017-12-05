@@ -8,24 +8,24 @@ import javax.ws.rs.ext.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ctc.wstx.util.StringUtil;
+import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 
-import de.ids_mannheim.korap.authentication.framework.AuthorizationData;
-import de.ids_mannheim.korap.authentication.framework.HttpAuthorizationHandler;
-import de.ids_mannheim.korap.authentication.framework.TransferEncoding;
+import de.ids_mannheim.korap.authentication.http.AuthorizationData;
+import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.authentication.http.TransferEncoding;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.StringUtils;
+import de.ids_mannheim.korap.web.FullResponseHandler;
 import de.ids_mannheim.korap.web.utils.KustvaktContext;
-import de.ids_mannheim.korap.web.utils.KustvaktResponseHandler;
 
 /**
  * @author hanl, margaretha
@@ -39,29 +39,28 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
     private AuthenticationManagerIface authManager;
 
     @Autowired
-    private KustvaktResponseHandler kustvaktResponseHandler;
-    
+    private FullResponseHandler kustvaktResponseHandler;
+
     @Autowired
     private TransferEncoding transferEncoding;
-    
+
     @Autowired
     private HttpAuthorizationHandler authorizationHandler;
-    
+
     @Override
     public ContainerRequest filter (ContainerRequest cr) {
         String authorization =
                 cr.getHeaderValue(ContainerRequest.AUTHORIZATION);
-        
+
         AuthorizationData data;
         try {
             data = authorizationHandler.parseAuthorizationHeader(authorization);
             data = authorizationHandler.parseToken(data);
         }
         catch (KustvaktException e) {
-            String authType = StringUtils.stripTokenType(authorization);
-            throw kustvaktResponseHandler.throwAuthenticationException(e, authType);
+            throw kustvaktResponseHandler.throwit(e);
         }
-        
+
         String host = cr.getHeaderValue(ContainerRequest.HOST);
         String agent = cr.getHeaderValue(ContainerRequest.USER_AGENT);
         Map<String, Object> attributes = new HashMap<>();
@@ -72,14 +71,14 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
             User user = authManager.authenticate(data.getAuthenticationType(),
                     data.getUsername(), data.getPassword(), attributes);
             if (!user.isAdmin()) {
-                throw kustvaktResponseHandler.throwAuthenticationException(
-                        "Admin authentication failed.", data.getAuthenticationType());
+                throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
+                        "Admin authentication failed.");
             }
             Map<String, Object> properties = cr.getProperties();
             properties.put("user", user);
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwAuthenticationException(e, data.getAuthenticationType());
+            throw kustvaktResponseHandler.throwit(e);
         }
 
         TokenContext c = new TokenContext();
