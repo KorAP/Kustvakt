@@ -13,7 +13,7 @@ import lombok.Getter;
  *
  */
 @Getter
-public class FullConfiguration extends KustvaktConfiguration{
+public class FullConfiguration extends KustvaktConfiguration {
 
     private String ldapConfig;
 
@@ -41,20 +41,7 @@ public class FullConfiguration extends KustvaktConfiguration{
         // EM: pattern for matching availability in Krill matches
         setLicensePatterns(properties);
 
-        authenticationScheme = properties.getProperty("authentication.scheme");
-        if (authenticationScheme == null) {
-            throw new NullPointerException(
-                    "authentication.scheme is missing in kustvakt.conf");
-        }
-        authenticationScheme = authenticationScheme.toLowerCase();
-        if (authenticationScheme
-                .equals(AuthenticationType.LDAP.displayName())) {
-            ldapConfig = properties.getProperty("ldap.config");
-            if (ldapConfig == null) {
-                throw new NullPointerException(
-                        "ldap.config is missing in kustvakt.conf");
-            }
-        }
+        ldapConfig = properties.getProperty("ldap.config");
     }
 
     private void setLicensePatterns (Properties properties) {

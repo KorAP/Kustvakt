@@ -12,6 +12,7 @@ import com.sun.jersey.spi.container.ResourceFilter;
 
 import de.ids_mannheim.korap.authentication.http.AuthorizationData;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
@@ -22,7 +23,7 @@ import de.ids_mannheim.korap.web.utils.KustvaktContext;
 /**
  * @author hanl, margaretha
  * @date 28/01/2014
- * @last update 5/12/2017
+ * @last update 7/12/2017
  */
 @Component
 @Provider
@@ -46,23 +47,33 @@ public class AuthenticationFilter
         String authorization =
                 request.getHeaderValue(ContainerRequest.AUTHORIZATION);
 
-
         if (authorization != null && !authorization.isEmpty()) {
-            TokenContext context;
+            TokenContext context = null;
             AuthorizationData authData;
             try {
                 authData = authorizationHandler
-                        .parseAuthorizationHeader(authorization);
-                context = userController.getTokenStatus(
-                        authData.getAuthenticationType(), authData.getToken(),
-                        host, ua);
+                        .parseAuthorizationHeaderValue(authorization);
+                switch (authData.getAuthenticationScheme()) {
+                    case BASIC:
+                        context = userController.getTokenStatus(TokenType.BASIC,
+                                authData.getToken(), host, ua);
+                        break;
+                    case SESSION:
+                        context = userController.getTokenStatus(TokenType.SESSION,
+                                authData.getToken(), host, ua);
+                        break;
+                    // EM: bearer or api
+                    default:
+                        context = userController.getTokenStatus(TokenType.API,
+                                authData.getToken(), host, ua);
+                        break;
+                }
                 checkContext(context, request);
+                request.setSecurityContext(new KustvaktContext(context));
             }
             catch (KustvaktException e) {
                 throw kustvaktResponseHandler.throwit(e);
             }
-            
-            request.setSecurityContext(new KustvaktContext(context));
         }
         return request;
     }

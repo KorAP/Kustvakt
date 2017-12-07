@@ -6,7 +6,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.TimeUtils;
@@ -67,7 +67,7 @@ public class SessionAuthentication implements AuthenticationIface {
                 now.getMillis());
         TokenContext ctx = new TokenContext();
         ctx.setUsername(user.getUsername());
-        ctx.setAuthenticationType(AuthenticationType.SESSION);
+        ctx.setTokenType(TokenType.SESSION);
         ctx.setToken(token);
         ctx.setExpirationTime(ex.getMillis()+(1000));
         ctx.setHostAddress(attr.get(Attributes.HOST).toString());
@@ -93,8 +93,8 @@ public class SessionAuthentication implements AuthenticationIface {
 
 
     @Override
-    public AuthenticationType getIdentifier () {
-        return AuthenticationType.OPENID;
+    public TokenType getTokenType () {
+        return TokenType.SESSION;
     }
 
 }

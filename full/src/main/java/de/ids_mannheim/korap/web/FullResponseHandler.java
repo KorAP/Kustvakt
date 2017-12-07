@@ -27,7 +27,7 @@ public class FullResponseHandler extends CoreResponseHandler {
     @Override
     public WebApplicationException throwit (KustvaktException e) {
         Response r;
-        // EM: for all status codes > 2000?
+
         if (e.getStatusCode() == StatusCodes.AUTHORIZATION_FAILED
                 || e.getStatusCode() >= StatusCodes.AUTHENTICATION_FAILED) {
             String notification = buildNotification(e.getStatusCode(),

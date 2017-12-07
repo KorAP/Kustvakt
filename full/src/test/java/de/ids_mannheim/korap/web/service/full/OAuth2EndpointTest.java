@@ -16,7 +16,7 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.authentication.http.TransferEncoding;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -40,8 +40,8 @@ public class OAuth2EndpointTest extends FastJerseyTest {
 
     @Test
     public void testAuthorizeClient () throws ClientHandlerException, UniformInterfaceException, KustvaktException {
-        String auth = handler.createAuthorizationHeader(
-                AuthenticationType.OAUTH2, helper().getUser().getUsername(),
+        String auth = handler.createBasicAuthorizationHeaderValue(
+                helper().getUser().getUsername(),
                 (String) TestHelper.getUserCredentials().get(Attributes.PASSWORD));
         ClientResponse response = resource().path(getAPIVersion()).path("oauth2")
                 .path("register")
@@ -78,7 +78,7 @@ public class OAuth2EndpointTest extends FastJerseyTest {
     @Ignore
     public void authenticate () throws KustvaktException {
         Map<String, Object> cred = TestHelper.getUserCredentials();
-        String enc = handler.createAuthorizationHeader(AuthenticationType.OAUTH2, 
+        String enc = handler.createBasicAuthorizationHeaderValue( 
                 (String) cred.get(Attributes.USERNAME), (String) cred.get(Attributes.PASSWORD));
         ClientResponse response = resource().path(getAPIVersion()).path("oauth2")
                 .path("register")

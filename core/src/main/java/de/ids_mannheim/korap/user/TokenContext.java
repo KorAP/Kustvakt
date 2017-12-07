@@ -1,9 +1,13 @@
 package de.ids_mannheim.korap.user;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
@@ -11,12 +15,6 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.DateTime;
-
-import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author hanl
@@ -31,7 +29,7 @@ public class TokenContext implements java.security.Principal, Serializable {
     private String username;
     private long expirationTime;
     // either "session_token " / "api_token
-    private AuthenticationType authenticationType;
+    private TokenType tokenType;
     private String token;
     private boolean secureRequired;
 
@@ -58,7 +56,7 @@ public class TokenContext implements java.security.Principal, Serializable {
         m.put(Attributes.TOKEN_EXPIRATION,
                 TimeUtils.format(this.expirationTime));
         m.put(Attributes.TOKEN, this.token);
-        m.put(Attributes.TOKEN_TYPE, this.authenticationType);
+        m.put(Attributes.TOKEN_TYPE, this.tokenType);
         return m;
     }
 
@@ -116,8 +114,7 @@ public class TokenContext implements java.security.Principal, Serializable {
         TokenContext c = new TokenContext();
         if (node != null) {
             c.setToken(node.path("token").asText());
-            // EM: fix me: token_type to authentication type
-            c.setAuthenticationType(AuthenticationType.valueOf(
+            c.setTokenType(TokenType.valueOf(
                     node.path("token_type").asText()));
             c.setExpirationTime(node.path("expires_in").asLong());
             c.addContextParameter("refresh_token", node.path("refresh_token")
@@ -131,7 +128,7 @@ public class TokenContext implements java.security.Principal, Serializable {
     public boolean isValid () {
         return (this.username != null && !this.username.isEmpty())
                 && (this.token != null && !this.token.isEmpty())
-                && (this.authenticationType != null);
+                && (this.tokenType != null);
     }
 
 

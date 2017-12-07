@@ -1,12 +1,14 @@
 package de.ids_mannheim.korap.authentication.http;
 
+import java.util.EnumSet;
+
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import de.ids_mannheim.korap.config.FullConfiguration;
+import de.ids_mannheim.korap.config.AuthenticationScheme;
 
 /** Implementation of HTTP authentication scheme (see RFC 7253 and 7617)
  *  for server creating responses with status 401 Unauthorized and 
@@ -17,15 +19,16 @@ import de.ids_mannheim.korap.config.FullConfiguration;
  */
 @Component
 public class HttpUnauthorizedHandler {
-    @Autowired
-    private FullConfiguration config;
 
     public Response createUnauthenticatedResponse (String notification) {
-        return Response.status(Response.Status.UNAUTHORIZED)
-                .header(HttpHeaders.WWW_AUTHENTICATE,
-                        config.getAuthenticationScheme()
-                                + " realm=\"Kustvakt\"")
-                .entity(notification)
-                .build();
+        ResponseBuilder builder = Response.status(Response.Status.UNAUTHORIZED);
+
+        for (AuthenticationScheme s : EnumSet
+                .allOf(AuthenticationScheme.class)) {
+            builder = builder.header(HttpHeaders.WWW_AUTHENTICATE,
+                    s.displayName() + " realm=\"Kustvakt\"");
+        }
+
+        return builder.entity(notification).build();
     }
 }

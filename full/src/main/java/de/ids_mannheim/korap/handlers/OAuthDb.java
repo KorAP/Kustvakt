@@ -6,7 +6,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.exceptions.DatabaseException;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.BooleanUtils;
@@ -209,8 +209,8 @@ public class OAuthDb {
                             c.setUsername(rs.getString(Attributes.USERNAME));
                             c.setExpirationTime(exp);
                             c.setToken(token);
-                            c.setAuthenticationType(AuthenticationType.OAUTH2);
-                            //.setTokenType(Attributes.OAUTH2_AUTHORIZATION);
+                            c.setTokenType(TokenType.BEARER);
+//                            c.setTokenType(Attributes.OAUTH2_AUTHORIZATION);
                             c.addContextParameter(Attributes.SCOPES,
                                     rs.getString(Attributes.SCOPES));
                             return c;

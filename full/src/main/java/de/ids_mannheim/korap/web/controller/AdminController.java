@@ -46,6 +46,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
  * Last changes:
  *  removed DocumentDao (EM)
  */
+@Deprecated
 @Controller
 @Path(KustvaktServer.API_VERSION + "/admin")
 @ResourceFilters({ AdminFilter.class, PiwikFilter.class })

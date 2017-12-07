@@ -17,7 +17,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.authentication.http.TransferEncoding;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -61,7 +61,7 @@ public class AuthServiceTest extends FastJerseyTest {
 
     @Test
     public void testSessionToken() throws KustvaktException {
-        String auth = handler.createAuthorizationHeader(AuthenticationType.SESSION, 
+        String auth = handler.createBasicAuthorizationHeaderValue( 
                 credentials[0], credentials[1]);
         ClientResponse response = resource().path("auth")
                 .path("sessionToken").header(Attributes.AUTHORIZATION, auth)
@@ -98,7 +98,7 @@ public class AuthServiceTest extends FastJerseyTest {
 
     @Test
     public void testSessionTokenExpire() throws KustvaktException {
-        String auth = handler.createAuthorizationHeader(AuthenticationType.SESSION,
+        String auth = handler.createBasicAuthorizationHeaderValue(
                 credentials[0], credentials[1]);
         ClientResponse response = resource().path("auth")
                 .path("sessionToken").header(Attributes.AUTHORIZATION, auth)

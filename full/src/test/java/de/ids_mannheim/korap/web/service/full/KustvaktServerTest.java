@@ -35,9 +35,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
-import de.ids_mannheim.korap.authentication.http.TransferEncoding;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.ResourceDao;
@@ -194,7 +192,7 @@ public class KustvaktServerTest extends BeanConfigTest {
         HttpPost httppost = new HttpPost(uri);
 
         httppost.addHeader(Attributes.AUTHORIZATION,
-                handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"));
+                handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"));
         HttpResponse response = httpClient.execute(httppost);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatusLine().getStatusCode());
@@ -224,7 +222,7 @@ public class KustvaktServerTest extends BeanConfigTest {
         HttpPost httppost = new HttpPost(uri);
 
         httppost.addHeader(Attributes.AUTHORIZATION,
-                handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"));
+                handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"));
         HttpResponse response = httpClient.execute(httppost);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatusLine().getStatusCode());
@@ -255,7 +253,7 @@ public class KustvaktServerTest extends BeanConfigTest {
         HttpPost httppost = new HttpPost(uri);
 
         httppost.addHeader(Attributes.AUTHORIZATION,
-                handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"));
+                handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"));
         HttpResponse response = httpClient.execute(httppost);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatusLine().getStatusCode());
@@ -314,7 +312,7 @@ public class KustvaktServerTest extends BeanConfigTest {
         URI uri = builder.build();
         HttpPost httppost = new HttpPost(uri);
         httppost.addHeader(Attributes.AUTHORIZATION,
-                handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", password));
+                handler.createBasicAuthorizationHeaderValue("kustvakt", password));
         return httpclient.execute(httppost);
 
     }
@@ -333,7 +331,7 @@ public class KustvaktServerTest extends BeanConfigTest {
         URI uri = builder.build();
         HttpPost httppost = new HttpPost(uri);
         httppost.addHeader(Attributes.AUTHORIZATION,
-                handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"));
+                handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"));
         HttpResponse response = httpclient.execute(httppost);
         
         assertEquals(ClientResponse.Status.OK.getStatusCode(),

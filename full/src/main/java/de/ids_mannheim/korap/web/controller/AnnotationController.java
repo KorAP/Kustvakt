@@ -36,7 +36,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
  */
 @Controller
 @Path("annotation/")
-@ResourceFilters({ AuthenticationFilter.class, DemoUserFilter.class, PiwikFilter.class })
+@ResourceFilters({DemoUserFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class AnnotationController {
 

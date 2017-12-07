@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.authentication.http.TransferEncoding;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.Scopes;
 import de.ids_mannheim.korap.dao.UserDao;
@@ -28,7 +28,8 @@ import de.ids_mannheim.korap.utils.TimeUtils;
  * is defined in {@link HttpAuthorizationHandler}. 
  * 
  * Basic authentication is intended to be used with a database. It is 
- * currently only used for testing using a dummy DAO (@see {@link UserDao}). 
+ * currently only used for testing using a dummy DAO (@see {@link UserDao}) 
+ * without passwords.
  *   
  * 
  * @author margaretha
@@ -55,23 +56,13 @@ public class BasicAuthentication implements AuthenticationIface {
     @Override
     public TokenContext getTokenContext (String authToken)
             throws KustvaktException {
-        // Hanl: fixme: handle via constructor
-        // EM: ?
         String[] values = transferEncoding.decodeBase64(authToken);
         if (values != null) {
             TokenContext c = new TokenContext();
-            User user = dao.getAccount(values[0]);
-            if (user instanceof KorAPUser
-                    && ((KorAPUser) user).getPassword() != null) {
-                boolean check = crypto.checkHash(values[1],
-                        ((KorAPUser) user).getPassword());
-
-                if (!check) return null;
-            }
             c.setUsername(values[0]);
             c.setExpirationTime(TimeUtils.plusSeconds(this.config.getTokenTTL())
                     .getMillis());
-            c.setAuthenticationType(AuthenticationType.BASIC);
+            c.setTokenType(getTokenType());
             // todo: for production mode, set true
             c.setSecureRequired(false);
             // EM: is this secure?
@@ -107,7 +98,7 @@ public class BasicAuthentication implements AuthenticationIface {
 
 
     @Override
-    public AuthenticationType getIdentifier () {
-        return AuthenticationType.BASIC;
+    public TokenType getTokenType () {
+        return TokenType.BASIC;
     }
 }

@@ -68,7 +68,7 @@ public class CoreResponseHandler {
                 e.getEntity());
     }
 
-    protected String buildNotification (int code, String message,
+    public static String buildNotification (int code, String message,
             String entity) {
         Notifications notif = new Notifications();
         notif.addError(code, message, entity);

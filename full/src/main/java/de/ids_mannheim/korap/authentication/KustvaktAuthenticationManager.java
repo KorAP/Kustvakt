@@ -20,12 +20,11 @@ import org.slf4j.LoggerFactory;
 import com.unboundid.ldap.sdk.LDAPException;
 
 import de.ids_mannheim.korap.auditing.AuditRecord;
-import de.ids_mannheim.korap.authentication.http.AuthorizationData;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.AuthenticationMethod;
 import de.ids_mannheim.korap.config.BeansFactory;
-import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.FullConfiguration;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -51,7 +50,6 @@ import de.ids_mannheim.korap.user.User.Location;
 import de.ids_mannheim.korap.user.UserDetails;
 import de.ids_mannheim.korap.user.UserSettings;
 import de.ids_mannheim.korap.user.Userdata;
-import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 
 /**
@@ -72,7 +70,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	private Collection userdatadaos;
 	private LoginCounter counter;
 	private ValidatorIface validator;
-
+	
 	public KustvaktAuthenticationManager(EntityHandlerIface userdb, AdminHandlerIface admindb, EncryptionIface crypto,
 			FullConfiguration config, AuditingIface auditer, Collection<UserDataDbIface> userdatadaos) {
 		this.entHandler = userdb;
@@ -100,7 +98,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	 * @throws KustvaktException
 	 */
 	@Override
-	public TokenContext getTokenStatus(AuthenticationType type, String token, 
+	public TokenContext getTokenStatus(TokenType type, String token, 
 	        String host, String useragent) throws KustvaktException {
 
 		AuthenticationIface provider = getProvider(type , null);
@@ -146,7 +144,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	}
 
 	public TokenContext refresh(TokenContext context) throws KustvaktException {
-		AuthenticationIface provider = getProvider(context.getAuthenticationType(), null);
+		AuthenticationIface provider = getProvider(context.getTokenType(), null);
 		if (provider == null) {
 			// todo:
 		}
@@ -170,10 +168,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	 * @throws KustvaktException
 	 */
 	@Override
-	public User authenticate(AuthenticationType type, String username, String password, Map<String, Object> attributes)
+	public User authenticate(AuthenticationMethod method, String username, String password, Map<String, Object> attributes)
 			throws KustvaktException {
 		User user;
-		switch (type) {
+		switch (method) {
 		case SHIBBOLETH:
 			// todo:
 			user = authenticateShib(attributes);
@@ -252,9 +250,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	} // getAccess
 
 	@Override
-	public TokenContext createTokenContext(User user, Map<String, Object> attr, AuthenticationType type)
+	public TokenContext createTokenContext(User user, Map<String, Object> attr, TokenType type)
 			throws KustvaktException {
-		AuthenticationIface provider = getProvider(type, AuthenticationType.LDAP);
+	    //  use api token
+		AuthenticationIface provider = getProvider(type, TokenType.API);
 
 		// EM: not in the new DB
 //		if (attr.get(Attributes.SCOPES) != null)
@@ -535,11 +534,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
 	public void logout(TokenContext context) throws KustvaktException {
 		try {
-			AuthenticationIface provider = getProvider(context.getAuthenticationType(), null);
+			AuthenticationIface provider = getProvider(context.getTokenType(), null);
 
 			if (provider == null) {
 				throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT, "Authentication "
-				        + "provider not supported!", context.getAuthenticationType().name());
+				        + "provider not supported!", context.getTokenType().displayName());
 			}
 			provider.removeUserSession(context.getToken());
 		} catch (KustvaktException e) {
@@ -923,4 +922,5 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 			throw new WrappedException(e, StatusCodes.UPDATE_ACCOUNT_FAILED);
 		}
 	}
+
 }

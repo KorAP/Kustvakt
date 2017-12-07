@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.authentication.http;
 
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.AuthenticationScheme;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,8 +9,9 @@ import lombok.Setter;
 public class AuthorizationData {
 
     private String token;
-    private AuthenticationType authenticationType;
+    private AuthenticationScheme authenticationScheme;
     private String username;
     private String password;
 
 }
+

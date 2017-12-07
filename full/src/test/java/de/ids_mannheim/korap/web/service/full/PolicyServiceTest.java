@@ -14,7 +14,7 @@ import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
@@ -55,7 +55,7 @@ public class PolicyServiceTest extends FastJerseyTest {
                 .queryParam("perm", Permission.READ.name())
                 .queryParam("expire", "")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -99,7 +99,7 @@ public class PolicyServiceTest extends FastJerseyTest {
                 .queryParam("loc", "255.255.255.0")
                 .queryParam("expire", "30D")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -137,7 +137,7 @@ public class PolicyServiceTest extends FastJerseyTest {
                 .queryParam("perm", Permission.DELETE.name())
                 .queryParam("expire", "30D")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),

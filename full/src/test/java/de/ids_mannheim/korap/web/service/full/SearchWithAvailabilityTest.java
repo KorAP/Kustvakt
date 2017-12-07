@@ -14,7 +14,7 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
@@ -182,7 +182,7 @@ public class SearchWithAvailabilityTest extends FastJerseyTest {
         return resource().path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("cq", collectionQuery)
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, ip)
                 .get(ClientResponse.class);
     }

@@ -14,7 +14,7 @@ import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
@@ -52,7 +52,7 @@ public class ResourceInfoServiceTest extends FastJerseyTest {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("collection")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());

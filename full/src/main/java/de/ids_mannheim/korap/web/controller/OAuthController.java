@@ -1,23 +1,26 @@
 package de.ids_mannheim.korap.web.controller;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ResourceFilters;
-import de.ids_mannheim.korap.config.*;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.handlers.OAuth2Handler;
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
-import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.server.KustvaktServer;
-import de.ids_mannheim.korap.user.*;
-import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.utils.StringUtils;
-import de.ids_mannheim.korap.web.CoreResponseHandler;
-import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
-import de.ids_mannheim.korap.web.filter.BlockingFilter;
-import de.ids_mannheim.korap.web.filter.DemoUserFilter;
-import de.ids_mannheim.korap.web.filter.PiwikFilter;
-import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 import org.apache.oltu.oauth2.as.issuer.MD5Generator;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
@@ -32,20 +35,39 @@ import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.OAuthResponse;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.message.types.ResponseType;
-import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.apache.oltu.oauth2.common.utils.OAuthUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ResourceFilters;
+
+import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthCodeInfo;
+import de.ids_mannheim.korap.config.AuthenticationMethod;
+import de.ids_mannheim.korap.config.AuthenticationScheme;
+import de.ids_mannheim.korap.config.BeansFactory;
+import de.ids_mannheim.korap.config.ClientInfo;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.config.Scopes;
+import de.ids_mannheim.korap.config.TokenType;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.handlers.OAuth2Handler;
+import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
+import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.server.KustvaktServer;
+import de.ids_mannheim.korap.user.TokenContext;
+import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.user.UserDetails;
+import de.ids_mannheim.korap.user.Userdata;
+import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.utils.StringUtils;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
+import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
+import de.ids_mannheim.korap.web.filter.BlockingFilter;
+import de.ids_mannheim.korap.web.filter.DemoUserFilter;
+import de.ids_mannheim.korap.web.filter.PiwikFilter;
+import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 
 /**
  * @author hanl
@@ -319,10 +341,10 @@ public class OAuthController {
                 // skips authorization code type and returns id_token and access token directly
                 if (oauthRequest.getScopes().contains("openid")) {
                     try {
+                        // EM: MH uses APIAuthentication to create api token
                         TokenContext new_context = this.controller
                                 .createTokenContext(user, attr, null);
-                        //builder.setParam(new_context.getTokenType(),
-                        builder.setParam(new_context.getAuthenticationType().name(),
+                        builder.setParam(new_context.getTokenType().displayName(),
                                 new_context.getToken());
                     }
                     catch (KustvaktException e) {
@@ -503,7 +525,7 @@ public class OAuthController {
                                 .addToken(oauthRequest.getCode(), accessToken,
                                         refreshToken, config.getTokenTTL());
 
-                        builder.setTokenType(TokenType.BEARER.toString());
+                        builder.setTokenType(TokenType.BEARER.displayName());
                         builder.setExpiresIn(String.valueOf(config
                                 .getLongTokenTTL()));
                         builder.setAccessToken(accessToken);
@@ -535,7 +557,8 @@ public class OAuthController {
 
                 openid_valid = true;
                 try {
-                    user = controller.authenticate(AuthenticationType.OAUTH2,
+                    // EM: MH uses database
+                    user = controller.authenticate(AuthenticationMethod.DATABASE,
                             oauthRequest.getUsername(),
                             oauthRequest.getPassword(), attr);
                 }
@@ -555,7 +578,7 @@ public class OAuthController {
                                         " "), config.getLongTokenTTL());
                         builder.setRefreshToken(refresh);
                     }
-                    builder.setTokenType(TokenType.BEARER.toString());
+                    builder.setTokenType(TokenType.BEARER.displayName());
                     builder.setExpiresIn(String.valueOf(config
                             .getLongTokenTTL()));
                     builder.setAccessToken(accessToken);
@@ -571,7 +594,8 @@ public class OAuthController {
                             Scopes.Scope.openid.toString())) {
                 try {
                     if (user == null)
-                        user = controller.authenticate(AuthenticationType.OAUTH2,
+                        // EM: MH uses database
+                        user = controller.authenticate(AuthenticationMethod.DATABASE,
                                 oauthRequest.getUsername(),
                                 oauthRequest.getPassword(), attr);
                     Userdata data = controller.getUserData(user,
@@ -580,11 +604,10 @@ public class OAuthController {
 
                     attr.put(Attributes.CLIENT_SECRET,
                             oauthRequest.getClientSecret());
-                    TokenContext c = controller.createTokenContext(user, attr,
-                            AuthenticationType.OPENID);
+                    TokenContext c = controller.createTokenContext(user, attr,TokenType.ID_TOKEN);
                             //Attributes.OPENID_AUTHENTICATION);
-                    //EM: why openid, not oauth2?
-                    builder.setParam(c.getAuthenticationType().name(), c.getToken());
+                    
+                    builder.setParam(c.getTokenType().displayName(), c.getToken());
                 }
                 catch (KustvaktException e) {
                     throw kustvaktResponseHandler.throwit(e);

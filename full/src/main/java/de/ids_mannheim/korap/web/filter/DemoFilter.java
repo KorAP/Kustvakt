@@ -11,7 +11,7 @@ import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.web.utils.KustvaktContext;
@@ -46,13 +46,13 @@ public class DemoFilter implements ContainerRequestFilter, ResourceFilter {
         TokenContext context = new TokenContext();
         String token = null;
         try {
-            token = handler.createAuthorizationHeader(AuthenticationType.BASIC,"demo", "demo2015");
+            token = handler.createBasicAuthorizationHeaderValue("demo", "demo2015");
         }
         catch (KustvaktException e) {
             e.printStackTrace();
         }
         context.setToken(token);
-        context.setAuthenticationType(AuthenticationType.LDAP);
+        context.setTokenType(TokenType.BASIC);
         context.setUsername("demo");
         return new KustvaktContext(context);
     }

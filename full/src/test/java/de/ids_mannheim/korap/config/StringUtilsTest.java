@@ -41,7 +41,7 @@ public class StringUtilsTest {
         HttpAuthorizationHandler handler = new HttpAuthorizationHandler();
         String s1 = "basic "
                 + new String(Base64.encodeBase64("test:testPass".getBytes()));
-        AuthorizationData f1 = handler.parseAuthorizationHeader(s1);
+        AuthorizationData f1 = handler.parseAuthorizationHeaderValue(s1);
         assertEquals(s2, f1.getToken());
     }
 

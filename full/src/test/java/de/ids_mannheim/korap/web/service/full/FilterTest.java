@@ -13,7 +13,7 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
@@ -37,7 +37,7 @@ public class FilterTest extends FastJerseyTest {
                 
                 .path("user/info")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,
+                        handler.createBasicAuthorizationHeaderValue(
                                 (String) TestHelper.getUserCredentials().get(Attributes.USERNAME),
                                 (String) TestHelper.getUserCredentials().get(Attributes.PASSWORD)))
                 .get(ClientResponse.class);
@@ -61,7 +61,7 @@ public class FilterTest extends FastJerseyTest {
         ClientResponse resp = resource()
                 .path("user/info")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,
+                        handler.createBasicAuthorizationHeaderValue(
                                 "kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
         String entity = resp.getEntity(String.class);

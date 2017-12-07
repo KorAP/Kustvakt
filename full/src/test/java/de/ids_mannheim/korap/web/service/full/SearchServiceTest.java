@@ -20,7 +20,7 @@ import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
@@ -143,7 +143,7 @@ public class SearchServiceTest extends FastJerseyTest {
                 .path("search").queryParam("q", "[orth=die]")
                 .queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -169,7 +169,7 @@ public class SearchServiceTest extends FastJerseyTest {
                 .path("search").queryParam("q", "[orth=die]")
                 .queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "172.27.0.32")
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -201,7 +201,7 @@ public class SearchServiceTest extends FastJerseyTest {
                 .queryParam("ql", "poliqarp")
                 .queryParam("cq", "textClass=politik & corpusSigle=BRZ10")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -230,7 +230,7 @@ public class SearchServiceTest extends FastJerseyTest {
                 .path("search").queryParam("q", "[orth=die]")
                 .queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -364,7 +364,7 @@ public class SearchServiceTest extends FastJerseyTest {
                 .path("corpus").path("GOE").path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -406,7 +406,7 @@ public class SearchServiceTest extends FastJerseyTest {
                 .path("corpus").path(id).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());

@@ -18,6 +18,7 @@ import de.ids_mannheim.korap.authentication.http.AuthorizationData;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.authentication.http.TransferEncoding;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthenticationMethod;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
@@ -30,7 +31,10 @@ import de.ids_mannheim.korap.web.utils.KustvaktContext;
 /**
  * @author hanl, margaretha
  * @date 04/2017
+ * 
+ * @see AuthenticationFilter
  */
+@Deprecated
 @Component
 @Provider
 public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
@@ -42,9 +46,6 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
     private FullResponseHandler kustvaktResponseHandler;
 
     @Autowired
-    private TransferEncoding transferEncoding;
-
-    @Autowired
     private HttpAuthorizationHandler authorizationHandler;
 
     @Override
@@ -54,8 +55,8 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
 
         AuthorizationData data;
         try {
-            data = authorizationHandler.parseAuthorizationHeader(authorization);
-            data = authorizationHandler.parseToken(data);
+            data = authorizationHandler.parseAuthorizationHeaderValue(authorization);
+            data = authorizationHandler.parseBasicToken(data);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -68,7 +69,7 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
         attributes.put(Attributes.USER_AGENT, agent);
         try {
             // EM: fix me: AuthenticationType based on header value
-            User user = authManager.authenticate(data.getAuthenticationType(),
+            User user = authManager.authenticate(AuthenticationMethod.LDAP,
                     data.getUsername(), data.getPassword(), attributes);
             if (!user.isAdmin()) {
                 throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
@@ -83,7 +84,9 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
 
         TokenContext c = new TokenContext();
         c.setUsername(data.getUsername());
-        c.setAuthenticationType(data.getAuthenticationType());
+        // EM: needs token type custom param in the authorization header
+//        c.setTokenType();
+        // MH: c.setTokenType(StringUtils.getTokenType(authentication));
         // EM: is this secure? Is token context not sent outside Kustvakt?
         c.setToken(data.getToken());
         c.setHostAddress(host);

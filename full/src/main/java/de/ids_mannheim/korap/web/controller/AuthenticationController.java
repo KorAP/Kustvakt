@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -30,11 +31,14 @@ import com.sun.jersey.spi.container.ResourceFilters;
 import de.ids_mannheim.korap.authentication.http.AuthorizationData;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.AuthenticationMethod;
+import de.ids_mannheim.korap.config.AuthenticationScheme;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
+import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -64,7 +68,7 @@ public class AuthenticationController {
     @Autowired
     private HttpAuthorizationHandler authorizationHandler;
 
-    private static Boolean DEBUG_LOG = true;
+    private static Boolean DEBUG_LOG = false;
 
     //todo: bootstrap function to transmit certain default configuration settings and examples (example user queries,
     // default usersettings, etc.)
@@ -120,6 +124,43 @@ public class AuthenticationController {
             throw kustvaktResponseHandler.throwit(e);
         }
     }
+    
+    // EM: testing using spring security authentication manager
+    @GET
+    @Path("ldap/token")
+    public Response requestToken (@Context HttpHeaders headers,
+            @Context Locale locale,
+            @HeaderParam(ContainerRequest.USER_AGENT) String agent,
+            @HeaderParam(ContainerRequest.HOST) String host,
+            @HeaderParam("referer-url") String referer,
+            @QueryParam("scope") String scopes,
+            //   @Context WebServiceContext wsContext, // FB
+            @Context SecurityContext securityContext) {
+        
+        Map<String, Object> attr = new HashMap<>();
+        if (scopes != null && !scopes.isEmpty())
+            attr.put(Attributes.SCOPES, scopes);
+        attr.put(Attributes.HOST, host);
+        attr.put(Attributes.USER_AGENT, agent);
+        
+        User user = new KorAPUser();
+        user.setUsername(securityContext.getUserPrincipal().getName());
+        controller.setAccessAndLocation(user, headers);
+        if (DEBUG_LOG == true) System.out.printf(
+                "Debug: /token/: location=%s, access='%s'.\n",
+                user.locationtoString(), user.accesstoString());
+        attr.put(Attributes.LOCATION, user.getLocation());
+        attr.put(Attributes.CORPUS_ACCESS, user.getCorpusAccess());
+        
+        try {
+            TokenContext context = controller.createTokenContext(user, attr,
+                    TokenType.API);
+            return Response.ok(context.toJson()).build();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+    }
 
 
     @GET
@@ -146,8 +187,13 @@ public class AuthenticationController {
         AuthorizationData authorizationData;
         try {
             authorizationData = authorizationHandler.
-                    parseAuthorizationHeader(auth.get(0));
-            authorizationData = authorizationHandler.parseToken(authorizationData);
+                    parseAuthorizationHeaderValue(auth.get(0));
+            if (authorizationData.getAuthenticationScheme().equals(AuthenticationScheme.BASIC)){
+                authorizationData = authorizationHandler.parseBasicToken(authorizationData);
+            }
+            else {
+                // EM: throw exception that auth scheme is not supported?
+            }
            
         }
         catch (KustvaktException e) {
@@ -205,7 +251,7 @@ public class AuthenticationController {
         TokenContext context;
         try {
             // User user = controller.authenticate(0, values[0], values[1], attr); Implementation by Hanl
-            User user = controller.authenticate(AuthenticationType.LDAP,
+            User user = controller.authenticate(AuthenticationMethod.LDAP,
                     authorizationData.getUsername(), authorizationData.getPassword(), attr); // Implementation with IdM/LDAP
             // Userdata data = this.controller.getUserData(user, UserDetails.class); // Implem. by Hanl
             // todo: is this necessary?
@@ -217,8 +263,9 @@ public class AuthenticationController {
             attr.put(Attributes.LOCATION, user.getLocation());
             attr.put(Attributes.CORPUS_ACCESS, user.getCorpusAccess());
             context = controller.createTokenContext(user, attr,
-                    AuthenticationType.LDAP);
-                    //Attributes.API_AUTHENTICATION);
+                  TokenType.API);
+//            context = controller.createTokenContext(user, attr,
+//                    Attributes.API_AUTHENTICATION);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -266,8 +313,8 @@ public class AuthenticationController {
         AuthorizationData authorizationData;
         try {
             authorizationData = authorizationHandler.
-                    parseAuthorizationHeader(auth.get(0));
-            authorizationData = authorizationHandler.parseToken(authorizationData);
+                    parseAuthorizationHeaderValue(auth.get(0));
+            authorizationData = authorizationHandler.parseBasicToken(authorizationData);
            
         }
         catch (KustvaktException e) {
@@ -290,10 +337,13 @@ public class AuthenticationController {
         TokenContext context;
         String contextJson;
         try {
-            User user = controller.authenticate(AuthenticationType.SESSION,
+            //EM: authentication scheme default
+            User user = controller.authenticate(AuthenticationMethod.DATABASE,
                     authorizationData.getUsername(), authorizationData.getPassword(), attr);
             context = controller.createTokenContext(user, attr,
-                    AuthenticationType.SESSION);
+                    TokenType.SESSION);
+//            context = controller.createTokenContext(user, attr,
+//                    Attributes.SESSION_AUTHENTICATION);
             contextJson = context.toJson();
             jlog.debug(contextJson);
         }
@@ -327,7 +377,7 @@ public class AuthenticationController {
 
         try {
             // todo: distinguish type KorAP/Shibusers
-            User user = controller.authenticate(AuthenticationType.SHIBBOLETH,
+            User user = controller.authenticate(AuthenticationMethod.SHIBBOLETH,
                     null, null, attr);
             context = controller.createTokenContext(user, attr, null);
         }

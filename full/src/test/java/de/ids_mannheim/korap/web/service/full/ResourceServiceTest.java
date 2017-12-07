@@ -19,7 +19,7 @@ import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.ResourceDao;
 import de.ids_mannheim.korap.resources.KustvaktResource;
@@ -46,7 +46,7 @@ public class ResourceServiceTest extends FastJerseyTest {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("collection")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -59,7 +59,7 @@ public class ResourceServiceTest extends FastJerseyTest {
         response = resource().path(getAPIVersion()).path("collection").path(id)
                 .path("stats")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -79,7 +79,7 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .path("virtualcollection").path("GOE-VC") // persistent id
                 .queryParam("name", "Goethe collection")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -104,7 +104,7 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .path("corpus").path("GOE") // persistent id
                 .queryParam("name", "Goethe corpus")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -127,7 +127,7 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .path("foundry").path("malt") // persistent id
                 .queryParam("name", "malt parser")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -149,7 +149,7 @@ public class ResourceServiceTest extends FastJerseyTest {
         ClientResponse response = resource().path(getAPIVersion()).path("layer")
                 .path("mate/d").queryParam("name", "Mate dependency")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -172,7 +172,7 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .path("corpus").path("GOEC") // persistent id
                 .queryParam("name", "Goethe corpus")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
@@ -208,7 +208,7 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .queryParam("name", "Brown")
                 .queryParam("description", "Brown corpus")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -242,7 +242,7 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .queryParam("name", "Brown")
                 .queryParam("description", "Brown corpus")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
@@ -267,7 +267,7 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .queryParam("query", "author ~ Asdert")
                 .queryParam("description", "Wikipedia subcorpus from Asdert")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -303,7 +303,7 @@ public class ResourceServiceTest extends FastJerseyTest {
                 .queryParam("name", "Goethe")
                 .queryParam("description", "Goethe corpus")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -333,7 +333,7 @@ public class ResourceServiceTest extends FastJerseyTest {
         response = resource().path(getAPIVersion()).path("virtualcollection")
                 .path(id).queryParam("name", "Goethe")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(HttpStatus.SC_BAD_REQUEST, response.getStatus());
@@ -346,7 +346,7 @@ public class ResourceServiceTest extends FastJerseyTest {
         response = resource().path(getAPIVersion()).path("virtualcollection")
                 .path(id).queryParam("name", "Goethe collection")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -361,7 +361,7 @@ public class ResourceServiceTest extends FastJerseyTest {
         response = resource().path(getAPIVersion()).path("virtualcollection")
                 .path(id)
                 .header(Attributes.AUTHORIZATION,
-                        handler.createAuthorizationHeader(AuthenticationType.BASIC,"kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
                 .delete(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),

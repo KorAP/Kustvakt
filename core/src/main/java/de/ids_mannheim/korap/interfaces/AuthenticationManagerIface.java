@@ -6,7 +6,9 @@ import java.util.Set;
 
 import javax.ws.rs.core.HttpHeaders;
 
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.TokenType;
+import de.ids_mannheim.korap.config.AuthenticationMethod;
+import de.ids_mannheim.korap.config.AuthenticationScheme;
 import de.ids_mannheim.korap.config.KustvaktCacheable;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.TokenContext;
@@ -19,7 +21,7 @@ import de.ids_mannheim.korap.user.Userdata;
  */
 public abstract class AuthenticationManagerIface extends KustvaktCacheable {
 
-    private Map<AuthenticationType, AuthenticationIface> providers;
+    private Map<TokenType, AuthenticationIface> providers;
 
 
     public AuthenticationManagerIface () {
@@ -29,12 +31,13 @@ public abstract class AuthenticationManagerIface extends KustvaktCacheable {
 
 
     public void setProviders (Set<AuthenticationIface> providers) {
-        for (AuthenticationIface i : providers)
-            this.providers.put(i.getIdentifier(), i);
+        for (AuthenticationIface i : providers){
+            this.providers.put(i.getTokenType(), i);
+        }
     }
 
 
-    protected AuthenticationIface getProvider (AuthenticationType type, AuthenticationType default_iface) {
+    protected AuthenticationIface getProvider (TokenType scheme, TokenType default_iface) {
     	
     	// Debug FB: loop a Map
     	
@@ -43,15 +46,17 @@ public abstract class AuthenticationManagerIface extends KustvaktCacheable {
     		System.out.println("Debug: provider: Key : " + entry.getKey() + " Value : " + entry.getValue());
     		}
     		*/
-    		
-        AuthenticationIface iface = this.providers.get(type);
-        // todo: configurable authentication schema
-        if (iface == null) iface = this.providers.get(default_iface);
-        return iface;
+     // todo: configurable authentication schema
+        if (scheme == null){ 
+            return this.providers.get(default_iface);
+        }
+        else{
+            return this.providers.get(scheme);
+        }
     }
 
 
-    public abstract TokenContext getTokenStatus (AuthenticationType type,
+    public abstract TokenContext getTokenStatus (TokenType type,
             String token, String host, String useragent)
             throws KustvaktException;
 
@@ -61,7 +66,7 @@ public abstract class AuthenticationManagerIface extends KustvaktCacheable {
     public abstract boolean isRegistered (String id);
 
 
-    public abstract User authenticate (AuthenticationType type, String username,
+    public abstract User authenticate (AuthenticationMethod method, String username,
             String password, Map<String, Object> attributes)
             throws KustvaktException;
 
@@ -71,8 +76,12 @@ public abstract class AuthenticationManagerIface extends KustvaktCacheable {
 
 
     public abstract TokenContext createTokenContext (User user,
-            Map<String, Object> attr, AuthenticationType type)
+            Map<String, Object> attr, TokenType type)
             throws KustvaktException;
+    
+//    public abstract TokenContext createTokenContext (User user,
+//            Map<String, Object> attr, String provider_key)
+//            throws KustvaktException;
 
     public abstract void setAccessAndLocation (User user, HttpHeaders headers);
 

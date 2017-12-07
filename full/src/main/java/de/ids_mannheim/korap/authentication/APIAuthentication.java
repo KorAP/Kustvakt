@@ -8,6 +8,7 @@ import com.nimbusds.jwt.SignedJWT;
 
 import de.ids_mannheim.korap.config.JWTSigner;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationIface;
@@ -34,7 +35,6 @@ public abstract class APIAuthentication implements AuthenticationIface {
                 config.getIssuer(), config.getTokenTTL());
     }
 
-
     @Override
     public TokenContext getTokenContext (String authToken)
             throws KustvaktException {
@@ -42,7 +42,7 @@ public abstract class APIAuthentication implements AuthenticationIface {
         //Element ein = invalided.get(authToken);
         try {
             context = signedToken.getTokenContext(authToken);
-            context.setAuthenticationType(getIdentifier());
+            context.setTokenType(getTokenType());
         }
         catch (JOSEException | ParseException ex) {
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);
@@ -65,7 +65,7 @@ public abstract class APIAuthentication implements AuthenticationIface {
         catch (ParseException e) {
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);
         }
-        c.setAuthenticationType(getIdentifier());
+        c.setTokenType(getTokenType());
         c.setToken(jwt.serialize());
         //id_tokens.put(new Element(c.getToken(), c));
         return c;
@@ -85,5 +85,11 @@ public abstract class APIAuthentication implements AuthenticationIface {
     public TokenContext refresh (TokenContext context)
             throws KustvaktException {
         return null;
+    }
+    
+
+    @Override
+    public TokenType getTokenType () {
+        return TokenType.API;
     }
 }

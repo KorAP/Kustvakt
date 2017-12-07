@@ -28,7 +28,7 @@ package de.ids_mannheim.korap.authentication;
 
 import com.unboundid.ldap.sdk.*;
 
-import de.ids_mannheim.korap.config.AuthenticationType;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 
 import java.io.*;
@@ -78,8 +78,8 @@ public class LdapAuth3 extends APIAuthentication {
     
 	
 	@Override
-	public AuthenticationType getIdentifier () {
-	    return AuthenticationType.LDAP;
+	public TokenType getTokenType () {
+	    return TokenType.API;
 	}
 	 
 	/**

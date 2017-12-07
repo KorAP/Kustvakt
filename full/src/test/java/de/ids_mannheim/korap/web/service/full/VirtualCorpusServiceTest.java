@@ -18,7 +18,6 @@ import com.sun.jersey.spi.container.ContainerRequest;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationType;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -36,10 +35,10 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
                 "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
                         + "\"test class\",\"collectionQuery\": \"corpusSigle=GOE\"}";
 
-        ClientResponse response = resource().path("vc").path("store").header(
-                Attributes.AUTHORIZATION,
-                handler.createAuthorizationHeader(AuthenticationType.BASIC,
-                        "kustvakt", "kustvakt2015"))
+        ClientResponse response = resource().path("vc").path("store")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(
+                                "user","pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(json)
                 .post(ClientResponse.class);
         String entity = response.getEntity(String.class);
@@ -56,14 +55,20 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
                 .entity(json).post(ClientResponse.class);
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
-        
+
         Set<Entry<String, List<String>>> headers =
                 response.getHeaders().entrySet();
 
         for (Entry<String, List<String>> header : headers) {
             if (header.getKey().equals(ContainerRequest.WWW_AUTHENTICATE)) {
-                assertEquals("ldap realm=\"Kustvakt\"",
+                assertEquals("Api realm=\"Kustvakt\"",
                         header.getValue().get(0));
+                assertEquals("Session realm=\"Kustvakt\"",
+                        header.getValue().get(1));
+                assertEquals("Bearer realm=\"Kustvakt\"",
+                        header.getValue().get(2));
+                assertEquals("Basic realm=\"Kustvakt\"",
+                        header.getValue().get(3));
             }
         }
 
@@ -84,7 +89,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
         ClientResponse response = resource().path("vc").path("store")
                 .entity(json).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
-//        System.out.println(entity);
+        //        System.out.println(entity);
 
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.DESERIALIZATION_FAILED,
