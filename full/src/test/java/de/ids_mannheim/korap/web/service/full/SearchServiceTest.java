@@ -155,7 +155,8 @@ public class SearchServiceTest extends FastJerseyTest {
         assertEquals("koral:docGroup", node.at("/collection/@type").asText());
         assertEquals("CC-BY.*",
                 node.at("/collection/operands/0/value").asText());
-        assertEquals("ACA.*", node.at("/collection/operands/1/value").asText());
+        assertEquals("ACA.*", node.at("/collection/operands/1/operands/0/value").asText());
+        assertEquals("QAO-NC", node.at("/collection/operands/1/operands/1/value").asText());
         assertEquals("operation:or", node.at("/collection/operation").asText());
         assertEquals("availability(PUB)",
                 node.at("/collection/rewrites/0/scope").asText());

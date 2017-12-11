@@ -164,15 +164,38 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
 
     private String buildAvailability (List<String> userAvailabilities) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < userAvailabilities.size() - 1; i++) {
-            sb.append("availability=/");
-            sb.append(userAvailabilities.get(i));
-            sb.append("/ | ");
+        for (int i = 0; i < userAvailabilities.size(); i++) {
+            parseAvailability(sb, userAvailabilities.get(i), "|");
         }
-        sb.append("availability=/");
-        sb.append(userAvailabilities.get(userAvailabilities.size() - 1));
-        sb.append("/");
-        return sb.toString();
+        String availabilities = sb.toString(); 
+        return availabilities.substring(0, availabilities.length()-3);
     }
+    
+    private void parseAvailability (StringBuilder sb, String availability, String operator) {
+        String uaArr[] = null;
+        if (availability.contains("|")){
+            uaArr = availability.split("\\|");
+            for (int j=0; j < uaArr.length; j++){
+                parseAvailability(sb, uaArr[j].trim(), "|");
+            }
+        }
+        // EM: not supported
+//        else if (availability.contains("&")){
+//            uaArr = availability.split("&");
+//            for (int j=0; j < uaArr.length -1; j++){
+//                parseAvailability(sb, uaArr[j], "&");
+//            }
+//            parseAvailability(sb, uaArr[uaArr.length-1], "|");
+//        } 
+        else{
+            sb.append("availability=/");
+            sb.append(availability);
+            sb.append("/ ");
+            sb.append(operator);
+            sb.append(" ");
+        }
+
+    }
+    
 }
 
