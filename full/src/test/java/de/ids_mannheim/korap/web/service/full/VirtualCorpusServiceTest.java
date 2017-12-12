@@ -3,6 +3,10 @@ package de.ids_mannheim.korap.web.service.full;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -18,6 +22,7 @@ import com.sun.jersey.spi.container.ContainerRequest;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.AuthenticationScheme;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -29,7 +34,6 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
     private HttpAuthorizationHandler handler;
 
     @Test
-    //    @Ignore
     public void testStoreVC () throws KustvaktException {
         String json =
                 "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
@@ -37,12 +41,37 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path("vc").path("store")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(
-                                "user","pass"))
+                        handler.createBasicAuthorizationHeaderValue("user",
+                                "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(json)
                 .post(ClientResponse.class);
         String entity = response.getEntity(String.class);
         System.out.println(entity);
+    }
+
+    @Test
+    public void testStoreVCWithExpiredToken () throws IOException, KustvaktException {
+        String json =
+                "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
+                        + "\"test class\",\"collectionQuery\": \"corpusSigle=GOE\"}";
+
+        InputStream is = getClass().getClassLoader().getResourceAsStream("test-user.token");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
+        String authToken = reader.readLine();
+        
+        ClientResponse response = resource().path("vc").path("store")
+                .header(Attributes.AUTHORIZATION,
+                        AuthenticationScheme.API.displayName() + " "
+                                + authToken)
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(json)
+                .post(ClientResponse.class);
+        String entity = response.getEntity(String.class);
+
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.EXPIRED, node.at("/errors/0/0").asInt());
+        assertEquals("Authentication token is expired",
+                node.at("/errors/0/1").asText());
     }
 
     @Test

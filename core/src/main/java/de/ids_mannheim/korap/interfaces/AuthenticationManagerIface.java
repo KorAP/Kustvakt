@@ -56,7 +56,7 @@ public abstract class AuthenticationManagerIface extends KustvaktCacheable {
     }
 
 
-    public abstract TokenContext getTokenStatus (TokenType type,
+    public abstract TokenContext getTokenContext (TokenType type,
             String token, String host, String useragent)
             throws KustvaktException;
 

@@ -30,7 +30,7 @@
 				<directory>src/test/resources</directory>
 				<filtering>true</filtering>
 				<includes>
-					<include>**/*.prop</include>
+					<include>**/*.token</include>
 					<include>**/*.xml</include>
 					<include>**/*.conf</include>
 					<include>**/*.info</include>
@@ -88,6 +88,7 @@
 					<excludes>
 						<exclude>de/ids_mannheim/korap/suites/*.java</exclude>
 						<exclude>de/ids_mannheim/korap/dao/*.java</exclude>
+						<exclude>de/ids_mannheim/korap/authentication/*.java</exclude>
 						<exclude>**/KustvaktServerTest.java</exclude>
 						<exclude>**/ResourceServiceTest.java</exclude>
 						<exclude>**/ResourceInfoServiceTest.java</exclude>

@@ -22,7 +22,7 @@ import net.sf.ehcache.Element;
  * 
  * Created by hanl on 5/23/14.
  */
-public abstract class APIAuthentication implements AuthenticationIface {
+public class APIAuthentication implements AuthenticationIface {
 
     private JWTSigner signedToken;
     private Cache invalided =
@@ -33,6 +33,13 @@ public abstract class APIAuthentication implements AuthenticationIface {
     public APIAuthentication (KustvaktConfiguration config) {
         this.signedToken = new JWTSigner(config.getSharedSecret(),
                 config.getIssuer(), config.getTokenTTL());
+    }
+    
+    /** EM: for testing
+     * @param signedToken
+     */
+    public APIAuthentication (JWTSigner signedToken) {
+        this.signedToken = signedToken;
     }
 
     @Override

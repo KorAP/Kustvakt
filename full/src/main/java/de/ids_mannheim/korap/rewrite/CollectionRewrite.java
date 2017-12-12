@@ -116,16 +116,16 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
         List<String> userAvailabilities = new ArrayList<String>();
         switch (user.getCorpusAccess()) {
             case PUB:
-                userAvailabilities.add(fullConfig.getFreeOnlyRegex());
-                userAvailabilities.add(fullConfig.getPublicOnlyRegex());
+                userAvailabilities.addAll(fullConfig.getFreeRegexList());
+                userAvailabilities.addAll(fullConfig.getPublicRegexList());
                 break;
             case ALL:
-                userAvailabilities.add(fullConfig.getFreeOnlyRegex());
-                userAvailabilities.add(fullConfig.getPublicOnlyRegex());
-                userAvailabilities.add(fullConfig.getAllOnlyRegex());
+                userAvailabilities.addAll(fullConfig.getFreeRegexList());
+                userAvailabilities.addAll(fullConfig.getPublicRegexList());
+                userAvailabilities.addAll(fullConfig.getAllRegexList());
                 break;
             case FREE:
-                userAvailabilities.add(fullConfig.getFreeOnlyRegex());
+                userAvailabilities.addAll(fullConfig.getFreeRegexList());
                 break;
         }
 

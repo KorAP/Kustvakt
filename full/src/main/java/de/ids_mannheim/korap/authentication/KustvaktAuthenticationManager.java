@@ -98,7 +98,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	 * @throws KustvaktException
 	 */
 	@Override
-	public TokenContext getTokenStatus(TokenType type, String token, 
+	public TokenContext getTokenContext(TokenType type, String token, 
 	        String host, String useragent) throws KustvaktException {
 
 		AuthenticationIface provider = getProvider(type , null);
@@ -109,11 +109,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 			        "token type not defined or found", "token_type");
 
 		TokenContext context = provider.getTokenContext(token);
-		if (context != null && TimeUtils.isExpired(context.getExpirationTime()))
-			throw new KustvaktException(StatusCodes.EXPIRED);
-		else if (context == null)
-			throw new KustvaktException(StatusCodes.NO_RESULT_FOUND);
-
 		// if (!matchStatus(host, useragent, context))
 		// provider.removeUserSession(token);
 		return context;

@@ -138,12 +138,12 @@ public class JWTSigner {
             if (!new DateTime(client.getJWTClaimsSet().getExpirationTimeClaim())
                     .isAfterNow())
                 throw new KustvaktException(StatusCodes.EXPIRED,
-                        "authentication token is expired", token);
+                        "Authentication token is expired", token);
         }
         catch (ParseException | JOSEException e) {
             //todo: message or entity, how to treat??!
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
-                    "token could not be verified", token);
+                    "Token could not be verified", token);
         }
         return client;
     }

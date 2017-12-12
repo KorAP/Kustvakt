@@ -17,13 +17,14 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.TokenContext;
+import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.FullResponseHandler;
 import de.ids_mannheim.korap.web.utils.KustvaktContext;
 
 /**
  * @author hanl, margaretha
  * @date 28/01/2014
- * @last update 7/12/2017
+ * @last update 12/2017
  */
 @Component
 @Provider
@@ -34,7 +35,7 @@ public class AuthenticationFilter
     private HttpAuthorizationHandler authorizationHandler;
 
     @Autowired
-    private AuthenticationManagerIface userController;
+    private AuthenticationManagerIface authenticationManager;
 
     @Autowired
     private FullResponseHandler kustvaktResponseHandler;
@@ -53,19 +54,21 @@ public class AuthenticationFilter
             try {
                 authData = authorizationHandler
                         .parseAuthorizationHeaderValue(authorization);
+
                 switch (authData.getAuthenticationScheme()) {
                     case BASIC:
-                        context = userController.getTokenStatus(TokenType.BASIC,
-                                authData.getToken(), host, ua);
+                        context = authenticationManager.getTokenContext(
+                                TokenType.BASIC, authData.getToken(), host, ua);
                         break;
                     case SESSION:
-                        context = userController.getTokenStatus(TokenType.SESSION,
-                                authData.getToken(), host, ua);
+                        context = authenticationManager.getTokenContext(
+                                TokenType.SESSION, authData.getToken(), host,
+                                ua);
                         break;
                     // EM: bearer or api
                     default:
-                        context = userController.getTokenStatus(TokenType.API,
-                                authData.getToken(), host, ua);
+                        context = authenticationManager.getTokenContext(
+                                TokenType.API, authData.getToken(), host, ua);
                         break;
                 }
                 checkContext(context, request);
@@ -93,6 +96,10 @@ public class AuthenticationFilter
         else if (context.isSecureRequired() && !request.isSecure()) {
             throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
                     "Request is not secure.");
+        }
+        else if (TimeUtils.isExpired(context.getExpirationTime())) {
+            throw new KustvaktException(StatusCodes.EXPIRED,
+                    "Login is expired.");
         }
     }
 
