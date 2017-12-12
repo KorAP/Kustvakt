@@ -49,23 +49,22 @@ public class FullConfiguration extends KustvaktConfiguration {
     }
 
     private void setLicensePatterns (Properties properties) {
-        setFreeLicensePattern(compilePattern(freeOnlyRegex));
+        setFreeLicensePattern(compilePattern(getFreeOnlyRegex()));
         setPublicLicensePattern(
-                compilePattern(freeOnlyRegex + "|" + publicOnlyRegex));
+                compilePattern(getFreeOnlyRegex() + "|" + getPublicOnlyRegex()));
         setAllLicensePattern(compilePattern(
-                freeOnlyRegex + "|" + publicOnlyRegex + "|" + allOnlyRegex));
+                getFreeOnlyRegex() + "|" + getPublicOnlyRegex() + "|" + getAllOnlyRegex()));
     }
 
     private void setLicenseRegex (Properties properties) {
-        freeOnlyRegex = properties.getProperty("availability.regex.free", "");
-        freeRegexList = splitAndAddToList(freeOnlyRegex);
+        setFreeOnlyRegex(properties.getProperty("availability.regex.free", ""));
+        freeRegexList = splitAndAddToList(getFreeOnlyRegex());
 
-        publicOnlyRegex =
-                properties.getProperty("availability.regex.public", "");
-        publicRegexList = splitAndAddToList(publicOnlyRegex);
+        setPublicOnlyRegex(properties.getProperty("availability.regex.public", ""));
+        publicRegexList = splitAndAddToList(getPublicOnlyRegex());
 
-        allOnlyRegex = properties.getProperty("availability.regex.all", "");
-        allRegexList = splitAndAddToList(allOnlyRegex);
+        setAllOnlyRegex(properties.getProperty("availability.regex.all", ""));
+        allRegexList = splitAndAddToList(getAllOnlyRegex());
     }
 
     private List<String> splitAndAddToList (String regex) {
@@ -152,6 +151,30 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     public void setAllRegexList (List<String> allRegexList) {
         this.allRegexList = allRegexList;
+    }
+
+    public String getFreeOnlyRegex () {
+        return freeOnlyRegex;
+    }
+
+    public void setFreeOnlyRegex (String freeOnlyRegex) {
+        this.freeOnlyRegex = freeOnlyRegex;
+    }
+
+    public String getPublicOnlyRegex () {
+        return publicOnlyRegex;
+    }
+
+    public void setPublicOnlyRegex (String publicOnlyRegex) {
+        this.publicOnlyRegex = publicOnlyRegex;
+    }
+
+    public String getAllOnlyRegex () {
+        return allOnlyRegex;
+    }
+
+    public void setAllOnlyRegex (String allOnlyRegex) {
+        this.allOnlyRegex = allOnlyRegex;
     }
 
 }
