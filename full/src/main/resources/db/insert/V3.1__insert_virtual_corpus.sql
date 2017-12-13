@@ -44,16 +44,20 @@ INSERT INTO user_group_member(user_id, group_id, status, created_by)
 		
 -- virtual corpora
 INSERT INTO virtual_corpus(name, type, required_access, created_by, description, status, collection_query) 
-	VALUES ("dory VC", "PRIVATE", "FREE", "dory", "test vc", "experimental","sigle=GOE");
+	VALUES ("dory VC", "PRIVATE", "FREE", "dory", "test vc", "experimental",
+	'{"collection":{"@type":"koral:doc","value":"GOE","match":"match:eq","key":"corpusSigle"}}');
 	
 INSERT INTO virtual_corpus(name, type, required_access, created_by, description, status, collection_query) 
-	VALUES ("group VC", "PROJECT", "PUB", "dory", "test vc", "experimental","sigle=GOE");
+	VALUES ("group VC", "PROJECT", "PUB", "dory", "test vc", "experimental",
+	'{"collection":{"@type":"koral:doc","value":"GOE","match":"match:eq","key":"corpusSigle"}}');
 
 INSERT INTO virtual_corpus(name, type, required_access, created_by, description, status, collection_query) 
-	VALUES ("system VC", "PREDEFINED", "ALL", "system", "test vc", "experimental","sigle=GOE");
+	VALUES ("system VC", "PREDEFINED", "ALL", "system", "test vc", "experimental",
+	'{"collection":{"@type":"koral:doc","value":"GOE","match":"match:eq","key":"corpusSigle"}}');
 
 INSERT INTO virtual_corpus(name, type, required_access, created_by, description, status, collection_query) 
-	VALUES ("published VC", "PUBLISHED", "ALL", "marlin", "test vc", "experimental","sigle=GOE");
+	VALUES ("published VC", "PUBLISHED", "ALL", "marlin", "test vc", "experimental",
+	'{"collection":{"@type":"koral:doc","value":"GOE","match":"match:eq","key":"corpusSigle"}}');
 
 
 -- virtual corpus access

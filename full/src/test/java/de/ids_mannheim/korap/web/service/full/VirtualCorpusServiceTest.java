@@ -14,10 +14,12 @@ import java.util.Set;
 import org.eclipse.jetty.http.HttpHeaders;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.ClientResponse.Status;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.spi.container.ContainerRequest;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
@@ -34,6 +36,23 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
     private HttpAuthorizationHandler handler;
 
     @Test
+    public void testRetrieveUserVC () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        ClientResponse response = resource().path("vc").path("user")
+                .queryParam("username", "dory")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("dory",
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                
+                .get(ClientResponse.class);
+        String entity = response.getEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+//        System.out.println(entity);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(3, node.size());
+    }
+    @Test
     public void testStoreVC () throws KustvaktException {
         String json =
                 "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
@@ -41,25 +60,42 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path("vc").path("store")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("user",
+                        handler.createBasicAuthorizationHeaderValue("test class",
                                 "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(json)
                 .post(ClientResponse.class);
         String entity = response.getEntity(String.class);
-        System.out.println(entity);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        response = resource().path("vc").path("user")
+                .queryParam("username", "test class")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("test class",
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                
+                .get(ClientResponse.class);
+        entity = response.getEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());   
+//        System.out.println(entity);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(2, node.size());
+        assertEquals("new vc", node.get(1).get("name").asText());
     }
 
     @Test
-    public void testStoreVCWithExpiredToken () throws IOException, KustvaktException {
+    public void testStoreVCWithExpiredToken ()
+            throws IOException, KustvaktException {
         String json =
                 "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
                         + "\"test class\",\"collectionQuery\": \"corpusSigle=GOE\"}";
 
-        InputStream is = getClass().getClassLoader().getResourceAsStream("test-user.token");
+        InputStream is = getClass().getClassLoader()
+                .getResourceAsStream("test-user.token");
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
         String authToken = reader.readLine();
-        
+
         ClientResponse response = resource().path("vc").path("store")
                 .header(Attributes.AUTHORIZATION,
                         AuthenticationScheme.API.displayName() + " "
@@ -67,6 +103,8 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(json)
                 .post(ClientResponse.class);
         String entity = response.getEntity(String.class);
+
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.EXPIRED, node.at("/errors/0/0").asInt());
@@ -83,7 +121,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
         ClientResponse response = resource().path("vc").path("store")
                 .entity(json).post(ClientResponse.class);
 
-        assertEquals(HttpStatus.UNAUTHORIZED.value(), response.getStatus());
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
         Set<Entry<String, List<String>>> headers =
                 response.getHeaders().entrySet();
@@ -119,6 +157,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
                 .entity(json).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
         //        System.out.println(entity);
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.DESERIALIZATION_FAILED,

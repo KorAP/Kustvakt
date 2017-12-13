@@ -1,5 +1,9 @@
 package de.ids_mannheim.korap.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +15,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.dao.VirtualCorpusDao;
+import de.ids_mannheim.korap.dto.VirtualCorpusDto;
+import de.ids_mannheim.korap.dto.converter.VirtualCorpusConverter;
+import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
@@ -29,16 +37,19 @@ public class VirtualCorpusService {
 
     @Autowired
     private VirtualCorpusDao dao;
-
     @Autowired
     private SearchKrill krill;
-
     @Autowired
     private FullConfiguration config;
+    @Autowired
+    private AuthenticationManagerIface authManager;
+    @Autowired
+    private VirtualCorpusConverter converter;
 
-    public void storeVC (VirtualCorpusFromJson vc, User user)
+    public void storeVC (VirtualCorpusFromJson vc, String username)
             throws KustvaktException {
 
+        User user = authManager.getUser(username);
         // EM: how about VirtualCorpusType.PUBLISHED?
         if (vc.getType().equals(VirtualCorpusType.PREDEFINED)
                 && !user.isAdmin()) {
@@ -99,5 +110,20 @@ public class VirtualCorpusService {
         int numberOfDoc = node.at("/documents").asInt();
         jlog.debug("License: " + license + ", number of docs: " + numberOfDoc);
         return (numberOfDoc > 0) ? true : false;
+    }
+
+    public List<VirtualCorpusDto> retrieveUserVC (String username)
+            throws KustvaktException {
+
+        Set<VirtualCorpus> vcs = dao.retrieveVCByUser(username);
+        ArrayList<VirtualCorpusDto> dtos = new ArrayList<>(vcs.size());
+        
+        for (VirtualCorpus vc : vcs) {
+            String json = vc.getCollectionQuery();
+            String statistics = krill.getStatistics(json);
+            VirtualCorpusDto vcDto = converter.createVirtualCorpusDto(vc, statistics);
+            dtos.add(vcDto);
+        }
+        return dtos;
     }
 }
