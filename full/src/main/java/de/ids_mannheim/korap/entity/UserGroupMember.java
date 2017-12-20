@@ -55,7 +55,7 @@ public class UserGroupMember {
     @JoinColumn(name = "group_id")
     private UserGroup group;
 
-    /** Information about roles is deemed always necessary to describe a member.
+    /** Information about roles is deemed to be always necessary to describe a member.
      * 
      */
     @ManyToMany(fetch = FetchType.EAGER)

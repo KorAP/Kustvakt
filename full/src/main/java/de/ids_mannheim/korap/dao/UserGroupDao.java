@@ -62,8 +62,8 @@ public class UserGroupDao {
         entityManager.persist(group);
 
         List<Role> roles = new ArrayList<Role>(2);
-        roles.add(roleDao.retrieveRoleById(PredefinedRole.GROUP_ADMIN.getId()));
-        roles.add(roleDao.retrieveRoleById(PredefinedRole.VC_ADMIN.getId()));
+        roles.add(roleDao.retrieveRoleById(PredefinedRole.USER_GROUP_ADMIN.getId()));
+        roles.add(roleDao.retrieveRoleById(PredefinedRole.VC_ACCESS_ADMIN.getId()));
 
         UserGroupMember owner = new UserGroupMember();
         owner.setUserId(createdBy);
@@ -194,6 +194,16 @@ public class UserGroupDao {
         return q.getResultList();
     }
 
+    public void retrieveGroupByVCId (String vcId) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<VirtualCorpusAccess> query =
+                criteriaBuilder.createQuery(VirtualCorpusAccess.class);
+
+        Root<VirtualCorpusAccess> root = query.from(VirtualCorpusAccess.class);
+
+
+    }
+    
     public void addVCToGroup (VirtualCorpus virtualCorpus, String createdBy,
             VirtualCorpusAccessStatus status, UserGroup group) {
         VirtualCorpusAccess accessGroup = new VirtualCorpusAccess();

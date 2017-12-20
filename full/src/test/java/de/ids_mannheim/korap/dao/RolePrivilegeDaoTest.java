@@ -27,7 +27,7 @@ public class RolePrivilegeDaoTest {
 
     @Test
     public void retrievePredefinedRole () {
-        Role r = roleDao.retrieveRoleById(PredefinedRole.GROUP_ADMIN.getId());
+        Role r = roleDao.retrieveRoleById(PredefinedRole.USER_GROUP_ADMIN.getId());
         assertEquals(1, r.getId());
     }
 

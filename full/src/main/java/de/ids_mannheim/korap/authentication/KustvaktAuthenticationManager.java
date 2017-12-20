@@ -135,7 +135,12 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 		// todo:
 		// user.addField(Attributes.HOST, context.getHostAddress());
 		// user.addField(Attributes.USER_AGENT, context.getUserAgent());
-		return entHandler.getAccount(username);
+		
+		//EM:copied from EntityDao
+		KorAPUser user = new KorAPUser(); // oder eigentlich new DemoUser oder new DefaultUser.
+        user.setUsername(username);
+        return user;
+//		return entHandler.getAccount(username);
 	}
 
 	public TokenContext refresh(TokenContext context) throws KustvaktException {

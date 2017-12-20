@@ -27,8 +27,16 @@ import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.web.SearchKrill;
+import de.ids_mannheim.korap.web.controller.VirtualCorpusController;
 import de.ids_mannheim.korap.web.input.VirtualCorpusFromJson;
 
+/** VirtualCorpusService handles the logic behind {@link VirtualCorpusController}. 
+ *  It communicates with {@link VirtualCorpusDao} and returns DTO to  
+ *  {@link VirtualCorpusController}.
+ * 
+ * @author margaretha
+ *
+ */
 @Service
 public class VirtualCorpusService {
 
@@ -117,13 +125,38 @@ public class VirtualCorpusService {
 
         Set<VirtualCorpus> vcs = dao.retrieveVCByUser(username);
         ArrayList<VirtualCorpusDto> dtos = new ArrayList<>(vcs.size());
-        
+
         for (VirtualCorpus vc : vcs) {
             String json = vc.getCollectionQuery();
             String statistics = krill.getStatistics(json);
-            VirtualCorpusDto vcDto = converter.createVirtualCorpusDto(vc, statistics);
+            VirtualCorpusDto vcDto =
+                    converter.createVirtualCorpusDto(vc, statistics);
             dtos.add(vcDto);
         }
         return dtos;
+    }
+
+    /** Only admin and the owner of the virtual corpus are allowed to 
+     *  delete a virtual corpus.
+     *  
+     *  EM: are VC-access admins also allowed to delete?
+     * 
+     * @param username username
+     * @param vcId virtual corpus id
+     * @throws KustvaktException
+     */
+    public void deleteVC (String username, int vcId)
+            throws KustvaktException {
+
+        User user = authManager.getUser(username);
+        VirtualCorpus vc = dao.retrieveVCById(vcId);
+
+        if (user.isAdmin() || vc.getCreatedBy().equals(username)) {
+            dao.deleteVirtualCorpus(vcId);
+        }
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
     }
 }

@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.web.controller;
 
 import java.util.List;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -77,29 +78,66 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
 
+    // EM: nicer URL with username?
     @GET
     @Path("user")
-    public Response getUserVC (@Context SecurityContext securityContext,
-            @QueryParam("userId") String userId) throws KustvaktException {
-
+    public Response getUserVC (@Context SecurityContext securityContext){
+        String result;
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
-        if (context.isDemo()) {
-            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Operation is not permitted for user: "
-                            + context.getUsername(),
-                    context.getUsername());
-        }
-
-        List<VirtualCorpusDto> dtos = service.retrieveUserVC(context.getUsername());
-        String result;
         try {
+            if (context.isDemo()) {
+                throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                        "Operation is not permitted for user: "
+                                + context.getUsername(),
+                        context.getUsername());
+            }
+
+            List<VirtualCorpusDto> dtos =
+                    service.retrieveUserVC(context.getUsername());
             result = JsonUtils.toJSON(dtos);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
         return Response.ok(result).build();
+    }
+
+    //    @POST
+    //    @Path("edit")
+    //    public Response editVC (@Context SecurityContext securityContext,
+    //            String json) throws KustvaktException {
+    //        TokenContext context =
+    //                (TokenContext) securityContext.getUserPrincipal();
+    //        if (context.isDemo()) {
+    //            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+    //                    "Operation is not permitted for user: "
+    //                            + context.getUsername(),
+    //                    context.getUsername());
+    //        }
+    //
+    //        return Response.ok().build();
+    //    }
+
+    @DELETE
+    @Path("delete")
+    public Response deleteVC (@Context SecurityContext securityContext,
+            @QueryParam("vcId") int vcId) {
+        try {
+            TokenContext context =
+                    (TokenContext) securityContext.getUserPrincipal();
+            if (context.isDemo()) {
+                throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                        "Operation is not permitted for user: "
+                                + context.getUsername(),
+                        context.getUsername());
+            }
+            service.deleteVC(context.getUsername(), vcId);
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+        return Response.ok().build();
     }
 
 }

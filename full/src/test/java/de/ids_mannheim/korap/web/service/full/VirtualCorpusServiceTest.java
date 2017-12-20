@@ -34,6 +34,24 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
 
     @Autowired
     private HttpAuthorizationHandler handler;
+    
+    private void checkWWWAuthenticateHeader (ClientResponse response) {
+        Set<Entry<String, List<String>>> headers =
+                response.getHeaders().entrySet();
+
+        for (Entry<String, List<String>> header : headers) {
+            if (header.getKey().equals(ContainerRequest.WWW_AUTHENTICATE)) {
+                assertEquals("Api realm=\"Kustvakt\"",
+                        header.getValue().get(0));
+                assertEquals("Session realm=\"Kustvakt\"",
+                        header.getValue().get(1));
+                assertEquals("Bearer realm=\"Kustvakt\"",
+                        header.getValue().get(2));
+                assertEquals("Basic realm=\"Kustvakt\"",
+                        header.getValue().get(3));
+            }
+        }
+    }
 
     @Test
     public void testRetrieveUserVC () throws UniformInterfaceException,
@@ -43,43 +61,91 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
                         handler.createBasicAuthorizationHeaderValue("dory",
                                 "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                
+
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-//        System.out.println(entity);
+        //        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(3, node.size());
     }
+
     @Test
-    public void testStoreVC () throws KustvaktException {
+    public void testRetrieveUserVCUnauthorized ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        ClientResponse response = resource().path("vc").path("user")
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+
+                .get(ClientResponse.class);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Operation is not permitted for user: guest",
+                node.at("/errors/0/1").asText());
+        
+        checkWWWAuthenticateHeader(response);
+    }
+
+    @Test
+    public void testStoreDeleteVC () throws KustvaktException {
         String json =
                 "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
                         + "\"test class\",\"collectionQuery\": \"corpusSigle=GOE\"}";
 
         ClientResponse response = resource().path("vc").path("store")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("test class",
-                                "pass"))
+                        handler.createBasicAuthorizationHeaderValue(
+                                "test class", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(json)
                 .post(ClientResponse.class);
         String entity = response.getEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
+        // retrieve user VC
         response = resource().path("vc").path("user")
-                .queryParam("username", "test class")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("test class",
-                                "pass"))
+                        handler.createBasicAuthorizationHeaderValue(
+                                "test class", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                
+
                 .get(ClientResponse.class);
         entity = response.getEntity(String.class);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());   
-//        System.out.println(entity);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        //        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.size());
         assertEquals("new vc", node.get(1).get("name").asText());
+
+        String vcId = node.get(1).get("id").asText();
+
+        // delete new VC
+        resource().path("vc").path("delete").queryParam("vcId", vcId)
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(
+                                "test class", "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+
+                .delete(ClientResponse.class);
+        //        entity = response.getEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        // retrieve user VC
+        response = resource().path("vc").path("user")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(
+                                "test class", "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+
+                .get(ClientResponse.class);
+        entity = response.getEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        //        System.out.println(entity);
+        node = JsonUtils.readTree(entity);
+        assertEquals(1, node.size());
     }
 
     @Test
@@ -109,6 +175,8 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
         assertEquals(StatusCodes.EXPIRED, node.at("/errors/0/0").asInt());
         assertEquals("Authentication token is expired",
                 node.at("/errors/0/1").asText());
+        
+        checkWWWAuthenticateHeader(response);
     }
 
     @Test
@@ -122,28 +190,14 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
-        Set<Entry<String, List<String>>> headers =
-                response.getHeaders().entrySet();
-
-        for (Entry<String, List<String>> header : headers) {
-            if (header.getKey().equals(ContainerRequest.WWW_AUTHENTICATE)) {
-                assertEquals("Api realm=\"Kustvakt\"",
-                        header.getValue().get(0));
-                assertEquals("Session realm=\"Kustvakt\"",
-                        header.getValue().get(1));
-                assertEquals("Bearer realm=\"Kustvakt\"",
-                        header.getValue().get(2));
-                assertEquals("Basic realm=\"Kustvakt\"",
-                        header.getValue().get(3));
-            }
-        }
-
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
         assertEquals("Operation is not permitted for user: guest",
                 node.at("/errors/0/1").asText());
+        
+        checkWWWAuthenticateHeader(response);
     }
 
     @Test
@@ -155,7 +209,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
         ClientResponse response = resource().path("vc").path("store")
                 .entity(json).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
-                System.out.println(entity);
+        //        System.out.println(entity);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
@@ -165,5 +219,28 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
                 "Cannot deserialize value of type `de.ids_mannheim.korap.constant."
                         + "VirtualCorpusType` from String \"PRIVAT\": value not one of "
                         + "declared Enum instance names"));
+    }
+
+    @Test
+    public void testDeleteVCUnauthorized () throws KustvaktException {
+        ClientResponse response =
+                resource().path("vc").path("delete").queryParam("vcId", "1")
+                        .header(Attributes.AUTHORIZATION,
+                                handler.createBasicAuthorizationHeaderValue(
+                                        "test class", "pass"))
+                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+
+                        .delete(ClientResponse.class);
+        
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Unauthorized operation for user: test class",
+                node.at("/errors/0/1").asText());
+        
+        checkWWWAuthenticateHeader(response);
     }
 }

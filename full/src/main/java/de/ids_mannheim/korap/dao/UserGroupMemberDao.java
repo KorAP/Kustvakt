@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.entity.Role;
+import de.ids_mannheim.korap.entity.Role_;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.entity.UserGroupMember_;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -102,7 +103,9 @@ public class UserGroupMemberDao {
         Predicate predicate = criteriaBuilder.and(
                 criteriaBuilder.equal(root.get(UserGroupMember_.group),
                         groupId),
-                criteriaBuilder.equal(memberRole.get("role_id"), roleId));
+                criteriaBuilder.notEqual(root.get(UserGroupMember_.status),
+                        GroupMemberStatus.DELETED),
+                criteriaBuilder.equal(memberRole.get(Role_.id), roleId));
 
         query.select(root);
         query.where(predicate);
@@ -117,8 +120,11 @@ public class UserGroupMemberDao {
 
         Root<UserGroupMember> root = query.from(UserGroupMember.class);
 
-        Predicate predicate = criteriaBuilder.and(criteriaBuilder
-                .equal(root.get(UserGroupMember_.group), groupId));
+        Predicate predicate = criteriaBuilder.and(
+                criteriaBuilder.equal(root.get(UserGroupMember_.group),
+                        groupId),
+                criteriaBuilder.notEqual(root.get(UserGroupMember_.status),
+                        GroupMemberStatus.DELETED));
 
         query.select(root);
         query.where(predicate);
