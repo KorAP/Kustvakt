@@ -42,7 +42,7 @@ public class FoundryInject implements RewriteTask.IterableRewritePath,
             mapper = new LayerMapper(config);
             
         if (node.get("@type").equals("koral:span")) {
-            if (!node.at("/wrap").rawNode().isMissingNode()){
+            if (!node.isMissingNode("/wrap")){
                 JsonNode term = rewriteQuery(node.at("/wrap"), config, user);
                 node.replaceAt("/wrap", term, new RewriteIdentifier("koral:term", "replace"));
             }

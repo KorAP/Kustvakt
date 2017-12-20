@@ -265,4 +265,9 @@ public abstract class KoralNode {
         }
 
     }
+
+
+    public boolean isMissingNode (String string) {
+        return this.node.at(string).isMissingNode();
+    }
 }

@@ -39,7 +39,6 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
     public void testRetrieveUserVC () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         ClientResponse response = resource().path("vc").path("user")
-                .queryParam("username", "dory")
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue("dory",
                                 "pass"))
@@ -156,8 +155,8 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
         ClientResponse response = resource().path("vc").path("store")
                 .entity(json).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
-        //        System.out.println(entity);
-        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+                System.out.println(entity);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.DESERIALIZATION_FAILED,
