@@ -1,7 +1,6 @@
 package de.ids_mannheim.korap.dao;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -10,7 +9,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.Predicate;
@@ -62,8 +60,10 @@ public class UserGroupDao {
         entityManager.persist(group);
 
         List<Role> roles = new ArrayList<Role>(2);
-        roles.add(roleDao.retrieveRoleById(PredefinedRole.USER_GROUP_ADMIN.getId()));
-        roles.add(roleDao.retrieveRoleById(PredefinedRole.VC_ACCESS_ADMIN.getId()));
+        roles.add(roleDao
+                .retrieveRoleById(PredefinedRole.USER_GROUP_ADMIN.getId()));
+        roles.add(roleDao
+                .retrieveRoleById(PredefinedRole.VC_ACCESS_ADMIN.getId()));
 
         UserGroupMember owner = new UserGroupMember();
         owner.setUserId(createdBy);
@@ -81,7 +81,15 @@ public class UserGroupDao {
         ParameterChecker.checkIntegerValue(groupId, "groupId");
         ParameterChecker.checkStringValue(deletedBy, "deletedBy");
 
-        UserGroup group = retrieveGroupById(groupId);
+        UserGroup group = null;
+        try {
+            group = retrieveGroupById(groupId);
+        }
+        catch (NoResultException e) {
+            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
+                    "groupId: " + groupId);
+        }
+
         if (isSoftDelete) {
             group.setStatus(UserGroupStatus.DELETED);
             group.setDeletedBy(deletedBy);
@@ -203,7 +211,7 @@ public class UserGroupDao {
 
 
     }
-    
+
     public void addVCToGroup (VirtualCorpus virtualCorpus, String createdBy,
             VirtualCorpusAccessStatus status, UserGroup group) {
         VirtualCorpusAccess accessGroup = new VirtualCorpusAccess();
@@ -223,7 +231,8 @@ public class UserGroupDao {
         }
     }
 
-    public void deleteVCFromGroup (int virtualCorpusId, int groupId) throws KustvaktException {
+    public void deleteVCFromGroup (int virtualCorpusId, int groupId)
+            throws KustvaktException {
         ParameterChecker.checkIntegerValue(virtualCorpusId, "virtualCorpusId");
         ParameterChecker.checkIntegerValue(groupId, "groupId");
 
@@ -232,16 +241,21 @@ public class UserGroupDao {
                 criteriaBuilder.createQuery(VirtualCorpusAccess.class);
 
         Root<VirtualCorpusAccess> root = query.from(VirtualCorpusAccess.class);
-        Join<VirtualCorpusAccess, VirtualCorpus> vc = root.join(VirtualCorpusAccess_.virtualCorpus);
-        Join<VirtualCorpusAccess, UserGroup> group = root.join(VirtualCorpusAccess_.userGroup);
+        Join<VirtualCorpusAccess, VirtualCorpus> vc =
+                root.join(VirtualCorpusAccess_.virtualCorpus);
+        Join<VirtualCorpusAccess, UserGroup> group =
+                root.join(VirtualCorpusAccess_.userGroup);
 
-        Predicate virtualCorpus = criteriaBuilder.equal(vc.get(VirtualCorpus_.id), virtualCorpusId);
-        Predicate userGroup = criteriaBuilder.equal(group.get(UserGroup_.id), groupId);
-        
+        Predicate virtualCorpus = criteriaBuilder
+                .equal(vc.get(VirtualCorpus_.id), virtualCorpusId);
+        Predicate userGroup =
+                criteriaBuilder.equal(group.get(UserGroup_.id), groupId);
+
         query.select(root);
         query.where(criteriaBuilder.and(virtualCorpus, userGroup));
         Query q = entityManager.createQuery(query);
-        VirtualCorpusAccess vcAccess = (VirtualCorpusAccess) q.getSingleResult();
+        VirtualCorpusAccess vcAccess =
+                (VirtualCorpusAccess) q.getSingleResult();
         entityManager.remove(vcAccess);
     }
 

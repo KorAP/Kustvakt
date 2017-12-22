@@ -28,7 +28,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.web.SearchKrill;
 import de.ids_mannheim.korap.web.controller.VirtualCorpusController;
-import de.ids_mannheim.korap.web.input.VirtualCorpusFromJson;
+import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
 
 /** VirtualCorpusService handles the logic behind {@link VirtualCorpusController}. 
  *  It communicates with {@link VirtualCorpusDao} and returns DTO to  
@@ -54,7 +54,7 @@ public class VirtualCorpusService {
     @Autowired
     private VirtualCorpusConverter converter;
 
-    public void storeVC (VirtualCorpusFromJson vc, String username)
+    public void storeVC (VirtualCorpusJson vc, String username)
             throws KustvaktException {
 
         User user = authManager.getUser(username);

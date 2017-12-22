@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class VirtualCorpusFromJson {
+public class VirtualCorpusJson {
 
     private String name;
     private VirtualCorpusType type;

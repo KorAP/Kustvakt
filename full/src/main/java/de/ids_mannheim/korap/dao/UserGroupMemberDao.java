@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.dao;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -20,6 +21,7 @@ import de.ids_mannheim.korap.entity.Role_;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.entity.UserGroupMember_;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
 @Transactional
@@ -49,6 +51,11 @@ public class UserGroupMemberDao {
         ParameterChecker.checkIntegerValue(groupId, "groupId");
 
         UserGroupMember member = retrieveMemberById(userId, groupId);
+        if (member.getStatus().equals(GroupMemberStatus.DELETED)) {
+            throw new KustvaktException(StatusCodes.NOTHING_CHANGED, "Username "
+                    + userId + " had been deleted in group " + groupId, userId);
+        }
+
         member.setStatus(GroupMemberStatus.ACTIVE);
         entityManager.persist(member);
     }
@@ -58,13 +65,14 @@ public class UserGroupMemberDao {
         ParameterChecker.checkStringValue(userId, "userId");
         ParameterChecker.checkIntegerValue(groupId, "groupId");
 
-        UserGroupMember m = retrieveMemberById(userId, groupId);
+        UserGroupMember member = retrieveMemberById(userId, groupId);
+
         if (isSoftDelete) {
-            m.setStatus(GroupMemberStatus.DELETED);
-            entityManager.persist(m);
+            member.setStatus(GroupMemberStatus.DELETED);
+            entityManager.persist(member);
         }
         else {
-            entityManager.remove(m);
+            entityManager.remove(member);
         }
     }
 
@@ -88,11 +96,20 @@ public class UserGroupMemberDao {
         query.select(root);
         query.where(predicate);
         Query q = entityManager.createQuery(query);
-        return (UserGroupMember) q.getSingleResult();
+
+        try {
+            return (UserGroupMember) q.getSingleResult();
+        }
+        catch (NoResultException e) {
+            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
+                    "Username " + userId + " is not found in group " + groupId,
+                    userId);
+        }
+
     }
 
-    public List<UserGroupMember> retrieveMemberByRole (int groupId,
-            int roleId) {
+    public List<UserGroupMember> retrieveMemberByRole (int groupId, int roleId)
+            throws KustvaktException {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<UserGroupMember> query =
                 criteriaBuilder.createQuery(UserGroupMember.class);
@@ -110,10 +127,19 @@ public class UserGroupMemberDao {
         query.select(root);
         query.where(predicate);
         Query q = entityManager.createQuery(query);
-        return q.getResultList();
+        try {
+            return q.getResultList();
+        }
+        catch (NoResultException e) {
+            throw new KustvaktException(
+                    StatusCodes.NO_RESULT_FOUND, "No member with role " + roleId
+                            + " is found in group " + groupId,
+                    String.valueOf(roleId));
+        }
     }
 
-    public List<UserGroupMember> retrieveMemberByGroupId (int groupId) {
+    public List<UserGroupMember> retrieveMemberByGroupId (int groupId)
+            throws KustvaktException {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<UserGroupMember> query =
                 criteriaBuilder.createQuery(UserGroupMember.class);
@@ -129,6 +155,14 @@ public class UserGroupMemberDao {
         query.select(root);
         query.where(predicate);
         Query q = entityManager.createQuery(query);
-        return q.getResultList();
+
+        try {
+            return q.getResultList();
+        }
+        catch (NoResultException e) {
+            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
+                    "No member is found in group " + groupId,
+                    String.valueOf(groupId));
+        }
     }
 }

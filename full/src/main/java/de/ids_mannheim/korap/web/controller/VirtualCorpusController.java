@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.web.controller;
 
 import java.util.List;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -26,12 +27,11 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.service.VirtualCorpusService;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.utils.ParameterChecker;
 import de.ids_mannheim.korap.web.FullResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
-import de.ids_mannheim.korap.web.input.VirtualCorpusFromJson;
+import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
 
 @Controller
 @Path("vc")
@@ -50,14 +50,10 @@ public class VirtualCorpusController {
 
     @POST
     @Path("store")
+    @Consumes("application/json")
     public Response storeVC (@Context SecurityContext securityContext,
-            String json) {
+            VirtualCorpusJson vc) {
         try {
-            ParameterChecker.checkStringValue(json, "json string");
-
-            // create vc object from json
-            VirtualCorpusFromJson vc =
-                    JsonUtils.convertToClass(json, VirtualCorpusFromJson.class);
             jlog.debug(vc.toString());
 
             // get user info
@@ -119,6 +115,14 @@ public class VirtualCorpusController {
     //        return Response.ok().build();
     //    }
 
+    /** Only VC owner and system admin can delete VCs. VC-access admins 
+     *  can delete VC-accesses e.g. of project VCs, but not the VCs 
+     *  themselves. 
+     * 
+     * @param securityContext
+     * @param vcId
+     * @return HTTP status 200, if successful
+     */
     @DELETE
     @Path("delete")
     public Response deleteVC (@Context SecurityContext securityContext,
@@ -139,5 +143,7 @@ public class VirtualCorpusController {
         }
         return Response.ok().build();
     }
+    
+    
 
 }

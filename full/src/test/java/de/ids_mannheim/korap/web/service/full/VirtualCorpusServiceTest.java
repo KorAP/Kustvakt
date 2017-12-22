@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.http.entity.ContentType;
 import org.eclipse.jetty.http.HttpHeaders;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,9 +101,11 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue(
                                 "test class", "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(json)
-                .post(ClientResponse.class);
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .post(ClientResponse.class, json);
         String entity = response.getEntity(String.class);
+        System.out.println(entity);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         // retrieve user VC
