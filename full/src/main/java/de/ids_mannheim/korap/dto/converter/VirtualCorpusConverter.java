@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.dto.converter;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -9,7 +9,7 @@ import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
-@Service
+@Component
 public class VirtualCorpusConverter {
 
     public VirtualCorpusDto createVirtualCorpusDto (VirtualCorpus vc,

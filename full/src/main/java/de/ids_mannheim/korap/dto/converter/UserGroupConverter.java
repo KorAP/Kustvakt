@@ -3,7 +3,7 @@ package de.ids_mannheim.korap.dto.converter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.dto.UserGroupDto;
 import de.ids_mannheim.korap.dto.UserGroupMemberDto;
@@ -11,7 +11,7 @@ import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 
-@Service
+@Component
 public class UserGroupConverter {
 
     public UserGroupDto createUserGroupDto (UserGroup group,

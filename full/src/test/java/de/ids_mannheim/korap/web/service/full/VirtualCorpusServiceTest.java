@@ -35,7 +35,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
 
     @Autowired
     private HttpAuthorizationHandler handler;
-    
+
     private void checkWWWAuthenticateHeader (ClientResponse response) {
         Set<Entry<String, List<String>>> headers =
                 response.getHeaders().entrySet();
@@ -87,7 +87,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
                 node.at("/errors/0/0").asInt());
         assertEquals("Operation is not permitted for user: guest",
                 node.at("/errors/0/1").asText());
-        
+
         checkWWWAuthenticateHeader(response);
     }
 
@@ -105,7 +105,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .post(ClientResponse.class, json);
         String entity = response.getEntity(String.class);
-        System.out.println(entity);
+//        System.out.println(entity);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         // retrieve user VC
@@ -168,8 +168,9 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
                 .header(Attributes.AUTHORIZATION,
                         AuthenticationScheme.API.displayName() + " "
                                 + authToken)
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(json)
-                .post(ClientResponse.class);
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .entity(json).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -178,7 +179,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
         assertEquals(StatusCodes.EXPIRED, node.at("/errors/0/0").asInt());
         assertEquals("Authentication token is expired",
                 node.at("/errors/0/1").asText());
-        
+
         checkWWWAuthenticateHeader(response);
     }
 
@@ -189,6 +190,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
                         + "\"test class\",\"collectionQuery\": \"pubDate eq 1982\"}";
 
         ClientResponse response = resource().path("vc").path("store")
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -199,7 +201,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
                 node.at("/errors/0/0").asInt());
         assertEquals("Operation is not permitted for user: guest",
                 node.at("/errors/0/1").asText());
-        
+
         checkWWWAuthenticateHeader(response);
     }
 
@@ -210,9 +212,13 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
                         + "\"test class\",\"collectionQuery\": \"pubDate eq 1982\"}";
 
         ClientResponse response = resource().path("vc").path("store")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(
+                                "test class", "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
-        //        System.out.println(entity);
+//        System.out.println(entity);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
@@ -234,16 +240,16 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
                         .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
 
                         .delete(ClientResponse.class);
-        
+
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        
+
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
         assertEquals("Unauthorized operation for user: test class",
                 node.at("/errors/0/1").asText());
-        
+
         checkWWWAuthenticateHeader(response);
     }
 }

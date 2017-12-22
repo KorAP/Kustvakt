@@ -23,20 +23,19 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.service.VirtualCorpusService;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.FullResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
-import de.ids_mannheim.korap.web.filter.DemoUserFilter;
+import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
 
 @Controller
 @Path("vc")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-@ResourceFilters({ AuthenticationFilter.class, DemoUserFilter.class,
+@ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class,
         PiwikFilter.class })
 public class VirtualCorpusController {
 
@@ -59,12 +58,6 @@ public class VirtualCorpusController {
             // get user info
             TokenContext context =
                     (TokenContext) securityContext.getUserPrincipal();
-            if (context.isDemo()) {
-                throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                        "Operation is not permitted for user: "
-                                + context.getUsername(),
-                        context.getUsername());
-            }
 
             service.storeVC(vc, context.getUsername());
         }
@@ -82,13 +75,6 @@ public class VirtualCorpusController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            if (context.isDemo()) {
-                throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                        "Operation is not permitted for user: "
-                                + context.getUsername(),
-                        context.getUsername());
-            }
-
             List<VirtualCorpusDto> dtos =
                     service.retrieveUserVC(context.getUsername());
             result = JsonUtils.toJSON(dtos);
@@ -127,15 +113,9 @@ public class VirtualCorpusController {
     @Path("delete")
     public Response deleteVC (@Context SecurityContext securityContext,
             @QueryParam("vcId") int vcId) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
         try {
-            TokenContext context =
-                    (TokenContext) securityContext.getUserPrincipal();
-            if (context.isDemo()) {
-                throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                        "Operation is not permitted for user: "
-                                + context.getUsername(),
-                        context.getUsername());
-            }
             service.deleteVC(context.getUsername(), vcId);
         }
         catch (KustvaktException e) {
@@ -143,7 +123,4 @@ public class VirtualCorpusController {
         }
         return Response.ok().build();
     }
-    
-    
-
 }

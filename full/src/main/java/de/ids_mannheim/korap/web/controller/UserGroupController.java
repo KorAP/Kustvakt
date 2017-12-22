@@ -22,20 +22,19 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.dto.UserGroupDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.service.UserGroupService;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.FullResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
-import de.ids_mannheim.korap.web.filter.DemoUserFilter;
+import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.input.UserGroupJson;
 
 @Controller
 @Path("group")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-@ResourceFilters({ AuthenticationFilter.class, DemoUserFilter.class,
+@ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class,
         PiwikFilter.class })
 public class UserGroupController {
 
@@ -50,25 +49,17 @@ public class UserGroupController {
     @GET
     @Path("list")
     public Response getUserGroup (@Context SecurityContext securityContext) {
-        String result;
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            if (context.isDemo()) {
-                throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                        "Operation is not permitted for user: "
-                                + context.getUsername(),
-                        context.getUsername());
-            }
-
             List<UserGroupDto> dtos =
                     service.retrieveUserGroup(context.getUsername());
-            result = JsonUtils.toJSON(dtos);
+            String result = JsonUtils.toJSON(dtos);
+            return Response.ok(result).build();
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
-        return Response.ok(result).build();
     }
 
 
@@ -99,19 +90,12 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            if (context.isDemo()) {
-                throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                        "Operation is not permitted for user: "
-                                + context.getUsername(),
-                        context.getUsername());
-            }
-
             service.createUserGroup(group, context.getUsername());
+            return Response.ok().build();
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
-        return Response.ok().build();
     }
 
 
@@ -123,19 +107,12 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            if (context.isDemo()) {
-                throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                        "Operation is not permitted for user: "
-                                + context.getUsername(),
-                        context.getUsername());
-            }
-
             service.subscribe(groupId, context.getUsername());
+            return Response.ok().build();
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
-        return Response.ok().build();
     }
 
     @POST
@@ -147,18 +124,11 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            if (context.isDemo()) {
-                throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                        "Operation is not permitted for user: "
-                                + context.getUsername(),
-                        context.getUsername());
-            }
-
             service.unsubscribe(groupId, context.getUsername());
+            return Response.ok().build();
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
-        return Response.ok().build();
     }
 }

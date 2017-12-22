@@ -249,7 +249,7 @@ public class ResourceServiceTest extends FastJerseyTest {
                 response.getStatus());
 
         String ent = response.getEntity(String.class);
-        System.out.println(ent);
+//        System.out.println(ent);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(402, node.at("/errors/0/0").asInt());
         assertEquals("Unsupported operation for the given resource type.",

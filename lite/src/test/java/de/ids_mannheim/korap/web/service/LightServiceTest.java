@@ -55,7 +55,7 @@ public class LightServiceTest extends FastJerseyLightTest {
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String query = response.getEntity(String.class);
-        System.out.println(query);
+//        System.out.println(query);
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
         assertEquals("orth", node.at("/query/wrap/layer").asText());

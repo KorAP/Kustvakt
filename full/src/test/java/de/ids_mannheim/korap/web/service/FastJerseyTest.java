@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.web.service;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.junit.Before;
 
 import de.ids_mannheim.korap.config.ContextHolder;
@@ -44,7 +46,8 @@ public abstract class FastJerseyTest extends FastJerseyBaseTest {
     @Before
     public void startServerBeforeFirstTestRun () {
         if (testContainer == null) {
-            initServer(PORT, classPackages);
+            int port = ThreadLocalRandom.current().nextInt(5000, 8000 + 1);
+            initServer(port, classPackages);
             startServer();
         }
     }

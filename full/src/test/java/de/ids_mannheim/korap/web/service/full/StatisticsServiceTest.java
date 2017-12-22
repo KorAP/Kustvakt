@@ -130,7 +130,7 @@ public class StatisticsServiceTest extends FastJerseyTest {
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
-        System.out.println(ent);
+//        System.out.println(ent);
         JsonNode node = mapper.readTree(ent);
         assertEquals(node.at("/errors/0/0").asInt(), 105);
         assertEquals(node.at("/errors/0/1").asText(),

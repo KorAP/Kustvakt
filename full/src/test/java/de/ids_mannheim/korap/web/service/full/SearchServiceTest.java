@@ -58,7 +58,7 @@ public class SearchServiceTest extends FastJerseyTest {
 //        assertEquals(ClientResponse.Status.OK.getStatusCode(),
 //                response.getStatus());
         String ent = response.getEntity(String.class);
-        System.out.println(ent);
+//        System.out.println(ent);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("koral:doc", node.at("/collection/@type").asText());
@@ -468,7 +468,7 @@ public class SearchServiceTest extends FastJerseyTest {
         s.setCollection("corpusSigle=GOE");
 
         s.setQuery("Wasser", "poliqarp");
-        System.out.println(s.toJSON());
+//        System.out.println(s.toJSON());
         ClientResponse response = resource()
                 .path("search").post(ClientResponse.class, s.toJSON());
         assertEquals(ClientResponse.Status.OK.getStatusCode(),

@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.dto.ResourceDto;
 import de.ids_mannheim.korap.entity.AnnotationPair;
 import de.ids_mannheim.korap.entity.Resource;
 
-@Service
+@Component
 public class ResourceConverter {
 
     public List<ResourceDto> convertToResourcesDto (List<Resource> resources) {

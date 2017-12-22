@@ -16,6 +16,8 @@ import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.web.FullResponseHandler;
 
 /**
+ * EM: pretty much identical to {@link BlockingFilter}, should be deleted? 
+ * 
  * @author hanl
  * @date 11/12/2014
  *       <p/>
@@ -42,8 +44,9 @@ public class NonDemoBlockingFilter
         }
 
         if (context == null || context.isDemo()) {
-            new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Operation is not permitted for guest users");
+            throw kustvaktResponseHandler.throwit(
+                    new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                            "Operation is not permitted for guest users"));
         }
         return request;
     }

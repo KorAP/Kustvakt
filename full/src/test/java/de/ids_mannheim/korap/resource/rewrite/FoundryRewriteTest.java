@@ -208,7 +208,7 @@ public class FoundryRewriteTest extends BeanConfigTest {
         assertTrue(handler.add(FoundryInject.class));
         String result = handler.processQuery(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
-        System.out.println("NODDE "+ node);
+//        System.out.println("NODDE "+ node);
         assertNotNull(node);
         assertEquals("koral:termGroup", node.at("/query/wrap/@type").asText());
         assertFalse(node.at("/query/wrap/operands/0/foundry")
@@ -229,7 +229,7 @@ public class FoundryRewriteTest extends BeanConfigTest {
         assertTrue(handler.add(FoundryInject.class));
         String result = handler.processQuery(s.toJSON(), null);
         JsonNode node = JsonUtils.readTree(result);
-        System.out.println("NODDE "+ node);
+//        System.out.println("NODDE "+ node);
         assertNotNull(node);
         assertEquals("koral:termGroup", node.at("/query/wrap/@type").asText());
         assertFalse(node.at("/query/wrap/operands/0/operands/0/foundry")
