@@ -14,7 +14,6 @@ import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
@@ -30,10 +29,11 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.UserFactory;
 import de.ids_mannheim.korap.web.service.FastJerseyTest;
 
-/** FIX ME: Database restructure
+/** Not in the new DB
  * @author margaretha
  */
 @Ignore
+@Deprecated
 public class PolicyServiceTest extends FastJerseyTest {
 
     @Autowired

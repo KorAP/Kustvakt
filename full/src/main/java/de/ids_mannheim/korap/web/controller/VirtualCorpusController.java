@@ -32,6 +32,14 @@ import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
 
+/** VirtualCorpusController defines web APIs related to virtual corpus
+ * such as creating, deleting and listing user virtual corpora.
+ * 
+ * These APIs are only available to logged-in users.
+ * 
+ * @author margaretha
+ *
+ */
 @Controller
 @Path("vc")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -70,7 +78,7 @@ public class VirtualCorpusController {
     // EM: nicer URL with username?
     @GET
     @Path("user")
-    public Response getUserVC (@Context SecurityContext securityContext){
+    public Response getUserVC (@Context SecurityContext securityContext) {
         String result;
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();

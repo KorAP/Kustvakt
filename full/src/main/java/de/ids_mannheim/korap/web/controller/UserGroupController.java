@@ -31,6 +31,16 @@ import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.input.UserGroupJson;
 
+/** UserGroupController defines web APIs related to user groups, 
+ *  such as creating a user group,  listing groups of a user, 
+ *  adding members to a group and subscribing (confirming an 
+ *  invitation) to a group. 
+ *  
+ *  These APIs are only available to logged-in users.
+ *   
+ * @author margaretha
+ *
+ */
 @Controller
 @Path("group")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")

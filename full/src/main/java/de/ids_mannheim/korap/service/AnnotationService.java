@@ -16,7 +16,13 @@ import de.ids_mannheim.korap.entity.AnnotationPair;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
+import de.ids_mannheim.korap.web.controller.AnnotationController;
 
+/** AnnotationService defines the logic behind {@link AnnotationController}.
+ * 
+ * @author margaretha
+ *
+ */
 @Service
 public class AnnotationService {
 

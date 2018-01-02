@@ -18,8 +18,16 @@ import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.web.controller.UserGroupController;
 import de.ids_mannheim.korap.web.input.UserGroupJson;
 
+/** UserGroupService defines the logic behind user group web controller.
+ * 
+ * @see UserGroupController
+ * 
+ * @author margaretha
+ *
+ */
 @Service
 public class UserGroupService {
 
@@ -33,11 +41,14 @@ public class UserGroupService {
     private UserGroupConverter converter;
 
 
-    /** Only USER_GROUP_ADMINs are allowed to see the members of the group.
+    /** Only users with {@link PredefinedRole#USER_GROUP_ADMIN} 
+     * are allowed to see the members of the group.
      * 
      * @param username username
      * @return a list of usergroups
      * @throws KustvaktException
+     * 
+     * @see {@link PredefinedRole}
      */
     public List<UserGroupDto> retrieveUserGroup (String username)
             throws KustvaktException {
@@ -70,13 +81,16 @@ public class UserGroupService {
     /** Group owner is automatically added when creating a group. 
      *  Do not include owners in group members. 
      *  
-     *  USER_GROUP_MEMBER and VC_ACCESS_MEMBER roles are automatically 
-     *  assigned to each group member. 
+     *  {@link PredefinedRole#USER_GROUP_MEMBER} and 
+     *  {@link PredefinedRole#VC_ACCESS_MEMBER} roles are 
+     *  automatically assigned to each group member. 
      *  
-     *  USER_GROUP_MEMBER cannot see other group members and may remove 
-     *  himself from the group.
+     *  {@link PredefinedRole#USER_GROUP_MEMBER} restrict users 
+     *  to see other group members and allow users to remove 
+     *  themselves from the groups.
      *   
-     *  VC_ACCESS_MEMBER can only read group VC.
+     *  {@link PredefinedRole#VC_ACCESS_MEMBER} allow user to 
+     *  read group VC.
      * 
      * @see /full/src/main/resources/db/predefined/V3.2__insert_predefined_roles.sql
      * 
@@ -115,12 +129,26 @@ public class UserGroupService {
         }
     }
 
+    /** Updates the {@link GroupMemberStatus} of a pending member 
+     * to {@link GroupMemberStatus#ACTIVE}.
+     * 
+     * @param groupId groupId
+     * @param username the username of the group member
+     * @throws KustvaktException
+     */
     public void subscribe (int groupId, String username)
             throws KustvaktException {
         groupMemberDao.approveMember(username, groupId);
     }
 
 
+    /** Updates the {@link GroupMemberStatus} of a member to 
+     * {@link GroupMemberStatus#DELETED}
+     * 
+     * @param groupId groupId
+     * @param username member's username
+     * @throws KustvaktException
+     */
     public void unsubscribe (int groupId, String username)
             throws KustvaktException {
         groupMemberDao.deleteMember(username, groupId, true);

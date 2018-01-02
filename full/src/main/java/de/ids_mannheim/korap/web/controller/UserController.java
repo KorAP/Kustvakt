@@ -58,7 +58,9 @@ import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 
-/**
+/** Some of the APIs are not applicable due to changes in DB, 
+ * i.e. users are not saved in the DB.
+ * 
  * @author hanl, margaretha
  * @lastUpdate 11/2017
  */
@@ -70,7 +72,7 @@ public class UserController {
 
     @Autowired
     private FullResponseHandler kustvaktResponseHandler;
-    
+
     private static Logger jlog = LoggerFactory.getLogger(UserController.class);
     @Autowired
     private AuthenticationManagerIface controller;
@@ -81,7 +83,8 @@ public class UserController {
     // fixme: json contains password in clear text. Encrypt request?
     // EM: no encryption is needed for communications over https. 
     // It should not be necessary in IDS internal network. 
-    
+
+    @Deprecated
     // fixme: should also collect service exception, not just db exception!
     @POST
     @Path("register")
@@ -127,12 +130,13 @@ public class UserController {
             jlog.error("Failed creating confirmation and expiry tokens.");
             // EM: why illegal argument when uri fragment/param is self-generated 
             throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
-                    "failed to validate uri parameter", "confirmation fragment");
+                    "failed to validate uri parameter",
+                    "confirmation fragment");
         }
 
     }
 
-
+    @Deprecated
     //todo: password update in special function? --> password reset only!
     @POST
     @Path("update")
@@ -158,7 +162,7 @@ public class UserController {
         return Response.ok().build();
     }
 
-
+    @Deprecated
     @GET
     @Path("confirm")
     @Produces(MediaType.TEXT_HTML)
@@ -181,7 +185,7 @@ public class UserController {
         return Response.ok().build();
     }
 
-
+    @Deprecated
     // todo: auditing!
     @POST
     @Path("requestReset")
@@ -237,7 +241,7 @@ public class UserController {
         }
     }
 
-
+    @Deprecated
     @POST
     @Path("reset")
     @Produces(MediaType.TEXT_HTML)
@@ -272,8 +276,7 @@ public class UserController {
             Userdata data = controller.getUserData(user, UserDetails.class);
 
             Set<String> base_scope = StringUtils.toSet(scopes, " ");
-            if (scopes != null)
-                base_scope.retainAll(StringUtils.toSet(scopes));
+            if (scopes != null) base_scope.retainAll(StringUtils.toSet(scopes));
             scopes = StringUtils.toString(base_scope);
             m = Scopes.mapScopes(scopes, data);
             return Response.ok(m.toEntity()).build();
@@ -315,8 +318,7 @@ public class UserController {
             @Context Locale locale, Map settings) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
 
-        if (settings == null)
-            return Response.notModified().build();
+        if (settings == null) return Response.notModified().build();
 
         try {
             User user = controller.getUser(ctx.getUsername());
@@ -378,8 +380,7 @@ public class UserController {
             @Context Locale locale, Map details) {
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
 
-        if (details == null)
-            return Response.notModified().build();
+        if (details == null) return Response.notModified().build();
 
         try {
             User user = controller.getUser(ctx.getUsername());
@@ -418,8 +419,8 @@ public class UserController {
             Iterator<JsonNode> node = nodes.elements();
             while (node.hasNext()) {
                 JsonNode cursor = node.next();
-                UserQuery query = new UserQuery(cursor.path("id").asInt(),
-                        user.getId());
+                UserQuery query =
+                        new UserQuery(cursor.path("id").asInt(), user.getId());
                 query.setQueryLanguage(cursor.path("queryLanguage").asText());
                 query.setQuery(cursor.path("query").asText());
                 query.setDescription(cursor.path("description").asText());
@@ -461,7 +462,7 @@ public class UserController {
         }
     }
 
-
+    @Deprecated
     @DELETE
     @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
             BlockingFilter.class })

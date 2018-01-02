@@ -11,7 +11,13 @@ import de.ids_mannheim.korap.dao.ResourceDao;
 import de.ids_mannheim.korap.dto.ResourceDto;
 import de.ids_mannheim.korap.dto.converter.ResourceConverter;
 import de.ids_mannheim.korap.entity.Resource;
+import de.ids_mannheim.korap.web.controller.ResourceController;
 
+/** ResourceService defines the logic behind {@link ResourceController}.
+ * 
+ * @author margaretha
+ *
+ */
 @Service
 public class ResourceService {
 
