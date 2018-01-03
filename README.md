@@ -13,11 +13,15 @@ Kustvakt acts as a middleware in KorAP binding other components, such as Koral a
   
   provides user and policy management and extended services (e.g. resource and annotation services) in addition to the basic services. This version requires a database (Sqlite is provided) and an LDAP system for user authentication.
   
+# Services
 
-# Prerequisites
-Jdk 1.7, Git, Maven 3, MySQL (optional).
+Services including their usage examples are described in the [wiki](https://github.com/KorAP/Kustvakt/wiki).
+
 
 # Setup
+
+
+Prerequisites: Jdk 1.7, Git, Maven 3, MySQL (optional).
 
 Clone the latest version of Kustvakt
 <pre>
@@ -33,21 +37,21 @@ cd Kustvakt/core
 mvn clean install
 </pre>
 
-Packaging Kustvakt full version
+Package Kustvakt full version
 <pre>
 cd ../full
 mvn clean package
 </pre>
 The jar file is located in the target/ folder.
 
-Packaging Kustvakt lite version
+Package Kustvakt lite version
 <pre>
 cd ../lite
 mvn clean package
 </pre>
 The jar file is located in the target/ folder.
 
-If there are errors regarding tests, please skip the tests.
+If there are errors regarding tests, please skip them.
 <pre>
 mvn clean package -DskipTests=true
 </pre>
@@ -113,11 +117,17 @@ Remove or comment the Sqlite Setting.
 
 Uncomment the MySQL Setting and fill in the correct values for the jdbc.url, jdbc.username and jdbc.password.
 
+The default setting for jdbc.schemaPath includes test data defined in ```full/src/main/resources/db/insert```
+and some user roles defined in ```full/src/main/resources/db/predefined```. You can omit the test data by removing
+ ```db.insert```.
+
 Save.
 
-You probably would like to git ignore this file to prevent pushing the password to github.
+You probably would like to git ignore this file to prevent pushing the database password to github.
 
-Open ```full/src/main/resource/default-config.xml``` and search for the Spring bean with id="flyway".
+
+Open ```full/src/main/resource/default-config.xml``` and search for the 
+Spring bean with id="flyway".
 
 Change the dataSource property to refer to the Spring bean with id="dataSource".
 <pre>
@@ -125,47 +135,13 @@ Change the dataSource property to refer to the Spring bean with id="dataSource".
 </pre>
 
 While running ```KustvaktServer``` or ```Kustvakt-full-[version].jar```,
-MySQL tables will be created to the specified database from the SQL files in ```full/src/main/resources/db/new-mysql```.
+MySQL tables will be created to the specified database from the SQL files in 
+```full/src/main/resources/db/new-mysql``` and other paths specified in 
+jdbc.schemaPath.
 
 # Known issues
-Tests are verbose - this is no indication for an error.
+Tests are verbose - they do not necessarily imply system errors.
 
-# Usage
-Kustvakt service base URI runs by default at
-<pre>
-http://[hostname:port]/api
-</pre>
-
-## Examples
-
-Search
-<pre>
-http://localhost:8089/api/search?q=Buchstabe&ql=poliqarp
-</pre>
-
-Retrieve match annotation information
-<pre>
-http://localhost:8089/api/corpus/GOE/AGA.00000/p865-866/matchInfo?foundry=*&spans=false
-</pre>
-
-## Examples of services in full version only
-
-Retrieve descriptions of all supported annotation layers.
-<pre>
-http://localhost:8089/api/annotation/layers
-</pre>
-
-Retrieve annotation descriptions of a list of foundries (POST request).
-
-<pre>
-curl -H "Content-Type: application/json" "http://localhost:8089/kustvakt/annotation/description" 
---data '{"codes":["opennlp/*"], "language":"en" }'
-</pre>
-
-Retrieve descriptions of free resources.
-<pre>
-http://localhost:8089/api/resource/info
-</pre>
 
 # Publication
 
