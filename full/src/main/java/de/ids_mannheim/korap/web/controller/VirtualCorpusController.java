@@ -56,9 +56,9 @@ public class VirtualCorpusController {
     private VirtualCorpusService service;
 
     @POST
-    @Path("store")
+    @Path("create")
     @Consumes("application/json")
-    public Response storeVC (@Context SecurityContext securityContext,
+    public Response createVC (@Context SecurityContext securityContext,
             VirtualCorpusJson vc) {
         try {
             jlog.debug(vc.toString());
@@ -67,7 +67,7 @@ public class VirtualCorpusController {
             TokenContext context =
                     (TokenContext) securityContext.getUserPrincipal();
 
-            service.storeVC(vc, context.getUsername());
+            service.createVC(vc, context.getUsername());
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);

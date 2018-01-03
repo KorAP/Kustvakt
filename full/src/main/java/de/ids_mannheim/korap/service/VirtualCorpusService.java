@@ -26,6 +26,7 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
+import de.ids_mannheim.korap.utils.ParameterChecker;
 import de.ids_mannheim.korap.web.SearchKrill;
 import de.ids_mannheim.korap.web.controller.VirtualCorpusController;
 import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
@@ -54,11 +55,14 @@ public class VirtualCorpusService {
     @Autowired
     private VirtualCorpusConverter converter;
 
-    public void storeVC (VirtualCorpusJson vc, String username)
+    public void createVC (VirtualCorpusJson vc, String username)
             throws KustvaktException {
-
+        
+        ParameterChecker.checkObjectValue(vc.getType(), "type");
+        
         User user = authManager.getUser(username);
         // EM: how about VirtualCorpusType.PUBLISHED?
+        
         if (vc.getType().equals(VirtualCorpusType.PREDEFINED)
                 && !user.isAdmin()) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,

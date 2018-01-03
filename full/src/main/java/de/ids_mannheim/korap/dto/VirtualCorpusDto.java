@@ -12,8 +12,8 @@ public class VirtualCorpusDto {
     private String type;
     private String status;
     private String description;
-    private String access;
+    private String requiredAccess;
     private String createdBy;
     
     private int numberOfDoc;
-}
+    private String koralQuery;}

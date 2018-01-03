@@ -45,11 +45,11 @@ INSERT INTO user_group_member(user_id, group_id, status, created_by)
 -- virtual corpora
 INSERT INTO virtual_corpus(name, type, required_access, created_by, description, status, collection_query) 
 	VALUES ("dory VC", "PRIVATE", "FREE", "dory", "test vc", "experimental",
-	'{"collection":{"@type":"koral:doc","value":"GOE","match":"match:eq","key":"corpusSigle"}}');
+	'{"collection": { "@type": "koral:docGroup", "operands": [ { "@type": "koral:doc", "key": "corpusSigle", "match": "match:eq", "value": "GOE" }, { "@type": "koral:doc", "key": "creationDate", "match": "match:geq", "type": "type:date", "value": "1820" } ], "operation": "operation:and" }}');
 	
 INSERT INTO virtual_corpus(name, type, required_access, created_by, description, status, collection_query) 
 	VALUES ("group VC", "PROJECT", "PUB", "dory", "test vc", "experimental",
-	'{"collection":{"@type":"koral:doc","value":"GOE","match":"match:eq","key":"corpusSigle"}}');
+	'{"collection": { "@type": "koral:docGroup", "operands": [ { "@type": "koral:doc", "key": "corpusSigle", "match": "match:eq", "value": "GOE" }, { "@type": "koral:doc", "key": "creationDate", "match": "match:leq", "type": "type:date", "value": "1810" } ], "operation": "operation:and" }}');
 
 INSERT INTO virtual_corpus(name, type, required_access, created_by, description, status, collection_query) 
 	VALUES ("system VC", "PREDEFINED", "ALL", "system", "test vc", "experimental",

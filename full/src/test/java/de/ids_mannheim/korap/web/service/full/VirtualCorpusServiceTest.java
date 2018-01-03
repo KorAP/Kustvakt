@@ -66,7 +66,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        //        System.out.println(entity);
+                System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(3, node.size());
     }
@@ -92,12 +92,12 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testStoreDeleteVC () throws KustvaktException {
+    public void testCreateDeleteVC () throws KustvaktException {
         String json =
                 "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
                         + "\"test class\",\"collectionQuery\": \"corpusSigle=GOE\"}";
 
-        ClientResponse response = resource().path("vc").path("store")
+        ClientResponse response = resource().path("vc").path("create")
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue(
                                 "test class", "pass"))
@@ -152,7 +152,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testStoreVCWithExpiredToken ()
+    public void testCreateVCWithExpiredToken ()
             throws IOException, KustvaktException {
         String json =
                 "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
@@ -164,7 +164,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
 
         String authToken = reader.readLine();
 
-        ClientResponse response = resource().path("vc").path("store")
+        ClientResponse response = resource().path("vc").path("create")
                 .header(Attributes.AUTHORIZATION,
                         AuthenticationScheme.API.displayName() + " "
                                 + authToken)
@@ -184,12 +184,12 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testStoreVCUnauthorized () throws KustvaktException {
+    public void testCreateVCUnauthorized () throws KustvaktException {
         String json =
                 "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
-                        + "\"test class\",\"collectionQuery\": \"pubDate eq 1982\"}";
+                        + "\"test class\",\"collectionQuery\": \"creationDate since 1820\"}";
 
-        ClientResponse response = resource().path("vc").path("store")
+        ClientResponse response = resource().path("vc").path("create")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
 
@@ -206,12 +206,35 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testStoreVCWithWrongType () throws KustvaktException {
+    public void testCreateVCWithoutType () throws KustvaktException {
+        String json =
+                "{\"name\": \"new vc\",\"createdBy\": "
+                        + "\"test class\",\"collectionQuery\": \"creationDate since 1820\"}";
+
+        ClientResponse response = resource().path("vc").path("create")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(
+                                "test class", "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .entity(json).post(ClientResponse.class);
+        String entity = response.getEntity(String.class);
+//        System.out.println(entity);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.INVALID_ARGUMENT,
+                node.at("/errors/0/0").asInt());
+        assertEquals("type",node.at("/errors/0/1").asText());
+        assertEquals("null",node.at("/errors/0/2").asText());
+    }
+    
+    @Test
+    public void testCreateVCWithWrongType () throws KustvaktException {
         String json =
                 "{\"name\": \"new vc\",\"type\": \"PRIVAT\",\"createdBy\": "
-                        + "\"test class\",\"collectionQuery\": \"pubDate eq 1982\"}";
+                        + "\"test class\",\"collectionQuery\": \"creationDate since 1820\"}";
 
-        ClientResponse response = resource().path("vc").path("store")
+        ClientResponse response = resource().path("vc").path("create")
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue(
                                 "test class", "pass"))
