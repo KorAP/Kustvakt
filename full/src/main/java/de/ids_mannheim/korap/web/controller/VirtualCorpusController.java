@@ -55,6 +55,12 @@ public class VirtualCorpusController {
     @Autowired
     private VirtualCorpusService service;
 
+    /** Creates a user VC, also for admins
+     * 
+     * @param securityContext
+     * @param vc a JSON object describing the virtual corpus
+     * @return HTTP Response OK if successful
+     */
     @POST
     @Path("create")
     @Consumes("application/json")
@@ -67,7 +73,7 @@ public class VirtualCorpusController {
             TokenContext context =
                     (TokenContext) securityContext.getUserPrincipal();
 
-            service.createVC(vc, context.getUsername());
+            service.storeVC(vc, context.getUsername());
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
@@ -75,9 +81,37 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
 
-    // EM: nicer URL with username?
+    /** Only the VC owner and system admins can edit VCs.
+     * 
+     * @param securityContext
+     * @param vc a JSON object describing the virtual corpus
+     * @return HTTP Response OK if successful
+     * @throws KustvaktException
+     */
+    @POST
+    @Path("edit")
+    @Consumes("application/json")
+    public Response editVC (@Context SecurityContext securityContext,
+            VirtualCorpusJson vc) throws KustvaktException {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+
+        try {
+            service.editVC(vc, context.getUsername());
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+        return Response.ok().build();
+    }
+
+    /** Lists not only private VCs but all VCs available to a user.
+     * 
+     * @param securityContext
+     * @return a list of VCs
+     */
     @GET
-    @Path("user")
+    @Path("list")
     public Response getUserVC (@Context SecurityContext securityContext) {
         String result;
         TokenContext context =
@@ -93,28 +127,12 @@ public class VirtualCorpusController {
         return Response.ok(result).build();
     }
 
-    //    @POST
-    //    @Path("edit")
-    //    public Response editVC (@Context SecurityContext securityContext,
-    //            String json) throws KustvaktException {
-    //        TokenContext context =
-    //                (TokenContext) securityContext.getUserPrincipal();
-    //        if (context.isDemo()) {
-    //            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-    //                    "Operation is not permitted for user: "
-    //                            + context.getUsername(),
-    //                    context.getUsername());
-    //        }
-    //
-    //        return Response.ok().build();
-    //    }
-
-    /** Only VC owner and system admin can delete VCs. VC-access admins 
+    /** Only the VC owner and system admins can delete VCs. VC-access admins 
      *  can delete VC-accesses e.g. of project VCs, but not the VCs 
      *  themselves. 
      * 
      * @param securityContext
-     * @param vcId
+     * @param vcId the id of the virtual corpus
      * @return HTTP status 200, if successful
      */
     @DELETE

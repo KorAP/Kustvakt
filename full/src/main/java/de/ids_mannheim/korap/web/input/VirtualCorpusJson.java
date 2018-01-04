@@ -10,45 +10,34 @@ import lombok.Getter;
 import lombok.Setter;
 
 /** Java POJO of JSON input of the virtual corpus service for 
- * creating virtual corpora.
+ * creating and editing virtual corpora.
  * 
  * @author margaretha
- * @see VirtualCorpusController#createVC(javax.ws.rs.core.SecurityContext, VirtualCorpusJson)
- * @see VirtualCorpusService#createVC(VirtualCorpusJson, String)
+ * @see VirtualCorpusController
+ * @see VirtualCorpusService
  */
 @Getter
 @Setter
 public class VirtualCorpusJson {
 
-    // required
+    // required in creating VCs
     private String name;
     private VirtualCorpusType type;
-    private String createdBy;
     private String collectionQuery;
-
+    private String createdBy;
+    
+    // required in editing VCs
+    private int id;
+    
     // optional
     private String definition;
     private String description;
     private String status;
 
-    public void setType (VirtualCorpusType type) throws KustvaktException {
-        ParameterChecker.checkObjectValue(type, "VirtualCorpusType");
-        this.type = type;
-    }
-
-    public void setName (String name) throws KustvaktException {
-        ParameterChecker.checkStringValue(name, "name");
-        this.name = name;
-    }
-
-    public void setCreatedBy (String createdBy) throws KustvaktException {
-        ParameterChecker.checkStringValue(createdBy, "createdBy");
-        this.createdBy = createdBy;
-    }
 
     public void setCollectionQuery (String collectionQuery)
             throws KustvaktException {
-        ParameterChecker.checkStringValue(collectionQuery, "collectionQuery");
+        
         this.collectionQuery = collectionQuery;
     }
 }

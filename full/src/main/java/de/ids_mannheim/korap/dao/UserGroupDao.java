@@ -202,15 +202,42 @@ public class UserGroupDao {
         return q.getResultList();
     }
 
-    public void retrieveGroupByVCId (String vcId) {
+    public UserGroup retrieveGroupByName (String groupName)
+            throws KustvaktException {
+        ParameterChecker.checkStringValue(groupName, "groupName");
+
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<VirtualCorpusAccess> query =
-                criteriaBuilder.createQuery(VirtualCorpusAccess.class);
+        CriteriaQuery<UserGroup> query =
+                criteriaBuilder.createQuery(UserGroup.class);
 
-        Root<VirtualCorpusAccess> root = query.from(VirtualCorpusAccess.class);
+        Root<UserGroup> root = query.from(UserGroup.class);
+        query.select(root);
+        query.where(
+                criteriaBuilder.equal(root.get(UserGroup_.name), groupName));
+        Query q = entityManager.createQuery(query);
 
-
+        UserGroup userGroup;
+        try {
+            userGroup = (UserGroup) q.getSingleResult();
+        }
+        catch (NoResultException e) {
+            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
+                    "No result found for query: retrieve group by name "
+                            + groupName,
+                    groupName, e);
+        }
+        return userGroup;
     }
+
+    //    public void retrieveGroupByVCId (String vcId) {
+    //        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    //        CriteriaQuery<VirtualCorpusAccess> query =
+    //                criteriaBuilder.createQuery(VirtualCorpusAccess.class);
+    //
+    //        Root<VirtualCorpusAccess> root = query.from(VirtualCorpusAccess.class);
+    //
+    //
+    //    }
 
     public void addVCToGroup (VirtualCorpus virtualCorpus, String createdBy,
             VirtualCorpusAccessStatus status, UserGroup group) {

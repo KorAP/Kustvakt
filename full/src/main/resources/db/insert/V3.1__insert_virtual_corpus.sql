@@ -7,8 +7,8 @@ INSERT INTO user_group(name,status,created_by)
 INSERT INTO user_group(name,status,created_by) 
 	VALUES ("auto group","HIDDEN","system");
 
-INSERT INTO user_group(name,status,created_by) 
-	VALUES ("all users","HIDDEN","system");
+--INSERT INTO user_group(name,status,created_by) 
+--	VALUES ("all users","HIDDEN","system");
 
 INSERT INTO user_group(name,status,created_by) 
 	VALUES ("deleted group","DELETED","dory");
@@ -77,7 +77,7 @@ INSERT INTO virtual_corpus_access(virtual_corpus_id, user_group_id, status, crea
 	SELECT 
 		(SELECT id from virtual_corpus where name = "published VC"),
 		(SELECT id from user_group where name = "all users"),
-		"HIDDEN", "marlin";
+		"HIDDEN", "system";
 
 INSERT INTO virtual_corpus_access(virtual_corpus_id, user_group_id, status, created_by) 
 	SELECT 

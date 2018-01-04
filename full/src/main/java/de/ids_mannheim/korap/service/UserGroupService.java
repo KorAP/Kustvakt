@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
+import de.ids_mannheim.korap.constant.PredefinedUserGroup;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.dao.RoleDao;
 import de.ids_mannheim.korap.dao.UserGroupDao;
@@ -127,6 +128,14 @@ public class UserGroupService {
             m.setStatus(GroupMemberStatus.PENDING);
             m.setRoles(roles);
         }
+    }
+
+    public int createAutoHiddenGroup (int vcId) throws KustvaktException {
+        String groupName = "auto-group-VC" + vcId;
+        int groupId = userGroupDao.createGroup(groupName, "system",
+                UserGroupStatus.HIDDEN);
+
+        return groupId;
     }
 
     /** Updates the {@link GroupMemberStatus} of a pending member 

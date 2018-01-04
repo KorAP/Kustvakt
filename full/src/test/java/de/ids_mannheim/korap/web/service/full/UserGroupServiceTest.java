@@ -40,7 +40,7 @@ public class UserGroupServiceTest extends SpringJerseyTest {
         //        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
 
-        assertEquals(1, node.at("/0/id").asInt());
+        assertEquals(2, node.at("/0/id").asInt());
         assertEquals("dory group", node.at("/0/name").asText());
         assertEquals("dory", node.at("/0/owner").asText());
         assertEquals(3, node.at("/0/members").size());
@@ -60,7 +60,7 @@ public class UserGroupServiceTest extends SpringJerseyTest {
         //        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
 
-        assertEquals(1, node.at("/0/id").asInt());
+        assertEquals(2, node.at("/0/id").asInt());
         assertEquals("dory group", node.at("/0/name").asText());
         assertEquals("dory", node.at("/0/owner").asText());
         // group members are not allowed to see other members
@@ -103,7 +103,7 @@ public class UserGroupServiceTest extends SpringJerseyTest {
     @Test
     public void testSubscribeMarlinToDoryGroup () throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("groupId", "1");
+        form.add("groupId", "2");
 
         ClientResponse response = resource().path("group").path("subscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
@@ -127,7 +127,7 @@ public class UserGroupServiceTest extends SpringJerseyTest {
         
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(1, node.size());
-        assertEquals(1, node.at("/0/id").asInt());
+        assertEquals(2, node.at("/0/id").asInt());
         assertEquals("dory group", node.at("/0/name").asText());
         assertEquals("dory", node.at("/0/owner").asText());
         // group members are not allowed to see other members
@@ -138,7 +138,7 @@ public class UserGroupServiceTest extends SpringJerseyTest {
     @Test
     public void testSubscribePearlToDoryGroup () throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("groupId", "1");
+        form.add("groupId", "2");
 
         ClientResponse response = resource().path("group").path("subscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
@@ -153,7 +153,7 @@ public class UserGroupServiceTest extends SpringJerseyTest {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.NOTHING_CHANGED,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Username pearl had been deleted in group 1",
+        assertEquals("Username pearl had been deleted in group 2",
                 node.at("/errors/0/1").asText());
     }
     
@@ -177,7 +177,7 @@ public class UserGroupServiceTest extends SpringJerseyTest {
     @Test
     public void testSubscribeNonExistentMember () throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("groupId", "1");
+        form.add("groupId", "2");
 
         ClientResponse response = resource().path("group").path("subscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
@@ -193,7 +193,7 @@ public class UserGroupServiceTest extends SpringJerseyTest {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.NO_RESULT_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Username bruce is not found in group 1",
+        assertEquals("Username bruce is not found in group 2",
                 node.at("/errors/0/1").asText());
     }
 

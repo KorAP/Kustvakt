@@ -49,8 +49,9 @@ public class VirtualCorpusDao {
     private EntityManager entityManager;
 
     public int createVirtualCorpus (String name, VirtualCorpusType type,
-            CorpusAccess requiredAccess, String collectionQuery, String definition,
-            String description, String status, String createdBy) {
+            CorpusAccess requiredAccess, String collectionQuery,
+            String definition, String description, String status,
+            String createdBy) throws KustvaktException {
 
         VirtualCorpus vc = new VirtualCorpus();
         vc.setName(name);
@@ -61,9 +62,38 @@ public class VirtualCorpusDao {
         vc.setDescription(description);
         vc.setStatus(status);
         vc.setCreatedBy(createdBy);
-        
+
         entityManager.persist(vc);
         return vc.getId();
+    }
+
+    public void editVirtualCorpus (VirtualCorpus vc, String name,
+            VirtualCorpusType type, CorpusAccess requiredAccess,
+            String collectionQuery, String definition, String description,
+            String status) throws KustvaktException {
+
+        if (name != null && !name.isEmpty()) {
+            vc.setName(name);
+        }
+        if (type != null) {
+            vc.setType(type);
+        }
+        if (requiredAccess != null) {
+            vc.setRequiredAccess(requiredAccess);
+        }
+        if (collectionQuery != null) {
+            vc.setCollectionQuery(collectionQuery);
+        }
+        if (definition != null && !definition.isEmpty()) {
+            vc.setDefinition(definition);
+        }
+        if (description != null && !description.isEmpty()) {
+            vc.setDescription(description);
+        }
+        if (status != null && !status.isEmpty()) {
+            vc.setStatus(status);
+        }
+        entityManager.merge(vc);
     }
 
     public void deleteVirtualCorpus (int id) throws KustvaktException {

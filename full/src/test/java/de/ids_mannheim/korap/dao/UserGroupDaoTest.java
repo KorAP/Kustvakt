@@ -86,8 +86,9 @@ public class UserGroupDaoTest {
 
     @Test
     public void retrieveGroupWithMembers () throws KustvaktException {
+        // dory group
         List<UserGroupMember> members =
-                userGroupDao.retrieveGroupWithMemberById(1).getMembers();
+                userGroupDao.retrieveGroupWithMemberById(2).getMembers();
         assertEquals(4, members.size());
 
         UserGroupMember m = members.get(1);
@@ -123,7 +124,7 @@ public class UserGroupDaoTest {
     @Test
     public void addVCToGroup () throws KustvaktException {
         // dory group
-        int groupId = 1;
+        int groupId = 2;
 
         UserGroup group = userGroupDao.retrieveGroupById(groupId);
         String createdBy = "dory";

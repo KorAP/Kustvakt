@@ -29,13 +29,25 @@ public class VirtualCorpusDaoTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
+    @Test
+    public void testListVCByType () throws KustvaktException {
+        List<VirtualCorpus> vcList =
+                dao.retrieveVCByType(VirtualCorpusType.PUBLISHED);
+        assertEquals(1, vcList.size());
+        
+        VirtualCorpus vc = vcList.get(0);
+        assertEquals(4, vc.getId());
+        assertEquals("published VC", vc.getName());
+        assertEquals("marlin", vc.getCreatedBy());
+    }
 
     @Test
     public void testPredefinedVC () throws KustvaktException {
         // insert vc
-        int id = dao.createVirtualCorpus("predefined VC", VirtualCorpusType.PREDEFINED,
-                User.CorpusAccess.FREE, "corpusSigle=GOE", "definition",
-                "description", "experimental", "test class");
+        int id = dao.createVirtualCorpus("predefined VC",
+                VirtualCorpusType.PREDEFINED, User.CorpusAccess.FREE,
+                "corpusSigle=GOE", "definition", "description", "experimental",
+                "test class");
 
         // select vc
         List<VirtualCorpus> vcList =
@@ -68,10 +80,10 @@ public class VirtualCorpusDaoTest {
         Set<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("dory");
         assertEquals(3, virtualCorpora.size());
         // order is random
-//        Iterator<VirtualCorpus> i = virtualCorpora.iterator();
-//        assertEquals("dory VC", i.next().getName());
-//        assertEquals("system VC", i.next().getName());
-//        assertEquals("group VC", i.next().getName());
+        //        Iterator<VirtualCorpus> i = virtualCorpora.iterator();
+        //        assertEquals("dory VC", i.next().getName());
+        //        assertEquals("system VC", i.next().getName());
+        //        assertEquals("group VC", i.next().getName());
     }
 
 

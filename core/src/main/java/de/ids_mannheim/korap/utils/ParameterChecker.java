@@ -15,9 +15,13 @@ public class ParameterChecker {
     
     public static void checkStringValue (String string, String name)
             throws KustvaktException {
-        if (string == null || string.isEmpty()) {
+        if (string == null ) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, name,
-                    string);
+                    "null");
+        }
+        else if (string.isEmpty()){
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, name,
+                    "empty");
         }
     }
 
@@ -27,5 +31,4 @@ public class ParameterChecker {
                     "0");
         }
     }
-
 }

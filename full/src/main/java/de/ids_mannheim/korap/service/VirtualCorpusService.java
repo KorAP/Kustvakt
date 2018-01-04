@@ -13,10 +13,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
+import de.ids_mannheim.korap.constant.PredefinedUserGroup;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.dao.VirtualCorpusDao;
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.dto.converter.VirtualCorpusConverter;
+import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -47,6 +49,8 @@ public class VirtualCorpusService {
     @Autowired
     private VirtualCorpusDao dao;
     @Autowired
+    private UserGroupService userGroupService;
+    @Autowired
     private SearchKrill krill;
     @Autowired
     private FullConfiguration config;
@@ -55,29 +59,70 @@ public class VirtualCorpusService {
     @Autowired
     private VirtualCorpusConverter converter;
 
-    public void createVC (VirtualCorpusJson vc, String username)
+    public void storeVC (VirtualCorpusJson vc, String username)
             throws KustvaktException {
-        
+
+        ParameterChecker.checkStringValue(vc.getName(), "name");
         ParameterChecker.checkObjectValue(vc.getType(), "type");
-        
+        ParameterChecker.checkStringValue(vc.getCollectionQuery(),
+                "collectionQuery");
+        ParameterChecker.checkStringValue(vc.getCreatedBy(), "createdBy");
+
         User user = authManager.getUser(username);
-        // EM: how about VirtualCorpusType.PUBLISHED?
-        
+
         if (vc.getType().equals(VirtualCorpusType.PREDEFINED)
                 && !user.isAdmin()) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: " + user.getUsername(),
-                    user.getUsername());
+                    "Unauthorized operation for user: " + username, username);
         }
 
         String koralQuery = serializeCollectionQuery(vc.getCollectionQuery());
         CorpusAccess requiredAccess = determineRequiredAccess(koralQuery);
 
-        dao.createVirtualCorpus(vc.getName(), vc.getType(), requiredAccess,
-                koralQuery, vc.getDefinition(), vc.getDescription(),
-                vc.getStatus(), vc.getCreatedBy());
+        int vcId = dao.createVirtualCorpus(vc.getName(), vc.getType(),
+                requiredAccess, koralQuery, vc.getDefinition(),
+                vc.getDescription(), vc.getStatus(), vc.getCreatedBy());
+
+        // EM: how about VirtualCorpusType.PUBLISHED?
+        //        if (vc.getType() != null
+        //                && vc.getType().equals(VirtualCorpusType.PUBLISHED)) {
+        //            int groupId = userGroupService.createAutoHiddenGroup(vcId);
+        //            UserGroup allUserGroup = userGroupDao
+        //                    .retrieveGroupByName(PredefinedUserGroup.ALL.getValue());
+        //            int allUserGroupId = allUserGroup.getId();
+        //            // add access to VC for all and auto-group
+        //        }
 
         // EM: should this return anything?
+    }
+
+    public void editVC (VirtualCorpusJson vcJson, String username)
+            throws KustvaktException {
+
+        ParameterChecker.checkIntegerValue(vcJson.getId(), "id");
+        VirtualCorpus vc = dao.retrieveVCById(vcJson.getId());
+
+        User user = authManager.getUser(username);
+
+        if (!username.equals(vc.getCreatedBy()) && !user.isAdmin()) {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
+
+        String koralQuery = null;
+        CorpusAccess requiredAccess = null;
+        if (vcJson.getCollectionQuery() != null
+                && vcJson.getCollectionQuery().isEmpty()) {
+            koralQuery = serializeCollectionQuery(vcJson.getCollectionQuery());
+            requiredAccess = determineRequiredAccess(koralQuery);
+        }
+
+        dao.editVirtualCorpus(vc, vcJson.getName(), vcJson.getType(), requiredAccess,
+                koralQuery, vcJson.getDefinition(), vcJson.getDescription(),
+                vcJson.getStatus());
+        
+        vc = dao.retrieveVCById(vcJson.getId());
+
     }
 
     private String serializeCollectionQuery (String collectionQuery)
@@ -149,8 +194,7 @@ public class VirtualCorpusService {
      * @param vcId virtual corpus id
      * @throws KustvaktException
      */
-    public void deleteVC (String username, int vcId)
-            throws KustvaktException {
+    public void deleteVC (String username, int vcId) throws KustvaktException {
 
         User user = authManager.getUser(username);
         VirtualCorpus vc = dao.retrieveVCById(vcId);
