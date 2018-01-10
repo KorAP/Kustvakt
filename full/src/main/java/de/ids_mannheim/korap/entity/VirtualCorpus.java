@@ -46,8 +46,8 @@ public class VirtualCorpus {
     @Enumerated(EnumType.STRING)
     @Column(name = "required_access")
     private CorpusAccess requiredAccess;
-    @Column(name = "collection_query")
-    private String collectionQuery;
+    @Column(name = "corpus_query")
+    private String corpusQuery;
     private String definition;
     @Column(name = "created_by")
     private String createdBy;
@@ -59,7 +59,7 @@ public class VirtualCorpus {
     public String toString () {
         return "id=" + id + ", name= " + name + ", type= " + type + ", status= "
                 + status + ", description=" + description + ", requiredAccess="
-                + requiredAccess + ", collectionQuery= " + collectionQuery
+                + requiredAccess + ", corpusQuery= " + corpusQuery
                 + ", definition= " + definition + ", createdBy= " + createdBy;
     }
     

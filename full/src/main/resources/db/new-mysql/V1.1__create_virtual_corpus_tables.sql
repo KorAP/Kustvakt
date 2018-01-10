@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS virtual_corpus (
   created_by varchar(100) NOT NULL,
   description varchar(255) DEFAULT NULL,
   status varchar(100) DEFAULT NULL,
-  collection_query varchar(2000) NOT NULL,
+  corpus_query varchar(2000) NOT NULL,
   definition varchar(255) DEFAULT NULL,
   INDEX owner_index (created_by),
   INDEX type_index (type)

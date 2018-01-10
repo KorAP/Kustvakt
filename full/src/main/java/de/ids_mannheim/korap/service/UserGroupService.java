@@ -77,7 +77,15 @@ public class UserGroupService {
 
         return dtos;
     }
-
+    
+    public UserGroup retrieveUserGroupById (int groupId)
+            throws KustvaktException {
+        return userGroupDao.retrieveGroupById(groupId);
+    }
+    
+    public UserGroup retrieveAllUserGroup () {
+        return userGroupDao.retrieveAllUserGroup();
+    }
 
     /** Group owner is automatically added when creating a group. 
      *  Do not include owners in group members. 
@@ -131,7 +139,7 @@ public class UserGroupService {
     }
 
     public int createAutoHiddenGroup (int vcId) throws KustvaktException {
-        String groupName = "auto-group-VC" + vcId;
+        String groupName = "auto-published-group";
         int groupId = userGroupDao.createGroup(groupName, "system",
                 UserGroupStatus.HIDDEN);
 
@@ -162,4 +170,5 @@ public class UserGroupService {
             throws KustvaktException {
         groupMemberDao.deleteMember(username, groupId, true);
     }
+
 }

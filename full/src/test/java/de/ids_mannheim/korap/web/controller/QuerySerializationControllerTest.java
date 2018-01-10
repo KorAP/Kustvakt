@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 /**
  * @author hanl, margaretha
@@ -24,12 +24,12 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.service.FastJerseyTest;
+import de.ids_mannheim.korap.web.FastJerseyTest;
 
 /* EM: potentially an unused service! */
 
 @Ignore
-public class QuerySerializationServiceTest extends FastJerseyTest {
+public class QuerySerializationControllerTest extends FastJerseyTest {
 
     @Autowired
     HttpAuthorizationHandler handler;

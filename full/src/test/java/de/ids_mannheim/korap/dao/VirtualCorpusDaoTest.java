@@ -34,7 +34,7 @@ public class VirtualCorpusDaoTest {
         List<VirtualCorpus> vcList =
                 dao.retrieveVCByType(VirtualCorpusType.PUBLISHED);
         assertEquals(1, vcList.size());
-        
+
         VirtualCorpus vc = vcList.get(0);
         assertEquals(4, vc.getId());
         assertEquals("published VC", vc.getName());

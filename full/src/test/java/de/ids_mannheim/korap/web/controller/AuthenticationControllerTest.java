@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -24,7 +24,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
-import de.ids_mannheim.korap.web.service.FastJerseyTest;
+import de.ids_mannheim.korap.web.FastJerseyTest;
 
 /**
  * EM: fix tests. New DB does not save users.
@@ -32,7 +32,7 @@ import de.ids_mannheim.korap.web.service.FastJerseyTest;
  * @date 24/09/2015
  */
 @Ignore
-public class AuthServiceTest extends FastJerseyTest {
+public class AuthenticationControllerTest extends FastJerseyTest {
 
     @Autowired
     HttpAuthorizationHandler handler;

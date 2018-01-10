@@ -1,3 +1,3 @@
 
-INSERT INTO user_group(name,status,created_by) 
-	VALUES ("all users","HIDDEN","system");
+INSERT INTO user_group(id,name,status,created_by) 
+	VALUES (1,"all users","HIDDEN","system");

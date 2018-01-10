@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -25,7 +25,7 @@ import de.ids_mannheim.korap.handlers.ResourceDao;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.service.FastJerseyTest;
+import de.ids_mannheim.korap.web.FastJerseyTest;
 
 /**
  * @author hanl, margaretha
@@ -34,7 +34,7 @@ import de.ids_mannheim.korap.web.service.FastJerseyTest;
  */
 @Ignore
 @Deprecated
-public class ResourceServiceTest extends FastJerseyTest {
+public class ResourceControllerTest extends FastJerseyTest {
 
     @Autowired
     HttpAuthorizationHandler handler;

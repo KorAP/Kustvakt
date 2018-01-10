@@ -112,13 +112,35 @@ public class VirtualCorpusController {
      */
     @GET
     @Path("list")
-    public Response getUserVC (@Context SecurityContext securityContext) {
+    public Response listVCByUser (@Context SecurityContext securityContext) {
         String result;
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             List<VirtualCorpusDto> dtos =
-                    service.retrieveUserVC(context.getUsername());
+                    service.listVCByUser(context.getUsername());
+            result = JsonUtils.toJSON(dtos);
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+        return Response.ok(result).build();
+    }
+    
+    /** Lists all VCs created by a user
+     * 
+     * @param securityContext
+     * @return a list of VCs created by the user in the security context.
+     */
+    @GET
+    @Path("list/user")
+    public Response listUserVC (@Context SecurityContext securityContext) {
+        String result;
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            List<VirtualCorpusDto> dtos =
+                    service.listOwnerVC(context.getUsername());
             result = JsonUtils.toJSON(dtos);
         }
         catch (KustvaktException e) {

@@ -1,6 +1,8 @@
 package de.ids_mannheim.korap.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -14,12 +16,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.PredefinedUserGroup;
+import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.dao.VirtualCorpusAccessDao;
 import de.ids_mannheim.korap.dao.VirtualCorpusDao;
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.dto.converter.VirtualCorpusConverter;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.VirtualCorpus;
+import de.ids_mannheim.korap.entity.VirtualCorpusAccess;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
@@ -34,8 +39,8 @@ import de.ids_mannheim.korap.web.controller.VirtualCorpusController;
 import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
 
 /** VirtualCorpusService handles the logic behind {@link VirtualCorpusController}. 
- *  It communicates with {@link VirtualCorpusDao} and returns DTO to  
- *  {@link VirtualCorpusController}.
+ *  It communicates with {@link VirtualCorpusDao} and returns 
+ *  {@link VirtualCorpusDto} to {@link VirtualCorpusController}.
  * 
  * @author margaretha
  *
@@ -47,7 +52,9 @@ public class VirtualCorpusService {
             LoggerFactory.getLogger(VirtualCorpusService.class);
 
     @Autowired
-    private VirtualCorpusDao dao;
+    private VirtualCorpusDao vcDao;
+    @Autowired
+    private VirtualCorpusAccessDao accessDao;
     @Autowired
     private UserGroupService userGroupService;
     @Autowired
@@ -59,13 +66,12 @@ public class VirtualCorpusService {
     @Autowired
     private VirtualCorpusConverter converter;
 
-    public void storeVC (VirtualCorpusJson vc, String username)
+    public int storeVC (VirtualCorpusJson vc, String username)
             throws KustvaktException {
 
         ParameterChecker.checkStringValue(vc.getName(), "name");
         ParameterChecker.checkObjectValue(vc.getType(), "type");
-        ParameterChecker.checkStringValue(vc.getCollectionQuery(),
-                "collectionQuery");
+        ParameterChecker.checkStringValue(vc.getCorpusQuery(), "corpusQuery");
         ParameterChecker.checkStringValue(vc.getCreatedBy(), "createdBy");
 
         User user = authManager.getUser(username);
@@ -76,31 +82,25 @@ public class VirtualCorpusService {
                     "Unauthorized operation for user: " + username, username);
         }
 
-        String koralQuery = serializeCollectionQuery(vc.getCollectionQuery());
+        String koralQuery = serializeCorpusQuery(vc.getCorpusQuery());
         CorpusAccess requiredAccess = determineRequiredAccess(koralQuery);
 
-        int vcId = dao.createVirtualCorpus(vc.getName(), vc.getType(),
+        int vcId = vcDao.createVirtualCorpus(vc.getName(), vc.getType(),
                 requiredAccess, koralQuery, vc.getDefinition(),
                 vc.getDescription(), vc.getStatus(), vc.getCreatedBy());
 
-        // EM: how about VirtualCorpusType.PUBLISHED?
-        //        if (vc.getType() != null
-        //                && vc.getType().equals(VirtualCorpusType.PUBLISHED)) {
-        //            int groupId = userGroupService.createAutoHiddenGroup(vcId);
-        //            UserGroup allUserGroup = userGroupDao
-        //                    .retrieveGroupByName(PredefinedUserGroup.ALL.getValue());
-        //            int allUserGroupId = allUserGroup.getId();
-        //            // add access to VC for all and auto-group
-        //        }
-
+        if (vc.getType().equals(VirtualCorpusType.PUBLISHED)) {
+            publishVC(vcId);
+        }
         // EM: should this return anything?
+        return vcId;
     }
 
     public void editVC (VirtualCorpusJson vcJson, String username)
             throws KustvaktException {
 
         ParameterChecker.checkIntegerValue(vcJson.getId(), "id");
-        VirtualCorpus vc = dao.retrieveVCById(vcJson.getId());
+        VirtualCorpus vc = vcDao.retrieveVCById(vcJson.getId());
 
         User user = authManager.getUser(username);
 
@@ -111,31 +111,57 @@ public class VirtualCorpusService {
 
         String koralQuery = null;
         CorpusAccess requiredAccess = null;
-        if (vcJson.getCollectionQuery() != null
-                && vcJson.getCollectionQuery().isEmpty()) {
-            koralQuery = serializeCollectionQuery(vcJson.getCollectionQuery());
+        if (vcJson.getCorpusQuery() != null
+                && vcJson.getCorpusQuery().isEmpty()) {
+            koralQuery = serializeCorpusQuery(vcJson.getCorpusQuery());
             requiredAccess = determineRequiredAccess(koralQuery);
         }
 
-        dao.editVirtualCorpus(vc, vcJson.getName(), vcJson.getType(), requiredAccess,
-                koralQuery, vcJson.getDefinition(), vcJson.getDescription(),
-                vcJson.getStatus());
-        
-        vc = dao.retrieveVCById(vcJson.getId());
+        vcDao.editVirtualCorpus(vc, vcJson.getName(), vcJson.getType(),
+                requiredAccess, koralQuery, vcJson.getDefinition(),
+                vcJson.getDescription(), vcJson.getStatus());
 
+        if (!vc.getType().equals(VirtualCorpusType.PUBLISHED)
+                && vcJson.getType() != null
+                && vcJson.getType().equals(VirtualCorpusType.PUBLISHED)) {
+            publishVC(vcJson.getId());
+        }
     }
 
-    private String serializeCollectionQuery (String collectionQuery)
+    private void publishVC (int vcId) throws KustvaktException {
+
+        // check if hidden access exists
+        if (!accessDao.hasHiddenAccess(vcId)) {
+            // assign hidden access for all users
+            VirtualCorpus vc = vcDao.retrieveVCById(vcId);
+            UserGroup all = userGroupService.retrieveAllUserGroup();
+            accessDao.addAccessToVC(vc, all, "system",
+                    VirtualCorpusAccessStatus.HIDDEN);
+
+            // create and assign a hidden group
+            int groupId = userGroupService.createAutoHiddenGroup(vcId);
+            UserGroup autoHidden =
+                    userGroupService.retrieveUserGroupById(groupId);
+            accessDao.addAccessToVC(vc, autoHidden, "system",
+                    VirtualCorpusAccessStatus.HIDDEN);
+        }
+        else {
+            jlog.error("Cannot publish VC with id: " + vcId
+                    + ". There have been hidden accesses for the VC already.");
+        }
+    }
+
+    private String serializeCorpusQuery (String corpusQuery)
             throws KustvaktException {
         QuerySerializer serializer = new QuerySerializer();
-        serializer.setCollection(collectionQuery);
+        serializer.setCollection(corpusQuery);
         String koralQuery;
         try {
             koralQuery = serializer.convertCollectionToJson();
         }
         catch (JsonProcessingException e) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
-                    "Invalid argument: " + collectionQuery, collectionQuery);
+                    "Invalid argument: " + corpusQuery, corpusQuery);
         }
         jlog.debug(koralQuery);
         return koralQuery;
@@ -169,14 +195,26 @@ public class VirtualCorpusService {
         return (numberOfDoc > 0) ? true : false;
     }
 
-    public List<VirtualCorpusDto> retrieveUserVC (String username)
+    public List<VirtualCorpusDto> listOwnerVC (String username)
             throws KustvaktException {
+        List<VirtualCorpus> vcList = vcDao.retrieveOwnerVC(username);
+        return createVCDtos(vcList);
+    }
 
-        Set<VirtualCorpus> vcs = dao.retrieveVCByUser(username);
-        ArrayList<VirtualCorpusDto> dtos = new ArrayList<>(vcs.size());
+    public List<VirtualCorpusDto> listVCByUser (String username)
+            throws KustvaktException {
+        Set<VirtualCorpus> vcSet = vcDao.retrieveVCByUser(username);
+        return createVCDtos(vcSet);
+    }
 
-        for (VirtualCorpus vc : vcs) {
-            String json = vc.getCollectionQuery();
+    private ArrayList<VirtualCorpusDto> createVCDtos (
+            Collection<VirtualCorpus> vcList) throws KustvaktException {
+        ArrayList<VirtualCorpusDto> dtos = new ArrayList<>(vcList.size());
+        VirtualCorpus vc;
+        Iterator<VirtualCorpus> i = vcList.iterator();
+        while (i.hasNext()) {
+            vc = i.next();
+            String json = vc.getCorpusQuery();
             String statistics = krill.getStatistics(json);
             VirtualCorpusDto vcDto =
                     converter.createVirtualCorpusDto(vc, statistics);
@@ -188,8 +226,6 @@ public class VirtualCorpusService {
     /** Only admin and the owner of the virtual corpus are allowed to 
      *  delete a virtual corpus.
      *  
-     *  EM: are VC-access admins also allowed to delete?
-     * 
      * @param username username
      * @param vcId virtual corpus id
      * @throws KustvaktException
@@ -197,14 +233,19 @@ public class VirtualCorpusService {
     public void deleteVC (String username, int vcId) throws KustvaktException {
 
         User user = authManager.getUser(username);
-        VirtualCorpus vc = dao.retrieveVCById(vcId);
+        VirtualCorpus vc = vcDao.retrieveVCById(vcId);
 
         if (user.isAdmin() || vc.getCreatedBy().equals(username)) {
-            dao.deleteVirtualCorpus(vcId);
+            vcDao.deleteVirtualCorpus(vcId);
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
+    }
+
+    public List<VirtualCorpusAccess> retrieveVCAccess (int vcId)
+            throws KustvaktException {
+        return accessDao.retrieveAccessByVC(vcId);
     }
 }

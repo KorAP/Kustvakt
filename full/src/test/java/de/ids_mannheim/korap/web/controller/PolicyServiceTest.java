@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
 
@@ -27,7 +27,7 @@ import de.ids_mannheim.korap.security.PolicyCondition;
 import de.ids_mannheim.korap.security.SecurityPolicy;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.UserFactory;
-import de.ids_mannheim.korap.web.service.FastJerseyTest;
+import de.ids_mannheim.korap.web.FastJerseyTest;
 
 /** Not in the new DB
  * @author margaretha

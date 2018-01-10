@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
 
@@ -21,7 +21,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
-public class UserGroupServiceTest extends SpringJerseyTest {
+public class UserGroupControllerTest extends SpringJerseyTest {
 
     @Autowired
     private HttpAuthorizationHandler handler;

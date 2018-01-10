@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
+import de.ids_mannheim.korap.constant.PredefinedUserGroup;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.entity.Role;
@@ -38,8 +39,6 @@ import de.ids_mannheim.korap.utils.ParameterChecker;
 @Transactional
 @Repository
 public class UserGroupDao {
-
-    public static final String USER_GROUP_ALL = "all";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -104,7 +103,20 @@ public class UserGroupDao {
             throws KustvaktException {
         UserGroup group = retrieveGroupById(groupId);
         group.setName(name);
-        entityManager.persist(group);
+        entityManager.merge(group);
+    }
+
+    public UserGroup retrieveAllUserGroup () {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<UserGroup> query =
+                criteriaBuilder.createQuery(UserGroup.class);
+
+        Root<UserGroup> root = query.from(UserGroup.class);
+        query.select(root);
+        query.where(criteriaBuilder.equal(root.get(UserGroup_.id),
+                PredefinedUserGroup.ALL.getId()));
+        Query q = entityManager.createQuery(query);
+        return (UserGroup) q.getSingleResult();
     }
 
     /** Retrieves the UserGroup by the given group id. This methods does not 
@@ -128,9 +140,8 @@ public class UserGroupDao {
         query.where(criteriaBuilder.equal(root.get(UserGroup_.id), groupId));
         Query q = entityManager.createQuery(query);
 
-        UserGroup userGroup;
         try {
-            userGroup = (UserGroup) q.getSingleResult();
+            return (UserGroup) q.getSingleResult();
         }
         catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
@@ -138,7 +149,6 @@ public class UserGroupDao {
                             + groupId,
                     String.valueOf(groupId), e);
         }
-        return userGroup;
     }
 
     public UserGroup retrieveGroupWithMemberById (int groupId)
@@ -156,9 +166,8 @@ public class UserGroupDao {
         query.where(criteriaBuilder.equal(root.get(UserGroup_.id), groupId));
         Query q = entityManager.createQuery(query);
 
-        UserGroup userGroup;
         try {
-            userGroup = (UserGroup) q.getSingleResult();
+            return (UserGroup) q.getSingleResult();
         }
         catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
@@ -166,7 +175,6 @@ public class UserGroupDao {
                             + groupId,
                     String.valueOf(groupId), e);
         }
-        return userGroup;
     }
 
     /** Retrieves only user-groups that are active (not hidden or deleted).
@@ -199,7 +207,18 @@ public class UserGroupDao {
         query.select(root);
         query.where(restrictions);
         Query q = entityManager.createQuery(query);
-        return q.getResultList();
+
+        try {
+            return q.getResultList();
+        }
+        catch (NoResultException e) {
+            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
+                    "No result found for query: retrieve group by used id "
+                            + userId,
+                    userId, e);
+        }
+
+
     }
 
     public UserGroup retrieveGroupByName (String groupName)
@@ -216,9 +235,8 @@ public class UserGroupDao {
                 criteriaBuilder.equal(root.get(UserGroup_.name), groupName));
         Query q = entityManager.createQuery(query);
 
-        UserGroup userGroup;
         try {
-            userGroup = (UserGroup) q.getSingleResult();
+            return (UserGroup) q.getSingleResult();
         }
         catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
@@ -226,7 +244,6 @@ public class UserGroupDao {
                             + groupName,
                     groupName, e);
         }
-        return userGroup;
     }
 
     //    public void retrieveGroupByVCId (String vcId) {

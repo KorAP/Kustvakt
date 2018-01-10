@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service;
+package de.ids_mannheim.korap.web;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;

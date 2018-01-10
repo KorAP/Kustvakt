@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 import java.io.IOException;
 
@@ -11,14 +11,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.web.service.FastJerseyTest;
+import de.ids_mannheim.korap.web.FastJerseyTest;
 
 /** 
  * @author margaretha
  * @date 27/09/2017
  *
  */
-public class StatisticsServiceTest extends FastJerseyTest {
+public class StatisticsControllerTest extends FastJerseyTest {
 
     private ObjectMapper mapper = new ObjectMapper();
 

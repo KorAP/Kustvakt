@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -27,13 +27,11 @@ import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.AuthenticationScheme;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
-import de.ids_mannheim.korap.dao.VirtualCorpusDao;
-import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
-public class VirtualCorpusServiceTest extends SpringJerseyTest {
+public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
     @Autowired
     private HttpAuthorizationHandler handler;
@@ -94,10 +92,53 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
     }
 
     @Test
+    public void testCreatePublishVC () throws KustvaktException {
+        String json =
+                "{\"name\": \"new published vc\",\"type\": \"PUBLISHED\",\"createdBy\": "
+                        + "\"test class\",\"corpusQuery\": \"corpusSigle=GOE\"}";
+        ClientResponse response = resource().path("vc").path("create")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(
+                                "test class", "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .post(ClientResponse.class, json);
+        
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
+        // test list owner vc
+        response = resource().path("vc").path("list").path("user")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(
+                                "test class", "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+
+                .get(ClientResponse.class);
+        
+        String entity = response.getEntity(String.class);
+        System.out.println(entity);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(1, node.size());
+        assertEquals("new published vc", node.get(0).get("name").asText());
+        // cannot explicitly checked hidden groups here
+        
+        String vcId = node.get(0).get("id").asText();
+        
+        // delete vc
+        resource().path("vc").path("delete").queryParam("vcId", vcId)
+        .header(Attributes.AUTHORIZATION,
+                handler.createBasicAuthorizationHeaderValue(
+                        "test class", "pass"))
+        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+
+        .delete(ClientResponse.class);
+    }
+    
+    @Test
     public void testCreateDeleteVC () throws KustvaktException {
         String json =
                 "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
-                        + "\"test class\",\"collectionQuery\": \"corpusSigle=GOE\"}";
+                        + "\"test class\",\"corpusQuery\": \"corpusSigle=GOE\"}";
 
         ClientResponse response = resource().path("vc").path("create")
                 .header(Attributes.AUTHORIZATION,
@@ -158,7 +199,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
             throws IOException, KustvaktException {
         String json =
                 "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
-                        + "\"test class\",\"collectionQuery\": \"corpusSigle=GOE\"}";
+                        + "\"test class\",\"corpusQuery\": \"corpusSigle=GOE\"}";
 
         InputStream is = getClass().getClassLoader()
                 .getResourceAsStream("test-user.token");
@@ -189,7 +230,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
     public void testCreateVCUnauthorized () throws KustvaktException {
         String json =
                 "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
-                        + "\"test class\",\"collectionQuery\": \"creationDate since 1820\"}";
+                        + "\"test class\",\"corpusQuery\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path("vc").path("create")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -208,7 +249,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testCreateVCWithoutCollectionQuery () throws KustvaktException {
+    public void testCreateVCWithoutcorpusQuery () throws KustvaktException {
         String json =
                 "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
                         + "\"test class\"}";
@@ -226,14 +267,14 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
-        assertEquals("collectionQuery", node.at("/errors/0/1").asText());
+        assertEquals("corpusQuery", node.at("/errors/0/1").asText());
         assertEquals("null", node.at("/errors/0/2").asText());
     }
 
     @Test
     public void testCreateVCWithoutType () throws KustvaktException {
         String json = "{\"name\": \"new vc\",\"createdBy\": "
-                + "\"test class\",\"collectionQuery\": \"creationDate since 1820\"}";
+                + "\"test class\",\"corpusQuery\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path("vc").path("create")
                 .header(Attributes.AUTHORIZATION,
@@ -256,7 +297,7 @@ public class VirtualCorpusServiceTest extends SpringJerseyTest {
     public void testCreateVCWithWrongType () throws KustvaktException {
         String json =
                 "{\"name\": \"new vc\",\"type\": \"PRIVAT\",\"createdBy\": "
-                        + "\"test class\",\"collectionQuery\": \"creationDate since 1820\"}";
+                        + "\"test class\",\"corpusQuery\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path("vc").path("create")
                 .header(Attributes.AUTHORIZATION,

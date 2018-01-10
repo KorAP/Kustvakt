@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service;
+package de.ids_mannheim.korap.web;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -6,6 +6,7 @@ import org.junit.Before;
 
 import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.TestHelper;
+import de.ids_mannheim.korap.web.service.FastJerseyBaseTest;
 
 public abstract class FastJerseyTest extends FastJerseyBaseTest {
 

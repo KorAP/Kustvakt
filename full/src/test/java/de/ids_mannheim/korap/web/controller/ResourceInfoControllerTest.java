@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -17,14 +17,14 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.service.FastJerseyTest;
+import de.ids_mannheim.korap.web.FastJerseyTest;
 /**
  * @author hanl, margaretha
  * @lastUpdate 19/04/2017
  * EM: FIX ME: Database restructure
  */
 @Ignore
-public class ResourceInfoServiceTest extends FastJerseyTest {
+public class ResourceInfoControllerTest extends FastJerseyTest {
 
     @Autowired
     HttpAuthorizationHandler handler;

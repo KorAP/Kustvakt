@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -34,7 +34,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
-import de.ids_mannheim.korap.web.service.FastJerseyTest;
+import de.ids_mannheim.korap.web.FastJerseyTest;
 
 /** EM: To do: not implemented in the new DB yet
  * @author hanl
@@ -44,7 +44,7 @@ import de.ids_mannheim.korap.web.service.FastJerseyTest;
 // todo: do benchmarks for simple request to check access_token check and user
 // retrieval!
 @Ignore
-public class UserServiceTest extends FastJerseyTest {
+public class UserControllerTest extends FastJerseyTest {
 
     @Autowired
     HttpAuthorizationHandler handler;

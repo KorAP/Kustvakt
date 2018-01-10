@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.full;
+package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -29,14 +29,14 @@ import de.ids_mannheim.korap.resources.Corpus;
 import de.ids_mannheim.korap.security.ac.ResourceFinder;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.service.FastJerseyTest;
+import de.ids_mannheim.korap.web.FastJerseyTest;
 
 /**
  * @author hanl, margaretha
  * @lastUpdate 30/05/2017
  *
  */
-public class SearchServiceTest extends FastJerseyTest {
+public class SearchControllerTest extends FastJerseyTest {
 
     @Autowired
     HttpAuthorizationHandler handler;
@@ -150,6 +150,7 @@ public class SearchServiceTest extends FastJerseyTest {
                 response.getStatus());
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
+        System.out.println(entity);
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
         assertEquals("koral:docGroup", node.at("/collection/@type").asText());
