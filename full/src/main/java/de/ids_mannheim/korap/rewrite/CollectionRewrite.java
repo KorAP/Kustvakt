@@ -145,6 +145,7 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
                     avalabilityCopy, userAvailabilities, false);
             if (!userAvailabilities.isEmpty()) {
                 builder.with(buildAvailability(avalabilityCopy));
+                jlog.debug("corpus query: " +builder.toString());
                 builder.setBaseQuery(builder.toJSON());
                 rewrittesNode = builder.mergeWith(jsonNode).at("/collection");
                 node.set("collection", rewrittesNode, identifier);
@@ -152,12 +153,13 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
         }
         else {
             builder.with(buildAvailability(userAvailabilities));
+            jlog.debug("corpus query: " +builder.toString());
             rewrittesNode =
                     JsonUtils.readTree(builder.toJSON()).at("/collection");
             node.set("collection", rewrittesNode, identifier);
         }
 
-        jlog.info("REWRITES: " + node.at("/collection").toString());
+        jlog.debug("REWRITES: " + node.at("/collection").toString());
         return node.rawNode();
     }
 

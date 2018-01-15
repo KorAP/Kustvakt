@@ -126,7 +126,7 @@ public class VirtualCorpusController {
         }
         return Response.ok(result).build();
     }
-    
+
     /** Lists all VCs created by a user
      * 
      * @param securityContext
@@ -165,6 +165,75 @@ public class VirtualCorpusController {
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             service.deleteVC(context.getUsername(), vcId);
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+        return Response.ok().build();
+    }
+
+    //  @POST
+    //  @Path("conceal")
+    //  public Response concealPublishedVC (@Context SecurityContext securityContext,
+    //          @QueryParam("vcId") int vcId) {
+    //      TokenContext context =
+    //              (TokenContext) securityContext.getUserPrincipal();
+    //      try {
+    //          service.concealVC(context.getUsername(), vcId);
+    //      }
+    //      catch (KustvaktException e) {
+    //          throw responseHandler.throwit(e);
+    //      }
+    //      return Response.ok().build();
+    //  }
+
+    /** VC can only be shared with a group, not individuals. 
+     *  Only VC Access Admins are allowed to share VCs and 
+     *  the VCs must have been created by themselves.
+     * 
+     * @param securityContext
+     * @param vcId a virtual corpus id
+     * @param groupId a user group id
+     * @return HTTP status 200, if successful
+     */
+    @POST
+    @Path("access/share")
+    public Response shareVC (@Context SecurityContext securityContext,
+            @QueryParam("vcId") int vcId, @QueryParam("groupId") int groupId) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            service.shareVC(context.getUsername(), vcId, groupId);
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+        return Response.ok().build();
+    }
+
+    @GET
+    @Path("access/list")
+    public Response listVCAccess (@Context SecurityContext securityContext,
+            @QueryParam("vcId") int vcId) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            service.listVCAccessByVC(context.getUsername(), vcId);
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+        return Response.ok().build();
+    }
+    
+    @GET
+    @Path("access/list/byGroup")
+    public Response listVCAccessByGroup (@Context SecurityContext securityContext,
+            @QueryParam("groupId") int groupId) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            service.listVCAccessByGroup(context.getUsername(), groupId);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);

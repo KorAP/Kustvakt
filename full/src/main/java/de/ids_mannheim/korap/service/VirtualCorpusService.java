@@ -15,14 +15,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
-import de.ids_mannheim.korap.constant.PredefinedUserGroup;
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.dao.VirtualCorpusAccessDao;
 import de.ids_mannheim.korap.dao.VirtualCorpusDao;
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.dto.converter.VirtualCorpusConverter;
+import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroup;
+import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.entity.VirtualCorpusAccess;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -66,6 +67,91 @@ public class VirtualCorpusService {
     @Autowired
     private VirtualCorpusConverter converter;
 
+    public List<VirtualCorpusDto> listOwnerVC (String username)
+            throws KustvaktException {
+        List<VirtualCorpus> vcList = vcDao.retrieveOwnerVC(username);
+        return createVCDtos(vcList);
+    }
+
+    public List<VirtualCorpusDto> listVCByUser (String username)
+            throws KustvaktException {
+        Set<VirtualCorpus> vcSet = vcDao.retrieveVCByUser(username);
+        return createVCDtos(vcSet);
+    }
+
+    private ArrayList<VirtualCorpusDto> createVCDtos (
+            Collection<VirtualCorpus> vcList) throws KustvaktException {
+        ArrayList<VirtualCorpusDto> dtos = new ArrayList<>(vcList.size());
+        VirtualCorpus vc;
+        Iterator<VirtualCorpus> i = vcList.iterator();
+        while (i.hasNext()) {
+            vc = i.next();
+            String json = vc.getCorpusQuery();
+            String statistics = krill.getStatistics(json);
+            VirtualCorpusDto vcDto =
+                    converter.createVirtualCorpusDto(vc, statistics);
+            dtos.add(vcDto);
+        }
+        return dtos;
+    }
+
+    /** Only admin and the owner of the virtual corpus are allowed to 
+     *  delete a virtual corpus.
+     *  
+     * @param username username
+     * @param vcId virtual corpus id
+     * @throws KustvaktException
+     */
+    public void deleteVC (String username, int vcId) throws KustvaktException {
+
+        User user = authManager.getUser(username);
+        VirtualCorpus vc = vcDao.retrieveVCById(vcId);
+
+        if (vc.getCreatedBy().equals(username) || user.isAdmin()) {
+            vcDao.deleteVirtualCorpus(vcId);
+        }
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
+    }
+
+    public void editVC (VirtualCorpusJson vcJson, String username)
+            throws KustvaktException {
+
+        VirtualCorpus vc = vcDao.retrieveVCById(vcJson.getId());
+        editVC(vc, vcJson, username);
+    }
+
+    public void editVC (VirtualCorpus vc, VirtualCorpusJson vcJson,
+            String username) throws KustvaktException {
+        ParameterChecker.checkIntegerValue(vcJson.getId(), "id");
+        User user = authManager.getUser(username);
+
+        if (!username.equals(vc.getCreatedBy()) || !user.isAdmin()) {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
+
+        String koralQuery = null;
+        CorpusAccess requiredAccess = null;
+        if (vcJson.getCorpusQuery() != null
+                && vcJson.getCorpusQuery().isEmpty()) {
+            koralQuery = serializeCorpusQuery(vcJson.getCorpusQuery());
+            requiredAccess = determineRequiredAccess(koralQuery);
+        }
+
+        vcDao.editVirtualCorpus(vc, vcJson.getName(), vcJson.getType(),
+                requiredAccess, koralQuery, vcJson.getDefinition(),
+                vcJson.getDescription(), vcJson.getStatus());
+
+        if (!vc.getType().equals(VirtualCorpusType.PUBLISHED)
+                && vcJson.getType() != null
+                && vcJson.getType().equals(VirtualCorpusType.PUBLISHED)) {
+            publishVC(vcJson.getId());
+        }
+    }
+
     public int storeVC (VirtualCorpusJson vc, String username)
             throws KustvaktException {
 
@@ -94,61 +180,6 @@ public class VirtualCorpusService {
         }
         // EM: should this return anything?
         return vcId;
-    }
-
-    public void editVC (VirtualCorpusJson vcJson, String username)
-            throws KustvaktException {
-
-        ParameterChecker.checkIntegerValue(vcJson.getId(), "id");
-        VirtualCorpus vc = vcDao.retrieveVCById(vcJson.getId());
-
-        User user = authManager.getUser(username);
-
-        if (!username.equals(vc.getCreatedBy()) && !user.isAdmin()) {
-            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: " + username, username);
-        }
-
-        String koralQuery = null;
-        CorpusAccess requiredAccess = null;
-        if (vcJson.getCorpusQuery() != null
-                && vcJson.getCorpusQuery().isEmpty()) {
-            koralQuery = serializeCorpusQuery(vcJson.getCorpusQuery());
-            requiredAccess = determineRequiredAccess(koralQuery);
-        }
-
-        vcDao.editVirtualCorpus(vc, vcJson.getName(), vcJson.getType(),
-                requiredAccess, koralQuery, vcJson.getDefinition(),
-                vcJson.getDescription(), vcJson.getStatus());
-
-        if (!vc.getType().equals(VirtualCorpusType.PUBLISHED)
-                && vcJson.getType() != null
-                && vcJson.getType().equals(VirtualCorpusType.PUBLISHED)) {
-            publishVC(vcJson.getId());
-        }
-    }
-
-    private void publishVC (int vcId) throws KustvaktException {
-
-        // check if hidden access exists
-        if (!accessDao.hasHiddenAccess(vcId)) {
-            // assign hidden access for all users
-            VirtualCorpus vc = vcDao.retrieveVCById(vcId);
-            UserGroup all = userGroupService.retrieveAllUserGroup();
-            accessDao.addAccessToVC(vc, all, "system",
-                    VirtualCorpusAccessStatus.HIDDEN);
-
-            // create and assign a hidden group
-            int groupId = userGroupService.createAutoHiddenGroup(vcId);
-            UserGroup autoHidden =
-                    userGroupService.retrieveUserGroupById(groupId);
-            accessDao.addAccessToVC(vc, autoHidden, "system",
-                    VirtualCorpusAccessStatus.HIDDEN);
-        }
-        else {
-            jlog.error("Cannot publish VC with id: " + vcId
-                    + ". There have been hidden accesses for the VC already.");
-        }
     }
 
     private String serializeCorpusQuery (String corpusQuery)
@@ -195,57 +226,141 @@ public class VirtualCorpusService {
         return (numberOfDoc > 0) ? true : false;
     }
 
-    public List<VirtualCorpusDto> listOwnerVC (String username)
-            throws KustvaktException {
-        List<VirtualCorpus> vcList = vcDao.retrieveOwnerVC(username);
-        return createVCDtos(vcList);
-    }
+    private void publishVC (int vcId) throws KustvaktException {
 
-    public List<VirtualCorpusDto> listVCByUser (String username)
-            throws KustvaktException {
-        Set<VirtualCorpus> vcSet = vcDao.retrieveVCByUser(username);
-        return createVCDtos(vcSet);
-    }
+        List<VirtualCorpusAccess> hiddenAccess =
+                accessDao.retrieveHiddenAccess(vcId);
 
-    private ArrayList<VirtualCorpusDto> createVCDtos (
-            Collection<VirtualCorpus> vcList) throws KustvaktException {
-        ArrayList<VirtualCorpusDto> dtos = new ArrayList<>(vcList.size());
-        VirtualCorpus vc;
-        Iterator<VirtualCorpus> i = vcList.iterator();
-        while (i.hasNext()) {
-            vc = i.next();
-            String json = vc.getCorpusQuery();
-            String statistics = krill.getStatistics(json);
-            VirtualCorpusDto vcDto =
-                    converter.createVirtualCorpusDto(vc, statistics);
-            dtos.add(vcDto);
-        }
-        return dtos;
-    }
+        // check if hidden access exists
+        if (hiddenAccess.isEmpty()) {
+            // assign hidden access for all users
+            VirtualCorpus vc = vcDao.retrieveVCById(vcId);
+            UserGroup all = userGroupService.retrieveAllUserGroup();
+            accessDao.createAccessToVC(vc, all, "system",
+                    VirtualCorpusAccessStatus.HIDDEN);
 
-    /** Only admin and the owner of the virtual corpus are allowed to 
-     *  delete a virtual corpus.
-     *  
-     * @param username username
-     * @param vcId virtual corpus id
-     * @throws KustvaktException
-     */
-    public void deleteVC (String username, int vcId) throws KustvaktException {
-
-        User user = authManager.getUser(username);
-        VirtualCorpus vc = vcDao.retrieveVCById(vcId);
-
-        if (user.isAdmin() || vc.getCreatedBy().equals(username)) {
-            vcDao.deleteVirtualCorpus(vcId);
+            // create and assign a hidden group
+            int groupId = userGroupService.createAutoHiddenGroup(vcId);
+            UserGroup autoHidden =
+                    userGroupService.retrieveUserGroupById(groupId);
+            accessDao.createAccessToVC(vc, autoHidden, "system",
+                    VirtualCorpusAccessStatus.HIDDEN);
         }
         else {
+            jlog.error("Cannot publish VC with id: " + vcId
+                    + ". There have been hidden accesses for the VC already.");
+        }
+    }
+
+
+    //    public void concealVC (String username, int vcId) throws KustvaktException {
+    //
+    //        VirtualCorpus vc = vcDao.retrieveVCById(vcId);
+    //        if (vc.getType().equals(VirtualCorpusType.PUBLISHED)) {
+    //            throw new KustvaktException(StatusCodes.NOTHING_CHANGED,
+    //                    "Virtual corpus is not published.");
+    //        }
+    //
+    //        VirtualCorpusJson vcJson = new VirtualCorpusJson();
+    //        // EM: a published VC may originate from a project or a private VC. 
+    //        // This origin is not saved in the DB. To be on the safe side, 
+    //        // VirtualCorpusType is changed into PROJECT so that any groups 
+    //        // associated with the VC can access it.
+    //        vcJson.setType(VirtualCorpusType.PROJECT);
+    //        editVC(vc, vcJson, username);
+    //
+    //        List<VirtualCorpusAccess> hiddenAccess =
+    //                accessDao.retrieveHiddenAccess(vcId);
+    //        for (VirtualCorpusAccess access : hiddenAccess){
+    //            access.setDeletedBy(username);
+    //            editVCAccess(access,username);
+    //        }
+    //
+    //    }
+
+    public List<VirtualCorpusAccess> retrieveVCAccess (int vcId)
+            throws KustvaktException {
+        return accessDao.retrieveAccessByVC(vcId);
+    }
+
+    public void shareVC (String username, int vcId, int groupId)
+            throws KustvaktException {
+
+        User user = authManager.getUser(username);
+
+        VirtualCorpus vc = vcDao.retrieveVCById(vcId);
+        if (!username.equals(vc.getCreatedBy()) || !user.isAdmin()) {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
+
+        UserGroup userGroup = userGroupService.retrieveUserGroupById(groupId);
+
+        if (!user.isAdmin() && !isVCAccessAdmin(userGroup, username)) {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
+        else {
+            accessDao.createAccessToVC(vc, userGroup, username,
+                    VirtualCorpusAccessStatus.ACTIVE);
+        }
+    }
+
+    private boolean isVCAccessAdmin (UserGroup userGroup, String username)
+            throws KustvaktException {
+        List<UserGroupMember> accessAdmins =
+                userGroupService.retrieveVCAccessAdmins(userGroup);
+        for (UserGroupMember m : accessAdmins) {
+            if (username.equals(m.getUserId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void editVCAccess (VirtualCorpusAccess access, String username)
+            throws KustvaktException {
+
+        // get all the VCA admins
+        UserGroup userGroup = access.getUserGroup();
+        List<UserGroupMember> accessAdmins =
+                userGroupService.retrieveVCAccessAdmins(userGroup);
+
+        User user = authManager.getUser(username);
+        if (!user.isAdmin()) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
     }
 
-    public List<VirtualCorpusAccess> retrieveVCAccess (int vcId)
-            throws KustvaktException {
-        return accessDao.retrieveAccessByVC(vcId);
+    public List<VirtualCorpusAccess> listVCAccessByVC (String username,
+            int vcId) throws KustvaktException {
+
+        List<VirtualCorpusAccess> accessList =
+                accessDao.retrieveAccessByVC(vcId);
+        User user = authManager.getUser(username);
+        if (user.isAdmin()){
+            return accessList;
+        }
+
+        List<VirtualCorpusAccess> filteredAccessList = new ArrayList<>();
+        for (VirtualCorpusAccess access : accessList){
+            UserGroup userGroup = access.getUserGroup();
+            if (isVCAccessAdmin(userGroup, username)){
+                filteredAccessList.add(access);
+            }
+        }
+        return filteredAccessList;
+    }
+
+    public List<VirtualCorpusAccess> listVCAccessByGroup (String username,
+            int groupId) throws KustvaktException {
+        User user = authManager.getUser(username);
+        UserGroup userGroup = userGroupService.retrieveUserGroupById(groupId);
+        if (!user.isAdmin() && !isVCAccessAdmin(userGroup, username)) {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
+        return accessDao.retrieveAccessByGroup(groupId);
     }
 }

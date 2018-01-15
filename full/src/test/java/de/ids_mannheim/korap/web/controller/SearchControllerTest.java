@@ -150,7 +150,7 @@ public class SearchControllerTest extends FastJerseyTest {
                 response.getStatus());
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        System.out.println(entity);
+//        System.out.println(entity);
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
         assertEquals("koral:docGroup", node.at("/collection/@type").asText());

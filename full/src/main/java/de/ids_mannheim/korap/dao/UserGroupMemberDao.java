@@ -110,6 +110,9 @@ public class UserGroupMemberDao {
 
     public List<UserGroupMember> retrieveMemberByRole (int groupId, int roleId)
             throws KustvaktException {
+        ParameterChecker.checkIntegerValue(roleId, "roleId");
+        ParameterChecker.checkIntegerValue(groupId, "groupId");
+
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<UserGroupMember> query =
                 criteriaBuilder.createQuery(UserGroupMember.class);

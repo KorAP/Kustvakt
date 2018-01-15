@@ -77,15 +77,30 @@ public class UserGroupService {
 
         return dtos;
     }
-    
+
     public UserGroup retrieveUserGroupById (int groupId)
             throws KustvaktException {
         return userGroupDao.retrieveGroupById(groupId);
     }
-    
+
     public UserGroup retrieveAllUserGroup () {
         return userGroupDao.retrieveAllUserGroup();
     }
+
+    public List<UserGroupMember> retrieveVCAccessAdmins (UserGroup userGroup)
+            throws KustvaktException {
+        List<UserGroupMember> groupAdmins = groupMemberDao.retrieveMemberByRole(
+                userGroup.getId(), PredefinedRole.VC_ACCESS_ADMIN.getId());
+        return groupAdmins;
+    }
+    
+    public List<UserGroupMember> retrieveUserGroupAdmins (UserGroup userGroup)
+            throws KustvaktException {
+        List<UserGroupMember> groupAdmins = groupMemberDao.retrieveMemberByRole(
+                userGroup.getId(), PredefinedRole.USER_GROUP_ADMIN.getId());
+        return groupAdmins;
+    }
+
 
     /** Group owner is automatically added when creating a group. 
      *  Do not include owners in group members. 

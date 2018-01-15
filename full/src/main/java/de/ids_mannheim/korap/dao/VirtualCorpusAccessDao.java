@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.entity.UserGroup;
+import de.ids_mannheim.korap.entity.UserGroup_;
 import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.entity.VirtualCorpusAccess;
 import de.ids_mannheim.korap.entity.VirtualCorpusAccess_;
@@ -49,6 +51,25 @@ public class VirtualCorpusAccessDao {
         Query q = entityManager.createQuery(query);
         return q.getResultList();
     }
+    
+    public List<VirtualCorpusAccess> retrieveAccessByGroup (int groupId)
+            throws KustvaktException {
+        ParameterChecker.checkIntegerValue(groupId, "groupId");
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<VirtualCorpusAccess> query =
+                builder.createQuery(VirtualCorpusAccess.class);
+
+        Root<VirtualCorpusAccess> access =
+                query.from(VirtualCorpusAccess.class);
+        Join<VirtualCorpusAccess, UserGroup> accessVC =
+                access.join(VirtualCorpusAccess_.userGroup);
+
+        query.select(access);
+        query.where(builder.equal(accessVC.get(UserGroup_.id), groupId));
+        Query q = entityManager.createQuery(query);
+        return q.getResultList();
+    }
 
     /** Hidden accesses are only created for published or system VC. 
      * 
@@ -58,7 +79,8 @@ public class VirtualCorpusAccessDao {
      * @return true if there is a hidden access, false otherwise
      * @throws KustvaktException
      */
-    public boolean hasHiddenAccess (int vcId) throws KustvaktException {
+    public List<VirtualCorpusAccess> retrieveHiddenAccess (int vcId)
+            throws KustvaktException {
         ParameterChecker.checkIntegerValue(vcId, "vcId");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -79,22 +101,17 @@ public class VirtualCorpusAccessDao {
 
         query.select(access);
         query.where(p);
+
         try {
             Query q = entityManager.createQuery(query);
-            List<VirtualCorpusAccess> resultList = q.getResultList();
-            if (resultList.isEmpty()) {
-                return false;
-            }
-            else {
-                return true;
-            }
+            return q.getResultList();
         }
         catch (NoResultException e) {
-            return false;
+            return new ArrayList<>();
         }
     }
-
-    public void addAccessToVC (VirtualCorpus virtualCorpus, UserGroup userGroup,
+    
+    public void createAccessToVC (VirtualCorpus virtualCorpus, UserGroup userGroup,
             String createdBy, VirtualCorpusAccessStatus status) {
         VirtualCorpusAccess vca = new VirtualCorpusAccess();
         vca.setVirtualCorpus(virtualCorpus);
