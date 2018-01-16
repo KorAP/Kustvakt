@@ -51,7 +51,7 @@ public class UserGroupMember {
     @Enumerated(EnumType.STRING)
     private GroupMemberStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "group_id")
     private UserGroup group;
 

@@ -33,7 +33,32 @@ public class VirtualCorpusAccessDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public List<VirtualCorpusAccess> retrieveAccessByVC (int vcId)
+    // for vca admins
+    public List<VirtualCorpusAccess> retrieveActiveAccessByVC (int vcId)
+            throws KustvaktException {
+        ParameterChecker.checkIntegerValue(vcId, "vcId");
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<VirtualCorpusAccess> query =
+                builder.createQuery(VirtualCorpusAccess.class);
+
+        Root<VirtualCorpusAccess> access =
+                query.from(VirtualCorpusAccess.class);
+        Join<VirtualCorpusAccess, VirtualCorpus> accessVC =
+                access.join(VirtualCorpusAccess_.virtualCorpus);
+
+        Predicate p = builder.and(
+                builder.equal(accessVC.get(VirtualCorpus_.id), vcId),
+                builder.equal(access.get(VirtualCorpusAccess_.status),
+                        VirtualCorpusAccessStatus.ACTIVE));
+        query.select(access);
+        query.where(p);
+        Query q = entityManager.createQuery(query);
+        return q.getResultList();
+    }
+    
+    // for system admins
+    public List<VirtualCorpusAccess> retrieveAllAccessByVC (int vcId)
             throws KustvaktException {
         ParameterChecker.checkIntegerValue(vcId, "vcId");
 
@@ -51,8 +76,8 @@ public class VirtualCorpusAccessDao {
         Query q = entityManager.createQuery(query);
         return q.getResultList();
     }
-    
-    public List<VirtualCorpusAccess> retrieveAccessByGroup (int groupId)
+
+    public List<VirtualCorpusAccess> retrieveAllAccessByGroup (int groupId)
             throws KustvaktException {
         ParameterChecker.checkIntegerValue(groupId, "groupId");
 
@@ -67,6 +92,30 @@ public class VirtualCorpusAccessDao {
 
         query.select(access);
         query.where(builder.equal(accessVC.get(UserGroup_.id), groupId));
+        Query q = entityManager.createQuery(query);
+        return q.getResultList();
+    }
+    
+    public List<VirtualCorpusAccess> retrieveActiveAccessByGroup (int groupId)
+            throws KustvaktException {
+        ParameterChecker.checkIntegerValue(groupId, "groupId");
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<VirtualCorpusAccess> query =
+                builder.createQuery(VirtualCorpusAccess.class);
+
+        Root<VirtualCorpusAccess> access =
+                query.from(VirtualCorpusAccess.class);
+        Join<VirtualCorpusAccess, UserGroup> accessVC =
+                access.join(VirtualCorpusAccess_.userGroup);
+
+        Predicate p = builder.and(
+                builder.equal(accessVC.get(UserGroup_.id), groupId),
+                builder.equal(access.get(VirtualCorpusAccess_.status),
+                        VirtualCorpusAccessStatus.ACTIVE));
+        
+        query.select(access);
+        query.where(p);
         Query q = entityManager.createQuery(query);
         return q.getResultList();
     }
@@ -110,9 +159,10 @@ public class VirtualCorpusAccessDao {
             return new ArrayList<>();
         }
     }
-    
-    public void createAccessToVC (VirtualCorpus virtualCorpus, UserGroup userGroup,
-            String createdBy, VirtualCorpusAccessStatus status) {
+
+    public void createAccessToVC (VirtualCorpus virtualCorpus,
+            UserGroup userGroup, String createdBy,
+            VirtualCorpusAccessStatus status) {
         VirtualCorpusAccess vca = new VirtualCorpusAccess();
         vca.setVirtualCorpus(virtualCorpus);
         vca.setUserGroup(userGroup);

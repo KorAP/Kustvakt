@@ -12,22 +12,23 @@ public class ParameterChecker {
                     "null");
         }
     }
-    
+
     public static void checkStringValue (String string, String name)
             throws KustvaktException {
-        if (string == null ) {
+        if (string == null) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, name,
                     "null");
         }
-        else if (string.isEmpty()){
+        else if (string.isEmpty()) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, name,
                     "empty");
         }
     }
 
-    public static void checkIntegerValue (int integer, String name) throws KustvaktException {
+    public static void checkIntegerValue (int integer, String name)
+            throws KustvaktException {
         if (integer == 0) {
-            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, name,
+            throw new KustvaktException(StatusCodes.MISSING_ARGUMENT, name,
                     "0");
         }
     }

@@ -65,15 +65,21 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
+				<version>3.7.0</version>
 				<configuration>
 					<compilerVersion>${java.version}</compilerVersion>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
-					<processors>
+					<verbose>true</verbose>
+          			<fork>true</fork>
+					<!-- <compilerArguments>
 						<processor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</processor>
 						<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
-					</processors>
+					</compilerArguments> -->
+					<!-- <processors>
+						<processor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</processor>
+						<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
+					</processors> -->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -86,12 +92,11 @@
 					<threadCount>10</threadCount>
 
 					<excludes>
-						<exclude>de/ids_mannheim/korap/suites/*.java</exclude>
-						<exclude>de/ids_mannheim/korap/dao/*.java</exclude>
+						<!-- <exclude>de/ids_mannheim/korap/suites/*.java</exclude> -->
+						<!-- <exclude>de/ids_mannheim/korap/dao/*.java</exclude> -->
 						<exclude>de/ids_mannheim/korap/authentication/*.java</exclude>
-						<exclude>**/KustvaktServerTest.java</exclude>
-						<exclude>**/ResourceServiceTest.java</exclude>
-						<exclude>**/ResourceInfoServiceTest.java</exclude>
+						<!-- <exclude>**/ResourceServiceTest.java</exclude> -->
+						<!-- <exclude>**/ResourceInfoServiceTest.java</exclude> -->
 						<exclude>**/PolicyServiceTest.java</exclude>
 					</excludes>
 					<includes>

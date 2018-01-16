@@ -12,7 +12,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
-import de.ids_mannheim.korap.dto.UserGroupDto;
 import de.ids_mannheim.korap.entity.VirtualCorpusAccess;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
@@ -34,7 +33,7 @@ public class VirtualCorpusServiceTest {
         vc.setType(VirtualCorpusType.PUBLISHED);
         int vcId = vcService.storeVC(vc, "VirtualCorpusServiceTest");
 
-        List<VirtualCorpusAccess> accesses = vcService.retrieveVCAccess(vcId);
+        List<VirtualCorpusAccess> accesses = vcService.retrieveAllVCAccess(vcId);
         assertEquals(2, accesses.size());
         for (VirtualCorpusAccess access : accesses) {
             assertEquals(VirtualCorpusAccessStatus.HIDDEN, access.getStatus());

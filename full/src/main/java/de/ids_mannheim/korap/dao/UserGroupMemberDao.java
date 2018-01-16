@@ -123,8 +123,8 @@ public class UserGroupMemberDao {
         Predicate predicate = criteriaBuilder.and(
                 criteriaBuilder.equal(root.get(UserGroupMember_.group),
                         groupId),
-                criteriaBuilder.notEqual(root.get(UserGroupMember_.status),
-                        GroupMemberStatus.DELETED),
+                criteriaBuilder.equal(root.get(UserGroupMember_.status),
+                        GroupMemberStatus.ACTIVE),
                 criteriaBuilder.equal(memberRole.get(Role_.id), roleId));
 
         query.select(root);

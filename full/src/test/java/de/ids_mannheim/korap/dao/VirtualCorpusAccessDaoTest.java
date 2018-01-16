@@ -29,7 +29,7 @@ public class VirtualCorpusAccessDaoTest {
 
     @Test
     public void getAccessByVC () throws KustvaktException {
-        List<VirtualCorpusAccess> vcaList = dao.retrieveAccessByVC(2);
+        List<VirtualCorpusAccess> vcaList = dao.retrieveActiveAccessByVC(2);
         VirtualCorpusAccess access = vcaList.get(0);
         assertEquals(VirtualCorpusAccessStatus.ACTIVE, access.getStatus());
         assertEquals("dory", access.getCreatedBy());
@@ -37,4 +37,6 @@ public class VirtualCorpusAccessDaoTest {
         UserGroup group = access.getUserGroup();
         assertEquals(2, group.getId());
     }
+    
+    
 }

@@ -21,6 +21,8 @@ import org.springframework.stereotype.Controller;
 
 import com.sun.jersey.spi.container.ResourceFilters;
 
+import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
+import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.service.VirtualCorpusService;
@@ -211,33 +213,49 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
 
+    /** Lists only active accesses to the specified virtual corpus.
+     * Only available to VCA admins.
+     * 
+     * @see VirtualCorpusAccessStatus
+     * 
+     * @param securityContext
+     * @param vcId virtual corpus id
+     * @return a list of access to the specified virtual corpus
+     */
     @GET
     @Path("access/list")
     public Response listVCAccess (@Context SecurityContext securityContext,
             @QueryParam("vcId") int vcId) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
+        String result;
         try {
-            service.listVCAccessByVC(context.getUsername(), vcId);
+            List<VirtualCorpusAccessDto> dtos =
+                    service.listVCAccessByVC(context.getUsername(), vcId);
+            result = JsonUtils.toJSON(dtos);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
-        return Response.ok().build();
+        return Response.ok(result).build();
     }
-    
+
     @GET
     @Path("access/list/byGroup")
-    public Response listVCAccessByGroup (@Context SecurityContext securityContext,
+    public Response listVCAccessByGroup (
+            @Context SecurityContext securityContext,
             @QueryParam("groupId") int groupId) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
+        String result;
         try {
-            service.listVCAccessByGroup(context.getUsername(), groupId);
+            List<VirtualCorpusAccessDto> dtos =
+                    service.listVCAccessByGroup(context.getUsername(), groupId);
+            result = JsonUtils.toJSON(dtos);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
-        return Response.ok().build();
+        return Response.ok(result).build();
     }
 }
