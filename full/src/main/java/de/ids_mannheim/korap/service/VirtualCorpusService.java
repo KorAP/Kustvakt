@@ -15,6 +15,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
+import de.ids_mannheim.korap.constant.GroupMemberStatus;
+import de.ids_mannheim.korap.constant.PredefinedUserGroup;
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.dao.VirtualCorpusAccessDao;
@@ -377,5 +379,56 @@ public class VirtualCorpusService {
         }
 
         return accessConverter.createVCADto(accessList);
+    }
+
+    public void deleteVCAccess (String username, int accessId)
+            throws KustvaktException {
+
+        User user = authManager.getUser(username);
+
+        VirtualCorpusAccess access = accessDao.retrieveAccessById(accessId);
+        UserGroup userGroup = access.getUserGroup();
+        if (isVCAccessAdmin(userGroup, username) || user.isAdmin()) {
+            accessDao.deleteAccess(access);
+        }
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
+
+    }
+
+    public VirtualCorpusDto searchVCById (String username, int vcId)
+            throws KustvaktException {
+        User user = authManager.getUser(username);
+
+        VirtualCorpus vc = vcDao.retrieveVCById(vcId);
+        VirtualCorpusType type = vc.getType();
+
+        if (!user.isAdmin()) {
+            if (type.equals(VirtualCorpusType.PRIVATE)
+                    || type.equals(VirtualCorpusType.PROJECT)) {
+                throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                        "Unauthorized operation for user: " + username,
+                        username);
+            }
+            else if (VirtualCorpusType.PUBLISHED.equals(type)) {
+                // add user in auto group 
+                List<VirtualCorpusAccess> hiddenAccessList =
+                        accessDao.retrieveHiddenAccess(vcId);
+                for (VirtualCorpusAccess access : hiddenAccessList) {
+                    if (PredefinedUserGroup.ALL.getId() != access.getUserGroup()
+                            .getId()) {
+                        userGroupService.addUserToGroup(username,
+                                access.getUserGroup());
+                        break;
+                    }
+                }
+            }
+        }
+
+        String json = vc.getCorpusQuery();
+        String statistics = krill.getStatistics(json);
+        return converter.createVirtualCorpusDto(vc, statistics);
     }
 }

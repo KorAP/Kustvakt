@@ -51,32 +51,32 @@ public class StatisticController {
 
     /**
      * Returns statistics of the virtual corpus defined by the given
-     * collectionQuery parameter.
+     * corpusQuery parameter.
      * 
      * @param context
      *            SecurityContext
      * @param locale
      *            Locale
-     * @param collectionQuery
+     * @param corpusQuery
      *            a collection query specifying a virtual corpus
      * @return statistics of the virtual corpus defined by the given
-     *         collectionQuery parameter.
+     *         corpusQuery parameter.
      */
     @GET
     public Response getStatistics (@Context SecurityContext context,
             @Context Locale locale,
-            @QueryParam("collectionQuery") String collectionQuery) {
+            @QueryParam("corpusQuery") String corpusQuery) {
 
-        if (collectionQuery == null || collectionQuery.isEmpty()) {
+        if (corpusQuery == null || corpusQuery.isEmpty()) {
             throw kustvaktResponseHandler
                     .throwit(new KustvaktException(StatusCodes.MISSING_ARGUMENT,
-                            "Parameter collectionQuery is missing.",
-                            "collectionQuery"));
+                            "Parameter corpusQuery is missing.",
+                            "corpusQuery"));
         }
 
 
         KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
-        builder.with(collectionQuery);
+        builder.with(corpusQuery);
         String json = null;
         try {
             json = builder.toJSON();

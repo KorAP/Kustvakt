@@ -564,5 +564,13 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         assertEquals(2, node.at("/0/userGroupId").asInt());
         assertEquals("dory group", node.at("/0/userGroupName").asText());
     }
+ 
+    // share VC
+    @Test
+    public void testCreateDeleteAccess () {
+        // TODO Auto-generated method stub
+
+    }
+    
     
 }

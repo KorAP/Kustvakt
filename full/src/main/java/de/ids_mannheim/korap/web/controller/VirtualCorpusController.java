@@ -7,6 +7,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -34,10 +35,15 @@ import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
 
-/** VirtualCorpusController defines web APIs related to virtual corpus
+/** VirtualCorpusController defines web APIs related to virtual corpus (VC)
  * such as creating, deleting and listing user virtual corpora.
  * 
- * These APIs are only available to logged-in users.
+ * This class also includes APIs related to virtual corpus access (VCA) 
+ * such as sharing and publishing VCs. When a VC is published, it is shared 
+ * with all users, but not always listed like system VC. It is listed for 
+ * a user, once when he/she have searched for the VC.
+ * 
+ * All the APIs in this class are available to logged-in users.
  * 
  * @author margaretha
  *
@@ -57,7 +63,7 @@ public class VirtualCorpusController {
     @Autowired
     private VirtualCorpusService service;
 
-    /** Creates a user VC, also for admins
+    /** Creates a user VC, also for system admins
      * 
      * @param securityContext
      * @param vc a JSON object describing the virtual corpus
@@ -107,6 +113,30 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
 
+    /** Searches for a specific VC.
+     * 
+     * @param securityContext
+     * @param vcId a virtual corpus id
+     * @return a list of VCs
+     */
+    @GET
+    @Path("search/{vcId}")
+    public Response searchVC (@Context SecurityContext securityContext,
+            @PathParam("vcId") int vcId) {
+        String result;
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            VirtualCorpusDto dto =
+                    service.searchVCById(context.getUsername(), vcId);
+            result = JsonUtils.toJSON(dto);
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+        return Response.ok(result).build();
+    }
+
     /** Lists not only private VCs but all VCs available to a user.
      * 
      * @param securityContext
@@ -151,7 +181,7 @@ public class VirtualCorpusController {
         return Response.ok(result).build();
     }
 
-    /** Only the VC owner and system admins can delete VCs. VC-access admins 
+    /** Only the VC owner and system admins can delete VCs. VCA admins 
      *  can delete VC-accesses e.g. of project VCs, but not the VCs 
      *  themselves. 
      * 
@@ -190,7 +220,7 @@ public class VirtualCorpusController {
     //  }
 
     /** VC can only be shared with a group, not individuals. 
-     *  Only VC Access Admins are allowed to share VCs and 
+     *  Only VCA admins are allowed to share VCs and 
      *  the VCs must have been created by themselves.
      * 
      * @param securityContext
@@ -213,8 +243,30 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
 
+    /** Only VCA Admins and system admins are allowed to delete a VC-access.
+     * 
+     * @param securityContext
+     * @param accessId
+     * @return
+     */
+    @DELETE
+    @Path("access/delete")
+    public Response deleteVCAccess (@Context SecurityContext securityContext,
+            @QueryParam("accessId") int accessId) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            service.deleteVCAccess(context.getUsername(), accessId);
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+        return Response.ok().build();
+    }
+
+
     /** Lists only active accesses to the specified virtual corpus.
-     * Only available to VCA admins.
+     * Only available to VCA and system admins.
      * 
      * @see VirtualCorpusAccessStatus
      * 
@@ -240,6 +292,13 @@ public class VirtualCorpusController {
         return Response.ok(result).build();
     }
 
+    /** Lists all VC-accesses available for a group. 
+     *  Only available to VCA and system admins.
+     * 
+     * @param securityContext
+     * @param groupId a group id
+     * @return a list of VC-access
+     */
     @GET
     @Path("access/list/byGroup")
     public Response listVCAccessByGroup (

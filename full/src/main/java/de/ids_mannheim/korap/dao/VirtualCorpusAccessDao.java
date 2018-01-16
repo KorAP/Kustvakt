@@ -33,6 +33,23 @@ public class VirtualCorpusAccessDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+    public VirtualCorpusAccess retrieveAccessById (int accessId)
+            throws KustvaktException {
+        ParameterChecker.checkIntegerValue(accessId, "accessId");
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<VirtualCorpusAccess> query =
+                builder.createQuery(VirtualCorpusAccess.class);
+
+        Root<VirtualCorpusAccess> access =
+                query.from(VirtualCorpusAccess.class);
+        query.select(access);
+        query.where(
+                builder.equal(access.get(VirtualCorpusAccess_.id), accessId));
+        Query q = entityManager.createQuery(query);
+        return (VirtualCorpusAccess) q.getSingleResult();
+    }
+
     // for vca admins
     public List<VirtualCorpusAccess> retrieveActiveAccessByVC (int vcId)
             throws KustvaktException {
@@ -56,7 +73,7 @@ public class VirtualCorpusAccessDao {
         Query q = entityManager.createQuery(query);
         return q.getResultList();
     }
-    
+
     // for system admins
     public List<VirtualCorpusAccess> retrieveAllAccessByVC (int vcId)
             throws KustvaktException {
@@ -95,7 +112,7 @@ public class VirtualCorpusAccessDao {
         Query q = entityManager.createQuery(query);
         return q.getResultList();
     }
-    
+
     public List<VirtualCorpusAccess> retrieveActiveAccessByGroup (int groupId)
             throws KustvaktException {
         ParameterChecker.checkIntegerValue(groupId, "groupId");
@@ -109,11 +126,11 @@ public class VirtualCorpusAccessDao {
         Join<VirtualCorpusAccess, UserGroup> accessVC =
                 access.join(VirtualCorpusAccess_.userGroup);
 
-        Predicate p = builder.and(
-                builder.equal(accessVC.get(UserGroup_.id), groupId),
-                builder.equal(access.get(VirtualCorpusAccess_.status),
-                        VirtualCorpusAccessStatus.ACTIVE));
-        
+        Predicate p =
+                builder.and(builder.equal(accessVC.get(UserGroup_.id), groupId),
+                        builder.equal(access.get(VirtualCorpusAccess_.status),
+                                VirtualCorpusAccessStatus.ACTIVE));
+
         query.select(access);
         query.where(p);
         Query q = entityManager.createQuery(query);
@@ -170,4 +187,9 @@ public class VirtualCorpusAccessDao {
         vca.setStatus(status);
         entityManager.persist(vca);
     }
+
+    public void deleteAccess (VirtualCorpusAccess access) {
+        entityManager.remove(access);
+    }
+
 }

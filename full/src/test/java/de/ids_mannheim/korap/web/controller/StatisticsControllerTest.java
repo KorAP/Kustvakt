@@ -31,10 +31,10 @@ public class StatisticsControllerTest extends FastJerseyTest {
     @Test
     public void testGetStatisticsNoResource ()
             throws JsonProcessingException, IOException {
-        String collectionQuery = "corpusSigle=WPD15";
+        String corpusQuery = "corpusSigle=WPD15";
         ClientResponse response = resource()
                 .path("statistics")
-                .queryParam("collectionQuery", collectionQuery)
+                .queryParam("corpusQuery", corpusQuery)
                 .get(ClientResponse.class);
 
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
@@ -47,12 +47,12 @@ public class StatisticsControllerTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetStatisticsWithCollectionQuery1 ()
+    public void testGetStatisticsWithcorpusQuery1 ()
             throws JsonProcessingException, IOException {
-        String collectionQuery = "corpusSigle=GOE";
+        String corpusQuery = "corpusSigle=GOE";
         ClientResponse response = resource()
                 .path("statistics")
-                .queryParam("collectionQuery", collectionQuery)
+                .queryParam("corpusQuery", corpusQuery)
                 .get(ClientResponse.class);
 
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
@@ -65,11 +65,11 @@ public class StatisticsControllerTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetStatisticsWithCollectionQuery2 ()
+    public void testGetStatisticsWithcorpusQuery2 ()
             throws JsonProcessingException, IOException {
         ClientResponse response = resource()
                 .path("statistics")
-                .queryParam("collectionQuery", "creationDate since 1810")
+                .queryParam("corpusQuery", "creationDate since 1810")
                 .get(ClientResponse.class);
         String ent = response.getEntity(String.class);
         JsonNode node = mapper.readTree(ent);
@@ -82,11 +82,11 @@ public class StatisticsControllerTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetStatisticsWithWrongCollectionQuery ()
+    public void testGetStatisticsWithWrongcorpusQuery ()
             throws JsonProcessingException, IOException {
         ClientResponse response = resource()
                 .path("statistics")
-                .queryParam("collectionQuery", "creationDate geq 1810")
+                .queryParam("corpusQuery", "creationDate geq 1810")
                 .get(ClientResponse.class);
 
         assert ClientResponse.Status.BAD_REQUEST.getStatusCode() == response
@@ -102,11 +102,11 @@ public class StatisticsControllerTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetStatisticsWithWrongCollectionQuery2 ()
+    public void testGetStatisticsWithWrongcorpusQuery2 ()
             throws JsonProcessingException, IOException {
         ClientResponse response = resource()
                 .path("statistics")
-                .queryParam("collectionQuery", "creationDate >= 1810")
+                .queryParam("corpusQuery", "creationDate >= 1810")
                 .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
@@ -121,7 +121,7 @@ public class StatisticsControllerTest extends FastJerseyTest {
 
     
     @Test
-    public void testGetStatisticsWithoutCollectionQuery ()
+    public void testGetStatisticsWithoutcorpusQuery ()
             throws JsonProcessingException, IOException {
         ClientResponse response = resource()
                 .path("statistics")
@@ -134,7 +134,7 @@ public class StatisticsControllerTest extends FastJerseyTest {
         JsonNode node = mapper.readTree(ent);
         assertEquals(node.at("/errors/0/0").asInt(), 105);
         assertEquals(node.at("/errors/0/1").asText(),
-                "Parameter collectionQuery is missing.");
-        assertEquals(node.at("/errors/0/2").asText(), "collectionQuery");
+                "Parameter corpusQuery is missing.");
+        assertEquals(node.at("/errors/0/2").asText(), "corpusQuery");
     }
 }

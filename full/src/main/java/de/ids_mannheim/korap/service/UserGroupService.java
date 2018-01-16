@@ -160,6 +160,25 @@ public class UserGroupService {
 
         return groupId;
     }
+    
+    public void addUserToGroup (String username, UserGroup userGroup)
+            throws KustvaktException {
+        
+        List<Role> roles = new ArrayList<Role>(2);
+        roles.add(roleDao
+                .retrieveRoleById(PredefinedRole.USER_GROUP_MEMBER.getId()));
+        roles.add(roleDao
+                .retrieveRoleById(PredefinedRole.VC_ACCESS_MEMBER.getId()));
+        
+        UserGroupMember member = new UserGroupMember();
+        member.setCreatedBy("system");
+        member.setGroup(userGroup);
+        member.setRoles(roles);
+        member.setStatus(GroupMemberStatus.ACTIVE);
+        member.setUserId(username);
+        
+        groupMemberDao.addMember(member);
+    }
 
     /** Updates the {@link GroupMemberStatus} of a pending member 
      * to {@link GroupMemberStatus#ACTIVE}.
