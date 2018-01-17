@@ -4,11 +4,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.apache.lucene.LucenePackage;
 import org.junit.Test;
+import org.springframework.web.context.ContextLoaderListener;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
+import com.sun.jersey.test.framework.AppDescriptor;
+import com.sun.jersey.test.framework.JerseyTest;
+import com.sun.jersey.test.framework.WebAppDescriptor;
+import com.sun.jersey.test.framework.spi.container.TestContainerException;
+import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
+import com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
@@ -18,17 +28,36 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * Created by hanl on 29.04.16.
  * 
  * @author margaretha
- * @date 10/10/2017
+ * @date 17/01/2017
  * 
  * Recent changes:
- * - updated the service paths and methods of query serialization tests
- * - added statistic service test
+ * - removed test configuration using FastJerseyLightTest
  */
-public class LightServiceTest extends FastJerseyLightTest {
+public class LightServiceTest extends JerseyTest{
+
+    public static final String classPackage = "de.ids_mannheim.korap.web.service.light";
 
     @Override
-    public void initMethod () throws KustvaktException {}
+    protected TestContainerFactory getTestContainerFactory ()
+            throws TestContainerException {
+        return new GrizzlyWebTestContainerFactory();
+    }
 
+    @Override
+    protected AppDescriptor configure () {
+        return new WebAppDescriptor.Builder(classPackage)
+                .servletClass(SpringServlet.class)
+                .contextListenerClass(ContextLoaderListener.class)
+                .contextParam("contextConfigLocation",
+                        "classpath:light-config.xml")
+                .build();
+    }
+
+    @Override
+    protected int getPort (int defaultPort) {
+        return ThreadLocalRandom.current().nextInt(5000, 8000 + 1);
+    }
+    
     @Test
     public void testStatistics () throws KustvaktException{
         ClientResponse response = resource()
