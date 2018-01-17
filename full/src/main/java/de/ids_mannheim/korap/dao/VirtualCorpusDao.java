@@ -48,9 +48,9 @@ public class VirtualCorpusDao {
     private EntityManager entityManager;
 
     public int createVirtualCorpus (String name, VirtualCorpusType type,
-            CorpusAccess requiredAccess, String corpusQuery,
-            String definition, String description, String status,
-            String createdBy) throws KustvaktException {
+            CorpusAccess requiredAccess, String corpusQuery, String definition,
+            String description, String status, String createdBy)
+            throws KustvaktException {
 
         VirtualCorpus vc = new VirtualCorpus();
         vc.setName(name);
@@ -157,9 +157,9 @@ public class VirtualCorpusDao {
         Query q = entityManager.createQuery(query);
         return q.getResultList();
     }
-    
-    public List<VirtualCorpus> retrieveOwnerVCByType (String userId, VirtualCorpusType type)
-            throws KustvaktException {
+
+    public List<VirtualCorpus> retrieveOwnerVCByType (String userId,
+            VirtualCorpusType type) throws KustvaktException {
         ParameterChecker.checkStringValue(userId, "userId");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -168,13 +168,11 @@ public class VirtualCorpusDao {
 
         Root<VirtualCorpus> virtualCorpus = query.from(VirtualCorpus.class);
         query.select(virtualCorpus);
-        
+
         Predicate p = builder.and(
                 builder.equal(virtualCorpus.get(VirtualCorpus_.createdBy),
                         userId),
-                builder.equal(virtualCorpus.get(VirtualCorpus_.type),
-                        type)
-                );
+                builder.equal(virtualCorpus.get(VirtualCorpus_.type), type));
         query.where(p);
 
         Query q = entityManager.createQuery(query);

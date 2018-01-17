@@ -405,30 +405,45 @@ public class VirtualCorpusService {
         VirtualCorpus vc = vcDao.retrieveVCById(vcId);
         VirtualCorpusType type = vc.getType();
 
-        if (!user.isAdmin()) {
+        if (!user.isAdmin() || !username.equals(vc.getCreatedBy())) {
             if (type.equals(VirtualCorpusType.PRIVATE)
-                    || type.equals(VirtualCorpusType.PROJECT)) {
+                    || (type.equals(VirtualCorpusType.PROJECT)
+                            && !hasAccess(username, vcId))) {
                 throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                         "Unauthorized operation for user: " + username,
                         username);
             }
+
             else if (VirtualCorpusType.PUBLISHED.equals(type)) {
-                // add user in auto group 
-                List<VirtualCorpusAccess> hiddenAccessList =
-                        accessDao.retrieveHiddenAccess(vcId);
-                for (VirtualCorpusAccess access : hiddenAccessList) {
-                    if (PredefinedUserGroup.ALL.getId() != access.getUserGroup()
-                            .getId()) {
-                        userGroupService.addUserToGroup(username,
-                                access.getUserGroup());
-                        break;
-                    }
+                // add user in the VC's auto group 
+                VirtualCorpusAccess access =
+                        accessDao.retrievePublishedGroupAccess(vcId);
+                UserGroup userGroup = access.getUserGroup();
+                if (userGroupService.isMember(username, userGroup)) {
+                    userGroupService.addUserToGroup(username, userGroup);
                 }
             }
+            // else VirtualCorpusType.PREDEFINED
         }
 
         String json = vc.getCorpusQuery();
         String statistics = krill.getStatistics(json);
         return converter.createVirtualCorpusDto(vc, statistics);
     }
+
+    private boolean hasAccess (String username, int vcId)
+            throws KustvaktException {
+        UserGroup userGroup;
+        List<VirtualCorpusAccess> accessList =
+                accessDao.retrieveActiveAccessByVC(vcId);
+        for (VirtualCorpusAccess access : accessList) {
+            userGroup = access.getUserGroup();
+            if (userGroupService.isMember(username, userGroup)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }

@@ -205,4 +205,17 @@ public class UserGroupService {
         groupMemberDao.deleteMember(username, groupId, true);
     }
 
+
+    public boolean isMember (String username, UserGroup userGroup)
+            throws KustvaktException {
+        List<UserGroupMember> members =
+                groupMemberDao.retrieveMemberByGroupId(userGroup.getId());
+        for (UserGroupMember member : members) {
+            if (member.getUserId().equals(username)
+                    && member.getStatus().equals(GroupMemberStatus.ACTIVE)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
