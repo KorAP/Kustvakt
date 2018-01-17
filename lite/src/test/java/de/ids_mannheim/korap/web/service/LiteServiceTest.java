@@ -33,7 +33,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * Recent changes:
  * - removed test configuration using FastJerseyLightTest
  */
-public class LightServiceTest extends JerseyTest{
+public class LiteServiceTest extends JerseyTest{
 
     public static final String classPackage = "de.ids_mannheim.korap.web.service.light";
 
@@ -49,7 +49,7 @@ public class LightServiceTest extends JerseyTest{
                 .servletClass(SpringServlet.class)
                 .contextListenerClass(ContextLoaderListener.class)
                 .contextParam("contextConfigLocation",
-                        "classpath:light-config.xml")
+                        "classpath:lite-config.xml")
                 .build();
     }
 

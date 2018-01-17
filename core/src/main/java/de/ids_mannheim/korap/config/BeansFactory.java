@@ -1,17 +1,14 @@
 package de.ids_mannheim.korap.config;
 
-import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
-import de.ids_mannheim.korap.user.Userdata;
-import de.ids_mannheim.korap.web.CoreResponseHandler;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Collection;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collection;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
 
 /**
  * User: hanl
@@ -19,8 +16,6 @@ import java.util.Collection;
  * Time: 11:20 AM
  */
 public class BeansFactory {
-
-    private static final String CONFIG_FILE = "light-config.xml";
 
     private static ContextHolder beanHolder;
 
@@ -50,7 +45,7 @@ public class BeansFactory {
     public static int loadClasspathContext (String ... files) {
         ApplicationContext context;
         if (files.length == 0)
-            context = new ClassPathXmlApplicationContext(CONFIG_FILE);
+            throw new IllegalArgumentException("Spring XML config file is not specified.");
         else
             context = new ClassPathXmlApplicationContext(files);
         ContextHolder h = new ContextHolder(context) {};

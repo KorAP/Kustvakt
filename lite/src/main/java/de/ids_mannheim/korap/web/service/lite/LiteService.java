@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.service.light;
+package de.ids_mannheim.korap.web.service.lite;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,9 +53,9 @@ import de.ids_mannheim.korap.web.SearchKrill;
 @Controller
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-public class LightService {
+public class LiteService {
 
-    private static Logger jlog = LoggerFactory.getLogger(LightService.class);
+    private static Logger jlog = LoggerFactory.getLogger(LiteService.class);
 
     @Autowired
     CoreResponseHandler kustvaktResponseHandler;
@@ -68,7 +68,7 @@ public class LightService {
     private KustvaktConfiguration config;
 
 
-    public LightService () {
+    public LiteService () {
         // Karang URI
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
         this.graphDBhandler = new ClientsHandler(builder.build());
