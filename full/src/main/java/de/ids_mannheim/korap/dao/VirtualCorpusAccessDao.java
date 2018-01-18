@@ -1,6 +1,5 @@
 package de.ids_mannheim.korap.dao;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -16,7 +15,6 @@ import javax.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import de.ids_mannheim.korap.constant.PredefinedUserGroup;
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroup_;
@@ -25,7 +23,6 @@ import de.ids_mannheim.korap.entity.VirtualCorpusAccess;
 import de.ids_mannheim.korap.entity.VirtualCorpusAccess_;
 import de.ids_mannheim.korap.entity.VirtualCorpus_;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
 @Transactional
@@ -147,7 +144,7 @@ public class VirtualCorpusAccessDao {
      * @return true if there is a hidden access, false otherwise
      * @throws KustvaktException
      */
-    public List<VirtualCorpusAccess> retrieveHiddenAccess (int vcId)
+    public VirtualCorpusAccess retrieveHiddenAccess (int vcId)
             throws KustvaktException {
         ParameterChecker.checkIntegerValue(vcId, "vcId");
 
@@ -163,45 +160,11 @@ public class VirtualCorpusAccessDao {
         Predicate p = builder.and(
                 builder.equal(accessVC.get(VirtualCorpus_.id), vcId),
                 builder.equal(access.get(VirtualCorpusAccess_.status),
-                        VirtualCorpusAccessStatus.HIDDEN),
-                builder.notEqual(access.get(VirtualCorpusAccess_.deletedBy),
-                        "NULL"));
-
-        query.select(access);
-        query.where(p);
-
-        try {
-            Query q = entityManager.createQuery(query);
-            return q.getResultList();
-        }
-        catch (NoResultException e) {
-            return new ArrayList<>();
-        }
-    }
-
-    public VirtualCorpusAccess retrievePublishedGroupAccess (int vcId)
-            throws KustvaktException {
-        ParameterChecker.checkIntegerValue(vcId, "vcId");
-
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<VirtualCorpusAccess> query =
-                builder.createQuery(VirtualCorpusAccess.class);
-
-        Root<VirtualCorpusAccess> access =
-                query.from(VirtualCorpusAccess.class);
-        Join<VirtualCorpusAccess, VirtualCorpus> accessVC =
-                access.join(VirtualCorpusAccess_.virtualCorpus);
-        Join<VirtualCorpusAccess, UserGroup> accessGroup =
-                access.join(VirtualCorpusAccess_.userGroup);
-
-        Predicate p = builder.and(
-                builder.equal(accessVC.get(VirtualCorpus_.id), vcId),
-                builder.equal(accessGroup.get(UserGroup_.id),
-                        PredefinedUserGroup.ALL.getId()),
-                builder.equal(access.get(VirtualCorpusAccess_.status),
-                        VirtualCorpusAccessStatus.HIDDEN),
-                builder.notEqual(access.get(VirtualCorpusAccess_.deletedBy),
-                        "NULL"));
+                        VirtualCorpusAccessStatus.HIDDEN)
+//                ,
+//                builder.notEqual(access.get(VirtualCorpusAccess_.deletedBy),
+//                        "NULL")
+                );
 
         query.select(access);
         query.where(p);
@@ -211,9 +174,7 @@ public class VirtualCorpusAccessDao {
             return (VirtualCorpusAccess) q.getSingleResult();
         }
         catch (NoResultException e) {
-            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                    "Auto group access  is not found for virtual corpus with id "
-                            + vcId);
+            return null;
         }
     }
 

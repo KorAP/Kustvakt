@@ -2,5 +2,9 @@ package de.ids_mannheim.korap.constant;
 
 public enum VirtualCorpusAccessStatus {
 
-    ACTIVE, PENDING, DELETED, HIDDEN;
+    ACTIVE, DELETED,
+    PENDING,
+    // access for hidden group
+    // maybe not necessary?
+    HIDDEN;
 }

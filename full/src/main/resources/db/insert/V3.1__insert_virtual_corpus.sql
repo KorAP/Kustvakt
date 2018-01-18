@@ -2,6 +2,9 @@
 
 -- user groups
 INSERT INTO user_group(name,status,created_by) 
+	VALUES ("marlin group","ACTIVE","marlin");
+	
+INSERT INTO user_group(name,status,created_by) 
 	VALUES ("dory group","ACTIVE","dory");
 
 INSERT INTO user_group(name,status,created_by) 
@@ -16,6 +19,16 @@ INSERT INTO user_group(name,status,created_by)
 
 
 -- user group members
+INSERT INTO user_group_member(user_id, group_id, status, created_by)
+	SELECT "marlin",
+		(SELECT id from user_group where name = "marlin group"),
+		"ACTIVE","marlin";
+
+INSERT INTO user_group_member(user_id, group_id, status, created_by)
+	SELECT "dory",
+		(SELECT id from user_group where name = "marlin group"),
+		"ACTIVE","marlin";
+		
 INSERT INTO user_group_member(user_id, group_id, status, created_by)
 	SELECT "dory",
 		(SELECT id from user_group where name = "dory group"),
@@ -67,23 +80,23 @@ INSERT INTO virtual_corpus_access(virtual_corpus_id, user_group_id, status, crea
 		(SELECT id from user_group where name = "dory group"), 
 		"ACTIVE", "dory";
 
-INSERT INTO virtual_corpus_access(virtual_corpus_id, user_group_id, status, created_by) 
-	SELECT 
-		(SELECT id from virtual_corpus where name = "system VC"), 
-		(SELECT id from user_group where name = "all users"),
-		"ACTIVE", "system";
+--INSERT INTO virtual_corpus_access(virtual_corpus_id, user_group_id, status, created_by) 
+--	SELECT 
+--		(SELECT id from virtual_corpus where name = "system VC"), 
+--		(SELECT id from user_group where name = "all users"),
+--		"ACTIVE", "system";
 
 INSERT INTO virtual_corpus_access(virtual_corpus_id, user_group_id, status, created_by) 
 	SELECT 
 		(SELECT id from virtual_corpus where name = "published VC"),
-		(SELECT id from user_group where name = "all users"),
-		"HIDDEN", "system";
+		(SELECT id from user_group where name = "marlin group"),
+		"ACTIVE", "marlin";
 
 INSERT INTO virtual_corpus_access(virtual_corpus_id, user_group_id, status, created_by) 
 	SELECT 
 		(SELECT id from virtual_corpus where name = "published VC"),
 		(SELECT id from user_group where name = "auto group"),
-		"ACTIVE", "system";
+		"HIDDEN", "system";
 
 	
 -- Summary user VC Lists

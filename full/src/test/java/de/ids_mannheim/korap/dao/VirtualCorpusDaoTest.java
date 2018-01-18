@@ -72,18 +72,19 @@ public class VirtualCorpusDaoTest {
 
 
     /** retrieve private and group VC
-     * excludes hidden published VC (user has never used it)
      * @throws KustvaktException
      */
     @Test
     public void retrieveVCByUserDory () throws KustvaktException {
         Set<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("dory");
-        assertEquals(3, virtualCorpora.size());
+        System.out.println(virtualCorpora);
+        assertEquals(4, virtualCorpora.size());
         // order is random
         //        Iterator<VirtualCorpus> i = virtualCorpora.iterator();
         //        assertEquals("dory VC", i.next().getName());
         //        assertEquals("system VC", i.next().getName());
         //        assertEquals("group VC", i.next().getName());
+        //      assertEquals("published VC", i.next().getName());
     }
 
 

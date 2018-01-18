@@ -49,7 +49,7 @@ public class UserGroupDaoTest {
                 UserGroupStatus.ACTIVE);
 
         // retrieve group
-        UserGroup group = userGroupDao.retrieveGroupWithMemberById(groupId);
+        UserGroup group = userGroupDao.retrieveGroupById(groupId, true);
         assertEquals(groupName, group.getName());
         assertEquals(createdBy, group.getCreatedBy());
         assertEquals(UserGroupStatus.ACTIVE, group.getStatus());
@@ -88,7 +88,7 @@ public class UserGroupDaoTest {
     public void retrieveGroupWithMembers () throws KustvaktException {
         // dory group
         List<UserGroupMember> members =
-                userGroupDao.retrieveGroupWithMemberById(2).getMembers();
+                userGroupDao.retrieveGroupById(2, true).getMembers();
         assertEquals(4, members.size());
 
         UserGroupMember m = members.get(1);
@@ -101,7 +101,7 @@ public class UserGroupDaoTest {
     @Test
     public void retrieveGroupByUserId () throws KustvaktException {
         List<UserGroup> group = userGroupDao.retrieveGroupByUserId("dory");
-        assertEquals(1, group.size());
+        assertEquals(2, group.size());
 
         group = userGroupDao.retrieveGroupByUserId("pearl");
         assertEquals(0, group.size());
@@ -140,9 +140,13 @@ public class UserGroupDaoTest {
         assertEquals(2, vc.size());
         assertEquals(name, vc.get(1).getName());
 
+        // delete vc from group
         userGroupDao.deleteVCFromGroup(virtualCorpus.getId(), groupId);
 
         vc = virtualCorpusDao.retrieveVCByGroup(groupId);
         assertEquals(1, vc.size());
+        
+        // delete vc
+        virtualCorpusDao.deleteVirtualCorpus(virtualCorpus.getId());
     }
 }

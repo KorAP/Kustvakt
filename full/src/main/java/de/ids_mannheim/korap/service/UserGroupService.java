@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
-import de.ids_mannheim.korap.constant.PredefinedUserGroup;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.dao.RoleDao;
 import de.ids_mannheim.korap.dao.UserGroupDao;
@@ -83,17 +82,13 @@ public class UserGroupService {
         return userGroupDao.retrieveGroupById(groupId);
     }
 
-    public UserGroup retrieveAllUserGroup () {
-        return userGroupDao.retrieveAllUserGroup();
-    }
-
     public List<UserGroupMember> retrieveVCAccessAdmins (UserGroup userGroup)
             throws KustvaktException {
         List<UserGroupMember> groupAdmins = groupMemberDao.retrieveMemberByRole(
                 userGroup.getId(), PredefinedRole.VC_ACCESS_ADMIN.getId());
         return groupAdmins;
     }
-    
+
     public List<UserGroupMember> retrieveUserGroupAdmins (UserGroup userGroup)
             throws KustvaktException {
         List<UserGroupMember> groupAdmins = groupMemberDao.retrieveMemberByRole(
@@ -154,29 +149,29 @@ public class UserGroupService {
     }
 
     public int createAutoHiddenGroup (int vcId) throws KustvaktException {
-        String groupName = "auto-published-group";
+        String groupName = "auto-hidden-group";
         int groupId = userGroupDao.createGroup(groupName, "system",
                 UserGroupStatus.HIDDEN);
 
         return groupId;
     }
-    
+
     public void addUserToGroup (String username, UserGroup userGroup)
             throws KustvaktException {
-        
+
         List<Role> roles = new ArrayList<Role>(2);
         roles.add(roleDao
                 .retrieveRoleById(PredefinedRole.USER_GROUP_MEMBER.getId()));
         roles.add(roleDao
                 .retrieveRoleById(PredefinedRole.VC_ACCESS_MEMBER.getId()));
-        
+
         UserGroupMember member = new UserGroupMember();
         member.setCreatedBy("system");
         member.setGroup(userGroup);
         member.setRoles(roles);
         member.setStatus(GroupMemberStatus.ACTIVE);
         member.setUserId(username);
-        
+
         groupMemberDao.addMember(member);
     }
 
@@ -217,5 +212,9 @@ public class UserGroupService {
             }
         }
         return false;
+    }
+
+    public UserGroup retrieveHiddenGroup (int vcId) throws KustvaktException {
+        return userGroupDao.retrieveHiddenGroupByVC(vcId);
     }
 }

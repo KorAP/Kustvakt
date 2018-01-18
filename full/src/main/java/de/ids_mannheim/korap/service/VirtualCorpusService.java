@@ -15,8 +15,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
-import de.ids_mannheim.korap.constant.GroupMemberStatus;
-import de.ids_mannheim.korap.constant.PredefinedUserGroup;
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.dao.VirtualCorpusAccessDao;
@@ -25,7 +23,6 @@ import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.dto.converter.VirtualCorpusAccessConverter;
 import de.ids_mannheim.korap.dto.converter.VirtualCorpusConverter;
-import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.entity.VirtualCorpus;
@@ -234,17 +231,9 @@ public class VirtualCorpusService {
 
     private void publishVC (int vcId) throws KustvaktException {
 
-        List<VirtualCorpusAccess> hiddenAccess =
-                accessDao.retrieveHiddenAccess(vcId);
-
         // check if hidden access exists
-        if (hiddenAccess.isEmpty()) {
-            // assign hidden access for all users
+        if (accessDao.retrieveHiddenAccess(vcId) != null) {
             VirtualCorpus vc = vcDao.retrieveVCById(vcId);
-            UserGroup all = userGroupService.retrieveAllUserGroup();
-            accessDao.createAccessToVC(vc, all, "system",
-                    VirtualCorpusAccessStatus.HIDDEN);
-
             // create and assign a hidden group
             int groupId = userGroupService.createAutoHiddenGroup(vcId);
             UserGroup autoHidden =
@@ -405,7 +394,7 @@ public class VirtualCorpusService {
         VirtualCorpus vc = vcDao.retrieveVCById(vcId);
         VirtualCorpusType type = vc.getType();
 
-        if (!user.isAdmin() || !username.equals(vc.getCreatedBy())) {
+        if (!user.isAdmin() && !username.equals(vc.getCreatedBy())) {
             if (type.equals(VirtualCorpusType.PRIVATE)
                     || (type.equals(VirtualCorpusType.PROJECT)
                             && !hasAccess(username, vcId))) {
@@ -416,10 +405,11 @@ public class VirtualCorpusService {
 
             else if (VirtualCorpusType.PUBLISHED.equals(type)) {
                 // add user in the VC's auto group 
-                VirtualCorpusAccess access =
-                        accessDao.retrievePublishedGroupAccess(vcId);
-                UserGroup userGroup = access.getUserGroup();
-                if (userGroupService.isMember(username, userGroup)) {
+//                VirtualCorpusAccess access =
+//                        accessDao.retrieveHiddenAccess(vcId);
+//                UserGroup userGroup = access.getUserGroup();
+                UserGroup userGroup = userGroupService.retrieveHiddenGroup(vcId);
+                if (!userGroupService.isMember(username, userGroup)) {
                     userGroupService.addUserToGroup(username, userGroup);
                 }
             }

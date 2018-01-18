@@ -2,7 +2,7 @@
 
 Kustvakt is a user and policy management component for KorAP (Diewald et al., 2016). It manages user access to resources (i.e. corpus data) that is typically bound with some licensing schemes. The licensing schemes of the IDS resources provided through KorAP (DeReKo) are very complex involving the access location and purposes (Kupietz & Lüngen, 2014). To manage user access to resources, Kustvakt performs query rewriting with document restrictions (Bański et al., 2014).
 
-Kustvakt acts as a middleware in KorAP binding other components, such as Koral a query serializer and Krill a search component, together. As KorAP's API provider, it provides services, e.g. searching and retrieving annotation data of a match/hit, that can be used by a client, e.g. [Kalamar](https://github.com/KorAP/Kalamar) (a KorAP web user interface) and [KorapSRU](https://github.com/KorAP/KorapSRU) (the CLARIN FCS endpoint for KorAP).
+Kustvakt acts as a middleware in KorAP binding other components, such as [Koral](https://github.com/KorAP/Koral) a query serializer and [Krill](https://github.com/KorAP/Krill) a search component, together. As KorAP's API provider, it provides services, e.g. searching and retrieving annotation data of a match/hit, that can be used by a client, e.g. [Kalamar](https://github.com/KorAP/Kalamar) (a KorAP web user interface) and [KorapSRU](https://github.com/KorAP/KorapSRU) (the CLARIN FCS endpoint for KorAP).
 
 # Versions
 * <b>Kustvakt lite version</b>
@@ -13,9 +13,9 @@ Kustvakt acts as a middleware in KorAP binding other components, such as Koral a
   
   provides user and policy management and extended services (e.g. resource and annotation services) in addition to the basic services. This version requires a database (Sqlite is provided) and an LDAP system for user authentication.
   
-# Services
+# Web-services
 
-Services including their usage examples are described in the [wiki](https://github.com/KorAP/Kustvakt/wiki).
+Web-services including their usage examples are described in the [wiki](https://github.com/KorAP/Kustvakt/wiki).
 
 
 # Setup
@@ -63,7 +63,8 @@ Copy the default Kustvakt configuration file (e.g. ```full/src/main/resources/ku
 Set krill.indexDir in the configuration file to the location of your Krill index (relative path). In Kustvakt root directory, there is a sample index, e.g.
 <pre>krill.indexDir = ../../sample-index</pre>
 
-Set the location of the ldap configuration file for Kustvakt full version. The file should contain an admin password to access an LDAP system. Without LDAP, user authentication functions and services cannot be used.
+Set the location of the LDAP configuration file for Kustvakt full version. The file should contain an admin password to access an LDAP system. Without LDAP, user authentication functions and services cannot be used. However, the authentication mechanism can be extended by implementing other authentication methods e.g. using a database. 
+
 
 <b>Optional custom configuration</b>
 
@@ -83,7 +84,7 @@ By default, Kustvakt service base URI refers to /api/*
 # Running Kustvakt Server
 Requires ```kustvakt.conf``` or ```kustvakt-lite.conf``` in the same folder as the jar file. Otherwise assuming sample-index located in the parent directory of the jar file.
 
-Kustvakt full version requires an LDAP configuration file containing an admin password to access an LDAP system. You can still run Kustvakt full version without an LDAP system, but user authentication functions and services cannot be used. Only services for guest/demo user would work.
+Kustvakt full version requires an LDAP configuration file containing an admin password to access an LDAP system. You can still run Kustvakt full version without an LDAP system, but user authentication functions and services cannot be used. Only services for guest/demo user would be available.
 
 <pre>
 cd target/
@@ -93,14 +94,14 @@ java -jar target/Kustvakt-[lite/full]-[version].jar
 
 # Futher Setup for Developer
 
-For working with an IDE, you need to install lombok for your tool. Go to the directory of your lombok.jar, e.g \.m2\repository\org\projectlombok\lombok\1.16.6 and run
+Installing lombok is necessary when working with an IDE. Go to the directory of your lombok.jar, e.g \.m2\repository\org\projectlombok\lombok\1.16.6 and run
 <pre>
 java -jar lombok-1.16.6.jar
 </pre>
 
 Restart your IDE and clean your project.
 
-Copy ```kustvakt.conf``` or ```kustvakt-lite.conf``` from  src/main/resources to the full/ or lite folder. Then the properties in the kustvakt.conf or kustvakt-lite.conf file can be customized.
+Copy ```kustvakt.conf``` or ```kustvakt-lite.conf``` from  src/main/resources to the full/ or lite/ folder. Then the properties the configuration file can be customized.
 
 In an IDE, you can run ```KustvaktLiteServer``` or ```KustvaktServer``` as a normal Java application.
 
@@ -108,16 +109,19 @@ In an IDE, you can run ```KustvaktLiteServer``` or ```KustvaktServer``` as a nor
 
 The default Sqlite database can be switch to a MySQL database.
 
-Copy the jdbc.properties from full/src/main/resources to the full/ directory. Do not change the filename.
+Copy ```jdbc.properties``` from full/src/main/resources to the full/ directory. Do not change the filename.
 <pre>
 cp full/src/main/resources/jdbc.properties full/
 </pre>
 
 Remove or comment the Sqlite Setting.
 
-Uncomment the MySQL Setting and fill in the correct values for the jdbc.url, jdbc.username and jdbc.password.
+Uncomment the MySQL Setting and fill in the correct values for the ```jdbc.url```,
+ ```jdbc.username```
+  and ```jdbc.password```.
 
-The default setting for jdbc.schemaPath includes test data defined in ```full/src/main/resources/db/insert```
+The default setting for ```jdbc.schemaPath```
+includes test data defined in ```full/src/main/resources/db/insert```
 and some user roles defined in ```full/src/main/resources/db/predefined```. You can omit the test data by removing
  ```db.insert```.
 
@@ -137,7 +141,7 @@ Change the dataSource property to refer to the Spring bean with id="dataSource".
 While running ```KustvaktServer``` or ```Kustvakt-full-[version].jar```,
 MySQL tables will be created to the specified database from the SQL files in 
 ```full/src/main/resources/db/new-mysql``` and other paths specified in 
-jdbc.schemaPath.
+```jdbc.schemaPath```.
 
 # Known issues
 Tests are verbose - they do not necessarily imply system errors.

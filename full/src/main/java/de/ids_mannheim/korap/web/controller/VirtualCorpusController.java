@@ -39,9 +39,10 @@ import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
  * such as creating, deleting and listing user virtual corpora.
  * 
  * This class also includes APIs related to virtual corpus access (VCA) 
- * such as sharing and publishing VCs. When a VC is published, it is shared 
+ * such as sharing and publishing VC. When a VC is published, it is shared 
  * with all users, but not always listed like system VC. It is listed for 
- * a user, once when he/she have searched for the VC.
+ * a user, once when he/she have searched for the VC. A VC can be published 
+ * by creating or editing the VC. 
  * 
  * All the APIs in this class are available to logged-in users.
  * 
@@ -89,7 +90,7 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
 
-    /** Only the VC owner and system admins can edit VCs.
+    /** Only the VC owner and system admins can edit VC.
      * 
      * @param securityContext
      * @param vc a JSON object describing the virtual corpus
@@ -117,7 +118,7 @@ public class VirtualCorpusController {
      * 
      * @param securityContext
      * @param vcId a virtual corpus id
-     * @return a list of VCs
+     * @return a list of VC
      */
     @GET
     @Path("search/{vcId}")
@@ -137,10 +138,10 @@ public class VirtualCorpusController {
         return Response.ok(result).build();
     }
 
-    /** Lists not only private VCs but all VCs available to a user.
+    /** Lists not only private VC but all VC available to a user.
      * 
      * @param securityContext
-     * @return a list of VCs
+     * @return a list of VC
      */
     @GET
     @Path("list")
@@ -159,10 +160,10 @@ public class VirtualCorpusController {
         return Response.ok(result).build();
     }
 
-    /** Lists all VCs created by a user
+    /** Lists all VC created by a user
      * 
      * @param securityContext
-     * @return a list of VCs created by the user in the security context.
+     * @return a list of VC created by the user in the security context.
      */
     @GET
     @Path("list/user")
@@ -181,8 +182,8 @@ public class VirtualCorpusController {
         return Response.ok(result).build();
     }
 
-    /** Only the VC owner and system admins can delete VCs. VCA admins 
-     *  can delete VC-accesses e.g. of project VCs, but not the VCs 
+    /** Only the VC owner and system admins can delete VC. VCA admins 
+     *  can delete VC-accesses e.g. of project VC, but not the VC 
      *  themselves. 
      * 
      * @param securityContext
@@ -220,8 +221,8 @@ public class VirtualCorpusController {
     //  }
 
     /** VC can only be shared with a group, not individuals. 
-     *  Only VCA admins are allowed to share VCs and 
-     *  the VCs must have been created by themselves.
+     *  Only VCA admins are allowed to share VC and 
+     *  the VC must have been created by themselves.
      * 
      * @param securityContext
      * @param vcId a virtual corpus id

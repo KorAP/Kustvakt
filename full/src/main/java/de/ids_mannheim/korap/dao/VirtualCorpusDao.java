@@ -191,12 +191,15 @@ public class VirtualCorpusDao {
         Join<VirtualCorpus, VirtualCorpusAccess> access =
                 virtualCorpus.join(VirtualCorpus_.virtualCorpusAccess);
 
-        Predicate corpusStatus = builder.and(
-                builder.notEqual(access.get(VirtualCorpusAccess_.status),
-                        VirtualCorpusAccessStatus.HIDDEN),
-                builder.notEqual(access.get(VirtualCorpusAccess_.status),
-                        VirtualCorpusAccessStatus.DELETED));
+//        Predicate corpusStatus = builder.and(
+//                builder.notEqual(access.get(VirtualCorpusAccess_.status),
+//                        VirtualCorpusAccessStatus.HIDDEN),
+//                builder.notEqual(access.get(VirtualCorpusAccess_.status),
+//                        VirtualCorpusAccessStatus.DELETED));
 
+        Predicate corpusStatus = builder.notEqual(access.get(VirtualCorpusAccess_.status),
+                VirtualCorpusAccessStatus.DELETED);
+        
         Predicate userGroupStatus =
                 builder.notEqual(access.get(VirtualCorpusAccess_.userGroup)
                         .get(UserGroup_.status), UserGroupStatus.DELETED);

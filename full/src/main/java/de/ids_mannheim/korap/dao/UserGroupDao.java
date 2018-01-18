@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
-import de.ids_mannheim.korap.constant.PredefinedUserGroup;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.entity.Role;
@@ -106,19 +105,6 @@ public class UserGroupDao {
         entityManager.merge(group);
     }
 
-    public UserGroup retrieveAllUserGroup () {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<UserGroup> query =
-                criteriaBuilder.createQuery(UserGroup.class);
-
-        Root<UserGroup> root = query.from(UserGroup.class);
-        query.select(root);
-        query.where(criteriaBuilder.equal(root.get(UserGroup_.id),
-                PredefinedUserGroup.ALL.getId()));
-        Query q = entityManager.createQuery(query);
-        return (UserGroup) q.getSingleResult();
-    }
-
     /** Retrieves the UserGroup by the given group id. This methods does not 
      *  fetch group members because only group admin is allowed to see them. 
      *  Group members have to be retrieved separately.
@@ -129,31 +115,11 @@ public class UserGroupDao {
      * @throws KustvaktException 
      */
     public UserGroup retrieveGroupById (int groupId) throws KustvaktException {
-        ParameterChecker.checkIntegerValue(groupId, "groupId");
-
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<UserGroup> query =
-                criteriaBuilder.createQuery(UserGroup.class);
-
-        Root<UserGroup> root = query.from(UserGroup.class);
-        query.select(root);
-        query.where(criteriaBuilder.equal(root.get(UserGroup_.id), groupId));
-        Query q = entityManager.createQuery(query);
-
-        try {
-            return (UserGroup) q.getSingleResult();
-        }
-        catch (NoResultException e) {
-            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                    "No result found for query: retrieve group by id "
-                            + groupId,
-                    String.valueOf(groupId), e);
-        }
+        return retrieveGroupById(groupId, false);
     }
 
-    public UserGroup retrieveGroupWithMemberById (int groupId)
+    public UserGroup retrieveGroupById (int groupId, boolean fetchMembers)
             throws KustvaktException {
-
         ParameterChecker.checkIntegerValue(groupId, "groupId");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -161,7 +127,9 @@ public class UserGroupDao {
                 criteriaBuilder.createQuery(UserGroup.class);
 
         Root<UserGroup> root = query.from(UserGroup.class);
-        root.fetch(UserGroup_.members);
+        if (fetchMembers) {
+            root.fetch(UserGroup_.members);
+        }
         query.select(root);
         query.where(criteriaBuilder.equal(root.get(UserGroup_.id), groupId));
         Query q = entityManager.createQuery(query);
@@ -176,6 +144,7 @@ public class UserGroupDao {
                     String.valueOf(groupId), e);
         }
     }
+
 
     /** Retrieves only user-groups that are active (not hidden or deleted).
      * 
@@ -246,15 +215,38 @@ public class UserGroupDao {
         }
     }
 
-    //    public void retrieveGroupByVCId (String vcId) {
-    //        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-    //        CriteriaQuery<VirtualCorpusAccess> query =
-    //                criteriaBuilder.createQuery(VirtualCorpusAccess.class);
-    //
-    //        Root<VirtualCorpusAccess> root = query.from(VirtualCorpusAccess.class);
-    //
-    //
-    //    }
+    public UserGroup retrieveHiddenGroupByVC (int vcId) throws KustvaktException {
+        ParameterChecker.checkIntegerValue(vcId, "vcId");
+
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<UserGroup> query =
+                criteriaBuilder.createQuery(UserGroup.class);
+
+        Root<UserGroup> root = query.from(UserGroup.class);
+        Join<UserGroup, VirtualCorpusAccess> access =
+                root.join(UserGroup_.virtualCorpusAccess);
+        Join<VirtualCorpusAccess, VirtualCorpus> vc =
+                access.join(VirtualCorpusAccess_.virtualCorpus);
+
+        Predicate p = criteriaBuilder.and(
+                criteriaBuilder.equal(root.get(UserGroup_.status),
+                        UserGroupStatus.HIDDEN),
+                criteriaBuilder.equal(vc.get(VirtualCorpus_.id), vcId));
+        
+        query.select(root);
+        query.where(p);
+        Query q = entityManager.createQuery(query);
+
+        try {
+            return (UserGroup) q.getSingleResult();
+        }
+        catch (NoResultException e) {
+            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
+                    "No hidden group found for virtual corpus with id " + vcId,
+                    String.valueOf(vcId), e);
+        }
+
+    }
 
     public void addVCToGroup (VirtualCorpus virtualCorpus, String createdBy,
             VirtualCorpusAccessStatus status, UserGroup group) {

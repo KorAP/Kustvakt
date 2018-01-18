@@ -1,8 +1,14 @@
 package de.ids_mannheim.korap.constant;
 
 public enum VirtualCorpusType {
-
-    PREDEFINED, PROJECT, PRIVATE, PUBLISHED;
+    // available for all
+    PREDEFINED, 
+    // available to project group members
+    PROJECT, 
+    // available only for the creator
+    PRIVATE, 
+    // available for all, but not listed for all
+    PUBLISHED;
     
     public String displayName () {
         return name().toLowerCase();
