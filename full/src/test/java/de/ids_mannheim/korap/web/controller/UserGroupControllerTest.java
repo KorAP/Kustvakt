@@ -40,10 +40,15 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         //        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
 
-        assertEquals(2, node.at("/0/id").asInt());
-        assertEquals("dory group", node.at("/0/name").asText());
-        assertEquals("dory", node.at("/0/owner").asText());
-        assertEquals(3, node.at("/0/members").size());
+        JsonNode group;
+        for (int i=0; i< node.size(); i++){
+            group = node.get(i);
+            if (group.at("/id").asInt() == 2){
+                assertEquals("dory group", group.at("/name").asText());
+                assertEquals("dory", group.at("/owner").asText());
+                assertEquals(3, group.at("/members").size());
+            }
+        }
     }
 
     // nemo is a group member in dory group
@@ -67,7 +72,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(0, node.at("/0/members").size());
     }
 
-    // marlin does not have any group
+    // marlin has a group
     @Test
     public void testRetrieveMarlinGroups () throws KustvaktException {
         ClientResponse response = resource().path("group").path("list")
@@ -79,7 +84,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(0, node.size());
+        assertEquals(1, node.size());
     }
 
     
@@ -126,12 +131,19 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(1, node.size());
-        assertEquals(2, node.at("/0/id").asInt());
-        assertEquals("dory group", node.at("/0/name").asText());
-        assertEquals("dory", node.at("/0/owner").asText());
-        // group members are not allowed to see other members
-        assertEquals(0, node.at("/0/members").size());
+        assertEquals(2, node.size());
+        
+        JsonNode group;
+        for (int i=0; i< node.size(); i++){
+            group = node.get(i);
+            if (group.at("/id").asInt() == 2){
+                assertEquals("dory group", group.at("/name").asText());
+                assertEquals("dory", group.at("/owner").asText());
+                // group members are not allowed to see other members
+                assertEquals(0, group.at("/members").size());
+            }
+        }
+            
     }
     
     // pearl has GroupMemberStatus.DELETED in dory group
