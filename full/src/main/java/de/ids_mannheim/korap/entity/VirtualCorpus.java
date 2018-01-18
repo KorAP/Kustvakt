@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.entity;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -52,7 +53,8 @@ public class VirtualCorpus {
     @Column(name = "created_by")
     private String createdBy;
 
-    @OneToMany(mappedBy = "virtualCorpus", fetch=FetchType.LAZY)
+    @OneToMany(mappedBy = "virtualCorpus", fetch = FetchType.LAZY,
+            cascade = CascadeType.REMOVE)
     private List<VirtualCorpusAccess> virtualCorpusAccess;
 
     @Override
@@ -62,7 +64,7 @@ public class VirtualCorpus {
                 + requiredAccess + ", corpusQuery= " + corpusQuery
                 + ", definition= " + definition + ", createdBy= " + createdBy;
     }
-    
+
     @Override
     public int hashCode () {
         int prime = 37;
@@ -72,7 +74,7 @@ public class VirtualCorpus {
         result = prime * result + createdBy.hashCode();
         return result;
     }
-    
+
     @Override
     public boolean equals (Object obj) {
         VirtualCorpus vc = (VirtualCorpus) obj;

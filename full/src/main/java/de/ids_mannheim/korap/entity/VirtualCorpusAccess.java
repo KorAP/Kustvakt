@@ -43,12 +43,11 @@ public class VirtualCorpusAccess {
     @Enumerated(EnumType.STRING)
     private VirtualCorpusAccessStatus status;
 
-    @ManyToOne(fetch=FetchType.EAGER)
-    @JoinColumn(name = "virtual_corpus_id",
-            referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "virtual_corpus_id", referencedColumnName = "id")
     private VirtualCorpus virtualCorpus;
 
-    @ManyToOne(fetch=FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_group_id", referencedColumnName = "id")
     private UserGroup userGroup;
 

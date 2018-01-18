@@ -231,8 +231,9 @@ public class VirtualCorpusService {
 
     private void publishVC (int vcId) throws KustvaktException {
 
+        VirtualCorpusAccess access = accessDao.retrieveHiddenAccess(vcId);
         // check if hidden access exists
-        if (accessDao.retrieveHiddenAccess(vcId) != null) {
+        if (access == null) {
             VirtualCorpus vc = vcDao.retrieveVCById(vcId);
             // create and assign a hidden group
             int groupId = userGroupService.createAutoHiddenGroup(vcId);

@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.entity;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -41,14 +42,16 @@ public class UserGroup {
     private String createdBy;
     @Column(name = "deleted_by")
     private String deletedBy;
-    
+
     @Enumerated(EnumType.STRING)
     private UserGroupStatus status;
 
-    @OneToMany(mappedBy="group", fetch = FetchType.LAZY)
-    List<UserGroupMember> members;
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY,
+            cascade = CascadeType.REMOVE)
+    private List<UserGroupMember> members;
 
-    @OneToMany(mappedBy = "userGroup", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "userGroup", fetch = FetchType.LAZY,
+            cascade = CascadeType.REMOVE)
     private List<VirtualCorpusAccess> virtualCorpusAccess;
 
 

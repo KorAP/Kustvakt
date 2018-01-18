@@ -25,19 +25,25 @@ public class VirtualCorpusServiceTest {
 
     @Test
     public void createPublishVC () throws KustvaktException {
-
+        String username = "VirtualCorpusServiceTest";
+        
         VirtualCorpusJson vc = new VirtualCorpusJson();
         vc.setCorpusQuery("corpusSigle=GOE");
-        vc.setCreatedBy("VirtualCorpusServiceTest");
+        vc.setCreatedBy(username);
         vc.setName("new published vc");
         vc.setType(VirtualCorpusType.PUBLISHED);
         int vcId = vcService.storeVC(vc, "VirtualCorpusServiceTest");
 
         List<VirtualCorpusAccess> accesses = vcService.retrieveAllVCAccess(vcId);
-        assertEquals(2, accesses.size());
-        for (VirtualCorpusAccess access : accesses) {
-            assertEquals(VirtualCorpusAccessStatus.HIDDEN, access.getStatus());
-        }
+        assertEquals(1, accesses.size());
+        
+        VirtualCorpusAccess access = accesses.get(0);
+        assertEquals(VirtualCorpusAccessStatus.HIDDEN, access.getStatus());
+        
+        // delete VC
+        vcService.deleteVC(username, vcId);
+        accesses = vcService.retrieveAllVCAccess(vcId);
+        assertEquals(0, accesses.size());
     }
 
 }

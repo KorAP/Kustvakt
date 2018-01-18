@@ -68,7 +68,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
-
+//        System.out.println(entity);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
@@ -715,11 +715,17 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     }
 
     // share VC
-    @Test
-    public void testCreateDeleteAccess () {
-        // TODO Auto-generated method stub
-
-    }
+//    @Test
+//    public void testCreateDeleteAccess () {
+//        // create VC
+//        
+//        // create group
+//        
+//        // share VC
+//        
+//        // delete 
+//
+//    }
 
 
 }
