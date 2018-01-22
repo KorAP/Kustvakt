@@ -41,9 +41,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
 
         JsonNode group;
-        for (int i=0; i< node.size(); i++){
+        for (int i = 0; i < node.size(); i++) {
             group = node.get(i);
-            if (group.at("/id").asInt() == 2){
+            if (group.at("/id").asInt() == 2) {
                 assertEquals("dory group", group.at("/name").asText());
                 assertEquals("dory", group.at("/owner").asText());
                 assertEquals(3, group.at("/members").size());
@@ -87,14 +87,14 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(1, node.size());
     }
 
-    
+
     @Test
     public void testRetrieveUserGroupUnauthorized () throws KustvaktException {
         ClientResponse response = resource().path("group").path("list")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
-//                System.out.println(entity);
+        //                System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -106,7 +106,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
     // marlin has GroupMemberStatus.PENDING in dory group
     @Test
-    public void testSubscribeMarlinToDoryGroup () throws KustvaktException {
+    public void testSubscribeUnsubscribeMarlinToDoryGroup () throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("groupId", "2");
 
@@ -117,8 +117,44 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                         handler.createBasicAuthorizationHeaderValue("marlin",
                                 "pass"))
                 .entity(form).post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        // retrieve marlin group
+        response = resource().path("group").path("list")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("marlin",
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
-        
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(2, node.size());
+
+        JsonNode group;
+        for (int i = 0; i < node.size(); i++) {
+            group = node.get(i);
+            if (group.at("/id").asInt() == 2) {
+                assertEquals("dory group", group.at("/name").asText());
+                assertEquals("dory", group.at("/owner").asText());
+                // group members are not allowed to see other members
+                assertEquals(0, group.at("/members").size());
+            }
+        }
+
+        // unsubscribe
+        response = resource().path("group").path("unsubscribe")
+                .type(MediaType.APPLICATION_FORM_URLENCODED)
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("marlin",
+                                "pass"))
+                .entity(form).post(ClientResponse.class);
+        entity = response.getEntity(String.class);
+
         // retrieve marlin group
         response = resource().path("group").path("list")
                 .header(Attributes.AUTHORIZATION,
@@ -129,23 +165,11 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         entity = response.getEntity(String.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(2, node.size());
-        
-        JsonNode group;
-        for (int i=0; i< node.size(); i++){
-            group = node.get(i);
-            if (group.at("/id").asInt() == 2){
-                assertEquals("dory group", group.at("/name").asText());
-                assertEquals("dory", group.at("/owner").asText());
-                // group members are not allowed to see other members
-                assertEquals(0, group.at("/members").size());
-            }
-        }
-            
+
+        node = JsonUtils.readTree(entity);
+        assertEquals(1, node.size());
     }
-    
+
     // pearl has GroupMemberStatus.DELETED in dory group
     @Test
     public void testSubscribePearlToDoryGroup () throws KustvaktException {
@@ -161,14 +185,14 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 .entity(form).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        
+
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.NOTHING_CHANGED,
                 node.at("/errors/0/0").asInt());
         assertEquals("Username pearl had been deleted in group 2",
                 node.at("/errors/0/1").asText());
     }
-    
+
     @Test
     public void testSubscribeMissingGroupId () throws KustvaktException {
         ClientResponse response = resource().path("group").path("subscribe")
@@ -199,7 +223,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                                 "pass"))
                 .entity(form).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
-//        System.out.println(entity);
+        //        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -222,7 +246,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                                 "pass"))
                 .entity(form).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
-//        System.out.println(entity);
+        //        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());

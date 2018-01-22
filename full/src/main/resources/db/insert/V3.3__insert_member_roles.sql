@@ -19,7 +19,7 @@ SELECT
 INSERT INTO group_member_role(group_member_id,role_id)
 SELECT
 	(SELECT id FROM user_group_member WHERE user_id="dory" AND group_id=1),
-	(SELECT id FROM role WHERE name = "vc member");
+	(SELECT id FROM role WHERE name = "vc admin");
 	
 	
 -- dory group

@@ -9,6 +9,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map.Entry;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+
 import java.util.Set;
 
 import org.apache.http.entity.ContentType;
@@ -21,6 +25,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.spi.container.ContainerRequest;
 
@@ -68,7 +73,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
-//        System.out.println(entity);
+        //        System.out.println(entity);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
@@ -166,19 +171,19 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
             ClientHandlerException, KustvaktException {
         ClientResponse response = resource().path("vc").path("search").path("4")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("VirtualCorpusControllerTest",
-                                "pass"))
+                        handler.createBasicAuthorizationHeaderValue(
+                                "gill", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
-//        System.out.println(entity);
+        //        System.out.println(entity);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals("published VC", node.at("/name").asText());
         assertEquals(VirtualCorpusType.PUBLISHED.displayName(),
                 node.at("/type").asText());
-        
+
         // EM: need admin to check if VirtualCorpusControllerTest is added to the hidden group
     }
 
@@ -209,7 +214,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
         entity = response.getEntity(String.class);
         node = JsonUtils.readTree(entity);
-        assertEquals(2, node.size());
+        assertEquals(3, node.size());
 
         // pearl
         response = resource().path("vc").path("list")
@@ -270,26 +275,20 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                 .get(ClientResponse.class);
         entity = response.getEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        //        System.out.println(entity);
+                System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.size());
-        //        EM: order may be different
-        //        assertEquals("new vc", node.get(0).get("name").asText());
+        assertEquals("new vc", node.get(1).get("name").asText());
 
         String vcId = null;
-        for (int i = 0; i < node.size(); i++) {
-            if (node.get(i).get("name").asText().equals("new vc")) {
-                vcId = node.get(i).get("id").asText();
-            }
-        }
+        vcId = node.get(1).get("id").asText();
 
         // delete new VC
-        resource().path("vc").path("delete").queryParam("vcId", vcId)
+        resource().path("vc").path("delete").path(vcId)
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue(
                                 "VirtualCorpusControllerTest", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-
                 .delete(ClientResponse.class);
         //        entity = response.getEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -343,7 +342,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         String vcId = node.get(0).get("id").asText();
 
         //EM: delete vc
-        resource().path("vc").path("delete").queryParam("vcId", vcId)
+        resource().path("vc").path("delete").path(vcId)
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue(
                                 "VirtualCorpusControllerTest", "pass"))
@@ -481,7 +480,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     @Test
     public void testDeleteVCUnauthorized () throws KustvaktException {
         ClientResponse response =
-                resource().path("vc").path("delete").queryParam("vcId", "1")
+                resource().path("vc").path("delete").path("1")
                         .header(Attributes.AUTHORIZATION,
                                 handler.createBasicAuthorizationHeaderValue(
                                         "VirtualCorpusControllerTest", "pass"))
@@ -530,14 +529,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
-
-        for (int i = 0; i < node.size(); i++) {
-            JsonNode n = node.get(i);
-            if (n.get("id").asInt() == 1) {
-                assertEquals("edited vc", n.get("name").asText());
-                break;
-            }
-        }
+        assertEquals("edited vc", node.get(0).get("name").asText());
 
         // 2nd edit
         json = "{\"id\": \"1\", \"name\": \"dory VC\"}";
@@ -565,14 +557,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
         entity = response.getEntity(String.class);
         node = JsonUtils.readTree(entity);
-
-        for (int i = 0; i < node.size(); i++) {
-            JsonNode n = node.get(i);
-            if (n.get("id").asInt() == 1) {
-                assertEquals("dory VC", n.get("name").asText());
-                break;
-            }
-        }
+        assertEquals("dory VC", node.get(0).get("name").asText());
     }
 
     @Test
@@ -604,16 +589,10 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
-
-        for (int i = 0; i < node.size(); i++) {
-            JsonNode n = node.get(i);
-            if (n.get("id").asInt() == 1) {
-                assertEquals("dory published vc", n.get("name").asText());
-                assertEquals(VirtualCorpusType.PUBLISHED.displayName(),
-                        n.get("type").asText());
-                break;
-            }
-        }
+        JsonNode n = node.get(0);
+        assertEquals("dory published vc", n.get("name").asText());
+        assertEquals(VirtualCorpusType.PUBLISHED.displayName(),
+                n.get("type").asText());
     }
 
     @Test
@@ -714,18 +693,156 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         assertEquals("dory group", node.at("/0/userGroupName").asText());
     }
 
-    // share VC
-//    @Test
-//    public void testCreateDeleteAccess () {
-//        // create VC
-//        
-//        // create group
-//        
-//        // share VC
-//        
-//        // delete 
-//
-//    }
 
+    @Test
+    public void testCreateDeleteAccess () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
 
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        // marlin vc
+        form.add("vcId", "5");
+        // marlin group
+        form.add("groupId", "1");
+
+        ClientResponse response;
+        // share VC
+        response = resource().path("vc").path("access").path("share")
+                .type(MediaType.APPLICATION_FORM_URLENCODED)
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("marlin",
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(form)
+                .post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        // list vc access by marlin
+        response = resource().path("vc").path("access").path("list")
+                .queryParam("vcId", "5")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("marlin",
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .get(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        //        System.out.println(entity);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(1, node.size());
+        node = node.get(0);
+        assertEquals(5, node.at("/vcId").asInt());
+        assertEquals("marlin VC", node.at("/vcName").asText());
+        assertEquals(1, node.at("/userGroupId").asInt());
+        assertEquals("marlin group", node.at("/userGroupName").asText());
+
+        String accessId = node.at("/accessId").asText();
+
+        // delete access
+        // unauthorized
+        response = resource().path("vc").path("access").path("delete")
+                .path(accessId)
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(
+                                "VirtualCorpusControllerTest", "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .delete(ClientResponse.class);
+
+        entity = response.getEntity(String.class);
+        //        System.out.println(entity);
+        node = JsonUtils.readTree(entity);
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals(
+                "Unauthorized operation for user: VirtualCorpusControllerTest",
+                node.at("/errors/0/1").asText());
+
+        // delete access
+        // dory is a vc-admin in marlin group
+        response = resource().path("vc").path("access").path("delete")
+                .path(accessId)
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("dory",
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .delete(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        // list vc access by dory
+        response = resource().path("vc").path("access").path("list")
+                .queryParam("vcId", "5")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("dory",
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .get(ClientResponse.class);
+
+        entity = response.getEntity(String.class);
+        assertEquals("[]", entity);
+        node = JsonUtils.readTree(entity);
+        assertEquals(0, node.size());
+    }
+
+    @Test
+    public void testCreateAccessByVCAButNotVCOwner ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        // marlin vc
+        form.add("vcId", "5");
+        // marlin group
+        form.add("groupId", "1");
+
+        // share VC
+        // dory is VCA in marlin group 
+        ClientResponse response = resource().path("vc").path("access")
+                .path("share").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("dory",
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(form)
+                .post(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Unauthorized operation for user: dory",
+                node.at("/errors/0/1").asText());
+    }
+    
+    @Test
+    public void testCreateAccessByNonVCA ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        // nemo vc
+        form.add("vcId", "6");
+        // marlin group
+        form.add("groupId", "1");
+
+        // share VC
+        // nemo is not VCA in marlin group 
+        ClientResponse response = resource().path("vc").path("access")
+                .path("share").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("nemo",
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(form)
+                .post(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Unauthorized operation for user: nemo",
+                node.at("/errors/0/1").asText());
+    }
 }

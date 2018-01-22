@@ -76,15 +76,15 @@ public class VirtualCorpusDaoTest {
      */
     @Test
     public void retrieveVCByUserDory () throws KustvaktException {
-        Set<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("dory");
-        System.out.println(virtualCorpora);
+        List<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("dory");
+//        System.out.println(virtualCorpora);
         assertEquals(4, virtualCorpora.size());
-        // order is random
-        //        Iterator<VirtualCorpus> i = virtualCorpora.iterator();
-        //        assertEquals("dory VC", i.next().getName());
-        //        assertEquals("system VC", i.next().getName());
-        //        assertEquals("group VC", i.next().getName());
-        //      assertEquals("published VC", i.next().getName());
+        // ordered by id
+        Iterator<VirtualCorpus> i = virtualCorpora.iterator();
+        assertEquals("dory VC", i.next().getName());
+        assertEquals("group VC", i.next().getName());   
+        assertEquals("system VC", i.next().getName());
+        assertEquals("published VC", i.next().getName());
     }
 
 
@@ -94,11 +94,12 @@ public class VirtualCorpusDaoTest {
      */
     @Test
     public void retrieveVCByUserNemo () throws KustvaktException {
-        Set<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("nemo");
-        assertEquals(2, virtualCorpora.size());
+        List<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("nemo");
+        assertEquals(3, virtualCorpora.size());
         Iterator<VirtualCorpus> i = virtualCorpora.iterator();
-        assertEquals("system VC", i.next().getName());
         assertEquals("group VC", i.next().getName());
+        assertEquals("system VC", i.next().getName());
+        assertEquals("nemo VC", i.next().getName());
     }
 
 
@@ -108,11 +109,12 @@ public class VirtualCorpusDaoTest {
      */
     @Test
     public void retrieveVCByUserMarlin () throws KustvaktException {
-        Set<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("marlin");
-        assertEquals(2, virtualCorpora.size());
+        List<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("marlin");
+        assertEquals(3, virtualCorpora.size());
         Iterator<VirtualCorpus> i = virtualCorpora.iterator();
         assertEquals("system VC", i.next().getName());
         assertEquals("published VC", i.next().getName());
+        assertEquals("marlin VC", i.next().getName());
     }
 
 
@@ -123,7 +125,7 @@ public class VirtualCorpusDaoTest {
      */
     @Test
     public void retrieveVCByUserPearl () throws KustvaktException {
-        Set<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("pearl");
+        List<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("pearl");
         assertEquals(2, virtualCorpora.size());
         Iterator<VirtualCorpus> i = virtualCorpora.iterator();
         assertEquals("system VC", i.next().getName());

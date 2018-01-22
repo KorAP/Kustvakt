@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.dao;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -220,7 +222,7 @@ public class VirtualCorpusDao {
         return q.getResultList();
     }
 
-    public Set<VirtualCorpus> retrieveVCByUser (String userId)
+    public List<VirtualCorpus> retrieveVCByUser (String userId)
             throws KustvaktException {
         ParameterChecker.checkStringValue(userId, "userId");
 
@@ -246,7 +248,11 @@ public class VirtualCorpusDao {
         Set<VirtualCorpus> vcSet = new HashSet<VirtualCorpus>();
         vcSet.addAll(vcList);
         vcSet.addAll(groupVC);
-        return vcSet;
+        
+        List<VirtualCorpus> merger = new ArrayList<VirtualCorpus>(vcSet.size());
+        merger.addAll(vcSet);
+        Collections.sort(merger);
+        return merger;
     }
 
     // for admins

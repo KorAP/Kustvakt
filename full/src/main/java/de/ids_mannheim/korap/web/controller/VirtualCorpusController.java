@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -191,9 +192,9 @@ public class VirtualCorpusController {
      * @return HTTP status 200, if successful
      */
     @DELETE
-    @Path("delete")
+    @Path("delete/{vcId}")
     public Response deleteVC (@Context SecurityContext securityContext,
-            @QueryParam("vcId") int vcId) {
+            @PathParam("vcId") int vcId) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
@@ -231,8 +232,9 @@ public class VirtualCorpusController {
      */
     @POST
     @Path("access/share")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response shareVC (@Context SecurityContext securityContext,
-            @QueryParam("vcId") int vcId, @QueryParam("groupId") int groupId) {
+            @FormParam("vcId") int vcId, @FormParam("groupId") int groupId) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
@@ -251,9 +253,9 @@ public class VirtualCorpusController {
      * @return
      */
     @DELETE
-    @Path("access/delete")
+    @Path("access/delete/{accessId}")
     public Response deleteVCAccess (@Context SecurityContext securityContext,
-            @QueryParam("accessId") int accessId) {
+            @PathParam("accessId") int accessId) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {

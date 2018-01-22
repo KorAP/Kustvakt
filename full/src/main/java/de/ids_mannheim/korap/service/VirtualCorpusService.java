@@ -1,10 +1,8 @@
 package de.ids_mannheim.korap.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,12 +76,12 @@ public class VirtualCorpusService {
 
     public List<VirtualCorpusDto> listVCByUser (String username)
             throws KustvaktException {
-        Set<VirtualCorpus> vcSet = vcDao.retrieveVCByUser(username);
-        return createVCDtos(vcSet);
+        List<VirtualCorpus> vcList = vcDao.retrieveVCByUser(username);
+        return createVCDtos(vcList);
     }
-
+    
     private ArrayList<VirtualCorpusDto> createVCDtos (
-            Collection<VirtualCorpus> vcList) throws KustvaktException {
+            List<VirtualCorpus> vcList) throws KustvaktException {
         ArrayList<VirtualCorpusDto> dtos = new ArrayList<>(vcList.size());
         VirtualCorpus vc;
         Iterator<VirtualCorpus> i = vcList.iterator();
@@ -285,14 +283,14 @@ public class VirtualCorpusService {
         User user = authManager.getUser(username);
 
         VirtualCorpus vc = vcDao.retrieveVCById(vcId);
-        if (!username.equals(vc.getCreatedBy()) || !user.isAdmin()) {
+        if (!username.equals(vc.getCreatedBy()) && !user.isAdmin()) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
 
         UserGroup userGroup = userGroupService.retrieveUserGroupById(groupId);
 
-        if (!user.isAdmin() && !isVCAccessAdmin(userGroup, username)) {
+        if (!isVCAccessAdmin(userGroup, username) && !user.isAdmin()) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }

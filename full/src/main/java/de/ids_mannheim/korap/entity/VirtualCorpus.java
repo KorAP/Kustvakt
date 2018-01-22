@@ -34,7 +34,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "virtual_corpus")
-public class VirtualCorpus {
+public class VirtualCorpus implements Comparable<VirtualCorpus>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -79,5 +79,16 @@ public class VirtualCorpus {
     public boolean equals (Object obj) {
         VirtualCorpus vc = (VirtualCorpus) obj;
         return (this.id == vc.getId()) ? true : false;
+    }
+
+    @Override
+    public int compareTo (VirtualCorpus o) {
+        if (this.getId() > o.getId()) {
+            return 1;
+        }
+        else if (this.getId() < o.getId()) {
+            return -1;
+        }
+        return 0;
     }
 }

@@ -190,6 +190,9 @@ public class VirtualCorpusAccessDao {
     }
 
     public void deleteAccess (VirtualCorpusAccess access) {
+        if (!entityManager.contains(access)){
+            access = entityManager.merge(access);
+        }
         entityManager.remove(access);
     }
 
