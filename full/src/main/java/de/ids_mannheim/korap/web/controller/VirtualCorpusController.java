@@ -206,21 +206,6 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
 
-    //  @POST
-    //  @Path("conceal")
-    //  public Response concealPublishedVC (@Context SecurityContext securityContext,
-    //          @QueryParam("vcId") int vcId) {
-    //      TokenContext context =
-    //              (TokenContext) securityContext.getUserPrincipal();
-    //      try {
-    //          service.concealVC(context.getUsername(), vcId);
-    //      }
-    //      catch (KustvaktException e) {
-    //          throw responseHandler.throwit(e);
-    //      }
-    //      return Response.ok().build();
-    //  }
-
     /** VC can only be shared with a group, not individuals. 
      *  Only VCA admins are allowed to share VC and 
      *  the VC must have been created by themselves.
@@ -259,7 +244,7 @@ public class VirtualCorpusController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            service.deleteVCAccess(context.getUsername(), accessId);
+            service.deleteVCAccess(accessId, context.getUsername());
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
@@ -268,8 +253,9 @@ public class VirtualCorpusController {
     }
 
 
-    /** Lists only active accesses to the specified virtual corpus.
-     * Only available to VCA and system admins.
+    /** Lists active VC accesses to the specified VC.
+     *  Only available to VCA and system admins.
+     *  For system admins, lists all VCA of the VC.
      * 
      * @see VirtualCorpusAccessStatus
      * 
@@ -295,8 +281,9 @@ public class VirtualCorpusController {
         return Response.ok(result).build();
     }
 
-    /** Lists all VC-accesses available for a group. 
-     *  Only available to VCA and system admins.
+    /** Lists active VC-accesses available for a user-group. 
+     *  Only available to VCA and system admins. 
+     *  For system admins, list all VCA for the group.
      * 
      * @param securityContext
      * @param groupId a group id

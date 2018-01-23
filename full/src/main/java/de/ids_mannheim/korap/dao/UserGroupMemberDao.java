@@ -60,7 +60,7 @@ public class UserGroupMemberDao {
         entityManager.persist(member);
     }
 
-    public void deleteMember (String userId, int groupId, boolean isSoftDelete)
+    public void deleteMember (String userId, int groupId, String deletedBy, boolean isSoftDelete)
             throws KustvaktException {
         ParameterChecker.checkStringValue(userId, "userId");
         ParameterChecker.checkIntegerValue(groupId, "groupId");

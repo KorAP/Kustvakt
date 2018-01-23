@@ -108,6 +108,21 @@ public class UserGroupController {
         }
     }
 
+    @POST
+    @Path("add")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addUserToGroup (@Context SecurityContext securityContext,
+            UserGroupJson group) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            service.addUsersToGroup(group, context.getUsername());
+            return Response.ok().build();
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
 
     @POST
     @Path("subscribe")

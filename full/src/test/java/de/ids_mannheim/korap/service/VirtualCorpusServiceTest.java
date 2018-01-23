@@ -10,8 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.dto.VirtualCorpusDto;
+import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.VirtualCorpusAccess;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
@@ -24,9 +27,9 @@ public class VirtualCorpusServiceTest {
     private VirtualCorpusService vcService;
 
     @Test
-    public void createPublishVC () throws KustvaktException {
+    public void createDeletePublishVC () throws KustvaktException {
         String username = "VirtualCorpusServiceTest";
-        
+
         VirtualCorpusJson vc = new VirtualCorpusJson();
         vc.setCorpusQuery("corpusSigle=GOE");
         vc.setCreatedBy(username);
@@ -34,16 +37,63 @@ public class VirtualCorpusServiceTest {
         vc.setType(VirtualCorpusType.PUBLISHED);
         int vcId = vcService.storeVC(vc, "VirtualCorpusServiceTest");
 
-        List<VirtualCorpusAccess> accesses = vcService.retrieveAllVCAccess(vcId);
+        List<VirtualCorpusAccess> accesses =
+                vcService.retrieveAllVCAccess(vcId);
         assertEquals(1, accesses.size());
-        
+
         VirtualCorpusAccess access = accesses.get(0);
         assertEquals(VirtualCorpusAccessStatus.HIDDEN, access.getStatus());
-        
-        // delete VC
+
         vcService.deleteVC(username, vcId);
         accesses = vcService.retrieveAllVCAccess(vcId);
         assertEquals(0, accesses.size());
+    }
+
+    @Test
+    public void testEditPublishVC () throws KustvaktException {
+        String username = "dory";
+        int vcId = 2;
+
+        VirtualCorpusJson vcJson = new VirtualCorpusJson();
+        vcJson.setId(vcId);
+        vcJson.setName("group VC published");
+        vcJson.setType(VirtualCorpusType.PUBLISHED);
+
+        vcService.editVC(vcJson, username);
+
+        // check VC
+        VirtualCorpusDto vcDto = vcService.searchVCById("dory", vcId);
+        assertEquals("group VC published", vcDto.getName());
+        assertEquals(VirtualCorpusType.PUBLISHED.displayName(), vcDto.getType());
+
+        // check access
+        List<VirtualCorpusAccess> accesses =
+                vcService.retrieveAllVCAccess(vcId);
+        assertEquals(2, accesses.size());
+
+        VirtualCorpusAccess access = accesses.get(1);
+        assertEquals(VirtualCorpusAccessStatus.HIDDEN, access.getStatus());
+        
+        // check auto hidden group
+        UserGroup autoHiddenGroup = access.getUserGroup();
+        assertEquals(UserGroupStatus.HIDDEN, autoHiddenGroup.getStatus());
+
+        // 2nd edit (withdraw from publication)
+        vcJson = new VirtualCorpusJson();
+        vcJson.setId(vcId);
+        vcJson.setName("group VC");
+        vcJson.setType(VirtualCorpusType.PROJECT);
+
+        vcService.editVC(vcJson, username);
+
+        // check VC
+        vcDto = vcService.searchVCById("dory", vcId);
+        assertEquals("group VC", vcDto.getName());
+        assertEquals(VirtualCorpusType.PROJECT.displayName(), vcDto.getType());
+
+        // check access
+        accesses = vcService.retrieveAllVCAccess(vcId);
+        assertEquals(1, accesses.size());
     }
 
 }

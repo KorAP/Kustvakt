@@ -36,6 +36,7 @@ import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.service.VirtualCorpusServiceTest;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 public class VirtualCorpusControllerTest extends SpringJerseyTest {
@@ -83,7 +84,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testOwnerSearchPrivateVC () throws UniformInterfaceException,
+    public void testSearchOwnerPrivateVC () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
 
         ClientResponse response = resource().path("vc").path("search").path("1")
@@ -309,7 +310,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testCreatePublishVC () throws KustvaktException {
+    public void testCreateDeletePublishVC () throws KustvaktException {
         String json =
                 "{\"name\": \"new published vc\",\"type\": \"PUBLISHED\",\"createdBy\": "
                         + "\"VirtualCorpusControllerTest\",\"corpusQuery\": \"corpusSigle=GOE\"}";
@@ -350,7 +351,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
                 .delete(ClientResponse.class);
 
-        //EM: have to delete the hidden groups as well (admin)
+        //EM: check if the hidden groups are deleted as well (require system admin)
     }
 
     @Test
@@ -561,11 +562,39 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    @Ignore
+    public void testEditVCNotOwner () throws KustvaktException {
+        String json = "{\"id\": \"1\", \"name\": \"edited vc\"}";
+
+        ClientResponse response = resource().path("vc").path("edit")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(
+                                "VirtualCorpusControllerTest", "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .post(ClientResponse.class, json);
+        String entity = response.getEntity(String.class);
+        //        System.out.println(entity);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals(
+                "Unauthorized operation for user: VirtualCorpusControllerTest",
+                node.at("/errors/0/1").asText());
+
+        checkWWWAuthenticateHeader(response);
+    }
+    
+    
+    /**
+     * @see VirtualCorpusServiceTest
+     * @throws KustvaktException
+     */
+    @Test
     public void testEditPublishVC () throws KustvaktException {
 
         String json =
-                "{\"id\": \"1\", \"name\": \"dory published vc\", \"type\": \"PUBLISHED\"}";
+                "{\"id\": \"2\", \"type\": \"PUBLISHED\"}";
 
         ClientResponse response = resource().path("vc").path("edit")
                 .header(Attributes.AUTHORIZATION,
@@ -589,35 +618,42 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
-        JsonNode n = node.get(0);
-        assertEquals("dory published vc", n.get("name").asText());
+        JsonNode n = node.get(1);
         assertEquals(VirtualCorpusType.PUBLISHED.displayName(),
                 n.get("type").asText());
-    }
+        
+        //check VC access
+        // need system admin account
+        
+        // edit 2nd
+        json =
+                "{\"id\": \"2\", \"type\": \"PROJECT\"}";
 
-    @Test
-    public void testEditVCNotOwner () throws KustvaktException {
-        String json = "{\"id\": \"1\", \"name\": \"edited vc\"}";
-
-        ClientResponse response = resource().path("vc").path("edit")
+        response = resource().path("vc").path("edit")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(
-                                "VirtualCorpusControllerTest", "pass"))
+                        handler.createBasicAuthorizationHeaderValue("dory",
+                                "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .post(ClientResponse.class, json);
-        String entity = response.getEntity(String.class);
-        //        System.out.println(entity);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
-                node.at("/errors/0/0").asInt());
-        assertEquals(
-                "Unauthorized operation for user: VirtualCorpusControllerTest",
-                node.at("/errors/0/1").asText());
 
-        checkWWWAuthenticateHeader(response);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
+        response = resource().path("vc").path("list").path("user")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("dory",
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+
+                .get(ClientResponse.class);
+        entity = response.getEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        node = JsonUtils.readTree(entity);
+        assertEquals(VirtualCorpusType.PROJECT.displayName(),
+                node.get(1).get("type").asText());
     }
+
 
     @Test
     public void testlistAccessByVC () throws KustvaktException {

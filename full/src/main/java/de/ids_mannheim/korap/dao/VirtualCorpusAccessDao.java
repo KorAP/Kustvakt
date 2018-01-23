@@ -189,7 +189,10 @@ public class VirtualCorpusAccessDao {
         entityManager.persist(vca);
     }
 
-    public void deleteAccess (VirtualCorpusAccess access) {
+    public void deleteAccess (VirtualCorpusAccess access, String deletedBy) {
+        // soft delete
+        
+        // hard delete
         if (!entityManager.contains(access)){
             access = entityManager.merge(access);
         }

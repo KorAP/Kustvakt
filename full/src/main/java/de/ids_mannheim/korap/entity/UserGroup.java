@@ -31,7 +31,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "user_group")
-public class UserGroup {
+public class UserGroup implements Comparable<UserGroup> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,5 +58,17 @@ public class UserGroup {
     @Override
     public String toString () {
         return "id=" + id + ", name= " + name + ", createdBy= " + createdBy;
+    }
+
+
+    @Override
+    public int compareTo (UserGroup o) {
+        if (this.getId() > o.getId()) {
+            return 1;
+        }
+        else if (this.getId() < o.getId()) {
+            return -1;
+        }
+        return 0;
     }
 }

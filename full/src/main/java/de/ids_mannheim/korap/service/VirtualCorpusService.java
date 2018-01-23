@@ -13,6 +13,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
+import de.ids_mannheim.korap.constant.GroupMemberStatus;
+import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.dao.VirtualCorpusAccessDao;
@@ -79,7 +81,7 @@ public class VirtualCorpusService {
         List<VirtualCorpus> vcList = vcDao.retrieveVCByUser(username);
         return createVCDtos(vcList);
     }
-    
+
     private ArrayList<VirtualCorpusDto> createVCDtos (
             List<VirtualCorpus> vcList) throws KustvaktException {
         ArrayList<VirtualCorpusDto> dtos = new ArrayList<>(vcList.size());
@@ -119,16 +121,11 @@ public class VirtualCorpusService {
 
     public void editVC (VirtualCorpusJson vcJson, String username)
             throws KustvaktException {
-
-        VirtualCorpus vc = vcDao.retrieveVCById(vcJson.getId());
-        editVC(vc, vcJson, username);
-    }
-
-    public void editVC (VirtualCorpus vc, VirtualCorpusJson vcJson,
-            String username) throws KustvaktException {
         ParameterChecker.checkIntegerValue(vcJson.getId(), "id");
-        User user = authManager.getUser(username);
+        int vcId = vcJson.getId();
+        VirtualCorpus vc = vcDao.retrieveVCById(vcId);
 
+        User user = authManager.getUser(username);
         if (!username.equals(vc.getCreatedBy()) && !user.isAdmin()) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
@@ -142,14 +139,45 @@ public class VirtualCorpusService {
             requiredAccess = determineRequiredAccess(koralQuery);
         }
 
+        VirtualCorpusType type = vcJson.getType();
+        if (type != null) {
+            if (vc.getType().equals(VirtualCorpusType.PUBLISHED)) {
+                // withdraw from publication
+                if (!type.equals(VirtualCorpusType.PUBLISHED)) {
+                    VirtualCorpusAccess hiddenAccess =
+                            accessDao.retrieveHiddenAccess(vcId);
+                    deleteVCAccess(hiddenAccess.getId(), "system");
+                    int groupId = hiddenAccess.getUserGroup().getId();
+                    userGroupService.deleteAutoHiddenGroup(groupId, "system");
+                }
+                // else remains the same
+            }
+            else if (type.equals(VirtualCorpusType.PUBLISHED)) {
+                publishVC(vcJson.getId());
+            }
+        }
+
         vcDao.editVirtualCorpus(vc, vcJson.getName(), vcJson.getType(),
                 requiredAccess, koralQuery, vcJson.getDefinition(),
                 vcJson.getDescription(), vcJson.getStatus());
+    }
 
-        if (!vc.getType().equals(VirtualCorpusType.PUBLISHED)
-                && vcJson.getType() != null
-                && vcJson.getType().equals(VirtualCorpusType.PUBLISHED)) {
-            publishVC(vcJson.getId());
+    private void publishVC (int vcId) throws KustvaktException {
+
+        VirtualCorpusAccess access = accessDao.retrieveHiddenAccess(vcId);
+        // check if hidden access exists
+        if (access == null) {
+            VirtualCorpus vc = vcDao.retrieveVCById(vcId);
+            // create and assign a hidden group
+            int groupId = userGroupService.createAutoHiddenGroup(vcId);
+            UserGroup autoHidden =
+                    userGroupService.retrieveUserGroupById(groupId);
+            accessDao.createAccessToVC(vc, autoHidden, "system",
+                    VirtualCorpusAccessStatus.HIDDEN);
+        }
+        else {
+            jlog.error("Cannot publish VC with id: " + vcId
+                    + ". There have been hidden accesses for the VC already.");
         }
     }
 
@@ -226,51 +254,6 @@ public class VirtualCorpusService {
         jlog.debug("License: " + license + ", number of docs: " + numberOfDoc);
         return (numberOfDoc > 0) ? true : false;
     }
-
-    private void publishVC (int vcId) throws KustvaktException {
-
-        VirtualCorpusAccess access = accessDao.retrieveHiddenAccess(vcId);
-        // check if hidden access exists
-        if (access == null) {
-            VirtualCorpus vc = vcDao.retrieveVCById(vcId);
-            // create and assign a hidden group
-            int groupId = userGroupService.createAutoHiddenGroup(vcId);
-            UserGroup autoHidden =
-                    userGroupService.retrieveUserGroupById(groupId);
-            accessDao.createAccessToVC(vc, autoHidden, "system",
-                    VirtualCorpusAccessStatus.HIDDEN);
-        }
-        else {
-            jlog.error("Cannot publish VC with id: " + vcId
-                    + ". There have been hidden accesses for the VC already.");
-        }
-    }
-
-
-    //    public void concealVC (String username, int vcId) throws KustvaktException {
-    //
-    //        VirtualCorpus vc = vcDao.retrieveVCById(vcId);
-    //        if (vc.getType().equals(VirtualCorpusType.PUBLISHED)) {
-    //            throw new KustvaktException(StatusCodes.NOTHING_CHANGED,
-    //                    "Virtual corpus is not published.");
-    //        }
-    //
-    //        VirtualCorpusJson vcJson = new VirtualCorpusJson();
-    //        // EM: a published VC may originate from a project or a private VC. 
-    //        // This origin is not saved in the DB. To be on the safe side, 
-    //        // VirtualCorpusType is changed into PROJECT so that any groups 
-    //        // associated with the VC can access it.
-    //        vcJson.setType(VirtualCorpusType.PROJECT);
-    //        editVC(vc, vcJson, username);
-    //
-    //        List<VirtualCorpusAccess> hiddenAccess =
-    //                accessDao.retrieveHiddenAccess(vcId);
-    //        for (VirtualCorpusAccess access : hiddenAccess){
-    //            access.setDeletedBy(username);
-    //            editVCAccess(access,username);
-    //        }
-    //
-    //    }
 
     public List<VirtualCorpusAccess> retrieveAllVCAccess (int vcId)
             throws KustvaktException {
@@ -369,7 +352,7 @@ public class VirtualCorpusService {
         return accessConverter.createVCADto(accessList);
     }
 
-    public void deleteVCAccess (String username, int accessId)
+    public void deleteVCAccess (int accessId, String username)
             throws KustvaktException {
 
         User user = authManager.getUser(username);
@@ -377,7 +360,7 @@ public class VirtualCorpusService {
         VirtualCorpusAccess access = accessDao.retrieveAccessById(accessId);
         UserGroup userGroup = access.getUserGroup();
         if (isVCAccessAdmin(userGroup, username) || user.isAdmin()) {
-            accessDao.deleteAccess(access);
+            accessDao.deleteAccess(access, username);
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
@@ -404,12 +387,19 @@ public class VirtualCorpusService {
 
             else if (VirtualCorpusType.PUBLISHED.equals(type)) {
                 // add user in the VC's auto group 
-//                VirtualCorpusAccess access =
-//                        accessDao.retrieveHiddenAccess(vcId);
-//                UserGroup userGroup = access.getUserGroup();
-                UserGroup userGroup = userGroupService.retrieveHiddenGroup(vcId);
-                if (!userGroupService.isMember(username, userGroup)) {
-                    userGroupService.addUserToGroup(username, userGroup);
+                //                VirtualCorpusAccess access =
+                //                        accessDao.retrieveHiddenAccess(vcId);
+                //                UserGroup userGroup = access.getUserGroup();
+                UserGroup userGroup =
+                        userGroupService.retrieveHiddenGroup(vcId);
+//                if (!userGroupService.isMember(username, userGroup)) {
+                try{
+                    userGroupService.addUserToGroup(username, userGroup,
+                            "system", GroupMemberStatus.ACTIVE);
+                }
+                catch (KustvaktException e) {
+                    // member exists
+                    // skip adding user to hidden group
                 }
             }
             // else VirtualCorpusType.PREDEFINED

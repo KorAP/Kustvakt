@@ -2,6 +2,8 @@ package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -20,6 +22,7 @@ import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.input.UserGroupJson;
 
 public class UserGroupControllerTest extends SpringJerseyTest {
 
@@ -40,15 +43,11 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         //        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
 
-        JsonNode group;
-        for (int i = 0; i < node.size(); i++) {
-            group = node.get(i);
-            if (group.at("/id").asInt() == 2) {
-                assertEquals("dory group", group.at("/name").asText());
-                assertEquals("dory", group.at("/owner").asText());
-                assertEquals(3, group.at("/members").size());
-            }
-        }
+        JsonNode group = node.get(1);
+        assertEquals(2, group.at("/id").asInt());
+        assertEquals("dory group", group.at("/name").asText());
+        assertEquals("dory", group.at("/owner").asText());
+        assertEquals(3, group.at("/members").size());
     }
 
     // nemo is a group member in dory group
@@ -104,13 +103,33 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 node.at("/errors/0/1").asText());
     }
 
+
+//    @Test
+//    public void testInviteMember () {
+//
+//    }
+//
+//    @Test
+//    public void testInviteDeletedMember () {
+//
+//    }
+//    
+//    @Test
+//    public void testDeletePendingMember () {
+//
+//    }
+
+    
     // marlin has GroupMemberStatus.PENDING in dory group
     @Test
-    public void testSubscribeUnsubscribeMarlinToDoryGroup () throws KustvaktException {
+    public void testSubscribeUnsubscribeMarlinToDoryGroup ()
+            throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("groupId", "2");
 
-        ClientResponse response = resource().path("group").path("subscribe")
+        ClientResponse response;
+        String entity;
+        response = resource().path("group").path("subscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION,
@@ -127,7 +146,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                                 "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
-        String entity = response.getEntity(String.class);
+        entity = response.getEntity(String.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
@@ -168,6 +187,24 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         node = JsonUtils.readTree(entity);
         assertEquals(1, node.size());
+
+        // add marlin to dory group again to set back the GroupMemberStatus.PENDING
+        ArrayList<String> members = new ArrayList<String>();
+        members.add("marlin");
+
+        UserGroupJson userGroup = new UserGroupJson();
+        userGroup.setMembers(members);
+        // dory group
+        userGroup.setId(2);
+
+        response = resource().path("group").path("add")
+                .type(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("dory",
+                                "pass"))
+                .entity(userGroup).post(ClientResponse.class);
+        entity = response.getEntity(String.class);
     }
 
     // pearl has GroupMemberStatus.DELETED in dory group

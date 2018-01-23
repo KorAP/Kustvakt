@@ -1,0 +1,55 @@
+0.59.10	2018-01-23
+	- added sort VC by id (margaretha)
+	- added test cases regarding VC sharing (margaretha)
+	- implemented withdraw VC from publication (margaretha)
+	- added Changes file (margaretha)
+	- implemented add users to group (margaretha)
+	
+	
+0.59.9 2018-01-19
+	- restructured basic authentication (margaretha)
+	- fixed AuthenticationException to include authentication scheme (margaretha)
+	- fixed rewrite redundancy in collection rewrite (margaretha)
+	- fixed foundry rewrite for constituents (margaretha)
+	- introduced authentication methods, schemes and tokens (margaretha)
+	- implemented collection rewrite with multiple licenses (margaretha)
+	- fixed foundry rewrite for korap span without wrap node (margaretha)
+	- implemented list user group (margaretha)
+	- implemented delete VC task (margaretha)
+	- implemented create user-group, subscribe to usergroup, unsubscribe to user group tasks(margaretha)
+	- fixed handling JSON mapping exception for missing enums (margaretha)
+    - implemented list VC task (margaretha)
+    - include KoralQuery in VC list (margaretha)
+	- implemented edit VC task (margaretha)
+	- implemented publish VC task (margaretha)
+    - implemented share VC task (margaretha)
+    - implemented list only owned VC task (margaretha) 
+    - implemented list VC access task (margaretha)
+    - implemented search VC by id task (margaretha)
+    - implemented delete VC access (margaretha)
+    - implemented search for project VC (margaretha)
+    - added search VC related tests (margaretha)
+    - removed PredefinedUserGroup.ALL and related codes (margaretha)
+    - implemented search for published VC (margaretha)
+    
+
+0.59.8 2017-09-21
+	- restructured statistics service (margaretha)
+	- removed deprecated loader codes and tests (margaretha)
+	- removed old Spring java configurations (margaretha)
+	- implemented entity classes for the new database (margaretha)
+	- added MySQL codes regarding virtual corpus and for testing (margaretha)
+	- added dao methods regarding virtual corpus (margaretha)
+	- added similar SQL codes (to MySQL) for sqlite (margaretha)
+	- added dao methods regarding user groups (margaretha)
+	- restructured web-service codes into controller and logic/business-service(margaretha)
+	- implemented user role and privilege, and added tests (margaretha)
+	- prepared test suite using new database (margaretha)
+	- implemented UserGroupDao and tests (margaretha)
+	- fixed missing exceptions in JsonUtils (margaretha)
+	- restructured web filters and authentication codes (margaretha)
+	- implemented create/store VC (margaretha)
+	- fixed collection rewrite bug regarding availability with operation or (margaretha)
+	
+	
+    

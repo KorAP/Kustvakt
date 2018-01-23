@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,10 @@ import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
+import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.ParameterChecker;
 import de.ids_mannheim.korap.web.controller.UserGroupController;
 import de.ids_mannheim.korap.web.input.UserGroupJson;
 
@@ -39,7 +44,10 @@ public class UserGroupService {
     private RoleDao roleDao;
     @Autowired
     private UserGroupConverter converter;
+    @Autowired
+    private AuthenticationManagerIface authManager;
 
+    private static List<Role> memberRoles;
 
     /** Only users with {@link PredefinedRole#USER_GROUP_ADMIN} 
      * are allowed to see the members of the group.
@@ -55,7 +63,7 @@ public class UserGroupService {
 
         List<UserGroup> userGroups =
                 userGroupDao.retrieveGroupByUserId(username);
-
+        Collections.sort(userGroups);
         ArrayList<UserGroupDto> dtos = new ArrayList<>(userGroups.size());
 
         List<UserGroupMember> groupAdmins;
@@ -126,11 +134,7 @@ public class UserGroupService {
                 UserGroupStatus.ACTIVE);
         UserGroup group = userGroupDao.retrieveGroupById(groupId);
 
-        List<Role> roles = new ArrayList<Role>(2);
-        roles.add(roleDao
-                .retrieveRoleById(PredefinedRole.USER_GROUP_MEMBER.getId()));
-        roles.add(roleDao
-                .retrieveRoleById(PredefinedRole.VC_ACCESS_MEMBER.getId()));
+        setMemberRoles();
 
         UserGroupMember m;
         for (String memberId : groupJson.getMembers()) {
@@ -144,7 +148,17 @@ public class UserGroupService {
             m.setCreatedBy(username);
             m.setGroup(group);
             m.setStatus(GroupMemberStatus.PENDING);
-            m.setRoles(roles);
+            m.setRoles(memberRoles);
+        }
+    }
+
+    private void setMemberRoles () {
+        if (memberRoles == null) {
+            memberRoles = new ArrayList<Role>(2);
+            memberRoles.add(roleDao.retrieveRoleById(
+                    PredefinedRole.USER_GROUP_MEMBER.getId()));
+            memberRoles.add(roleDao
+                    .retrieveRoleById(PredefinedRole.VC_ACCESS_MEMBER.getId()));
         }
     }
 
@@ -156,23 +170,106 @@ public class UserGroupService {
         return groupId;
     }
 
-    public void addUserToGroup (String username, UserGroup userGroup)
+    public void deleteAutoHiddenGroup (int groupId, String deletedBy)
+            throws KustvaktException {
+        // default hard delete
+        userGroupDao.deleteGroup(groupId, deletedBy, false);
+    }
+
+    /** Adds a user to the specified usergroup. If the username with 
+     *  {@link GroupMemberStatus} DELETED exists as a member of the group, 
+     *  the entry will be deleted first, and a new entry will be added.
+     *  
+     *  If a username with other statuses exists, a KustvaktException will 
+     *  be thrown.    
+     * 
+     * @see GroupMemberStatus
+     * 
+     * @param username a username
+     * @param userGroup a user group
+     * @param createdBy the user (VCA/system) adding the user the user-group 
+     * @param status the status of the membership
+     * @throws KustvaktException
+     */
+    public void addUserToGroup (String username, UserGroup userGroup,
+            String createdBy, GroupMemberStatus status)
             throws KustvaktException {
 
-        List<Role> roles = new ArrayList<Role>(2);
-        roles.add(roleDao
-                .retrieveRoleById(PredefinedRole.USER_GROUP_MEMBER.getId()));
-        roles.add(roleDao
-                .retrieveRoleById(PredefinedRole.VC_ACCESS_MEMBER.getId()));
+        int groupId = userGroup.getId();
+        ParameterChecker.checkIntegerValue(groupId, "userGroupId");
+
+        if (memberExists(username, groupId, status)) {
+            throw new KustvaktException(StatusCodes.ENTRY_EXISTS,
+                    "Username: " + username + " with status " + status
+                            + " exists in usergroup " + userGroup.getName());
+        }
+
+        setMemberRoles();
 
         UserGroupMember member = new UserGroupMember();
-        member.setCreatedBy("system");
+        member.setCreatedBy(createdBy);
         member.setGroup(userGroup);
-        member.setRoles(roles);
-        member.setStatus(GroupMemberStatus.ACTIVE);
+        member.setRoles(memberRoles);
+        member.setStatus(status);
         member.setUserId(username);
 
         groupMemberDao.addMember(member);
+    }
+
+    private boolean memberExists (String username, int groupId,
+            GroupMemberStatus status) throws KustvaktException {
+        UserGroupMember existingMember;
+        try {
+            existingMember =
+                    groupMemberDao.retrieveMemberById(username, groupId);
+        }
+        catch (KustvaktException e) {
+            return false;
+        }
+
+        GroupMemberStatus memberStatus = existingMember.getStatus();
+        if (memberStatus.equals(status)) {
+            return true;
+        }
+        else if (memberStatus.equals(GroupMemberStatus.DELETED)) {
+            // hard delete
+            groupMemberDao.deleteMember(username, groupId, "system", false);
+        }
+
+        return false;
+    }
+
+    public void addUsersToGroup (UserGroupJson group, String username)
+            throws KustvaktException {
+        int groupId = group.getId();
+        List<String> members = group.getMembers();
+        ParameterChecker.checkIntegerValue(groupId, "id");
+        ParameterChecker.checkObjectValue(members, "members");
+
+        UserGroup userGroup = retrieveUserGroupById(groupId);
+        User user = authManager.getUser(username);
+        if (isUserGroupAdmin(username, userGroup) || user.isAdmin()) {
+            for (String memberName : members) {
+                addUserToGroup(memberName, userGroup, username,
+                        GroupMemberStatus.PENDING);
+            }
+        }
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
+    }
+
+    private boolean isUserGroupAdmin (String username, UserGroup userGroup)
+            throws KustvaktException {
+        List<UserGroupMember> userGroupAdmins =
+                retrieveUserGroupAdmins(userGroup);
+        for (UserGroupMember admin : userGroupAdmins) {
+            if (username.equals(admin.getUserId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Updates the {@link GroupMemberStatus} of a pending member 
@@ -197,7 +294,7 @@ public class UserGroupService {
      */
     public void unsubscribe (int groupId, String username)
             throws KustvaktException {
-        groupMemberDao.deleteMember(username, groupId, true);
+        groupMemberDao.deleteMember(username, groupId, username, true);
     }
 
 
@@ -217,4 +314,6 @@ public class UserGroupService {
     public UserGroup retrieveHiddenGroup (int vcId) throws KustvaktException {
         return userGroupDao.retrieveHiddenGroupByVC(vcId);
     }
+
+
 }

@@ -91,9 +91,12 @@ public class UserGroupDao {
         if (isSoftDelete) {
             group.setStatus(UserGroupStatus.DELETED);
             group.setDeletedBy(deletedBy);
-            entityManager.persist(group);
+            entityManager.merge(group);
         }
         else {
+            if (!entityManager.contains(group)){
+                group = entityManager.merge(group);
+            }
             entityManager.remove(group);
         }
     }

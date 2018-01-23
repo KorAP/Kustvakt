@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 public class UserGroupJson {
 
+    private int id;
     private String name;
     private List<String> members;
 }
