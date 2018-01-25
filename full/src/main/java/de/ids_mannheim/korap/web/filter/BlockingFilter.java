@@ -44,7 +44,7 @@ public class BlockingFilter implements ContainerRequestFilter, ResourceFilter {
         if (context == null || context.isDemo()) {
             throw kustvaktResponseHandler.throwit(new KustvaktException(
                     StatusCodes.AUTHORIZATION_FAILED,
-                    "Operation is not permitted for user: guest", "guest"));
+                    "Unauthorized operation for user: guest", "guest"));
         }
 
 

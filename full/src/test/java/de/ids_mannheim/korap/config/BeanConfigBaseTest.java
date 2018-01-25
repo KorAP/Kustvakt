@@ -19,6 +19,7 @@ import net.jcip.annotations.NotThreadSafe;
  * @author hanl
  * @date 09/03/2016
  */
+@Deprecated
 @NotThreadSafe
 @RunWith(BeanConfigBaseTest.SpringExtendedSetupListener.class)
 @ContextConfiguration("classpath:test-config.xml")

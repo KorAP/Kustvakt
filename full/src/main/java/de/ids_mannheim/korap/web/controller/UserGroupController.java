@@ -3,11 +3,13 @@ package de.ids_mannheim.korap.web.controller;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -31,13 +33,14 @@ import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.input.UserGroupJson;
 
-/** UserGroupController defines web APIs related to user groups, 
- *  such as creating a user group,  listing groups of a user, 
- *  adding members to a group and subscribing (confirming an 
- *  invitation) to a group. 
- *  
- *  These APIs are only available to logged-in users.
- *   
+/**
+ * UserGroupController defines web APIs related to user groups,
+ * such as creating a user group, listing groups of a user,
+ * adding members to a group and subscribing (confirming an
+ * invitation) to a group.
+ * 
+ * These APIs are only available to logged-in users.
+ * 
  * @author margaretha
  *
  */
@@ -95,7 +98,7 @@ public class UserGroupController {
     @POST
     @Path("create")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createGroup (@Context SecurityContext securityContext,
+    public Response createUserGroup (@Context SecurityContext securityContext,
             UserGroupJson group) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
@@ -108,8 +111,50 @@ public class UserGroupController {
         }
     }
 
+    @DELETE
+    @Path("delete")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteUserGroup (
+            @Context SecurityContext securityContext,
+            @QueryParam("groupId") int groupId) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            service.deleteGroup(groupId, context.getUsername());
+            return Response.ok().build();
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
+    
+    /** Group owner cannot be deleted.
+     * 
+     * @param securityContext
+     * @param memberId a username of a group member
+     * @param groupId a group id
+     * @return if successful, HTTP response status OK
+     */
+    @DELETE
+    @Path("member/delete")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteUserFromGroup (
+            @Context SecurityContext securityContext,
+            @QueryParam("memberId") String memberId,
+            @QueryParam("groupId") int groupId) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            service.deleteGroupMember(memberId, groupId, context.getUsername());
+            return Response.ok().build();
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
+
     @POST
-    @Path("add")
+    @Path("member/invite")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addUserToGroup (@Context SecurityContext securityContext,
             UserGroupJson group) {

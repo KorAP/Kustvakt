@@ -71,7 +71,7 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
             // EM: fix me: AuthenticationType based on header value
             User user = authManager.authenticate(AuthenticationMethod.LDAP,
                     data.getUsername(), data.getPassword(), attributes);
-            if (!user.isAdmin()) {
+            if (!user.isSystemAdmin()) {
                 throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
                         "Admin authentication failed.");
             }

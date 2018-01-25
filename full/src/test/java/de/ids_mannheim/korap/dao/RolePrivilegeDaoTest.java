@@ -49,21 +49,21 @@ public class RolePrivilegeDaoTest {
 
     @Test
     public void updateRole () {
-        Role role = roleDao.retrieveRoleByName("group member");
-        roleDao.editRoleName(role.getId(), "group member role");
+        Role role = roleDao.retrieveRoleByName("USER_GROUP_MEMBER");
+        roleDao.editRoleName(role.getId(), "USER_GROUP_MEMBER role");
 
         role = roleDao.retrieveRoleById(role.getId());
-        assertEquals("group member role", role.getName());
+        assertEquals("USER_GROUP_MEMBER role", role.getName());
 
-        roleDao.editRoleName(role.getId(), "group member");
+        roleDao.editRoleName(role.getId(), "USER_GROUP_MEMBER");
         role = roleDao.retrieveRoleById(role.getId());
-        assertEquals("group member", role.getName());
+        assertEquals("USER_GROUP_MEMBER", role.getName());
     }
 
 
     @Test
     public void addDeletePrivilegeOfExistingRole () {
-        Role role = roleDao.retrieveRoleByName("group member");
+        Role role = roleDao.retrieveRoleByName("USER_GROUP_MEMBER");
         List<Privilege> privileges = role.getPrivileges();
         assertEquals(1, role.getPrivileges().size());
         assertEquals(privileges.get(0).getName(), PrivilegeType.DELETE);
@@ -73,13 +73,13 @@ public class RolePrivilegeDaoTest {
         privilegeTypes.add(PrivilegeType.READ);
         privilegeDao.addPrivilegesToRole(role, privilegeTypes);
 
-        role = roleDao.retrieveRoleByName("group member");
+        role = roleDao.retrieveRoleByName("USER_GROUP_MEMBER");
         assertEquals(2, role.getPrivileges().size());
 
         //delete privilege
         privilegeDao.deletePrivilegeFromRole(role.getId(), PrivilegeType.READ);
 
-        role = roleDao.retrieveRoleByName("group member");
+        role = roleDao.retrieveRoleByName("USER_GROUP_MEMBER");
         assertEquals(1, role.getPrivileges().size());
         assertEquals(privileges.get(0).getName(), PrivilegeType.DELETE);
     }

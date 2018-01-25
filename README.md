@@ -29,7 +29,11 @@ git clone git@github.com:KorAP/Kustvakt.git
 </pre>
 
 Since Kustvakt requires Krill and Koral, please install [Krill](https://github.com/KorAP/Krill) and [Koral](https://github.com/KorAP/Koral) in your maven local repository.
-Adjust the versions of Krill and Koral in Kustvakt/core/pom.xml according to the versions in Koral/pom.xml and Krill/pom.xml.
+Adjust the versions of Krill and Koral in ```Kustvakt/core/pom.xml``` 
+according to the versions in 
+```Koral/pom.xml```
+ and 
+ ```Krill/pom.xml```.
 
 Install Kustvakt-core in your maven local repository
 <pre>
@@ -42,14 +46,14 @@ Package Kustvakt full version
 cd ../full
 mvn clean package
 </pre>
-The jar file is located in the target/ folder.
+The jar file is located in the ```target/``` folder.
 
 Package Kustvakt lite version
 <pre>
 cd ../lite
 mvn clean package
 </pre>
-The jar file is located in the target/ folder.
+The jar file is located in the ```target/``` folder.
 
 If there are errors regarding tests, please skip them.
 <pre>
@@ -58,7 +62,7 @@ mvn clean package -DskipTests=true
 
 # Setting kustvakt configuration file
 
-Copy the default Kustvakt configuration file (e.g. ```full/src/main/resources/kustvakt.conf``` or ```lite/src/main/resources/kustvakt-lite.conf```), to the same  folder as the Kustvakt jar files  (/target). Please do not change the name of the configuration file.
+Copy the default Kustvakt configuration file (e.g. ```full/src/main/resources/kustvakt.conf``` or ```lite/src/main/resources/kustvakt-lite.conf```), to the same  folder as the Kustvakt jar files  (```/target```). Please do not change the name of the configuration file.
 
 Set krill.indexDir in the configuration file to the location of your Krill index (relative path). In Kustvakt root directory, there is a sample index, e.g.
 <pre>krill.indexDir = ../../sample-index</pre>
@@ -94,14 +98,14 @@ java -jar target/Kustvakt-[lite/full]-[version].jar
 
 # Futher Setup for Developer
 
-Installing lombok is necessary when working with an IDE. Go to the directory of your lombok.jar, e.g \.m2\repository\org\projectlombok\lombok\1.16.6 and run
+Installing lombok is necessary when working with an IDE. Go to the directory of your lombok.jar, e.g ```~/.m2/repository/org/projectlombok/lombok/1.16.6``` and run
 <pre>
 java -jar lombok-1.16.6.jar
 </pre>
 
 Restart your IDE and clean your project.
 
-Copy ```kustvakt.conf``` or ```kustvakt-lite.conf``` from  src/main/resources to the full/ or lite/ folder. Then the properties the configuration file can be customized.
+Copy ```kustvakt.conf``` or ```kustvakt-lite.conf``` from  ```src/main/resources``` to the ```full/``` or ```lite/``` folder. Then the properties the configuration file can be customized.
 
 In an IDE, you can run ```KustvaktLiteServer``` or ```KustvaktServer``` as a normal Java application.
 
@@ -109,7 +113,7 @@ In an IDE, you can run ```KustvaktLiteServer``` or ```KustvaktServer``` as a nor
 
 The default Sqlite database can be switch to a MySQL database.
 
-Copy ```jdbc.properties``` from full/src/main/resources to the full/ directory. Do not change the filename.
+Copy ```jdbc.properties``` from ```full/src/main/resources``` to the ```full/``` directory. Do not change the filename.
 <pre>
 cp full/src/main/resources/jdbc.properties full/
 </pre>
@@ -131,9 +135,9 @@ You probably would like to git ignore this file to prevent pushing the database 
 
 
 Open ```full/src/main/resource/default-config.xml``` and search for the 
-Spring bean with id="flyway".
+Spring bean with id "flyway".
 
-Change the dataSource property to refer to the Spring bean with id="dataSource".
+Change the dataSource property to refer to the Spring bean with id "dataSource".
 <pre>
 &lt;property name="dataSource" ref="dataSource" /&gt;
 </pre>

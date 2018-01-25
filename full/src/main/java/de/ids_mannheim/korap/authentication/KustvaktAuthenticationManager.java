@@ -324,7 +324,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 		}
 
 		boolean isAdmin = adminHandler.isAdmin(unknown.getId());
-		unknown.setAdmin(isAdmin);
+		unknown.setSystemAdmin(isAdmin);
 		jlog.debug("Authentication: found username " + unknown.getUsername());
 
 		if (unknown instanceof KorAPUser) {
@@ -697,7 +697,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
 		String o = (String) attributes.get(Attributes.IS_ADMIN);
 		boolean b = Boolean.parseBoolean(o);
-		user.setAdmin(b);
+		user.setSystemAdmin(b);
 
 		try {
 			UserDetails details = new UserDetails();
@@ -708,7 +708,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
 			jlog.info("Creating new user account for user {}", user.getUsername());
 			entHandler.createAccount(user);
-			if (user.isAdmin() && user instanceof KorAPUser) {
+			if (user.isSystemAdmin() && user instanceof KorAPUser) {
 				adminHandler.addAccount(user);
 				user.setCorpusAccess(CorpusAccess.ALL);
 			}

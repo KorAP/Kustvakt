@@ -9,15 +9,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
-import java.util.Set;
-
 import org.apache.http.entity.ContentType;
 import org.eclipse.jetty.http.HttpHeaders;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,8 +23,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.spi.container.ContainerRequest;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
@@ -243,7 +241,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Operation is not permitted for user: guest",
+        assertEquals("Unauthorized operation for user: guest",
                 node.at("/errors/0/1").asText());
 
         checkWWWAuthenticateHeader(response);
@@ -276,7 +274,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                 .get(ClientResponse.class);
         entity = response.getEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-                System.out.println(entity);
+//                System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.size());
         assertEquals("new vc", node.get(1).get("name").asText());
@@ -402,7 +400,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Operation is not permitted for user: guest",
+        assertEquals("Unauthorized operation for user: guest",
                 node.at("/errors/0/1").asText());
 
         checkWWWAuthenticateHeader(response);
@@ -663,10 +661,9 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                         handler.createBasicAuthorizationHeaderValue("dory",
                                 "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
-        //        System.out.println(entity);
+//                System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(1, node.at("/0/accessId").asInt());
         assertEquals(2, node.at("/0/vcId").asInt());
@@ -684,7 +681,6 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                         handler.createBasicAuthorizationHeaderValue("nemo",
                                 "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
         assertEquals("[]", entity);
@@ -698,8 +694,6 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                                 handler.createBasicAuthorizationHeaderValue(
                                         "VirtualCorpusControllerTest", "pass"))
                         .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                        .header(HttpHeaders.CONTENT_TYPE,
-                                ContentType.APPLICATION_JSON)
                         .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -717,7 +711,6 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                         handler.createBasicAuthorizationHeaderValue("dory",
                                 "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
         //        System.out.println(entity);
@@ -727,7 +720,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         assertEquals("group VC", node.at("/0/vcName").asText());
         assertEquals(2, node.at("/0/userGroupId").asInt());
         assertEquals("dory group", node.at("/0/userGroupName").asText());
-    }
+    }   
 
 
     @Test

@@ -1,32 +1,27 @@
 package de.ids_mannheim.korap.web.controller;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.ClientResponse;
 
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.web.FastJerseyTest;
+import de.ids_mannheim.korap.config.SpringJerseyTest;
 
 /** 
  * @author margaretha
  * @date 27/09/2017
  *
  */
-public class StatisticsControllerTest extends FastJerseyTest {
+public class StatisticsControllerTest extends SpringJerseyTest {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-
-    @Override
-    public void initMethod () throws KustvaktException {
-
-    }
 
     @Test
     public void testGetStatisticsNoResource ()

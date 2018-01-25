@@ -22,6 +22,7 @@ public class StatusCodes {
     public static final int CONNECTION_ERROR = 106;
     public static final int INVALID_ARGUMENT = 107;
     public static final int NOT_SUPPORTED = 108;
+    public static final int NOT_ALLOWED = 109;
     
     /**
      * 300 status codes for query language and serialization

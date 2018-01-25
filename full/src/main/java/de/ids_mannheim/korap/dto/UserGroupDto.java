@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.dto;
 
 import java.util.List;
 
+import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,4 +14,5 @@ public class UserGroupDto {
     private String name;
     private String owner;
     private List<UserGroupMemberDto> members;
+    private GroupMemberStatus userMemberStatus;
 }

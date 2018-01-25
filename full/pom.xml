@@ -161,15 +161,8 @@
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Kustvakt-core</artifactId>
-			<version>0.59.9</version>
+			<version>0.59.10</version>
 			<type>jar</type>
-		</dependency>
-		<dependency>
-			<groupId>de.ids_mannheim.korap</groupId>
-			<artifactId>Kustvakt-core</artifactId>
-			<version>0.59.9</version>
-			<type>test-jar</type>
-			<scope>test</scope>
 		</dependency>
 		<!-- LDAP -->
 		<dependency>

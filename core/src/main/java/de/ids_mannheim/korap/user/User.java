@@ -1,6 +1,15 @@
 package de.ids_mannheim.korap.user;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.joda.time.DateTime;
+
 import com.fasterxml.jackson.databind.JsonNode;
+
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.ParamFields;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -11,13 +20,6 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.DateTime;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Data
 public abstract class User implements Serializable {
@@ -45,7 +47,7 @@ public abstract class User implements Serializable {
 
     private List<Userdata> userdata;
 
-    private boolean isAdmin;
+    private boolean isSystemAdmin;
 
     // Values for corpusAccess:
     public enum CorpusAccess	 {

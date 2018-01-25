@@ -2,8 +2,6 @@ package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -12,13 +10,17 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
+import de.ids_mannheim.korap.constant.GroupMemberStatus;
+import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -28,10 +30,11 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
     @Autowired
     private HttpAuthorizationHandler handler;
+    private String username = "UserGroupControllerTest";
 
     // dory is a group admin in dory group
     @Test
-    public void testRetrieveDoryGroups () throws KustvaktException {
+    public void testListDoryGroups () throws KustvaktException {
         ClientResponse response = resource().path("group").path("list")
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue("dory",
@@ -52,7 +55,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
     // nemo is a group member in dory group
     @Test
-    public void testRetrieveNemoGroups () throws KustvaktException {
+    public void testListNemoGroups () throws KustvaktException {
         ClientResponse response = resource().path("group").path("list")
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue("nemo",
@@ -71,9 +74,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(0, node.at("/0/members").size());
     }
 
-    // marlin has a group
+    // marlin has 2 groups
     @Test
-    public void testRetrieveMarlinGroups () throws KustvaktException {
+    public void testListMarlinGroups () throws KustvaktException {
         ClientResponse response = resource().path("group").path("list")
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue("marlin",
@@ -83,12 +86,12 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(1, node.size());
+        assertEquals(2, node.size());
     }
 
 
     @Test
-    public void testRetrieveUserGroupUnauthorized () throws KustvaktException {
+    public void testListUserGroupUnauthorized () throws KustvaktException {
         ClientResponse response = resource().path("group").path("list")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
@@ -99,37 +102,192 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Operation is not permitted for user: guest",
+        assertEquals("Unauthorized operation for user: guest",
                 node.at("/errors/0/1").asText());
     }
 
+    @Test
+    public void testCreateUserGroup () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
 
-//    @Test
-//    public void testInviteMember () {
-//
-//    }
-//
-//    @Test
-//    public void testInviteDeletedMember () {
-//
-//    }
-//    
-//    @Test
-//    public void testDeletePendingMember () {
-//
-//    }
+        UserGroupJson json = new UserGroupJson();
+        json.setName("new user group");
+        json.setMembers(new String[] { "marlin", "nemo" });
 
-    
+        ClientResponse response = resource().path("group").path("create")
+                .type(MediaType.APPLICATION_JSON)
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(username,
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(json)
+                .post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        // list user group
+        response = resource().path("group").path("list")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(username,
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        //        System.out.println(entity);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(1, node.size());
+        node = node.get(0);
+        assertEquals("new user group", node.get("name").asText());
+        String groupId = node.get("id").asText();
+
+        assertEquals(username, node.get("owner").asText());
+        assertEquals(3, node.get("members").size());
+        assertEquals(username, node.at("/members/0/userId").asText());
+        assertEquals(GroupMemberStatus.ACTIVE.name(),
+                node.at("/members/0/status").asText());
+        assertEquals(PredefinedRole.USER_GROUP_ADMIN.name(),
+                node.at("/members/0/roles/0").asText());
+        assertEquals(PredefinedRole.VC_ACCESS_ADMIN.name(),
+                node.at("/members/0/roles/1").asText());
+
+        assertEquals("marlin", node.at("/members/1/userId").asText());
+        assertEquals(GroupMemberStatus.PENDING.name(),
+                node.at("/members/1/status").asText());
+        assertEquals(PredefinedRole.USER_GROUP_MEMBER.name(),
+                node.at("/members/1/roles/0").asText());
+        assertEquals(PredefinedRole.VC_ACCESS_MEMBER.name(),
+                node.at("/members/1/roles/1").asText());
+
+        testDeleteGroupMemberUnauthorized(groupId);
+        testDeleteGroupMember(groupId);
+        testDeleteGroup(groupId);
+    }
+
+    private void testDeleteGroupMemberUnauthorized (String groupId)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        // nemo is a group member
+        ClientResponse response = resource().path("group").path("member")
+                .path("delete").queryParam("memberId", "marlin")
+                .queryParam("groupId", groupId)
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("nemo",
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .delete(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+//        System.out.println(entity);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Unauthorized operation for user: nemo",
+                node.at("/errors/0/1").asText());
+    }
+
+    private void testDeleteGroupMember (String groupId)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        // delete marlin from group
+        ClientResponse response = resource().path("group").path("member")
+                .path("delete").queryParam("memberId", "marlin")
+                .queryParam("groupId", groupId)
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(username,
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .delete(ClientResponse.class);
+
+        // check group member
+        response = resource().path("group").path("list")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(username,
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get(ClientResponse.class);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        node = node.get(0);
+        assertEquals(2, node.get("members").size());
+        assertEquals("nemo", node.at("/members/1/userId").asText());
+        assertEquals(GroupMemberStatus.PENDING.name(),
+                node.at("/members/1/status").asText());
+
+    }
+
+    private void testDeleteGroup (String groupId)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        //delete group
+        ClientResponse response = resource().path("group").path("delete")
+                .queryParam("groupId", groupId)
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(username,
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .delete(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        // check group
+        response = resource().path("group").path("list")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(username,
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get(ClientResponse.class);
+        String entity = response.getEntity(String.class);
+        assertEquals("[]", entity);
+    }
+
+    @Test
+    public void testDeleteGroupOwner () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        // delete marlin from marlin group
+        // dory is a VCA in marlin group
+        ClientResponse response = resource().path("group").path("member")
+                .path("delete").queryParam("memberId", "marlin")
+                .queryParam("groupId", "1")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("dory",
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .delete(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        //        System.out.println(entity);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.NOT_ALLOWED, node.at("/errors/0/0").asInt());
+        assertEquals("Operation 'delete group owner'is not allowed.",
+                node.at("/errors/0/1").asText());
+
+    }
+
+    //    @Test
+    //    public void testInviteMember () {
+    //
+    //    }
+    //
+    //    @Test
+    //    public void testInviteDeletedMember () {
+    //
+    //    }
+    //    
+    //    @Test
+    //    public void testDeletePendingMember () {
+    //
+    //    }
+
+
     // marlin has GroupMemberStatus.PENDING in dory group
     @Test
-    public void testSubscribeUnsubscribeMarlinToDoryGroup ()
-            throws KustvaktException {
+    public void testSubscribeMarlinToDoryGroup () throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("groupId", "2");
 
-        ClientResponse response;
-        String entity;
-        response = resource().path("group").path("subscribe")
+        ClientResponse response = resource().path("group").path("subscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION,
@@ -140,71 +298,84 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         // retrieve marlin group
-        response = resource().path("group").path("list")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("marlin",
-                                "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
-        entity = response.getEntity(String.class);
-
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
-        JsonNode node = JsonUtils.readTree(entity);
+        JsonNode node = retrieveMarlinGroups();
+        System.out.println(node);
         assertEquals(2, node.size());
 
-        JsonNode group;
-        for (int i = 0; i < node.size(); i++) {
-            group = node.get(i);
-            if (group.at("/id").asInt() == 2) {
-                assertEquals("dory group", group.at("/name").asText());
-                assertEquals("dory", group.at("/owner").asText());
-                // group members are not allowed to see other members
-                assertEquals(0, group.at("/members").size());
-            }
-        }
+        JsonNode group = node.get(1);
+        assertEquals(2, group.at("/id").asInt());
+        assertEquals("dory group", group.at("/name").asText());
+        assertEquals("dory", group.at("/owner").asText());
+        // group members are not allowed to see other members
+        assertEquals(0, group.at("/members").size());
+        assertEquals(GroupMemberStatus.ACTIVE.name(),
+                group.at("/userMemberStatus").asText());
 
-        // unsubscribe
-        response = resource().path("group").path("unsubscribe")
+        // unsubscribe marlin from dory group
+        testUnsubscribe(form);
+
+        // invite marlin to dory group to set back the GroupMemberStatus.PENDING
+        testInviteMember();
+    }
+
+    private JsonNode retrieveMarlinGroups () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        ClientResponse response = resource().path("group").path("list")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("marlin",
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get(ClientResponse.class);
+        String entity = response.getEntity(String.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        return JsonUtils.readTree(entity);
+    }
+
+    private void testUnsubscribe (MultivaluedMap<String, String> form)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        ClientResponse response = resource().path("group").path("unsubscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue("marlin",
                                 "pass"))
                 .entity(form).post(ClientResponse.class);
-        entity = response.getEntity(String.class);
-
-        // retrieve marlin group
-        response = resource().path("group").path("list")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("marlin",
-                                "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
-        entity = response.getEntity(String.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        node = JsonUtils.readTree(entity);
+        JsonNode node = retrieveMarlinGroups();
         assertEquals(1, node.size());
+    }
 
-        // add marlin to dory group again to set back the GroupMemberStatus.PENDING
-        ArrayList<String> members = new ArrayList<String>();
-        members.add("marlin");
+    private void testInviteMember () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        String[] members = new String[] { "marlin" };
 
         UserGroupJson userGroup = new UserGroupJson();
         userGroup.setMembers(members);
         // dory group
         userGroup.setId(2);
 
-        response = resource().path("group").path("add")
-                .type(MediaType.APPLICATION_JSON)
+        ClientResponse response = resource().path("group").path("member")
+                .path("invite").type(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue("dory",
                                 "pass"))
                 .entity(userGroup).post(ClientResponse.class);
-        entity = response.getEntity(String.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        // check member
+        JsonNode node = retrieveMarlinGroups();
+        assertEquals(2, node.size());
+        JsonNode group = node.get(1);
+        assertEquals(GroupMemberStatus.PENDING.name(),
+                group.at("/userMemberStatus").asText());
+
     }
 
     // pearl has GroupMemberStatus.DELETED in dory group

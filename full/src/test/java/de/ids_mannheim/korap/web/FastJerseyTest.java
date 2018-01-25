@@ -22,11 +22,9 @@ import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
 import com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory;
 import com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory;
 
-import de.ids_mannheim.korap.config.BeanConfigBaseTest;
-import de.ids_mannheim.korap.config.ContextHolder;
-import de.ids_mannheim.korap.config.TestHelper;
+import de.ids_mannheim.korap.config.BeanConfigTest;
 
-public abstract class FastJerseyTest extends BeanConfigBaseTest{
+public abstract class FastJerseyTest extends BeanConfigTest{
 
     private static String[] classPackages =
             new String[] { "de.ids_mannheim.korap.web.service.full",
@@ -114,20 +112,20 @@ public abstract class FastJerseyTest extends BeanConfigBaseTest{
         return client.resource(getBaseUri());
     }
     
-    protected TestHelper helper () {
-        try {
-            return TestHelper.newInstance(this.context);
-        }
-        catch (Exception e) {
-            return null;
-        }
-    }
-
-
-    @Override
-    protected ContextHolder getContext () {
-        return helper().getContext();
-    }
+//    protected TestHelper helper () {
+//        try {
+//            return TestHelper.newInstance(this.context);
+//        }
+//        catch (Exception e) {
+//            return null;
+//        }
+//    }
+//
+//
+//    @Override
+//    protected ContextHolder getContext () {
+//        return helper().getContext();
+//    }
 
 
     public static void startServer () {

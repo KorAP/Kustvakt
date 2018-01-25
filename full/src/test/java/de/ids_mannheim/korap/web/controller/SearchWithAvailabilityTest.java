@@ -14,20 +14,14 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.TokenType;
+import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.FastJerseyTest;
 
-public class SearchWithAvailabilityTest extends FastJerseyTest {
+public class SearchWithAvailabilityTest extends SpringJerseyTest {
     @Autowired
-    HttpAuthorizationHandler handler;
+    private HttpAuthorizationHandler handler;
     
-    @Override
-    public void initMethod () throws KustvaktException {
-        //        helper().runBootInterfaces();
-    }
-
     private void checkAndFree (String json) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(json);
         assertEquals("availability",

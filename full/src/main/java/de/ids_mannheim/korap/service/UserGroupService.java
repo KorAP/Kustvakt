@@ -66,28 +66,42 @@ public class UserGroupService {
         Collections.sort(userGroups);
         ArrayList<UserGroupDto> dtos = new ArrayList<>(userGroups.size());
 
-        List<UserGroupMember> groupAdmins;
+        UserGroupMember userAsMember;
+        List<UserGroupMember> members;
         for (UserGroup group : userGroups) {
-            groupAdmins = groupMemberDao.retrieveMemberByRole(group.getId(),
-                    PredefinedRole.USER_GROUP_ADMIN.getId());
-
-            List<UserGroupMember> members = null;
-            for (UserGroupMember admin : groupAdmins) {
-                if (admin.getUserId().equals(username)) {
-                    members = groupMemberDao
-                            .retrieveMemberByGroupId(group.getId());
-                    break;
-                }
-            }
-            dtos.add(converter.createUserGroupDto(group, members));
+            members = retrieveMembers(group.getId(), username);
+            userAsMember =
+                    groupMemberDao.retrieveMemberById(username, group.getId());
+            dtos.add(converter.createUserGroupDto(group, members,
+                    userAsMember.getStatus()));
         }
 
         return dtos;
     }
 
+    private List<UserGroupMember> retrieveMembers (int groupId, String username)
+            throws KustvaktException {
+        List<UserGroupMember> groupAdmins = groupMemberDao.retrieveMemberByRole(
+                groupId, PredefinedRole.USER_GROUP_ADMIN.getId());
+
+        List<UserGroupMember> members = null;
+        for (UserGroupMember admin : groupAdmins) {
+            if (admin.getUserId().equals(username)) {
+                members = groupMemberDao.retrieveMemberByGroupId(groupId);
+                break;
+            }
+        }
+        
+        return members;
+    }
+
     public UserGroup retrieveUserGroupById (int groupId)
             throws KustvaktException {
         return userGroupDao.retrieveGroupById(groupId);
+    }
+
+    public UserGroup retrieveHiddenGroup (int vcId) throws KustvaktException {
+        return userGroupDao.retrieveHiddenGroupByVC(vcId);
     }
 
     public List<UserGroupMember> retrieveVCAccessAdmins (UserGroup userGroup)
@@ -104,6 +118,15 @@ public class UserGroupService {
         return groupAdmins;
     }
 
+    private void setMemberRoles () {
+        if (memberRoles == null) {
+            memberRoles = new ArrayList<Role>(2);
+            memberRoles.add(roleDao.retrieveRoleById(
+                    PredefinedRole.USER_GROUP_MEMBER.getId()));
+            memberRoles.add(roleDao
+                    .retrieveRoleById(PredefinedRole.VC_ACCESS_MEMBER.getId()));
+        }
+    }
 
     /** Group owner is automatically added when creating a group. 
      *  Do not include owners in group members. 
@@ -122,43 +145,37 @@ public class UserGroupService {
      * @see /full/src/main/resources/db/predefined/V3.2__insert_predefined_roles.sql
      * 
      * @param groupJson UserGroupJson object from json
-     * @param username the user creating the group
+     * @param createdBy the user creating the group
      * @throws KustvaktException
      * 
      * 
      */
-    public void createUserGroup (UserGroupJson groupJson, String username)
+    public void createUserGroup (UserGroupJson groupJson, String createdBy)
             throws KustvaktException {
 
-        int groupId = userGroupDao.createGroup(groupJson.getName(), username,
+        int groupId = userGroupDao.createGroup(groupJson.getName(), createdBy,
                 UserGroupStatus.ACTIVE);
-        UserGroup group = userGroupDao.retrieveGroupById(groupId);
+        UserGroup userGroup = userGroupDao.retrieveGroupById(groupId);
 
         setMemberRoles();
 
-        UserGroupMember m;
+
         for (String memberId : groupJson.getMembers()) {
-            if (memberId.equals(username)) {
+            if (memberId.equals(createdBy)) {
                 // skip owner, already added while creating group.
                 continue;
             }
-
-            m = new UserGroupMember();
-            m.setUserId(memberId);
-            m.setCreatedBy(username);
-            m.setGroup(group);
-            m.setStatus(GroupMemberStatus.PENDING);
-            m.setRoles(memberRoles);
+            addGroupMember(memberId, userGroup, createdBy,
+                    GroupMemberStatus.PENDING);
         }
     }
 
-    private void setMemberRoles () {
-        if (memberRoles == null) {
-            memberRoles = new ArrayList<Role>(2);
-            memberRoles.add(roleDao.retrieveRoleById(
-                    PredefinedRole.USER_GROUP_MEMBER.getId()));
-            memberRoles.add(roleDao
-                    .retrieveRoleById(PredefinedRole.VC_ACCESS_MEMBER.getId()));
+    public void deleteGroup (int groupId, String username)
+            throws KustvaktException {
+        User user = authManager.getUser(username);
+        UserGroup userGroup = userGroupDao.retrieveGroupById(groupId);
+        if (userGroup.getCreatedBy().equals(username) || user.isSystemAdmin()) {
+            userGroupDao.deleteGroup(groupId, username, false);
         }
     }
 
@@ -191,7 +208,7 @@ public class UserGroupService {
      * @param status the status of the membership
      * @throws KustvaktException
      */
-    public void addUserToGroup (String username, UserGroup userGroup,
+    public void addGroupMember (String username, UserGroup userGroup,
             String createdBy, GroupMemberStatus status)
             throws KustvaktException {
 
@@ -227,11 +244,12 @@ public class UserGroupService {
             return false;
         }
 
-        GroupMemberStatus memberStatus = existingMember.getStatus();
-        if (memberStatus.equals(status)) {
+        GroupMemberStatus existingStatus = existingMember.getStatus();
+        if (existingStatus.equals(GroupMemberStatus.ACTIVE)
+                || existingStatus.equals(status)) {
             return true;
         }
-        else if (memberStatus.equals(GroupMemberStatus.DELETED)) {
+        else if (existingStatus.equals(GroupMemberStatus.DELETED)) {
             // hard delete
             groupMemberDao.deleteMember(username, groupId, "system", false);
         }
@@ -242,15 +260,15 @@ public class UserGroupService {
     public void addUsersToGroup (UserGroupJson group, String username)
             throws KustvaktException {
         int groupId = group.getId();
-        List<String> members = group.getMembers();
+        String[] members = group.getMembers();
         ParameterChecker.checkIntegerValue(groupId, "id");
         ParameterChecker.checkObjectValue(members, "members");
 
         UserGroup userGroup = retrieveUserGroupById(groupId);
         User user = authManager.getUser(username);
-        if (isUserGroupAdmin(username, userGroup) || user.isAdmin()) {
+        if (isUserGroupAdmin(username, userGroup) || user.isSystemAdmin()) {
             for (String memberName : members) {
-                addUserToGroup(memberName, userGroup, username,
+                addGroupMember(memberName, userGroup, username,
                         GroupMemberStatus.PENDING);
             }
         }
@@ -311,9 +329,23 @@ public class UserGroupService {
         return false;
     }
 
-    public UserGroup retrieveHiddenGroup (int vcId) throws KustvaktException {
-        return userGroupDao.retrieveHiddenGroupByVC(vcId);
+    public void deleteGroupMember (String memberId, int groupId,
+            String deletedBy) throws KustvaktException {
+        User user = authManager.getUser(deletedBy);
+        UserGroup userGroup = userGroupDao.retrieveGroupById(groupId);
+        if (memberId.equals(userGroup.getCreatedBy())) {
+            throw new KustvaktException(StatusCodes.NOT_ALLOWED,
+                    "Operation " + "'delete group owner'" + "is not allowed.",
+                    "delete group owner");
+        }
+        else if (isUserGroupAdmin(deletedBy, userGroup)
+                || user.isSystemAdmin()) {
+            groupMemberDao.deleteMember(memberId, groupId, deletedBy, false);
+        }
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + deletedBy, deletedBy);
+        }
     }
-
 
 }
