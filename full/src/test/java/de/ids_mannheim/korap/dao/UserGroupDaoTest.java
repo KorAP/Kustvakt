@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
@@ -35,10 +36,12 @@ public class UserGroupDaoTest {
     private VirtualCorpusDao virtualCorpusDao;
     @Autowired
     private RoleDao roleDao;
+    @Autowired
+    private FullConfiguration config;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
+    
 
     @Test
     public void createDeleteNewUserGroup () throws KustvaktException {
@@ -74,7 +77,7 @@ public class UserGroupDaoTest {
         assertEquals(0, vc.size());
 
         // soft delete group
-        userGroupDao.deleteGroup(groupId, createdBy, true);
+        userGroupDao.deleteGroup(groupId, createdBy, config.isSoftDeleteGroup());
         group = userGroupDao.retrieveGroupById(groupId);
         assertEquals(UserGroupStatus.DELETED, group.getStatus());
 

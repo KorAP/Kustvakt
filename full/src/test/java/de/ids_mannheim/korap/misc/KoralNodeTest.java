@@ -1,8 +1,12 @@
 package de.ids_mannheim.korap.misc;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import de.ids_mannheim.korap.resource.rewrite.KoralNode;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import org.junit.Test;
 
 /**
  * @author hanl
@@ -18,7 +22,7 @@ public class KoralNodeTest {
         KoralNode knode = KoralNode.wrapNode(node);
         knode.put("value_1", "setting_1");
 
-        System.out.println(knode.rawNode().toString());
+        assertEquals("{\"value_1\":\"setting_1\"}",knode.rawNode().toString());
     }
 
 
@@ -28,7 +32,7 @@ public class KoralNodeTest {
         node.put("value_1", "setting_1");
         KoralNode knode = KoralNode.wrapNode(node);
         knode.remove("value_1", null);
-        System.out.println(knode.rawNode().toString());
+        assertEquals("{}",knode.rawNode().toString());
     }
 
 
@@ -38,7 +42,7 @@ public class KoralNodeTest {
         node.put("value_1", "setting_1");
         KoralNode knode = KoralNode.wrapNode(node);
         knode.replace("value_1", "settings_2", null);
-        System.out.println(knode.rawNode().toString());
+        assertEquals("{\"value_1\":\"settings_2\"}",knode.rawNode().toString());
     }
 
 

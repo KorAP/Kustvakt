@@ -60,12 +60,18 @@ public class UserGroupMemberDao {
         entityManager.persist(member);
     }
 
-    public void deleteMember (String userId, int groupId, String deletedBy, boolean isSoftDelete)
-            throws KustvaktException {
+    public void deleteMember (String userId, int groupId, String deletedBy,
+            boolean isSoftDelete) throws KustvaktException {
         ParameterChecker.checkStringValue(userId, "userId");
         ParameterChecker.checkIntegerValue(groupId, "groupId");
 
         UserGroupMember member = retrieveMemberById(userId, groupId);
+        GroupMemberStatus status = member.getStatus();
+        if (isSoftDelete && status.equals(GroupMemberStatus.DELETED)) {
+            throw new KustvaktException(StatusCodes.DB_ENTRY_DELETED,
+                    userId + " has already been deleted from the group.",
+                    userId);
+        }
 
         if (isSoftDelete) {
             member.setStatus(GroupMemberStatus.DELETED);

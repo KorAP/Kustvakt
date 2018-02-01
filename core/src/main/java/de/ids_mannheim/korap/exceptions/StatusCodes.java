@@ -15,7 +15,7 @@ public class StatusCodes {
      */
     public static final int DEFAULT_ERROR = 100;
     public static final int NO_RESULT_FOUND = 101;
-    public static final int ENTRY_EXISTS = 102;
+
     public static final int UNSUPPORTED_OPERATION = 103;
     public static final int ILLEGAL_ARGUMENT = 104;
     public static final int MISSING_ARGUMENT = 105;
@@ -79,7 +79,9 @@ public class StatusCodes {
     public static final int DB_INSERT_SUCCESSFUL = 505;
     public static final int DB_DELETE_SUCCESSFUL = 506;
     public static final int DB_UPDATE_SUCCESSFUL = 507;
-
+    
+    public static final int DB_ENTRY_EXISTS = 508;
+    public static final int DB_ENTRY_DELETED = 509;
 
 //    public static final int ARGUMENT_VALIDATION_FAILURE = 700;
     // public static final int ARGUMENT_VALIDATION_FAILURE = 701;

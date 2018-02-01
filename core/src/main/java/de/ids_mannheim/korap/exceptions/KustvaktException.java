@@ -30,8 +30,10 @@ public class KustvaktException extends Exception {
     }
     
     public KustvaktException (int status, String ... args) {
+        super(args[0]);
         this.statusCode = status;
-        this.entity = Arrays.asList(args).toString();
+        String[] subarray = Arrays.copyOfRange(args, 1, args.length);
+        this.entity = Arrays.asList(subarray).toString();
     }
 
     public KustvaktException (int status, String notification, boolean isNotification) {

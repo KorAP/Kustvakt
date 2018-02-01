@@ -1,7 +1,9 @@
-0.59.10 2018-01-25 
+0.59.10 2018-02-01 
 	- updated hibernate and reflection versions (margaretha)
 	- added Changes file (margaretha)
 	- merged BeanConfigBaseTest to BeanConfigTest in /full (margaretha)
+	- added status code for already deleted entry (margaretha)
+	- updated library versions and java environment (margaretha)	
 0.59.9 	2017-11-08
 	- fixed missing exception in JsonUtils (margaretha)
 	- fixed and restructured KustvaktResponseHandler (margaretha)

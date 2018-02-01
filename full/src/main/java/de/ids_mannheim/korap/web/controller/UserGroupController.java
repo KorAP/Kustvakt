@@ -111,6 +111,12 @@ public class UserGroupController {
         }
     }
 
+    /** Only group owner and system admins can delete groups. 
+     * 
+     * @param securityContext
+     * @param groupId
+     * @return HTTP 200, if successful.
+     */
     @DELETE
     @Path("delete")
     @Consumes(MediaType.APPLICATION_JSON)

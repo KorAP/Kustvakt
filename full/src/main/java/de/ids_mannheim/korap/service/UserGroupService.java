@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
@@ -46,6 +47,8 @@ public class UserGroupService {
     private UserGroupConverter converter;
     @Autowired
     private AuthenticationManagerIface authManager;
+    @Autowired
+    private FullConfiguration config;
 
     private static List<Role> memberRoles;
 
@@ -91,7 +94,7 @@ public class UserGroupService {
                 break;
             }
         }
-        
+
         return members;
     }
 
@@ -175,7 +178,13 @@ public class UserGroupService {
         User user = authManager.getUser(username);
         UserGroup userGroup = userGroupDao.retrieveGroupById(groupId);
         if (userGroup.getCreatedBy().equals(username) || user.isSystemAdmin()) {
-            userGroupDao.deleteGroup(groupId, username, false);
+            // soft delete
+            userGroupDao.deleteGroup(groupId, username,
+                    config.isSoftDeleteGroup());
+        }
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
         }
     }
 
@@ -190,7 +199,7 @@ public class UserGroupService {
     public void deleteAutoHiddenGroup (int groupId, String deletedBy)
             throws KustvaktException {
         // default hard delete
-        userGroupDao.deleteGroup(groupId, deletedBy, false);
+        userGroupDao.deleteGroup(groupId, deletedBy, config.isSoftDeleteAutoGroup());
     }
 
     /** Adds a user to the specified usergroup. If the username with 
@@ -216,9 +225,10 @@ public class UserGroupService {
         ParameterChecker.checkIntegerValue(groupId, "userGroupId");
 
         if (memberExists(username, groupId, status)) {
-            throw new KustvaktException(StatusCodes.ENTRY_EXISTS,
-                    "Username: " + username + " with status " + status
-                            + " exists in usergroup " + userGroup.getName());
+            throw new KustvaktException(StatusCodes.DB_ENTRY_EXISTS,
+                    "Username " + username + " with status " + status
+                            + " exists in user-group " + userGroup.getName(),
+                    username, status.name(), userGroup.getName());
         }
 
         setMemberRoles();
@@ -250,7 +260,7 @@ public class UserGroupService {
             return true;
         }
         else if (existingStatus.equals(GroupMemberStatus.DELETED)) {
-            // hard delete
+            // hard delete, not customizable
             groupMemberDao.deleteMember(username, groupId, "system", false);
         }
 
@@ -312,7 +322,8 @@ public class UserGroupService {
      */
     public void unsubscribe (int groupId, String username)
             throws KustvaktException {
-        groupMemberDao.deleteMember(username, groupId, username, true);
+        groupMemberDao.deleteMember(username, groupId, username,
+                config.isSoftDeleteGroupMember());
     }
 
 
@@ -340,7 +351,9 @@ public class UserGroupService {
         }
         else if (isUserGroupAdmin(deletedBy, userGroup)
                 || user.isSystemAdmin()) {
-            groupMemberDao.deleteMember(memberId, groupId, deletedBy, false);
+            // soft delete
+            groupMemberDao.deleteMember(memberId, groupId, deletedBy,
+                    config.isSoftDeleteGroupMember());
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,

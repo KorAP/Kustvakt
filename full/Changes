@@ -1,4 +1,4 @@
-0.59.10	2018-01-25 
+0.59.10	2018-02-01 
 	- added sort VC by id (margaretha)
 	- added test cases regarding VC sharing (margaretha)
 	- implemented withdraw VC from publication (margaretha)
@@ -6,7 +6,10 @@
 	- implemented add users to group (margaretha)
 	- implemented delete user-group and member tasks (margaretha)
 	- added userMemberStatus in group lists (margaretha)
-	- updated sql test data (margaretha)
+	- updated and added SQL test data (margaretha)
+	- added user group related tests (margaretha)
+	- implemented custom configuration for deleting user groups and members (margaretha)
+	- updated library versions and java environment (margaretha)
 	
 0.59.9 2018-01-19
 	- restructured basic authentication (margaretha)
@@ -51,7 +54,5 @@
 	- fixed missing exceptions in JsonUtils (margaretha)
 	- restructured web filters and authentication codes (margaretha)
 	- implemented create/store VC (margaretha)
-	- fixed collection rewrite bug regarding availability with operation or (margaretha)
-	
-	
+	- fixed collection rewrite bug regarding availability with operation or (margaretha)	
     

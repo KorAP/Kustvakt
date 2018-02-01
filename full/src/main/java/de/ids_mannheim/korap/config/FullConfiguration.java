@@ -31,6 +31,10 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     private String authenticationScheme;
 
+    private boolean isSoftDeleteAutoGroup;
+    private boolean isSoftDeleteGroup;
+    private boolean isSoftDeleteGroupMember;
+
     public FullConfiguration (Properties properties) throws IOException {
         super(properties);
     }
@@ -44,23 +48,35 @@ public class FullConfiguration extends KustvaktConfiguration {
 
         // EM: pattern for matching availability in Krill matches
         setLicensePatterns(properties);
-
+        setDeleteConfiguration(properties);
         ldapConfig = properties.getProperty("ldap.config");
+    }
+
+    private void setDeleteConfiguration (Properties properties) {
+        setSoftDeleteGroup(parseDeleteConfig(properties.getProperty("delete.group", "")));
+        setSoftDeleteAutoGroup(parseDeleteConfig(properties.getProperty("delete.auto.group", "")));
+        setSoftDeleteGroupMember(parseDeleteConfig(
+                properties.getProperty("delete.group.member", "")));
+    }
+
+    private boolean parseDeleteConfig (String deleteConfig) {
+        return deleteConfig.equals("soft") ? true : false;
     }
 
     private void setLicensePatterns (Properties properties) {
         setFreeLicensePattern(compilePattern(getFreeOnlyRegex()));
-        setPublicLicensePattern(
-                compilePattern(getFreeOnlyRegex() + "|" + getPublicOnlyRegex()));
-        setAllLicensePattern(compilePattern(
-                getFreeOnlyRegex() + "|" + getPublicOnlyRegex() + "|" + getAllOnlyRegex()));
+        setPublicLicensePattern(compilePattern(
+                getFreeOnlyRegex() + "|" + getPublicOnlyRegex()));
+        setAllLicensePattern(compilePattern(getFreeOnlyRegex() + "|"
+                + getPublicOnlyRegex() + "|" + getAllOnlyRegex()));
     }
 
     private void setLicenseRegex (Properties properties) {
         setFreeOnlyRegex(properties.getProperty("availability.regex.free", ""));
         freeRegexList = splitAndAddToList(getFreeOnlyRegex());
 
-        setPublicOnlyRegex(properties.getProperty("availability.regex.public", ""));
+        setPublicOnlyRegex(
+                properties.getProperty("availability.regex.public", ""));
         publicRegexList = splitAndAddToList(getPublicOnlyRegex());
 
         setAllOnlyRegex(properties.getProperty("availability.regex.all", ""));
@@ -76,7 +92,7 @@ public class FullConfiguration extends KustvaktConfiguration {
                 list.add(s.trim());
             }
         }
-        else{
+        else {
             list = new ArrayList<>(1);
             list.add(regex);
         }
@@ -175,6 +191,30 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     public void setAllOnlyRegex (String allOnlyRegex) {
         this.allOnlyRegex = allOnlyRegex;
+    }
+
+    public boolean isSoftDeleteGroup () {
+        return isSoftDeleteGroup;
+    }
+
+    public void setSoftDeleteGroup (boolean isSoftDeleteGroup) {
+        this.isSoftDeleteGroup = isSoftDeleteGroup;
+    }
+
+    public boolean isSoftDeleteGroupMember () {
+        return isSoftDeleteGroupMember;
+    }
+
+    public void setSoftDeleteGroupMember (boolean isSoftDeleteGroupMember) {
+        this.isSoftDeleteGroupMember = isSoftDeleteGroupMember;
+    }
+
+    public boolean isSoftDeleteAutoGroup () {
+        return isSoftDeleteAutoGroup;
+    }
+
+    public void setSoftDeleteAutoGroup (boolean isSoftDeleteAutoGroup) {
+        this.isSoftDeleteAutoGroup = isSoftDeleteAutoGroup;
     }
 
 }
