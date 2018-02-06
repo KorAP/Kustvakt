@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS user_group_member (
   status varchar(100) NOT NULL,
   created_by varchar(100) NOT NULL,
   deleted_by varchar(100) DEFAULT NULL,
+  status_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE INDEX unique_index (user_id,group_id),
   INDEX status_index(status),
   FOREIGN KEY (group_id) 

@@ -36,45 +36,34 @@ public class UserGroupMemberDao {
         entityManager.persist(member);
     }
 
-    public void addMembers (List<UserGroupMember> members)
-            throws KustvaktException {
-        ParameterChecker.checkObjectValue(members, "List<UserGroupMember>");
+//    @Deprecated
+//    public void addMembers (List<UserGroupMember> members)
+//            throws KustvaktException {
+//        ParameterChecker.checkObjectValue(members, "List<UserGroupMember>");
+//
+//        for (UserGroupMember member : members) {
+//            addMember(member);
+//        }
+//    }
 
-        for (UserGroupMember member : members) {
-            addMember(member);
-        }
+    public void updateMember (UserGroupMember member)
+            throws KustvaktException {
+        ParameterChecker.checkObjectValue(member, "UserGroupMember");
+        entityManager.merge(member);
     }
 
-    public void approveMember (String userId, int groupId)
-            throws KustvaktException {
-        ParameterChecker.checkStringValue(userId, "userId");
-        ParameterChecker.checkIntegerValue(groupId, "groupId");
-
-        UserGroupMember member = retrieveMemberById(userId, groupId);
-        if (member.getStatus().equals(GroupMemberStatus.DELETED)) {
-            throw new KustvaktException(StatusCodes.NOTHING_CHANGED, "Username "
-                    + userId + " had been deleted in group " + groupId, userId);
-        }
-
-        member.setStatus(GroupMemberStatus.ACTIVE);
-        entityManager.persist(member);
-    }
-
-    public void deleteMember (String userId, int groupId, String deletedBy,
+    public void deleteMember (UserGroupMember member, String deletedBy,
             boolean isSoftDelete) throws KustvaktException {
-        ParameterChecker.checkStringValue(userId, "userId");
-        ParameterChecker.checkIntegerValue(groupId, "groupId");
+        ParameterChecker.checkObjectValue(member, "UserGroupMember");
+        ParameterChecker.checkStringValue(deletedBy, "deletedBy");
 
-        UserGroupMember member = retrieveMemberById(userId, groupId);
-        GroupMemberStatus status = member.getStatus();
-        if (isSoftDelete && status.equals(GroupMemberStatus.DELETED)) {
-            throw new KustvaktException(StatusCodes.DB_ENTRY_DELETED,
-                    userId + " has already been deleted from the group.",
-                    userId);
+        if (!entityManager.contains(member)) {
+            member = entityManager.merge(member);
         }
 
         if (isSoftDelete) {
             member.setStatus(GroupMemberStatus.DELETED);
+            member.setDeletedBy(deletedBy);
             entityManager.persist(member);
         }
         else {

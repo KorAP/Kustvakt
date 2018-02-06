@@ -35,6 +35,8 @@ CREATE TABLE IF NOT EXISTS user_group_member (
   status varchar(100) NOT NULL,
   created_by varchar(100) NOT NULL,
   deleted_by varchar(100) DEFAULT NULL,
+-- interprets now as localtime and save it as UTC
+  status_date timestamp DEFAULT (datetime('now','localtime')),
   FOREIGN KEY (group_id) 
   	REFERENCES user_group (id)
   	ON DELETE CASCADE

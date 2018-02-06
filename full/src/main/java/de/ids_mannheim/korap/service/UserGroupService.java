@@ -1,9 +1,15 @@
 package de.ids_mannheim.korap.service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +43,8 @@ import de.ids_mannheim.korap.web.input.UserGroupJson;
 @Service
 public class UserGroupService {
 
+    private static Logger jlog =
+            LoggerFactory.getLogger(UserGroupService.class);
     @Autowired
     private UserGroupDao userGroupDao;
     @Autowired
@@ -199,7 +207,8 @@ public class UserGroupService {
     public void deleteAutoHiddenGroup (int groupId, String deletedBy)
             throws KustvaktException {
         // default hard delete
-        userGroupDao.deleteGroup(groupId, deletedBy, config.isSoftDeleteAutoGroup());
+        userGroupDao.deleteGroup(groupId, deletedBy,
+                config.isSoftDeleteAutoGroup());
     }
 
     /** Adds a user to the specified usergroup. If the username with 
@@ -225,9 +234,10 @@ public class UserGroupService {
         ParameterChecker.checkIntegerValue(groupId, "userGroupId");
 
         if (memberExists(username, groupId, status)) {
-            throw new KustvaktException(StatusCodes.DB_ENTRY_EXISTS,
+            throw new KustvaktException(StatusCodes.GROUP_MEMBER_EXISTS,
                     "Username " + username + " with status " + status
-                            + " exists in user-group " + userGroup.getName(),
+                            + " exists in the user-group "
+                            + userGroup.getName(),
                     username, status.name(), userGroup.getName());
         }
 
@@ -261,7 +271,7 @@ public class UserGroupService {
         }
         else if (existingStatus.equals(GroupMemberStatus.DELETED)) {
             // hard delete, not customizable
-            groupMemberDao.deleteMember(username, groupId, "system", false);
+            deleteMember(username, groupId, "system", false);
         }
 
         return false;
@@ -307,25 +317,46 @@ public class UserGroupService {
      * @param username the username of the group member
      * @throws KustvaktException
      */
-    public void subscribe (int groupId, String username)
+    public void acceptInvitation (int groupId, String username)
             throws KustvaktException {
-        groupMemberDao.approveMember(username, groupId);
+
+        ParameterChecker.checkStringValue(username, "userId");
+        ParameterChecker.checkIntegerValue(groupId, "groupId");
+
+        UserGroupMember member =
+                groupMemberDao.retrieveMemberById(username, groupId);
+        GroupMemberStatus status = member.getStatus();
+        if (status.equals(GroupMemberStatus.DELETED)) {
+            UserGroup group = userGroupDao.retrieveGroupById(groupId);
+            throw new KustvaktException(StatusCodes.GROUP_MEMBER_DELETED,
+                    username + " has already been deleted from the group "
+                            + group.getName(),
+                    username, group.getName());
+        }
+        else if (member.getStatus().equals(GroupMemberStatus.ACTIVE)) {
+            UserGroup userGroup = retrieveUserGroupById(groupId);
+            throw new KustvaktException(StatusCodes.GROUP_MEMBER_EXISTS,
+                    "Username " + username + " with status " + status
+                            + " exists in the user-group "
+                            + userGroup.getName(),
+                    username, status.name(), userGroup.getName());
+        }
+        // status pending
+        else {
+            jlog.debug("status: " +member.getStatusDate());
+            ZonedDateTime expiration = member.getStatusDate().plusMinutes(30);
+            ZonedDateTime now = ZonedDateTime.now();
+            jlog.debug("expiration: " + expiration + ", now: " + now);
+
+            if (expiration.isAfter(now)){
+                member.setStatus(GroupMemberStatus.ACTIVE);
+                groupMemberDao.updateMember(member);
+            }
+            else{
+                throw new KustvaktException(StatusCodes.INVITATION_EXPIRED);
+            }
+        }
     }
-
-
-    /** Updates the {@link GroupMemberStatus} of a member to 
-     * {@link GroupMemberStatus#DELETED}
-     * 
-     * @param groupId groupId
-     * @param username member's username
-     * @throws KustvaktException
-     */
-    public void unsubscribe (int groupId, String username)
-            throws KustvaktException {
-        groupMemberDao.deleteMember(username, groupId, username,
-                config.isSoftDeleteGroupMember());
-    }
-
 
     public boolean isMember (String username, UserGroup userGroup)
             throws KustvaktException {
@@ -349,10 +380,11 @@ public class UserGroupService {
                     "Operation " + "'delete group owner'" + "is not allowed.",
                     "delete group owner");
         }
-        else if (isUserGroupAdmin(deletedBy, userGroup)
+        else if (memberId.equals(deletedBy)
+                || isUserGroupAdmin(deletedBy, userGroup)
                 || user.isSystemAdmin()) {
             // soft delete
-            groupMemberDao.deleteMember(memberId, groupId, deletedBy,
+            deleteMember(memberId, groupId, deletedBy,
                     config.isSoftDeleteGroupMember());
         }
         else {
@@ -361,4 +393,29 @@ public class UserGroupService {
         }
     }
 
+    /** Updates the {@link GroupMemberStatus} of a member to 
+     * {@link GroupMemberStatus#DELETED}
+     * 
+     * @param userId user to be deleted
+     * @param groupId user-group id
+     * @param deletedBy user that issue the delete 
+     * @param isSoftDelete true if database entry is to be deleted 
+     * permanently, false otherwise
+     * @throws KustvaktException
+     */
+    private void deleteMember (String username, int groupId, String deletedBy,
+            boolean isSoftDelete) throws KustvaktException {
+        UserGroupMember member =
+                groupMemberDao.retrieveMemberById(username, groupId);
+        GroupMemberStatus status = member.getStatus();
+        if (isSoftDelete && status.equals(GroupMemberStatus.DELETED)) {
+            UserGroup group = userGroupDao.retrieveGroupById(groupId);
+            throw new KustvaktException(StatusCodes.GROUP_MEMBER_DELETED,
+                    username + " has already been deleted from the group "
+                            + group.getName(),
+                    username, group.getName());
+        }
+
+        groupMemberDao.deleteMember(member, deletedBy, isSoftDelete);
+    }
 }

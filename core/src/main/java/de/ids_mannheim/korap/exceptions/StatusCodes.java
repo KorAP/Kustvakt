@@ -79,9 +79,14 @@ public class StatusCodes {
     public static final int DB_INSERT_SUCCESSFUL = 505;
     public static final int DB_DELETE_SUCCESSFUL = 506;
     public static final int DB_UPDATE_SUCCESSFUL = 507;
-    
     public static final int DB_ENTRY_EXISTS = 508;
-    public static final int DB_ENTRY_DELETED = 509;
+    
+    
+    // User group and member 
+    public static final int GROUP_MEMBER_EXISTS = 601;
+    public static final int GROUP_MEMBER_DELETED = 602;
+    public static final int INVITATION_EXPIRED = 602;
+    
 
 //    public static final int ARGUMENT_VALIDATION_FAILURE = 700;
     // public static final int ARGUMENT_VALIDATION_FAILURE = 701;

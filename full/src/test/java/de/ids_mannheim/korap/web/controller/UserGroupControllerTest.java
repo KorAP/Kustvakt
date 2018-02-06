@@ -236,6 +236,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 node.at("/errors/0/1").asText());
     }
 
+    // EM: same as cancel invitation
     private void testDeletePendingMember () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         // dory delete pearl
@@ -270,14 +271,14 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 .delete(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
-        System.out.println(entity);
+        //        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        assertEquals(StatusCodes.DB_ENTRY_DELETED,
+        assertEquals(StatusCodes.GROUP_MEMBER_DELETED,
                 node.at("/errors/0/0").asInt());
-        assertEquals("pearl has already been deleted from the group.",
+        assertEquals("pearl has already been deleted from the group dory group",
                 node.at("/errors/0/1").asText());
-        assertEquals("pearl", node.at("/errors/0/2").asText());
+        assertEquals("[pearl, dory group]", node.at("/errors/0/2").asText());
     }
 
     private void testDeleteGroup (String groupId)
@@ -442,7 +443,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         //        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        assertEquals(StatusCodes.DB_ENTRY_EXISTS,
+        assertEquals(StatusCodes.GROUP_MEMBER_EXISTS,
                 node.at("/errors/0/0").asInt());
         assertEquals("Username marlin with status PENDING exists in user-group "
                 + "dory group", node.at("/errors/0/1").asText());
@@ -469,8 +470,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                                 "pass"))
                 .entity(userGroup).post(ClientResponse.class);
 
-//        String entity = response.getEntity(String.class);
-//        System.out.println(entity);
+                String entity = response.getEntity(String.class);
+                System.out.println(entity);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         // check member
@@ -625,4 +626,62 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(1, node.size());
     }
 
+    @Test
+    public void testUnsubscribeDeletedMember ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        // pearl unsubscribes from dory group 
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        // dory group
+        form.add("groupId", "2");
+
+        ClientResponse response = resource().path("group").path("unsubscribe")
+                .type(MediaType.APPLICATION_FORM_URLENCODED)
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("pearl",
+                                "pass"))
+                .entity(form).post(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        //        System.out.println(entity);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.GROUP_MEMBER_DELETED,
+                node.at("/errors/0/0").asInt());
+        assertEquals("pearl has already been deleted from the group dory group",
+                node.at("/errors/0/1").asText());
+        assertEquals("[pearl, dory group]", node.at("/errors/0/2").asText());
+    }
+    
+    @Test
+    public void testUnsubscribePendingMember ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+
+        JsonNode node = retrieveUserGroups("marlin");
+        assertEquals(2, node.size());
+        
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        // dory group
+        form.add("groupId", "2");
+
+        ClientResponse response = resource().path("group").path("unsubscribe")
+                .type(MediaType.APPLICATION_FORM_URLENCODED)
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("marlin",
+                                "pass"))
+                .entity(form).post(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        //        System.out.println(entity);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+         node = retrieveUserGroups("marlin");
+        assertEquals(1, node.size());
+        
+        // invite marlin to dory group to set back the GroupMemberStatus.PENDING
+        testInviteDeletedMember();
+    }
 }

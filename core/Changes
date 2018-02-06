@@ -3,7 +3,8 @@
 	- added Changes file (margaretha)
 	- merged BeanConfigBaseTest to BeanConfigTest in /full (margaretha)
 	- added status code for already deleted entry (margaretha)
-	- updated library versions and java environment (margaretha)	
+	- updated library versions and java environment (margaretha)
+	- added status codes (margaretha)
 0.59.9 	2017-11-08
 	- fixed missing exception in JsonUtils (margaretha)
 	- fixed and restructured KustvaktResponseHandler (margaretha)

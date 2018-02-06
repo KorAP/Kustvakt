@@ -59,6 +59,11 @@ public class UserGroupController {
     @Autowired
     private UserGroupService service;
 
+    /** Returns all user-groups wherein a user is an active or pending member.
+     * 
+     * @param securityContext
+     * @return a list of user-groups
+     */
     @GET
     @Path("list")
     public Response getUserGroup (@Context SecurityContext securityContext) {
@@ -120,8 +125,7 @@ public class UserGroupController {
     @DELETE
     @Path("delete")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteUserGroup (
-            @Context SecurityContext securityContext,
+    public Response deleteUserGroup (@Context SecurityContext securityContext,
             @QueryParam("groupId") int groupId) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
@@ -133,7 +137,7 @@ public class UserGroupController {
             throw responseHandler.throwit(e);
         }
     }
-    
+
     /** Group owner cannot be deleted.
      * 
      * @param securityContext
@@ -183,7 +187,7 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            service.subscribe(groupId, context.getUsername());
+            service.acceptInvitation(groupId, context.getUsername());
             return Response.ok().build();
         }
         catch (KustvaktException e) {
@@ -200,7 +204,8 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            service.unsubscribe(groupId, context.getUsername());
+            service.deleteGroupMember(context.getUsername(), groupId,
+                    context.getUsername());
             return Response.ok().build();
         }
         catch (KustvaktException e) {

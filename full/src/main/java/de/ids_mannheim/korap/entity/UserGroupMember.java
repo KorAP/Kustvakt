@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.entity;
 
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -47,6 +49,10 @@ public class UserGroupMember {
     private String createdBy;
     @Column(name = "deleted_by")
     private String deletedBy;
+    
+    // auto update in the database
+    @Column(name = "status_date")
+    private ZonedDateTime statusDate;
 
     @Enumerated(EnumType.STRING)
     private GroupMemberStatus status;

@@ -1,15 +1,16 @@
-0.59.10	2018-02-01 
+0.59.10	2018-02-06 
 	- added sort VC by id (margaretha)
 	- added test cases regarding VC sharing (margaretha)
 	- implemented withdraw VC from publication (margaretha)
 	- added Changes file (margaretha)
-	- implemented add users to group (margaretha)
+	- implemented add/invite users to group (margaretha)
 	- implemented delete user-group and member tasks (margaretha)
 	- added userMemberStatus in group lists (margaretha)
 	- updated and added SQL test data (margaretha)
 	- added user group related tests (margaretha)
 	- implemented custom configuration for deleting user groups and members (margaretha)
 	- updated library versions and java environment (margaretha)
+	- added expiration time check for member invitation (margaretha)
 	
 0.59.9 2018-01-19
 	- restructured basic authentication (margaretha)
@@ -21,7 +22,7 @@
 	- fixed foundry rewrite for korap span without wrap node (margaretha)
 	- implemented list user group (margaretha)
 	- implemented delete VC task (margaretha)
-	- implemented create user-group, subscribe to usergroup, unsubscribe to user group tasks(margaretha)
+	- implemented create user-group, subscribe to user-groups, unsubscribe to user-groups tasks(margaretha)
 	- fixed handling JSON mapping exception for missing enums (margaretha)
     - implemented list VC task (margaretha)
     - added KoralQuery in VC lists (margaretha)
