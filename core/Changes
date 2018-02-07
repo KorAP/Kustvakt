@@ -1,15 +1,21 @@
-0.59.10 2018-02-01 
+version 0.59.10 
+07/02/2018
 	- updated hibernate and reflection versions (margaretha)
 	- added Changes file (margaretha)
 	- merged BeanConfigBaseTest to BeanConfigTest in /full (margaretha)
 	- added status code for already deleted entry (margaretha)
 	- updated library versions and java environment (margaretha)
 	- added status codes (margaretha)
-0.59.9 	2017-11-08
+	- moved validation.properties (margaretha)
+	
+version 0.59.9 	
+08/11/2017
 	- fixed missing exception in JsonUtils (margaretha)
 	- fixed and restructured KustvaktResponseHandler (margaretha)
 	- updated status code in ParameterChecker (margaretha)
-0.59.8 2017-10-24
+	
+version 0.59.8 
+24/10/2017
 	- restructured Kustvakt and created core project (margaretha)
 	- marked loader classes as deprecated (margaretha)
 	- updated Spring version (margaretha)

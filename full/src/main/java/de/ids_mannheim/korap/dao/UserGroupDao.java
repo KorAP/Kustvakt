@@ -94,7 +94,7 @@ public class UserGroupDao {
             entityManager.merge(group);
         }
         else {
-            if (!entityManager.contains(group)){
+            if (!entityManager.contains(group)) {
                 group = entityManager.merge(group);
             }
             entityManager.remove(group);
@@ -141,9 +141,8 @@ public class UserGroupDao {
             return (UserGroup) q.getSingleResult();
         }
         catch (NoResultException e) {
-            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                    "No result found for query: retrieve group by id "
-                            + groupId,
+            throw new KustvaktException(StatusCodes.GROUP_NOT_FOUND,
+                    "Group with id " + groupId + " is not found",
                     String.valueOf(groupId), e);
         }
     }
@@ -174,8 +173,8 @@ public class UserGroupDao {
                         userId),
                 criteriaBuilder.notEqual(members.get(UserGroupMember_.status),
                         GroupMemberStatus.DELETED));
-//                criteriaBuilder.equal(members.get(UserGroupMember_.status),
-//                        GroupMemberStatus.ACTIVE));
+        //                criteriaBuilder.equal(members.get(UserGroupMember_.status),
+        //                        GroupMemberStatus.ACTIVE));
 
 
         query.select(root);
@@ -220,7 +219,8 @@ public class UserGroupDao {
         }
     }
 
-    public UserGroup retrieveHiddenGroupByVC (int vcId) throws KustvaktException {
+    public UserGroup retrieveHiddenGroupByVC (int vcId)
+            throws KustvaktException {
         ParameterChecker.checkIntegerValue(vcId, "vcId");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -237,7 +237,7 @@ public class UserGroupDao {
                 criteriaBuilder.equal(root.get(UserGroup_.status),
                         UserGroupStatus.HIDDEN),
                 criteriaBuilder.equal(vc.get(VirtualCorpus_.id), vcId));
-        
+
         query.select(root);
         query.where(p);
         Query q = entityManager.createQuery(query);

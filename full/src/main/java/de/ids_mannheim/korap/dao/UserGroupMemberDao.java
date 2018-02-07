@@ -36,18 +36,17 @@ public class UserGroupMemberDao {
         entityManager.persist(member);
     }
 
-//    @Deprecated
-//    public void addMembers (List<UserGroupMember> members)
-//            throws KustvaktException {
-//        ParameterChecker.checkObjectValue(members, "List<UserGroupMember>");
-//
-//        for (UserGroupMember member : members) {
-//            addMember(member);
-//        }
-//    }
+    //    @Deprecated
+    //    public void addMembers (List<UserGroupMember> members)
+    //            throws KustvaktException {
+    //        ParameterChecker.checkObjectValue(members, "List<UserGroupMember>");
+    //
+    //        for (UserGroupMember member : members) {
+    //            addMember(member);
+    //        }
+    //    }
 
-    public void updateMember (UserGroupMember member)
-            throws KustvaktException {
+    public void updateMember (UserGroupMember member) throws KustvaktException {
         ParameterChecker.checkObjectValue(member, "UserGroupMember");
         entityManager.merge(member);
     }
@@ -96,9 +95,8 @@ public class UserGroupMemberDao {
             return (UserGroupMember) q.getSingleResult();
         }
         catch (NoResultException e) {
-            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                    "Username " + userId + " is not found in group " + groupId,
-                    userId);
+            throw new KustvaktException(StatusCodes.GROUP_MEMBER_NOT_FOUND,
+                    userId + " is not found in the group", userId);
         }
 
     }

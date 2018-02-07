@@ -41,9 +41,9 @@
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="locations">
 			<array>
-				<value>classpath:jdbc.properties</value>
+				<value>classpath:*/jdbc.properties</value>
 				<value>file:./jdbc.properties</value>
-				<value>classpath:hibernate.properties</value>
+				<value>classpath:*/hibernate.properties</value>
 				<value>classpath:kustvakt.conf</value>
 				<value>file:./kustvakt.conf</value>
 			</array>
@@ -312,4 +312,20 @@
 		<property name="dataSource" ref="sqliteDataSource" />
 	</bean>
 	
+	<!-- mail -->
+	<!-- <bean id="smtpSession" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="java:comp/env/mail/jetty" />
+	</bean>
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="session" ref="smtpSession" />
+	</bean>
+	<bean id="velocityEngine" class="org.apache.velocity.app.VelocityEngine">
+		<constructor-arg index="0">
+			<props>
+				<prop key="resource.loader">class</prop>
+				<prop key="class.resource.loader.class">org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
+				</prop>
+			</props>
+		</constructor-arg>
+	</bean> -->
 </beans>

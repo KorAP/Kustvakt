@@ -1,4 +1,5 @@
-0.59.10	2018-02-06 
+version 0.59.10	
+07/02/2018 
 	- added sort VC by id (margaretha)
 	- added test cases regarding VC sharing (margaretha)
 	- implemented withdraw VC from publication (margaretha)
@@ -11,8 +12,12 @@
 	- implemented custom configuration for deleting user groups and members (margaretha)
 	- updated library versions and java environment (margaretha)
 	- added expiration time check for member invitation (margaretha)
+	- moved .properties files (margaretha) 
+	- merged changelog file to Changes (margaretha)
+	- updated status codes and error messages to be more detailed (margaretha)
 	
-0.59.9 2018-01-19
+version 0.59.9 
+19/01/2018
 	- restructured basic authentication (margaretha)
 	- fixed AuthenticationException to include authentication scheme (margaretha)
 	- fixed rewrite redundancy in collection rewrite (margaretha)
@@ -38,8 +43,8 @@
     - removed PredefinedUserGroup.ALL and related codes (margaretha)
     - implemented search for published VC (margaretha)
     
-
-0.59.8 2017-09-21
+version 0.59.8 
+21/09/2017
 	- restructured statistics service (margaretha)
 	- removed deprecated loader codes and tests (margaretha)
 	- removed old Spring java configurations (margaretha)
@@ -55,5 +60,14 @@
 	- fixed missing exceptions in JsonUtils (margaretha)
 	- restructured web filters and authentication codes (margaretha)
 	- implemented create/store VC (margaretha)
-	- fixed collection rewrite bug regarding availability with operation or (margaretha)	
-    
+	- fixed collection rewrite bug regarding availability with operation or (margaretha)    
+
+version 0.59.7
+13/10/2016
+    - MOD: updated search to use new siglen (diewald)
+    - MOD: fixed matchinfo retrieval in light service (diewald)
+
+05/05/2015
+    - ADD: rest test suite for user service (hanl)
+    - MOD: setup parameter modification (hanl)
+    - ADD: oauth2 client unique constraint (hanl)

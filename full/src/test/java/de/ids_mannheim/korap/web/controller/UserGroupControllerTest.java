@@ -445,7 +445,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.GROUP_MEMBER_EXISTS,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Username marlin with status PENDING exists in user-group "
+        assertEquals("Username marlin with status PENDING exists in the user-group "
                 + "dory group", node.at("/errors/0/1").asText());
         assertEquals("[marlin, PENDING, dory group]",
                 node.at("/errors/0/2").asText());
@@ -539,9 +539,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        assertEquals(StatusCodes.NOTHING_CHANGED,
+        assertEquals(StatusCodes.GROUP_MEMBER_DELETED,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Username pearl had been deleted in group 2",
+        assertEquals("pearl has already been deleted from the group dory group",
                 node.at("/errors/0/1").asText());
     }
 
@@ -579,9 +579,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        assertEquals(StatusCodes.NO_RESULT_FOUND,
+        assertEquals(StatusCodes.GROUP_MEMBER_NOT_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Username bruce is not found in group 2",
+        assertEquals("bruce is not found in the group",
                 node.at("/errors/0/1").asText());
     }
 
@@ -602,9 +602,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        assertEquals(StatusCodes.NO_RESULT_FOUND,
+        assertEquals(StatusCodes.GROUP_NOT_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Username pearl is not found in group 100",
+        assertEquals("Group with id 100 is not found",
                 node.at("/errors/0/1").asText());
     }
 

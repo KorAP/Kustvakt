@@ -322,24 +322,24 @@ public class UserGroupService {
 
         ParameterChecker.checkStringValue(username, "userId");
         ParameterChecker.checkIntegerValue(groupId, "groupId");
-
+        
+        UserGroup group = userGroupDao.retrieveGroupById(groupId);
+        
         UserGroupMember member =
                 groupMemberDao.retrieveMemberById(username, groupId);
         GroupMemberStatus status = member.getStatus();
         if (status.equals(GroupMemberStatus.DELETED)) {
-            UserGroup group = userGroupDao.retrieveGroupById(groupId);
             throw new KustvaktException(StatusCodes.GROUP_MEMBER_DELETED,
                     username + " has already been deleted from the group "
                             + group.getName(),
                     username, group.getName());
         }
         else if (member.getStatus().equals(GroupMemberStatus.ACTIVE)) {
-            UserGroup userGroup = retrieveUserGroupById(groupId);
             throw new KustvaktException(StatusCodes.GROUP_MEMBER_EXISTS,
                     "Username " + username + " with status " + status
                             + " exists in the user-group "
-                            + userGroup.getName(),
-                    username, status.name(), userGroup.getName());
+                            + group.getName(),
+                    username, status.name(), group.getName());
         }
         // status pending
         else {
@@ -405,11 +405,13 @@ public class UserGroupService {
      */
     private void deleteMember (String username, int groupId, String deletedBy,
             boolean isSoftDelete) throws KustvaktException {
+        
+        UserGroup group = userGroupDao.retrieveGroupById(groupId);
+        
         UserGroupMember member =
                 groupMemberDao.retrieveMemberById(username, groupId);
         GroupMemberStatus status = member.getStatus();
         if (isSoftDelete && status.equals(GroupMemberStatus.DELETED)) {
-            UserGroup group = userGroupDao.retrieveGroupById(groupId);
             throw new KustvaktException(StatusCodes.GROUP_MEMBER_DELETED,
                     username + " has already been deleted from the group "
                             + group.getName(),
