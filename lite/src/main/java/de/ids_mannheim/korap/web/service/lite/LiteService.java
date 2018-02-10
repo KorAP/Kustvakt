@@ -361,4 +361,23 @@ public class LiteService {
         return Response.ok(results).build();
     }
 
+
+	/*
+     * Returns the meta data fields of a certain document
+     */
+    @GET
+    @Path("/corpus/{corpusId}/{docId}/{textId}")
+    public Response getMeta (
+		@PathParam("corpusId") String corpusId,
+		@PathParam("docId") String docId,
+		@PathParam("textId") String textId,
+		// @QueryParam("fields") Set<String> fields,
+		@Context HttpServletRequest request) throws KustvaktException {
+
+		String textSigle = searchKrill.getTextSigle(corpusId, docId, textId);
+		
+		String results = searchKrill.getFields(textSigle);
+
+        return Response.ok(results).build();
+    }
 }

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.*;
 
 import org.apache.lucene.LucenePackage;
 import org.junit.Test;
@@ -261,4 +262,58 @@ public class LiteServiceTest extends JerseyTest{
         assertEquals("WPD", node.at("/collection/operands/1/value").asText());
     }
 
+	@Test
+	public void testMetaFields () throws KustvaktException {
+        ClientResponse response = resource()
+                .path("/corpus/GOE/AGA/01784")
+                .method("GET", ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String resp = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(resp);
+		System.err.println(node.toString());
+
+		Iterator fieldIter = node.at("/document/fields").elements();
+
+		int checkC = 0;
+		while (fieldIter.hasNext()) {
+			JsonNode field = (JsonNode) fieldIter.next();
+
+			String key = field.at("/key").asText();
+
+			assertEquals("koral:field", field.at("/@type").asText());
+
+			switch (key) {
+			case "textSigle":
+				assertEquals("type:string", field.at("/type").asText());
+				assertEquals("GOE/AGA/01784", field.at("/value").asText());
+				checkC++;
+				break;
+			case "author":
+				assertEquals("type:text", field.at("/type").asText());
+				assertEquals("Goethe, Johann Wolfgang von", field.at("/value").asText());
+				checkC++;
+				break;
+			case "docSigle":
+				assertEquals("type:string", field.at("/type").asText());
+				assertEquals("GOE/AGA", field.at("/value").asText());
+				checkC++;
+				break;
+			case "docTitle":
+				assertEquals("type:text", field.at("/type").asText());
+				assertEquals(
+					"Goethe: Autobiographische Schriften II, (1817-1825, 1832)",
+					field.at("/value").asText()
+					);
+				checkC++;
+				break;
+			case "pubDate":
+				assertEquals("type:number", field.at("/type").asText());
+				assertEquals(19820000, field.at("/value").asInt());
+				checkC++;
+				break;
+			};		
+		};
+		assertEquals(5, checkC);
+	};
 }
