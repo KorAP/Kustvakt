@@ -139,6 +139,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 		//EM:copied from EntityDao
 		KorAPUser user = new KorAPUser(); // oder eigentlich new DemoUser oder new DefaultUser.
         user.setUsername(username);
+        // get user data
+        user.setEmail(config.getTestEmail());
         return user;
 //		return entHandler.getAccount(username);
 	}
@@ -215,9 +217,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	     	return;
 	    }
 		
-		if (headerMap != null && headerMap.containsKey(org.eclipse.jetty.http.HttpHeaders.X_FORWARDED_FOR)) {
+		if (headerMap != null && headerMap.containsKey(com.google.common.net.HttpHeaders.X_FORWARDED_FOR)) {
 
-			String[] vals = headerMap.getFirst(org.eclipse.jetty.http.HttpHeaders.X_FORWARDED_FOR).split(",");
+			String[] vals = headerMap.getFirst(com.google.common.net.HttpHeaders.X_FORWARDED_FOR).split(",");
 			String clientAddress = vals[0];
 
 			try {

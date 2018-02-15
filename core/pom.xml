@@ -10,7 +10,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring-framework.version>5.0.3.RELEASE</spring-framework.version>
 		<jersey.version>1.19.4</jersey.version>
-		<jetty.version>8.2.0.v20160908</jetty.version>
+		<jetty.version>9.4.8.v20171121</jetty.version>
 		<hibernate.version>5.1.11.Final</hibernate.version>
 	</properties>
 	<build>
@@ -358,6 +358,8 @@
 			<artifactId>commons-collections</artifactId>
 			<version>3.2.2</version>
 		</dependency>
+		
+		<!-- jetty -->
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
@@ -368,6 +370,12 @@
 			<artifactId>jetty-servlet</artifactId>
 			<version>${jetty.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-webapp</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>asm</groupId>
 			<artifactId>asm</artifactId>

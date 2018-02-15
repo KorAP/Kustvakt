@@ -76,27 +76,27 @@
 		<property name="username" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
 		<property name="connectionProperties">
-            <props>
-                <prop key="date_string_format">yyyy-MM-dd HH:mm:ss</prop>
-            </props>
-        </property>
-        
+			<props>
+				<prop key="date_string_format">yyyy-MM-dd HH:mm:ss</prop>
+			</props>
+		</property>
+
 		<!-- Sqlite can only have a single connection -->
 		<property name="suppressClose">
 			<value>true</value>
 		</property>
 	</bean>
-	
+
 	<bean id="c3p0DataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
-	    destroy-method="close">
-	    <property name="driverClass" value="${jdbc.driverClassName}" />
+		destroy-method="close">
+		<property name="driverClass" value="${jdbc.driverClassName}" />
 		<property name="jdbcUrl" value="${jdbc.url}" />
 		<property name="user" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
-	    <property name="maxPoolSize" value="4" />
-	    <property name="minPoolSize" value="1" />
-	    <property name="maxStatements" value="1" />
-	    <property name="testConnectionOnCheckout" value="true" />
+		<property name="maxPoolSize" value="4" />
+		<property name="minPoolSize" value="1" />
+		<property name="maxStatements" value="1" />
+		<property name="testConnectionOnCheckout" value="true" />
 	</bean>
 
 	<!-- to configure database for sqlite, mysql, etc. migrations -->
@@ -155,12 +155,12 @@
 	</bean>
 
 	<!-- Data access objects -->
-	<bean id="resourceDao" class="de.ids_mannheim.korap.dao.ResourceDao"/>
+	<bean id="resourceDao" class="de.ids_mannheim.korap.dao.ResourceDao" />
 	<!-- <bean id="annotationDao" class="de.ids_mannheim.korap.dao.AnnotationDao"/> -->
 
 	<!-- Krill -->
 	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">
-		<constructor-arg value="${krill.indexDir}"/>
+		<constructor-arg value="${krill.indexDir}" />
 	</bean>
 
 
@@ -171,11 +171,10 @@
 	<bean id="kustvakt_auditing" class="de.ids_mannheim.korap.handlers.JDBCAuditing">
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
-	
-	<bean id="kustvakt_response"
-          class="de.ids_mannheim.korap.web.FullResponseHandler">
-          <constructor-arg index="0" name="iface" ref="kustvakt_auditing"/>
-    </bean>
+
+	<bean id="kustvakt_response" class="de.ids_mannheim.korap.web.FullResponseHandler">
+		<constructor-arg index="0" name="iface" ref="kustvakt_auditing" />
+	</bean>
 
 	<bean id="kustvakt_userdb" class="de.ids_mannheim.korap.handlers.EntityDao">
 		<constructor-arg ref="kustvakt_db" />
@@ -203,15 +202,14 @@
 	</bean>
 
 	<!-- authentication providers to use -->
-	<!-- <bean id="api_auth" class="de.ids_mannheim.korap.authentication.APIAuthentication">
-		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
-			ref="kustvakt_config" />
-	</bean> -->
+	<!-- <bean id="api_auth" class="de.ids_mannheim.korap.authentication.APIAuthentication"> 
+		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration" 
+		ref="kustvakt_config" /> </bean> -->
 	<bean id="ldap_auth" class="de.ids_mannheim.korap.authentication.LdapAuth3">
 		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
 			ref="kustvakt_config" />
 	</bean>
-	
+
 	<bean id="openid_auth"
 		class="de.ids_mannheim.korap.authentication.OpenIDconnectAuthentication">
 		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
@@ -220,7 +218,8 @@
 			type="de.ids_mannheim.korap.interfaces.db.PersistenceClient" ref="kustvakt_db" />
 	</bean>
 
-	<bean id="basic_auth" class="de.ids_mannheim.korap.authentication.BasicAuthentication" />
+	<bean id="basic_auth"
+		class="de.ids_mannheim.korap.authentication.BasicAuthentication" />
 
 
 	<bean id="session_auth"
@@ -305,4 +304,21 @@
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
+
+	<!-- mail -->
+	<!-- <bean id="smtpSession" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="java:comp/env/mail/jetty" />
+	</bean>
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="session" ref="smtpSession" />
+	</bean>
+	<bean id="velocityEngine" class="org.apache.velocity.app.VelocityEngine">
+		<constructor-arg index="0">
+			<props>
+				<prop key="resource.loader">class</prop>
+				<prop key="class.resource.loader.class">org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
+				</prop>
+			</props>
+		</constructor-arg>
+	</bean> -->
 </beans>

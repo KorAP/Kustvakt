@@ -166,12 +166,12 @@ public class UserGroupController {
     @POST
     @Path("member/invite")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addUserToGroup (@Context SecurityContext securityContext,
+    public Response inviteGroupMembers (@Context SecurityContext securityContext,
             UserGroupJson group) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            service.addUsersToGroup(group, context.getUsername());
+            service.inviteGroupMembers(group, context.getUsername());
             return Response.ok().build();
         }
         catch (KustvaktException e) {

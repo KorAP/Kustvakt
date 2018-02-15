@@ -1,11 +1,8 @@
 package de.ids_mannheim.korap.service;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -57,6 +54,8 @@ public class UserGroupService {
     private AuthenticationManagerIface authManager;
     @Autowired
     private FullConfiguration config;
+    @Autowired
+    private MailService mailService;
 
     private static List<Role> memberRoles;
 
@@ -176,7 +175,7 @@ public class UserGroupService {
                 // skip owner, already added while creating group.
                 continue;
             }
-            addGroupMember(memberId, userGroup, createdBy,
+            inviteGroupMember(memberId, userGroup, createdBy,
                     GroupMemberStatus.PENDING);
         }
     }
@@ -226,7 +225,7 @@ public class UserGroupService {
      * @param status the status of the membership
      * @throws KustvaktException
      */
-    public void addGroupMember (String username, UserGroup userGroup,
+    public void inviteGroupMember (String username, UserGroup userGroup,
             String createdBy, GroupMemberStatus status)
             throws KustvaktException {
 
@@ -249,8 +248,12 @@ public class UserGroupService {
         member.setRoles(memberRoles);
         member.setStatus(status);
         member.setUserId(username);
-
         groupMemberDao.addMember(member);
+
+        if (config.isMailEnabled()) {
+            mailService.sendMemberInvitationNotification(username,
+                    userGroup.getName(), createdBy);
+        }
     }
 
     private boolean memberExists (String username, int groupId,
@@ -277,7 +280,7 @@ public class UserGroupService {
         return false;
     }
 
-    public void addUsersToGroup (UserGroupJson group, String username)
+    public void inviteGroupMembers (UserGroupJson group, String inviter)
             throws KustvaktException {
         int groupId = group.getId();
         String[] members = group.getMembers();
@@ -285,16 +288,16 @@ public class UserGroupService {
         ParameterChecker.checkObjectValue(members, "members");
 
         UserGroup userGroup = retrieveUserGroupById(groupId);
-        User user = authManager.getUser(username);
-        if (isUserGroupAdmin(username, userGroup) || user.isSystemAdmin()) {
+        User user = authManager.getUser(inviter);
+        if (isUserGroupAdmin(inviter, userGroup) || user.isSystemAdmin()) {
             for (String memberName : members) {
-                addGroupMember(memberName, userGroup, username,
+                inviteGroupMember(memberName, userGroup, inviter,
                         GroupMemberStatus.PENDING);
             }
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: " + username, username);
+                    "Unauthorized operation for user: " + inviter, inviter);
         }
     }
 
@@ -322,9 +325,9 @@ public class UserGroupService {
 
         ParameterChecker.checkStringValue(username, "userId");
         ParameterChecker.checkIntegerValue(groupId, "groupId");
-        
+
         UserGroup group = userGroupDao.retrieveGroupById(groupId);
-        
+
         UserGroupMember member =
                 groupMemberDao.retrieveMemberById(username, groupId);
         GroupMemberStatus status = member.getStatus();
@@ -337,22 +340,21 @@ public class UserGroupService {
         else if (member.getStatus().equals(GroupMemberStatus.ACTIVE)) {
             throw new KustvaktException(StatusCodes.GROUP_MEMBER_EXISTS,
                     "Username " + username + " with status " + status
-                            + " exists in the user-group "
-                            + group.getName(),
+                            + " exists in the user-group " + group.getName(),
                     username, status.name(), group.getName());
         }
         // status pending
         else {
-            jlog.debug("status: " +member.getStatusDate());
+            jlog.debug("status: " + member.getStatusDate());
             ZonedDateTime expiration = member.getStatusDate().plusMinutes(30);
             ZonedDateTime now = ZonedDateTime.now();
             jlog.debug("expiration: " + expiration + ", now: " + now);
 
-            if (expiration.isAfter(now)){
+            if (expiration.isAfter(now)) {
                 member.setStatus(GroupMemberStatus.ACTIVE);
                 groupMemberDao.updateMember(member);
             }
-            else{
+            else {
                 throw new KustvaktException(StatusCodes.INVITATION_EXPIRED);
             }
         }
@@ -405,9 +407,9 @@ public class UserGroupService {
      */
     private void deleteMember (String username, int groupId, String deletedBy,
             boolean isSoftDelete) throws KustvaktException {
-        
+
         UserGroup group = userGroupDao.retrieveGroupById(groupId);
-        
+
         UserGroupMember member =
                 groupMemberDao.retrieveMemberById(username, groupId);
         GroupMemberStatus status = member.getStatus();

@@ -24,9 +24,10 @@ import lombok.Setter;
 @Data
 public abstract class User implements Serializable {
 
-//    public static final int ADMINISTRATOR_ID = 34349733;
-//    public static final String ADMINISTRATOR_NAME = "admin";
-
+    //EM: add
+    private String email;
+    //EM: finish
+    
     private Integer id;
     // in local its username, in shib it's edupersonPrincipalName
     private String username;

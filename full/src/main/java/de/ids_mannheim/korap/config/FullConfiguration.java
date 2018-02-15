@@ -14,6 +14,13 @@ import java.util.regex.Pattern;
  */
 
 public class FullConfiguration extends KustvaktConfiguration {
+    // mail configuration
+    private boolean isMailEnabled;
+    private String testEmail;
+    private String mailUsername;
+    private String mailPassword;
+    private String mailSmtp;
+    private String mailPort;
 
     private String ldapConfig;
 
@@ -49,12 +56,28 @@ public class FullConfiguration extends KustvaktConfiguration {
         // EM: pattern for matching availability in Krill matches
         setLicensePatterns(properties);
         setDeleteConfiguration(properties);
+        setMailConfiguration(properties);
         ldapConfig = properties.getProperty("ldap.config");
+
+    }
+
+    private void setMailConfiguration (Properties properties) {
+        setMailEnabled(Boolean.valueOf(properties.getProperty("mail.enabled", "false")));
+        setTestEmail(properties.getProperty("mail.receiver"));
+        if (isMailEnabled){
+            // other properties must be set in the kustvakt.conf
+            setMailUsername(properties.getProperty("mail.username"));
+            setMailPassword(properties.getProperty("mail.password"));
+            setMailSmtp(properties.getProperty("mail.smtp"));
+            setMailPort(properties.getProperty("mail.port"));
+        }
     }
 
     private void setDeleteConfiguration (Properties properties) {
-        setSoftDeleteGroup(parseDeleteConfig(properties.getProperty("delete.group", "")));
-        setSoftDeleteAutoGroup(parseDeleteConfig(properties.getProperty("delete.auto.group", "")));
+        setSoftDeleteGroup(
+                parseDeleteConfig(properties.getProperty("delete.group", "")));
+        setSoftDeleteAutoGroup(parseDeleteConfig(
+                properties.getProperty("delete.auto.group", "")));
         setSoftDeleteGroupMember(parseDeleteConfig(
                 properties.getProperty("delete.group.member", "")));
     }
@@ -215,6 +238,54 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     public void setSoftDeleteAutoGroup (boolean isSoftDeleteAutoGroup) {
         this.isSoftDeleteAutoGroup = isSoftDeleteAutoGroup;
+    }
+
+    public String getTestEmail () {
+        return testEmail;
+    }
+
+    public void setTestEmail (String testEmail) {
+        this.testEmail = testEmail;
+    }
+
+    public String getMailUsername () {
+        return mailUsername;
+    }
+
+    public void setMailUsername (String mailUsername) {
+        this.mailUsername = mailUsername;
+    }
+
+    public String getMailPassword () {
+        return mailPassword;
+    }
+
+    public void setMailPassword (String mailPassword) {
+        this.mailPassword = mailPassword;
+    }
+
+    public String getMailSmtp () {
+        return mailSmtp;
+    }
+
+    public void setMailSmtp (String mailHost) {
+        this.mailSmtp = mailHost;
+    }
+
+    public String getMailPort () {
+        return mailPort;
+    }
+
+    public void setMailPort (String mailPort) {
+        this.mailPort = mailPort;
+    }
+
+    public boolean isMailEnabled () {
+        return isMailEnabled;
+    }
+
+    public void setMailEnabled (boolean isMailEnabled) {
+        this.isMailEnabled = isMailEnabled;
     }
 
 }

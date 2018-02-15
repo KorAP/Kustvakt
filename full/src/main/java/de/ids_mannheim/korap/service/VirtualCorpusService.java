@@ -395,7 +395,7 @@ public class VirtualCorpusService {
                         userGroupService.retrieveHiddenGroup(vcId);
                 //                if (!userGroupService.isMember(username, userGroup)) {
                 try {
-                    userGroupService.addGroupMember(username, userGroup,
+                    userGroupService.inviteGroupMember(username, userGroup,
                             "system", GroupMemberStatus.ACTIVE);
                 }
                 catch (KustvaktException e) {

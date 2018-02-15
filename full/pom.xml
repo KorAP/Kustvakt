@@ -9,6 +9,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring-framework.version>5.0.3.RELEASE</spring-framework.version>
 		<spring-security.version>4.2.3.RELEASE</spring-security.version>
+		<jetty.version>9.4.8.v20171121</jetty.version>
 		<jersey.version>1.19.4</jersey.version>
 		<hibernate.version>5.1.11.Final</hibernate.version>
 	</properties>
@@ -72,10 +73,9 @@
 					<compilerVersion>${java.version}</compilerVersion>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
-					<!-- <compilerArguments>
-						<processor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</processor>
-						<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
-					</compilerArguments> -->
+					<!-- <compilerArguments> <processor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</processor> 
+						<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor> 
+						</compilerArguments> -->
 					<processors>
 						<processor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</processor>
 						<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
@@ -183,7 +183,7 @@
 			<exclusions>
 				<exclusion>
 					<groupId>org.javassist</groupId>
-		   			<artifactId>javassist</artifactId>
+					<artifactId>javassist</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -194,14 +194,14 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.hibernate</groupId>
-		    <artifactId>hibernate-java8</artifactId>
-		    <version>${hibernate.version}</version>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-java8</artifactId>
+			<version>${hibernate.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.javassist</groupId>
-		    <artifactId>javassist</artifactId>
-		    <version>3.22.0-GA</version>
+			<groupId>org.javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.22.0-GA</version>
 		</dependency>
 
 		<!-- MySql -->
@@ -237,14 +237,55 @@
 			<version>${spring-framework.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.springframework.security</groupId>
-		    <artifactId>spring-security-core</artifactId>
-		    <version>${spring-security.version}</version>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-core</artifactId>
+			<version>${spring-security.version}</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.springframework.security</groupId>
-		    <artifactId>spring-security-web</artifactId>
-		    <version>${spring-security.version}</version>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>${spring-security.version}</version>
+		</dependency>
+
+		<!-- jetty -->
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-jndi</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-plus</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
+
+		<!-- velocity -->
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity-engine-core</artifactId>
+			<version>2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity-tools</artifactId>
+			<version>2.0</version>
+		</dependency>
+		<!-- mail -->
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>javax.mail</artifactId>
+			<version>1.6.0</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.activation</groupId>
+			<artifactId>activation</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>javax.servlet</groupId>
+		    <artifactId>javax.servlet-api</artifactId>
+		    <version>4.0.0</version>
 		</dependency>
 
 		<!-- Flyway -->
@@ -254,4 +295,5 @@
 			<version>4.0</version>
 		</dependency>
 	</dependencies>
+
 </project>

@@ -22,10 +22,4 @@ public class KustvaktLiteServer extends KustvaktBaseServer {
         server.start();
     }
 
-    @Override
-    protected void setup () {
-        // TODO Auto-generated method stub
-
-    }
-
 }
