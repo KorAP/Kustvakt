@@ -50,7 +50,7 @@ public abstract class KustvaktBaseServer {
                             .append("--help : This help menu\n");
                     System.out.println(b.toString());
                     System.out.println();
-                    break;
+                    return (KustvaktArgs) null;
                 case "--init":
                     kargs.init = true;
                     break;

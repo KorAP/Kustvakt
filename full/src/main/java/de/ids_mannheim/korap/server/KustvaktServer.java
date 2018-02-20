@@ -17,6 +17,9 @@ public class KustvaktServer extends KustvaktBaseServer {
         KustvaktServer server = new KustvaktServer();
         kargs = server.readAttributes(args);
 
+		if (kargs == null)
+			System.exit(0);
+		
         if (kargs.getConfig() != null)
             BeansFactory.loadFileContext(kargs.getConfig());
         else{

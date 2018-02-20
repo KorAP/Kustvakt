@@ -10,6 +10,9 @@ public class KustvaktLiteServer extends KustvaktBaseServer {
         KustvaktLiteServer server = new KustvaktLiteServer();
         kargs = server.readAttributes(args);
 
+		if (kargs == null)
+			System.exit(0);
+
         if (kargs.getConfig() == null) {
             kargs.setConfig("lite-config.xml");
         }
