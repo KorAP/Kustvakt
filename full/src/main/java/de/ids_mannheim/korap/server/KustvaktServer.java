@@ -39,12 +39,15 @@ public class KustvaktServer extends KustvaktBaseServer {
         fullConfig = new FullConfiguration(properties);
         config = fullConfig;
 
+		if (kargs == null)
+			System.exit(0);
+
         if (kargs.getConfig() == null){
 //            BeansFactory.loadFileContext(kargs.getConfig());
-//        }
-//        else {
+//      }
+//      else {
             kargs.setConfig("default-config.xml");
-//            BeansFactory.loadClasspathContext("default-config.xml");
+//          BeansFactory.loadClasspathContext("default-config.xml");
         }
         kargs.setRootPackages(new String[] { "de.ids_mannheim.korap.web.utils",
                 "de.ids_mannheim.korap.web.service.full" });
