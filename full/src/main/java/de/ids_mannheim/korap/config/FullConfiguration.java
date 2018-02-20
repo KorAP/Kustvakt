@@ -17,10 +17,7 @@ public class FullConfiguration extends KustvaktConfiguration {
     // mail configuration
     private boolean isMailEnabled;
     private String testEmail;
-    private String mailUsername;
-    private String mailPassword;
-    private String mailSmtp;
-    private String mailPort;
+    private String noReply;
 
     private String ldapConfig;
 
@@ -63,13 +60,10 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     private void setMailConfiguration (Properties properties) {
         setMailEnabled(Boolean.valueOf(properties.getProperty("mail.enabled", "false")));
-        setTestEmail(properties.getProperty("mail.receiver"));
         if (isMailEnabled){
             // other properties must be set in the kustvakt.conf
-            setMailUsername(properties.getProperty("mail.username"));
-            setMailPassword(properties.getProperty("mail.password"));
-            setMailSmtp(properties.getProperty("mail.smtp"));
-            setMailPort(properties.getProperty("mail.port"));
+            setTestEmail(properties.getProperty("mail.receiver"));
+            setNoReply(properties.getProperty("mail.sender"));
         }
     }
 
@@ -248,44 +242,20 @@ public class FullConfiguration extends KustvaktConfiguration {
         this.testEmail = testEmail;
     }
 
-    public String getMailUsername () {
-        return mailUsername;
-    }
-
-    public void setMailUsername (String mailUsername) {
-        this.mailUsername = mailUsername;
-    }
-
-    public String getMailPassword () {
-        return mailPassword;
-    }
-
-    public void setMailPassword (String mailPassword) {
-        this.mailPassword = mailPassword;
-    }
-
-    public String getMailSmtp () {
-        return mailSmtp;
-    }
-
-    public void setMailSmtp (String mailHost) {
-        this.mailSmtp = mailHost;
-    }
-
-    public String getMailPort () {
-        return mailPort;
-    }
-
-    public void setMailPort (String mailPort) {
-        this.mailPort = mailPort;
-    }
-
     public boolean isMailEnabled () {
         return isMailEnabled;
     }
 
     public void setMailEnabled (boolean isMailEnabled) {
         this.isMailEnabled = isMailEnabled;
+    }
+
+    public String getNoReply () {
+        return noReply;
+    }
+
+    public void setNoReply (String noReply) {
+        this.noReply = noReply;
     }
 
 }

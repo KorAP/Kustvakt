@@ -1,5 +1,5 @@
 version 0.59.10	
-07/02/2018 
+20/02/2018 
 	- added sort VC by id (margaretha)
 	- added test cases regarding VC sharing (margaretha)
 	- implemented withdraw VC from publication (margaretha)
@@ -15,6 +15,9 @@ version 0.59.10
 	- moved .properties files (margaretha) 
 	- merged changelog file to Changes (margaretha)
 	- updated status codes and error messages to be more detailed (margaretha)
+	- testing mail implementation using embedded jetty jndi (margaretha)
+	- fixed collection rewrite regarding OR operation with other fields (margaretha)
+	- implemented sending mail using spring injection and removed jetty jndi (margaretha) 
 	
 version 0.59.9 
 19/01/2018

@@ -252,7 +252,7 @@ public class UserGroupService {
 
         if (config.isMailEnabled()) {
             mailService.sendMemberInvitationNotification(username,
-                    userGroup.getName(), createdBy);
+                    config.getNoReply(), userGroup.getName(), createdBy);
         }
     }
 

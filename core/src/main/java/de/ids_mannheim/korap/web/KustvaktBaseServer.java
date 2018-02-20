@@ -1,17 +1,12 @@
 package de.ids_mannheim.korap.web;
 
-import javax.naming.InitialContext;
 import javax.servlet.ServletContextListener;
 
 import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.webapp.WebAppContext;
-import org.eclipse.jetty.webapp.Configuration.ClassList;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.ContextLoaderListener;
 
@@ -67,8 +62,6 @@ public abstract class KustvaktBaseServer {
         return kargs;
     }
 
-    protected void setupJndi (Server server, WebAppContext webapp){}
-
     protected void start(){
         
         if (kargs.port == -1){
@@ -98,26 +91,9 @@ public abstract class KustvaktBaseServer {
         
         server.setHandler(contextHandler);
         
-//        ClassList classlist = ClassList.setServerDefault(server);
-//        classlist.addAfter("org.eclipse.jetty.webapp.FragmentConfiguration",
-//                "org.eclipse.jetty.plus.webapp.EnvConfiguration",
-//                "org.eclipse.jetty.plus.webapp.PlusConfiguration");
-        
-//        WebAppContext webapp = new WebAppContext();
-//        webapp.setDescriptor(KustvaktBaseServer.class.getResource("/WEB-INF/web.xml").toString());
-//        webapp.setContextPath("/");
-//        webapp.setWar("./kustvakt.war");
-//        server.setHandler(webapp);
-//        setupJndi(server, webapp);
-//        HandlerList handlerList = new HandlerList();
-//        handlerList.setHandlers(new Handler[]{webapp,contextHandler});
-//        server.setHandler(handlerList);
-        
         server.setConnectors(new Connector[] { connector });
         try {
             server.start();
-//            InitialContext ic = new InitialContext();
-//            Object object = ic.lookup("mail/Session");
             server.join();
         }
         catch (Exception e) {

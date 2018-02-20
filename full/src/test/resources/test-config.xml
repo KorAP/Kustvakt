@@ -36,6 +36,8 @@
 			<array>
 				<value>classpath:test-jdbc.properties</value>
 				<value>file:./test-jdbc.properties</value>
+				<value>classpath:properties/mail.properties</value>
+				<value>file:./mail.properties</value>
 				<value>classpath:test-hibernate.properties</value>
 				<value>classpath:kustvakt-test.conf</value>
 			</array>
@@ -306,8 +308,22 @@
 	</bean>
 
 	<!-- mail -->
-	<!-- <bean id="smtpSession" class="org.springframework.jndi.JndiObjectFactoryBean">
-		<property name="jndiName" value="java:comp/env/mail/jetty" />
+	<bean id="authenticator" class="de.ids_mannheim.korap.service.MailAuthenticator">
+		<constructor-arg index="0" value="${mail.username}"/>
+		<constructor-arg index="1" value="${mail.password}"/>
+	</bean>
+	<bean id="smtpSession" class="javax.mail.Session" factory-method="getInstance">
+		<constructor-arg index="0">
+			<props>
+				<prop key="mail.smtp.submitter">${mail.username}</prop>
+				<prop key="mail.smtp.auth">${mail.auth}</prop>
+				<prop key="mail.smtp.host">${mail.host}</prop>
+				<prop key="mail.smtp.port">${mail.port}</prop>
+				<prop key="mail.smtp.starttls.enable">${mail.starttls.enable}</prop>
+				<prop key="mail.smtp.connectiontimeout">${mail.connectiontimeout}</prop>
+			</props>
+		</constructor-arg>
+		<constructor-arg index="1" ref="authenticator"/>
 	</bean>
 	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
 		<property name="session" ref="smtpSession" />
@@ -320,5 +336,5 @@
 				</prop>
 			</props>
 		</constructor-arg>
-	</bean> -->
+	</bean>
 </beans>

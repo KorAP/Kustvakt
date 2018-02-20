@@ -5,17 +5,6 @@ import java.io.FileInputStream;
 import java.net.URL;
 import java.util.Properties;
 
-import javax.naming.NamingException;
-
-import org.eclipse.jetty.jndi.factories.MailSessionReference;
-import org.eclipse.jetty.plus.jndi.Resource;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.webapp.Configuration.ClassList;
-import org.eclipse.jetty.webapp.WebAppContext;
-
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.web.KustvaktBaseServer;
 
@@ -37,7 +26,7 @@ public class KustvaktServer extends KustvaktBaseServer {
         
         File f = new File("kustvakt.conf");
         if (!f.exists()){
-            URL url = KustvaktServer.class.getClassLoader().getResource("kustvakt.conf");
+            URL url = KustvaktServer.class.getResource("kustvakt.conf");
             if (url!=null){
                 f = new File(url.toURI());
             }
@@ -63,32 +52,4 @@ public class KustvaktServer extends KustvaktBaseServer {
                 + "de.ids_mannheim.korap.web.service.full";
         server.start();
     }
-
-    @Override
-    protected void setupJndi(Server server, WebAppContext webapp) {
-        
-        
-//        ClassList classlist = ClassList.setServerDefault(server);
-//        classlist.addAfter("org.eclipse.jetty.webapp.FragmentConfiguration",
-//                "org.eclipse.jetty.plus.webapp.EnvConfiguration",
-//                "org.eclipse.jetty.plus.webapp.PlusConfiguration");
-        
-        MailSessionReference mailref = new MailSessionReference();
-        mailref.setUser(fullConfig.getMailUsername());
-        mailref.setPassword(fullConfig.getMailPassword());
-        
-        Properties props = new Properties();
-        props.put("mail.smtp.auth", "false");
-        props.put("mail.smtp.host",fullConfig.getMailSmtp());
-        props.put("mail.from",fullConfig.getMailUsername());
-        props.put("mail.debug", "false");
-        mailref.setProperties(props);
-        try {
-            new Resource(webapp, "mail/Session", mailref);
-        }
-        catch (NamingException e) {
-            e.printStackTrace();
-        }
-    }
-    
 }

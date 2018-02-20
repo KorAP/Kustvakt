@@ -41,9 +41,12 @@
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="locations">
 			<array>
-				<value>classpath:*/jdbc.properties</value>
+				<value>classpath:properties/jdbc.properties</value>
 				<value>file:./jdbc.properties</value>
-				<value>classpath:*/hibernate.properties</value>
+				<value>classpath:properties/mail.properties</value>
+				<value>file:./mail.properties</value>
+				<value>classpath:properties/hibernate.properties</value>
+				
 				<value>classpath:kustvakt.conf</value>
 				<value>file:./kustvakt.conf</value>
 			</array>
@@ -313,19 +316,34 @@
 	</bean>
 	
 	<!-- mail -->
-	<!-- <bean id="smtpSession" class="org.springframework.jndi.JndiObjectFactoryBean">
-		<property name="jndiName" value="java:comp/env/mail/jetty" />
+		<bean id="authenticator" class="de.ids_mannheim.korap.service.MailAuthenticator">
+		<constructor-arg index="0" value="${mail.username}"/>
+		<constructor-arg index="1" value="${mail.password}"/>
+	</bean>
+	<bean id="smtpSession" class="javax.mail.Session" factory-method="getInstance">
+		<constructor-arg index="0">
+			<props>
+				<prop key="mail.smtp.submitter">${mail.username}</prop>
+				<prop key="mail.smtp.auth">${mail.auth}</prop>
+				<prop key="mail.smtp.host">${mail.host}</prop>
+				<prop key="mail.smtp.port">${mail.port}</prop>
+				<prop key="mail.smtp.starttls.enable">${mail.starttls.enable}</prop>
+				<prop key="mail.smtp.connectiontimeout">${mail.connectiontimeout}</prop>
+			</props>
+		</constructor-arg>
+		<constructor-arg index="1" ref="authenticator"/>
 	</bean>
 	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="username" value="${mail.username}" />
+	    <property name="password" value="${mail.password}" />
 		<property name="session" ref="smtpSession" />
 	</bean>
 	<bean id="velocityEngine" class="org.apache.velocity.app.VelocityEngine">
 		<constructor-arg index="0">
 			<props>
 				<prop key="resource.loader">class</prop>
-				<prop key="class.resource.loader.class">org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
-				</prop>
+				<prop key="class.resource.loader.class">org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader</prop>
 			</props>
 		</constructor-arg>
-	</bean> -->
+	</bean>
 </beans>
