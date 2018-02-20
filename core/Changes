@@ -1,5 +1,5 @@
 version 0.59.10 
-07/02/2018
+20/02/2018
 	- updated hibernate and reflection versions (margaretha)
 	- added Changes file (margaretha)
 	- merged BeanConfigBaseTest to BeanConfigTest in /full (margaretha)
@@ -7,6 +7,7 @@ version 0.59.10
 	- updated library versions and java environment (margaretha)
 	- added status codes (margaretha)
 	- moved validation.properties (margaretha)
+	- fixed unrecognize media-type application/json (margaretha)
 	
 version 0.59.9 	
 08/11/2017

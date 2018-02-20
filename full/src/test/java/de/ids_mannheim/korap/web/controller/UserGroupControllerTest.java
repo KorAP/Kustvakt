@@ -445,8 +445,10 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.GROUP_MEMBER_EXISTS,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Username marlin with status PENDING exists in the user-group "
-                + "dory group", node.at("/errors/0/1").asText());
+        assertEquals(
+                "Username marlin with status PENDING exists in the user-group "
+                        + "dory group",
+                node.at("/errors/0/1").asText());
         assertEquals("[marlin, PENDING, dory group]",
                 node.at("/errors/0/2").asText());
     }
@@ -470,8 +472,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                                 "pass"))
                 .entity(userGroup).post(ClientResponse.class);
 
-                String entity = response.getEntity(String.class);
-                System.out.println(entity);
+        String entity = response.getEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         // check member
@@ -653,7 +654,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 node.at("/errors/0/1").asText());
         assertEquals("[pearl, dory group]", node.at("/errors/0/2").asText());
     }
-    
+
     @Test
     public void testUnsubscribePendingMember ()
             throws UniformInterfaceException, ClientHandlerException,
@@ -661,7 +662,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         JsonNode node = retrieveUserGroups("marlin");
         assertEquals(2, node.size());
-        
+
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         // dory group
         form.add("groupId", "2");
@@ -678,9 +679,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         //        System.out.println(entity);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-         node = retrieveUserGroups("marlin");
+        node = retrieveUserGroups("marlin");
         assertEquals(1, node.size());
-        
+
         // invite marlin to dory group to set back the GroupMemberStatus.PENDING
         testInviteDeletedMember();
     }

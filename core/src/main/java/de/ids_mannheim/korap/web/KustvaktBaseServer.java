@@ -24,7 +24,7 @@ import lombok.Setter;
 public abstract class KustvaktBaseServer {
 
     protected static KustvaktConfiguration config;
-    
+
     protected static String rootPackages;
     protected static KustvaktArgs kargs;
 
@@ -62,35 +62,37 @@ public abstract class KustvaktBaseServer {
         return kargs;
     }
 
-    protected void start(){
-        
-        if (kargs.port == -1){
+    protected void start () {
+
+        if (kargs.port == -1) {
             kargs.setPort(config.getPort());
         }
 
         Server server = new Server();
-        
-        ServletContextHandler contextHandler = new ServletContextHandler(
-                ServletContextHandler.NO_SESSIONS);
+
+        ServletContextHandler contextHandler =
+                new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
         contextHandler.setContextPath("/");
         contextHandler.setInitParameter("contextConfigLocation",
                 "classpath:" + kargs.getConfig());
-        
+
         ServletContextListener listener = new ContextLoaderListener();
         contextHandler.addEventListener(listener);
 
         ServletHolder servletHolder = new ServletHolder(new SpringServlet());
         servletHolder.setInitParameter(
                 "com.sun.jersey.config.property.packages", rootPackages);
+        servletHolder.setInitParameter(
+                "com.sun.jersey.api.json.POJOMappingFeature", "true");
         servletHolder.setInitOrder(1);
         contextHandler.addServlet(servletHolder, config.getBaseURL());
 
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(kargs.port);
         connector.setIdleTimeout(60000);
-        
+
         server.setHandler(contextHandler);
-        
+
         server.setConnectors(new Connector[] { connector });
         try {
             server.start();

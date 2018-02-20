@@ -45,7 +45,7 @@ public class MailService {
                 MimeMessageHelper message = new MimeMessageHelper(mimeMessage);
                 message.setTo(new InternetAddress(invitee.getEmail()));
                 message.setFrom(sender);
-                message.setSubject("Invitation to join group");
+                message.setSubject("Invitation to join "+groupName);
                 message.setText(prepareText(inviteeName, groupName, inviter),
                         true);
             }
@@ -62,12 +62,8 @@ public class MailService {
         context.put("inviter", inviter);
         
         StringWriter stringWriter = new StringWriter();
-//        URL url = getClass().getClassLoader().getResource("notification.vm");
-//        System.out.println(url);
-//        Template t = velocityEngine.getTemplate(url.toString());
-//        System.out.println(t);
         
-        velocityEngine.mergeTemplate("notification.vm",
+        velocityEngine.mergeTemplate("templates/notification.vm",
                 StandardCharsets.UTF_8.name(), context, stringWriter);
         
         String message = stringWriter.toString();

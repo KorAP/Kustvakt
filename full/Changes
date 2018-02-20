@@ -17,7 +17,8 @@ version 0.59.10
 	- updated status codes and error messages to be more detailed (margaretha)
 	- testing mail implementation using embedded jetty jndi (margaretha)
 	- fixed collection rewrite regarding OR operation with other fields (margaretha)
-	- implemented sending mail using spring injection and removed jetty jndi (margaretha) 
+	- implemented sending mail using spring injection and removed jetty jndi (margaretha)
+	- fixed and updated velocity template (margaretha)
 	
 version 0.59.9 
 19/01/2018
