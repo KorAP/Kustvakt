@@ -81,9 +81,20 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
             }
             else {
                 for (int i = 0; i < operands.size(); i++) {
-                    updatedAvailabilities = checkAvailability(operands.get(i),
-                            originalAvailabilities, updatedAvailabilities,
-                            true);
+                    node = operands.get(i);
+                    if (node.has("key") && !node.at("/key").asText()
+                            .equals("availability")) {
+                        jlog.debug("RESET availabilities 1, key="
+                                + node.at("/key").asText());
+                        updatedAvailabilities.clear();
+                        updatedAvailabilities.addAll(originalAvailabilities);
+                        break;
+                    }
+                    else {
+                        updatedAvailabilities = checkAvailability(
+                                operands.get(i), originalAvailabilities,
+                                updatedAvailabilities, true);
+                    }
                 }
             }
         }
@@ -91,13 +102,14 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
                 && node.at("/key").asText().equals("availability")) {
             String queryAvailability = node.at("/value").asText();
             String matchOp = node.at("/match").asText();
+
             if (originalAvailabilities.contains(queryAvailability)
                     && matchOp.equals(KoralMatchOperator.EQUALS.toString())) {
                 jlog.debug("REMOVE " + queryAvailability);
                 updatedAvailabilities.remove(queryAvailability);
             }
             else if (isOperationOr) {
-                jlog.debug("RESET availabilities");
+                jlog.debug("RESET availabilities 2");
                 updatedAvailabilities.clear();
                 updatedAvailabilities.addAll(originalAvailabilities);
                 return updatedAvailabilities;
@@ -110,7 +122,7 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
     public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) throws KustvaktException {
         JsonNode jsonNode = node.rawNode();
-        
+
         FullConfiguration fullConfig = (FullConfiguration) config;
 
         List<String> userAvailabilities = new ArrayList<String>();
@@ -145,7 +157,7 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
                     avalabilityCopy, userAvailabilities, false);
             if (!userAvailabilities.isEmpty()) {
                 builder.with(buildAvailability(avalabilityCopy));
-                jlog.debug("corpus query: " +builder.toString());
+                jlog.debug("corpus query: " + builder.toString());
                 builder.setBaseQuery(builder.toJSON());
                 rewrittesNode = builder.mergeWith(jsonNode).at("/collection");
                 node.set("collection", rewrittesNode, identifier);
@@ -153,7 +165,7 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
         }
         else {
             builder.with(buildAvailability(userAvailabilities));
-            jlog.debug("corpus query: " +builder.toString());
+            jlog.debug("corpus query: " + builder.toString());
             rewrittesNode =
                     JsonUtils.readTree(builder.toJSON()).at("/collection");
             node.set("collection", rewrittesNode, identifier);
@@ -169,27 +181,28 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
         for (int i = 0; i < userAvailabilities.size(); i++) {
             parseAvailability(sb, userAvailabilities.get(i), "|");
         }
-        String availabilities = sb.toString(); 
-        return availabilities.substring(0, availabilities.length()-3);
+        String availabilities = sb.toString();
+        return availabilities.substring(0, availabilities.length() - 3);
     }
-    
-    private void parseAvailability (StringBuilder sb, String availability, String operator) {
+
+    private void parseAvailability (StringBuilder sb, String availability,
+            String operator) {
         String uaArr[] = null;
-        if (availability.contains("|")){
+        if (availability.contains("|")) {
             uaArr = availability.split("\\|");
-            for (int j=0; j < uaArr.length; j++){
+            for (int j = 0; j < uaArr.length; j++) {
                 parseAvailability(sb, uaArr[j].trim(), "|");
             }
         }
         // EM: not supported
-//        else if (availability.contains("&")){
-//            uaArr = availability.split("&");
-//            for (int j=0; j < uaArr.length -1; j++){
-//                parseAvailability(sb, uaArr[j], "&");
-//            }
-//            parseAvailability(sb, uaArr[uaArr.length-1], "|");
-//        } 
-        else{
+        //        else if (availability.contains("&")){
+        //            uaArr = availability.split("&");
+        //            for (int j=0; j < uaArr.length -1; j++){
+        //                parseAvailability(sb, uaArr[j], "&");
+        //            }
+        //            parseAvailability(sb, uaArr[uaArr.length-1], "|");
+        //        } 
+        else {
             sb.append("availability=/");
             sb.append(availability);
             sb.append("/ ");
@@ -198,6 +211,6 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
         }
 
     }
-    
+
 }
 

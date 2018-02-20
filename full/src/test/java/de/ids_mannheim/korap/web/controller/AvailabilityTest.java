@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
@@ -18,10 +19,10 @@ import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
-public class SearchWithAvailabilityTest extends SpringJerseyTest {
+public class AvailabilityTest extends SpringJerseyTest {
     @Autowired
     private HttpAuthorizationHandler handler;
-    
+
     private void checkAndFree (String json) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(json);
         assertEquals("availability",
@@ -38,6 +39,7 @@ public class SearchWithAvailabilityTest extends SpringJerseyTest {
     private void checkAndPublic (String json) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(json);
         assertNotNull(node);
+
         assertEquals("operation:and",
                 node.at("/collection/operation").asText());
         assertEquals("match:eq",
@@ -49,21 +51,24 @@ public class SearchWithAvailabilityTest extends SpringJerseyTest {
         assertEquals("CC-BY.*",
                 node.at("/collection/operands/0/operands/0/value").asText());
         assertEquals("match:eq",
-                node.at("/collection/operands/0/operands/1/operands/0/match").asText());
+                node.at("/collection/operands/0/operands/1/operands/0/match")
+                        .asText());
         assertEquals("ACA.*",
-                node.at("/collection/operands/0/operands/1/operands/0/value").asText());
+                node.at("/collection/operands/0/operands/1/operands/0/value")
+                        .asText());
         assertEquals("match:eq",
-                node.at("/collection/operands/0/operands/1/operands/1/match").asText());
+                node.at("/collection/operands/0/operands/1/operands/1/match")
+                        .asText());
         assertEquals("QAO-NC",
-                node.at("/collection/operands/0/operands/1/operands/1/value").asText());
+                node.at("/collection/operands/0/operands/1/operands/1/value")
+                        .asText());
         assertEquals("operation:insertion",
                 node.at("/collection/rewrites/0/operation").asText());
         assertEquals("availability(PUB)",
                 node.at("/collection/rewrites/0/scope").asText());
     }
 
-    private void checkAndPublicWithACA (String json)
-            throws KustvaktException {
+    private void checkAndPublicWithACA (String json) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(json);
         assertNotNull(node);
         assertEquals("operation:and",
@@ -72,7 +77,7 @@ public class SearchWithAvailabilityTest extends SpringJerseyTest {
                 node.at("/collection/rewrites/0/operation").asText());
         assertEquals("availability(PUB)",
                 node.at("/collection/rewrites/0/scope").asText());
-        
+
         assertEquals("match:eq",
                 node.at("/collection/operands/1/match").asText());
         assertEquals("type:regex",
@@ -80,16 +85,12 @@ public class SearchWithAvailabilityTest extends SpringJerseyTest {
         assertEquals("availability",
                 node.at("/collection/operands/1/key").asText());
         assertEquals("ACA.*", node.at("/collection/operands/1/value").asText());
-        
+
         node = node.at("/collection/operands/0");
-        assertEquals("match:eq",
-                node.at("/operands/0/match").asText());
-        assertEquals("type:regex",
-                node.at("/operands/0/type").asText());
-        assertEquals("availability",
-                node.at("/operands/0/key").asText());
-        assertEquals("CC-BY.*",
-                node.at("/operands/0/value").asText());
+        assertEquals("match:eq", node.at("/operands/0/match").asText());
+        assertEquals("type:regex", node.at("/operands/0/type").asText());
+        assertEquals("availability", node.at("/operands/0/key").asText());
+        assertEquals("CC-BY.*", node.at("/operands/0/value").asText());
 
         assertEquals("match:eq",
                 node.at("/operands/1/operands/0/match").asText());
@@ -99,7 +100,7 @@ public class SearchWithAvailabilityTest extends SpringJerseyTest {
                 node.at("/operands/1/operands/0/key").asText());
         assertEquals("ACA.*", node.at("/operands/1/operands/0/value").asText());
 
-        
+
     }
 
     private void checkAndAll (String json) throws KustvaktException {
@@ -140,7 +141,7 @@ public class SearchWithAvailabilityTest extends SpringJerseyTest {
                 node.at("/collection/rewrites/0/operation").asText());
         assertEquals("availability(ALL)",
                 node.at("/collection/rewrites/0/scope").asText());
-        
+
         assertEquals("match:eq",
                 node.at("/collection/operands/1/match").asText());
         assertEquals("type:regex",
@@ -148,17 +149,13 @@ public class SearchWithAvailabilityTest extends SpringJerseyTest {
         assertEquals("availability",
                 node.at("/collection/operands/1/key").asText());
         assertEquals("ACA.*", node.at("/collection/operands/1/value").asText());
-        
+
         node = node.at("/collection/operands/0");
-        
-        assertEquals("match:eq",
-                node.at("/operands/0/match").asText());
-        assertEquals("type:regex",
-                node.at("/operands/0/type").asText());
-        assertEquals("availability",
-                node.at("/operands/0/key").asText());
-        assertEquals("CC-BY.*",
-                node.at("/operands/0/value").asText());
+
+        assertEquals("match:eq", node.at("/operands/0/match").asText());
+        assertEquals("type:regex", node.at("/operands/0/type").asText());
+        assertEquals("availability", node.at("/operands/0/key").asText());
+        assertEquals("CC-BY.*", node.at("/operands/0/value").asText());
         assertEquals("match:eq",
                 node.at("/operands/1/operands/1/operands/0/match").asText());
         assertEquals("QAO-NC",
@@ -167,7 +164,7 @@ public class SearchWithAvailabilityTest extends SpringJerseyTest {
                 node.at("/operands/1/operands/1/operands/1/match").asText());
         assertEquals("QAO.*",
                 node.at("/operands/1/operands/1/operands/1/value").asText());
-        
+
     }
 
 
@@ -180,11 +177,13 @@ public class SearchWithAvailabilityTest extends SpringJerseyTest {
 
 
     private ClientResponse builtClientResponseWithIP (String collectionQuery,
-            String ip) throws UniformInterfaceException, ClientHandlerException, KustvaktException {
+            String ip) throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
         return resource().path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("cq", collectionQuery)
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
+                        handler.createBasicAuthorizationHeaderValue("kustvakt",
+                                "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, ip)
                 .get(ClientResponse.class);
     }
@@ -244,7 +243,7 @@ public class SearchWithAvailabilityTest extends SpringJerseyTest {
                 response.getStatus());
 
         String json = response.getEntity(String.class);
-        
+
         JsonNode node = JsonUtils.readTree(json);
         assertEquals("operation:and",
                 node.at("/collection/operation").asText());
@@ -440,4 +439,61 @@ public class SearchWithAvailabilityTest extends SpringJerseyTest {
         checkAndAllWithACA(response.getEntity(String.class));
     }
 
+    @Test
+    public void testAvailabilityOr () throws KustvaktException {
+        ClientResponse response = builtSimpleClientResponse(
+                "availability=/CC-BY.*/ | availability=/ACA.*/");
+
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+
+        checkAndFree(response.getEntity(String.class));
+    }
+
+    @Test
+    public void testRedundancyOrPub () throws KustvaktException {
+        ClientResponse response = builtClientResponseWithIP(
+                "availability=/CC-BY.*/ | availability=/ACA.*/ | availability=/QAO-NC/",
+                "149.27.0.32");
+
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+
+        String json = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(json);
+        assertTrue(node.at("/collection/rewrites").isMissingNode());
+        assertEquals("operation:or", node.at("/collection/operation").asText());
+    }
+
+    @Test
+    public void testAvailabilityOrCorpusSigle () throws KustvaktException {
+        ClientResponse response = builtSimpleClientResponse(
+                "availability=/CC-BY.*/ | corpusSigle=GOE");
+
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+
+        checkAndFree(response.getEntity(String.class));
+    }
+
+    @Test
+    public void testOrWithoutAvailability () throws KustvaktException {
+        ClientResponse response = builtSimpleClientResponse(
+                "corpusSigle=GOE | textClass=politik");
+
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+
+        checkAndFree(response.getEntity(String.class));
+    }
+
+    @Test
+    public void testWithoutAvailability () throws KustvaktException {
+        ClientResponse response = builtSimpleClientResponse("corpusSigle=GOE");
+
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+
+        checkAndFree(response.getEntity(String.class));
+    }
 }
