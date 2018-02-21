@@ -203,7 +203,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
 	@Override
 	public void setAccessAndLocation(User user, HttpHeaders headers) {
-		Boolean DEBUG_LOG = true;
 		MultivaluedMap<String, String> headerMap = headers.getRequestHeaders();
 		Location location = Location.EXTERN;
 		CorpusAccess corpusAccess = CorpusAccess.FREE;
@@ -212,8 +211,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	    {
 	    	// to be absolutely sure:
 	    	user.setCorpusAccess(User.CorpusAccess.FREE);
-	    	if( DEBUG_LOG == true )
-	    		System.out.printf("setAccessAndLocation: DemoUser: location=%s, access=%s.\n", user.locationtoString(), user.accesstoString());
+	    	jlog.debug("setAccessAndLocation: DemoUser: location=%s, access=%s.\n", user.locationtoString(), user.accesstoString());
 	     	return;
 	    }
 		
@@ -245,8 +243,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
 			user.setLocation(location);
 			user.setCorpusAccess(corpusAccess);
-	    	if( DEBUG_LOG == true )
-	    		System.out.printf("setAccessAndLocation: KorAPUser: location=%s, access=%s.\n", user.locationtoString(), user.accesstoString());
+	    	
+	    	jlog.debug("setAccessAndLocation: KorAPUser: location=%s, access=%s.\n", user.locationtoString(), user.accesstoString());
 
 		}
 	} // getAccess

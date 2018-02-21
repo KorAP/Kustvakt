@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ids_mannheim.korap</groupId>
 	<artifactId>Kustvakt-full</artifactId>
-	<version>0.59.10</version>
+	<version>0.60</version>
 	<properties>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -86,12 +86,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.19.1</version>
+				<version>2.20.1</version>
 				<configuration>
 					<reuseForks>false</reuseForks>
 					<forkCount>2</forkCount>
 					<threadCount>10</threadCount>
-
+					<argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
 					<excludes>
 						<!-- <exclude>de/ids_mannheim/korap/suites/*.java</exclude> -->
 						<!-- <exclude>de/ids_mannheim/korap/dao/*.java</exclude> -->

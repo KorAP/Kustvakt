@@ -17,24 +17,26 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
 
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.User;
 
 @Service
 public class MailService {
-    
-    private static Logger jlog =
-            LoggerFactory.getLogger(MailService.class);
-    
+
+    private static Logger jlog = LoggerFactory.getLogger(MailService.class);
+
     @Autowired
     private AuthenticationManagerIface authManager;
     @Autowired
     private JavaMailSender mailSender;
     @Autowired
     private VelocityEngine velocityEngine;
+    @Autowired
+    private FullConfiguration config;
 
     public void sendMemberInvitationNotification (String inviteeName,
-            String sender, String groupName, String inviter) {
+            String groupName, String inviter) {
 
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
 
@@ -44,28 +46,29 @@ public class MailService {
 
                 MimeMessageHelper message = new MimeMessageHelper(mimeMessage);
                 message.setTo(new InternetAddress(invitee.getEmail()));
-                message.setFrom(sender);
-                message.setSubject("Invitation to join "+groupName);
-                message.setText(prepareText(inviteeName, groupName, inviter),
-                        true);
+                message.setFrom(config.getNoReply());
+                message.setSubject("Invitation to join " + groupName);
+                message.setText(prepareGroupInvitationText(inviteeName,
+                        groupName, inviter), true);
             }
 
         };
         mailSender.send(preparator);
     }
 
-    private String prepareText (String username, String groupName,
-            String inviter) {
+    private String prepareGroupInvitationText (String username,
+            String groupName, String inviter) {
         Context context = new VelocityContext();
         context.put("username", username);
         context.put("group", groupName);
         context.put("inviter", inviter);
-        
+
         StringWriter stringWriter = new StringWriter();
-        
-        velocityEngine.mergeTemplate("templates/notification.vm",
+
+        velocityEngine.mergeTemplate(
+                "templates/" + config.getGroupInvitationTemplate(),
                 StandardCharsets.UTF_8.name(), context, stringWriter);
-        
+
         String message = stringWriter.toString();
         jlog.debug(message);
         return message;

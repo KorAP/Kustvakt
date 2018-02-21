@@ -472,7 +472,6 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                                 "pass"))
                 .entity(userGroup).post(ClientResponse.class);
 
-        String entity = response.getEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         // check member

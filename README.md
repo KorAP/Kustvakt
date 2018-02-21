@@ -21,7 +21,7 @@ Web-services including their usage examples are described in the [wiki](https://
 # Setup
 
 
-Prerequisites: Jdk 1.7, Git, Maven 3, MySQL (optional).
+Prerequisites: Jdk 1.8, Git, Maven 3, MySQL (optional), Postfix (optional).
 
 Clone the latest version of Kustvakt
 <pre>
@@ -146,6 +146,92 @@ While running ```KustvaktServer``` or ```Kustvakt-full-[version].jar```,
 MySQL tables will be created to the specified database from the SQL files in 
 ```full/src/main/resources/db/new-mysql``` and other paths specified in 
 ```jdbc.schemaPath```.
+
+## Enabling Mail
+
+Kustvakt supports email notification, for instance of a invitation to a user-group.
+The mail setting is by default configured for a mail server at localhost post 25. 
+You can setup a mail server for example by using [Postfix](http://www.postfix.org/).
+
+In kustvakt.conf or kustvakt-test.conf, set  
+
+	mail.enabled = true
+	mail.receiver = test@localhost
+	mail.sender = noreply@ids-mannheim.de
+
+
+You can change ```mail.sender``` value to any email address.
+```mail.receiver``` is only used for testing purpose. Change 
+```test``` to any username available in your system, or create an alias for 
+```test@localhost```. 
+
+To view the mailbox, you can use ```mailx``` 
+
+	$ mailx -u test
+	s-nail version v14.8.6.  Type ? for help.
+	"/var/mail/test": 1 messages 0 unread
+	 O  1 noreply@ids-mannhe Wed Feb 21 18:07   30/1227  Invitation to join
+
+
+### Creating email aliases 
+
+	sudo vi /etc/postfix/main.cf
+	
+In main.cf, set
+
+	"virtual_alias_maps = hash:/etc/postfix/alias"
+
+Create alias file:
+
+	sudo vi /etc/postfix/alias
+
+In the alias file, create an alias for ```test@localhost``` to a user in your system
+
+	test@localhost username
+
+Create alias database
+
+	sudo postmap /etc/postfix/alias
+	
+Restart postfix
+
+	sudo /etc/init.d/postfix restart
+
+
+By default, any emails sent to ```test@localhost``` will be available at 
+```/var/mail/username```.
+
+### Customizing SMTP configuration
+
+To connect to an external/remote mail server instead of using local Postfix,
+copy ```full/src/main/resources/properties/mail.properties``` to 
+the ```full/``` folder. Customize the properties in the file according to
+the mail server setup.  
+
+	mail.host = smtp.host.address
+	mail.port = 123
+	mail.connectiontimeout = 3000
+	mail.auth = true
+	mail.starttls.enable = true
+	mail.username = username
+	mail.password = password
+ 
+### Customizing Mail template
+
+Kustvakt uses [Apache Velocity](http://velocity.apache.org/) as the email template engine and searches for templates located at:
+
+```full/src/main/resources/templates```.
+
+For instance, the template for email notification of user-group invitation is 
+
+```full/src/main/resources/templates/notification.vm```
+
+You can change the template according to Velocity Template Language.
+
+In ```kustvakt.conf``` or ```kustvakt-test.conf```, specify which template should be used. 
+	
+	template.group.invitation = notification.vm
+
 
 # Known issues
 Tests are verbose - they do not necessarily imply system errors.

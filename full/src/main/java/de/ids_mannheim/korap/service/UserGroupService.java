@@ -250,9 +250,8 @@ public class UserGroupService {
         member.setUserId(username);
         groupMemberDao.addMember(member);
 
-        if (config.isMailEnabled()) {
-            mailService.sendMemberInvitationNotification(username,
-                    config.getNoReply(), userGroup.getName(), createdBy);
+        if (config.isMailEnabled() && userGroup.getStatus() != UserGroupStatus.HIDDEN) {
+            mailService.sendMemberInvitationNotification(username,userGroup.getName(), createdBy);
         }
     }
 

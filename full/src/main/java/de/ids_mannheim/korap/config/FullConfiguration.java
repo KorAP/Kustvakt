@@ -19,6 +19,8 @@ public class FullConfiguration extends KustvaktConfiguration {
     private String testEmail;
     private String noReply;
 
+    private String groupInvitationTemplate;
+    
     private String ldapConfig;
 
     private String freeOnlyRegex;
@@ -64,6 +66,7 @@ public class FullConfiguration extends KustvaktConfiguration {
             // other properties must be set in the kustvakt.conf
             setTestEmail(properties.getProperty("mail.receiver"));
             setNoReply(properties.getProperty("mail.sender"));
+            setGroupInvitationTemplate(properties.getProperty("template.group.invitation"));
         }
     }
 
@@ -256,6 +259,14 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     public void setNoReply (String noReply) {
         this.noReply = noReply;
+    }
+
+    public String getGroupInvitationTemplate () {
+        return groupInvitationTemplate;
+    }
+
+    public void setGroupInvitationTemplate (String groupInvitationTemplate) {
+        this.groupInvitationTemplate = groupInvitationTemplate;
     }
 
 }
