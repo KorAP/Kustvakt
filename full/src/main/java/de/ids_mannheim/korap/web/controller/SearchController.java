@@ -1005,6 +1005,28 @@ public class SearchController {
     }
 
 
+	/*
+     * Returns the meta data fields of a certain document
+     */
+	// This is currently identical to LiteService#getMeta(),
+	// but may need auth code to work following policies
+    @GET
+    @Path("/corpus/{corpusId}/{docId}/{textId}")
+    public Response getMeta (
+		@PathParam("corpusId") String corpusId,
+		@PathParam("docId") String docId,
+		@PathParam("textId") String textId
+		// @QueryParam("fields") Set<String> fields
+		) throws KustvaktException {
+
+		String textSigle = searchKrill.getTextSigle(corpusId, docId, textId);
+		
+		String results = searchKrill.getFields(textSigle);
+
+        return Response.ok(results).build();
+    }
+
+
     // todo:?!
     @POST
     @Path("match/{id}")
