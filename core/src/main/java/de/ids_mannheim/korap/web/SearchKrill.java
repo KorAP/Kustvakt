@@ -18,6 +18,7 @@ import de.ids_mannheim.korap.KrillIndex;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.response.Match;
+import de.ids_mannheim.korap.response.MetaFields;
 import de.ids_mannheim.korap.response.Result;
 import de.ids_mannheim.korap.util.QueryException;
 
@@ -144,6 +145,29 @@ public class SearchKrill {
     };
 
 
+	/*
+	 * Retrieve the meta fields for a certain document
+	 */
+	public String getFields (String id) {
+		MetaFields meta;
+
+		// No index found
+		if (this.index == null) {
+        	meta = new MetaFields(id);
+        	meta.addError(601, "Unable to find index");
+		}
+
+		// Index available
+		else {
+
+			//Get fields
+			meta = this.index.getFields(id);
+		};
+		return meta.toJsonString();
+	};
+
+
+	
     public String getMatch (String id, List<String> foundries,
             List<String> layers, boolean includeSpans,
             boolean includeHighlights, boolean sentenceExpansion, 
@@ -283,6 +307,18 @@ public class SearchKrill {
         StringBuilder sb = new StringBuilder();
         sb.append("match-").append(corpusID).append('/').append(docID)
                 .append('/').append(textID).append('-').append(matchID);
+        return sb.toString();
+    };
+
+
+    /**
+     * Return the text sigle as a string.
+     */
+    public String getTextSigle (String corpusID, String docID, String textID) {
+        // Create a string representation of the match 
+        StringBuilder sb = new StringBuilder();
+        sb.append(corpusID).append('/').append(docID)
+                .append('/').append(textID);
         return sb.toString();
     };
 };
