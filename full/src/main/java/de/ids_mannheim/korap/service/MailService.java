@@ -42,7 +42,8 @@ public class MailService {
 
             public void prepare (MimeMessage mimeMessage) throws Exception {
 
-                User invitee = authManager.getUser(inviteeName);
+                User invitee = authManager.getUser(inviteeName,
+                        config.getEmailAddressRetrieval());
 
                 MimeMessageHelper message = new MimeMessageHelper(mimeMessage);
                 message.setTo(new InternetAddress(invitee.getEmail()));

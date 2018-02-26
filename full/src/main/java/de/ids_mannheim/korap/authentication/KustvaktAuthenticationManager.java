@@ -139,11 +139,27 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 		//EM:copied from EntityDao
 		KorAPUser user = new KorAPUser(); // oder eigentlich new DemoUser oder new DefaultUser.
         user.setUsername(username);
-        // get user data
-        user.setEmail(config.getTestEmail());
         return user;
 //		return entHandler.getAccount(username);
 	}
+	
+	@Override
+    public User getUser (String username, String method)
+            throws KustvaktException {
+	    KorAPUser user = new KorAPUser();
+        user.setUsername(username);
+        String email = null;
+        switch (method.toLowerCase()) {
+            case "ldap":
+                email = config.getTestEmail();
+                break;
+            default:
+                email = config.getTestEmail();
+                break;
+        }
+        user.setEmail(email);
+        return user;
+    }
 
 	public TokenContext refresh(TokenContext context) throws KustvaktException {
 		AuthenticationIface provider = getProvider(context.getTokenType(), null);

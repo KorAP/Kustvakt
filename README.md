@@ -156,14 +156,22 @@ You can setup a mail server for example by using [Postfix](http://www.postfix.or
 In kustvakt.conf or kustvakt-test.conf, set  
 
 	mail.enabled = true
-	mail.receiver = test@localhost
 	mail.sender = noreply@ids-mannheim.de
+	mail.receiver = test@localhost
+	mail.address.retrieval = test
 
+You can change ```mail.sender``` value to any email address (beware 
+of spam in your mail server configuration). ```mail.receiver``` 
+is an email address used for testing. All mails are to be sent to this 
+email address. Change ```test``` to any username available in your system, 
+or create an alias for ```test@localhost```. 
 
-You can change ```mail.sender``` value to any email address.
-```mail.receiver``` is only used for testing purpose. Change 
-```test``` to any username available in your system, or create an alias for 
-```test@localhost```. 
+```mail.address.retrieval``` 
+determines how user email addresses are retrieved. By default and 
+for testing, only the ```mail.receiver``` value is used as the 
+email address of all users. For custom implementation, 
+please refer to ```de.ids_mannheim.korap.authentication.KustvaktAuthenticationManager.getUser(String, String)```
+ 
 
 To view the mailbox, you can use ```mailx``` 
 

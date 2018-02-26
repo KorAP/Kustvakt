@@ -123,4 +123,9 @@ public abstract class AuthenticationManagerIface extends KustvaktCacheable {
     public String providerList () {
         return "provider list: " + this.providers.toString();
     }
+
+
+    public abstract User getUser (String username, String method)
+            throws KustvaktException;
+
 }
