@@ -7,7 +7,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
@@ -170,9 +169,9 @@ public class BeanConfiguration {
         }
 
 
-        public AuthenticationManagerIface getAuthenticationManager () {
-            return getBean(KUSTVAKT_AUTHENTICATION_MANAGER);
-        }
+//        public AuthenticationManagerIface getAuthenticationManager () {
+//            return getBean(KUSTVAKT_AUTHENTICATION_MANAGER);
+//        }
 
 
         public EntityHandlerIface getUserDBHandler () {

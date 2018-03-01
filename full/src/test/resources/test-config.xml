@@ -194,10 +194,6 @@
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
 
-	<bean id="kustvakt_policies" class="de.ids_mannheim.korap.security.ac.PolicyDao">
-		<constructor-arg ref="kustvakt_db" />
-	</bean>
-
 	<bean name="kustvakt_encryption"
 		class="de.ids_mannheim.korap.interfaces.defaults.KustvaktEncryption">
 		<constructor-arg ref="kustvakt_config" />

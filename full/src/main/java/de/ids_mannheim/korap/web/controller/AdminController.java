@@ -1,10 +1,8 @@
 package de.ids_mannheim.korap.web.controller;
 
-import java.util.List;
 import java.util.Locale;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -19,20 +17,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.auditing.AuditRecord;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
-import de.ids_mannheim.korap.resources.KustvaktResource;
-import de.ids_mannheim.korap.resources.Permissions;
-import de.ids_mannheim.korap.resources.ResourceFactory;
-import de.ids_mannheim.korap.security.PolicyCondition;
-import de.ids_mannheim.korap.security.ac.PolicyBuilder;
 import de.ids_mannheim.korap.server.KustvaktServer;
-import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
@@ -100,80 +91,81 @@ public class AdminController {
     }
 
 
-    @POST
-    @Path("createPolicies/{id}")
-    public Response addResourcePolicy (@PathParam("id") String persistentid,
-            @QueryParam("type") String type, @QueryParam("name") String name,
-            @QueryParam("description") String description,
-            @QueryParam("group") String group,
-            @QueryParam("perm") List<String> permissions,
-            @QueryParam("loc") String loc,
-            @QueryParam("expire") String duration, @Context HttpContext context)
-            throws KustvaktException {
-
-        if (type == null | type.isEmpty()) {
-            KustvaktException e = new KustvaktException(
-                    StatusCodes.MISSING_ARGUMENT,
-                    "The value of parameter type is missing.");
-            throw kustvaktResponseHandler.throwit(e);
-        }
-        else if (name == null | name.isEmpty()) {
-            KustvaktException e = new KustvaktException(
-                    StatusCodes.MISSING_ARGUMENT,
-                    "The value of parameter name is missing.");
-            throw kustvaktResponseHandler.throwit(e);
-        }
-        else if (description == null | description.isEmpty()) {
-            KustvaktException e = new KustvaktException(
-                    StatusCodes.MISSING_ARGUMENT,
-                    "The value of parameter description is missing.");
-            throw kustvaktResponseHandler.throwit(e);
-        }
-        else if (group == null | group.isEmpty()) {
-            KustvaktException e = new KustvaktException(
-                    StatusCodes.MISSING_ARGUMENT,
-                    "The value of parameter group is missing.");
-            throw kustvaktResponseHandler.throwit(e);
-        }
-        else if (permissions == null | permissions.isEmpty()) {
-            KustvaktException e = new KustvaktException(
-                    StatusCodes.MISSING_ARGUMENT,
-                    "The value of parameter permissions is missing.");
-            throw kustvaktResponseHandler.throwit(e);
-        }
-
-
-        try {
-            KustvaktResource resource = ResourceFactory.getResource(type);
-            resource.setPersistentID(persistentid);
-            resource.setDescription(description);
-            resource.setName(name);
-
-            Permissions.Permission[] p = Permissions
-                    .read(permissions.toArray(new String[0]));
-
-            User user = (User) context.getProperties().get("user");
-
-            PolicyBuilder pb = new PolicyBuilder(user)
-                    .setConditions(new PolicyCondition(group))
-                    .setResources(resource);
-
-            if (loc != null && !loc.isEmpty()){
-                pb.setLocation(loc);
-            }
-            if (duration != null && !duration.isEmpty()){
-                long now = TimeUtils.getNow().getMillis();
-                pb.setContext(now,
-                        now + TimeUtils.convertTimeToSeconds(duration));
-            }
-            pb.setPermissions(p);
-            pb.create();
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
-
-        return Response.ok().build();
-    }
+//    @Deprecated
+//    @POST
+//    @Path("createPolicies/{id}")
+//    public Response addResourcePolicy (@PathParam("id") String persistentid,
+//            @QueryParam("type") String type, @QueryParam("name") String name,
+//            @QueryParam("description") String description,
+//            @QueryParam("group") String group,
+//            @QueryParam("perm") List<String> permissions,
+//            @QueryParam("loc") String loc,
+//            @QueryParam("expire") String duration, @Context HttpContext context)
+//            throws KustvaktException {
+//
+//        if (type == null | type.isEmpty()) {
+//            KustvaktException e = new KustvaktException(
+//                    StatusCodes.MISSING_ARGUMENT,
+//                    "The value of parameter type is missing.");
+//            throw kustvaktResponseHandler.throwit(e);
+//        }
+//        else if (name == null | name.isEmpty()) {
+//            KustvaktException e = new KustvaktException(
+//                    StatusCodes.MISSING_ARGUMENT,
+//                    "The value of parameter name is missing.");
+//            throw kustvaktResponseHandler.throwit(e);
+//        }
+//        else if (description == null | description.isEmpty()) {
+//            KustvaktException e = new KustvaktException(
+//                    StatusCodes.MISSING_ARGUMENT,
+//                    "The value of parameter description is missing.");
+//            throw kustvaktResponseHandler.throwit(e);
+//        }
+//        else if (group == null | group.isEmpty()) {
+//            KustvaktException e = new KustvaktException(
+//                    StatusCodes.MISSING_ARGUMENT,
+//                    "The value of parameter group is missing.");
+//            throw kustvaktResponseHandler.throwit(e);
+//        }
+//        else if (permissions == null | permissions.isEmpty()) {
+//            KustvaktException e = new KustvaktException(
+//                    StatusCodes.MISSING_ARGUMENT,
+//                    "The value of parameter permissions is missing.");
+//            throw kustvaktResponseHandler.throwit(e);
+//        }
+//
+//
+//        try {
+//            KustvaktResource resource = ResourceFactory.getResource(type);
+//            resource.setPersistentID(persistentid);
+//            resource.setDescription(description);
+//            resource.setName(name);
+//
+//            Permissions.Permission[] p = Permissions
+//                    .read(permissions.toArray(new String[0]));
+//
+//            User user = (User) context.getProperties().get("user");
+//
+//            PolicyBuilder pb = new PolicyBuilder(user)
+//                    .setConditions(new PolicyCondition(group))
+//                    .setResources(resource);
+//
+//            if (loc != null && !loc.isEmpty()){
+//                pb.setLocation(loc);
+//            }
+//            if (duration != null && !duration.isEmpty()){
+//                long now = TimeUtils.getNow().getMillis();
+//                pb.setContext(now,
+//                        now + TimeUtils.convertTimeToSeconds(duration));
+//            }
+//            pb.setPermissions(p);
+//            pb.create();
+//        }
+//        catch (KustvaktException e) {
+//            throw kustvaktResponseHandler.throwit(e);
+//        }
+//
+//        return Response.ok().build();
+//    }
 
 }

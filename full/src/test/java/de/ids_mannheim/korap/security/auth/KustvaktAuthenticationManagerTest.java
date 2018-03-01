@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeanConfigTest;
@@ -28,16 +29,17 @@ import de.ids_mannheim.korap.user.Userdata;
 @Ignore
 public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
 
+    @Autowired
+    private AuthenticationManagerIface authManager;
+    
     @After
     public void after () {
         try {
-            User user = helper()
-                    .getContext()
-                    .getAuthenticationManager()
+            User user = authManager
                     .getUser(
                             (String) KustvaktConfiguration.KUSTVAKT_USER
                                     .get(Attributes.USERNAME));
-            helper().getContext().getAuthenticationManager()
+            authManager
                     .deleteAccount(user);
         }
         catch (KustvaktException e) {}
@@ -47,7 +49,7 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
     @Test
     @Ignore
     public void testCreateUser () throws KustvaktException {
-        User user = helper().getContext().getAuthenticationManager()
+        User user = authManager
                 .createUserAccount(KustvaktConfiguration.KUSTVAKT_USER, false);
 
         EntityHandlerIface dao = helper().getContext().getUserDBHandler();
@@ -61,8 +63,8 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
     public void testBatchStore () {
         int i = 6;
 
-        AuthenticationManagerIface manager = helper().getContext()
-                .getAuthenticationManager();
+//        AuthenticationManagerIface manager = helper().getContext()
+//                .getAuthenticationManager();
         for (int ix = 0; ix < i; ix++) {}
 
     }
@@ -72,14 +74,12 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
     @Ignore
     public void testUserdetailsGet () throws KustvaktException {
         testCreateUser();
-        AuthenticationManagerIface manager = helper().getContext()
-                .getAuthenticationManager();
 
-        User user = manager
+        User user = authManager
                 .getUser((String) KustvaktConfiguration.KUSTVAKT_USER
                         .get(Attributes.USERNAME));
 
-        Userdata data = manager.getUserData(user, UserDetails.class);
+        Userdata data = authManager.getUserData(user, UserDetails.class);
         assertNotNull(data);
     }
 
@@ -88,14 +88,12 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
     @Ignore
     public void testUsersettingsGet () throws KustvaktException {
         testCreateUser();
-        AuthenticationManagerIface manager = helper().getContext()
-                .getAuthenticationManager();
 
-        User user = manager
+        User user = authManager
                 .getUser((String) KustvaktConfiguration.KUSTVAKT_USER
                         .get(Attributes.USERNAME));
 
-        Userdata data = manager.getUserData(user, UserSettings.class);
+        Userdata data = authManager.getUserData(user, UserSettings.class);
         assertNotNull(data);
     }
 
@@ -103,30 +101,24 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
     @Test(expected = KustvaktException.class)
     public void testUserDetailsGetNonExistent () throws KustvaktException {
         testCreateUser();
-        AuthenticationManagerIface manager = helper().getContext()
-                .getAuthenticationManager();
 
         User user = new KorAPUser(10, "random");
-        manager.getUserData(user, UserDetails.class);
+        authManager.getUserData(user, UserDetails.class);
     }
 
 
     @Test(expected = KustvaktException.class)
     public void testUserSettingsGetNonExistent () throws KustvaktException {
         testCreateUser();
-        AuthenticationManagerIface manager = helper().getContext()
-                .getAuthenticationManager();
 
         User user = new KorAPUser(10, "random");
-        manager.getUserData(user, UserSettings.class);
+        authManager.getUserData(user, UserSettings.class);
     }
 
     @Test
     @Ignore
     public void testUserUpdate() throws KustvaktException {
         testCreateUser();
-        AuthenticationManagerIface manager = helper().getContext()
-                .getAuthenticationManager();
         // todo:
     }
 

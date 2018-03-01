@@ -90,15 +90,10 @@
 				<configuration>
 					<reuseForks>false</reuseForks>
 					<forkCount>2</forkCount>
-					<threadCount>10</threadCount>
-					<argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
+					<threadCount>4</threadCount>
+					<argLine>-Xmx512m -XX:MaxPermSize=256m</argLine>
 					<excludes>
-						<!-- <exclude>de/ids_mannheim/korap/suites/*.java</exclude> -->
-						<!-- <exclude>de/ids_mannheim/korap/dao/*.java</exclude> -->
 						<exclude>de/ids_mannheim/korap/authentication/*.java</exclude>
-						<!-- <exclude>**/ResourceServiceTest.java</exclude> -->
-						<!-- <exclude>**/ResourceInfoServiceTest.java</exclude> -->
-						<exclude>**/PolicyServiceTest.java</exclude>
 					</excludes>
 					<includes>
 						<include>de/ids_mannheim/korap/**/*.java</include>
@@ -161,7 +156,7 @@
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Kustvakt-core</artifactId>
-			<version>0.59.10</version>
+			<version>0.60</version>
 			<type>jar</type>
 		</dependency>
 		<!-- LDAP -->

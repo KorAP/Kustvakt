@@ -3,9 +3,6 @@ package de.ids_mannheim.korap.resource.rewrite;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -15,6 +12,7 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.TestVariables;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
+import de.ids_mannheim.korap.rewrite.CollectionConstraint;
 import de.ids_mannheim.korap.rewrite.CollectionRewrite;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -32,19 +30,6 @@ public class CollectionRewriteTest extends BeanConfigTest {
     public void initMethod () throws KustvaktException {
 //        helper().runBootInterfaces();
         config = helper().getContext().getConfiguration();
-    }
-
-
-    @Deprecated
-    @Test
-    public void test2 () {
-        Pattern p = Pattern.compile("([\\.\\w]+)\\((.+)\\)");
-        String cl = de.ids_mannheim.korap.security.ac.SecurityManager.class
-                .getCanonicalName();
-        Matcher m = p.matcher(cl);
-        while (m.find())
-            System.out.println("group 1 " + m.group(1));
-
     }
 
 

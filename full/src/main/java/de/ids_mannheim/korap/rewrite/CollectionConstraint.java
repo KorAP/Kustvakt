@@ -1,12 +1,15 @@
-package de.ids_mannheim.korap.resource.rewrite;
+package de.ids_mannheim.korap.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.resource.rewrite.KoralNode;
+import de.ids_mannheim.korap.resource.rewrite.RewriteTask;
+import de.ids_mannheim.korap.resource.rewrite.KoralNode.RewriteIdentifier;
+import de.ids_mannheim.korap.resource.rewrite.RewriteTask.IterableRewritePath;
 import de.ids_mannheim.korap.resources.Corpus;
 import de.ids_mannheim.korap.resources.KustvaktResource;
-import de.ids_mannheim.korap.security.ac.SecurityManager;
 import de.ids_mannheim.korap.user.User;
 
 /**
@@ -23,8 +26,9 @@ public class CollectionConstraint implements RewriteTask.IterableRewritePath {
         if (node.get("@type").equals("koral:doc")) {
             if (node.get("key").equals(Attributes.CORPUS_SIGLE)) {
                 String id = node.get("value");
-                KustvaktResource corpus = check(id, user);
-                if (corpus == null)
+                // EM: MH checks if user has access to corpus
+//                KustvaktResource corpus = check(id, user);
+//                if (corpus == null)
                     node.removeNode(new KoralNode.RewriteIdentifier(
                             Attributes.CORPUS_SIGLE, id));
             }
@@ -38,22 +42,23 @@ public class CollectionConstraint implements RewriteTask.IterableRewritePath {
      * @param user
      * @return boolean if true access granted
      */
-    private KustvaktResource check (String id, User user) {
-        // todo: can be used to circumvent access control if public filter not applied
-        if (user == null)
-            return null;
-
-        KustvaktResource corpus;
-        try {
-            SecurityManager m = SecurityManager
-                    .findbyId(id, user, Corpus.class);
-            corpus = m.getResource();
-        }
-        catch (RuntimeException | KustvaktException e) {
-            return null;
-        }
-        return corpus;
-    }
+//    @Deprecated
+//    private KustvaktResource check (String id, User user) {
+//        // todo: can be used to circumvent access control if public filter not applied
+//        if (user == null)
+//            return null;
+//
+//        KustvaktResource corpus;
+//        try {
+//            SecurityManager m = SecurityManager
+//                    .findbyId(id, user, Corpus.class);
+//            corpus = m.getResource();
+//        }
+//        catch (RuntimeException | KustvaktException e) {
+//            return null;
+//        }
+//        return corpus;
+//    }
 
 
     @Override

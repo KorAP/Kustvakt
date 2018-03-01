@@ -26,13 +26,14 @@ public class ClassLoaderTest extends BeanConfigTest {
     }
 
 
-    @Test
-    public void testDefaultCreation2ThrowsNoException () {
-        AuthenticationManagerIface iface = helper().getContext()
-                .getAuthenticationManager();
-        assertNotNull(iface);
-        assertTrue(iface instanceof KustvaktAuthenticationManager);
-    }
+//    @Test
+//    @Deprecated
+//    public void testDefaultCreation2ThrowsNoException () {
+//        AuthenticationManagerIface iface = helper().getContext()
+//                .getAuthenticationManager();
+//        assertNotNull(iface);
+//        assertTrue(iface instanceof KustvaktAuthenticationManager);
+//    }
 
 
     @Test

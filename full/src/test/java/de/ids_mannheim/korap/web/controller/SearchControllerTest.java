@@ -5,9 +5,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Iterator;
-import java.util.Set;
-
 import javax.ws.rs.core.MediaType;
 
 import org.junit.Ignore;
@@ -20,13 +17,8 @@ import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
-import de.ids_mannheim.korap.resources.Corpus;
-import de.ids_mannheim.korap.security.ac.ResourceFinder;
-import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.FastJerseyTest;
 
@@ -302,45 +294,6 @@ public class SearchControllerTest extends FastJerseyTest {
         assertEquals(1, node.at("/meta/totalResults").asInt());
     }
 
-    // EM: non practical use-case
-    @Test
-    @Ignore
-    public void testSearchForPublicCorpusWithIntegerId ()
-            throws KustvaktException {
-        Set<Corpus> publicCorpora = ResourceFinder.searchPublic(Corpus.class);
-        Iterator<Corpus> i = publicCorpora.iterator();
-        String id = null;
-        while (i.hasNext()) {
-            Corpus c = i.next();
-            if (c.getName().equals("Goethe")) {
-                id = c.getId().toString();
-            }
-        }
-
-        ClientResponse response = resource()
-                .path("corpus").path(id).path("search").queryParam("q", "blau")
-                .queryParam("ql", "poliqarp").get(ClientResponse.class);
-
-        String ent = response.getEntity(String.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
-                response.getStatus());
-
-        JsonNode node = JsonUtils.readTree(ent);
-        assertNotNull(node);
-        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
-        assertEquals("operation:and",
-                node.at("/collection/operation").asText());
-        assertEquals("availability",
-                node.at("/collection/operands/0/key").asText());
-        assertEquals("CC-BY.*",
-                node.at("/collection/operands/0/value").asText());
-        assertEquals("corpusSigle",
-                node.at("/collection/operands/1/key").asText());
-        assertEquals("GOE", node.at("/collection/operands/1/value").asText());
-        assertNotEquals(0, node.path("matches").size());
-    }
-
-
     @Test
     @Ignore
     public void testSearchForCorpusWithStringIdUnauthorized () throws KustvaktException {
@@ -385,46 +338,6 @@ public class SearchControllerTest extends FastJerseyTest {
     }
 
 
-    @Test
-    @Ignore
-    public void testSearchForOwnersCorpusWithIntegerId ()
-            throws KustvaktException {
-
-        User kustvaktUser = ((EntityHandlerIface) helper()
-                .getBean(ContextHolder.KUSTVAKT_USERDB)).getAccount("kustvakt");
-        Set<Corpus> userCorpora = ResourceFinder.search(kustvaktUser,
-                Corpus.class);
-        Iterator<Corpus> i = userCorpora.iterator();
-        String id = null;
-        while (i.hasNext()) {
-            Corpus c = i.next();
-            if (c.getPersistentID().equals("GOE")) {
-                id = c.getId().toString();
-                //                System.out.println("Corpus "+id);
-            }
-        }
-        ClientResponse response = resource()
-                .path("corpus").path(id).path("search")
-                .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
-                response.getStatus());
-        String entity = response.getEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertNotNull(node);
-        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
-        assertEquals("operation:and",
-                node.at("/collection/operation").asText());
-        assertEquals("availability",
-                node.at("/collection/operands/0/key").asText());
-        assertEquals("CC-BY.*",
-                node.at("/collection/operands/0/value").asText());
-        assertEquals("corpusSigle",
-                node.at("/collection/operands/1/key").asText());
-        assertEquals("GOE", node.at("/collection/operands/1/value").asText());
-    }
 
 
     @Test

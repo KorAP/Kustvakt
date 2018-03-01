@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -35,6 +34,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.spi.container.ResourceFilters;
 
+import de.ids_mannheim.korap.cache.ResourceCache;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
@@ -49,9 +49,6 @@ import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.rewrite.FullRewriteHandler;
-import de.ids_mannheim.korap.security.ac.ResourceFinder;
-import de.ids_mannheim.korap.security.ac.ResourceHandler;
-import de.ids_mannheim.korap.user.DemoUser;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
@@ -67,12 +64,12 @@ import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 
 /**
- * EM: To Do: restructure codes regarding service and controller
- * layers
  * 
  * @author hanl, margaretha
  * @date 29/01/2014
- * @lastUpdate 06/2017
+ * @lastUpdate 01/2018
+ * 
+ * removed deprecated codes
  */
 @Controller
 @Path("/")
@@ -85,10 +82,10 @@ public class SearchController {
             LoggerFactory.getLogger(SearchController.class);
 
     @Autowired
-    CoreResponseHandler responseHandler;
+    private CoreResponseHandler responseHandler;
     @Autowired
     private SearchKrill searchKrill;
-    private ResourceHandler resourceHandler;
+    private ResourceCache resourceHandler;
     @Autowired
     private AuthenticationManagerIface controller;
     private ClientsHandler graphDBhandler;
@@ -99,7 +96,7 @@ public class SearchController {
 
 
     public SearchController () {
-        this.resourceHandler = new ResourceHandler();
+        this.resourceHandler = new ResourceCache();
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
         this.graphDBhandler = new ClientsHandler(builder.build());
     }
@@ -224,7 +221,6 @@ public class SearchController {
     }
 
 
-    /* EM: potentially an unused service! */
     /** Builds a json query serialization from the given parameters.
      * 
      * @param locale
@@ -519,65 +515,6 @@ public class SearchController {
 
     }
 
-    @Deprecated
-    private String createQuery (User user, String type, String id,
-            KoralCollectionQueryBuilder builder) {
-        KustvaktResource resource = null;
-        try {
-            // EM: this doesn't look like very useful since the id is :
-            // 1. auto-generated 
-            // 2. random
-            // 3. not really known.
-            if (user instanceof DemoUser) {
-                Set<KustvaktResource> set = null;
-                if (StringUtils.isInteger(id)) {
-                    set = ResourceFinder.searchPublicFilteredIntId(
-                            ResourceFactory.getResourceClass(type),
-                            Integer.parseInt(id));
-                }
-                else {
-                    set = ResourceFinder.searchPublicFiltered(
-                            ResourceFactory.getResourceClass(type), id);
-                }
-                resource = (KustvaktResource) set.toArray()[0];
-            }
-            else if (StringUtils.isInteger(id)) {
-                resource = this.resourceHandler.findbyIntId(Integer.valueOf(id),
-                        user);
-            }
-            else {
-                resource = this.resourceHandler.findbyStrId(id, user,
-                        ResourceFactory.getResourceClass(type));
-            }
-        }
-        catch (KustvaktException e) {
-            jlog.error("Failed retrieving resource: {}", e.string());
-            throw responseHandler.throwit(e);
-        }
-        try {
-            if (resource instanceof VirtualCollection) {
-                // test this
-                //builder.setBaseQuery(resource.getData());
-                return JsonUtils
-                        .toJSON(builder.and().mergeWith(resource.getData()));
-            }
-            else if (resource instanceof Corpus) {
-                builder.and().with(Attributes.CORPUS_SIGLE, "=",
-                        resource.getPersistentID());
-
-                return builder.toJSON();
-            }
-
-
-            else {
-                throw responseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
-                        "Type parameter not supported", type);
-            }
-        }
-        catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
-        }
-    }
 
     /**
      * @param context
@@ -629,298 +566,6 @@ public class SearchController {
         }
     }
 
-
-    // EM: this handles layer id containing a slash. 
-    // Probably better to restrict the id not to contain any slash instead.
-    @Deprecated
-    @POST
-    @Path("{type}/{id}/{child}")
-    public Response updateResource (@Context SecurityContext context,
-            @Context Locale locale, @PathParam("type") String type,
-            @PathParam("id") String id, @PathParam("child") String child,
-            @QueryParam("name") String name,
-            @QueryParam("description") String description) {
-        return updateResource(context, locale, type,
-                StringUtils.joinResources(id, child), name, description);
-    }
-
-
-    @Deprecated
-    @POST
-    @Path("{type}/{id}")
-    public Response updateResource (@Context SecurityContext context,
-            @Context Locale locale, @PathParam("type") String type,
-            @PathParam("id") String id, @QueryParam("name") String name,
-            @QueryParam("description") String description) {
-        TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        User user;
-        try {
-            user = controller.getUser(ctx.getUsername());
-            KustvaktResource resource = this.resourceHandler.findbyStrId(id,
-                    user, ResourceFactory.getResourceClass(type));
-
-            if (name != null && !name.isEmpty()) {
-                if (description == null) {
-                    if (name.equals(resource.getName())) {
-                        throw new KustvaktException(StatusCodes.NOTHING_CHANGED,
-                                "No change has found.");
-                    }
-                    resource.setName(name);
-                }
-                else if (name.equals(resource.getName())
-                        && description.equals(resource.getDescription())) {
-                    throw new KustvaktException(StatusCodes.NOTHING_CHANGED,
-                            "No change has found.");
-                }
-                else {
-                    resource.setName(name);
-                    resource.setDescription(description);
-                }
-            }
-            else if (description != null && !description.isEmpty()) {
-                resource.setDescription(description);
-            }
-            else {
-                throw new KustvaktException(StatusCodes.NOTHING_CHANGED,
-                        "The given resource name and description are the same as already stored.");
-            }
-
-
-            this.resourceHandler.updateResources(user, resource);
-        }
-        catch (KustvaktException e) {
-            jlog.error("Exception encountered: {}", e.string());
-            throw responseHandler.throwit(e);
-        }
-        return Response.ok().build();
-    }
-
-    @Deprecated
-    // todo: change or deprecate
-    @POST
-    @Path("nv/{type}")
-    public Response storeResource (@Context SecurityContext context,
-            @Context Locale locale, @PathParam("type") String type,
-            @QueryParam("name") String name,
-            @QueryParam("description") String description,
-            // deprecate -> if you want to store a resource based on another,
-            // build the query first yourself or via a function
-            @QueryParam("ref") String reference,
-            @QueryParam("cache") Boolean cache,
-            @QueryParam("query") String query) {
-        TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        cache = cache != null ? cache : false;
-        type = StringUtils.normalize(type);
-        reference = StringUtils.decodeHTML(reference);
-        Map vals = new HashMap();
-        User user;
-        Class ctype;
-        try {
-            ctype = ResourceFactory.getResourceClass(type);
-            user = controller.getUser(ctx.getUsername());
-        }
-        catch (KustvaktException e) {
-            jlog.error("Exception encountered: {}", e.string());
-            throw responseHandler.throwit(e);
-        }
-        if (VirtualCollection.class.equals(ctype)) {
-            VirtualCollection cachetmp, collection;
-
-            JsonNode base = null;
-            if (reference != null && !reference.equals("null")) {
-                try {
-                    base = resourceHandler.findbyStrId(reference, user,
-                            VirtualCollection.class).getData();
-                }
-                catch (KustvaktException e) {
-                    throw responseHandler.throwit(e);
-                }
-
-            }
-            else if (query != null)
-                try {
-                    base = JsonUtils.readTree(query);
-                }
-                catch (KustvaktException e) {
-                    responseHandler.throwit(e);
-                }
-            else
-                // todo: throw exception response for no resource to save!
-                return null;
-
-            KoralCollectionQueryBuilder cquery =
-                    new KoralCollectionQueryBuilder();
-            cquery.setBaseQuery(base);
-
-            try {
-                cachetmp = ResourceFactory.getCachedCollection(cquery.toJSON());
-
-                // see if collection was cached!
-                VirtualCollection tmp = resourceHandler
-                        .getCache(cachetmp.getId(), VirtualCollection.class);
-                // if not cached, fill with stats values
-                if (tmp == null) {
-                    String stats = searchKrill.getStatistics(cquery.toJSON());
-                    cachetmp.setStats(
-                            JsonUtils.convertToClass(stats, Map.class));
-                }
-
-                if (!cache) {
-                    collection = ResourceFactory.getPermanentCollection(
-                            cachetmp, name, description);
-                    vals = collection.toMap();
-                    resourceHandler.storeResources(user, collection);
-                }
-                else {
-                    resourceHandler.cache(cachetmp);
-                    vals = cachetmp.toMap();
-                }
-
-            }
-            catch (KustvaktException e) {
-                throw responseHandler.throwit(e);
-            }
-        }
-        try {
-            return Response.ok(JsonUtils.toJSON(vals)).build();
-        }
-        catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
-        }
-    }
-
-
-    /**
-     * EM: store a virtual collection in resource_store, but
-     * not in the policy_store table as well.
-     * 
-     * Retrieve cached entry first and then store collection
-     * 
-     * @param context
-     * @param locale
-     * @param query
-     * @return
-     * @throws KustvaktException
-     */
-    @Deprecated
-    @POST
-    @Path("{type}")
-    public Response storeResource (@Context SecurityContext context,
-            @Context Locale locale, @PathParam("type") String type,
-            @QueryParam("filter") Boolean filter,
-            @QueryParam("name") String name,
-            @QueryParam("description") String description,
-            @QueryParam("ref") String reference,
-            @QueryParam("cache") Boolean cache,
-            @QueryParam("query") String query) throws KustvaktException {
-        TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        filter = filter != null ? filter : false;
-        cache = cache != null ? cache : false;
-        type = StringUtils.normalize(type);
-        reference = StringUtils.decodeHTML(reference);
-        Map vals = new HashMap();
-        User user;
-        Class<KustvaktResource> ctype;
-        try {
-            ctype = ResourceFactory.getResourceClass(type);
-
-            user = controller.getUser(ctx.getUsername());
-        }
-        catch (KustvaktException e) {
-            jlog.error("Exception encountered: {}", e.string());
-            throw responseHandler.throwit(e);
-        }
-
-        if (VirtualCollection.class.equals(ctype)) {
-            VirtualCollection cachetmp, collection;
-
-            KoralCollectionQueryBuilder cquery =
-                    new KoralCollectionQueryBuilder();
-            if (reference != null && !reference.equals("null")) {
-                try {
-                    cquery.setBaseQuery(resourceHandler.findbyStrId(reference,
-                            user, VirtualCollection.class).getData());
-
-                }
-                catch (KustvaktException e) {
-                    throw responseHandler.throwit(e);
-                }
-            }
-            if (query != null && !query.isEmpty()) cquery.with(query);
-
-            cachetmp = ResourceFactory.getCachedCollection(cquery.toJSON());
-
-            // see if vc was cached!
-            VirtualCollection tmp = resourceHandler.getCache(cachetmp.getId(),
-                    VirtualCollection.class);
-
-            // if not cached, fill with stats values
-            if (tmp == null) {
-                String stats = searchKrill.getStatistics(cquery.toJSON());
-                cachetmp.setStats(JsonUtils.convertToClass(stats, Map.class));
-                if (query != null && !query.isEmpty())
-                    cachetmp.setFields(cquery.toJSON());
-            }
-
-            if (!cache && !User.UserFactory.isDemo(ctx.getUsername())) {
-                collection = ResourceFactory.getPermanentCollection(cachetmp,
-                        name, description);
-                vals = collection.toMap();
-                try {
-                    resourceHandler.storeResources(user, collection);
-                }
-                catch (KustvaktException e) {
-                    jlog.error("Exception encountered: {}", e.string());
-                    throw responseHandler.throwit(e);
-                }
-            }
-            else {
-                resourceHandler.cache(cachetmp);
-                vals = cachetmp.toMap();
-            }
-        }
-        else {
-            throw responseHandler.throwit(
-                    new KustvaktException(StatusCodes.UNSUPPORTED_RESOURCE,
-                            "Unsupported operation for the given resource type.",
-                            type));
-        }
-        return Response.ok(JsonUtils.toJSON(vals)).build();
-    }
-
-
-    @DELETE
-    @Path("{type}/{id}/{child}")
-    public Response deleteResourceChild (@Context SecurityContext context,
-            @Context Locale locale, @PathParam("type") String type,
-            @PathParam("id") String id, @PathParam("child") String child) {
-        return deleteResource(context, locale, type,
-                StringUtils.joinResources(id, child));
-    }
-
-    @Deprecated
-    @DELETE
-    @Path("{type}/{id}")
-    public Response deleteResource (@Context SecurityContext context,
-            @Context Locale locale, @PathParam("type") String type,
-            @PathParam("id") String id) {
-        TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        type = StringUtils.normalizeHTML(type);
-        id = StringUtils.decodeHTML(id);
-        try {
-            User user = controller.getUser(ctx.getUsername());
-            KustvaktResource r = ResourceFactory.getResource(type);
-            r.setPersistentID(id);
-            // todo: eliminate the need to find the resource first!
-            resourceHandler.deleteResources(user, r);
-        }
-        catch (KustvaktException e) {
-            jlog.error("Exception encountered: {}", e.string());
-            throw responseHandler.throwit(e);
-        }
-
-        return Response.ok().build();
-    }
 
     @GET
     @Path("/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
@@ -1024,61 +669,6 @@ public class SearchController {
 		String results = searchKrill.getFields(textSigle);
 
         return Response.ok(results).build();
-    }
-
-
-    // todo:?!
-    @POST
-    @Path("match/{id}")
-    @Deprecated
-    public Response save (@PathParam("{id}") String id,
-            @QueryParam("d") String description,
-            @Context SecurityContext context) {
-        TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        // save match for user and later retrieval!
-
-        // KustvaktResource match = new QueryMatch(id);
-        // match.setDescription(description);
-        // match.setCreated(TimeUtils.getNow().getMillis());
-        // try {
-        // this.resourceHandler.storeResources(controller.getUser(ctx), match);
-        // } catch (KustvaktException | NotAuthorizedException e) {
-        // throw MappedHTTPResponse.throwit(e);
-        // }
-
-        return Response.ok().build();
-    }
-
-
-    @GET
-    @Path("matches")
-    @Deprecated
-    public Response get (@Context SecurityContext context) {
-        TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        // todo save match for user and later retrieval!
-        // todo: retrieve matches in range! --choices: date, document, id
-        // (matchid)
-        return Response.ok().build();
-    }
-
-
-    @DELETE
-    @Path("match/{id}")
-    @Deprecated
-    public Response remove (@PathParam("{id}") String id,
-            @Context SecurityContext context) {
-        TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        // save match for user and later retrieval!
-        try {
-            this.resourceHandler.deleteResources(
-                    this.controller.getUser(ctx.getUsername()), id);
-        }
-        catch (KustvaktException e) {
-            jlog.error("Exception encountered: {}", e.string());
-            throw responseHandler.throwit(e);
-        }
-
-        return Response.ok().build();
     }
 
 }

@@ -44,7 +44,6 @@ import com.sun.jersey.spi.container.ResourceFilters;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.AuthCodeInfo;
 import de.ids_mannheim.korap.config.AuthenticationMethod;
-import de.ids_mannheim.korap.config.AuthenticationScheme;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.ClientInfo;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
@@ -91,8 +90,8 @@ public class OAuthController {
     public OAuthController () {
         this.handler = new OAuth2Handler(BeansFactory.getKustvaktContext()
                 .getPersistenceClient());
-        this.controller = BeansFactory.getKustvaktContext()
-                .getAuthenticationManager();
+//        this.controller = BeansFactory.getKustvaktContext()
+//                .getAuthenticationManager();
         this.crypto = BeansFactory.getKustvaktContext().getEncryption();
         this.config = BeansFactory.getKustvaktContext().getConfiguration();
     }

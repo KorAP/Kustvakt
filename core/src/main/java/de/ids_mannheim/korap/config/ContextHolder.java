@@ -1,7 +1,5 @@
 package de.ids_mannheim.korap.config;
 
-import de.ids_mannheim.korap.interfaces.AuthenticationIface;
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.interfaces.db.*;
@@ -99,9 +97,9 @@ public abstract class ContextHolder {
     }
 
 
-    public AuthenticationManagerIface getAuthenticationManager () {
-        return getBean(KUSTVAKT_AUTHENTICATION_MANAGER);
-    }
+//    public AuthenticationManagerIface getAuthenticationManager () {
+//        return getBean(KUSTVAKT_AUTHENTICATION_MANAGER);
+//    }
 
 
     public EntityHandlerIface getUserDBHandler () {
@@ -119,9 +117,9 @@ public abstract class ContextHolder {
     }
 
 
-    public Collection<AuthenticationIface> getAuthProviders () {
-        return getBean(KUSTVAKT_AUTHPROVIDERS);
-    }
+//    public Collection<AuthenticationIface> getAuthProviders () {
+//        return getBean(KUSTVAKT_AUTHPROVIDERS);
+//    }
 
 
     public Collection<ResourceOperationIface> getResourceProviders () {
