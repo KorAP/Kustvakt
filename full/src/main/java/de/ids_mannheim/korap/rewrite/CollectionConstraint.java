@@ -1,15 +1,11 @@
 package de.ids_mannheim.korap.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.resource.rewrite.KoralNode;
 import de.ids_mannheim.korap.resource.rewrite.RewriteTask;
-import de.ids_mannheim.korap.resource.rewrite.KoralNode.RewriteIdentifier;
-import de.ids_mannheim.korap.resource.rewrite.RewriteTask.IterableRewritePath;
-import de.ids_mannheim.korap.resources.Corpus;
-import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.user.User;
 
 /**
@@ -17,8 +13,6 @@ import de.ids_mannheim.korap.user.User;
  * @date 03/07/2015
  */
 public class CollectionConstraint implements RewriteTask.IterableRewritePath {
-
-
 
     @Override
     public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,

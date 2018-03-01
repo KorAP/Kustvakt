@@ -6,10 +6,9 @@ import java.util.Set;
 
 import javax.ws.rs.core.HttpHeaders;
 
-import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.config.AuthenticationMethod;
-import de.ids_mannheim.korap.config.AuthenticationScheme;
 import de.ids_mannheim.korap.config.KustvaktCacheable;
+import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;

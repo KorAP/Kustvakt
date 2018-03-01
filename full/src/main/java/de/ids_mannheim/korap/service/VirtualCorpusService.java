@@ -296,20 +296,20 @@ public class VirtualCorpusService {
         return false;
     }
 
-    public void editVCAccess (VirtualCorpusAccess access, String username)
-            throws KustvaktException {
-
-        // get all the VCA admins
-        UserGroup userGroup = access.getUserGroup();
-        List<UserGroupMember> accessAdmins =
-                userGroupService.retrieveVCAccessAdmins(userGroup);
-
-        User user = authManager.getUser(username);
-        if (!user.isSystemAdmin()) {
-            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: " + username, username);
-        }
-    }
+//    public void editVCAccess (VirtualCorpusAccess access, String username)
+//            throws KustvaktException {
+//
+//        // get all the VCA admins
+//        UserGroup userGroup = access.getUserGroup();
+//        List<UserGroupMember> accessAdmins =
+//                userGroupService.retrieveVCAccessAdmins(userGroup);
+//
+//        User user = authManager.getUser(username);
+//        if (!user.isSystemAdmin()) {
+//            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+//                    "Unauthorized operation for user: " + username, username);
+//        }
+//    }
 
     public List<VirtualCorpusAccessDto> listVCAccessByVC (String username,
             int vcId) throws KustvaktException {

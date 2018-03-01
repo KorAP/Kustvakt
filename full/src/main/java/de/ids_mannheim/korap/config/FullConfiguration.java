@@ -19,9 +19,9 @@ public class FullConfiguration extends KustvaktConfiguration {
     private String testEmail;
     private String noReply;
     private String emailAddressRetrieval;
-    
+
     private String groupInvitationTemplate;
-    
+
     private String ldapConfig;
 
     private String freeOnlyRegex;
@@ -62,13 +62,17 @@ public class FullConfiguration extends KustvaktConfiguration {
     }
 
     private void setMailConfiguration (Properties properties) {
-        setMailEnabled(Boolean.valueOf(properties.getProperty("mail.enabled", "false")));
-        if (isMailEnabled){
+        setMailEnabled(Boolean
+                .valueOf(properties.getProperty("mail.enabled", "false")));
+        if (isMailEnabled) {
             // other properties must be set in the kustvakt.conf
-            setTestEmail(properties.getProperty("mail.receiver","test@localhost"));
+            setTestEmail(
+                    properties.getProperty("mail.receiver", "test@localhost"));
             setNoReply(properties.getProperty("mail.sender"));
-            setGroupInvitationTemplate(properties.getProperty("template.group.invitation"));
-            setEmailAddressRetrieval(properties.getProperty("mail.address.retrieval","test"));
+            setGroupInvitationTemplate(
+                    properties.getProperty("template.group.invitation"));
+            setEmailAddressRetrieval(
+                    properties.getProperty("mail.address.retrieval", "test"));
         }
     }
 

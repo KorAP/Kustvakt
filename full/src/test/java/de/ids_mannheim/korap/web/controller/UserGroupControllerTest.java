@@ -58,8 +58,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
+        System.out.println(entity);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        //        System.out.println(entity);
+      
         JsonNode node = JsonUtils.readTree(entity);
 
         JsonNode group = node.get(1);

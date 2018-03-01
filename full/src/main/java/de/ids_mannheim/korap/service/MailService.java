@@ -21,6 +21,12 @@ import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.User;
 
+/** Manages mail related services, such as sending group member invitations 
+ * per email.  
+ * 
+ * @author margaretha
+ *
+ */
 @Service
 public class MailService {
 

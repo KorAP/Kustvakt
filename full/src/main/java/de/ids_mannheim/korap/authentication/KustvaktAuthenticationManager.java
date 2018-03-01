@@ -103,11 +103,12 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
 		AuthenticationIface provider = getProvider(type , null);
 
-		if (provider == null)
-			// throw exception for missing type parameter
+		if (provider == null){
 			throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT, 
-			        "token type not defined or found", "token_type");
-
+			        "Authentication provider for token type "+type
+			        +" is not found.", type.displayName());
+		}
+		
 		TokenContext context = provider.getTokenContext(token);
 		// if (!matchStatus(host, useragent, context))
 		// provider.removeUserSession(token);

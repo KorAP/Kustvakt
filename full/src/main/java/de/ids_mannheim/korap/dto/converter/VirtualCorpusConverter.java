@@ -9,6 +9,14 @@ import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
+/**
+ * VirtualCorpusConverter prepares data transfer objects (DTOs) from {@link VirtualCorpus}
+ * entities. DTO structure defines controllers output, namely the structure of 
+ * JSON objects in HTTP responses.
+ * 
+ * @author margaretha
+ *
+ */
 @Component
 public class VirtualCorpusConverter {
 

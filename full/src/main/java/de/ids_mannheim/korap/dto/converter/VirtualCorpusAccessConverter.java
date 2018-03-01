@@ -7,7 +7,14 @@ import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
 import de.ids_mannheim.korap.entity.VirtualCorpusAccess;
-
+/**
+ * VirtualCorpusAccessConverter prepares data transfer objects (DTOs) from {@link VirtualCorpusAccess}
+ * entities. DTO structure defines controllers output, namely the structure of 
+ * JSON objects in HTTP responses.
+ * 
+ * @author margaretha
+ *
+ */
 @Component
 public class VirtualCorpusAccessConverter {
 

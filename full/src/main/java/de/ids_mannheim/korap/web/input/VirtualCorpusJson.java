@@ -8,7 +8,7 @@ import de.ids_mannheim.korap.web.controller.VirtualCorpusController;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Java POJO of JSON input of the virtual corpus service for 
+/** Java POJO of JSON input of the virtual corpus controller for 
  * creating and editing virtual corpora.
  * 
  * @author margaretha

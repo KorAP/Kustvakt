@@ -51,9 +51,6 @@ import de.ids_mannheim.korap.web.input.UserGroupJson;
         PiwikFilter.class })
 public class UserGroupController {
 
-    private static Logger jlog =
-            LoggerFactory.getLogger(UserGroupController.class);
-
     @Autowired
     private FullResponseHandler responseHandler;
     @Autowired

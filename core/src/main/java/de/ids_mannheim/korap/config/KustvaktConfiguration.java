@@ -114,7 +114,7 @@ public class KustvaktConfiguration {
         queryLanguages = new ArrayList<>();
         for (String querylang : qls)
             queryLanguages.add(querylang.trim().toUpperCase());
-        String is = properties.getProperty("kustvakt.security.jwt.issuer", "");
+        String is = properties.getProperty("security.jwt.issuer", "");
 
         if (!is.startsWith("http"))
             is = "http://" + is;

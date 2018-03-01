@@ -223,9 +223,6 @@
 			type="de.ids_mannheim.korap.interfaces.db.PersistenceClient" ref="kustvakt_db" />
 	</bean>
 
-	<bean id="basic_auth" class="de.ids_mannheim.korap.authentication.BasicAuthentication" />
-
-
 	<bean id="session_auth"
 		class="de.ids_mannheim.korap.authentication.SessionAuthentication">
 		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
@@ -236,7 +233,6 @@
 
 	<util:list id="kustvakt_authproviders"
 		value-type="de.ids_mannheim.korap.interfaces.AuthenticationIface">
-		<ref bean="basic_auth" />
 		<ref bean="ldap_auth" />
 		<ref bean="session_auth" />
 		<!-- <ref bean="api_auth" /> -->
