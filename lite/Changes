@@ -1,8 +1,14 @@
+version 0.60
+08/03/2018	
+    - updated field type:date in the metadata test (margaretha)
+    - removed loading application context via BeanFactory (margaretha)
+
 version 0.59.9 
 01/02/2018
 	- renamed light to lite (margaretha)
 	- added Changes file (margaretha)
 	- updated library versions and java environment (margaretha)
+	- added metadata test (diewald)
 	
 version 0.59.8 
 17/01/2018 

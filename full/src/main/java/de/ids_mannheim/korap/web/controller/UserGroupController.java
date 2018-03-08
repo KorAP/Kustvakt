@@ -15,8 +15,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -56,7 +54,7 @@ public class UserGroupController {
     @Autowired
     private UserGroupService service;
 
-    /** Returns all user-groups wherein a user is an active or pending member.
+    /** Returns all user-groups in which a user is an active or a pending member.
      * 
      * @param securityContext
      * @return a list of user-groups

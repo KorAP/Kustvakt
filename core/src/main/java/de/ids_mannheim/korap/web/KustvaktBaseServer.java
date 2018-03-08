@@ -37,8 +37,8 @@ public abstract class KustvaktBaseServer {
         KustvaktArgs kargs = new KustvaktArgs();
         for (int i = 0; i < args.length; i++) {
             switch ((args[i])) {
-                case "--config":
-                    kargs.setConfig(args[i + 1]);
+                case "--spring-config":
+                    kargs.setSpringConfig(args[i + 1]);
                     break;
                 case "--port":
                     kargs.setPort(Integer.valueOf(args[i + 1]));
@@ -47,8 +47,8 @@ public abstract class KustvaktBaseServer {
                     StringBuffer b = new StringBuffer();
 
                     b.append("Parameter description: \n")
-                            .append("--config  <Path to spring configuration file> : Configuration file\n")
-                            .append("--port  <Server port> : Port under which the server is accessible \n")
+                            .append("--spring-config  <Spring XML configuration filename in classpath>\n")
+                            .append("--port  <Server port number>\n")
                             //                            .append("--props  <Path to kustvakt properties> : list of configuration properties\n")
                             .append("--help : This help menu\n");
                     System.out.println(b.toString());
@@ -74,7 +74,7 @@ public abstract class KustvaktBaseServer {
                 new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
         contextHandler.setContextPath("/");
         contextHandler.setInitParameter("contextConfigLocation",
-                "classpath:" + kargs.getConfig());
+                "classpath:" + kargs.getSpringConfig());
 
         ServletContextListener listener = new ContextLoaderListener();
         contextHandler.addEventListener(listener);
@@ -110,7 +110,7 @@ public abstract class KustvaktBaseServer {
     public static class KustvaktArgs {
 
         @Getter
-        private String config;
+        private String springConfig;
         private int port;
         private String[] rootPackages;
         private boolean init;
@@ -118,7 +118,7 @@ public abstract class KustvaktBaseServer {
 
         public KustvaktArgs () {
             this.port = -1;
-            this.config = null;
+            this.springConfig = null;
             this.init = false;
         }
 

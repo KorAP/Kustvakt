@@ -1,5 +1,5 @@
 version 0.60 release
-01/03/2018
+08/03/2018
 	- set up mail settings using localhost port 25 (margaretha)
 	- added mail template in kustvakt configuration (margaretha)
 	- added mail settings to readme (margaretha)
@@ -8,6 +8,7 @@ version 0.60 release
 	- enabled custom implementation for email address retrieval (margaretha)
 	- removed old policy and deprecated code (margaretha)
 	- moved authentication related code to /full (margaretha)
+	- removed spring config option in KustvaktServer (margaretha)
 
 version 0.59.10	
 20/02/2018 

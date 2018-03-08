@@ -1,6 +1,5 @@
 package de.ids_mannheim.korap.server;
 
-import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.web.KustvaktBaseServer;
 
 public class KustvaktLiteServer extends KustvaktBaseServer {
@@ -10,14 +9,9 @@ public class KustvaktLiteServer extends KustvaktBaseServer {
         KustvaktLiteServer server = new KustvaktLiteServer();
         kargs = server.readAttributes(args);
 
-		if (kargs == null)
-			System.exit(0);
+        if (kargs == null) System.exit(0);
 
-        if (kargs.getConfig() == null) {
-            kargs.setConfig("lite-config.xml");
-        }
-        
-        BeansFactory.loadClasspathContext(kargs.getConfig());
+        kargs.setSpringConfig("lite-config.xml");
         kargs.setRootPackages(
                 new String[] { "de.ids_mannheim.korap.web.service.lite" });
         rootPackages = "de.ids_mannheim.korap.web.service.lite";

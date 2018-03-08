@@ -28,11 +28,13 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 /**
  * Created by hanl on 29.04.16.
  * 
- * @author margaretha
- * @date 17/01/2017
+ * @author margaretha, diewald
+ * @date 08/03/2018
  * 
  * Recent changes:
  * - removed test configuration using FastJerseyLightTest
+ * - added metadata test
+ * - updated field type:date 
  */
 public class LiteServiceTest extends JerseyTest{
 
@@ -271,9 +273,9 @@ public class LiteServiceTest extends JerseyTest{
                 response.getStatus());
         String resp = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(resp);
-		System.err.println(node.toString());
+//		System.err.println(node.toString());
 
-		Iterator fieldIter = node.at("/document/fields").elements();
+		Iterator<JsonNode> fieldIter = node.at("/document/fields").elements();
 
 		int checkC = 0;
 		while (fieldIter.hasNext()) {
@@ -308,8 +310,8 @@ public class LiteServiceTest extends JerseyTest{
 				checkC++;
 				break;
 			case "pubDate":
-				assertEquals("type:number", field.at("/type").asText());
-				assertEquals(19820000, field.at("/value").asInt());
+				assertEquals("type:date", field.at("/type").asText());
+				assertEquals(1982, field.at("/value").asInt());
 				checkC++;
 				break;
 			};		

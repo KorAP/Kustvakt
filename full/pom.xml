@@ -248,18 +248,6 @@
 			<version>${spring-security.version}</version>
 		</dependency>
 
-		<!-- jetty -->
-		<!-- <dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-jndi</artifactId>
-			<version>${jetty.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-plus</artifactId>
-			<version>${jetty.version}</version>
-		</dependency> -->
-
 		<!-- velocity -->
 		<dependency>
 			<groupId>org.apache.velocity</groupId>
@@ -295,6 +283,7 @@
 			<artifactId>flyway-core</artifactId>
 			<version>4.0</version>
 		</dependency>
+		
 	</dependencies>
 
 </project>
