@@ -190,8 +190,6 @@ public class UserGroupDao {
                             + userId,
                     userId, e);
         }
-
-
     }
 
     public UserGroup retrieveGroupByName (String groupName)

@@ -78,12 +78,14 @@ public class UserGroupService {
 
         UserGroupMember userAsMember;
         List<UserGroupMember> members;
+        UserGroupDto groupDto;
         for (UserGroup group : userGroups) {
             members = retrieveMembers(group.getId(), username);
             userAsMember =
                     groupMemberDao.retrieveMemberById(username, group.getId());
-            dtos.add(converter.createUserGroupDto(group, members,
-                    userAsMember.getStatus()));
+            groupDto = converter.createUserGroupDto(group, members,
+                    userAsMember.getStatus(), userAsMember.getRoles());
+            dtos.add(groupDto);
         }
 
         return dtos;
@@ -250,8 +252,10 @@ public class UserGroupService {
         member.setUserId(username);
         groupMemberDao.addMember(member);
 
-        if (config.isMailEnabled() && userGroup.getStatus() != UserGroupStatus.HIDDEN) {
-            mailService.sendMemberInvitationNotification(username,userGroup.getName(), createdBy);
+        if (config.isMailEnabled()
+                && userGroup.getStatus() != UserGroupStatus.HIDDEN) {
+            mailService.sendMemberInvitationNotification(username,
+                    userGroup.getName(), createdBy);
         }
     }
 

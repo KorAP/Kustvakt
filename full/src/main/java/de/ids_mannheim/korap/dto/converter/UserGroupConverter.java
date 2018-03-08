@@ -16,13 +16,20 @@ import de.ids_mannheim.korap.entity.UserGroupMember;
 public class UserGroupConverter {
 
     public UserGroupDto createUserGroupDto (UserGroup group,
-            List<UserGroupMember> members, GroupMemberStatus userMemberStatus) {
+            List<UserGroupMember> members, GroupMemberStatus userMemberStatus,
+            List<Role> userRoles) {
 
         UserGroupDto dto = new UserGroupDto();
         dto.setId(group.getId());
         dto.setName(group.getName());
         dto.setOwner(group.getCreatedBy());
         dto.setUserMemberStatus(userMemberStatus);
+
+        List<String> roles = new ArrayList<>(userRoles.size());
+        for (Role r : userRoles) {
+            roles.add(r.getName());
+        }
+        dto.setUserRoles(roles);
 
         if (members != null) {
             ArrayList<UserGroupMemberDto> memberDtos =
@@ -32,11 +39,11 @@ public class UserGroupConverter {
                 UserGroupMemberDto memberDto = new UserGroupMemberDto();
                 memberDto.setUserId(member.getUserId());
                 memberDto.setStatus(member.getStatus());
-                List<String> roles = new ArrayList<>(member.getRoles().size());
+                List<String> memberRoles = new ArrayList<>(member.getRoles().size());
                 for (Role r : member.getRoles()) {
-                    roles.add(r.getName());
+                    memberRoles.add(r.getName());
                 }
-                memberDto.setRoles(roles);
+                memberDto.setRoles(memberRoles);
                 memberDtos.add(memberDto);
             }
             dto.setMembers(memberDtos);
