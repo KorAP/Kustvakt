@@ -1,5 +1,5 @@
 version 0.60 release
-08/03/2018
+13/03/2018
 	- set up mail settings using localhost port 25 (margaretha)
 	- added mail template in kustvakt configuration (margaretha)
 	- added mail settings to readme (margaretha)

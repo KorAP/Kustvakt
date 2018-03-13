@@ -21,7 +21,7 @@ Web-services including their usage examples are described in the [wiki](https://
 # Setup
 
 
-Prerequisites: Jdk 1.8, Git, Maven 3, MySQL (optional), Postfix (optional).
+Prerequisites: Jdk 1.8, Git, Maven 3
 
 Clone the latest version of Kustvakt
 <pre>
@@ -60,29 +60,58 @@ If there are errors regarding tests, please skip them.
 mvn clean package -DskipTests=true
 </pre>
 
-# Setting kustvakt configuration file
+## Customizing Kustvakt configuration
 
 Copy the default Kustvakt configuration file (e.g. ```full/src/main/resources/kustvakt.conf``` or ```lite/src/main/resources/kustvakt-lite.conf```), to the same  folder as the Kustvakt jar files  (```/target```). Please do not change the name of the configuration file.
 
-Set krill.indexDir in the configuration file to the location of your Krill index (relative path). In Kustvakt root directory, there is a sample index, e.g.
+### Setting Index Directory
+
+Set krill.indexDir in the configuration file to the location of your Krill index (relative path to the jar). In Kustvakt root directory, there is a sample index, e.g.
 <pre>krill.indexDir = ../../sample-index</pre>
 
-Set the location of the LDAP configuration file for Kustvakt full version. The file should contain an admin password to access an LDAP system. Without LDAP, user authentication functions and services cannot be used. However, the authentication mechanism can be extended by implementing other authentication methods e.g. using a database. 
+### Setting LDAP
+
+Set the location of the LDAP configuration file for Kustvakt full version. The file should contain an admin password to access an LDAP system. Without LDAP, user authentication functions and services cannot be used. Authentication mechanism can be extended by implementing other authentication methods e.g. using a database. 
+
+	ldap.config = path-to-ldap-password
+
+### Setting BasicAuthentication for Testing
+
+For testing, you can use/activate BasicAuthentication, see Spring XML configuration file for testing at ```/full/src/test/resources/test-config.xml```. BasicAuthentication uses a dummy UserDao allowing all users to be authenticated users. You can implement UserDao by connecting it to a user table in a database and checking username and password for authentication. 
+
+	<bean id="basic_auth"
+		class="de.ids_mannheim.korap.authentication.BasicAuthentication" />
+		
+	<util:list id="kustvakt_authproviders"
+		value-type="de.ids_mannheim.korap.interfaces.AuthenticationIface">
+		<ref bean="basic_auth" />
+		...
+	</util:list>
 
 
-<b>Optional custom configuration</b>
 
-Changing Kustvakt server port and host
-<pre>
-Server.port = 8089
-Server.host = localhost
-</pre>
+## Optional Custom Configuration
 
-Changing Kustvakt service base URI
-<pre>
-kustvakt.base.url=/kustvakt/*
-</pre>
-By default, Kustvakt service base URI refers to /api/*
+### Changing Kustvakt Server Port and Host
+
+	Server.port = 8089
+	Server.host = localhost
+
+### Changing Kustvakt Service Base URL
+
+The default base URL is
+
+	kustvakt.base.url=/kustvakt/api/*
+
+### Setting Default Layers
+
+The values of the following properties are foundries. 
+
+	default.layer.partOfSpeech = tt
+	default.layer.lemma = tt
+	default.layer.orthography = opennlp
+	default.layer.dependency = mate
+	default.layer.constituent = corenlp
 
 
 # Running Kustvakt Server
@@ -96,153 +125,9 @@ java -jar target/Kustvakt-[lite/full]-[version].jar
 </pre>
 
 
-# Futher Setup for Developer
+# Futher Setup
 
-Installing lombok is necessary when working with an IDE. Go to the directory of your lombok.jar, e.g ```~/.m2/repository/org/projectlombok/lombok/1.16.6``` and run
-<pre>
-java -jar lombok-1.16.6.jar
-</pre>
-
-Restart your IDE and clean your project.
-
-Copy ```kustvakt.conf``` or ```kustvakt-lite.conf``` from  ```src/main/resources``` to the ```full/``` or ```lite/``` folder. Then the properties the configuration file can be customized.
-
-In an IDE, you can run ```KustvaktLiteServer``` or ```KustvaktServer``` as a normal Java application.
-
-## Changing Database
-
-The default Sqlite database can be switch to a MySQL database.
-
-Copy ```jdbc.properties``` from ```full/src/main/resources``` to the ```full/``` directory. Do not change the filename.
-<pre>
-cp full/src/main/resources/jdbc.properties full/
-</pre>
-
-Remove or comment the Sqlite Setting.
-
-Uncomment the MySQL Setting and fill in the correct values for the ```jdbc.url```,
- ```jdbc.username```
-  and ```jdbc.password```.
-
-The default setting for ```jdbc.schemaPath```
-includes test data defined in ```full/src/main/resources/db/insert```
-and some user roles defined in ```full/src/main/resources/db/predefined```. You can omit the test data by removing
- ```db.insert```.
-
-Save.
-
-You probably would like to git ignore this file to prevent pushing the database password to github.
-
-
-Open ```full/src/main/resource/default-config.xml``` and search for the 
-Spring bean with id "flyway".
-
-Change the dataSource property to refer to the Spring bean with id "dataSource".
-<pre>
-&lt;property name="dataSource" ref="dataSource" /&gt;
-</pre>
-
-While running ```KustvaktServer``` or ```Kustvakt-full-[version].jar```,
-MySQL tables will be created to the specified database from the SQL files in 
-```full/src/main/resources/db/new-mysql``` and other paths specified in 
-```jdbc.schemaPath```.
-
-## Enabling Mail
-
-Kustvakt supports email notification, for instance of a invitation to a user-group.
-The mail setting is by default configured for a mail server at localhost post 25. 
-You can setup a mail server for example by using [Postfix](http://www.postfix.org/).
-
-In kustvakt.conf or kustvakt-test.conf, set  
-
-	mail.enabled = true
-	mail.sender = noreply@ids-mannheim.de
-	mail.receiver = test@localhost
-	mail.address.retrieval = test
-
-You can change ```mail.sender``` value to any email address (beware 
-of spam in your mail server configuration). ```mail.receiver``` 
-is an email address used for testing. All mails are to be sent to this 
-email address. Change ```test``` to any username available in your system, 
-or create an alias for ```test@localhost```. 
-
-```mail.address.retrieval``` 
-determines how user email addresses are retrieved. By default and 
-for testing, only the ```mail.receiver``` value is used as the 
-email address of all users. For custom implementation, 
-please refer to ```de.ids_mannheim.korap.authentication.KustvaktAuthenticationManager.getUser(String, String)```
- 
-
-To view the mailbox, you can use ```mailx``` 
-
-	$ mailx -u test
-	s-nail version v14.8.6.  Type ? for help.
-	"/var/mail/test": 1 messages 0 unread
-	 O  1 noreply@ids-mannhe Wed Feb 21 18:07   30/1227  Invitation to join
-
-
-### Creating email aliases 
-
-	sudo vi /etc/postfix/main.cf
-	
-In main.cf, set
-
-	"virtual_alias_maps = hash:/etc/postfix/alias"
-
-Create alias file:
-
-	sudo vi /etc/postfix/alias
-
-In the alias file, create an alias for ```test@localhost``` to a user in your system
-
-	test@localhost username
-
-Create alias database
-
-	sudo postmap /etc/postfix/alias
-	
-Restart postfix
-
-	sudo /etc/init.d/postfix restart
-
-
-By default, any emails sent to ```test@localhost``` will be available at 
-```/var/mail/username```.
-
-### Customizing SMTP configuration
-
-To connect to an external/remote mail server instead of using local Postfix,
-copy ```full/src/main/resources/properties/mail.properties``` to 
-the ```full/``` folder. Customize the properties in the file according to
-the mail server setup.  
-
-	mail.host = smtp.host.address
-	mail.port = 123
-	mail.connectiontimeout = 3000
-	mail.auth = true
-	mail.starttls.enable = true
-	mail.username = username
-	mail.password = password
- 
-### Customizing Mail template
-
-Kustvakt uses [Apache Velocity](http://velocity.apache.org/) as the email template engine and searches for templates located at:
-
-```full/src/main/resources/templates```.
-
-For instance, the template for email notification of user-group invitation is 
-
-```full/src/main/resources/templates/notification.vm```
-
-You can change the template according to Velocity Template Language.
-
-In ```kustvakt.conf``` or ```kustvakt-test.conf```, specify which template should be used. 
-	
-	template.group.invitation = notification.vm
-
-
-# Known issues
-Tests are verbose - they do not necessarily imply system errors.
+Advanced setup including database and mailing setting are described in the [wiki](https://github.com/KorAP/Kustvakt/wiki).
 
 
 # Publication

@@ -119,7 +119,6 @@ public class UserGroupController {
      */
     @DELETE
     @Path("delete")
-    @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteUserGroup (@Context SecurityContext securityContext,
             @QueryParam("groupId") int groupId) {
         TokenContext context =
@@ -142,7 +141,6 @@ public class UserGroupController {
      */
     @DELETE
     @Path("member/delete")
-    @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteUserFromGroup (
             @Context SecurityContext securityContext,
             @QueryParam("memberId") String memberId,

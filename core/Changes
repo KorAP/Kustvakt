@@ -1,7 +1,8 @@
 version 0.60
-01/03/2018
+13/03/2018
 	- removed old policy and deprecated code (margaretha)
 	- moved authentication related code to /full (margaretha)
+	- elaborated default layer names in the configuration file. (margaretha)
 
 version 0.59.10 
 20/02/2018

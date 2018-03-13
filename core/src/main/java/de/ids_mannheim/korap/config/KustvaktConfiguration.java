@@ -121,11 +121,11 @@ public class KustvaktConfiguration {
         issuer = new URL(is);
 
         default_const = properties
-                .getProperty("default.layer.c", "mate");
-        default_dep = properties.getProperty("default.layer.d", "mate");
-        default_lemma = properties.getProperty("default.layer.l", "tt");
-        default_pos = properties.getProperty("default.layer.p", "tt");
-        default_token = properties.getProperty("default.layer.o",
+                .getProperty("default.layer.constituent", "mate");
+        default_dep = properties.getProperty("default.layer.dependency", "mate");
+        default_lemma = properties.getProperty("default.layer.lemma", "tt");
+        default_pos = properties.getProperty("default.layer.partOfSpeech", "tt");
+        default_token = properties.getProperty("default.layer.orthography",
                 "opennlp");
 
         // security configuration
@@ -158,8 +158,8 @@ public class KustvaktConfiguration {
         shortTokenTTL = TimeUtils.convertTimeToSeconds(properties.getProperty(
                 "security.shortTokenTTL", "3H"));
 
-        passcodeSaltField = properties.getProperty("security.passcode.salt",
-                "accountCreation");
+//        passcodeSaltField = properties.getProperty("security.passcode.salt",
+//                "accountCreation");
         
     }
 
