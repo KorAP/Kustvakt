@@ -234,12 +234,13 @@ public class UserGroupService {
         int groupId = userGroup.getId();
         ParameterChecker.checkIntegerValue(groupId, "userGroupId");
 
-        if (memberExists(username, groupId, status)) {
+        GroupMemberStatus existingStatus = memberExists(username, groupId, status);
+        if (existingStatus != null){
             throw new KustvaktException(StatusCodes.GROUP_MEMBER_EXISTS,
-                    "Username " + username + " with status " + status
+                    "Username " + username + " with status " + existingStatus
                             + " exists in the user-group "
                             + userGroup.getName(),
-                    username, status.name(), userGroup.getName());
+                    username, existingStatus.name(), userGroup.getName());
         }
 
         setMemberRoles();
@@ -259,7 +260,7 @@ public class UserGroupService {
         }
     }
 
-    private boolean memberExists (String username, int groupId,
+    private GroupMemberStatus memberExists (String username, int groupId,
             GroupMemberStatus status) throws KustvaktException {
         UserGroupMember existingMember;
         try {
@@ -267,20 +268,20 @@ public class UserGroupService {
                     groupMemberDao.retrieveMemberById(username, groupId);
         }
         catch (KustvaktException e) {
-            return false;
+            return null;
         }
 
         GroupMemberStatus existingStatus = existingMember.getStatus();
         if (existingStatus.equals(GroupMemberStatus.ACTIVE)
                 || existingStatus.equals(status)) {
-            return true;
+            return existingStatus;
         }
         else if (existingStatus.equals(GroupMemberStatus.DELETED)) {
             // hard delete, not customizable
             deleteMember(username, groupId, "system", false);
         }
 
-        return false;
+        return null;
     }
 
     public void inviteGroupMembers (UserGroupJson group, String inviter)
@@ -291,6 +292,12 @@ public class UserGroupService {
         ParameterChecker.checkObjectValue(members, "members");
 
         UserGroup userGroup = retrieveUserGroupById(groupId);
+        if (userGroup.getStatus() == UserGroupStatus.DELETED) {
+            throw new KustvaktException(StatusCodes.GROUP_DELETED,
+                    "Group " + userGroup.getName() + " has been deleted.",
+                    userGroup.getName());
+        }
+
         User user = authManager.getUser(inviter);
         if (isUserGroupAdmin(inviter, userGroup) || user.isSystemAdmin()) {
             for (String memberName : members) {

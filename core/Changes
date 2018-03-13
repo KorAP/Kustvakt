@@ -2,7 +2,8 @@ version 0.60
 13/03/2018
 	- removed old policy and deprecated code (margaretha)
 	- moved authentication related code to /full (margaretha)
-	- elaborated default layer names in the configuration file. (margaretha)
+	- elaborated default layer names in the configuration file (margaretha)
+	- added GROUP_DELETED status code (margaretha)
 
 version 0.59.10 
 20/02/2018
@@ -13,7 +14,7 @@ version 0.59.10
 	- updated library versions and java environment (margaretha)
 	- added status codes (margaretha)
 	- moved validation.properties (margaretha)
-	- fixed unrecognize media-type application/json (margaretha)
+	- fixed unrecognized media-type application/json (margaretha)
 	
 version 0.59.9 	
 08/11/2017

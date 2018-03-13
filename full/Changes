@@ -9,6 +9,9 @@ version 0.60 release
 	- removed old policy and deprecated code (margaretha)
 	- moved authentication related code to /full (margaretha)
 	- added userRoles attribute to UserGroupDto. (margaretha)
+	- fixed sqlite trigger (margaretha)
+	- fixed member exist error message (margaretha)
+	- fixed member invitation to join deleted group (margaretha)
 
 version 0.59.10	
 20/02/2018 

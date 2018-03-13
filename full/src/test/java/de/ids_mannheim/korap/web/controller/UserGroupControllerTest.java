@@ -60,7 +60,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         System.out.println(entity);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-      
+
         JsonNode node = JsonUtils.readTree(entity);
 
         JsonNode group = node.get(1);
@@ -423,6 +423,37 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     @Test
+    public void testInviteDeletedMember2 () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        // pearl has status deleted in dory group
+        String[] members = new String[] { "pearl" };
+
+        UserGroupJson userGroup = new UserGroupJson();
+        userGroup.setMembers(members);
+        // dory group
+        userGroup.setId(2);
+
+        ClientResponse response = resource().path("group").path("member")
+                .path("invite").type(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("dory",
+                                "pass"))
+                .entity(userGroup).post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        // check member
+        JsonNode node = retrieveUserGroups("pearl");
+        assertEquals(1, node.size());
+        JsonNode group = node.get(0);
+        assertEquals(GroupMemberStatus.PENDING.name(),
+                group.at("/userMemberStatus").asText());
+
+        testDeletePendingMember();
+    }
+    
+    @Test
     public void testInvitePendingMember () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         // marlin has status PENDING in dory group
@@ -454,11 +485,12 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 node.at("/errors/0/2").asText());
     }
 
+
     @Test
-    public void testInviteDeletedMember2 () throws UniformInterfaceException,
+    public void testInviteActiveMember () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        // pearl has status deleted in dory group
-        String[] members = new String[] { "pearl" };
+        // nemo has status active in dory group
+        String[] members = new String[] { "nemo" };
 
         UserGroupJson userGroup = new UserGroupJson();
         userGroup.setMembers(members);
@@ -473,19 +505,51 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                                 "pass"))
                 .entity(userGroup).post(ClientResponse.class);
 
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
-        // check member
-        JsonNode node = retrieveUserGroups("pearl");
-        assertEquals(1, node.size());
-        JsonNode group = node.get(0);
-        assertEquals(GroupMemberStatus.PENDING.name(),
-                group.at("/userMemberStatus").asText());
-
-        testDeletePendingMember();
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.GROUP_MEMBER_EXISTS,
+                node.at("/errors/0/0").asInt());
+        assertEquals(
+                "Username nemo with status ACTIVE exists in the user-group "
+                        + "dory group",
+                node.at("/errors/0/1").asText());
+        assertEquals("[nemo, ACTIVE, dory group]",
+                node.at("/errors/0/2").asText());
     }
 
+    @Test
+    public void testInviteMemberToDeletedGroup ()
+            throws UniformInterfaceException, ClientHandlerException, KustvaktException {
+        String[] members = new String[] { "nemo" };
 
+        UserGroupJson userGroup = new UserGroupJson();
+        userGroup.setMembers(members);
+        // dory's deleted group
+        userGroup.setId(4);
+
+        ClientResponse response = resource().path("group").path("member")
+                .path("invite").type(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("dory",
+                                "pass"))
+                .entity(userGroup).post(ClientResponse.class);
+
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.GROUP_DELETED,
+                node.at("/errors/0/0").asInt());
+        assertEquals(
+                "Group deleted group has been deleted.",
+                node.at("/errors/0/1").asText());
+        assertEquals("deleted group",
+                node.at("/errors/0/2").asText());
+    }
+    
     // marlin has GroupMemberStatus.PENDING in dory group
     @Test
     public void testSubscribePendingMember () throws KustvaktException {

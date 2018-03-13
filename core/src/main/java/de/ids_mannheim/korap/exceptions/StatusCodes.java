@@ -88,6 +88,7 @@ public class StatusCodes {
     public static final int GROUP_MEMBER_NOT_FOUND = 603;
     public static final int INVITATION_EXPIRED = 604;
     public static final int GROUP_NOT_FOUND = 605;
+    public static final int GROUP_DELETED = 606;
     
 
 //    public static final int ARGUMENT_VALIDATION_FAILURE = 700;
