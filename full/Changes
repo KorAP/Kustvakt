@@ -1,5 +1,5 @@
 version 0.60 release
-13/03/2018
+14/03/2018
 	- set up mail settings using localhost port 25 (margaretha)
 	- added mail template in kustvakt configuration (margaretha)
 	- added mail settings to readme (margaretha)
@@ -12,6 +12,7 @@ version 0.60 release
 	- fixed sqlite trigger (margaretha)
 	- fixed member exist error message (margaretha)
 	- fixed member invitation to join deleted group (margaretha)
+	- added checking deleted group (margaretha)
 
 version 0.59.10	
 20/02/2018 

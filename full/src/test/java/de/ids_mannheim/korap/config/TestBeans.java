@@ -1,12 +1,15 @@
 package de.ids_mannheim.korap.config;
 
-import de.ids_mannheim.korap.handlers.AdminDao;
+import java.util.List;
+
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.interfaces.db.*;
-import org.springframework.context.annotation.Bean;
-
-import java.util.List;
+import de.ids_mannheim.korap.interfaces.db.AdminHandlerIface;
+import de.ids_mannheim.korap.interfaces.db.AuditingIface;
+import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
+import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
+import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
+import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 
 /**
  * @author hanl
