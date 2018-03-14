@@ -14,6 +14,7 @@ import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
+import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.dao.RoleDao;
 import de.ids_mannheim.korap.dao.UserGroupDao;
 import de.ids_mannheim.korap.dao.UserGroupMemberDao;
@@ -24,8 +25,6 @@ import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
-import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 import de.ids_mannheim.korap.web.controller.UserGroupController;
 import de.ids_mannheim.korap.web.input.UserGroupJson;
@@ -49,9 +48,9 @@ public class UserGroupService {
     @Autowired
     private RoleDao roleDao;
     @Autowired
-    private UserGroupConverter converter;
+    private AdminDao adminDao;
     @Autowired
-    private AuthenticationManagerIface authManager;
+    private UserGroupConverter converter;
     @Autowired
     private FullConfiguration config;
     @Autowired
@@ -68,8 +67,21 @@ public class UserGroupService {
      * 
      * @see {@link PredefinedRole}
      */
-    public List<UserGroupDto> retrieveUserGroup (String username)
-            throws KustvaktException {
+    public List<UserGroupDto> retrieveUserGroup (String username,
+            String contextUsername) throws KustvaktException {
+
+        boolean isAdmin = adminDao.isAdmin(contextUsername);
+
+        if (username != null) {
+            if (!username.equals(contextUsername) && !isAdmin) {
+                throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                        "Unauthorized operation for user: " + contextUsername,
+                        contextUsername);
+            }
+        }
+        else {
+            username = contextUsername;
+        }
 
         List<UserGroup> userGroups =
                 userGroupDao.retrieveGroupByUserId(username);
@@ -184,14 +196,14 @@ public class UserGroupService {
 
     public void deleteGroup (int groupId, String username)
             throws KustvaktException {
-        User user = authManager.getUser(username);
         UserGroup userGroup = userGroupDao.retrieveGroupById(groupId);
         if (userGroup.getStatus() == UserGroupStatus.DELETED) {
             throw new KustvaktException(StatusCodes.GROUP_DELETED,
                     "Group " + userGroup.getName() + " has been deleted.",
                     userGroup.getName());
         }
-        else if (userGroup.getCreatedBy().equals(username) || user.isSystemAdmin()) {
+        else if (userGroup.getCreatedBy().equals(username)
+                || adminDao.isAdmin(username)) {
             // soft delete
             userGroupDao.deleteGroup(groupId, username,
                     config.isSoftDeleteGroup());
@@ -304,8 +316,7 @@ public class UserGroupService {
                     userGroup.getName());
         }
 
-        User user = authManager.getUser(inviter);
-        if (isUserGroupAdmin(inviter, userGroup) || user.isSystemAdmin()) {
+        if (isUserGroupAdmin(inviter, userGroup) || adminDao.isAdmin(inviter)) {
             for (String memberName : members) {
                 inviteGroupMember(memberName, userGroup, inviter,
                         GroupMemberStatus.PENDING);
@@ -397,7 +408,7 @@ public class UserGroupService {
 
     public void deleteGroupMember (String memberId, int groupId,
             String deletedBy) throws KustvaktException {
-        User user = authManager.getUser(deletedBy);
+
         UserGroup userGroup = userGroupDao.retrieveGroupById(groupId);
         if (userGroup.getStatus() == UserGroupStatus.DELETED) {
             throw new KustvaktException(StatusCodes.GROUP_DELETED,
@@ -411,7 +422,7 @@ public class UserGroupService {
         }
         else if (memberId.equals(deletedBy)
                 || isUserGroupAdmin(deletedBy, userGroup)
-                || user.isSystemAdmin()) {
+                || adminDao.isAdmin(deletedBy)) {
             // soft delete
             deleteMember(memberId, groupId, deletedBy,
                     config.isSoftDeleteGroupMember());

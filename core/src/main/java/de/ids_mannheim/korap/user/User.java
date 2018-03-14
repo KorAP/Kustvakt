@@ -48,7 +48,7 @@ public abstract class User implements Serializable {
 
     private List<Userdata> userdata;
 
-    private boolean isSystemAdmin;
+//    private boolean isSystemAdmin;
 
     // Values for corpusAccess:
     public enum CorpusAccess	 {

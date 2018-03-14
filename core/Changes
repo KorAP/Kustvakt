@@ -1,3 +1,8 @@
+version 0.60.1
+14/03/2018
+	- removed AdminHandlerIface (margaretha)
+	- removed isSystemAdmin in User class (margaretha)
+
 version 0.60
 13/03/2018
 	- removed old policy and deprecated code (margaretha)

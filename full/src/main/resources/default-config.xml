@@ -187,10 +187,6 @@
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
 
-	<bean id="kustvakt_admindb" class="de.ids_mannheim.korap.handlers.AdminDao">
-		<constructor-arg ref="kustvakt_db" />
-	</bean>
-
 	<bean id="resource_provider" class="de.ids_mannheim.korap.handlers.ResourceDao">
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
@@ -266,8 +262,6 @@
 		class="de.ids_mannheim.korap.authentication.KustvaktAuthenticationManager">
 		<constructor-arg
 			type="de.ids_mannheim.korap.interfaces.db.EntityHandlerIface" ref="kustvakt_userdb" />
-		<constructor-arg
-			type="de.ids_mannheim.korap.interfaces.db.AdminHandlerIface" ref="kustvakt_admindb" />
 		<constructor-arg type="de.ids_mannheim.korap.interfaces.EncryptionIface"
 			ref="kustvakt_encryption" />
 		<constructor-arg ref="kustvakt_config" />

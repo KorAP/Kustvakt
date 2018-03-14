@@ -19,6 +19,7 @@ import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.authentication.http.TransferEncoding;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.AuthenticationMethod;
+import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
@@ -39,6 +40,8 @@ import de.ids_mannheim.korap.web.utils.KustvaktContext;
 @Provider
 public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
 
+    @Autowired
+    private AdminDao adminDao;
     @Autowired
     private AuthenticationManagerIface authManager;
 
@@ -71,7 +74,7 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
             // EM: fix me: AuthenticationType based on header value
             User user = authManager.authenticate(AuthenticationMethod.LDAP,
                     data.getUsername(), data.getPassword(), attributes);
-            if (!user.isSystemAdmin()) {
+            if (!adminDao.isAdmin(user.getUsername())) {
                 throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
                         "Admin authentication failed.");
             }

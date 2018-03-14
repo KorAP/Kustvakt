@@ -61,12 +61,13 @@ public class UserGroupController {
      */
     @GET
     @Path("list")
-    public Response getUserGroup (@Context SecurityContext securityContext) {
+    public Response getUserGroup (@Context SecurityContext securityContext,
+            @QueryParam("username") String username) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             List<UserGroupDto> dtos =
-                    service.retrieveUserGroup(context.getUsername());
+                    service.retrieveUserGroup(username, context.getUsername());
             String result = JsonUtils.toJSON(dtos);
             return Response.ok(result).build();
         }
@@ -159,8 +160,8 @@ public class UserGroupController {
     @POST
     @Path("member/invite")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response inviteGroupMembers (@Context SecurityContext securityContext,
-            UserGroupJson group) {
+    public Response inviteGroupMembers (
+            @Context SecurityContext securityContext, UserGroupJson group) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {

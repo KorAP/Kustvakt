@@ -16,6 +16,7 @@ import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.dao.VirtualCorpusAccessDao;
 import de.ids_mannheim.korap.dao.VirtualCorpusDao;
 import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
@@ -28,9 +29,7 @@ import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.entity.VirtualCorpusAccess;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
-import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
@@ -57,13 +56,13 @@ public class VirtualCorpusService {
     @Autowired
     private VirtualCorpusAccessDao accessDao;
     @Autowired
+    private AdminDao adminDao;
+    @Autowired
     private UserGroupService userGroupService;
     @Autowired
     private SearchKrill krill;
     @Autowired
     private FullConfiguration config;
-    @Autowired
-    private AuthenticationManagerIface authManager;
     @Autowired
     private VirtualCorpusConverter converter;
     @Autowired
@@ -106,10 +105,9 @@ public class VirtualCorpusService {
      */
     public void deleteVC (String username, int vcId) throws KustvaktException {
 
-        User user = authManager.getUser(username);
         VirtualCorpus vc = vcDao.retrieveVCById(vcId);
 
-        if (vc.getCreatedBy().equals(username) || user.isSystemAdmin()) {
+        if (vc.getCreatedBy().equals(username) || adminDao.isAdmin(username)) {
             vcDao.deleteVirtualCorpus(vcId);
         }
         else {
@@ -124,8 +122,8 @@ public class VirtualCorpusService {
         int vcId = vcJson.getId();
         VirtualCorpus vc = vcDao.retrieveVCById(vcId);
 
-        User user = authManager.getUser(username);
-        if (!username.equals(vc.getCreatedBy()) && !user.isSystemAdmin()) {
+        if (!username.equals(vc.getCreatedBy())
+                && !adminDao.isAdmin(username)) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
@@ -188,10 +186,9 @@ public class VirtualCorpusService {
         ParameterChecker.checkStringValue(vc.getCorpusQuery(), "corpusQuery");
         ParameterChecker.checkStringValue(vc.getCreatedBy(), "createdBy");
 
-        User user = authManager.getUser(username);
 
         if (vc.getType().equals(VirtualCorpusType.PREDEFINED)
-                && !user.isSystemAdmin()) {
+                && !adminDao.isAdmin(username)) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
@@ -262,17 +259,17 @@ public class VirtualCorpusService {
     public void shareVC (String username, int vcId, int groupId)
             throws KustvaktException {
 
-        User user = authManager.getUser(username);
-
         VirtualCorpus vc = vcDao.retrieveVCById(vcId);
-        if (!username.equals(vc.getCreatedBy()) && !user.isSystemAdmin()) {
+        if (!username.equals(vc.getCreatedBy())
+                && !adminDao.isAdmin(username)) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
 
         UserGroup userGroup = userGroupService.retrieveUserGroupById(groupId);
 
-        if (!isVCAccessAdmin(userGroup, username) && !user.isSystemAdmin()) {
+        if (!isVCAccessAdmin(userGroup, username)
+                && !adminDao.isAdmin(username)) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
@@ -296,27 +293,26 @@ public class VirtualCorpusService {
         return false;
     }
 
-//    public void editVCAccess (VirtualCorpusAccess access, String username)
-//            throws KustvaktException {
-//
-//        // get all the VCA admins
-//        UserGroup userGroup = access.getUserGroup();
-//        List<UserGroupMember> accessAdmins =
-//                userGroupService.retrieveVCAccessAdmins(userGroup);
-//
-//        User user = authManager.getUser(username);
-//        if (!user.isSystemAdmin()) {
-//            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-//                    "Unauthorized operation for user: " + username, username);
-//        }
-//    }
+    //    public void editVCAccess (VirtualCorpusAccess access, String username)
+    //            throws KustvaktException {
+    //
+    //        // get all the VCA admins
+    //        UserGroup userGroup = access.getUserGroup();
+    //        List<UserGroupMember> accessAdmins =
+    //                userGroupService.retrieveVCAccessAdmins(userGroup);
+    //
+    //        User user = authManager.getUser(username);
+    //        if (!user.isSystemAdmin()) {
+    //            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+    //                    "Unauthorized operation for user: " + username, username);
+    //        }
+    //    }
 
     public List<VirtualCorpusAccessDto> listVCAccessByVC (String username,
             int vcId) throws KustvaktException {
 
         List<VirtualCorpusAccess> accessList;
-        User user = authManager.getUser(username);
-        if (user.isSystemAdmin()) {
+        if (adminDao.isAdmin(username)) {
             accessList = accessDao.retrieveAllAccessByVC(vcId);
         }
         else {
@@ -335,11 +331,10 @@ public class VirtualCorpusService {
 
     public List<VirtualCorpusAccessDto> listVCAccessByGroup (String username,
             int groupId) throws KustvaktException {
-        User user = authManager.getUser(username);
         UserGroup userGroup = userGroupService.retrieveUserGroupById(groupId);
 
         List<VirtualCorpusAccess> accessList;
-        if (user.isSystemAdmin()) {
+        if (adminDao.isAdmin(username)) {
             accessList = accessDao.retrieveAllAccessByGroup(groupId);
         }
         else if (isVCAccessAdmin(userGroup, username)) {
@@ -356,11 +351,10 @@ public class VirtualCorpusService {
     public void deleteVCAccess (int accessId, String username)
             throws KustvaktException {
 
-        User user = authManager.getUser(username);
-
         VirtualCorpusAccess access = accessDao.retrieveAccessById(accessId);
         UserGroup userGroup = access.getUserGroup();
-        if (isVCAccessAdmin(userGroup, username) || user.isSystemAdmin()) {
+        if (isVCAccessAdmin(userGroup, username)
+                || adminDao.isAdmin(username)) {
             accessDao.deleteAccess(access, username);
         }
         else {
@@ -372,12 +366,12 @@ public class VirtualCorpusService {
 
     public VirtualCorpusDto searchVCById (String username, int vcId)
             throws KustvaktException {
-        User user = authManager.getUser(username);
 
         VirtualCorpus vc = vcDao.retrieveVCById(vcId);
         VirtualCorpusType type = vc.getType();
 
-        if (!user.isSystemAdmin() && !username.equals(vc.getCreatedBy())) {
+        if (!adminDao.isAdmin(username)
+                && !username.equals(vc.getCreatedBy())) {
             if (type.equals(VirtualCorpusType.PRIVATE)
                     || (type.equals(VirtualCorpusType.PROJECT)
                             && !hasAccess(username, vcId))) {
@@ -388,12 +382,8 @@ public class VirtualCorpusService {
 
             else if (VirtualCorpusType.PUBLISHED.equals(type)) {
                 // add user in the VC's auto group 
-                //                VirtualCorpusAccess access =
-                //                        accessDao.retrieveHiddenAccess(vcId);
-                //                UserGroup userGroup = access.getUserGroup();
                 UserGroup userGroup =
                         userGroupService.retrieveHiddenGroup(vcId);
-                //                if (!userGroupService.isMember(username, userGroup)) {
                 try {
                     userGroupService.inviteGroupMember(username, userGroup,
                             "system", GroupMemberStatus.ACTIVE);
@@ -424,6 +414,4 @@ public class VirtualCorpusService {
         }
         return false;
     }
-
-
 }

@@ -14,6 +14,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 // import com.novell.ldap.*; search() funktioniert nicht korrekt, ausgewechselt gegen unboundID's Bibliothek 20.04.17/FB
 //Using JAR from unboundID:
@@ -26,6 +27,7 @@ import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.config.URIParam;
+import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.NotAuthorizedException;
@@ -35,7 +37,6 @@ import de.ids_mannheim.korap.interfaces.AuthenticationIface;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.ValidatorIface;
-import de.ids_mannheim.korap.interfaces.db.AdminHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
@@ -64,17 +65,17 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	private static Logger jlog = LoggerFactory.getLogger(KustvaktAuthenticationManager.class);
 	private EncryptionIface crypto;
 	private EntityHandlerIface entHandler;
-	private AdminHandlerIface adminHandler;
+	@Autowired
+	private AdminDao adminDao;
 	private AuditingIface auditing;
 	private FullConfiguration config;
 	private Collection userdatadaos;
 	private LoginCounter counter;
 	private ValidatorIface validator;
 	
-	public KustvaktAuthenticationManager(EntityHandlerIface userdb, AdminHandlerIface admindb, EncryptionIface crypto,
+	public KustvaktAuthenticationManager(EntityHandlerIface userdb, EncryptionIface crypto,
 			FullConfiguration config, AuditingIface auditer, Collection<UserDataDbIface> userdatadaos) {
 		this.entHandler = userdb;
-		this.adminHandler = admindb;
 		this.config = config;
 		this.crypto = crypto;
 		this.auditing = auditer;
@@ -340,8 +341,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 			}
 		}
 
-		boolean isAdmin = adminHandler.isAdmin(unknown.getId());
-		unknown.setSystemAdmin(isAdmin);
+		boolean isAdmin = adminDao.isAdmin(unknown.getUsername());
 		jlog.debug("Authentication: found username " + unknown.getUsername());
 
 		if (unknown instanceof KorAPUser) {
@@ -712,9 +712,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 		}
 		user.setPassword(hash);
 
-		String o = (String) attributes.get(Attributes.IS_ADMIN);
-		boolean b = Boolean.parseBoolean(o);
-		user.setSystemAdmin(b);
+//		String o = (String) attributes.get(Attributes.IS_ADMIN);
+//		boolean b = Boolean.parseBoolean(o);
+//		user.setSystemAdmin(b);
 
 		try {
 			UserDetails details = new UserDetails();
@@ -725,10 +725,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
 			jlog.info("Creating new user account for user {}", user.getUsername());
 			entHandler.createAccount(user);
-			if (user.isSystemAdmin() && user instanceof KorAPUser) {
-				adminHandler.addAccount(user);
-				user.setCorpusAccess(CorpusAccess.ALL);
-			}
+//			if (user.isSystemAdmin() && user instanceof KorAPUser) {
+//				adminDao.addAccount(user);
+//				user.setCorpusAccess(CorpusAccess.ALL);
+//			}
 			details.setUserId(user.getId());
 			settings.setUserId(user.getId());
 

@@ -94,6 +94,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     @Test
     public void testListMarlinGroups () throws KustvaktException {
         ClientResponse response = resource().path("group").path("list")
+                .queryParam("username", "marlin")
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue("marlin",
                                 "pass"))
@@ -107,7 +108,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
 
     @Test
-    public void testListUserGroupUnauthorized () throws KustvaktException {
+    public void testListGroupGuest () throws KustvaktException {
         ClientResponse response = resource().path("group").path("list")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
@@ -119,6 +120,25 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
         assertEquals("Unauthorized operation for user: guest",
+                node.at("/errors/0/1").asText());
+    }
+    
+    @Test
+    public void testListGroupOtherUser() throws KustvaktException {
+        ClientResponse response = resource().path("group").path("list")
+                .queryParam("username", "dory")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("marlin",
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get(ClientResponse.class);
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Unauthorized operation for user: marlin",
                 node.at("/errors/0/1").asText());
     }
 

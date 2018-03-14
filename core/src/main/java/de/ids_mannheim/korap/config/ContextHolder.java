@@ -106,11 +106,6 @@ public abstract class ContextHolder {
         return getBean(KUSTVAKT_USERDB);
     }
     
-    public AdminHandlerIface getAdminDBHandler () {
-        return getBean(KUSTVAKT_ADMINDB);
-    }
-
-
     public PolicyHandlerIface getPolicyDbProvider () {
         Object b = getBean(KUSTVAKT_POLICIES);
         return (PolicyHandlerIface) b;

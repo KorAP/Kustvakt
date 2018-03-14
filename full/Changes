@@ -1,3 +1,9 @@
+version 0.60.1
+14/03/2018
+	- added admin-related SQL codes (margaretha)
+	- updated AdminDao (margaretha)
+	- added optional username query parameter to group list controller (margaretha) 
+	
 version 0.60 release
 14/03/2018
 	- set up mail settings using localhost port 25 (margaretha)
