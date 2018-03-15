@@ -3,6 +3,10 @@ package de.ids_mannheim.korap.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * @author margaretha
+ *
+ */
 @Getter
 @Setter
 public class VirtualCorpusAccessDto {

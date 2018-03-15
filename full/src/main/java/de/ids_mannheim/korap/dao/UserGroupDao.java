@@ -35,6 +35,14 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
+/** Manages database transactions regarding {@link UserGroup} entity and 
+ *  database table.
+ * 
+ * @author margaretha
+ * 
+ * @see UserGroup
+ *
+ */
 @Transactional
 @Repository
 public class UserGroupDao {

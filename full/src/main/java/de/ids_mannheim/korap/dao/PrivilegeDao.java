@@ -18,6 +18,16 @@ import de.ids_mannheim.korap.entity.Privilege_;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.Role_;
 
+/** Manages database transactions regarding {@link Privilege} entity or 
+ *  database table.
+ * 
+ * @see Privilege
+ * @see PrivilegeType
+ * @see Role
+ * 
+ * @author margaretha
+ *
+ */
 @Transactional
 @Repository
 public class PrivilegeDao {

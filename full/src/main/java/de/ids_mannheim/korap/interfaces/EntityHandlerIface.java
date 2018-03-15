@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.interfaces.db;
+package de.ids_mannheim.korap.interfaces;
 
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;

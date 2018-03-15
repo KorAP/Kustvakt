@@ -1,5 +1,10 @@
 package de.ids_mannheim.korap.constant;
 
+/** Defines some predefined roles used in the system.
+ * 
+ * @author margaretha
+ *
+ */
 public enum PredefinedRole {
     USER_GROUP_ADMIN(1), USER_GROUP_MEMBER(2), VC_ACCESS_ADMIN(3), VC_ACCESS_MEMBER(4);
     

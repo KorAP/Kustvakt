@@ -147,7 +147,7 @@
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Kustvakt-core</artifactId>
-			<version>0.60</version>
+			<version>0.60.1</version>
 		</dependency>
 		
 		<!-- Spring -->

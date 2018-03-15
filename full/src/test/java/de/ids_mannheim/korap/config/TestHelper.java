@@ -33,7 +33,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.JDBCClient;
 import de.ids_mannheim.korap.handlers.ResourceDao;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
+import de.ids_mannheim.korap.interfaces.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.user.User;
@@ -119,48 +119,49 @@ public class TestHelper {
         return this;
     }
 
-
-    public TestHelper setupSimpleAccount (String username, String password) {
-        KustvaktBaseDaoInterface dao = getBean(ContextHolder.KUSTVAKT_USERDB);
-        EntityHandlerIface edao = (EntityHandlerIface) dao;
-        try {
-            edao.getAccount(username);
-        }
-        catch (EmptyResultException e) {
-            // do nothing
-        }
-        catch (KustvaktException ex) {
-            assertNull("Test user could not be set up", true);
-        }
-
-        Map m = new HashMap<>();
-        m.put(Attributes.USERNAME, username);
-
-        try {
-            String hash = ((EncryptionIface) getBean(ContextHolder.KUSTVAKT_ENCRYPTION))
-                    .secureHash(password);
-            m.put(Attributes.PASSWORD, hash);
-        }
-        catch (NoSuchAlgorithmException | UnsupportedEncodingException
-                | KustvaktException e) {
-            // do nohting
-            assertNotNull("Exception thrown", null);
-        }
-        assertNotNull("userdatabase handler must not be null", dao);
-
-        try {
-
-            int i = edao.createAccount(User.UserFactory.toKorAPUser(m));
-            assert BeansFactory.getKustvaktContext().getUserDBHandler()
-                    .getAccount((String) data.get(Attributes.USERNAME)) != null;
-            assertEquals(1, i);
-        }
-        catch (KustvaktException e) {
-            // do nothing
-            assertNull("Test user could not be set up", true);
-        }
-        return this;
-    }
+    // EM
+    @Deprecated
+//    public TestHelper setupSimpleAccount (String username, String password) {
+//        KustvaktBaseDaoInterface dao = getBean(ContextHolder.KUSTVAKT_USERDB);
+//        EntityHandlerIface edao = (EntityHandlerIface) dao;
+//        try {
+//            edao.getAccount(username);
+//        }
+//        catch (EmptyResultException e) {
+//            // do nothing
+//        }
+//        catch (KustvaktException ex) {
+//            assertNull("Test user could not be set up", true);
+//        }
+//
+//        Map m = new HashMap<>();
+//        m.put(Attributes.USERNAME, username);
+//
+//        try {
+//            String hash = ((EncryptionIface) getBean(ContextHolder.KUSTVAKT_ENCRYPTION))
+//                    .secureHash(password);
+//            m.put(Attributes.PASSWORD, hash);
+//        }
+//        catch (NoSuchAlgorithmException | UnsupportedEncodingException
+//                | KustvaktException e) {
+//            // do nohting
+//            assertNotNull("Exception thrown", null);
+//        }
+//        assertNotNull("userdatabase handler must not be null", dao);
+//
+//        try {
+//
+//            int i = edao.createAccount(User.UserFactory.toKorAPUser(m));
+//            assert BeansFactory.getKustvaktContext().getUserDBHandler()
+//                    .getAccount((String) data.get(Attributes.USERNAME)) != null;
+//            assertEquals(1, i);
+//        }
+//        catch (KustvaktException e) {
+//            // do nothing
+//            assertNull("Test user could not be set up", true);
+//        }
+//        return this;
+//    }
 
 
     public User getUser () {

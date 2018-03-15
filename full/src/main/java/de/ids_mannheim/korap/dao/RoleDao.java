@@ -20,6 +20,12 @@ import de.ids_mannheim.korap.entity.Role_;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.entity.UserGroupMember_;
 
+/** Manages database transactions regarding {@link Role} entity or database table. 
+ * 
+ * @author margaretha
+ * @see Role
+ * @see PrivilegeDao
+ */
 @Transactional
 @Repository
 public class RoleDao {
@@ -28,7 +34,7 @@ public class RoleDao {
     private EntityManager entityManager;
 
     @Autowired
-    PrivilegeDao privilegeDao;
+    private PrivilegeDao privilegeDao;
 
     public void createRole (String name, List<PrivilegeType> privilegeTypes) {
         Role r = new Role();

@@ -10,9 +10,7 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
-import de.ids_mannheim.korap.interfaces.db.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
-import de.ids_mannheim.korap.interfaces.db.PolicyHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.interfaces.defaults.ApacheValidator;
@@ -37,7 +35,6 @@ public class BeanConfiguration {
 
     public static final String KUSTVAKT_AUTHENTICATION_MANAGER = "kustvakt_authenticationmanager";
     public static final String KUSTVAKT_USERDB = "kustvakt_userdb";
-    public static final String KUSTVAKT_POLICIES = "kustvakt_policies";
 
     private static BeanHolderHelper beans;
 
@@ -174,15 +171,9 @@ public class BeanConfiguration {
 //        }
 
 
-        public EntityHandlerIface getUserDBHandler () {
-            return getBean(KUSTVAKT_USERDB);
-        }
-
-
-        public PolicyHandlerIface getPolicyDbProvider () {
-            return getBean(KUSTVAKT_POLICIES);
-        }
-
+//        public EntityHandlerIface getUserDBHandler () {
+//            return getBean(KUSTVAKT_USERDB);
+//        }
 
         public ValidatorIface getValidator()  {
             try {

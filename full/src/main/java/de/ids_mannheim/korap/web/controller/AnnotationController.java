@@ -39,9 +39,6 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class AnnotationController {
 
-    private static Logger jlog =
-            LoggerFactory.getLogger(AnnotationController.class);
-
     @Autowired
     CoreResponseHandler responseHandler;
     

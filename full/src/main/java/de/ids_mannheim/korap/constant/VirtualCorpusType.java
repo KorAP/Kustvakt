@@ -1,5 +1,12 @@
 package de.ids_mannheim.korap.constant;
 
+import de.ids_mannheim.korap.entity.VirtualCorpus;
+
+/** Defines types of {@link VirtualCorpus} 
+ * 
+ * @author margaretha
+ *
+ */
 public enum VirtualCorpusType {
     // available for all
     PREDEFINED, 

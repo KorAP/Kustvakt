@@ -1,16 +1,19 @@
 package de.ids_mannheim.korap.config;
 
-import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.interfaces.ValidatorIface;
-import de.ids_mannheim.korap.interfaces.db.*;
-import de.ids_mannheim.korap.interfaces.defaults.ApacheValidator;
-import de.ids_mannheim.korap.web.CoreResponseHandler;
+import java.io.IOException;
+import java.util.Collection;
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 
-import java.io.IOException;
-import java.util.Collection;
+import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.interfaces.ValidatorIface;
+import de.ids_mannheim.korap.interfaces.db.AuditingIface;
+import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
+import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
+import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
+import de.ids_mannheim.korap.interfaces.defaults.ApacheValidator;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
 
 /**
  * @author hanl
@@ -102,16 +105,10 @@ public abstract class ContextHolder {
 //    }
 
 
-    public EntityHandlerIface getUserDBHandler () {
-        return getBean(KUSTVAKT_USERDB);
-    }
+//    public EntityHandlerIface getUserDBHandler () {
+//        return getBean(KUSTVAKT_USERDB);
+//    }
     
-    public PolicyHandlerIface getPolicyDbProvider () {
-        Object b = getBean(KUSTVAKT_POLICIES);
-        return (PolicyHandlerIface) b;
-    }
-
-
 //    public Collection<AuthenticationIface> getAuthProviders () {
 //        return getBean(KUSTVAKT_AUTHPROVIDERS);
 //    }

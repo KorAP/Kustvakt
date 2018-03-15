@@ -261,7 +261,7 @@
 	<bean id="kustvakt_authenticationmanager"
 		class="de.ids_mannheim.korap.authentication.KustvaktAuthenticationManager">
 		<constructor-arg
-			type="de.ids_mannheim.korap.interfaces.db.EntityHandlerIface" ref="kustvakt_userdb" />
+			type="de.ids_mannheim.korap.interfaces.EntityHandlerIface" ref="kustvakt_userdb" />
 		<constructor-arg type="de.ids_mannheim.korap.interfaces.EncryptionIface"
 			ref="kustvakt_encryption" />
 		<constructor-arg ref="kustvakt_config" />

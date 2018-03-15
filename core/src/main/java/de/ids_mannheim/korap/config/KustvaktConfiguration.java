@@ -76,8 +76,6 @@ public class KustvaktConfiguration {
     private String default_token;
     private String default_dep;
     private String default_const;
-    @Deprecated    
-    private String policyConfig;
     private ArrayList<String> foundries;
     private ArrayList<String> layers;
     

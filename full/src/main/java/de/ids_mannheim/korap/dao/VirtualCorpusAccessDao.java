@@ -25,6 +25,14 @@ import de.ids_mannheim.korap.entity.VirtualCorpus_;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
+/** Manages database transactions regarding {@link VirtualCorpusAccess} entity 
+ *  and its corresponding database table.
+ * 
+ * @author margaretha
+ *
+ * @see VirtualCorpusAccess
+ * @see VirtualCorpus
+ */
 @Transactional
 @Repository
 public class VirtualCorpusAccessDao {

@@ -12,6 +12,13 @@ import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 
+/** Manages conversion of  {@link UserGroup} objects to their data access objects (DTO), 
+ * e.g. UserGroupDto. DTO structure defines controllers output, namely the structure of 
+ * JSON objects in HTTP responses.
+ * 
+ * @author margaretha
+ *
+ */
 @Component
 public class UserGroupConverter {
 
@@ -39,7 +46,8 @@ public class UserGroupConverter {
                 UserGroupMemberDto memberDto = new UserGroupMemberDto();
                 memberDto.setUserId(member.getUserId());
                 memberDto.setStatus(member.getStatus());
-                List<String> memberRoles = new ArrayList<>(member.getRoles().size());
+                List<String> memberRoles =
+                        new ArrayList<>(member.getRoles().size());
                 for (Role r : member.getRoles()) {
                     memberRoles.add(r.getName());
                 }

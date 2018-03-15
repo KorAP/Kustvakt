@@ -1,8 +1,15 @@
 package de.ids_mannheim.korap.dto;
 
+import de.ids_mannheim.korap.entity.VirtualCorpus;
 import lombok.Getter;
 import lombok.Setter;
 
+/** Defines the structure of {@link VirtualCorpus} description to be 
+ *  sent as JSON objects in HTTP responses. 
+ * 
+ * @author margaretha
+ *
+ */
 @Getter
 @Setter
 public class VirtualCorpusDto {

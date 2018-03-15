@@ -6,6 +6,11 @@ import de.ids_mannheim.korap.resource.rewrite.DocMatchRewrite;
 import de.ids_mannheim.korap.resource.rewrite.IdWriter;
 import de.ids_mannheim.korap.resource.rewrite.RewriteHandler;
 
+/** Defines rewrite handling methods relevant only in full version. 
+ * 
+ * @author margaretha
+ *
+ */
 public class FullRewriteHandler extends RewriteHandler{
 
     public FullRewriteHandler (FullConfiguration config) {

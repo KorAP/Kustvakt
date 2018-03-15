@@ -275,7 +275,7 @@ public class UserControllerTest extends FastJerseyTest {
 
 	@Test
 	public void testGetUserDetailsNonExistent() throws KustvaktException {
-		helper().setupSimpleAccount("userservicetest", "servicepass");
+//		helper().setupSimpleAccount("userservicetest", "servicepass");
 
 		String enc = handler.createBasicAuthorizationHeaderValue("userservicetest", "servicepass");
 		ClientResponse response = resource().path("user").path("details")
