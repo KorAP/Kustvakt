@@ -1,7 +1,8 @@
 version 0.60
-08/03/2018	
+15/03/2018	
     - updated field type:date in the metadata test (margaretha)
     - removed loading application context via BeanFactory (margaretha)
+    - fixed missing kustvakt-lite.conf (margaretha))
 
 version 0.59.9 
 01/02/2018
