@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.server;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
@@ -25,15 +26,16 @@ public class KustvaktServer extends KustvaktBaseServer {
         kargs = server.readAttributes(args);
         
         File f = new File("kustvakt.conf");
+        Properties properties = new Properties();
+        
+        InputStream in = null;
         if (!f.exists()){
-            URL url = KustvaktServer.class.getResource("kustvakt.conf");
-            if (url!=null){
-                f = new File(url.toURI());
-            }
+            in = KustvaktServer.class.getClassLoader().getResourceAsStream("kustvakt.conf");
+        }
+        else{
+            in = new FileInputStream(f);
         }
         
-        Properties properties = new Properties();
-        FileInputStream in = new FileInputStream(f);
         properties.load(in);
         in.close();
         fullConfig = new FullConfiguration(properties);
