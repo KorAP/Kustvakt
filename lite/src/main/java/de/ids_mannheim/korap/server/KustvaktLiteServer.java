@@ -3,7 +3,6 @@ package de.ids_mannheim.korap.server;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Properties;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;

@@ -13,8 +13,8 @@ INSERT INTO user_group(name,status,created_by)
 --INSERT INTO user_group(name,status,created_by) 
 --	VALUES ("all users","HIDDEN","system");
 
-INSERT INTO user_group(name,status,created_by) 
-	VALUES ("deleted group","DELETED","dory");
+INSERT INTO user_group(name,status,created_by, deleted_by) 
+	VALUES ("deleted group","DELETED","dory", "dory");
 
 
 
@@ -53,6 +53,11 @@ INSERT INTO user_group_member(user_id, group_id, status, created_by)
 	SELECT "pearl",
 		(SELECT id from user_group where name = "auto group"),
 		"ACTIVE","system";
+
+INSERT INTO user_group_member(user_id, group_id, status, created_by)
+	SELECT "dory",
+		(SELECT id from user_group where name = "deleted group"),
+		"ACTIVE","dory";
 
 		
 -- virtual corpora
