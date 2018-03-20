@@ -259,6 +259,60 @@ public class UserGroupDao {
 
     }
 
+    /** This is an admin function. It retrieves all groups given the userId 
+     * and status.
+     * 
+     * @param userId
+     * @param status
+     * @return a list of {@link UserGroup}s
+     * @throws KustvaktException
+     */
+    public List<UserGroup> retrieveGroupByStatus (String userId,
+            UserGroupStatus status) throws KustvaktException {
+
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<UserGroup> query =
+                criteriaBuilder.createQuery(UserGroup.class);
+
+        Root<UserGroup> root = query.from(UserGroup.class);
+
+        Predicate restrictions = null;
+
+        if (userId != null && !userId.isEmpty()) {
+
+            ListJoin<UserGroup, UserGroupMember> members =
+                    root.join(UserGroup_.members);
+            restrictions = criteriaBuilder.and(
+                    criteriaBuilder.equal(members.get(UserGroupMember_.userId),
+                            userId));
+            
+            if (status != null){
+                restrictions = criteriaBuilder.and(restrictions, criteriaBuilder
+                        .equal(root.get(UserGroup_.status), status));
+            }
+        }
+        else if (status != null) {
+                restrictions = criteriaBuilder
+                        .equal(root.get(UserGroup_.status), status);
+                
+        }
+
+        query.select(root);
+        if (restrictions!=null){
+            query.where(restrictions);
+        }
+        Query q = entityManager.createQuery(query);
+
+        try {
+            return q.getResultList();
+        }
+        catch (NoResultException e) {
+            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
+                    "No group found for status " + status, status.toString());
+        }
+
+    }
+
     public void addVCToGroup (VirtualCorpus virtualCorpus, String createdBy,
             VirtualCorpusAccessStatus status, UserGroup group) {
         VirtualCorpusAccess accessGroup = new VirtualCorpusAccess();

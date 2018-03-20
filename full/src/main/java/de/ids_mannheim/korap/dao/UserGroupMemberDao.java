@@ -143,17 +143,25 @@ public class UserGroupMemberDao {
 
     public List<UserGroupMember> retrieveMemberByGroupId (int groupId)
             throws KustvaktException {
+        return retrieveMemberByGroupId(groupId, false);
+    }
+
+    public List<UserGroupMember> retrieveMemberByGroupId (int groupId,
+            boolean isAdmin) throws KustvaktException {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<UserGroupMember> query =
                 criteriaBuilder.createQuery(UserGroupMember.class);
 
         Root<UserGroupMember> root = query.from(UserGroupMember.class);
 
-        Predicate predicate = criteriaBuilder.and(
-                criteriaBuilder.equal(root.get(UserGroupMember_.group),
-                        groupId),
-                criteriaBuilder.notEqual(root.get(UserGroupMember_.status),
-                        GroupMemberStatus.DELETED));
+        Predicate predicate = criteriaBuilder.and(criteriaBuilder
+                .equal(root.get(UserGroupMember_.group), groupId));
+
+        if (!isAdmin) {
+            predicate = criteriaBuilder.and(predicate,
+                    criteriaBuilder.notEqual(root.get(UserGroupMember_.status),
+                            GroupMemberStatus.DELETED));
+        }
 
         query.select(root);
         query.where(predicate);

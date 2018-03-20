@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 
 import com.sun.jersey.spi.container.ResourceFilters;
 
+import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.dto.UserGroupDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.service.UserGroupService;
@@ -55,19 +56,21 @@ public class UserGroupController {
     private UserGroupService service;
 
     /** Returns all user-groups in which a user is an active or a pending member.
+     *  Not suitable for system-admin, instead use {@link UserGroupController#
+     *  getUserGroupBySystemAdmin(SecurityContext, String, UserGroupStatus)} 
      * 
      * @param securityContext
      * @return a list of user-groups
+     * 
      */
     @GET
     @Path("list")
-    public Response getUserGroup (@Context SecurityContext securityContext,
-            @QueryParam("username") String username) {
+    public Response getUserGroup (@Context SecurityContext securityContext) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             List<UserGroupDto> dtos =
-                    service.retrieveUserGroup(username, context.getUsername());
+                    service.retrieveUserGroup(context.getUsername());
             String result = JsonUtils.toJSON(dtos);
             return Response.ok(result).build();
         }
@@ -76,6 +79,34 @@ public class UserGroupController {
         }
     }
 
+    
+    /** Lists user-groups for system-admin purposes. If username parameter 
+     *  is not specified, list user-groups of all users. If status is not
+     *  specified, list user-groups of all statuses.
+     * 
+     * @param securityContext
+     * @param username username
+     * @param status {@link UserGroupStatus}
+     * @return a list of user-groups
+     */
+    @GET
+    @Path("list/system-admin")
+    public Response getUserGroupBySystemAdmin (
+            @Context SecurityContext securityContext,
+            @QueryParam("username") String username,
+            @QueryParam("status") UserGroupStatus status) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            List<UserGroupDto> dtos = service.retrieveUserGroupByStatus(
+                    username, context.getUsername(), status);
+            String result = JsonUtils.toJSON(dtos);
+            return Response.ok(result).build();
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
 
     /** Creates a user group where the user in token context is the 
      * group owner, and assigns the listed group members with status 

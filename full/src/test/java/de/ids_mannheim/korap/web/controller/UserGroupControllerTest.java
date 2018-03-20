@@ -31,6 +31,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     @Autowired
     private HttpAuthorizationHandler handler;
     private String username = "UserGroupControllerTest";
+    private String admin = "admin";
 
     private JsonNode retrieveUserGroups (String username)
             throws UniformInterfaceException, ClientHandlerException,
@@ -120,25 +121,6 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
         assertEquals("Unauthorized operation for user: guest",
-                node.at("/errors/0/1").asText());
-    }
-    
-    @Test
-    public void testListGroupOtherUser() throws KustvaktException {
-        ClientResponse response = resource().path("group").path("list")
-                .queryParam("username", "dory")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("marlin",
-                                "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
-        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-        
-        String entity = response.getEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
-                node.at("/errors/0/0").asInt());
-        assertEquals("Unauthorized operation for user: marlin",
                 node.at("/errors/0/1").asText());
     }
 
@@ -319,14 +301,25 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         // check group
-        response = resource().path("group").path("list")
+        response = resource().path("group").path("list").path("system-admin")
+                .queryParam("username", username)
+                .queryParam("status", "DELETED")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(username,
+                        handler.createBasicAuthorizationHeaderValue(admin,
                                 "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
-        assertEquals("[]", entity);
+
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(1, node.size());
+        assertEquals(groupId, node.at("/0/id").asText());
+
+        // check group members
+        for (int i=0; i< node.at("/0/members").size(); i++){
+            assertEquals(GroupMemberStatus.DELETED.name(),
+                    node.at("/0/members/"+i+"/status").asText());    
+        }
     }
 
     @Test

@@ -29,14 +29,17 @@ public class UserGroupConverter {
         UserGroupDto dto = new UserGroupDto();
         dto.setId(group.getId());
         dto.setName(group.getName());
+        dto.setStatus(group.getStatus());
         dto.setOwner(group.getCreatedBy());
         dto.setUserMemberStatus(userMemberStatus);
 
-        List<String> roles = new ArrayList<>(userRoles.size());
-        for (Role r : userRoles) {
-            roles.add(r.getName());
+        if (userRoles != null) {
+            List<String> roles = new ArrayList<>(userRoles.size());
+            for (Role r : userRoles) {
+                roles.add(r.getName());
+            }
+            dto.setUserRoles(roles);
         }
-        dto.setUserRoles(roles);
 
         if (members != null) {
             ArrayList<UserGroupMemberDto> memberDtos =

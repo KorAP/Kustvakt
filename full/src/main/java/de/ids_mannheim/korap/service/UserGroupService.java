@@ -67,21 +67,8 @@ public class UserGroupService {
      * 
      * @see {@link PredefinedRole}
      */
-    public List<UserGroupDto> retrieveUserGroup (String username,
-            String contextUsername) throws KustvaktException {
-
-        boolean isAdmin = adminDao.isAdmin(contextUsername);
-
-        if (username != null) {
-            if (!username.equals(contextUsername) && !isAdmin) {
-                throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                        "Unauthorized operation for user: " + contextUsername,
-                        contextUsername);
-            }
-        }
-        else {
-            username = contextUsername;
-        }
+    public List<UserGroupDto> retrieveUserGroup (String username)
+            throws KustvaktException {
 
         List<UserGroup> userGroups =
                 userGroupDao.retrieveGroupByUserId(username);
@@ -124,8 +111,38 @@ public class UserGroupService {
         return userGroupDao.retrieveGroupById(groupId);
     }
 
-    public UserGroup retrieveHiddenGroup (int vcId) throws KustvaktException {
+    public UserGroup retrieveHiddenUserGroupByVC (int vcId)
+            throws KustvaktException {
         return userGroupDao.retrieveHiddenGroupByVC(vcId);
+    }
+
+    public List<UserGroupDto> retrieveUserGroupByStatus (String username,
+            String contextUsername, UserGroupStatus status)
+            throws KustvaktException {
+
+        boolean isAdmin = adminDao.isAdmin(contextUsername);
+
+        if (isAdmin) {
+            List<UserGroup> userGroups =
+                    userGroupDao.retrieveGroupByStatus(username, status);
+            Collections.sort(userGroups);
+            ArrayList<UserGroupDto> dtos = new ArrayList<>(userGroups.size());
+
+            List<UserGroupMember> members;
+            UserGroupDto groupDto;
+            for (UserGroup group : userGroups) {
+                members = groupMemberDao.retrieveMemberByGroupId(group.getId(), true);
+                groupDto = converter.createUserGroupDto(group, members, null,
+                        null);
+                dtos.add(groupDto);
+            }
+            return dtos;
+        }
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + contextUsername,
+                    contextUsername);
+        }
     }
 
     public List<UserGroupMember> retrieveVCAccessAdmins (UserGroup userGroup)
@@ -460,4 +477,6 @@ public class UserGroupService {
 
         groupMemberDao.deleteMember(member, deletedBy, isSoftDelete);
     }
+
+
 }

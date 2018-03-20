@@ -383,7 +383,7 @@ public class VirtualCorpusService {
             else if (VirtualCorpusType.PUBLISHED.equals(type)) {
                 // add user in the VC's auto group 
                 UserGroup userGroup =
-                        userGroupService.retrieveHiddenGroup(vcId);
+                        userGroupService.retrieveHiddenUserGroupByVC(vcId);
                 try {
                     userGroupService.inviteGroupMember(username, userGroup,
                             "system", GroupMemberStatus.ACTIVE);

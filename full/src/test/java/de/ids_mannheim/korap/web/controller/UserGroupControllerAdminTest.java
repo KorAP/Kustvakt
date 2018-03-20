@@ -37,28 +37,52 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
                 .queryParam("username", username)
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue(
+                                testUsername, "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        return node;
+    }
+
+    @Test
+    public void testListDoryGroups () throws KustvaktException {
+        ClientResponse response = resource().path("group").path("list")
+                .path("system-admin").queryParam("username", "dory")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(
                                 adminUsername, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.getEntity(String.class);
-                System.out.println(entity);
+//        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
-
-        return node;
+        assertEquals(3, node.size());
     }
 
     @Test
-    public void testListDoryGroups () throws KustvaktException {
-        JsonNode node = listGroup("dory");
-        JsonNode group = node.get(1);
-        assertEquals(2, group.at("/id").asInt());
-        assertEquals("dory group", group.at("/name").asText());
-        assertEquals("dory", group.at("/owner").asText());
-        assertEquals(3, group.at("/members").size());
-    }
+    public void testListDoryActiveGroups () throws KustvaktException {
+        ClientResponse response = resource().path("group").path("list")
+                .path("system-admin").queryParam("username", "dory")
+                .queryParam("status", "ACTIVE")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(
+                                adminUsername, "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get(ClientResponse.class);
 
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String entity = response.getEntity(String.class);
+//        System.out.println(entity);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(2, node.size());
+    }
+    
+    
     // same as list user-groups of the admin
     @Test
     public void testListWithoutUsername () throws UniformInterfaceException,
@@ -76,7 +100,43 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testCreateUserGroup () throws UniformInterfaceException,
+    public void testListByStatusAll () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        ClientResponse response =
+                resource().path("group").path("list").path("system-admin")
+                        .header(Attributes.AUTHORIZATION,
+                                handler.createBasicAuthorizationHeaderValue(
+                                        adminUsername, "pass"))
+                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                        .get(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String entity = response.getEntity(String.class);
+
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(4, node.size());
+    }
+
+    @Test
+    public void testListByStatusHidden () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        ClientResponse response = resource().path("group").path("list")
+                .path("system-admin").queryParam("status", "HIDDEN")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(
+                                adminUsername, "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(1, node.size());
+        assertEquals(3, node.at("/0/id").asInt());
+    }
+
+    @Test
+    public void testUserGroup () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
 
         UserGroupJson json = new UserGroupJson();
@@ -100,8 +160,8 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         assertEquals("admin test group", node.get("name").asText());
 
         String groupId = node.get("id").asText();
-//        testInviteMember(groupId);
-//        testDeleteMember(groupId);
+        testInviteMember(groupId);
+        testDeleteMember(groupId);
         testDeleteGroup(groupId);
     }
 
@@ -120,8 +180,8 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         // check group
-//        JsonNode node = listGroup(testUsername);
-//        assertEquals(0, node.size());
+        JsonNode node = listGroup(testUsername);
+        assertEquals(0, node.size());
     }
 
     private void testDeleteMember (String groupId)
