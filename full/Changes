@@ -9,6 +9,12 @@ version 0.60.1
 	- added user-group status in user-group DTO (margaretha)
 	- added check for hidden groups in user-group tests (margaretha)
 	- added database trigger test on deleting members when deleting group (margaretha)
+	- renamed VC type PREDEFINED to SYSTEM (margaretha)
+	- added VC list controller for system admin (margaretha)
+	- added VC controller tests with for system admin (margaretha) 
+	- added hidden access removal when deleting published VC (margaretha)
+	- added check for hidden groups in VC controller tests (margaretha)
+	- added search user-group controller (margaretha)
 	
 version 0.60 release
 14/03/2018
@@ -82,8 +88,8 @@ version 0.59.8
 	- removed deprecated loader codes and tests (margaretha)
 	- removed old Spring java configurations (margaretha)
 	- implemented entity classes for the new database (margaretha)
-	- added MySQL codes regarding virtual corpus and for testing (margaretha)
-	- added dao methods regarding virtual corpus (margaretha)
+	- added MySQL codes regarding VC and for testing (margaretha)
+	- added dao methods regarding VC (margaretha)
 	- added similar SQL codes (to MySQL) for sqlite (margaretha)
 	- added dao methods regarding user groups (margaretha)
 	- restructured web-service codes into controller and logic/business-service(margaretha)

@@ -131,7 +131,8 @@ public class UserGroupService {
             List<UserGroupMember> members;
             UserGroupDto groupDto;
             for (UserGroup group : userGroups) {
-                members = groupMemberDao.retrieveMemberByGroupId(group.getId(), true);
+                members = groupMemberDao.retrieveMemberByGroupId(group.getId(),
+                        true);
                 groupDto = converter.createUserGroupDto(group, members, null,
                         null);
                 dtos.add(groupDto);
@@ -476,6 +477,21 @@ public class UserGroupService {
         }
 
         groupMemberDao.deleteMember(member, deletedBy, isSoftDelete);
+    }
+
+    public UserGroupDto searchById (String username, int groupId)
+            throws KustvaktException {
+        if (adminDao.isAdmin(username)) {
+            UserGroup userGroup = userGroupDao.retrieveGroupById(groupId, true);
+            UserGroupDto groupDto = converter.createUserGroupDto(userGroup,
+                    userGroup.getMembers(), null, null);
+            return groupDto;
+        }
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
+
     }
 
 

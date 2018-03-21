@@ -24,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
+import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -65,7 +66,9 @@ public class VirtualCorpusController {
     @Autowired
     private VirtualCorpusService service;
 
-    /** Creates a user VC, also for system admins
+    /** Creates a user virtual corpus, also for system admins
+     * 
+     *  EM: should system admins be able to create VC for other users?
      * 
      * @param securityContext
      * @param vc a JSON object describing the virtual corpus
@@ -91,7 +94,8 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
 
-    /** Only the VC owner and system admins can edit VC.
+    /** Only the virtual corpus owner and system admins can edit 
+     * a virtual corpus.
      * 
      * @param securityContext
      * @param vc a JSON object describing the virtual corpus
@@ -115,11 +119,11 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
 
-    /** Searches for a specific VC.
+    /** Searches for a specific virtual corpus.
      * 
      * @param securityContext
      * @param vcId a virtual corpus id
-     * @return a list of VC
+     * @return a list of virtual corpora
      */
     @GET
     @Path("search/{vcId}")
@@ -139,20 +143,27 @@ public class VirtualCorpusController {
         return Response.ok(result).build();
     }
 
-    /** Lists not only private VC but all VC available to a user.
+    /** Lists not only private virtual corpora but all virtual corpora 
+     *  available to a user.
+     *  
+     *  Users, except system admins, cannot list virtual corpora of 
+     *  other users. Thus, createdBy parameter is only relevant for 
+     *  requests from system admins.
      * 
      * @param securityContext
-     * @return a list of VC
+     * @param createdBy username of virtual corpus creator (optional)
+     * @return a list of virtual corpora
      */
     @GET
     @Path("list")
-    public Response listVCByUser (@Context SecurityContext securityContext) {
+    public Response listVCByUser (@Context SecurityContext securityContext,
+            @QueryParam("createdBy") String createdBy) {
         String result;
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             List<VirtualCorpusDto> dtos =
-                    service.listVCByUser(context.getUsername());
+                    service.listVCByUser(context.getUsername(), createdBy);
             result = JsonUtils.toJSON(dtos);
         }
         catch (KustvaktException e) {
@@ -161,10 +172,11 @@ public class VirtualCorpusController {
         return Response.ok(result).build();
     }
 
-    /** Lists all VC created by a user
+    /** Lists all virtual corpora created by a user
      * 
      * @param securityContext
-     * @return a list of VC created by the user in the security context.
+     * @return a list of virtual corpora created by the user 
+     * in the security context.
      */
     @GET
     @Path("list/user")
@@ -175,6 +187,37 @@ public class VirtualCorpusController {
         try {
             List<VirtualCorpusDto> dtos =
                     service.listOwnerVC(context.getUsername());
+            result = JsonUtils.toJSON(dtos);
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+        return Response.ok(result).build();
+    }
+
+    /** Lists virtual corpora by creator and type. This is a controller for 
+     *  system admin requiring valid system admin authentication. 
+     *  
+     *  If type is not specified, retrieves virtual corpora of all types. 
+     *  If createdBy is not specified, retrieves virtual corpora of all 
+     *  users.
+     *  
+     * @param securityContext
+     * @param createdBy username of virtual corpus creator
+     * @param type {@link VirtualCorpusType}
+     * @return a list of virtual corpora
+     */
+    @GET
+    @Path("list/system-admin")
+    public Response listVCByStatus (@Context SecurityContext securityContext,
+            @QueryParam("createdBy") String createdBy,
+            @QueryParam("type") VirtualCorpusType type) {
+        String result;
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            List<VirtualCorpusDto> dtos = service
+                    .listVCByType(context.getUsername(), createdBy, type);
             result = JsonUtils.toJSON(dtos);
         }
         catch (KustvaktException e) {

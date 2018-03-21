@@ -32,7 +32,7 @@ public class VirtualCorpusDaoTest {
     @Test
     public void testListVCByType () throws KustvaktException {
         List<VirtualCorpus> vcList =
-                dao.retrieveVCByType(VirtualCorpusType.PUBLISHED);
+                dao.retrieveVCByType(VirtualCorpusType.PUBLISHED, null);
         assertEquals(1, vcList.size());
 
         VirtualCorpus vc = vcList.get(0);
@@ -42,20 +42,20 @@ public class VirtualCorpusDaoTest {
     }
 
     @Test
-    public void testPredefinedVC () throws KustvaktException {
+    public void testSystemVC () throws KustvaktException {
         // insert vc
-        int id = dao.createVirtualCorpus("predefined VC",
-                VirtualCorpusType.PREDEFINED, User.CorpusAccess.FREE,
-                "corpusSigle=GOE", "definition", "description", "experimental",
-                "test class");
+        int id = dao.createVirtualCorpus("system VC", VirtualCorpusType.SYSTEM,
+                User.CorpusAccess.FREE, "corpusSigle=GOE", "definition",
+                "description", "experimental", "test class");
 
         // select vc
         List<VirtualCorpus> vcList =
-                dao.retrieveVCByType(VirtualCorpusType.PREDEFINED);
+                dao.retrieveVCByType(VirtualCorpusType.SYSTEM, null);
         assertEquals(2, vcList.size());
 
+        VirtualCorpus vc = dao.retrieveVCById(id);
         // delete vc
-        dao.deleteVirtualCorpus(id);
+        dao.deleteVirtualCorpus(vc);
 
         // check if vc has been deleted
         thrown.expect(KustvaktException.class);
@@ -64,9 +64,8 @@ public class VirtualCorpusDaoTest {
 
 
     @Test
-    public void retrievePredefinedVC () throws KustvaktException {
-        List<VirtualCorpus> vc =
-                dao.retrieveVCByType(VirtualCorpusType.PREDEFINED);
+    public void retrieveSystemVC () throws KustvaktException {
+        List<VirtualCorpus> vc = dao.retrieveVCByType(VirtualCorpusType.SYSTEM, null);
         assertEquals(1, vc.size());
     }
 
@@ -77,12 +76,12 @@ public class VirtualCorpusDaoTest {
     @Test
     public void retrieveVCByUserDory () throws KustvaktException {
         List<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("dory");
-//        System.out.println(virtualCorpora);
+        //        System.out.println(virtualCorpora);
         assertEquals(4, virtualCorpora.size());
         // ordered by id
         Iterator<VirtualCorpus> i = virtualCorpora.iterator();
         assertEquals("dory VC", i.next().getName());
-        assertEquals("group VC", i.next().getName());   
+        assertEquals("group VC", i.next().getName());
         assertEquals("system VC", i.next().getName());
         assertEquals("published VC", i.next().getName());
     }

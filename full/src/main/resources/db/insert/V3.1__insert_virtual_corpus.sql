@@ -70,7 +70,7 @@ INSERT INTO virtual_corpus(name, type, required_access, created_by, description,
 	'{"collection": { "@type": "koral:docGroup", "operands": [ { "@type": "koral:doc", "key": "corpusSigle", "match": "match:eq", "value": "GOE" }, { "@type": "koral:doc", "key": "creationDate", "match": "match:leq", "type": "type:date", "value": "1810" } ], "operation": "operation:and" }}');
 
 INSERT INTO virtual_corpus(name, type, required_access, created_by, description, status, corpus_query) 
-	VALUES ("system VC", "PREDEFINED", "ALL", "system", "test vc", "experimental",
+	VALUES ("system VC", "SYSTEM", "ALL", "system", "test vc", "experimental",
 	'{"collection":{"@type":"koral:doc","value":"GOE","match":"match:eq","key":"corpusSigle"}}');
 
 INSERT INTO virtual_corpus(name, type, required_access, created_by, description, status, corpus_query) 

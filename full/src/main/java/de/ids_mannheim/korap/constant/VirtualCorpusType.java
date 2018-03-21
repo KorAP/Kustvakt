@@ -9,7 +9,7 @@ import de.ids_mannheim.korap.entity.VirtualCorpus;
  */
 public enum VirtualCorpusType {
     // available for all
-    PREDEFINED, 
+    SYSTEM, 
     // available to project group members
     PROJECT, 
     // available only for the creator

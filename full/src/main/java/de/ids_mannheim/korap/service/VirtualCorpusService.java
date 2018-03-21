@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.dao.VirtualCorpusAccessDao;
 import de.ids_mannheim.korap.dao.VirtualCorpusDao;
+import de.ids_mannheim.korap.dto.UserGroupDto;
 import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.dto.converter.VirtualCorpusAccessConverter;
@@ -74,10 +76,40 @@ public class VirtualCorpusService {
         return createVCDtos(vcList);
     }
 
-    public List<VirtualCorpusDto> listVCByUser (String username)
-            throws KustvaktException {
-        List<VirtualCorpus> vcList = vcDao.retrieveVCByUser(username);
+    public List<VirtualCorpusDto> listVCByUser (String contextUsername,
+            String createdBy) throws KustvaktException {
+
+        boolean isAdmin = adminDao.isAdmin(contextUsername);
+
+        if (createdBy != null) {
+            if (!createdBy.equals(contextUsername) && !isAdmin) {
+                throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                        "Unauthorized operation for user: " + contextUsername,
+                        contextUsername);
+            }
+        }
+        else {
+            createdBy = contextUsername;
+        }
+        List<VirtualCorpus> vcList = vcDao.retrieveVCByUser(createdBy);
         return createVCDtos(vcList);
+    }
+
+    public List<VirtualCorpusDto> listVCByType (String username,
+            String createdBy, VirtualCorpusType type) throws KustvaktException {
+
+        boolean isAdmin = adminDao.isAdmin(username);
+
+        if (isAdmin) {
+            List<VirtualCorpus> virtualCorpora =
+                    vcDao.retrieveVCByType(type, createdBy);
+            Collections.sort(virtualCorpora);
+            return createVCDtos(virtualCorpora);
+        }
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
     }
 
     private ArrayList<VirtualCorpusDto> createVCDtos (
@@ -108,7 +140,15 @@ public class VirtualCorpusService {
         VirtualCorpus vc = vcDao.retrieveVCById(vcId);
 
         if (vc.getCreatedBy().equals(username) || adminDao.isAdmin(username)) {
-            vcDao.deleteVirtualCorpus(vcId);
+
+            if (vc.getType().equals(VirtualCorpusType.PUBLISHED)) {
+                VirtualCorpusAccess access =
+                        accessDao.retrieveHiddenAccess(vcId);
+                accessDao.deleteAccess(access, "system");
+                userGroupService.deleteAutoHiddenGroup(
+                        access.getUserGroup().getId(), "system");
+            }
+            vcDao.deleteVirtualCorpus(vc);
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
@@ -187,7 +227,7 @@ public class VirtualCorpusService {
         ParameterChecker.checkStringValue(vc.getCreatedBy(), "createdBy");
 
 
-        if (vc.getType().equals(VirtualCorpusType.PREDEFINED)
+        if (vc.getType().equals(VirtualCorpusType.SYSTEM)
                 && !adminDao.isAdmin(username)) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
@@ -393,7 +433,7 @@ public class VirtualCorpusService {
                     // skip adding user to hidden group
                 }
             }
-            // else VirtualCorpusType.PREDEFINED
+            // else VirtualCorpusType.SYSTEM
         }
 
         String json = vc.getCorpusQuery();
@@ -414,4 +454,6 @@ public class VirtualCorpusService {
         }
         return false;
     }
+
+
 }

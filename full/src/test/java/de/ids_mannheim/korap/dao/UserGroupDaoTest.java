@@ -150,6 +150,6 @@ public class UserGroupDaoTest {
         assertEquals(1, vc.size());
         
         // delete vc
-        virtualCorpusDao.deleteVirtualCorpus(virtualCorpus.getId());
+        virtualCorpusDao.deleteVirtualCorpus(virtualCorpus);
     }
 }

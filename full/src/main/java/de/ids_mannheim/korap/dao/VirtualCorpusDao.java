@@ -97,23 +97,51 @@ public class VirtualCorpusDao {
         entityManager.merge(vc);
     }
 
-    public void deleteVirtualCorpus (int id) throws KustvaktException {
-        VirtualCorpus vc = retrieveVCById(id);
+    public void deleteVirtualCorpus (VirtualCorpus vc) throws KustvaktException {
+        if (!entityManager.contains(vc)){
+            vc = entityManager.merge(vc);
+        }
         entityManager.remove(vc);
+        
     }
 
-    // for admins
-    public List<VirtualCorpus> retrieveVCByType (VirtualCorpusType type)
-            throws KustvaktException {
-        ParameterChecker.checkObjectValue(type, "type");
+    /** System admin function. 
+     * 
+     *  Retrieves virtual corpus by creator and type. If type is not specified, 
+     *  retrieves virtual corpora of all types. If createdBy is not specified,
+     *  retrieves virtual corpora of all users.
+     * 
+     * @param type {@link VirtualCorpusType}
+     * @param createdBy username of the virtual corpus creator
+     * @return a list of {@link VirtualCorpus}
+     * @throws KustvaktException
+     */
+    public List<VirtualCorpus> retrieveVCByType (VirtualCorpusType type,
+            String createdBy) throws KustvaktException {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<VirtualCorpus> query =
                 criteriaBuilder.createQuery(VirtualCorpus.class);
         Root<VirtualCorpus> virtualCorpus = query.from(VirtualCorpus.class);
+
+        Predicate conditions = null;
+        if (createdBy != null && !createdBy.isEmpty()) {
+            conditions = criteriaBuilder.equal(
+                    virtualCorpus.get(VirtualCorpus_.createdBy), createdBy);
+            if (type != null) {
+                conditions = criteriaBuilder.and(conditions, criteriaBuilder
+                        .equal(virtualCorpus.get(VirtualCorpus_.type), type));
+            }
+        }
+        else if (type != null) {
+            conditions = criteriaBuilder
+                    .equal(virtualCorpus.get(VirtualCorpus_.type), type);
+        }
+
         query.select(virtualCorpus);
-        query.where(criteriaBuilder
-                .equal(virtualCorpus.get(VirtualCorpus_.type), type));
+        if (conditions != null) {
+            query.where(conditions);
+        }
         Query q = entityManager.createQuery(query);
         return q.getResultList();
     }
@@ -193,15 +221,16 @@ public class VirtualCorpusDao {
         Join<VirtualCorpus, VirtualCorpusAccess> access =
                 virtualCorpus.join(VirtualCorpus_.virtualCorpusAccess);
 
-//        Predicate corpusStatus = builder.and(
-//                builder.notEqual(access.get(VirtualCorpusAccess_.status),
-//                        VirtualCorpusAccessStatus.HIDDEN),
-//                builder.notEqual(access.get(VirtualCorpusAccess_.status),
-//                        VirtualCorpusAccessStatus.DELETED));
+        //        Predicate corpusStatus = builder.and(
+        //                builder.notEqual(access.get(VirtualCorpusAccess_.status),
+        //                        VirtualCorpusAccessStatus.HIDDEN),
+        //                builder.notEqual(access.get(VirtualCorpusAccess_.status),
+        //                        VirtualCorpusAccessStatus.DELETED));
 
-        Predicate corpusStatus = builder.notEqual(access.get(VirtualCorpusAccess_.status),
-                VirtualCorpusAccessStatus.DELETED);
-        
+        Predicate corpusStatus =
+                builder.notEqual(access.get(VirtualCorpusAccess_.status),
+                        VirtualCorpusAccessStatus.DELETED);
+
         Predicate userGroupStatus =
                 builder.notEqual(access.get(VirtualCorpusAccess_.userGroup)
                         .get(UserGroup_.status), UserGroupStatus.DELETED);
@@ -235,7 +264,7 @@ public class VirtualCorpusDao {
                 builder.equal(virtualCorpus.get(VirtualCorpus_.createdBy),
                         userId),
                 builder.equal(virtualCorpus.get(VirtualCorpus_.type),
-                        VirtualCorpusType.PREDEFINED));
+                        VirtualCorpusType.SYSTEM));
 
 
         query.select(virtualCorpus);
@@ -248,7 +277,7 @@ public class VirtualCorpusDao {
         Set<VirtualCorpus> vcSet = new HashSet<VirtualCorpus>();
         vcSet.addAll(vcList);
         vcSet.addAll(groupVC);
-        
+
         List<VirtualCorpus> merger = new ArrayList<VirtualCorpus>(vcSet.size());
         merger.addAll(vcSet);
         Collections.sort(merger);

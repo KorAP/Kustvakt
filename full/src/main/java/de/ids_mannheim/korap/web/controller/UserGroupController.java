@@ -8,6 +8,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -22,6 +23,7 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.dto.UserGroupDto;
+import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.service.UserGroupService;
 import de.ids_mannheim.korap.user.TokenContext;
@@ -108,6 +110,30 @@ public class UserGroupController {
         }
     }
 
+    /** Searches for a specific user-group for system admins.
+     * 
+     * @param securityContext
+     * @param groupId group id
+     * @return a user-group
+     */
+    @GET
+    @Path("search/{groupId}")
+    public Response searchUserGroup (@Context SecurityContext securityContext,
+            @PathParam("groupId") int groupId) {
+        String result;
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            UserGroupDto dto =
+                    service.searchById(context.getUsername(), groupId);
+            result = JsonUtils.toJSON(dto);
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+        return Response.ok(result).build();
+    }
+    
     /** Creates a user group where the user in token context is the 
      * group owner, and assigns the listed group members with status 
      * GroupMemberStatus.PENDING. 
