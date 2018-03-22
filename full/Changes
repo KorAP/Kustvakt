@@ -15,8 +15,9 @@ version 0.60.1
 	- added hidden access removal when deleting published VC (margaretha)
 	- added check for hidden groups in VC controller tests (margaretha)
 	- added search user-group controller (margaretha)
+	- removed createdBy from VirtualCorpusJson (margaretha)
 	
-version 0.60 release
+version 0.60
 14/03/2018
 	- set up mail settings using localhost port 25 (margaretha)
 	- added mail template in kustvakt configuration (margaretha)

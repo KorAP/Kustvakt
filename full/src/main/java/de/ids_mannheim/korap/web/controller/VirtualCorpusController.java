@@ -66,9 +66,10 @@ public class VirtualCorpusController {
     @Autowired
     private VirtualCorpusService service;
 
+    // EM: should system admins be able to create VC for other users?
     /** Creates a user virtual corpus, also for system admins
      * 
-     *  EM: should system admins be able to create VC for other users?
+     * @see VirtualCorpusJson
      * 
      * @param securityContext
      * @param vc a JSON object describing the virtual corpus
@@ -94,8 +95,11 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
 
-    /** Only the virtual corpus owner and system admins can edit 
-     * a virtual corpus.
+    /** Edits a virtual corpus attributes including name, type and corpus 
+     *  query. Only the virtual corpus owner and system admins can edit 
+     *  a virtual corpus.
+     * 
+     * @see VirtualCorpusJson
      * 
      * @param securityContext
      * @param vc a JSON object describing the virtual corpus
@@ -119,7 +123,7 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
 
-    /** Searches for a specific virtual corpus.
+    /** Searches for a specific VC given the VC id. 
      * 
      * @param securityContext
      * @param vcId a virtual corpus id

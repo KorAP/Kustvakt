@@ -32,7 +32,6 @@ public class VirtualCorpusServiceTest {
 
         VirtualCorpusJson vc = new VirtualCorpusJson();
         vc.setCorpusQuery("corpusSigle=GOE");
-        vc.setCreatedBy(username);
         vc.setName("new published vc");
         vc.setType(VirtualCorpusType.PUBLISHED);
         int vcId = vcService.storeVC(vc, "VirtualCorpusServiceTest");

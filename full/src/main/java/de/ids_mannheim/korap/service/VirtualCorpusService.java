@@ -20,7 +20,6 @@ import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.dao.VirtualCorpusAccessDao;
 import de.ids_mannheim.korap.dao.VirtualCorpusDao;
-import de.ids_mannheim.korap.dto.UserGroupDto;
 import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.dto.converter.VirtualCorpusAccessConverter;
@@ -224,7 +223,6 @@ public class VirtualCorpusService {
         ParameterChecker.checkStringValue(vc.getName(), "name");
         ParameterChecker.checkObjectValue(vc.getType(), "type");
         ParameterChecker.checkStringValue(vc.getCorpusQuery(), "corpusQuery");
-        ParameterChecker.checkStringValue(vc.getCreatedBy(), "createdBy");
 
 
         if (vc.getType().equals(VirtualCorpusType.SYSTEM)
@@ -238,7 +236,7 @@ public class VirtualCorpusService {
 
         int vcId = vcDao.createVirtualCorpus(vc.getName(), vc.getType(),
                 requiredAccess, koralQuery, vc.getDefinition(),
-                vc.getDescription(), vc.getStatus(), vc.getCreatedBy());
+                vc.getDescription(), vc.getStatus(), username);
 
         if (vc.getType().equals(VirtualCorpusType.PUBLISHED)) {
             publishVC(vcId);
@@ -454,6 +452,4 @@ public class VirtualCorpusService {
         }
         return false;
     }
-
-
 }

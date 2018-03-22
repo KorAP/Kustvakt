@@ -23,7 +23,6 @@ public class VirtualCorpusJson {
     private String name;
     private VirtualCorpusType type;
     private String corpusQuery;
-    private String createdBy;
     
     // required in editing VCs
     private int id;
