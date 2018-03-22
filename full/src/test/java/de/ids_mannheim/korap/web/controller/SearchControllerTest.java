@@ -17,28 +17,21 @@ import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.FastJerseyTest;
 
 /**
- * @author hanl, margaretha
- * @lastUpdate 30/05/2017
+ * @author margaretha, hanl
+ * @lastUpdate 22/03/2018
  *
  */
-public class SearchControllerTest extends FastJerseyTest {
+public class SearchControllerTest extends SpringJerseyTest {
 
     @Autowired
-    HttpAuthorizationHandler handler;
+    private HttpAuthorizationHandler handler;
     
-    @Override
-    public void initMethod () throws KustvaktException {
-//        helper().runBootInterfaces();
-//        helper().setupAccount();
-    }
-
-
 
     @Test
     public void testSearchQueryPublicCorpora () throws KustvaktException{
@@ -46,8 +39,8 @@ public class SearchControllerTest extends FastJerseyTest {
                 .path("search").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp")
                 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-//        assertEquals(ClientResponse.Status.OK.getStatusCode(),
-//                response.getStatus());
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
         String ent = response.getEntity(String.class);
 //        System.out.println(ent);
         JsonNode node = JsonUtils.readTree(ent);

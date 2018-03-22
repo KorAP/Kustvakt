@@ -107,8 +107,7 @@ public class VirtualCorpusControllerAdminTest extends SpringJerseyTest {
     @Test
     public void testCreateSystemVC () throws KustvaktException {
         String json = "{\"name\": \"new system vc\",\"type\": \"SYSTEM\","
-                + "\"createdBy\": \"admin\",\"corpusQuery\": \"creationDate "
-                + "since 1820\"}";
+                + "\"corpusQuery\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path("vc").path("create")
                 .header(Attributes.AUTHORIZATION,
@@ -147,10 +146,8 @@ public class VirtualCorpusControllerAdminTest extends SpringJerseyTest {
     @Test
     public void testPrivateVC () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        String json =
-                "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
-                        + "\"" + username
-                        + "\",\"corpusQuery\": \"corpusSigle=GOE\"}";
+        String json = "{\"name\": \"new vc\",\"type\": \"PRIVATE\","
+                + "\"corpusQuery\": \"corpusSigle=GOE\"}";
 
         ClientResponse response = resource().path("vc").path("create")
                 .header(Attributes.AUTHORIZATION,
@@ -236,7 +233,7 @@ public class VirtualCorpusControllerAdminTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(1, node.size());
         node = node.get(0);
-        
+
         assertEquals(admin, node.at("/createdBy").asText());
         assertEquals(5, node.at("/vcId").asInt());
         assertEquals("marlin VC", node.at("/vcName").asText());
@@ -246,7 +243,8 @@ public class VirtualCorpusControllerAdminTest extends SpringJerseyTest {
         return node.at("/accessId").asText();
     }
 
-    private void testlistAccessByGroup (String groupId) throws KustvaktException {
+    private void testlistAccessByGroup (String groupId)
+            throws KustvaktException {
         ClientResponse response = resource().path("vc").path("access")
                 .path("list").path("byGroup").queryParam("groupId", groupId)
                 .header(Attributes.AUTHORIZATION,
@@ -268,7 +266,7 @@ public class VirtualCorpusControllerAdminTest extends SpringJerseyTest {
 
         testCreateVCAccess(vcId, groupId);
         testlistAccessByGroup(groupId);
-        
+
         String accessId = testlistAccessByVC(vcId);
         testDeleteVCAccess(accessId);
     }

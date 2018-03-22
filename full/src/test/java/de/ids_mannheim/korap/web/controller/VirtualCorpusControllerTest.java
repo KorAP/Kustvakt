@@ -294,9 +294,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
     @Test
     public void testCreatePrivateVC () throws KustvaktException {
-        String json =
-                "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
-                        + "\"VirtualCorpusControllerTest\",\"corpusQuery\": \"corpusSigle=GOE\"}";
+        String json = "{\"name\": \"new vc\",\"type\": \"PRIVATE\","
+                + "\"corpusQuery\": \"corpusSigle=GOE\"}";
 
         ClientResponse response = resource().path("vc").path("create")
                 .header(Attributes.AUTHORIZATION,
@@ -326,9 +325,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
     @Test
     public void testCreatePublishVC () throws KustvaktException {
-        String json =
-                "{\"name\": \"new published vc\",\"type\": \"PUBLISHED\",\"createdBy\": "
-                        + "\"VirtualCorpusControllerTest\",\"corpusQuery\": \"corpusSigle=GOE\"}";
+        String json = "{\"name\": \"new published vc\",\"type\": \"PUBLISHED\""
+                + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
         ClientResponse response = resource().path("vc").path("create")
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue(
@@ -388,7 +386,6 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     public void testCreateVCWithExpiredToken ()
             throws IOException, KustvaktException {
         String json = "{\"name\": \"new vc\",\"type\": \"PRIVATE\","
-                + "\"createdBy\": \"VirtualCorpusControllerTest\","
                 + "\"corpusQuery\": \"corpusSigle=GOE\"}";
 
         InputStream is = getClass().getClassLoader()
@@ -422,7 +419,6 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     @Test
     public void testCreateSystemVC () throws KustvaktException {
         String json = "{\"name\": \"new vc\",\"type\": \"SYSTEM\","
-                + "\"createdBy\": \"VirtualCorpusControllerTest\","
                 + "\"corpusQuery\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path("vc").path("create")
@@ -447,9 +443,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
     @Test
     public void testCreateVCUnauthorized () throws KustvaktException {
-        String json =
-                "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
-                        + "\"VirtualCorpusControllerTest\",\"corpusQuery\": \"creationDate since 1820\"}";
+        String json = "{\"name\": \"new vc\",\"type\": \"PRIVATE\","
+                + "\"corpusQuery\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path("vc").path("create")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -469,9 +464,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
     @Test
     public void testCreateVCWithoutcorpusQuery () throws KustvaktException {
-        String json =
-                "{\"name\": \"new vc\",\"type\": \"PRIVATE\",\"createdBy\": "
-                        + "\"VirtualCorpusControllerTest\"}";
+        String json = "{\"name\": \"new vc\",\"type\": \"PRIVATE\"}";
 
         ClientResponse response = resource().path("vc").path("create")
                 .header(Attributes.AUTHORIZATION,
@@ -492,8 +485,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
     @Test
     public void testCreateVCWithoutType () throws KustvaktException {
-        String json = "{\"name\": \"new vc\",\"createdBy\": "
-                + "\"VirtualCorpusControllerTest\",\"corpusQuery\": \"creationDate since 1820\"}";
+        String json = "{\"name\": \"new vc\",\"corpusQuery\": "
+                + "\"creationDate since 1820\"}";
 
         ClientResponse response = resource().path("vc").path("create")
                 .header(Attributes.AUTHORIZATION,
@@ -514,9 +507,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
     @Test
     public void testCreateVCWithWrongType () throws KustvaktException {
-        String json =
-                "{\"name\": \"new vc\",\"type\": \"PRIVAT\",\"createdBy\": "
-                        + "\"VirtualCorpusControllerTest\",\"corpusQuery\": \"creationDate since 1820\"}";
+        String json = "{\"name\": \"new vc\",\"type\": \"PRIVAT\","
+                + "\"corpusQuery\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path("vc").path("create")
                 .header(Attributes.AUTHORIZATION,
