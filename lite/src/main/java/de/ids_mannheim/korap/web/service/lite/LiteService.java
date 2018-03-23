@@ -334,6 +334,8 @@ public class LiteService {
             @QueryParam("foundry") Set<String> foundries,
             @QueryParam("layer") Set<String> layers,
             @QueryParam("spans") Boolean spans,
+			// Highlights may also be a list of valid highlight classes
+			@QueryParam("hls") Boolean highlights,
             @Context HttpServletRequest request) throws KustvaktException {
 
         String matchid =
@@ -349,6 +351,7 @@ public class LiteService {
             f_list = new ArrayList<>(foundries);
 
         spans = spans != null ? spans : false;
+        highlights = highlights != null ? highlights : false;
 
         boolean match_only = foundries == null || foundries.isEmpty();
         String results;
@@ -356,7 +359,7 @@ public class LiteService {
             results = searchKrill.getMatch(matchid, null);
         else
             results = searchKrill.getMatch(matchid, f_list, l_list, spans,
-                    false, true, null);
+                    highlights, true, null);
 
         return Response.ok(results).build();
     }
