@@ -91,7 +91,6 @@ public class StatusCodes {
     public static final int GROUP_NOT_FOUND = 606;
     public static final int GROUP_DELETED = 607;
 
-
     //    public static final int ARGUMENT_VALIDATION_FAILURE = 700;
     // public static final int ARGUMENT_VALIDATION_FAILURE = 701;
 
