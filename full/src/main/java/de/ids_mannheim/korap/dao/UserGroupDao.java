@@ -1,7 +1,9 @@
 package de.ids_mannheim.korap.dao;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -65,7 +67,7 @@ public class UserGroupDao {
         group.setCreatedBy(createdBy);
         entityManager.persist(group);
 
-        List<Role> roles = new ArrayList<Role>(2);
+        Set<Role> roles = new HashSet<Role>();
         roles.add(roleDao
                 .retrieveRoleById(PredefinedRole.USER_GROUP_ADMIN.getId()));
         roles.add(roleDao
@@ -282,23 +284,22 @@ public class UserGroupDao {
 
             ListJoin<UserGroup, UserGroupMember> members =
                     root.join(UserGroup_.members);
-            restrictions = criteriaBuilder.and(
-                    criteriaBuilder.equal(members.get(UserGroupMember_.userId),
-                            userId));
-            
-            if (status != null){
+            restrictions = criteriaBuilder.and(criteriaBuilder
+                    .equal(members.get(UserGroupMember_.userId), userId));
+
+            if (status != null) {
                 restrictions = criteriaBuilder.and(restrictions, criteriaBuilder
                         .equal(root.get(UserGroup_.status), status));
             }
         }
         else if (status != null) {
-                restrictions = criteriaBuilder
-                        .equal(root.get(UserGroup_.status), status);
-                
+            restrictions =
+                    criteriaBuilder.equal(root.get(UserGroup_.status), status);
+
         }
 
         query.select(root);
-        if (restrictions!=null){
+        if (restrictions != null) {
             query.where(restrictions);
         }
         Query q = entityManager.createQuery(query);

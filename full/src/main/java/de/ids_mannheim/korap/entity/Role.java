@@ -26,7 +26,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "role")
-public class Role {
+public class Role implements Comparable<Role>{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -42,5 +42,16 @@ public class Role {
 
     public String toString () {
         return "id=" + id + ", name=" + name;
+    }
+
+    @Override
+    public int compareTo (Role o) {
+        if (this.getId() > o.getId()){
+            return 1;
+        }
+        else if (this.getId() < o.getId()){
+            return -1;
+        }
+        return 0;
     }
 }

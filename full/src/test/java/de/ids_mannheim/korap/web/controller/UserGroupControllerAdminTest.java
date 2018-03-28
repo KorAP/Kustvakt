@@ -3,6 +3,8 @@ package de.ids_mannheim.korap.web.controller;
 import static org.junit.Assert.assertEquals;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
@@ -59,7 +62,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.getEntity(String.class);
-//        System.out.println(entity);
+        //        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(3, node.size());
     }
@@ -77,12 +80,12 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.getEntity(String.class);
-//        System.out.println(entity);
+        //        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.size());
     }
-    
-    
+
+
     // same as list user-groups of the admin
     @Test
     public void testListWithoutUsername () throws UniformInterfaceException,
@@ -160,9 +163,112 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         assertEquals("admin test group", node.get("name").asText());
 
         String groupId = node.get("id").asText();
+        testMemberRole("marlin", groupId);
         testInviteMember(groupId);
         testDeleteMember(groupId);
         testDeleteGroup(groupId);
+    }
+
+    private void testMemberRole (String memberUsername, String groupId)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+
+        // accept invitation
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("groupId", groupId);
+
+        ClientResponse response = resource().path("group").path("subscribe")
+                .type(MediaType.APPLICATION_FORM_URLENCODED)
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("marlin",
+                                "pass"))
+                .entity(form).post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        testAddMemberRoles(groupId, memberUsername);
+        testDeleteMemberRoles(groupId, memberUsername);
+    }
+
+    private void testAddMemberRoles (String groupId, String memberUsername)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        MultivaluedMap<String, String> map = new MultivaluedHashMap<>();
+        map.add("groupId", groupId.toString());
+        map.add("memberUsername", memberUsername);
+        map.add("roleIds", "1"); // USER_GROUP_ADMIN
+        map.add("roleIds", "2"); // USER_GROUP_MEMBER
+
+        ClientResponse response =
+                resource().path("group").path("member").path("role").path("add")
+                        .type(MediaType.APPLICATION_FORM_URLENCODED)
+                        .header(Attributes.AUTHORIZATION,
+                                handler.createBasicAuthorizationHeaderValue(
+                                        adminUsername, "password"))
+                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                        .entity(map).post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        JsonNode node = retrieveGroup(groupId).at("/members");
+        JsonNode member;
+        for (int i = 0; i < node.size(); i++) {
+            member = node.get(i);
+            if (member.at("/userId").asText().equals(memberUsername)) {
+                assertEquals(3, member.at("/roles").size());
+                assertEquals(PredefinedRole.USER_GROUP_ADMIN.name(),
+                        member.at("/roles/0").asText());
+                break;
+            }
+        }
+    }
+
+    private void testDeleteMemberRoles (String groupId, String memberUsername)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        MultivaluedMap<String, String> map = new MultivaluedHashMap<>();
+        map.add("groupId", groupId.toString());
+        map.add("memberUsername", memberUsername);
+        map.add("roleIds", "1"); // USER_GROUP_ADMIN
+
+        ClientResponse response = resource().path("group").path("member")
+                .path("role").path("delete")
+                .type(MediaType.APPLICATION_FORM_URLENCODED)
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(
+                                adminUsername, "password"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(map)
+                .post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        JsonNode node = retrieveGroup(groupId).at("/members");
+        JsonNode member;
+        for (int i = 0; i < node.size(); i++) {
+            member = node.get(i);
+            if (member.at("/userId").asText().equals(memberUsername)) {
+                assertEquals(2, member.at("/roles").size());
+                break;
+            }
+        }
+    }
+
+    private JsonNode retrieveGroup (String groupId)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        ClientResponse response = resource().path("group").path(groupId)
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(
+                                adminUsername, "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        return node;
     }
 
     private void testDeleteGroup (String groupId)
@@ -233,10 +339,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         assertEquals("darla", node.at("/members/3/userId").asText());
         assertEquals(GroupMemberStatus.PENDING.name(),
                 node.at("/members/3/status").asText());
-        assertEquals(PredefinedRole.USER_GROUP_MEMBER.name(),
-                node.at("/members/3/roles/0").asText());
-        assertEquals(PredefinedRole.VC_ACCESS_MEMBER.name(),
-                node.at("/members/3/roles/1").asText());
+        assertEquals(0, node.at("/members/3/roles").size());
     }
 
 }

@@ -151,7 +151,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 .get(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
-        //        System.out.println(entity);
+//        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(1, node.size());
         node = node.get(0);
@@ -171,11 +171,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals("marlin", node.at("/members/1/userId").asText());
         assertEquals(GroupMemberStatus.PENDING.name(),
                 node.at("/members/1/status").asText());
-        assertEquals(PredefinedRole.USER_GROUP_MEMBER.name(),
-                node.at("/members/1/roles/0").asText());
-        assertEquals(PredefinedRole.VC_ACCESS_MEMBER.name(),
-                node.at("/members/1/roles/1").asText());
-
+        assertEquals(0, node.at("/members/1/roles").size());
 
         testInviteMember(groupId);
 
@@ -212,10 +208,6 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
         node = node.get(0);
         assertEquals(3, node.get("members").size());
-        assertEquals("nemo", node.at("/members/1/userId").asText());
-        assertEquals(GroupMemberStatus.PENDING.name(),
-                node.at("/members/1/status").asText());
-
     }
 
     private void testDeleteMemberUnauthorized (String groupId)
@@ -316,9 +308,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(groupId, node.at("/0/id").asText());
 
         // check group members
-        for (int i=0; i< node.at("/0/members").size(); i++){
+        for (int i = 0; i < node.at("/0/members").size(); i++) {
             assertEquals(GroupMemberStatus.DELETED.name(),
-                    node.at("/0/members/"+i+"/status").asText());    
+                    node.at("/0/members/" + i + "/status").asText());
         }
     }
 
@@ -424,10 +416,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals("darla", node.at("/members/3/userId").asText());
         assertEquals(GroupMemberStatus.PENDING.name(),
                 node.at("/members/3/status").asText());
-        assertEquals(PredefinedRole.USER_GROUP_MEMBER.name(),
-                node.at("/members/3/roles/0").asText());
-        assertEquals(PredefinedRole.VC_ACCESS_MEMBER.name(),
-                node.at("/members/3/roles/1").asText());
+        assertEquals(0, node.at("/members/3/roles").size());
     }
 
     private void testInviteDeletedMember () throws UniformInterfaceException,
@@ -602,7 +591,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         // retrieve marlin group
         JsonNode node = retrieveUserGroups("marlin");
-        //        System.out.println(node);
+        // System.out.println(node);
         assertEquals(2, node.size());
 
         JsonNode group = node.get(1);
@@ -613,9 +602,15 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(0, group.at("/members").size());
         assertEquals(GroupMemberStatus.ACTIVE.name(),
                 group.at("/userMemberStatus").asText());
+        assertEquals(PredefinedRole.USER_GROUP_MEMBER.name(),
+                group.at("/userRoles/0").asText());
+        assertEquals(PredefinedRole.VC_ACCESS_MEMBER.name(),
+                group.at("/userRoles/1").asText());
+
 
         // unsubscribe marlin from dory group
         testUnsubscribeActiveMember(form);
+        checkGroupMemberRole("2", "marlin");
 
         // invite marlin to dory group to set back the GroupMemberStatus.PENDING
         testInviteDeletedMember();
@@ -746,6 +741,29 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         JsonNode node = retrieveUserGroups("marlin");
         assertEquals(1, node.size());
+    }
+
+    private void checkGroupMemberRole (String groupId, String deletedMemberName)
+            throws KustvaktException {
+        ClientResponse response = resource().path("group").path(groupId)
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(admin,
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get(ClientResponse.class);
+        String entity = response.getEntity(String.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        JsonNode node = JsonUtils.readTree(entity).at("/members");
+        JsonNode member;
+        for (int i = 0; i < node.size(); i++) {
+            member = node.get(i);
+            if (deletedMemberName.equals(member.at("/userId").asText())) {
+                assertEquals(0, node.at("/roles").size());
+                break;
+            }
+        }
     }
 
     @Test

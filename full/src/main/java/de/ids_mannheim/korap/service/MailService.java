@@ -18,8 +18,10 @@ import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.ParameterChecker;
 
 /** Manages mail related services, such as sending group member invitations 
  * per email.  
@@ -42,8 +44,12 @@ public class MailService {
     private FullConfiguration config;
 
     public void sendMemberInvitationNotification (String inviteeName,
-            String groupName, String inviter) {
+            String groupName, String inviter) throws KustvaktException {
 
+        ParameterChecker.checkStringValue(inviteeName, "inviteeName");
+        ParameterChecker.checkStringValue(groupName, "groupName");
+        ParameterChecker.checkStringValue(inviter, "inviter");
+        
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
 
             public void prepare (MimeMessage mimeMessage) throws Exception {

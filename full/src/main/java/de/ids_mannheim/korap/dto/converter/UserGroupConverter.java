@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.dto.converter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
@@ -11,6 +12,7 @@ import de.ids_mannheim.korap.dto.UserGroupMemberDto;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
+import edu.emory.mathcs.backport.java.util.Collections;
 
 /** Manages conversion of  {@link UserGroup} objects to their data access objects (DTO), 
  * e.g. UserGroupDto. DTO structure defines controllers output, namely the structure of 
@@ -24,7 +26,7 @@ public class UserGroupConverter {
 
     public UserGroupDto createUserGroupDto (UserGroup group,
             List<UserGroupMember> members, GroupMemberStatus userMemberStatus,
-            List<Role> userRoles) {
+            Set<Role> roleSet) {
 
         UserGroupDto dto = new UserGroupDto();
         dto.setId(group.getId());
@@ -33,12 +35,8 @@ public class UserGroupConverter {
         dto.setOwner(group.getCreatedBy());
         dto.setUserMemberStatus(userMemberStatus);
 
-        if (userRoles != null) {
-            List<String> roles = new ArrayList<>(userRoles.size());
-            for (Role r : userRoles) {
-                roles.add(r.getName());
-            }
-            dto.setUserRoles(roles);
+        if (roleSet != null) {
+            dto.setUserRoles(convertRoleSetToStringList(roleSet));
         }
 
         if (members != null) {
@@ -49,12 +47,8 @@ public class UserGroupConverter {
                 UserGroupMemberDto memberDto = new UserGroupMemberDto();
                 memberDto.setUserId(member.getUserId());
                 memberDto.setStatus(member.getStatus());
-                List<String> memberRoles =
-                        new ArrayList<>(member.getRoles().size());
-                for (Role r : member.getRoles()) {
-                    memberRoles.add(r.getName());
-                }
-                memberDto.setRoles(memberRoles);
+                memberDto.setRoles(
+                        convertRoleSetToStringList(member.getRoles()));
                 memberDtos.add(memberDto);
             }
             dto.setMembers(memberDtos);
@@ -66,4 +60,12 @@ public class UserGroupConverter {
         return dto;
     }
 
+    private List<String> convertRoleSetToStringList (Set<Role> roleSet) {
+        List<String> roles = new ArrayList<>(roleSet.size());
+        for (Role r : roleSet) {
+            roles.add(r.getName());
+        }
+        Collections.sort(roles);
+        return roles;
+    }
 }

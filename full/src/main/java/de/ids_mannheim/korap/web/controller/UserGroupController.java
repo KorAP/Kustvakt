@@ -23,7 +23,6 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.dto.UserGroupDto;
-import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.service.UserGroupService;
 import de.ids_mannheim.korap.user.TokenContext;
@@ -81,7 +80,7 @@ public class UserGroupController {
         }
     }
 
-    
+
     /** Lists user-groups for system-admin purposes. If username parameter 
      *  is not specified, list user-groups of all users. If status is not
      *  specified, list user-groups of all statuses.
@@ -110,14 +109,14 @@ public class UserGroupController {
         }
     }
 
-    /** Searches for a specific user-group for system admins.
+    /** Retrieves a specific user-group for system admins.
      * 
      * @param securityContext
      * @param groupId group id
      * @return a user-group
      */
     @GET
-    @Path("search/{groupId}")
+    @Path("{groupId}")
     public Response searchUserGroup (@Context SecurityContext securityContext,
             @PathParam("groupId") int groupId) {
         String result;
@@ -133,7 +132,7 @@ public class UserGroupController {
         }
         return Response.ok(result).build();
     }
-    
+
     /** Creates a user group where the user in token context is the 
      * group owner, and assigns the listed group members with status 
      * GroupMemberStatus.PENDING. 
@@ -169,7 +168,8 @@ public class UserGroupController {
         }
     }
 
-    /** Only group owner and system admins can delete groups. 
+    /** Deletes a user-group specified by the group id. Only group owner 
+     *  and system admins can delete groups. 
      * 
      * @param securityContext
      * @param groupId
@@ -190,7 +190,7 @@ public class UserGroupController {
         }
     }
 
-    /** Group owner cannot be deleted.
+    /** Deletes a user-group member. Group owner cannot be deleted.
      * 
      * @param securityContext
      * @param memberId a username of a group member
@@ -214,6 +214,12 @@ public class UserGroupController {
         }
     }
 
+    /** Invites group members to join a user-group specified in the JSON object.
+     * @param securityContext
+     * @param group UserGroupJson containing groupId and usernames to be invited
+     * as members 
+     * @return if successful, HTTP response status OK
+     */
     @POST
     @Path("member/invite")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -230,6 +236,69 @@ public class UserGroupController {
         }
     }
 
+    /** Adds roles of an active member of a user-group. Only user-group admins
+     * and system admins are allowed.
+     * 
+     * @param securityContext
+     * @param groupId a group id
+     * @param memberUsername the username of a group member
+     * @param roleIds list of role ids
+     * @return if successful, HTTP response status OK
+     */
+    @POST
+    @Path("member/role/add")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response addMemberRoles (@Context SecurityContext securityContext,
+            @FormParam("groupId") int groupId,
+            @FormParam("memberUsername") String memberUsername,
+            @FormParam("roleIds") List<Integer> roleIds) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            service.addMemberRoles(context.getUsername(), groupId,
+                    memberUsername, roleIds);
+            return Response.ok().build();
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
+
+    /** Deletes roles of a member of a user-group. Only user-group admins
+     * and system admins are allowed.
+     * 
+     * @param securityContext
+     * @param groupId a group id
+     * @param memberUsername the username of a group member
+     * @param roleIds list of role ids
+     * @return if successful, HTTP response status OK
+     */
+    @POST
+    @Path("member/role/delete")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response deleteMemberRoles (@Context SecurityContext securityContext,
+            @FormParam("groupId") int groupId,
+            @FormParam("memberUsername") String memberUsername,
+            @FormParam("roleIds") List<Integer> roleIds) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            service.deleteMemberRoles(context.getUsername(), groupId,
+                    memberUsername, roleIds);
+            return Response.ok().build();
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
+
+    /** Handles requests to accept membership invitation. Only invited users 
+     * can subscribe to the corresponding user-group. 
+     * 
+     * @param securityContext
+     * @param groupId a group id
+     * @return if successful, HTTP response status OK
+     */
     @POST
     @Path("subscribe")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -246,6 +315,15 @@ public class UserGroupController {
         }
     }
 
+    /** Handles requests to reject membership invitation. A member can only 
+     * unsubscribe him/herself from a group. 
+     * 
+     * Implemented identical to delete group member.
+     * 
+     * @param securityContext
+     * @param groupId
+     * @return if successful, HTTP response status OK
+     */
     @POST
     @Path("unsubscribe")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)

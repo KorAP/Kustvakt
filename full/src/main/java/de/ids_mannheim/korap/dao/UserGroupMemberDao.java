@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.dao;
 
+import java.util.HashSet;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -43,16 +44,6 @@ public class UserGroupMemberDao {
         entityManager.persist(member);
     }
 
-    //    @Deprecated
-    //    public void addMembers (List<UserGroupMember> members)
-    //            throws KustvaktException {
-    //        ParameterChecker.checkObjectValue(members, "List<UserGroupMember>");
-    //
-    //        for (UserGroupMember member : members) {
-    //            addMember(member);
-    //        }
-    //    }
-
     public void updateMember (UserGroupMember member) throws KustvaktException {
         ParameterChecker.checkObjectValue(member, "UserGroupMember");
         entityManager.merge(member);
@@ -70,9 +61,11 @@ public class UserGroupMemberDao {
         if (isSoftDelete) {
             member.setStatus(GroupMemberStatus.DELETED);
             member.setDeletedBy(deletedBy);
+            member.setRoles(new HashSet<>());
             entityManager.persist(member);
         }
         else {
+            member.setRoles(new HashSet<>());
             entityManager.remove(member);
         }
     }

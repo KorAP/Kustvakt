@@ -362,7 +362,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
         //EM: check if the hidden groups are deleted as well
         node = testCheckHiddenGroup(groupId);
-        assertEquals(605, node.at("/errors/0/0").asInt());
+        assertEquals(StatusCodes.GROUP_NOT_FOUND,
+                node.at("/errors/0/0").asInt());
         assertEquals("Group with id 5 is not found",
                 node.at("/errors/0/1").asText());
     }
@@ -370,13 +371,12 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     private JsonNode testCheckHiddenGroup (String groupId)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        ClientResponse response =
-                resource().path("group").path("search").path(groupId)
-                        .header(Attributes.AUTHORIZATION,
-                                handler.createBasicAuthorizationHeaderValue(
-                                        "admin", "pass"))
-                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                        .get(ClientResponse.class);
+        ClientResponse response = resource().path("group").path(groupId)
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue("admin",
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
         return JsonUtils.readTree(entity);
