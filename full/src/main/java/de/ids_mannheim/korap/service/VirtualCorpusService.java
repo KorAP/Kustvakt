@@ -423,8 +423,9 @@ public class VirtualCorpusService {
                 UserGroup userGroup =
                         userGroupService.retrieveHiddenUserGroupByVC(vcId);
                 try {
-                    userGroupService.inviteGroupMember(username, userGroup,
+                    userGroupService.addGroupMember(username, userGroup,
                             "system", GroupMemberStatus.ACTIVE);
+                    // member roles has not been set (not necessary)
                 }
                 catch (KustvaktException e) {
                     // member exists

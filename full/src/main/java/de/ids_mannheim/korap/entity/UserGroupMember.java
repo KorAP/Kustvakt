@@ -1,7 +1,7 @@
 package de.ids_mannheim.korap.entity;
 
 import java.time.ZonedDateTime;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -71,7 +71,7 @@ public class UserGroupMember {
                     referencedColumnName = "id"),
             uniqueConstraints = @UniqueConstraint(
                     columnNames = { "group_member_id", "role_id" }))
-    private List<Role> roles;
+    private Set<Role> roles;
 
     @Override
     public String toString () {

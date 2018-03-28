@@ -2,8 +2,14 @@ package de.ids_mannheim.korap.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
+import javax.validation.constraints.AssertTrue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,6 +31,7 @@ import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
+import edu.emory.mathcs.backport.java.util.Collections;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:test-config.xml")
@@ -41,7 +48,7 @@ public class UserGroupDaoTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-    
+
 
     @Test
     public void createDeleteNewUserGroup () throws KustvaktException {
@@ -69,15 +76,18 @@ public class UserGroupDaoTest {
         // member roles
         List<Role> roles = roleDao.retrieveRoleByGroupMemberId(m.getId());
         assertEquals(2, roles.size());
-        assertEquals(PredefinedRole.USER_GROUP_ADMIN.getId(), roles.get(0).getId());
-        assertEquals(PredefinedRole.VC_ACCESS_ADMIN.getId(), roles.get(1).getId());
+        assertEquals(PredefinedRole.USER_GROUP_ADMIN.getId(),
+                roles.get(0).getId());
+        assertEquals(PredefinedRole.VC_ACCESS_ADMIN.getId(),
+                roles.get(1).getId());
 
         //retrieve VC by group
         List<VirtualCorpus> vc = virtualCorpusDao.retrieveVCByGroup(groupId);
         assertEquals(0, vc.size());
 
         // soft delete group
-        userGroupDao.deleteGroup(groupId, createdBy, config.isSoftDeleteGroup());
+        userGroupDao.deleteGroup(groupId, createdBy,
+                config.isSoftDeleteGroup());
         group = userGroupDao.retrieveGroupById(groupId);
         assertEquals(UserGroupStatus.DELETED, group.getStatus());
 
@@ -95,10 +105,16 @@ public class UserGroupDaoTest {
         assertEquals(4, members.size());
 
         UserGroupMember m = members.get(1);
-        List<Role> roles = m.getRoles();
+        Set<Role> roles = m.getRoles();
         assertEquals(2, roles.size());
-        assertEquals(PredefinedRole.USER_GROUP_MEMBER.getId(), roles.get(0).getId());
-        assertEquals(PredefinedRole.VC_ACCESS_MEMBER.getId(), roles.get(1).getId());
+
+        List<Role> sortedRoles = new ArrayList<>(roles);
+        Collections.sort(sortedRoles);
+
+        assertEquals(PredefinedRole.USER_GROUP_MEMBER.name(),
+                sortedRoles.get(0).getName());
+        assertEquals(PredefinedRole.VC_ACCESS_MEMBER.name(),
+                sortedRoles.get(1).getName());
     }
 
     @Test
@@ -132,8 +148,9 @@ public class UserGroupDaoTest {
         UserGroup group = userGroupDao.retrieveGroupById(groupId);
         String createdBy = "dory";
         String name = "dory new vc";
-        int id = virtualCorpusDao.createVirtualCorpus(name, VirtualCorpusType.PROJECT,
-                CorpusAccess.PUB, "corpusSigle=WPD15", "", "", "", createdBy);
+        int id = virtualCorpusDao.createVirtualCorpus(name,
+                VirtualCorpusType.PROJECT, CorpusAccess.PUB,
+                "corpusSigle=WPD15", "", "", "", createdBy);
 
         VirtualCorpus virtualCorpus = virtualCorpusDao.retrieveVCById(id);
         userGroupDao.addVCToGroup(virtualCorpus, createdBy,
@@ -148,7 +165,7 @@ public class UserGroupDaoTest {
 
         vc = virtualCorpusDao.retrieveVCByGroup(groupId);
         assertEquals(1, vc.size());
-        
+
         // delete vc
         virtualCorpusDao.deleteVirtualCorpus(virtualCorpus);
     }

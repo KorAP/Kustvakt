@@ -1,5 +1,5 @@
 version 0.60.1
-20/03/2018
+28/03/2018
 	- added admin-related SQL codes (margaretha)
 	- updated AdminDao (margaretha)
 	- added optional username query parameter to group list controller (margaretha) 
@@ -16,6 +16,9 @@ version 0.60.1
 	- added check for hidden groups in VC controller tests (margaretha)
 	- added search user-group controller (margaretha)
 	- removed createdBy from VirtualCorpusJson (margaretha)
+	- moved member role setting from the invitation phase to the after-subscription phase (margaretha)
+	- added member role removal after deleting members (margaretha)
+	- added add and delete member role controllers (margaretha)
 	
 version 0.60
 14/03/2018
