@@ -169,7 +169,12 @@
 		<constructor-arg value="${krill.indexDir}"/>
 	</bean>
 
-
+	<!-- URLValidator -->
+	<bean id="urlValidator" class="org.apache.commons.validator.routines.UrlValidator">
+		<constructor-arg value="http,https"/>
+	</bean>
+	
+	
 	<bean id="kustvakt_rewrite" class="de.ids_mannheim.korap.rewrite.FullRewriteHandler">
 		<constructor-arg ref="kustvakt_config" />
 	</bean>

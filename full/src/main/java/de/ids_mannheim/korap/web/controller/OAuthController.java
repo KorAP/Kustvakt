@@ -54,7 +54,6 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.handlers.OAuth2Handler;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.server.KustvaktServer;
 import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserDetails;
@@ -74,7 +73,7 @@ import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
  */
 //todo: only allow oauth2 access_token requests GET methods?
 //todo: allow refresh tokens
-@Path(KustvaktServer.API_VERSION + "/oauth2")
+@Path("/oauth2")
 public class OAuthController {
 
     @Autowired
@@ -83,17 +82,18 @@ public class OAuthController {
     private OAuth2Handler handler;
     @Autowired
     private AuthenticationManagerIface controller;
-    private EncryptionIface crypto;
+    
+//    private EncryptionIface crypto;
+    @Autowired
     private KustvaktConfiguration config;
 
 
     public OAuthController () {
-        this.handler = new OAuth2Handler(BeansFactory.getKustvaktContext()
-                .getPersistenceClient());
+//        this.handler = new OAuth2Handler(BeansFactory.getKustvaktContext()
+//                .getPersistenceClient());
 //        this.controller = BeansFactory.getKustvaktContext()
 //                .getAuthenticationManager();
-        this.crypto = BeansFactory.getKustvaktContext().getEncryption();
-        this.config = BeansFactory.getKustvaktContext().getConfiguration();
+//        this.crypto = BeansFactory.getKustvaktContext().getEncryption();
     }
 
 
@@ -118,31 +118,31 @@ public class OAuthController {
     }
 
 
-    @POST
-    @Path("register")
-    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
-    public Response registerClient (@Context SecurityContext context,
-            @HeaderParam("Host") String host,
-            @QueryParam("redirect_url") String rurl) {
-        ClientInfo info = new ClientInfo(crypto.createRandomNumber(),
-                crypto.createToken());
-        info.setUrl(host);
-        if (rurl == null)
-            throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
-                    "Missing parameter!", "redirect_url");
-        info.setRedirect_uri(rurl);
-        TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        String json = "";
-        try {
-            User user = this.controller.getUser(ctx.getUsername());
-            this.handler.getPersistenceHandler().registerClient(info, user);
-            json = info.toJSON();
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
-        return Response.ok(json).build();
-    }
+//    @POST
+//    @Path("register")
+//    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
+//    public Response registerClient (@Context SecurityContext context,
+//            @HeaderParam("Host") String host,
+//            @QueryParam("redirect_url") String rurl) {
+//        ClientInfo info = new ClientInfo(crypto.createRandomNumber(),
+//                crypto.createToken());
+//        info.setUrl(host);
+//        if (rurl == null)
+//            throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+//                    "Missing parameter!", "redirect_url");
+//        info.setRedirect_uri(rurl);
+//        TokenContext ctx = (TokenContext) context.getUserPrincipal();
+//        String json = "";
+//        try {
+//            User user = this.controller.getUser(ctx.getUsername());
+//            this.handler.getPersistenceHandler().registerClient(info, user);
+//            json = info.toJSON();
+//        }
+//        catch (KustvaktException e) {
+//            throw kustvaktResponseHandler.throwit(e);
+//        }
+//        return Response.ok(json).build();
+//    }
 
 
     @GET

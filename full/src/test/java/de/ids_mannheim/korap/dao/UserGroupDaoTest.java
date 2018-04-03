@@ -2,14 +2,10 @@ package de.ids_mannheim.korap.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import javax.validation.constraints.AssertTrue;
 
 import org.junit.Rule;
 import org.junit.Test;

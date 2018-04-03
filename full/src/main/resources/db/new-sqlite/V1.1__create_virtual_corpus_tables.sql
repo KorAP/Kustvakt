@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS virtual_corpus (
   created_by varchar(100) NOT NULL,
   description varchar(255) DEFAULT NULL,
   status varchar(100) DEFAULT NULL,
-  corpus_query varchar(2000) NOT NULL,
+  corpus_query TEXT NOT NULL,
   definition varchar(255) DEFAULT NULL
 );
 
