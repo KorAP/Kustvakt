@@ -20,7 +20,7 @@ import com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestCon
 public abstract class SpringJerseyTest extends JerseyTest {
 
     private static String[] classPackages =
-            new String[] { "de.ids_mannheim.korap.web.service.full",
+            new String[] { "de.ids_mannheim.korap.web.controller",
                     "de.ids_mannheim.korap.web.filter",
                     "de.ids_mannheim.korap.web.utils" };
 

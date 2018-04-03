@@ -1,3 +1,7 @@
+version 0.60.2
+03/04/2018
+	- implemented OAuth2 client registration (margaretha)
+	
 version 0.60.1
 28/03/2018
 	- added admin-related SQL codes (margaretha)

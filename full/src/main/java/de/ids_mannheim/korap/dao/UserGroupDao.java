@@ -1,6 +1,5 @@
 package de.ids_mannheim.korap.dao;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
