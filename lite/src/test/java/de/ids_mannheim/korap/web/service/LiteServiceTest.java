@@ -195,8 +195,7 @@ public class LiteServiceTest extends JerseyTest{
 	@Test
 	public void testMatchInfoGetWithoutSpans () throws KustvaktException{
         ClientResponse response = resource()
-			
-			.path("corpus/GOE/AGA/01784/p36-46/matchInfo")
+			.path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42/matchInfo")
 			.queryParam("foundry", "*")
 			.queryParam("spans", "false")
 			.get(ClientResponse.class);
@@ -206,9 +205,54 @@ public class LiteServiceTest extends JerseyTest{
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
+        assertEquals("match-GOE/AGA/01784-p36-46(5)37-45(2)38-42",
+					 node.at("/matchID").asText());
         assertEquals("Belagerung von Mainz", node.at("/title").asText());
 	};
 
+	@Test
+	public void testMatchInfoGetWithoutHighlights () throws KustvaktException{
+        ClientResponse response = resource()
+			.path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42/matchInfo")
+			.queryParam("foundry", "xy")
+			.queryParam("spans", "false")
+			.get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+					 response.getStatus());
+        String ent = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertEquals("<span class=\"context-left\"></span><span class=\"match\">der alte freie Weg nach Mainz war gesperrt, ich mußte über die Schiffbrücke bei Rüsselsheim; in Ginsheim ward <mark>gefüttert; der Ort ist sehr zerschossen; dann über die Schiffbrücke</mark> auf die Nonnenaue, wo viele Bäume niedergehauen lagen, sofort auf dem zweiten Teil der Schiffbrücke über den größern Arm des Rheins.</span><span class=\"context-right\"></span>",
+					 node.at("/snippet").asText());
+        assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
+        assertEquals("match-GOE/AGA/01784-p36-46(5)37-45(2)38-42",
+					 node.at("/matchID").asText());
+        assertEquals("Belagerung von Mainz", node.at("/title").asText());
+	};
+
+	
+	@Test
+	public void testMatchInfoGetWithHighlights () throws KustvaktException{
+        ClientResponse response = resource()			
+			.path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42/matchInfo")
+			.queryParam("foundry", "xy")
+			.queryParam("spans", "false")
+			.queryParam("hls", "true")
+			.get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+					 response.getStatus());
+        String ent = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
+        assertEquals("<span class=\"context-left\"></span><span class=\"match\">der alte freie Weg nach Mainz war gesperrt, ich mußte über die Schiffbrücke bei Rüsselsheim; in Ginsheim ward <mark>gefüttert; <mark class=\"class-5 level-0\">der <mark class=\"class-2 level-1\">Ort ist sehr zerschossen; dann</mark> über die Schiffbrücke</mark></mark> auf die Nonnenaue, wo viele Bäume niedergehauen lagen, sofort auf dem zweiten Teil der Schiffbrücke über den größern Arm des Rheins.</span><span class=\"context-right\"></span>",
+					 node.at("/snippet").asText());
+		assertEquals("match-GOE/AGA/01784-p36-46(5)37-45(2)38-42",
+					 node.at("/matchID").asText());
+        assertEquals("Belagerung von Mainz", node.at("/title").asText());
+	};
+
+	
 	@Test
 	public void testMatchInfoGet2 () throws KustvaktException{
         ClientResponse response = resource()
