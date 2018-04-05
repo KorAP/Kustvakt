@@ -10,6 +10,7 @@ import lombok.Data;
  * @author hanl
  * @date 22/01/2014
  */
+@Deprecated
 @Data
 public class ClientInfo {
 

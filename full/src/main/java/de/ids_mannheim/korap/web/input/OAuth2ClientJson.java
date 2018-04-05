@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.web.input;
 
-import de.ids_mannheim.korap.constant.ClientType;
+import de.ids_mannheim.korap.constant.OAuth2ClientType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +10,7 @@ public class OAuth2ClientJson {
     
     // all required for registration
     private String name;
-    private ClientType type;
+    private OAuth2ClientType type;
     private String url;
     private String redirectURI;
 }

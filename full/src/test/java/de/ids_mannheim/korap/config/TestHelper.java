@@ -34,6 +34,7 @@ import de.ids_mannheim.korap.handlers.JDBCClient;
 import de.ids_mannheim.korap.handlers.ResourceDao;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.EntityHandlerIface;
+import de.ids_mannheim.korap.interfaces.KustvaktBaseDaoInterface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.user.User;

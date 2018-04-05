@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.web.controller;
 
+import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Controller;
 
 import com.sun.jersey.spi.container.ResourceFilters;
 
+import de.ids_mannheim.korap.dto.ResourceDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.service.ResourceService;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -40,15 +43,7 @@ public class ResourceController {
      */
     @GET
     @Path("info")
-    public Response getAllResourceInfo () {
-        String result = "";
-        try {
-            result = JsonUtils.toJSON(resourceService.getResourceDtos());
-        }
-        catch (KustvaktException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return Response.ok(result).build();
+    public List<ResourceDto> getAllResourceInfo () {
+        return resourceService.getResourceDtos();
     }
 }

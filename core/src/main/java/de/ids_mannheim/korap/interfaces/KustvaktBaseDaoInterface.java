@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.config;
+package de.ids_mannheim.korap.interfaces;
 
 /**
  * @author hanl

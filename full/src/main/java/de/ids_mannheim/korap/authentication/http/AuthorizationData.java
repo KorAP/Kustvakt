@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.authentication.http;
 
-import de.ids_mannheim.korap.config.AuthenticationScheme;
+import de.ids_mannheim.korap.constant.AuthenticationScheme;
 import lombok.Getter;
 import lombok.Setter;
 

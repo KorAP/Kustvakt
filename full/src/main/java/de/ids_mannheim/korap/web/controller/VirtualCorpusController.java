@@ -16,8 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -28,9 +26,8 @@ import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.VirtualCorpusService;
-import de.ids_mannheim.korap.user.TokenContext;
-import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.FullResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
@@ -53,13 +50,9 @@ import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
  */
 @Controller
 @Path("vc")
-@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class,
         PiwikFilter.class })
 public class VirtualCorpusController {
-
-    private static Logger jlog =
-            LoggerFactory.getLogger(VirtualCorpusController.class);
 
     @Autowired
     private FullResponseHandler responseHandler;
@@ -81,8 +74,6 @@ public class VirtualCorpusController {
     public Response createVC (@Context SecurityContext securityContext,
             VirtualCorpusJson vc) {
         try {
-            jlog.debug(vc.toString());
-
             // get user info
             TokenContext context =
                     (TokenContext) securityContext.getUserPrincipal();
@@ -131,20 +122,17 @@ public class VirtualCorpusController {
      */
     @GET
     @Path("search/{vcId}")
-    public Response searchVC (@Context SecurityContext securityContext,
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public VirtualCorpusDto searchVC (@Context SecurityContext securityContext,
             @PathParam("vcId") int vcId) {
-        String result;
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            VirtualCorpusDto dto =
-                    service.searchVCById(context.getUsername(), vcId);
-            result = JsonUtils.toJSON(dto);
+            return service.searchVCById(context.getUsername(), vcId);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
-        return Response.ok(result).build();
     }
 
     /** Lists not only private virtual corpora but all virtual corpora 
@@ -160,20 +148,18 @@ public class VirtualCorpusController {
      */
     @GET
     @Path("list")
-    public Response listVCByUser (@Context SecurityContext securityContext,
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public List<VirtualCorpusDto> listVCByUser (
+            @Context SecurityContext securityContext,
             @QueryParam("createdBy") String createdBy) {
-        String result;
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            List<VirtualCorpusDto> dtos =
-                    service.listVCByUser(context.getUsername(), createdBy);
-            result = JsonUtils.toJSON(dtos);
+            return service.listVCByUser(context.getUsername(), createdBy);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
-        return Response.ok(result).build();
     }
 
     /** Lists all virtual corpora created by a user
@@ -184,19 +170,17 @@ public class VirtualCorpusController {
      */
     @GET
     @Path("list/user")
-    public Response listUserVC (@Context SecurityContext securityContext) {
-        String result;
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public List<VirtualCorpusDto> listUserVC (
+            @Context SecurityContext securityContext) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            List<VirtualCorpusDto> dtos =
-                    service.listOwnerVC(context.getUsername());
-            result = JsonUtils.toJSON(dtos);
+            return service.listOwnerVC(context.getUsername());
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
-        return Response.ok(result).build();
     }
 
     /** Lists virtual corpora by creator and type. This is a controller for 
@@ -213,21 +197,19 @@ public class VirtualCorpusController {
      */
     @GET
     @Path("list/system-admin")
-    public Response listVCByStatus (@Context SecurityContext securityContext,
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public List<VirtualCorpusDto> listVCByStatus (
+            @Context SecurityContext securityContext,
             @QueryParam("createdBy") String createdBy,
             @QueryParam("type") VirtualCorpusType type) {
-        String result;
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            List<VirtualCorpusDto> dtos = service
-                    .listVCByType(context.getUsername(), createdBy, type);
-            result = JsonUtils.toJSON(dtos);
+            return service.listVCByType(context.getUsername(), createdBy, type);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
-        return Response.ok(result).build();
     }
 
     /** Only the VC owner and system admins can delete VC. VCA admins 
@@ -312,20 +294,18 @@ public class VirtualCorpusController {
      */
     @GET
     @Path("access/list")
-    public Response listVCAccess (@Context SecurityContext securityContext,
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public List<VirtualCorpusAccessDto> listVCAccess (
+            @Context SecurityContext securityContext,
             @QueryParam("vcId") int vcId) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
-        String result;
         try {
-            List<VirtualCorpusAccessDto> dtos =
-                    service.listVCAccessByVC(context.getUsername(), vcId);
-            result = JsonUtils.toJSON(dtos);
+            return service.listVCAccessByVC(context.getUsername(), vcId);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
-        return Response.ok(result).build();
     }
 
     /** Lists active VC-accesses available for a user-group. 
@@ -338,20 +318,17 @@ public class VirtualCorpusController {
      */
     @GET
     @Path("access/list/byGroup")
-    public Response listVCAccessByGroup (
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public List<VirtualCorpusAccessDto> listVCAccessByGroup (
             @Context SecurityContext securityContext,
             @QueryParam("groupId") int groupId) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
-        String result;
         try {
-            List<VirtualCorpusAccessDto> dtos =
-                    service.listVCAccessByGroup(context.getUsername(), groupId);
-            result = JsonUtils.toJSON(dtos);
+            return service.listVCAccessByGroup(context.getUsername(), groupId);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
-        return Response.ok(result).build();
     }
 }

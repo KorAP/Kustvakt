@@ -1,6 +1,5 @@
 package de.ids_mannheim.korap.handlers;
 
-import de.ids_mannheim.korap.config.KustvaktBaseDaoInterface;
 import de.ids_mannheim.korap.config.ParamFields;
 import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
@@ -8,6 +7,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.exceptions.DatabaseException;
 import de.ids_mannheim.korap.interfaces.EntityHandlerIface;
+import de.ids_mannheim.korap.interfaces.KustvaktBaseDaoInterface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.ShibUser;

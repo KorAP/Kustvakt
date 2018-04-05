@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.user;
+package de.ids_mannheim.korap.security.context;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -7,8 +7,10 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.TokenType;
+import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.user.User.UserFactory;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.AccessLevel;

@@ -1,8 +1,8 @@
 package de.ids_mannheim.korap.interfaces.db;
 
-import de.ids_mannheim.korap.config.KustvaktBaseDaoInterface;
-import de.ids_mannheim.korap.config.KustvaktTypeInterface;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.interfaces.KustvaktBaseDaoInterface;
+import de.ids_mannheim.korap.interfaces.KustvaktTypeInterface;
 import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.user.User;
 

@@ -1,8 +1,7 @@
-package de.ids_mannheim.korap.web.utils;
-
-import de.ids_mannheim.korap.user.TokenContext;
+package de.ids_mannheim.korap.security.context;
 
 import javax.ws.rs.core.SecurityContext;
+
 import java.security.Principal;
 
 /**

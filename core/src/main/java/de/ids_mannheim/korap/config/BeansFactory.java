@@ -8,6 +8,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
+import de.ids_mannheim.korap.interfaces.KustvaktTypeInterface;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
 
 /**

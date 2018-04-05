@@ -2,8 +2,8 @@ package de.ids_mannheim.korap.authentication;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.DemoUser;
-import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.utils.ConcurrentMultiMap;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import org.joda.time.DateTime;

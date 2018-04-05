@@ -1,7 +1,7 @@
 package de.ids_mannheim.korap.interfaces.db;
 
-import de.ids_mannheim.korap.config.KustvaktTypeInterface;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.interfaces.KustvaktTypeInterface;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.Userdata;
 

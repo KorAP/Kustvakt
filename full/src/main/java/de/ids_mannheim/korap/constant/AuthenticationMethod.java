@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.config;
+package de.ids_mannheim.korap.constant;
 
 /** Lists possible actual authentication methods. Multiple 
  *  {@link AuthenticationScheme} may use an identical 

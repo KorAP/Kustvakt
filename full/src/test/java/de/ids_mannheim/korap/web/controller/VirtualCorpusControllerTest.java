@@ -29,8 +29,8 @@ import com.sun.jersey.spi.container.ContainerRequest;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationScheme;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
+import de.ids_mannheim.korap.constant.AuthenticationScheme;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;

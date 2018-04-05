@@ -24,9 +24,8 @@ import com.sun.jersey.spi.container.ResourceFilters;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.dto.UserGroupDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.UserGroupService;
-import de.ids_mannheim.korap.user.TokenContext;
-import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.FullResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
@@ -46,7 +45,6 @@ import de.ids_mannheim.korap.web.input.UserGroupJson;
  */
 @Controller
 @Path("group")
-@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class,
         PiwikFilter.class })
 public class UserGroupController {
@@ -66,14 +64,13 @@ public class UserGroupController {
      */
     @GET
     @Path("list")
-    public Response getUserGroup (@Context SecurityContext securityContext) {
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public List<UserGroupDto> getUserGroup (
+            @Context SecurityContext securityContext) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            List<UserGroupDto> dtos =
-                    service.retrieveUserGroup(context.getUsername());
-            String result = JsonUtils.toJSON(dtos);
-            return Response.ok(result).build();
+            return service.retrieveUserGroup(context.getUsername());
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
@@ -92,17 +89,16 @@ public class UserGroupController {
      */
     @GET
     @Path("list/system-admin")
-    public Response getUserGroupBySystemAdmin (
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public List<UserGroupDto> getUserGroupBySystemAdmin (
             @Context SecurityContext securityContext,
             @QueryParam("username") String username,
             @QueryParam("status") UserGroupStatus status) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            List<UserGroupDto> dtos = service.retrieveUserGroupByStatus(
-                    username, context.getUsername(), status);
-            String result = JsonUtils.toJSON(dtos);
-            return Response.ok(result).build();
+            return service.retrieveUserGroupByStatus(username,
+                    context.getUsername(), status);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
@@ -117,20 +113,19 @@ public class UserGroupController {
      */
     @GET
     @Path("{groupId}")
-    public Response searchUserGroup (@Context SecurityContext securityContext,
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public UserGroupDto searchUserGroup (
+            @Context SecurityContext securityContext,
             @PathParam("groupId") int groupId) {
-        String result;
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            UserGroupDto dto =
-                    service.searchById(context.getUsername(), groupId);
-            result = JsonUtils.toJSON(dto);
+            return service.searchById(context.getUsername(), groupId);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
-        return Response.ok(result).build();
+
     }
 
     /** Creates a user group where the user in token context is the 

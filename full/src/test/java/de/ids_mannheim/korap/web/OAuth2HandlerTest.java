@@ -15,7 +15,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.OAuth2Handler;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
-import de.ids_mannheim.korap.user.TokenContext;
+import de.ids_mannheim.korap.security.context.TokenContext;
 
 /**
  * EM: To do: not implemented in the new DB yet

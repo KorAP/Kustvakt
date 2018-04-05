@@ -43,18 +43,18 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.AuthCodeInfo;
-import de.ids_mannheim.korap.config.AuthenticationMethod;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.ClientInfo;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.Scopes;
-import de.ids_mannheim.korap.config.TokenType;
+import de.ids_mannheim.korap.constant.AuthenticationMethod;
+import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.handlers.OAuth2Handler;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.user.TokenContext;
+import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserDetails;
 import de.ids_mannheim.korap.user.Userdata;
@@ -73,7 +73,7 @@ import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
  */
 //todo: only allow oauth2 access_token requests GET methods?
 //todo: allow refresh tokens
-@Path("/oauth2")
+//@Path("/oauth2")
 public class OAuthController {
 
     @Autowired

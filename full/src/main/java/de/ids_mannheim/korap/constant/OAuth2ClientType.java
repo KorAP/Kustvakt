@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.constant;
 
-public enum ClientType {
+public enum OAuth2ClientType {
 
     // EM: from RFC 6749
         
