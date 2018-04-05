@@ -9,16 +9,15 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.spi.container.ResourceFilters;
 
+import de.ids_mannheim.korap.dto.FoundryDto;
+import de.ids_mannheim.korap.dto.LayerDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.service.AnnotationService;
@@ -35,13 +34,13 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
  */
 @Controller
 @Path("annotation/")
-@ResourceFilters({DemoUserFilter.class, PiwikFilter.class })
+@ResourceFilters({ DemoUserFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class AnnotationController {
 
     @Autowired
     CoreResponseHandler responseHandler;
-    
+
     @Autowired
     private AnnotationService annotationService;
 
@@ -52,13 +51,8 @@ public class AnnotationController {
      */
     @GET
     @Path("layers")
-    public Response getLayers () {
-        try {
-            return Response.ok(JsonUtils.toJSON(annotationService.getLayerDtos())).build();
-        }
-        catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
-        }
+    public List<LayerDto> getLayers () {
+        return annotationService.getLayerDtos();
     }
 
 
@@ -75,13 +69,13 @@ public class AnnotationController {
     @POST
     @Path("description")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getFoundryDescriptions (String json) {
+    public List<FoundryDto> getFoundryDescriptions (String json) {
         if (json == null || json.isEmpty()) {
             throw responseHandler
                     .throwit(new KustvaktException(StatusCodes.MISSING_ARGUMENT,
                             "Missing a json string.", ""));
         }
-        
+
         JsonNode node;
         try {
             node = JsonUtils.readTree(json);
@@ -125,16 +119,12 @@ public class AnnotationController {
                             "No result found.", "codes:[]"));
         }
 
-        String result;
         try {
-            result = JsonUtils
-                    .toJSON(annotationService.getFoundryDtos(codes, language));
+            return annotationService.getFoundryDtos(codes, language);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
-        return Response.ok(result).build();
     }
-
 }
 

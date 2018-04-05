@@ -12,7 +12,7 @@ import com.sun.jersey.spi.container.ResourceFilter;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.user.TokenContext;
+import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.FullResponseHandler;
 
 /**

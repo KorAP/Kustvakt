@@ -8,7 +8,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.springframework.stereotype.Component;
 
-import de.ids_mannheim.korap.config.AuthenticationScheme;
+import de.ids_mannheim.korap.constant.AuthenticationScheme;
 
 /** Implementation of HTTP authentication scheme (see RFC 7253 and 7617)
  *  for server creating responses with status 401 Unauthorized and 

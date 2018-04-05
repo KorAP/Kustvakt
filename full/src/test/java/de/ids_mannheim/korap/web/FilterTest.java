@@ -13,8 +13,8 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.config.TestHelper;
+import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 
 /** EM: fix tests. new DB does not save users.

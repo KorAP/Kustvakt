@@ -1,13 +1,13 @@
 package de.ids_mannheim.korap.handlers;
 
 import de.ids_mannheim.korap.config.ClientInfo;
+import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.exceptions.DatabaseException;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
+import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.TokenType;
-import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.BooleanUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;

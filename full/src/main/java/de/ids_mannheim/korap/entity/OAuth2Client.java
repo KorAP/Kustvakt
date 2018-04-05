@@ -7,7 +7,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import de.ids_mannheim.korap.constant.ClientType;
+import de.ids_mannheim.korap.constant.OAuth2ClientType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,17 +23,20 @@ public class OAuth2Client {
 
     @Id
     private String id;
+    private String name;
     private String secret;
     @Enumerated(EnumType.STRING)
-    private ClientType type;
+    private OAuth2ClientType type;
+    private String url;
     @Column(name = "redirect_uri")
     private String redirectURI;
-    private String url;
-    private String name;
+    private String registeredBy;
+
 
     @Override
     public String toString () {
         return "id=" + id + ", secret=" + secret + ", type=" + type + ", name="
-                + name + ", url=" + url + ", redirectURI=" + redirectURI;
+                + name + ", url=" + url + ", redirectURI=" + redirectURI
+                + ", registeredBy=" + registeredBy;
     }
 }

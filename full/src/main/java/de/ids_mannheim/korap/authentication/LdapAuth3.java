@@ -28,8 +28,8 @@ package de.ids_mannheim.korap.authentication;
 
 import com.unboundid.ldap.sdk.*;
 
-import de.ids_mannheim.korap.config.TokenType;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.constant.TokenType;
 
 import java.io.*;
 import java.util.*;

@@ -12,10 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
-import de.ids_mannheim.korap.config.TokenType;
+import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.KorAPUser;
-import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 
 public class APIAuthenticationTest extends SpringJerseyTest {

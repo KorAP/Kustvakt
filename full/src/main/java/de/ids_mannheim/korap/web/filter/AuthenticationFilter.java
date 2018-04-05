@@ -12,14 +12,14 @@ import com.sun.jersey.spi.container.ResourceFilter;
 
 import de.ids_mannheim.korap.authentication.http.AuthorizationData;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
-import de.ids_mannheim.korap.config.TokenType;
+import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
-import de.ids_mannheim.korap.user.TokenContext;
+import de.ids_mannheim.korap.security.context.KustvaktContext;
+import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.FullResponseHandler;
-import de.ids_mannheim.korap.web.utils.KustvaktContext;
 
 /**
  * @author hanl, margaretha

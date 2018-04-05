@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:p="http://www.springframework.org/schema/p" 
-	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:aop="http://www.springframework.org/schema/aop" 
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns="http://www.springframework.org/schema/beans" 
-	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:cache="http://www.springframework.org/schema/cache"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
@@ -21,9 +18,8 @@
 	<context:component-scan base-package="de.ids_mannheim.korap" />
 	<context:annotation-config />
 
-	<!-- <bean id="test" class="de.ids_mannheim.korap.web.Test">
-		<property name="config" ref="kustvakt_config" />
-	</bean> -->
+	<!-- <bean id="test" class="de.ids_mannheim.korap.web.Test"> <property name="config" 
+		ref="kustvakt_config" /> </bean> -->
 
 	<bean id="props"
 		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
@@ -46,7 +42,7 @@
 				<value>classpath:properties/mail.properties</value>
 				<value>file:./mail.properties</value>
 				<value>classpath:properties/hibernate.properties</value>
-				
+
 				<value>classpath:kustvakt.conf</value>
 				<value>file:./kustvakt.conf</value>
 			</array>
@@ -91,11 +87,11 @@
 		<property name="username" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
 		<property name="connectionProperties">
-            <props>
-                <prop key="date_string_format">yyyy-MM-dd HH:mm:ss</prop>
-            </props>
-        </property>
-        
+			<props>
+				<prop key="date_string_format">yyyy-MM-dd HH:mm:ss</prop>
+			</props>
+		</property>
+
 		<!-- relevant for single connection datasource and sqlite -->
 		<property name="suppressClose">
 			<value>true</value>
@@ -113,8 +109,8 @@
 		<!-- <property name="dataSource" ref="dataSource" /> -->
 		<property name="dataSource" ref="sqliteDataSource" />
 	</bean>
-	
-	
+
+
 	<bean id="kustvakt_db" class="de.ids_mannheim.korap.handlers.JDBCClient">
 		<constructor-arg index="0" ref="dataSource" />
 		<!-- deprecated property -->
@@ -125,7 +121,7 @@
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<!-- <property name="dataSource" ref="dataSource" /> -->
 		<property name="dataSource" ref="sqliteDataSource" />
-		
+
 		<property name="packagesToScan" value="de.ids_mannheim.korap.entity" />
 		<property name="jpaVendorAdapter">
 			<bean id="jpaVendorAdapter"
@@ -150,7 +146,7 @@
 
 	<tx:annotation-driven proxy-target-class="true"
 		transaction-manager="transactionManager" />
-		
+
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory" ref="entityManagerFactory" />
 	</bean>
@@ -161,20 +157,20 @@
 	</bean>
 
 	<!-- Data access objects -->
-	<bean id="resourceDao" class="de.ids_mannheim.korap.dao.ResourceDao"/>
+	<bean id="resourceDao" class="de.ids_mannheim.korap.dao.ResourceDao" />
 	<!-- <bean id="annotationDao" class="de.ids_mannheim.korap.dao.AnnotationDao"/> -->
 
 	<!-- Krill -->
 	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">
-		<constructor-arg value="${krill.indexDir}"/>
+		<constructor-arg value="${krill.indexDir}" />
 	</bean>
 
 	<!-- URLValidator -->
 	<bean id="urlValidator" class="org.apache.commons.validator.routines.UrlValidator">
-		<constructor-arg value="http,https"/>
+		<constructor-arg value="http,https" />
 	</bean>
-	
-	
+
+
 	<bean id="kustvakt_rewrite" class="de.ids_mannheim.korap.rewrite.FullRewriteHandler">
 		<constructor-arg ref="kustvakt_config" />
 	</bean>
@@ -183,11 +179,10 @@
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
 
-	<bean id="kustvakt_response"
-          class="de.ids_mannheim.korap.web.FullResponseHandler">
-          <constructor-arg index="0" name="iface" ref="kustvakt_auditing"/>
-    </bean>
-    
+	<bean id="kustvakt_response" class="de.ids_mannheim.korap.web.FullResponseHandler">
+		<constructor-arg index="0" name="iface" ref="kustvakt_auditing" />
+	</bean>
+
 	<bean id="kustvakt_userdb" class="de.ids_mannheim.korap.handlers.EntityDao">
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
@@ -206,11 +201,13 @@
 	</bean>
 
 	<!-- authentication providers to use -->
-	<!-- <bean id="api_auth" class="de.ids_mannheim.korap.authentication.APIAuthentication">
-		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
-			ref="kustvakt_config" />
-	</bean> -->
-	
+	<!-- <bean id="api_auth" class="de.ids_mannheim.korap.authentication.APIAuthentication"> 
+		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration" 
+		ref="kustvakt_config" /> </bean> -->
+
+	<bean id="client_auth"
+		class="de.ids_mannheim.korap.authentication.OAuth2ClientAuthentication" />
+
 	<bean id="ldap_auth" class="de.ids_mannheim.korap.authentication.LdapAuth3">
 		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
 			ref="kustvakt_config" />
@@ -238,6 +235,7 @@
 		<ref bean="session_auth" />
 		<!-- <ref bean="api_auth" /> -->
 		<ref bean="openid_auth" />
+		<ref bean="client_auth" />
 	</util:list>
 
 
@@ -265,8 +263,8 @@
 	<!-- specify type for constructor argument -->
 	<bean id="kustvakt_authenticationmanager"
 		class="de.ids_mannheim.korap.authentication.KustvaktAuthenticationManager">
-		<constructor-arg
-			type="de.ids_mannheim.korap.interfaces.EntityHandlerIface" ref="kustvakt_userdb" />
+		<constructor-arg type="de.ids_mannheim.korap.interfaces.EntityHandlerIface"
+			ref="kustvakt_userdb" />
 		<constructor-arg type="de.ids_mannheim.korap.interfaces.EncryptionIface"
 			ref="kustvakt_encryption" />
 		<constructor-arg ref="kustvakt_config" />
@@ -305,11 +303,11 @@
 		<!-- <property name="dataSource" ref="dataSource" /> -->
 		<property name="dataSource" ref="sqliteDataSource" />
 	</bean>
-	
+
 	<!-- mail -->
-		<bean id="authenticator" class="de.ids_mannheim.korap.service.MailAuthenticator">
-		<constructor-arg index="0" value="${mail.username}"/>
-		<constructor-arg index="1" value="${mail.password}"/>
+	<bean id="authenticator" class="de.ids_mannheim.korap.service.MailAuthenticator">
+		<constructor-arg index="0" value="${mail.username}" />
+		<constructor-arg index="1" value="${mail.password}" />
 	</bean>
 	<bean id="smtpSession" class="javax.mail.Session" factory-method="getInstance">
 		<constructor-arg index="0">
@@ -322,18 +320,19 @@
 				<prop key="mail.smtp.connectiontimeout">${mail.connectiontimeout}</prop>
 			</props>
 		</constructor-arg>
-		<constructor-arg index="1" ref="authenticator"/>
+		<constructor-arg index="1" ref="authenticator" />
 	</bean>
 	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
 		<property name="username" value="${mail.username}" />
-	    <property name="password" value="${mail.password}" />
+		<property name="password" value="${mail.password}" />
 		<property name="session" ref="smtpSession" />
 	</bean>
 	<bean id="velocityEngine" class="org.apache.velocity.app.VelocityEngine">
 		<constructor-arg index="0">
 			<props>
 				<prop key="resource.loader">class</prop>
-				<prop key="class.resource.loader.class">org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader</prop>
+				<prop key="class.resource.loader.class">org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
+				</prop>
 			</props>
 		</constructor-arg>
 	</bean>

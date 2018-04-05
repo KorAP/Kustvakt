@@ -3,7 +3,7 @@ package de.ids_mannheim.korap.authentication.http;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import de.ids_mannheim.korap.config.AuthenticationScheme;
+import de.ids_mannheim.korap.constant.AuthenticationScheme;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.ParameterChecker;

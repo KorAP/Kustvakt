@@ -8,11 +8,11 @@ import org.springframework.security.core.AuthenticationException;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.Scopes;
-import de.ids_mannheim.korap.config.TokenType;
+import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.dao.UserDao;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.KorAPUser;
-import de.ids_mannheim.korap.user.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.TimeUtils;
 

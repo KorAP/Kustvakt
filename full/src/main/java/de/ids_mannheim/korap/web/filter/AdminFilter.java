@@ -18,16 +18,16 @@ import de.ids_mannheim.korap.authentication.http.AuthorizationData;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.authentication.http.TransferEncoding;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.AuthenticationMethod;
+import de.ids_mannheim.korap.constant.AuthenticationMethod;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
-import de.ids_mannheim.korap.user.TokenContext;
+import de.ids_mannheim.korap.security.context.KustvaktContext;
+import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.web.FullResponseHandler;
-import de.ids_mannheim.korap.web.utils.KustvaktContext;
 
 /**
  * @author hanl, margaretha

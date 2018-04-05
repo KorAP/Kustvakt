@@ -14,6 +14,7 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
+import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.*;
 import net.minidev.json.JSONArray;
 import org.slf4j.Logger;

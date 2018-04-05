@@ -49,7 +49,7 @@ import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.resources.VirtualCollection;
 import de.ids_mannheim.korap.rewrite.FullRewriteHandler;
-import de.ids_mannheim.korap.user.TokenContext;
+import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.JsonUtils;

@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.ids_mannheim.korap.auditing.AuditRecord;
-import de.ids_mannheim.korap.config.TokenType;
+//import de.ids_mannheim.korap.constant.TokenType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,7 +23,7 @@ public class KustvaktException extends Exception {
     private String entity;
     private String notification;
     private boolean isNotification;
-    private TokenType authType;
+//    private TokenType authType;
 
     public KustvaktException (int status) {
         this.statusCode = status;
@@ -74,13 +74,6 @@ public class KustvaktException extends Exception {
         this.userid = String.valueOf(userid);
     }
 
-    public KustvaktException (TokenType type, int status, String message, String entity) {
-        super(message);
-        this.statusCode = status;
-        this.entity = entity;
-        this.authType = type;
-    }
-    
     public KustvaktException (int status, String message, String entity) {
         super(message);
         this.statusCode = status;

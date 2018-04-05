@@ -6,7 +6,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,9 @@ import org.springframework.stereotype.Controller;
 
 import com.sun.jersey.spi.container.ResourceFilters;
 
+import de.ids_mannheim.korap.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.OAuth2ClientService;
 import de.ids_mannheim.korap.web.FullResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
@@ -23,9 +24,7 @@ import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
 
 @Controller
-@Path("/client")
-//@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-//@ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
+@Path("/oauth2/client")
 public class OAuthClientController {
 
     @Autowired
@@ -33,27 +32,77 @@ public class OAuthClientController {
     @Autowired
     private FullResponseHandler responseHandler;
 
-    /** EM: who can register a client?
+    /** Registers a client application. Before starting an OAuth process, 
+     * client applications have to be registered first. Only registered
+     * users are allowed to register client applications.
      * 
+     * From RFC 6749:
      * The authorization server SHOULD document the size of any identifier 
      * it issues.
      * 
      * @param context
-     * @param clientJson
-     * @return
+     * @param clientJson a JSON object describing the client
+     * @return client id and secret if the client type is confidential
      */
     @POST
     @Path("register")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response registerClient (@Context SecurityContext context,
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
+    public OAuth2ClientDto registerClient (
+            @Context SecurityContext securityContext,
             OAuth2ClientJson clientJson) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
         try {
-            clientService.registerClient(clientJson);
+            return clientService.registerClient(clientJson,
+                    context.getUsername());
         }
         catch (KustvaktException e) {
-            responseHandler.throwit(e);
+            throw responseHandler.throwit(e);
         }
-        return Response.ok().build();
     }
 
+
+    //    /** Deregisters a client via owner authentication. 
+    //     * 
+    //     * EM: who can deregister clients? The user registered the clients or the client itself?
+    //     * 
+    //     * @param securityContext
+    //     * @param clientId
+    //     * @return HTTP Response OK if successful.
+    //     */
+    //    @POST
+    //    @Path("deregister")
+    //    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    //    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
+    //    public OAuth2ClientDto deregisterClient (
+    //            @Context SecurityContext securityContext,
+    //            @FormParam("client_id") String clientId) {
+    //        TokenContext context =
+    //                (TokenContext) securityContext.getUserPrincipal();
+    //        try {
+    //            return clientService.deregisterClient(clientId,
+    //                    context.getUsername());
+    //        }
+    //        catch (KustvaktException e) {
+    //            throw responseHandler.throwit(e);
+    //        }
+    //    }
+    //
+    //    @POST
+    //    @Path("deregister")
+    //    @ResourceFilters({ OAuth2ClientAuthenticationFilter.class,
+    //            BlockingFilter.class })
+    //    public OAuth2ClientDto deregisterClient (
+    //            @Context SecurityContext securityContext) {
+    //        TokenContext context =
+    //                (TokenContext) securityContext.getUserPrincipal();
+    //        try {
+    //            return clientService.deregisterClient();
+    //        }
+    //        catch (KustvaktException e) {
+    //            throw responseHandler.throwit(e);
+    //        }
+    //    }
 }
