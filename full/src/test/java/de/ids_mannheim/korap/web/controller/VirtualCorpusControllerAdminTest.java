@@ -35,7 +35,7 @@ public class VirtualCorpusControllerAdminTest extends SpringJerseyTest {
     @Test
     public void testSearchPrivateVC () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        ClientResponse response = resource().path("vc").path("search").path("1")
+        ClientResponse response = resource().path("vc").path("1")
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue(admin,
                                 "pass"))
@@ -55,7 +55,7 @@ public class VirtualCorpusControllerAdminTest extends SpringJerseyTest {
     public void testSearchProjectVC () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
 
-        ClientResponse response = resource().path("vc").path("search").path("2")
+        ClientResponse response = resource().path("vc").path("2")
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue(admin,
                                 "pass"))

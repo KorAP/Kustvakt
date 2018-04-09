@@ -210,11 +210,8 @@ public class UserGroupController {
     }
 
     /** Invites group members to join a user-group specified in the JSON object.
-<<<<<<< Upstream, based on dev
      * Only user-group admins and system admins are allowed. 
      * 
-=======
->>>>>>> 18533fd Implemented #17 and added role removal after deleting members.
      * @param securityContext
      * @param group UserGroupJson containing groupId and usernames to be invited
      * as members 

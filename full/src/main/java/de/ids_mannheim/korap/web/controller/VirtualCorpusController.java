@@ -121,9 +121,9 @@ public class VirtualCorpusController {
      * @return a list of virtual corpora
      */
     @GET
-    @Path("search/{vcId}")
+    @Path("{vcId}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public VirtualCorpusDto searchVC (@Context SecurityContext securityContext,
+    public VirtualCorpusDto retrieveVC (@Context SecurityContext securityContext,
             @PathParam("vcId") int vcId) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();

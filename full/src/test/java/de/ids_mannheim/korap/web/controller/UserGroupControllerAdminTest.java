@@ -303,6 +303,8 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .delete(ClientResponse.class);
 
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
         // check group member
         JsonNode node = listGroup(testUsername);
         node = node.get(0);
