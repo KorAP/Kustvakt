@@ -3,17 +3,12 @@ package de.ids_mannheim.korap.config;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Properties;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -43,22 +38,6 @@ public class ConfigTest extends BeanConfigTest {
         assertNotNull(p);
     }
 
-
-    @Test
-    public void testAdminHash () throws IOException, KustvaktException,
-            NoSuchAlgorithmException {
-        AdminSetup setup = AdminSetup.getInstance();
-        String hash = setup.getHash();
-        File f = new File("./admin_token");
-        FileInputStream stream = new FileInputStream(f);
-        String token = IOUtil.toString(stream);
-        assertNotEquals("", hash);
-        assertNotEquals("", token);
-        EncryptionIface crypto = helper().getContext().getEncryption();
-        assertTrue(crypto.checkHash(token, hash));
-    }
-
-
     @Test
     public void testServiceInfo () {
         String version = ServiceInfo.getInfo().getVersion();
@@ -87,16 +66,6 @@ public class ConfigTest extends BeanConfigTest {
                         ConfigTest.class.getClassLoader().getResourceAsStream(
                                 "kustvakt.conf"));
     }
-
-    @Test
-    @Ignore
-    public void testKustvaktValueValidation() {
-        Map m = KustvaktConfiguration.KUSTVAKT_USER;
-        EncryptionIface crypto = helper().getContext().getEncryption();
-
-
-    }
-
 
     @Test
     public void testBootConfigDependencyOrder () {

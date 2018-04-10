@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import de.ids_mannheim.korap.authentication.http.AuthorizationData;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.AuthenticationScheme;
 import de.ids_mannheim.korap.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.dao.AdminDao;
@@ -34,6 +35,8 @@ public class OAuth2ClientService {
     private EncryptionIface encryption;
     @Autowired
     private HttpAuthorizationHandler authorizationHandler;
+    @Autowired
+    private FullConfiguration config;
 
 
     public OAuth2ClientDto registerClient (OAuth2ClientJson clientJson,
@@ -49,6 +52,7 @@ public class OAuth2ClientService {
         }
 
         String secret = null;
+        String secretHashcode = null;
         if (clientJson.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
             // RFC 6749:
             // The authorization server MUST NOT issue client passwords or other
@@ -61,11 +65,13 @@ public class OAuth2ClientService {
             // specific device.
 
             secret = encryption.createToken();
+            secretHashcode = encryption.secureHash(secret,
+                    config.getPasscodeSaltField());
         }
 
         String id = encryption.createRandomNumber();
         try {
-            clientDao.registerClient(id, secret, clientJson.getName(),
+            clientDao.registerClient(id, secretHashcode, clientJson.getName(),
                     clientJson.getType(), clientJson.getUrl(),
                     clientJson.getUrl().hashCode(), clientJson.getRedirectURI(),
                     registeredBy);
@@ -162,7 +168,9 @@ public class OAuth2ClientService {
                     .equals(AuthenticationScheme.BASIC)) {
                 authorizationHandler.parseBasicToken(authData);
                 if (!client.getId().equals(clientId)
-                        || !client.getSecret().equals(authData.getPassword())) {
+                        || !encryption.checkHash(authData.getPassword(),
+                                client.getSecret(),
+                                config.getPasscodeSaltField())) {
                     throw new KustvaktException(
                             StatusCodes.AUTHENTICATION_FAILED,
                             "Client credentials are incorrect.");

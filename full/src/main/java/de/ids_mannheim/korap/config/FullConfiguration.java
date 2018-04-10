@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import de.ids_mannheim.korap.interfaces.EncryptionIface;
+
 /** Configuration for Kustvakt full version including properties concerning
  *  authentication and licenses. 
  * 
@@ -42,6 +44,8 @@ public class FullConfiguration extends KustvaktConfiguration {
     private boolean isSoftDeleteGroup;
     private boolean isSoftDeleteGroupMember;
 
+    private EncryptionIface.Encryption encryption;
+    
     public FullConfiguration (Properties properties) throws IOException {
         super(properties);
     }
@@ -59,6 +63,8 @@ public class FullConfiguration extends KustvaktConfiguration {
         setMailConfiguration(properties);
         ldapConfig = properties.getProperty("ldap.config");
 
+        setEncryption(Enum.valueOf(EncryptionIface.Encryption.class,
+                properties.getProperty("security.encryption", "BCRYPT")));
     }
 
     private void setMailConfiguration (Properties properties) {
@@ -281,6 +287,14 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     public void setEmailAddressRetrieval (String emailAddressRetrieval) {
         this.emailAddressRetrieval = emailAddressRetrieval;
+    }
+
+    public EncryptionIface.Encryption getEncryption () {
+        return encryption;
+    }
+
+    public void setEncryption (EncryptionIface.Encryption encryption) {
+        this.encryption = encryption;
     }
 
 }

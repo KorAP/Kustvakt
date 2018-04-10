@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.interfaces.defaults;
+package de.ids_mannheim.korap.encryption;
 
 import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.Configurable;
@@ -29,8 +29,7 @@ public class DefaultEncryption implements EncryptionIface {
 
     @Override
     public String secureHash (String input, String salt)
-            throws NoSuchAlgorithmException, UnsupportedEncodingException,
-            KustvaktException {
+            throws KustvaktException {
         return null;
     }
 

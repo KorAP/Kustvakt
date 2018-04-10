@@ -24,6 +24,7 @@ public class OAuth2Client {
     @Id
     private String id;
     private String name;
+    // Secret hashcode is stored instead of plain secret
     private String secret;
     @Enumerated(EnumType.STRING)
     private OAuth2ClientType type;

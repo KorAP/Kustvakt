@@ -196,7 +196,7 @@
 	</bean>
 
 	<bean name="kustvakt_encryption"
-		class="de.ids_mannheim.korap.interfaces.defaults.KustvaktEncryption">
+		class="de.ids_mannheim.korap.encryption.KustvaktEncryption">
 		<constructor-arg ref="kustvakt_config" />
 	</bean>
 

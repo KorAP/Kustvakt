@@ -1,13 +1,10 @@
-package de.ids_mannheim.korap.interfaces.defaults;
+package de.ids_mannheim.korap.encryption;
 
-import de.ids_mannheim.korap.config.KustvaktConfiguration;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.web.utils.KustvaktMap;
-import edu.emory.mathcs.backport.java.util.Collections;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.RandomStringUtils;
@@ -15,16 +12,8 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import de.ids_mannheim.korap.config.FullConfiguration;
+import de.ids_mannheim.korap.interfaces.EncryptionIface;
 
 public class KustvaktEncryption implements EncryptionIface {
 
@@ -32,10 +21,10 @@ public class KustvaktEncryption implements EncryptionIface {
     private static Logger jlog = LoggerFactory
             .getLogger(KustvaktEncryption.class);
 
-    private final KustvaktConfiguration config;
+    private final FullConfiguration config;
 
 
-    public KustvaktEncryption (KustvaktConfiguration config) {
+    public KustvaktEncryption (FullConfiguration config) {
         jlog.info("initializing KorAPEncryption implementation");
         this.config = config;
     }
@@ -176,11 +165,14 @@ public class KustvaktEncryption implements EncryptionIface {
 
     @Override
     public String createToken () {
-        String encoded;
-        String v = RandomStringUtils.randomAlphanumeric(64);
-        encoded = hash(v);
-        jlog.trace("creating new token {}", encoded);
-        return encoded;
+        return RandomStringUtils.randomAlphanumeric(64);
+        
+        // EM: code from MH
+//        String encoded;
+//        String v = RandomStringUtils.randomAlphanumeric(64);
+//        encoded = hash(v);
+//        jlog.trace("creating new token {}", encoded);
+//        return encoded;
     }
 
 

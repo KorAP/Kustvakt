@@ -6,7 +6,7 @@ import java.util.Collection;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 
-import de.ids_mannheim.korap.interfaces.EncryptionIface;
+//import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
@@ -95,9 +95,9 @@ public abstract class ContextHolder {
     }
 
 
-    public EncryptionIface getEncryption () {
-        return getBean(KUSTVAKT_ENCRYPTION);
-    }
+//    public EncryptionIface getEncryption () {
+//        return getBean(KUSTVAKT_ENCRYPTION);
+//    }
 
 
 //    public AuthenticationManagerIface getAuthenticationManager () {

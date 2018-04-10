@@ -26,7 +26,7 @@ public class OAuth2ClientDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public void registerClient (String id, String secret, String name,
+    public void registerClient (String id, String secretHashcode, String name,
             OAuth2ClientType type, String url, int urlHashCode,
             String redirectURI, String registeredBy) throws KustvaktException {
         ParameterChecker.checkStringValue(id, "client id");
@@ -39,7 +39,7 @@ public class OAuth2ClientDao {
         OAuth2Client client = new OAuth2Client();
         client.setId(id);
         client.setName(name);
-        client.setSecret(secret);
+        client.setSecret(secretHashcode);
         client.setType(type);
         client.setUrl(url);
         client.setUrlHashCode(urlHashCode);

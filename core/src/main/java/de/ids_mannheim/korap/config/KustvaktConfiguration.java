@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.Getter;
 
@@ -60,8 +59,7 @@ public class KustvaktConfiguration {
     private int validationStringLength;
     @Deprecated
     private int validationEmaillength;
-    // fixme: should move to base config?!
-    private EncryptionIface.Encryption encryption;
+    
     private byte[] sharedSecret;
     @Deprecated
     private String adminToken;
@@ -143,8 +141,7 @@ public class KustvaktConfiguration {
                 "security.validation.stringLength", "150"));
         validationEmaillength = Integer.valueOf(properties.getProperty(
                 "security.validation.emailLength", "40"));
-        encryption = Enum.valueOf(EncryptionIface.Encryption.class,
-                properties.getProperty("security.encryption", "BCRYPT"));
+        
         sharedSecret = properties.getProperty("security.sharedSecret", "")
                 .getBytes();
         adminToken = properties.getProperty("security.adminToken");

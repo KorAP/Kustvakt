@@ -21,12 +21,9 @@ public interface EncryptionIface {
      * @param input
      * @param salt
      * @return
-     * @throws java.security.NoSuchAlgorithmException
-     * @throws java.io.UnsupportedEncodingException
      */
     public String secureHash (String input, String salt)
-            throws NoSuchAlgorithmException, UnsupportedEncodingException,
-            KustvaktException;
+            throws KustvaktException;
 
 
     public String secureHash (String input) throws NoSuchAlgorithmException,
