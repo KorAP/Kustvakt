@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.service;
 
+import java.sql.SQLException;
+
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import de.ids_mannheim.korap.authentication.http.AuthorizationData;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.constant.AuthenticationScheme;
 import de.ids_mannheim.korap.constant.OAuth2ClientType;
+import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.dao.OAuth2ClientDao;
 import de.ids_mannheim.korap.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.entity.OAuth2Client;
@@ -24,11 +27,14 @@ public class OAuth2ClientService {
     @Autowired
     private OAuth2ClientDao clientDao;
     @Autowired
+    private AdminDao adminDao;
+    @Autowired
     private UrlValidator urlValidator;
     @Autowired
     private EncryptionIface encryption;
     @Autowired
     private HttpAuthorizationHandler authorizationHandler;
+
 
     public OAuth2ClientDto registerClient (OAuth2ClientJson clientJson,
             String registeredBy) throws KustvaktException {
@@ -48,19 +54,49 @@ public class OAuth2ClientService {
         }
 
         String id = encryption.createRandomNumber();
-
-        clientDao.registerClient(id, secret, clientJson.getName(),
-                clientJson.getType(), clientJson.getUrl(),
-                clientJson.getRedirectURI(), registeredBy);
+        try {
+            clientDao.registerClient(id, secret, clientJson.getName(),
+                    clientJson.getType(), clientJson.getUrl(),
+                    clientJson.getUrl().hashCode(), clientJson.getRedirectURI(),
+                    registeredBy);
+        }
+        catch (Exception e) {
+            Throwable cause = e;
+            Throwable lastCause = null;
+            while ((cause = cause.getCause()) != null
+                    && !cause.equals(lastCause)) {
+                if (cause instanceof SQLException) {
+                    throw new KustvaktException(
+                            StatusCodes.CLIENT_REGISTRATION_FAILED,
+                            cause.getMessage(), cause);
+                }
+                lastCause = cause;
+            }
+        }
 
         return new OAuth2ClientDto(id, secret);
     }
 
 
-    public OAuth2ClientDto deregisterClient (String clientId, String username) {
+    public void deregisterClient (String clientId, String username)
+            throws KustvaktException {
 
-
-        return null;
+        OAuth2Client client = clientDao.retrieveClientById(clientId);
+        if (adminDao.isAdmin(username)) {
+            clientDao.deregisterClient(client);
+        }
+        else if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
+            throw new KustvaktException(
+                    StatusCodes.CLIENT_DEREGISTRATION_FAILED,
+                    "Service is limited to public clients.");
+        }
+        else if (client.getRegisteredBy().equals(username)) {
+            clientDao.deregisterClient(client);
+        }
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
     }
 
 

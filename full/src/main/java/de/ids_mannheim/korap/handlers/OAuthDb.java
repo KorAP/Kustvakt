@@ -249,7 +249,7 @@ public class OAuthDb {
             jlog.error("removing client '{}' failed", info.getClient_id());
             throw new DatabaseException(new KustvaktException(user.getId(),
                     StatusCodes.ILLEGAL_ARGUMENT, "arguments given not valid",
-                    info.toJSON()), StatusCodes.CLIENT_REMOVAL_FAILURE,
+                    info.toJSON()), StatusCodes.CLIENT_DEREGISTRATION_FAILED,
                     info.toJSON());
 
         }

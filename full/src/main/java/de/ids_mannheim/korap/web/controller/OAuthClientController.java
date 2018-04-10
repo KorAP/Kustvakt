@@ -1,11 +1,14 @@
 package de.ids_mannheim.korap.web.controller;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,45 +67,44 @@ public class OAuthClientController {
     }
 
 
-    //    /** Deregisters a client via owner authentication. 
-    //     * 
-    //     * EM: who can deregister clients? The user registered the clients or the client itself?
-    //     * 
-    //     * @param securityContext
-    //     * @param clientId
-    //     * @return HTTP Response OK if successful.
-    //     */
-    //    @POST
-    //    @Path("deregister")
-    //    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    //    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
-    //    public OAuth2ClientDto deregisterClient (
-    //            @Context SecurityContext securityContext,
-    //            @FormParam("client_id") String clientId) {
-    //        TokenContext context =
-    //                (TokenContext) securityContext.getUserPrincipal();
-    //        try {
-    //            return clientService.deregisterClient(clientId,
-    //                    context.getUsername());
-    //        }
-    //        catch (KustvaktException e) {
-    //            throw responseHandler.throwit(e);
-    //        }
-    //    }
-    //
-    //    @POST
-    //    @Path("deregister")
-    //    @ResourceFilters({ OAuth2ClientAuthenticationFilter.class,
-    //            BlockingFilter.class })
-    //    public OAuth2ClientDto deregisterClient (
-    //            @Context SecurityContext securityContext) {
-    //        TokenContext context =
-    //                (TokenContext) securityContext.getUserPrincipal();
-    //        try {
-    //            return clientService.deregisterClient();
-    //        }
-    //        catch (KustvaktException e) {
-    //            throw responseHandler.throwit(e);
-    //        }
-    //    }
+    /** Deregisters a public client via owner authentication.
+     * 
+     * 
+     * @param securityContext
+     * @param clientId the client id
+     * @return HTTP Response OK if successful.
+     */
+    @DELETE
+    @Path("deregister")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
+    public Response deregisterClient (
+            @Context SecurityContext securityContext,
+            @FormParam("client_id") String clientId) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            clientService.deregisterClient(clientId,
+                    context.getUsername());
+            return Response.ok().build();
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
+    
+
+//    @POST
+//    @Path("deregister")
+//    public OAuth2ClientDto deregisterClient (
+//            @Context SecurityContext securityContext) {
+//        TokenContext context =
+//                (TokenContext) securityContext.getUserPrincipal();
+//        try {
+//            return clientService.deregisterClient();
+//        }
+//        catch (KustvaktException e) {
+//            throw responseHandler.throwit(e);
+//        }
+//    }
 }

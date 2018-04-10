@@ -80,13 +80,13 @@ public class KustvaktException extends Exception {
         this.entity = entity;
     }
     
-    public KustvaktException (int status, String message, String entity, Exception e) {
+    public KustvaktException (int status, String message, String entity, Throwable e) {
         super(message, e);
         this.statusCode = status;
         this.entity = entity;
     }
     
-    public KustvaktException (int status, String message, Exception e) {
+    public KustvaktException (int status, String message, Throwable e) {
         super(message, e);
         this.statusCode = status;
     }

@@ -28,6 +28,8 @@ public class OAuth2Client {
     @Enumerated(EnumType.STRING)
     private OAuth2ClientType type;
     private String url;
+    @Column(name = "url_hashcode")
+    private int urlHashCode;
     @Column(name = "redirect_uri")
     private String redirectURI;
     private String registeredBy;

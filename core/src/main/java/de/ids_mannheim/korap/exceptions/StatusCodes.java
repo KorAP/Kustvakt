@@ -116,7 +116,7 @@ public class StatusCodes {
      */
 
     public static final int CLIENT_REGISTRATION_FAILED = 1800;
-    public static final int CLIENT_REMOVAL_FAILURE = 1801;
+    public static final int CLIENT_DEREGISTRATION_FAILED = 1801;
     public static final int CLIENT_AUTHENTICATION_FAILED = 1802;
     public static final int CLIENT_NOT_FOUND = 1803;
     
