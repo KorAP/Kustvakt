@@ -50,6 +50,16 @@ public class OAuth2ClientService {
 
         String secret = null;
         if (clientJson.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
+            // RFC 6749:
+            // The authorization server MUST NOT issue client passwords or other
+            // client credentials to native application (clients installed and 
+            // executed on the device used by the resource owner e.g. desktop  
+            // application, native mobile application) or user-agent-based
+            // application clients for client authentication.  The authorization
+            // server MAY issue a client password or other credentials
+            // for a specific installation of a native application client on a
+            // specific device.
+
             secret = encryption.createToken();
         }
 
@@ -78,7 +88,7 @@ public class OAuth2ClientService {
     }
 
 
-    public void deregisterClient (String clientId, String username)
+    public void deregisterPublicClient (String clientId, String username)
             throws KustvaktException {
 
         OAuth2Client client = clientDao.retrieveClientById(clientId);
@@ -88,7 +98,9 @@ public class OAuth2ClientService {
         else if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
             throw new KustvaktException(
                     StatusCodes.CLIENT_DEREGISTRATION_FAILED,
-                    "Service is limited to public clients.");
+                    "Service is limited to public clients. To deregister "
+                            + "confidential clients, use service at path: "
+                            + "oauth2/client/deregister/confidential.");
         }
         else if (client.getRegisteredBy().equals(username)) {
             clientDao.deregisterClient(client);
@@ -99,6 +111,12 @@ public class OAuth2ClientService {
         }
     }
 
+
+    public void deregisterConfidentialClient (String authorization,
+            String clientId) throws KustvaktException {
+        OAuth2Client client = authenticateClient(authorization, null, clientId);
+        clientDao.deregisterClient(client);
+    }
 
     public TokenContext requestAccessTokenByClientCredentials (
             String authorization, String grantType) throws KustvaktException {
@@ -120,19 +138,19 @@ public class OAuth2ClientService {
      * 
      * @param authorization
      * @param grantType
-     * @param client_id
+     * @param clientId
      * @return
      * @throws KustvaktException
      */
     public OAuth2Client authenticateClient (String authorization,
-            GrantType grantType, String client_id) throws KustvaktException {
+            GrantType grantType, String clientId) throws KustvaktException {
 
-        OAuth2Client client = clientDao.retrieveClientById(client_id);
+        OAuth2Client client = clientDao.retrieveClientById(clientId);
 
         if (authorization == null || authorization.isEmpty()) {
             if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)
                     || grantType.equals(GrantType.CLIENT_CREDENTIALS)) {
-                new KustvaktException(StatusCodes.CLIENT_AUTHENTICATION_FAILED,
+                throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
                         "Authorization header is not found.");
             }
             // OAuth2 does not require client authentication
@@ -142,9 +160,11 @@ public class OAuth2ClientService {
                     .parseAuthorizationHeaderValue(authorization);
             if (authData.getAuthenticationScheme()
                     .equals(AuthenticationScheme.BASIC)) {
-                if (!client.getSecret().equals(authData.getPassword())) {
-                    new KustvaktException(
-                            StatusCodes.CLIENT_AUTHENTICATION_FAILED,
+                authorizationHandler.parseBasicToken(authData);
+                if (!client.getId().equals(clientId)
+                        || !client.getSecret().equals(authData.getPassword())) {
+                    throw new KustvaktException(
+                            StatusCodes.AUTHENTICATION_FAILED,
                             "Client credentials are incorrect.");
                 }
             }
@@ -158,4 +178,5 @@ public class OAuth2ClientService {
         }
         return client;
     }
+
 }

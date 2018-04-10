@@ -57,14 +57,19 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
-        assertNotNull(node.at("/client_id").asText());
-        assertNotNull(node.at("/client_secret").asText());
+        String clientId = node.at("/client_id").asText();
+        String clientSecret = node.at("/client_secret").asText();
+        assertNotNull(clientId);
+        assertNotNull(clientSecret);
 
         response = testRegisterConfidentialClient();
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         node = JsonUtils.readTree(response.getEntity(String.class));
         assertEquals(StatusCodes.CLIENT_REGISTRATION_FAILED,
                 node.at("/errors/0/0").asInt());
+
+        testDeregisterClientIncorrectCredentials(clientId);
+        testDeregisterConfidentialClient(clientId, clientSecret);
     }
 
     @Test
@@ -113,5 +118,50 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
                 .entity(form).delete(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+
+    private void testDeregisterConfidentialClient (String clientId,
+            String clientSecret) throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("client_id", clientId);
+
+        ClientResponse response = resource().path("oauth2").path("client")
+                .path("deregister").path("confidential")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(clientId,
+                                clientSecret))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).delete(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+
+    private void testDeregisterClientIncorrectCredentials (String clientId)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("client_id", clientId);
+
+        ClientResponse response = resource().path("oauth2").path("client")
+                .path("deregister").path("confidential")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(clientId,
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).delete(ClientResponse.class);
+
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.AUTHENTICATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Client credentials are incorrect.",
+                node.at("/errors/0/1").asText());
     }
 }

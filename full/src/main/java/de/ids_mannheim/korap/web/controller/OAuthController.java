@@ -43,17 +43,14 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.AuthCodeInfo;
-import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.ClientInfo;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.Scopes;
 import de.ids_mannheim.korap.constant.AuthenticationMethod;
 import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.handlers.OAuth2Handler;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
-import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserDetails;
@@ -97,25 +94,25 @@ public class OAuthController {
     }
 
 
-    @POST
-    @Path("unregister")
-    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
-    public Response unregisterClient (@Context SecurityContext context,
-            @HeaderParam("Host") String host,
-            @QueryParam("client_secret") String secret,
-            @QueryParam("client_id") String client_id) {
-        ClientInfo info = new ClientInfo(client_id, secret);
-        info.setUrl(host);
-        TokenContext ctx = (TokenContext) context.getUserPrincipal();
-        try {
-            this.handler.getPersistenceHandler().removeClient(info,
-                    this.controller.getUser(ctx.getUsername()));
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
-        return Response.ok().build();
-    }
+//    @POST
+//    @Path("unregister")
+//    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
+//    public Response unregisterClient (@Context SecurityContext context,
+//            @HeaderParam("Host") String host,
+//            @QueryParam("client_secret") String secret,
+//            @QueryParam("client_id") String client_id) {
+//        ClientInfo info = new ClientInfo(client_id, secret);
+//        info.setUrl(host);
+//        TokenContext ctx = (TokenContext) context.getUserPrincipal();
+//        try {
+//            this.handler.getPersistenceHandler().removeClient(info,
+//                    this.controller.getUser(ctx.getUsername()));
+//        }
+//        catch (KustvaktException e) {
+//            throw kustvaktResponseHandler.throwit(e);
+//        }
+//        return Response.ok().build();
+//    }
 
 
 //    @POST

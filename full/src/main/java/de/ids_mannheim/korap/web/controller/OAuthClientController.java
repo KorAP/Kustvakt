@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.web.controller;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -78,13 +79,13 @@ public class OAuthClientController {
     @Path("deregister")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
-    public Response deregisterClient (
+    public Response deregisterPublicClient (
             @Context SecurityContext securityContext,
             @FormParam("client_id") String clientId) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            clientService.deregisterClient(clientId,
+            clientService.deregisterPublicClient(clientId,
                     context.getUsername());
             return Response.ok().build();
         }
@@ -92,19 +93,21 @@ public class OAuthClientController {
             throw responseHandler.throwit(e);
         }
     }
-    
 
-//    @POST
-//    @Path("deregister")
-//    public OAuth2ClientDto deregisterClient (
-//            @Context SecurityContext securityContext) {
-//        TokenContext context =
-//                (TokenContext) securityContext.getUserPrincipal();
-//        try {
-//            return clientService.deregisterClient();
-//        }
-//        catch (KustvaktException e) {
-//            throw responseHandler.throwit(e);
-//        }
-//    }
+
+    @DELETE
+    @Path("deregister/confidential")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response deregisterConfidentialClient (
+            @Context SecurityContext securityContext,
+            @HeaderParam("Authorization") String authorization,
+            @FormParam("client_id") String clientId) {
+        try {
+            clientService.deregisterConfidentialClient(authorization, clientId);
+            return Response.ok().build();
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
 }
