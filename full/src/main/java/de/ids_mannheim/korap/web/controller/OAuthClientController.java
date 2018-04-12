@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
+import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -27,6 +28,12 @@ import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
 
+/** Defines controllers for OAuth2 clients, namely applications attempting
+ * to access users' resources. 
+ * 
+ * @author margaretha
+ *
+ */
 @Controller
 @Path("/oauth2/client")
 public class OAuthClientController {
@@ -38,7 +45,10 @@ public class OAuthClientController {
 
     /** Registers a client application. Before starting an OAuth process, 
      * client applications have to be registered first. Only registered
-     * users are allowed to register client applications.
+     * users are allowed to register client applications. After registration,
+     * the client will receive a client_id and a client_secret, if the client 
+     * is confidential (capable of storing the client_secret), that are needed 
+     * in the authorization process.
      * 
      * From RFC 6749:
      * The authorization server SHOULD document the size of any identifier 
@@ -46,7 +56,9 @@ public class OAuthClientController {
      * 
      * @param context
      * @param clientJson a JSON object describing the client
-     * @return client id and secret if the client type is confidential
+     * @return client_id and client_secret if the client type is confidential
+     * 
+     * @see OAuth2ClientJson
      */
     @POST
     @Path("register")
@@ -92,6 +104,9 @@ public class OAuthClientController {
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
+        catch (OAuthProblemException e) {
+            throw responseHandler.throwit(e);
+        }
     }
 
 
@@ -107,6 +122,9 @@ public class OAuthClientController {
             return Response.ok().build();
         }
         catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+        catch (OAuthProblemException e) {
             throw responseHandler.throwit(e);
         }
     }

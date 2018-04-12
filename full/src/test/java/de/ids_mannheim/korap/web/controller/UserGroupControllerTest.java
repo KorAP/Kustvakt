@@ -26,6 +26,10 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.input.UserGroupJson;
 
+/**
+ * @author margaretha
+ *
+ */
 public class UserGroupControllerTest extends SpringJerseyTest {
 
     @Autowired

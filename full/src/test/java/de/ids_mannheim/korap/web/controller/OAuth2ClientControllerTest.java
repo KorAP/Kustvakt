@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.http.entity.ContentType;
+import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,6 +28,10 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
+/**
+ * @author margaretha
+ *
+ */
 public class OAuth2ClientControllerTest extends SpringJerseyTest {
 
     @Autowired
@@ -40,7 +45,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         json.setName("OAuth2ClientTest");
         json.setType(OAuth2ClientType.CONFIDENTIAL);
         json.setUrl("http://example.client.com");
-        json.setRedirectURI("http://example.client.com/redirect");
+        json.setRedirectURI("https://example.client.com/redirect");
 
         return resource().path("oauth2").path("client").path("register")
                 .header(Attributes.AUTHORIZATION,
@@ -79,7 +84,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         json.setName("OAuth2PublicClient");
         json.setType(OAuth2ClientType.PUBLIC);
         json.setUrl("http://public.client.com");
-        json.setRedirectURI("http://public.client.com/redirect");
+        json.setRedirectURI("https://public.client.com/redirect");
 
         ClientResponse response = resource().path("oauth2").path("client")
                 .path("register")
@@ -155,13 +160,14 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).delete(ClientResponse.class);
 
-        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-
         String entity = response.getEntity(String.class);
+//        System.out.println(entity);
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.AUTHENTICATION_FAILED,
-                node.at("/errors/0/0").asInt());
-        assertEquals("Client credentials are incorrect.",
-                node.at("/errors/0/1").asText());
+        assertEquals(OAuthError.TokenResponse.INVALID_CLIENT,
+                node.at("/error").asText());
+        assertEquals("Invalid client credentials.",
+                node.at("/error_description").asText());
     }
 }

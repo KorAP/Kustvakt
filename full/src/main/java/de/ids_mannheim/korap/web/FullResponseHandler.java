@@ -3,6 +3,9 @@ package de.ids_mannheim.korap.web;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
+import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
+import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
+import org.apache.oltu.oauth2.common.message.OAuthResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.authentication.http.HttpUnauthorizedHandler;
@@ -43,6 +46,24 @@ public class FullResponseHandler extends CoreResponseHandler {
                     .entity(buildNotification(e)).build();
         }
         return new WebApplicationException(r);
+    }
+
+    public WebApplicationException throwit (OAuthProblemException e) {
+        OAuthResponse or = null;
+        try {
+            or = OAuthResponse.errorResponse(e.getResponseStatus()).error(e)
+                    .buildJSONMessage();
+        }
+        catch (OAuthSystemException e1) {
+            //            return throwit(new KustvaktException(
+            //                    StatusCodes.OAUTH2_SYSTEM_ERROR, e1.getMessage(), e1));
+            return throwit(StatusCodes.OAUTH2_SYSTEM_ERROR, e1.getMessage());
+        }
+
+        Response r = Response.status(or.getResponseStatus())
+                .entity(or.getBody()).build();
+        return new WebApplicationException(r);
+
     }
 
     //    public WebApplicationException throwAuthenticationException (

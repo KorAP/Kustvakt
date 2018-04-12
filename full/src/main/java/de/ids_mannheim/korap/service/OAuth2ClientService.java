@@ -2,8 +2,11 @@ package de.ids_mannheim.korap.service;
 
 import java.sql.SQLException;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.validator.routines.UrlValidator;
-import org.apache.oltu.oauth2.common.message.types.GrantType;
+import org.apache.oltu.oauth2.common.error.OAuthError;
+import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +22,23 @@ import de.ids_mannheim.korap.entity.OAuth2Client;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
+/** According to RFC 6749, an authorization server MUST: 
+ * <ul>
+ * <li>
+ * require client authentication for confidential clients or for any
+ * client that was issued client credentials (or with other authentication 
+ * requirements),
+ * </li>
+ * 
+ * <li>authenticate the client if client authentication is included
+ * </li>
+ * </ul>
+ * 
+ * @author margaretha
+ *
+ */
 @Service
 public class OAuth2ClientService {
 
@@ -31,6 +48,8 @@ public class OAuth2ClientService {
     private AdminDao adminDao;
     @Autowired
     private UrlValidator urlValidator;
+    @Autowired
+    private UrlValidator httpsValidator;
     @Autowired
     private EncryptionIface encryption;
     @Autowired
@@ -45,9 +64,10 @@ public class OAuth2ClientService {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     clientJson.getUrl() + " is invalid.", clientJson.getUrl());
         }
-        if (!urlValidator.isValid(clientJson.getRedirectURI())) {
-            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
-                    clientJson.getRedirectURI() + " is invalid.",
+        if (!httpsValidator.isValid(clientJson.getRedirectURI())) {
+            throw new KustvaktException(StatusCodes.HTTPS_REQUIRED,
+                    clientJson.getRedirectURI()
+                            + " is invalid. RedirectURI requires https.",
                     clientJson.getRedirectURI());
         }
 
@@ -95,9 +115,9 @@ public class OAuth2ClientService {
 
 
     public void deregisterPublicClient (String clientId, String username)
-            throws KustvaktException {
+            throws KustvaktException, OAuthProblemException {
 
-        OAuth2Client client = clientDao.retrieveClientById(clientId);
+        OAuth2Client client = retrieveClientById(clientId);
         if (adminDao.isAdmin(username)) {
             clientDao.deregisterClient(client);
         }
@@ -119,47 +139,34 @@ public class OAuth2ClientService {
 
 
     public void deregisterConfidentialClient (String authorization,
-            String clientId) throws KustvaktException {
-        OAuth2Client client = authenticateClient(authorization, null, clientId);
+            String clientId) throws KustvaktException, OAuthProblemException {
+        OAuth2Client client =
+                authenticateClientByBasicAuthorization(authorization, clientId);
         clientDao.deregisterClient(client);
     }
 
-    public TokenContext requestAccessTokenByClientCredentials (
-            String authorization, String grantType) throws KustvaktException {
-
-        return null;
+    public OAuth2Client authenticateClientById (String clientId)
+            throws OAuthProblemException {
+        if (clientId == null || clientId.isEmpty()) {
+            throw OAuthProblemException
+                    .error(OAuthError.TokenResponse.INVALID_REQUEST)
+                    .description("client_id is missing.")
+                    .responseStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
+        else {
+            return retrieveClientById(clientId);
+        }
     }
 
-    /** According to RFC 6749, an authorization server MUST: 
-     * <ul>
-     * <li>
-     * require client authentication for confidential clients or for any
-     * client that was issued client credentials (or with other authentication 
-     * requirements),
-     * </li>
-     * 
-     * <li>authenticate the client if client authentication is included
-     * </li>
-     * </ul>
-     * 
-     * @param authorization
-     * @param grantType
-     * @param clientId
-     * @return
-     * @throws KustvaktException
-     */
-    public OAuth2Client authenticateClient (String authorization,
-            GrantType grantType, String clientId) throws KustvaktException {
-
-        OAuth2Client client = clientDao.retrieveClientById(clientId);
+    public OAuth2Client authenticateClientByBasicAuthorization (
+            String authorization, String clientId)
+            throws KustvaktException, OAuthProblemException {
 
         if (authorization == null || authorization.isEmpty()) {
-            if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)
-                    || grantType.equals(GrantType.CLIENT_CREDENTIALS)) {
-                throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
-                        "Authorization header is not found.");
-            }
-            // OAuth2 does not require client authentication
+            throw OAuthProblemException
+                    .error(OAuthError.TokenResponse.INVALID_REQUEST)
+                    .description("Authorization header is not found.")
+                    .responseStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
         else {
             AuthorizationData authData = authorizationHandler
@@ -167,24 +174,64 @@ public class OAuth2ClientService {
             if (authData.getAuthenticationScheme()
                     .equals(AuthenticationScheme.BASIC)) {
                 authorizationHandler.parseBasicToken(authData);
-                if (!client.getId().equals(clientId)
-                        || !encryption.checkHash(authData.getPassword(),
-                                client.getSecret(),
-                                config.getPasscodeSaltField())) {
-                    throw new KustvaktException(
-                            StatusCodes.AUTHENTICATION_FAILED,
-                            "Client credentials are incorrect.");
-                }
+                return verifyClientCredentials(clientId, authData);
             }
             else {
-                throw new KustvaktException(
-                        StatusCodes.UNSUPPORTED_AUTHENTICATION_SCHEME,
-                        authData.getAuthenticationScheme().displayName()
-                                + "is unsupported for client authentication.",
-                        authData.getAuthenticationScheme().displayName());
+                throw OAuthProblemException
+                        .error(OAuthError.TokenResponse.INVALID_CLIENT)
+                        .description(
+                                "Client authentication with "
+                                        + authData.getAuthenticationScheme()
+                                                .displayName()
+                                        + "is not supported")
+                        .responseStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
         }
-        return client;
     }
 
+    private OAuth2Client verifyClientCredentials (String clientId,
+            AuthorizationData authData) throws OAuthProblemException {
+
+        try {
+            OAuth2Client client = retrieveClientById(authData.getUsername());
+            // EM: not sure if this is necessary
+            if (clientId != null && !clientId.isEmpty()) {
+                if (!client.getId().equals(clientId)) {
+                    throw new KustvaktException(
+                            StatusCodes.CLIENT_AUTHENTICATION_FAILED);
+                }
+            }
+            if (!encryption.checkHash(authData.getPassword(),
+                    client.getSecret(), config.getPasscodeSaltField())) {
+                throw new KustvaktException(
+                        StatusCodes.CLIENT_AUTHENTICATION_FAILED);
+            }
+            return client;
+        }
+        catch (Exception e) {
+            throw OAuthProblemException
+                    .error(OAuthError.TokenResponse.INVALID_CLIENT)
+                    .description("Invalid client credentials.")
+                    .responseStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
+    }
+
+    public OAuth2Client retrieveClientById (String clientId)
+            throws OAuthProblemException {
+        try {
+            return clientDao.retrieveClientById(clientId);
+        }
+        catch (KustvaktException e) {
+            throw OAuthProblemException
+                    .error(OAuthError.TokenResponse.INVALID_REQUEST)
+                    .description(e.getMessage() + "is missing.")
+                    .responseStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
+        catch (Exception e) {
+            throw OAuthProblemException
+                    .error(OAuthError.TokenResponse.INVALID_CLIENT)
+                    .description("Invalid client credentials.")
+                    .responseStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
+    }
 }

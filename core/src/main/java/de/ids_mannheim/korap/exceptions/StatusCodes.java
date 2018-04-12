@@ -23,6 +23,7 @@ public class StatusCodes {
     public static final int INVALID_ARGUMENT = 107;
     public static final int NOT_SUPPORTED = 108;
     public static final int NOT_ALLOWED = 109;
+    public static final int HTTPS_REQUIRED = 110;
 
     /**
      * 300 status codes for query language and serialization
@@ -115,10 +116,12 @@ public class StatusCodes {
      * 1800 Oauth2
      */
 
-    public static final int CLIENT_REGISTRATION_FAILED = 1800;
-    public static final int CLIENT_DEREGISTRATION_FAILED = 1801;
-    public static final int CLIENT_AUTHENTICATION_FAILED = 1802;
-    public static final int CLIENT_NOT_FOUND = 1803;
+    public static final int OAUTH2_SYSTEM_ERROR = 1800;
+    
+    public static final int CLIENT_REGISTRATION_FAILED = 1801;
+    public static final int CLIENT_DEREGISTRATION_FAILED = 1802;
+    public static final int CLIENT_AUTHENTICATION_FAILED = 1803;
+    public static final int CLIENT_NOT_FOUND = 1804;
     
     public static final int UNSUPPORTED_GRANT_TYPE = 1810;
     

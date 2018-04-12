@@ -26,6 +26,10 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.input.UserGroupJson;
 
+/**
+ * @author margaretha
+ *
+ */
 public class UserGroupControllerAdminTest extends SpringJerseyTest {
     @Autowired
     private HttpAuthorizationHandler handler;

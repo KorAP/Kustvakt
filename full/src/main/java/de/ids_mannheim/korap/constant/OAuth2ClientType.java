@@ -14,6 +14,7 @@ public enum OAuth2ClientType {
 //    credentials (e.g., clients executing on the device used by the
 //    resource owner, such as an installed native application or a web
 //    browser-based application), and incapable of secure client
-//    authentication via any other means.
+//    authentication via any other means. Mobile and Javascript apps 
+//    are considered public clients. 
     PUBLIC;
 }

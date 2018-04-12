@@ -24,6 +24,10 @@ import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
+/**
+ * @author margaretha
+ *
+ */
 public class VirtualCorpusControllerAdminTest extends SpringJerseyTest {
 
     @Autowired

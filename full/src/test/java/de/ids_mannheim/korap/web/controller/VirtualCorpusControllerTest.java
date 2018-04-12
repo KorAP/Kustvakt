@@ -37,6 +37,10 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.service.VirtualCorpusServiceTest;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
+/**
+ * @author margaretha
+ *
+ */
 public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
     @Autowired
