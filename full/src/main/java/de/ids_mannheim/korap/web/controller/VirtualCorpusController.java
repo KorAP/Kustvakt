@@ -28,7 +28,7 @@ import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.VirtualCorpusService;
-import de.ids_mannheim.korap.web.FullResponseHandler;
+import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
@@ -55,7 +55,7 @@ import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
 public class VirtualCorpusController {
 
     @Autowired
-    private FullResponseHandler responseHandler;
+    private KustvaktExceptionHandler responseHandler;
     @Autowired
     private VirtualCorpusService service;
 

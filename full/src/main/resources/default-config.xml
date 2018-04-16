@@ -181,9 +181,13 @@
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
 
-	<bean id="kustvakt_response" class="de.ids_mannheim.korap.web.FullResponseHandler">
+	<bean id="kustvaktResponseHandler" class="de.ids_mannheim.korap.web.KustvaktExceptionHandler">
 		<constructor-arg index="0" name="iface" ref="kustvakt_auditing" />
 	</bean>
+	<bean id="oauth2_exception" class="de.ids_mannheim.korap.web.OAuth2ExceptionHandler">
+		<constructor-arg index="0" name="iface" ref="kustvakt_auditing" />
+	</bean>
+
 
 	<bean id="kustvakt_userdb" class="de.ids_mannheim.korap.handlers.EntityDao">
 		<constructor-arg ref="kustvakt_db" />

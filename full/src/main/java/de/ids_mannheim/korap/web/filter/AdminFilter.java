@@ -27,7 +27,7 @@ import de.ids_mannheim.korap.security.context.KustvaktContext;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.StringUtils;
-import de.ids_mannheim.korap.web.FullResponseHandler;
+import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
 
 /**
  * @author hanl, margaretha
@@ -46,7 +46,7 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
     private AuthenticationManagerIface authManager;
 
     @Autowired
-    private FullResponseHandler kustvaktResponseHandler;
+    private KustvaktExceptionHandler kustvaktResponseHandler;
 
     @Autowired
     private HttpAuthorizationHandler authorizationHandler;

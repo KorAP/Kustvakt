@@ -4,6 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+import java.util.Set;
+import java.util.Map.Entry;
+
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.http.entity.ContentType;
@@ -18,6 +22,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+import com.sun.jersey.spi.container.ContainerRequest;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -38,6 +43,18 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
     private HttpAuthorizationHandler handler;
     private String username = "OAuth2ClientControllerTest";
 
+    private void checkWWWAuthenticateHeader (ClientResponse response) {
+        Set<Entry<String, List<String>>> headers =
+                response.getHeaders().entrySet();
+
+        for (Entry<String, List<String>> header : headers) {
+            if (header.getKey().equals(ContainerRequest.WWW_AUTHENTICATE)) {
+                assertEquals("Basic realm=\"Kustvakt\"",
+                        header.getValue().get(0));
+            }
+        }
+    }
+    
     private ClientResponse testRegisterConfidentialClient ()
             throws KustvaktException {
 
@@ -70,8 +87,8 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         response = testRegisterConfidentialClient();
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         node = JsonUtils.readTree(response.getEntity(String.class));
-        assertEquals(StatusCodes.CLIENT_REGISTRATION_FAILED,
-                node.at("/errors/0/0").asInt());
+        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
+                node.at("/error").asText());
 
         testDeregisterClientIncorrectCredentials(clientId);
         testDeregisterConfidentialClient(clientId, clientSecret);
@@ -161,7 +178,6 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
                 .entity(form).delete(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
-//        System.out.println(entity);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         
         JsonNode node = JsonUtils.readTree(entity);
@@ -169,5 +185,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
                 node.at("/error").asText());
         assertEquals("Invalid client credentials.",
                 node.at("/error_description").asText());
+        
+        checkWWWAuthenticateHeader(response);
     }
 }

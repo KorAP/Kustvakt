@@ -49,10 +49,10 @@ public class OAuth2ClientDao {
     }
 
     public OAuth2Client retrieveClientById (String clientId)
-            throws Exception {
+            throws KustvaktException {
 
         ParameterChecker.checkStringValue(clientId, "client_id");
-        
+
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<OAuth2Client> query =
                 builder.createQuery(OAuth2Client.class);
@@ -62,13 +62,13 @@ public class OAuth2ClientDao {
         query.where(builder.equal(root.get(OAuth2Client_.id), clientId));
 
         Query q = entityManager.createQuery(query);
-//        try {
+        try {
             return (OAuth2Client) q.getSingleResult();
-//        }
-//        catch (NoResultException e) {
-//            throw new KustvaktException(StatusCodes.CLIENT_NOT_FOUND,
-//                    "Client with id " + clientId + " is not found");
-//        }
+        }
+        catch (Exception e) {
+            throw new KustvaktException(StatusCodes.CLIENT_NOT_FOUND,
+                    e.getMessage(), "invalid_client");
+        }
     }
 
     public void deregisterClient (OAuth2Client client) {

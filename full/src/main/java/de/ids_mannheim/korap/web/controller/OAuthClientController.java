@@ -12,7 +12,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -22,7 +21,8 @@ import de.ids_mannheim.korap.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.OAuth2ClientService;
-import de.ids_mannheim.korap.web.FullResponseHandler;
+import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
+import de.ids_mannheim.korap.web.OAuth2ExceptionHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
@@ -41,7 +41,7 @@ public class OAuthClientController {
     @Autowired
     private OAuth2ClientService clientService;
     @Autowired
-    private FullResponseHandler responseHandler;
+    private OAuth2ExceptionHandler responseHandler;
 
     /** Registers a client application. Before starting an OAuth process, 
      * client applications have to be registered first. Only registered
@@ -104,9 +104,6 @@ public class OAuthClientController {
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
-        catch (OAuthProblemException e) {
-            throw responseHandler.throwit(e);
-        }
     }
 
 
@@ -122,9 +119,6 @@ public class OAuthClientController {
             return Response.ok().build();
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
-        }
-        catch (OAuthProblemException e) {
             throw responseHandler.throwit(e);
         }
     }

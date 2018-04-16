@@ -21,6 +21,7 @@ import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.entity.OAuth2Client;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 
 @Service
 public class OAuth2Service {
@@ -52,29 +53,26 @@ public class OAuth2Service {
      * @throws OAuthSystemException 
      */
     public OAuthResponse requestAccessToken (HttpServletRequest request,
-            String authorization, GrantType grantType, String authorizationCode,
+            String authorization, String grantType, String authorizationCode,
             String redirectURI, String clientId, String username,
-            String password, String scope)
-            throws KustvaktException, OAuthProblemException {
+            String password, String scope) throws KustvaktException {
 
-        if (grantType.equals(GrantType.AUTHORIZATION_CODE)) {
+        if (grantType.equals(GrantType.AUTHORIZATION_CODE.toString())) {
             return requestAccessTokenWithAuthorizationCode(authorization,
                     authorizationCode, redirectURI, clientId);
         }
-        else if (grantType.equals(GrantType.PASSWORD)) {
+        else if (grantType.equals(GrantType.PASSWORD.toString())) {
             return requestAccessTokenWithPassword(authorization, username,
                     password, scope);
         }
-        else if (grantType.equals(GrantType.CLIENT_CREDENTIALS)) {
+        else if (grantType.equals(GrantType.CLIENT_CREDENTIALS.toString())) {
             return requestAccessTokenWithClientCredentials(authorization,
                     scope);
         }
         else {
-            throw OAuthProblemException
-                    .error(OAuthError.TokenResponse.UNSUPPORTED_GRANT_TYPE)
-                    .description(grantType.name() + "is not supported.")
-                    .responseStatus(HttpServletResponse.SC_BAD_REQUEST);
-
+            throw new KustvaktException(StatusCodes.UNSUPPORTED_GRANT_TYPE,
+                    grantType + " is not supported.",
+                    OAuthError.TokenResponse.UNSUPPORTED_GRANT_TYPE);
         }
 
     }
@@ -92,16 +90,15 @@ public class OAuth2Service {
      */
     private OAuthResponse requestAccessTokenWithAuthorizationCode (
             String authorization, String authorizationCode, String redirectURI,
-            String clientId) throws KustvaktException, OAuthProblemException {
+            String clientId) throws KustvaktException {
         OAuth2Client client;
         if (authorization == null || authorization.isEmpty()) {
             client = clientService.authenticateClientById(clientId);
             if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
-                throw OAuthProblemException
-                        .error(OAuthError.TokenResponse.INVALID_CLIENT)
-                        .description("Client authentication using "
-                                + "authorization header is required.")
-                        .responseStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                throw new KustvaktException(
+                        StatusCodes.CLIENT_AUTHENTICATION_FAILED,
+                        "Client authentication using authorization header is required.",
+                        OAuthError.TokenResponse.INVALID_CLIENT);
             }
         }
         else {
@@ -138,15 +135,13 @@ public class OAuth2Service {
      * @throws KustvaktException 
      */
     private OAuthResponse requestAccessTokenWithClientCredentials (
-            String authorization, String scope)
-            throws OAuthProblemException, KustvaktException {
+            String authorization, String scope) throws KustvaktException {
 
         if (authorization == null || authorization.isEmpty()) {
-            throw OAuthProblemException
-                    .error(OAuthError.TokenResponse.INVALID_CLIENT)
-                    .description("Client authentication using "
-                            + "authorization header is required.")
-                    .responseStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            throw new KustvaktException(
+                    StatusCodes.CLIENT_AUTHENTICATION_FAILED,
+                    "Client authentication using authorization header is required.",
+                    OAuthError.TokenResponse.INVALID_CLIENT);
         }
         else {
             OAuth2Client client =

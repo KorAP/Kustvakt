@@ -2,8 +2,6 @@ package de.ids_mannheim.korap.service;
 
 import java.sql.SQLException;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
@@ -62,13 +60,14 @@ public class OAuth2ClientService {
             String registeredBy) throws KustvaktException {
         if (!urlValidator.isValid(clientJson.getUrl())) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
-                    clientJson.getUrl() + " is invalid.", clientJson.getUrl());
+                    clientJson.getUrl() + " is invalid.",
+                    OAuthError.TokenResponse.INVALID_REQUEST);
         }
         if (!httpsValidator.isValid(clientJson.getRedirectURI())) {
             throw new KustvaktException(StatusCodes.HTTPS_REQUIRED,
                     clientJson.getRedirectURI()
                             + " is invalid. RedirectURI requires https.",
-                    clientJson.getRedirectURI());
+                    OAuthError.TokenResponse.INVALID_REQUEST);
         }
 
         String secret = null;
@@ -104,7 +103,8 @@ public class OAuth2ClientService {
                 if (cause instanceof SQLException) {
                     throw new KustvaktException(
                             StatusCodes.CLIENT_REGISTRATION_FAILED,
-                            cause.getMessage(), cause);
+                            cause.getMessage(),
+                            OAuthError.TokenResponse.INVALID_REQUEST);
                 }
                 lastCause = cause;
             }
@@ -115,7 +115,7 @@ public class OAuth2ClientService {
 
 
     public void deregisterPublicClient (String clientId, String username)
-            throws KustvaktException, OAuthProblemException {
+            throws KustvaktException {
 
         OAuth2Client client = retrieveClientById(clientId);
         if (adminDao.isAdmin(username)) {
@@ -126,7 +126,8 @@ public class OAuth2ClientService {
                     StatusCodes.CLIENT_DEREGISTRATION_FAILED,
                     "Service is limited to public clients. To deregister "
                             + "confidential clients, use service at path: "
-                            + "oauth2/client/deregister/confidential.");
+                            + "oauth2/client/deregister/confidential.",
+                    OAuthError.TokenResponse.INVALID_REQUEST);
         }
         else if (client.getRegisteredBy().equals(username)) {
             clientDao.deregisterClient(client);
@@ -139,19 +140,19 @@ public class OAuth2ClientService {
 
 
     public void deregisterConfidentialClient (String authorization,
-            String clientId) throws KustvaktException, OAuthProblemException {
+            String clientId) throws KustvaktException {
         OAuth2Client client =
                 authenticateClientByBasicAuthorization(authorization, clientId);
         clientDao.deregisterClient(client);
     }
 
     public OAuth2Client authenticateClientById (String clientId)
-            throws OAuthProblemException {
+            throws KustvaktException {
         if (clientId == null || clientId.isEmpty()) {
-            throw OAuthProblemException
-                    .error(OAuthError.TokenResponse.INVALID_REQUEST)
-                    .description("client_id is missing.")
-                    .responseStatus(HttpServletResponse.SC_BAD_REQUEST);
+            throw new KustvaktException(
+                    StatusCodes.CLIENT_AUTHENTICATION_FAILED,
+                    "client_id is missing.",
+                    OAuthError.TokenResponse.INVALID_CLIENT);
         }
         else {
             return retrieveClientById(clientId);
@@ -159,14 +160,13 @@ public class OAuth2ClientService {
     }
 
     public OAuth2Client authenticateClientByBasicAuthorization (
-            String authorization, String clientId)
-            throws KustvaktException, OAuthProblemException {
+            String authorization, String clientId) throws KustvaktException {
 
         if (authorization == null || authorization.isEmpty()) {
-            throw OAuthProblemException
-                    .error(OAuthError.TokenResponse.INVALID_REQUEST)
-                    .description("Authorization header is not found.")
-                    .responseStatus(HttpServletResponse.SC_BAD_REQUEST);
+            throw new KustvaktException(
+                    StatusCodes.CLIENT_AUTHENTICATION_FAILED,
+                    "Authorization header is not found.",
+                    OAuthError.TokenResponse.INVALID_CLIENT);
         }
         else {
             AuthorizationData authData = authorizationHandler
@@ -177,61 +177,41 @@ public class OAuth2ClientService {
                 return verifyClientCredentials(clientId, authData);
             }
             else {
-                throw OAuthProblemException
-                        .error(OAuthError.TokenResponse.INVALID_CLIENT)
-                        .description(
-                                "Client authentication with "
-                                        + authData.getAuthenticationScheme()
-                                                .displayName()
-                                        + "is not supported")
-                        .responseStatus(HttpServletResponse.SC_BAD_REQUEST);
+                throw new KustvaktException(
+                        StatusCodes.CLIENT_AUTHENTICATION_FAILED,
+                        "Client authentication with " + authData
+                                .getAuthenticationScheme().displayName()
+                                + "is not supported",
+                        "invalid_client");
             }
         }
     }
 
     private OAuth2Client verifyClientCredentials (String clientId,
-            AuthorizationData authData) throws OAuthProblemException {
+            AuthorizationData authData) throws KustvaktException {
 
-        try {
-            OAuth2Client client = retrieveClientById(authData.getUsername());
-            // EM: not sure if this is necessary
-            if (clientId != null && !clientId.isEmpty()) {
-                if (!client.getId().equals(clientId)) {
-                    throw new KustvaktException(
-                            StatusCodes.CLIENT_AUTHENTICATION_FAILED);
-                }
-            }
-            if (!encryption.checkHash(authData.getPassword(),
-                    client.getSecret(), config.getPasscodeSaltField())) {
+        OAuth2Client client = retrieveClientById(authData.getUsername());
+        // EM: not sure if this is necessary
+        if (clientId != null && !clientId.isEmpty()) {
+            if (!client.getId().equals(clientId)) {
                 throw new KustvaktException(
-                        StatusCodes.CLIENT_AUTHENTICATION_FAILED);
+                        StatusCodes.CLIENT_AUTHENTICATION_FAILED,
+                        "Invalid client credentials.",
+                        OAuthError.TokenResponse.INVALID_CLIENT);
             }
-            return client;
         }
-        catch (Exception e) {
-            throw OAuthProblemException
-                    .error(OAuthError.TokenResponse.INVALID_CLIENT)
-                    .description("Invalid client credentials.")
-                    .responseStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        if (!encryption.checkHash(authData.getPassword(), client.getSecret(),
+                config.getPasscodeSaltField())) {
+            throw new KustvaktException(
+                    StatusCodes.CLIENT_AUTHENTICATION_FAILED,
+                    "Invalid client credentials.",
+                    OAuthError.TokenResponse.INVALID_CLIENT);
         }
+        return client;
     }
 
     public OAuth2Client retrieveClientById (String clientId)
-            throws OAuthProblemException {
-        try {
-            return clientDao.retrieveClientById(clientId);
-        }
-        catch (KustvaktException e) {
-            throw OAuthProblemException
-                    .error(OAuthError.TokenResponse.INVALID_REQUEST)
-                    .description(e.getMessage() + "is missing.")
-                    .responseStatus(HttpServletResponse.SC_BAD_REQUEST);
-        }
-        catch (Exception e) {
-            throw OAuthProblemException
-                    .error(OAuthError.TokenResponse.INVALID_CLIENT)
-                    .description("Invalid client credentials.")
-                    .responseStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        }
+            throws KustvaktException {
+        return clientDao.retrieveClientById(clientId);
     }
 }

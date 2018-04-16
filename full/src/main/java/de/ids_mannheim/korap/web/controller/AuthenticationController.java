@@ -44,7 +44,7 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.ServiceInfo;
-import de.ids_mannheim.korap.web.FullResponseHandler;
+import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
@@ -63,7 +63,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 public class AuthenticationController {
 
     @Autowired
-    private FullResponseHandler kustvaktResponseHandler;
+    private KustvaktExceptionHandler kustvaktExceptionHandler;
     
     @Autowired
     private HttpAuthorizationHandler authorizationHandler;
@@ -102,7 +102,7 @@ public class AuthenticationController {
             return Response.ok(JsonUtils.toJSON(m)).build();
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 
@@ -121,7 +121,7 @@ public class AuthenticationController {
             return Response.ok(ctx.toJson()).build();
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
     
@@ -158,7 +158,7 @@ public class AuthenticationController {
             return Response.ok(context.toJson()).build();
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 
@@ -178,7 +178,7 @@ public class AuthenticationController {
         List<String> auth =
                 headers.getRequestHeader(ContainerRequest.AUTHORIZATION);
         if (auth == null || auth.isEmpty()) {
-            throw kustvaktResponseHandler
+            throw kustvaktExceptionHandler
                     .throwit(new KustvaktException(StatusCodes.MISSING_ARGUMENT,
                             "Authorization header is missing.",
                             "Authorization header"));
@@ -197,7 +197,7 @@ public class AuthenticationController {
            
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
 
         if (DEBUG_LOG == true) {
@@ -240,7 +240,7 @@ public class AuthenticationController {
                 authorizationData.getPassword()== null || 
                 authorizationData.getPassword().isEmpty())
             // is actual an invalid request
-            throw kustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
+            throw kustvaktExceptionHandler.throwit(StatusCodes.REQUEST_INVALID);
 
         Map<String, Object> attr = new HashMap<>();
         if (scopes != null && !scopes.isEmpty())
@@ -268,14 +268,14 @@ public class AuthenticationController {
 //                    Attributes.API_AUTHENTICATION);
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
 
         try {
             return Response.ok(context.toJson()).build();
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 
@@ -318,7 +318,7 @@ public class AuthenticationController {
            
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
 
         // Implementation Hanl mit '|'. 16.02.17/FB
@@ -329,7 +329,7 @@ public class AuthenticationController {
                 authorizationData.getPassword()== null || 
                 authorizationData.getPassword().isEmpty())
             // is actual an invalid request
-            throw kustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
+            throw kustvaktExceptionHandler.throwit(StatusCodes.REQUEST_INVALID);
 
         Map<String, Object> attr = new HashMap<>();
         attr.put(Attributes.HOST, host);
@@ -348,7 +348,7 @@ public class AuthenticationController {
             jlog.debug(contextJson);
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
         return Response.ok().entity(contextJson).build();
     }
@@ -382,13 +382,13 @@ public class AuthenticationController {
             context = controller.createTokenContext(user, attr, null);
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
         try {
             return Response.ok().entity(context.toJson()).build();
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 
@@ -406,7 +406,7 @@ public class AuthenticationController {
         }
         catch (KustvaktException e) {
             jlog.error("Logout Exception: {}", e.string());
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
         return Response.ok().build();
     }

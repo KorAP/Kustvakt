@@ -19,7 +19,7 @@ import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.security.context.KustvaktContext;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.utils.TimeUtils;
-import de.ids_mannheim.korap.web.FullResponseHandler;
+import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
 
 /**
  * @author hanl, margaretha
@@ -38,7 +38,7 @@ public class AuthenticationFilter
     private AuthenticationManagerIface authenticationManager;
 
     @Autowired
-    private FullResponseHandler kustvaktResponseHandler;
+    private KustvaktExceptionHandler kustvaktResponseHandler;
 
     @Override
     public ContainerRequest filter (ContainerRequest request) {

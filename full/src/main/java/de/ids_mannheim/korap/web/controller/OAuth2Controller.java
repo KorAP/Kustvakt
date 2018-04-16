@@ -14,23 +14,20 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.http.HttpHeaders;
-import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
-import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.OAuthResponse;
-import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.service.OAuth2Service;
-import de.ids_mannheim.korap.web.FullResponseHandler;
+import de.ids_mannheim.korap.web.OAuth2ExceptionHandler;
 
 @Controller
 @Path("/oauth2")
 public class OAuth2Controller {
 
     @Autowired
-    private FullResponseHandler responseHandler;
+    private OAuth2ExceptionHandler responseHandler;
     @Autowired
     private OAuth2Service oauth2Service;
 
@@ -59,7 +56,7 @@ public class OAuth2Controller {
             @Context SecurityContext securityContext,
             @HeaderParam("Authorization") String authorization,
             // required for all grants
-            @FormParam("grant_type") GrantType grantType,
+            @FormParam("grant_type") String grantType,
             // required for Authorization Code Grant
             @FormParam("code") String authorizationCode,
             @FormParam("redirect_uri") String redirectURI,
@@ -83,9 +80,6 @@ public class OAuth2Controller {
             return builder.build();
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
-        }
-        catch (OAuthProblemException e) {
             throw responseHandler.throwit(e);
         }
     }

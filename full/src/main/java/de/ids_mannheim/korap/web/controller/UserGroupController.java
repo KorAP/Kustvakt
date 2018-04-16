@@ -26,7 +26,7 @@ import de.ids_mannheim.korap.dto.UserGroupDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.UserGroupService;
-import de.ids_mannheim.korap.web.FullResponseHandler;
+import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
@@ -50,7 +50,7 @@ import de.ids_mannheim.korap.web.input.UserGroupJson;
 public class UserGroupController {
 
     @Autowired
-    private FullResponseHandler responseHandler;
+    private KustvaktExceptionHandler responseHandler;
     @Autowired
     private UserGroupService service;
 

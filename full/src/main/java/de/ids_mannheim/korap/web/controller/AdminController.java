@@ -26,7 +26,7 @@ import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.server.KustvaktServer;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
-import de.ids_mannheim.korap.web.CoreResponseHandler;
+import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
 import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 
@@ -49,7 +49,7 @@ public class AdminController {
     private AuditingIface auditingController;
 
     @Autowired
-    CoreResponseHandler kustvaktResponseHandler;
+    private KustvaktExceptionHandler kustvaktExceptionHandler;
 
     // EM: not documented and tested, not sure what the purpose of the service is
     @GET
@@ -75,7 +75,7 @@ public class AdminController {
             integer_limit = Integer.valueOf(limit);
         }
         catch (NumberFormatException | NullPointerException e) {
-            throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT);
+            throw kustvaktExceptionHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT);
         }
         String result="";
         try {
@@ -84,7 +84,7 @@ public class AdminController {
                     until_date, dayOnly, integer_limit));
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
         // limit number of records to return
         return Response.ok(result).build();

@@ -18,12 +18,12 @@ import de.ids_mannheim.korap.interfaces.db.AuditingIface;
  * @author margaretha
  *
  */
-public class FullResponseHandler extends CoreResponseHandler {
+public class KustvaktExceptionHandler extends CoreResponseHandler {
 
     @Autowired
     private HttpUnauthorizedHandler handler;
 
-    public FullResponseHandler (AuditingIface iface) {
+    public KustvaktExceptionHandler (AuditingIface iface) {
         super(iface);
     }
 

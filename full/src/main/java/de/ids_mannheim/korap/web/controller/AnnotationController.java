@@ -22,7 +22,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.service.AnnotationService;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.CoreResponseHandler;
+import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 
@@ -39,7 +39,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 public class AnnotationController {
 
     @Autowired
-    CoreResponseHandler responseHandler;
+    private KustvaktExceptionHandler responseHandler;
 
     @Autowired
     private AnnotationService annotationService;

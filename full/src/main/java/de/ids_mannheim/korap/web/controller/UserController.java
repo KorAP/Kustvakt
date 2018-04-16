@@ -52,7 +52,7 @@ import de.ids_mannheim.korap.user.Userdata;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
-import de.ids_mannheim.korap.web.FullResponseHandler;
+import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
@@ -71,7 +71,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 public class UserController {
 
     @Autowired
-    private FullResponseHandler kustvaktResponseHandler;
+    private KustvaktExceptionHandler kustvaktExceptionHandler;
 
     private static Logger jlog = LoggerFactory.getLogger(UserController.class);
     @Autowired
@@ -104,7 +104,7 @@ public class UserController {
             user = controller.createUserAccount(values, true);
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
         URIParam uri = user.getField(URIParam.class);
         if (uri.hasValues()) {
@@ -123,13 +123,13 @@ public class UserController {
                 return Response.ok(JsonUtils.toJSON(object)).build();
             }
             catch (KustvaktException e) {
-                throw kustvaktResponseHandler.throwit(e);
+                throw kustvaktExceptionHandler.throwit(e);
             }
         }
         else {
             jlog.error("Failed creating confirmation and expiry tokens.");
             // EM: why illegal argument when uri fragment/param is self-generated 
-            throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+            throw kustvaktExceptionHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     "failed to validate uri parameter",
                     "confirmation fragment");
         }
@@ -157,7 +157,7 @@ public class UserController {
             //            controller.updateAccount(user);
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -169,10 +169,10 @@ public class UserController {
     public Response confirmRegistration (@QueryParam("uri") String uritoken,
             @Context Locale locale, @QueryParam("user") String username) {
         if (uritoken == null || uritoken.isEmpty())
-            throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+            throw kustvaktExceptionHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     "parameter missing", "uri parameter");
         if (username == null || username.isEmpty())
-            throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+            throw kustvaktExceptionHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     "parameter missing", "Username");
 
         try {
@@ -180,7 +180,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             e.printStackTrace();
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -198,7 +198,7 @@ public class UserController {
             node = JsonUtils.readTree(json);
         }
         catch (KustvaktException e1) {
-            throw kustvaktResponseHandler.throwit(e1);
+            throw kustvaktExceptionHandler.throwit(e1);
         }
         StringBuilder builder = new StringBuilder();
         String username, email;
@@ -227,7 +227,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             jlog.error("Eoxception encountered!", e.string());
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
 
         ObjectNode obj = JsonUtils.createObjectNode();
@@ -237,7 +237,7 @@ public class UserController {
             return Response.ok(JsonUtils.toJSON(obj)).build();
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 
@@ -282,7 +282,7 @@ public class UserController {
             return Response.ok(m.toEntity()).build();
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 
@@ -303,7 +303,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
         return Response.ok(result).build();
     }
@@ -339,7 +339,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
 
         return Response.ok().build();
@@ -365,7 +365,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered: {}", e.string());
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
         return Response.ok(result).build();
     }
@@ -396,7 +396,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -452,13 +452,13 @@ public class UserController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
         try {
             return Response.ok(JsonUtils.toJSON(add)).build();
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 
@@ -475,7 +475,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -499,7 +499,7 @@ public class UserController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered!", e);
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
         return Response.ok(queryStr).build();
     }

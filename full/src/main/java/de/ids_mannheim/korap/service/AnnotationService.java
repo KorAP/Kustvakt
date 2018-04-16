@@ -15,7 +15,6 @@ import de.ids_mannheim.korap.dto.converter.AnnotationConverter;
 import de.ids_mannheim.korap.entity.AnnotationPair;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.controller.AnnotationController;
 
 /** AnnotationService defines the logic behind {@link AnnotationController}.
@@ -28,9 +27,6 @@ public class AnnotationService {
 
     private static Logger jlog =
             LoggerFactory.getLogger(AnnotationService.class);
-
-    @Autowired
-    CoreResponseHandler kustvaktResponseHandler;
 
     @Autowired
     private AnnotationDao annotationDao;
@@ -68,9 +64,8 @@ public class AnnotationService {
                 }
                 else {
                     jlog.error("Annotation code is wrong: " + annotationCode);
-                    kustvaktResponseHandler.throwit(
-                            new KustvaktException(StatusCodes.INVALID_ATTRIBUTE,
-                                    "Bad attribute:", code));
+                    throw new KustvaktException(StatusCodes.INVALID_ATTRIBUTE,
+                            "Bad attribute:", code);
                 }
 
                 annotationPairs.addAll(annotationDao

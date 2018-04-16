@@ -1,25 +1,30 @@
 package de.ids_mannheim.korap.web.controller;
 
-import com.sun.jersey.spi.container.ResourceFilters;
-import de.ids_mannheim.korap.config.BeansFactory;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.handlers.DocumentDao;
-import de.ids_mannheim.korap.resources.Document;
-import de.ids_mannheim.korap.server.KustvaktServer;
-import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
-import de.ids_mannheim.korap.web.CoreResponseHandler;
-import de.ids_mannheim.korap.web.filter.AdminFilter;
+import java.util.List;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.List;
+import com.sun.jersey.spi.container.ResourceFilters;
+
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.handlers.DocumentDao;
+import de.ids_mannheim.korap.resources.Document;
+import de.ids_mannheim.korap.server.KustvaktServer;
+import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
+import de.ids_mannheim.korap.web.filter.AdminFilter;
 
 /**
  * EM: To Do: restructure codes regarding service and controller layers
@@ -35,8 +40,8 @@ import java.util.List;
 public class DocumentController {
 
     @Autowired
-    CoreResponseHandler kustvaktResponseHandler;
-    
+    private KustvaktExceptionHandler kustvaktExceptionHandler;
+
     private static Logger jlog =
             LoggerFactory.getLogger(DocumentController.class);
     private DocumentDao documentDao;
@@ -52,7 +57,7 @@ public class DocumentController {
             this.documentDao.storeResource(doc, null);
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -73,7 +78,7 @@ public class DocumentController {
             return Response.ok(JsonUtils.toJSON(docs)).build();
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 
