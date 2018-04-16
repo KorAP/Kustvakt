@@ -54,12 +54,12 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
             if (header.getKey().equals(ContainerRequest.WWW_AUTHENTICATE)) {
                 assertEquals("Api realm=\"Kustvakt\"",
                         header.getValue().get(0));
-                assertEquals("Session realm=\"Kustvakt\"",
-                        header.getValue().get(1));
+//                assertEquals("Session realm=\"Kustvakt\"",
+//                        header.getValue().get(1));
                 assertEquals("Bearer realm=\"Kustvakt\"",
-                        header.getValue().get(2));
+                        header.getValue().get(1));
                 assertEquals("Basic realm=\"Kustvakt\"",
-                        header.getValue().get(3));
+                        header.getValue().get(2));
             }
         }
     }

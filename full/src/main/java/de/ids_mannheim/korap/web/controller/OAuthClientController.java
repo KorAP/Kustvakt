@@ -21,8 +21,7 @@ import de.ids_mannheim.korap.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.OAuth2ClientService;
-import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
-import de.ids_mannheim.korap.web.OAuth2ExceptionHandler;
+import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
@@ -41,7 +40,7 @@ public class OAuthClientController {
     @Autowired
     private OAuth2ClientService clientService;
     @Autowired
-    private OAuth2ExceptionHandler responseHandler;
+    private OAuth2ResponseHandler responseHandler;
 
     /** Registers a client application. Before starting an OAuth process, 
      * client applications have to be registered first. Only registered
@@ -88,7 +87,7 @@ public class OAuthClientController {
      * @return HTTP Response OK if successful.
      */
     @DELETE
-    @Path("deregister")
+    @Path("deregister/public")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     public Response deregisterPublicClient (

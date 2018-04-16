@@ -46,7 +46,7 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
     private AuthenticationManagerIface authManager;
 
     @Autowired
-    private KustvaktExceptionHandler kustvaktResponseHandler;
+    private KustvaktExceptionHandler kustvaktExceptionHandler;
 
     @Autowired
     private HttpAuthorizationHandler authorizationHandler;
@@ -62,7 +62,7 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
             data = authorizationHandler.parseBasicToken(data);
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
 
         String host = cr.getHeaderValue(ContainerRequest.HOST);
@@ -82,7 +82,7 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
             properties.put("user", user);
         }
         catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
 
         TokenContext c = new TokenContext();

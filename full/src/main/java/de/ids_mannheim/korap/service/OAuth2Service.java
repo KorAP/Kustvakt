@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.service;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Set;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.oltu.oauth2.as.issuer.MD5Generator;
@@ -52,22 +53,25 @@ public class OAuth2Service {
      * @throws OAuthProblemException 
      * @throws OAuthSystemException 
      */
-    public OAuthResponse requestAccessToken (HttpServletRequest request,
-            String authorization, String grantType, String authorizationCode,
-            String redirectURI, String clientId, String username,
-            String password, String scope) throws KustvaktException {
+    public OAuthResponse requestAccessToken (OAuthTokenRequest oAuthRequest,
+            String authorization)
+            throws KustvaktException, OAuthSystemException {
+
+        String grantType = oAuthRequest.getGrantType();
 
         if (grantType.equals(GrantType.AUTHORIZATION_CODE.toString())) {
             return requestAccessTokenWithAuthorizationCode(authorization,
-                    authorizationCode, redirectURI, clientId);
+                    oAuthRequest.getCode(), oAuthRequest.getRedirectURI(),
+                    oAuthRequest.getClientId());
         }
         else if (grantType.equals(GrantType.PASSWORD.toString())) {
-            return requestAccessTokenWithPassword(authorization, username,
-                    password, scope);
+            return requestAccessTokenWithPassword(authorization,
+                    oAuthRequest.getUsername(), oAuthRequest.getPassword(),
+                    oAuthRequest.getScopes());
         }
         else if (grantType.equals(GrantType.CLIENT_CREDENTIALS.toString())) {
             return requestAccessTokenWithClientCredentials(authorization,
-                    scope);
+                    oAuthRequest.getScopes());
         }
         else {
             throw new KustvaktException(StatusCodes.UNSUPPORTED_GRANT_TYPE,
@@ -115,11 +119,11 @@ public class OAuth2Service {
      * @param authorization
      * @param username
      * @param password
-     * @param scope
+     * @param scopes
      * @return
      */
     private OAuthResponse requestAccessTokenWithPassword (String authorization,
-            String username, String password, String scope) {
+            String username, String password, Set<String> scopes) {
 
 
 
@@ -129,13 +133,15 @@ public class OAuth2Service {
     /** Clients must authenticate
      * 
      * @param authorization
-     * @param scope
+     * @param scopes
+     * @param request 
      * @return
-     * @throws OAuthProblemException 
      * @throws KustvaktException 
+     * @throws OAuthSystemException 
      */
     private OAuthResponse requestAccessTokenWithClientCredentials (
-            String authorization, String scope) throws KustvaktException {
+            String authorization, Set<String> scopes)
+            throws KustvaktException, OAuthSystemException {
 
         if (authorization == null || authorization.isEmpty()) {
             throw new KustvaktException(
@@ -144,12 +150,10 @@ public class OAuth2Service {
                     OAuthError.TokenResponse.INVALID_CLIENT);
         }
         else {
-            OAuth2Client client =
-                    clientService.authenticateClientByBasicAuthorization(
-                            authorization, null);
-            //TODO
+            clientService.authenticateClientByBasicAuthorization(authorization,
+                    null);
+            return createsAccessTokenResponse();
         }
-        return null;
     }
 
 
@@ -159,31 +163,20 @@ public class OAuth2Service {
      * @throws OAuthSystemException 
      * 
      */
-    private OAuthResponse createsAccessTokenResponse (
-            HttpServletRequest request) throws OAuthSystemException {
-        OAuthTokenRequest oauthRequest = null;
+    private OAuthResponse createsAccessTokenResponse ()
+            throws OAuthSystemException {
         OAuthIssuer oauthIssuerImpl = new OAuthIssuerImpl(new MD5Generator());
         OAuthResponse r = null;
-        try {
-            oauthRequest = new OAuthTokenRequest(request);
-            String authorizationCode = oauthRequest.getCode();
 
-            String accessToken = oauthIssuerImpl.accessToken();
-            String refreshToken = oauthIssuerImpl.refreshToken();
+        String accessToken = oauthIssuerImpl.accessToken();
+        String refreshToken = oauthIssuerImpl.refreshToken();
 
-            r = OAuthASResponse.tokenResponse(HttpServletResponse.SC_OK)
-                    .setAccessToken(accessToken)
-                    .setTokenType(TokenType.BEARER.name())
-                    .setExpiresIn(String.valueOf(config.getLongTokenTTL()))
-                    .setRefreshToken(refreshToken).buildJSONMessage();
-            // scope
-
-        }
-        catch (OAuthProblemException e) {
-            r = OAuthResponse.errorResponse(HttpServletResponse.SC_UNAUTHORIZED)
-                    .error(e).buildJSONMessage();
-        }
-
+        r = OAuthASResponse.tokenResponse(HttpServletResponse.SC_OK)
+                .setAccessToken(accessToken)
+                .setTokenType(TokenType.BEARER.toString())
+                .setExpiresIn(String.valueOf(config.getLongTokenTTL()))
+                .setRefreshToken(refreshToken).buildJSONMessage();
+        // scope
         return r;
     }
 }

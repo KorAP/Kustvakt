@@ -1,14 +1,13 @@
 package de.ids_mannheim.korap.web;
 
+import java.util.EnumSet;
+
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
-import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
-import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
-import org.apache.oltu.oauth2.common.message.OAuthResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import de.ids_mannheim.korap.authentication.http.HttpUnauthorizedHandler;
+import de.ids_mannheim.korap.constant.AuthenticationScheme;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
@@ -19,9 +18,6 @@ import de.ids_mannheim.korap.interfaces.db.AuditingIface;
  *
  */
 public class KustvaktExceptionHandler extends CoreResponseHandler {
-
-    @Autowired
-    private HttpUnauthorizedHandler handler;
 
     public KustvaktExceptionHandler (AuditingIface iface) {
         super(iface);
@@ -35,7 +31,7 @@ public class KustvaktExceptionHandler extends CoreResponseHandler {
                 || e.getStatusCode() >= StatusCodes.AUTHENTICATION_FAILED) {
             String notification = buildNotification(e.getStatusCode(),
                     e.getMessage(), e.getEntity());
-            r = handler.createUnauthenticatedResponse(notification);
+            r = createUnauthenticatedResponse(notification);
         }
         else if (e.hasNotification()) {
             r = Response.status(getStatus(e.getStatusCode()))
@@ -48,38 +44,15 @@ public class KustvaktExceptionHandler extends CoreResponseHandler {
         return new WebApplicationException(r);
     }
 
-    public WebApplicationException throwit (OAuthProblemException e) {
-        OAuthResponse or = null;
-        try {
-            or = OAuthResponse.errorResponse(e.getResponseStatus()).error(e)
-                    .buildJSONMessage();
-        }
-        catch (OAuthSystemException e1) {
-            //            return throwit(new KustvaktException(
-            //                    StatusCodes.OAUTH2_SYSTEM_ERROR, e1.getMessage(), e1));
-            return throwit(StatusCodes.OAUTH2_SYSTEM_ERROR, e1.getMessage());
+    public Response createUnauthenticatedResponse (String notification) {
+        ResponseBuilder builder = Response.status(Response.Status.UNAUTHORIZED);
+
+        for (AuthenticationScheme s : EnumSet
+                .allOf(AuthenticationScheme.class)) {
+            builder = builder.header(HttpHeaders.WWW_AUTHENTICATE,
+                    s.displayName() + " realm=\"Kustvakt\"");
         }
 
-        Response r = Response.status(or.getResponseStatus())
-                .entity(or.getBody()).build();
-        return new WebApplicationException(r);
-
+        return builder.entity(notification).build();
     }
-
-    //    public WebApplicationException throwAuthenticationException (
-    //            String message) {
-    //        String notification =
-    //                buildNotification(StatusCodes.AUTHORIZATION_FAILED,
-    //                        "Authorization failed", message);
-    //        return new WebApplicationException(
-    //                handler.createUnauthenticatedResponse(notification));
-    //    }
-
-    //    public WebApplicationException throwAuthenticationException (
-    //            KustvaktException e) {
-    //        String notification = buildNotification(e.getStatusCode(),
-    //                e.getMessage(), e.getEntity());
-    //        return new WebApplicationException(
-    //                handler.createUnauthenticatedResponse(notification));
-    //    }
 }

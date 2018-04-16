@@ -65,6 +65,10 @@ public class OAuth2ClientDao {
         try {
             return (OAuth2Client) q.getSingleResult();
         }
+        catch (NoResultException e) {
+            throw new KustvaktException(StatusCodes.CLIENT_NOT_FOUND,
+                    "Unknown client with "+clientId+".", "invalid_client");
+        }
         catch (Exception e) {
             throw new KustvaktException(StatusCodes.CLIENT_NOT_FOUND,
                     e.getMessage(), "invalid_client");

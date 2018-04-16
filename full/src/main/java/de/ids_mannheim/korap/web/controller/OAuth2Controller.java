@@ -2,32 +2,34 @@ package de.ids_mannheim.korap.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
 
-import org.apache.http.HttpHeaders;
+import org.apache.oltu.oauth2.as.request.OAuthTokenRequest;
+import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
+import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.OAuthResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.service.OAuth2Service;
-import de.ids_mannheim.korap.web.OAuth2ExceptionHandler;
+import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
+import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 
 @Controller
 @Path("/oauth2")
 public class OAuth2Controller {
 
     @Autowired
-    private OAuth2ExceptionHandler responseHandler;
+    private OAuth2ResponseHandler responseHandler;
     @Autowired
     private OAuth2Service oauth2Service;
 
@@ -55,31 +57,27 @@ public class OAuth2Controller {
     public Response requestAccessToken (@Context HttpServletRequest request,
             @Context SecurityContext securityContext,
             @HeaderParam("Authorization") String authorization,
-            // required for all grants
-            @FormParam("grant_type") String grantType,
-            // required for Authorization Code Grant
-            @FormParam("code") String authorizationCode,
-            @FormParam("redirect_uri") String redirectURI,
-            @FormParam("client_id") String client_id,
-            // required for Resource Owner Password Grant
-            @FormParam("username") String username,
-            @FormParam("password") String password,
-            // optional for Resource Owner Password and Client Credentials Grants
-            @FormParam("scope") String scope) {
+            MultivaluedMap<String, String> form) {
 
         try {
-            OAuthResponse oauth2Response = oauth2Service.requestAccessToken(request,
-                    authorization, grantType, authorizationCode, redirectURI,
-                    client_id, username, password, scope);
+            OAuthTokenRequest oAuthRequest = null;
+            try {
+                oAuthRequest = new OAuthTokenRequest(
+                        new FormRequestWrapper(request, form));
+            }
+            catch (OAuthProblemException e) {
+                throw responseHandler.throwit(e);
+            }
 
-            ResponseBuilder builder =
-                    Response.status(oauth2Response.getResponseStatus());
-            builder.entity(oauth2Response.getBody());
-            builder.header(HttpHeaders.CACHE_CONTROL, "no-store");
-            builder.header(HttpHeaders.PRAGMA, "no-store");
-            return builder.build();
+            OAuthResponse oAuthResponse = oauth2Service
+                    .requestAccessToken(oAuthRequest, authorization);
+
+            return responseHandler.createResponse(oAuthResponse);
         }
         catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+        catch (OAuthSystemException e) {
             throw responseHandler.throwit(e);
         }
     }

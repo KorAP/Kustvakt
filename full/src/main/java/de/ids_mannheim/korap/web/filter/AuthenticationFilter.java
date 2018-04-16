@@ -38,7 +38,7 @@ public class AuthenticationFilter
     private AuthenticationManagerIface authenticationManager;
 
     @Autowired
-    private KustvaktExceptionHandler kustvaktResponseHandler;
+    private KustvaktExceptionHandler kustvaktExceptionHandler;
 
     @Override
     public ContainerRequest filter (ContainerRequest request) {
@@ -60,11 +60,12 @@ public class AuthenticationFilter
                         context = authenticationManager.getTokenContext(
                                 TokenType.BASIC, authData.getToken(), host, ua);
                         break;
-                    case SESSION:
-                        context = authenticationManager.getTokenContext(
-                                TokenType.SESSION, authData.getToken(), host,
-                                ua);
-                        break;
+                      // EM: has not been tested yet
+//                    case SESSION:
+//                        context = authenticationManager.getTokenContext(
+//                                TokenType.SESSION, authData.getToken(), host,
+//                                ua);
+//                        break;
                     // EM: bearer or api
                     default:
                         context = authenticationManager.getTokenContext(
@@ -75,7 +76,7 @@ public class AuthenticationFilter
                 request.setSecurityContext(new KustvaktContext(context));
             }
             catch (KustvaktException e) {
-                throw kustvaktResponseHandler.throwit(e);
+                throw kustvaktExceptionHandler.throwit(e);
             }
         }
         return request;

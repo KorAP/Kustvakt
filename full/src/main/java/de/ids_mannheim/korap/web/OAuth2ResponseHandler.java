@@ -1,22 +1,23 @@
 package de.ids_mannheim.korap.web;
 
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.http.HttpHeaders;
 import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.OAuthResponse;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 
-/** OAuth2ExceptionHandler maps {@link KustvaktException} to 
- * {@link OAuthProblemException} and creates {@link Response} 
- * accordingly. 
+/** OAuth2ResponseHandler builds {@link Response}s from 
+ * {@link OAuthResponse}s and handles exceptions by building 
+ * OAuth error responses accordingly. 
  * 
  * <br/><br/>
  * 
@@ -63,10 +64,27 @@ import de.ids_mannheim.korap.interfaces.db.AuditingIface;
  * @author margaretha
  *
  */
-public class OAuth2ExceptionHandler extends CoreResponseHandler {
+public class OAuth2ResponseHandler extends KustvaktExceptionHandler {
 
-    public OAuth2ExceptionHandler (AuditingIface iface) {
+    public OAuth2ResponseHandler (AuditingIface iface) {
         super(iface);
+    }
+
+    public WebApplicationException throwit (OAuthSystemException e) {
+        return throwit(StatusCodes.OAUTH2_SYSTEM_ERROR, e.getMessage());
+    }
+
+    public WebApplicationException throwit (OAuthProblemException e) {
+        OAuthResponse oAuthResponse = null;
+        try {
+            oAuthResponse = OAuthResponse.errorResponse(e.getResponseStatus())
+                    .error(e).buildJSONMessage();
+        }
+        catch (OAuthSystemException e1) {
+            throwit(e1);
+        }
+        Response r = createResponse(oAuthResponse);
+        return new WebApplicationException(r);
     }
 
     @Override
@@ -95,9 +113,7 @@ public class OAuth2ExceptionHandler extends CoreResponseHandler {
             }
         }
         catch (OAuthSystemException e1) {
-            Response r = Response.status(Status.BAD_REQUEST)
-                    .entity(e1.getMessage()).build();
-            return new WebApplicationException(r);
+            return throwit(e1);
         }
 
         Response r = createResponse(oAuthResponse);
@@ -112,10 +128,13 @@ public class OAuth2ExceptionHandler extends CoreResponseHandler {
                 .error(oAuthProblemException).buildJSONMessage();
     }
 
-    private Response createResponse (OAuthResponse oAuthResponse) {
+    public Response createResponse (OAuthResponse oAuthResponse) {
         ResponseBuilder builder =
                 Response.status(oAuthResponse.getResponseStatus());
         builder.entity(oAuthResponse.getBody());
+        builder.header(HttpHeaders.CACHE_CONTROL, "no-store");
+        builder.header(HttpHeaders.PRAGMA, "no-store");
+
         if (oAuthResponse.getResponseStatus() == Status.UNAUTHORIZED
                 .getStatusCode()) {
             builder.header(HttpHeaders.WWW_AUTHENTICATE,

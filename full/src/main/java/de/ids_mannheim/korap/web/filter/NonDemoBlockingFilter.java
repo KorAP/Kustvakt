@@ -30,7 +30,7 @@ public class NonDemoBlockingFilter
         implements ContainerRequestFilter, ResourceFilter {
 
     @Autowired
-    private KustvaktExceptionHandler kustvaktResponseHandler;
+    private KustvaktExceptionHandler kustvaktExceptionHandler;
 
     @Override
     public ContainerRequest filter (ContainerRequest request) {
@@ -39,12 +39,12 @@ public class NonDemoBlockingFilter
             context = (TokenContext) request.getUserPrincipal();
         }
         catch (UnsupportedOperationException e) {
-            throw kustvaktResponseHandler.throwit(new KustvaktException(
+            throw kustvaktExceptionHandler.throwit(new KustvaktException(
                     StatusCodes.UNSUPPORTED_OPERATION, e.getMessage(), e));
         }
 
         if (context == null || context.isDemo()) {
-            throw kustvaktResponseHandler.throwit(
+            throw kustvaktExceptionHandler.throwit(
                     new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                             "Operation is not permitted for guest users"));
         }

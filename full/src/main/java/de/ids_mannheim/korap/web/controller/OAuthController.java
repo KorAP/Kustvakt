@@ -74,7 +74,7 @@ import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 public class OAuthController {
 
     @Autowired
-    CoreResponseHandler kustvaktExceptionHandler;
+    private CoreResponseHandler kustvaktExceptionHandler;
     
     private OAuth2Handler handler;
     @Autowired
@@ -201,7 +201,7 @@ public class OAuthController {
             @Context SecurityContext context,
             @HeaderParam(ContainerRequest.USER_AGENT) String agent,
             @HeaderParam(ContainerRequest.HOST) String host,
-            MultivaluedMap<String, Object> form) throws OAuthSystemException,
+            MultivaluedMap<String, String> form) throws OAuthSystemException,
             URISyntaxException {
         // user needs to be authenticated to this service!
         TokenContext c = (TokenContext) context.getUserPrincipal();

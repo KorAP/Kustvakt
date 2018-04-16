@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS oauth2_client (
 	url TEXT NOT NULL,
 	url_hashcode INTEGER NOT NULL,
 	redirect_uri TEXT NOT NULL,
-	registeredBy VARCHAR(100) NOT NULL
+	registered_by VARCHAR(100) NOT NULL
 );
 
 CREATE UNIQUE INDEX client_id_index on oauth2_client(id);

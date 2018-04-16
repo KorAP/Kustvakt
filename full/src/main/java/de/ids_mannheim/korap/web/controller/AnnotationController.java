@@ -39,7 +39,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 public class AnnotationController {
 
     @Autowired
-    private KustvaktExceptionHandler responseHandler;
+    private KustvaktExceptionHandler kustvaktExceptionHandler;
 
     @Autowired
     private AnnotationService annotationService;
@@ -71,7 +71,7 @@ public class AnnotationController {
     @Consumes(MediaType.APPLICATION_JSON)
     public List<FoundryDto> getFoundryDescriptions (String json) {
         if (json == null || json.isEmpty()) {
-            throw responseHandler
+            throw kustvaktExceptionHandler
                     .throwit(new KustvaktException(StatusCodes.MISSING_ARGUMENT,
                             "Missing a json string.", ""));
         }
@@ -81,7 +81,7 @@ public class AnnotationController {
             node = JsonUtils.readTree(json);
         }
         catch (KustvaktException e1) {
-            throw responseHandler.throwit(e1);
+            throw kustvaktExceptionHandler.throwit(e1);
         }
 
         String language;
@@ -94,7 +94,7 @@ public class AnnotationController {
                 language = "en";
             }
             else if (!(language.equals("en") || language.equals("de"))) {
-                throw responseHandler.throwit(
+                throw kustvaktExceptionHandler.throwit(
                         new KustvaktException(StatusCodes.UNSUPPORTED_VALUE,
                                 "Unsupported value:", language));
             }
@@ -105,16 +105,16 @@ public class AnnotationController {
             codes = JsonUtils.convert(node.get("codes"), List.class);
         }
         catch (IOException | NullPointerException e) {
-            throw responseHandler.throwit(new KustvaktException(
+            throw kustvaktExceptionHandler.throwit(new KustvaktException(
                     StatusCodes.INVALID_ARGUMENT, "Bad argument:", json));
         }
         if (codes == null) {
-            throw responseHandler.throwit(
+            throw kustvaktExceptionHandler.throwit(
                     new KustvaktException(StatusCodes.MISSING_ATTRIBUTE,
                             "Missing attribute:", "codes"));
         }
         else if (codes.isEmpty()) {
-            throw responseHandler
+            throw kustvaktExceptionHandler
                     .throwit(new KustvaktException(StatusCodes.NO_RESULT_FOUND,
                             "No result found.", "codes:[]"));
         }
@@ -123,7 +123,7 @@ public class AnnotationController {
             return annotationService.getFoundryDtos(codes, language);
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 }

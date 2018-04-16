@@ -4,7 +4,6 @@ import java.sql.SQLException;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.oltu.oauth2.common.error.OAuthError;
-import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

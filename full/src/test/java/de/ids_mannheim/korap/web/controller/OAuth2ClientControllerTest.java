@@ -5,8 +5,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -29,7 +29,6 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
@@ -100,8 +99,8 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         OAuth2ClientJson json = new OAuth2ClientJson();
         json.setName("OAuth2PublicClient");
         json.setType(OAuth2ClientType.PUBLIC);
-        json.setUrl("http://public.client.com");
-        json.setRedirectURI("https://public.client.com/redirect");
+        json.setUrl("http://test.public.client.com");
+        json.setRedirectURI("https://test.public.client.com/redirect");
 
         ClientResponse response = resource().path("oauth2").path("client")
                 .path("register")
@@ -130,7 +129,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         form.add("client_id", clientId);
 
         ClientResponse response = resource().path("oauth2").path("client")
-                .path("deregister")
+                .path("deregister").path("public")
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue(username,
                                 "pass"))

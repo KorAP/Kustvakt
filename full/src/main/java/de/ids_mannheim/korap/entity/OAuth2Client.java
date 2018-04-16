@@ -33,6 +33,7 @@ public class OAuth2Client {
     private int urlHashCode;
     @Column(name = "redirect_uri")
     private String redirectURI;
+    @Column(name = "registered_by")
     private String registeredBy;
 
 

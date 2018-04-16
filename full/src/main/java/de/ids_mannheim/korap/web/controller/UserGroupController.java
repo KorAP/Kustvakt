@@ -50,7 +50,7 @@ import de.ids_mannheim.korap.web.input.UserGroupJson;
 public class UserGroupController {
 
     @Autowired
-    private KustvaktExceptionHandler responseHandler;
+    private KustvaktExceptionHandler kustvaktExceptionHandler;
     @Autowired
     private UserGroupService service;
 
@@ -73,7 +73,7 @@ public class UserGroupController {
             return service.retrieveUserGroup(context.getUsername());
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 
@@ -101,7 +101,7 @@ public class UserGroupController {
                     context.getUsername(), status);
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 
@@ -123,7 +123,7 @@ public class UserGroupController {
             return service.searchById(context.getUsername(), groupId);
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
 
     }
@@ -159,7 +159,7 @@ public class UserGroupController {
             return Response.ok().build();
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 
@@ -181,7 +181,7 @@ public class UserGroupController {
             return Response.ok().build();
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 
@@ -205,7 +205,7 @@ public class UserGroupController {
             return Response.ok().build();
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 
@@ -229,7 +229,7 @@ public class UserGroupController {
             return Response.ok().build();
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 
@@ -257,7 +257,7 @@ public class UserGroupController {
             return Response.ok().build();
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 
@@ -285,7 +285,7 @@ public class UserGroupController {
             return Response.ok().build();
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 
@@ -308,7 +308,7 @@ public class UserGroupController {
             return Response.ok().build();
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 
@@ -335,7 +335,7 @@ public class UserGroupController {
             return Response.ok().build();
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
+            throw kustvaktExceptionHandler.throwit(e);
         }
     }
 }

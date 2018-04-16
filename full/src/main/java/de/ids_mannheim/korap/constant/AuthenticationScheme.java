@@ -12,7 +12,8 @@ public enum AuthenticationScheme {
     // standard http
     BASIC, BEARER,
     // custom
-    SESSION, API;
+    // SESSION, has not been supported yet 
+    API;
 
     public String displayName () {
         return WordUtils.capitalizeFully(name());

@@ -27,7 +27,7 @@ import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
 public class BlockingFilter implements ContainerRequestFilter, ResourceFilter {
 
     @Autowired
-    private KustvaktExceptionHandler kustvaktResponseHandler;
+    private KustvaktExceptionHandler kustvaktExceptionHandler;
 
     @Override
     public ContainerRequest filter (ContainerRequest request) {
@@ -37,12 +37,12 @@ public class BlockingFilter implements ContainerRequestFilter, ResourceFilter {
             context = (TokenContext) request.getUserPrincipal();
         }
         catch (UnsupportedOperationException e) {
-            throw kustvaktResponseHandler.throwit(new KustvaktException(
+            throw kustvaktExceptionHandler.throwit(new KustvaktException(
                     StatusCodes.UNSUPPORTED_OPERATION, e.getMessage(), e));
         }
 
         if (context == null || context.isDemo()) {
-            throw kustvaktResponseHandler.throwit(new KustvaktException(
+            throw kustvaktExceptionHandler.throwit(new KustvaktException(
                     StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: guest", "guest"));
         }
