@@ -72,7 +72,7 @@ public class AnnotationController {
     public List<FoundryDto> getFoundryDescriptions (String json) {
         if (json == null || json.isEmpty()) {
             throw kustvaktExceptionHandler
-                    .throwit(new KustvaktException(StatusCodes.MISSING_ARGUMENT,
+                    .throwit(new KustvaktException(StatusCodes.MISSING_PARAMETER,
                             "Missing a json string.", ""));
         }
 

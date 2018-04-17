@@ -1,8 +1,13 @@
 package de.ids_mannheim.korap.service;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.SQLException;
 
 import org.apache.commons.validator.routines.UrlValidator;
+import org.apache.log4j.Logger;
 import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +44,8 @@ import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 @Service
 public class OAuth2ClientService {
 
+    private Logger jlog = Logger.getLogger(OAuth2ClientService.class);
+
     @Autowired
     private OAuth2ClientDao clientDao;
     @Autowired
@@ -54,7 +61,6 @@ public class OAuth2ClientService {
     @Autowired
     private FullConfiguration config;
 
-
     public OAuth2ClientDto registerClient (OAuth2ClientJson clientJson,
             String registeredBy) throws KustvaktException {
         if (!urlValidator.isValid(clientJson.getUrl())) {
@@ -68,6 +74,9 @@ public class OAuth2ClientService {
                             + " is invalid. RedirectURI requires https.",
                     OAuthError.TokenResponse.INVALID_REQUEST);
         }
+
+        boolean isNative = isNativeClient(clientJson.getUrl(),
+                clientJson.getRedirectURI());
 
         String secret = null;
         String secretHashcode = null;
@@ -90,7 +99,7 @@ public class OAuth2ClientService {
         String id = encryption.createRandomNumber();
         try {
             clientDao.registerClient(id, secretHashcode, clientJson.getName(),
-                    clientJson.getType(), clientJson.getUrl(),
+                    clientJson.getType(), isNative, clientJson.getUrl(),
                     clientJson.getUrl().hashCode(), clientJson.getRedirectURI(),
                     registeredBy);
         }
@@ -110,6 +119,33 @@ public class OAuth2ClientService {
         }
 
         return new OAuth2ClientDto(id, secret);
+    }
+
+
+    private boolean isNativeClient (String url, String redirectURI)
+            throws KustvaktException {
+        String nativeHost = config.getNativeClientHost();
+        String urlHost = null;
+        try {
+            urlHost = new URL(url).getHost();
+        }
+        catch (MalformedURLException e) {
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
+                    "Invalid url :" + e.getMessage(),
+                    OAuthError.TokenResponse.INVALID_REQUEST);
+        }
+        String uriHost = null;
+        try {
+            uriHost = new URI(redirectURI).getHost();
+        }
+        catch (URISyntaxException e) {
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
+                    "Invalid redirectURI: "+e.getMessage(), OAuthError.TokenResponse.INVALID_REQUEST);
+        }
+        boolean isNative =
+                urlHost.equals(nativeHost) && uriHost.equals(nativeHost);
+        jlog.debug(urlHost + " " + uriHost + " " + isNative);
+        return isNative;
     }
 
 
@@ -145,13 +181,32 @@ public class OAuth2ClientService {
         clientDao.deregisterClient(client);
     }
 
+    public OAuth2Client authenticateClient (String authorization,
+            String clientId) throws KustvaktException {
+        OAuth2Client client;
+        if (authorization == null || authorization.isEmpty()) {
+            client = authenticateClientById(clientId);
+            if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
+                throw new KustvaktException(
+                        StatusCodes.CLIENT_AUTHENTICATION_FAILED,
+                        "Client authentication using authorization header is required.",
+                        OAuthError.TokenResponse.INVALID_CLIENT);
+            }
+        }
+        else {
+            client = authenticateClientByBasicAuthorization(authorization,
+                    clientId);
+        }
+        return client;
+    }
+
     public OAuth2Client authenticateClientById (String clientId)
             throws KustvaktException {
-        if (clientId == null || clientId.isEmpty()) {
+        if (clientId == null || clientId.equals("null") || clientId.isEmpty()) {
             throw new KustvaktException(
                     StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                    "client_id is missing.",
-                    OAuthError.TokenResponse.INVALID_CLIENT);
+                    "client_id is missing",
+                    OAuthError.TokenResponse.INVALID_REQUEST);
         }
         else {
             return retrieveClientById(clientId);

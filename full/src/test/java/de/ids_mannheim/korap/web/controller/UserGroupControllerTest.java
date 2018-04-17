@@ -654,7 +654,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        assertEquals(StatusCodes.MISSING_ARGUMENT,
+        assertEquals(StatusCodes.MISSING_PARAMETER,
                 node.at("/errors/0/0").asInt());
         assertEquals("groupId", node.at("/errors/0/1").asText());
         assertEquals("0", node.at("/errors/0/2").asText());
@@ -844,7 +844,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
-        assertEquals(StatusCodes.MISSING_ARGUMENT,
+        assertEquals(StatusCodes.MISSING_PARAMETER,
                 node.at("/errors/0/0").asInt());
         assertEquals("groupId", node.at("/errors/0/1").asText());
         assertEquals("0", node.at("/errors/0/2").asText());

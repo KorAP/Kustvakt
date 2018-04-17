@@ -28,7 +28,7 @@ public class ParameterChecker {
     public static void checkIntegerValue (int integer, String name)
             throws KustvaktException {
         if (integer == 0) {
-            throw new KustvaktException(StatusCodes.MISSING_ARGUMENT, name,
+            throw new KustvaktException(StatusCodes.MISSING_PARAMETER, name,
                     "0");
         }
     }

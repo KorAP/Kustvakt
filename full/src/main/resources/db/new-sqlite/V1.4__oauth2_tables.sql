@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS oauth2_client (
 	name VARCHAR(200) NOT NULL,
 	secret VARCHAR(200),
 	type VARCHAR(200) NOT NULL,
+	native BOOLEAN DEFAULT FALSE,
 	url TEXT NOT NULL,
 	url_hashcode INTEGER NOT NULL,
 	redirect_uri TEXT NOT NULL,

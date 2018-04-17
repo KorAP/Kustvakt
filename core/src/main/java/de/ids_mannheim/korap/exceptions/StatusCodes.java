@@ -18,7 +18,7 @@ public class StatusCodes {
     public static final int UNSUPPORTED_AUTHENTICATION_SCHEME = 102;
     public static final int UNSUPPORTED_OPERATION = 103;
     public static final int ILLEGAL_ARGUMENT = 104;
-    public static final int MISSING_ARGUMENT = 105;
+    public static final int MISSING_PARAMETER = 105;
     public static final int CONNECTION_ERROR = 106;
     public static final int INVALID_ARGUMENT = 107;
     public static final int NOT_SUPPORTED = 108;
@@ -121,7 +121,8 @@ public class StatusCodes {
     public static final int CLIENT_REGISTRATION_FAILED = 1801;
     public static final int CLIENT_DEREGISTRATION_FAILED = 1802;
     public static final int CLIENT_AUTHENTICATION_FAILED = 1803;
-    public static final int CLIENT_NOT_FOUND = 1804;
+    public static final int CLIENT_AUTHORIZATION_FAILED = 1804;
+    public static final int CLIENT_NOT_FOUND = 1805;
     
     public static final int UNSUPPORTED_GRANT_TYPE = 1810;
     

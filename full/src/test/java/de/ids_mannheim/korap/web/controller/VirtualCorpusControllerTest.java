@@ -689,7 +689,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        assertEquals(StatusCodes.MISSING_ARGUMENT,
+        assertEquals(StatusCodes.MISSING_PARAMETER,
                 node.at("/errors/0/0").asInt());
         assertEquals("vcId", node.at("/errors/0/1").asText());
     }

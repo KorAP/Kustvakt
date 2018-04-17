@@ -69,7 +69,7 @@ public class StatisticController {
 
         if (corpusQuery == null || corpusQuery.isEmpty()) {
             throw kustvaktExceptionHandler
-                    .throwit(new KustvaktException(StatusCodes.MISSING_ARGUMENT,
+                    .throwit(new KustvaktException(StatusCodes.MISSING_PARAMETER,
                             "Parameter corpusQuery is missing.",
                             "corpusQuery"));
         }

@@ -53,7 +53,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
             }
         }
     }
-    
+
     private ClientResponse testRegisterConfidentialClient ()
             throws KustvaktException {
 
@@ -121,6 +121,29 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         testDeregisterPublicClient(clientId);
     }
 
+    @Test
+    public void testRegisterNativeClient () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        OAuth2ClientJson json = new OAuth2ClientJson();
+        json.setName("NativeClient");
+        json.setType(OAuth2ClientType.PUBLIC);
+        json.setUrl("http://korap.ids-mannheim.de/native");
+        json.setRedirectURI("https://korap.ids-mannheim.de/native/redirect");
+
+        ClientResponse response = resource().path("oauth2").path("client")
+                .path("register")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(username,
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .entity(json).post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
+        //EM: need to check native
+    }
+
     private void testDeregisterPublicClient (String clientId)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
@@ -178,13 +201,13 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
 
         String entity = response.getEntity(String.class);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-        
+
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuthError.TokenResponse.INVALID_CLIENT,
                 node.at("/error").asText());
         assertEquals("Invalid client credentials.",
                 node.at("/error_description").asText());
-        
+
         checkWWWAuthenticateHeader(response);
     }
 }

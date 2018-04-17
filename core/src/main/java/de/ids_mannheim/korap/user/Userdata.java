@@ -74,7 +74,7 @@ public abstract class Userdata {
     public void checkRequired () throws KustvaktException {
         String[] fields = missing();
         if (missing().length != 0) {
-            throw new KustvaktException(userId, StatusCodes.MISSING_ARGUMENT,
+            throw new KustvaktException(userId, StatusCodes.MISSING_PARAMETER,
                     "User data object not valid. Object has missing fields!",
                     Arrays.asList(fields).toString());
         }

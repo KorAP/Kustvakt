@@ -179,7 +179,7 @@ public class AuthenticationController {
                 headers.getRequestHeader(ContainerRequest.AUTHORIZATION);
         if (auth == null || auth.isEmpty()) {
             throw kustvaktExceptionHandler
-                    .throwit(new KustvaktException(StatusCodes.MISSING_ARGUMENT,
+                    .throwit(new KustvaktException(StatusCodes.MISSING_PARAMETER,
                             "Authorization header is missing.",
                             "Authorization header"));
         }

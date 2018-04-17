@@ -28,6 +28,8 @@ public class OAuth2Client {
     private String secret;
     @Enumerated(EnumType.STRING)
     private OAuth2ClientType type;
+    @Column(name = "native")
+    private boolean isNative;
     private String url;
     @Column(name = "url_hashcode")
     private int urlHashCode;
@@ -35,7 +37,6 @@ public class OAuth2Client {
     private String redirectURI;
     @Column(name = "registered_by")
     private String registeredBy;
-
 
     @Override
     public String toString () {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import de.ids_mannheim.korap.constant.AuthenticationMethod;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 
 /** Configuration for Kustvakt full version including properties concerning
@@ -45,7 +46,10 @@ public class FullConfiguration extends KustvaktConfiguration {
     private boolean isSoftDeleteGroupMember;
 
     private EncryptionIface.Encryption encryption;
-    
+
+    private AuthenticationMethod OAuth2passwordAuthentication;
+    private String nativeClientHost;
+
     public FullConfiguration (Properties properties) throws IOException {
         super(properties);
     }
@@ -65,6 +69,16 @@ public class FullConfiguration extends KustvaktConfiguration {
 
         setEncryption(Enum.valueOf(EncryptionIface.Encryption.class,
                 properties.getProperty("security.encryption", "BCRYPT")));
+
+        setOAuth2Configuration(properties);
+    }
+
+    private void setOAuth2Configuration (Properties properties) {
+        setOAuth2passwordAuthentication(
+                Enum.valueOf(AuthenticationMethod.class, properties
+                        .getProperty("oauth.password.authentication", "TEST")));
+        setNativeClientHost(properties.getProperty("oauth.native.client.host",
+                "korap.ids-mannheim.de"));
     }
 
     private void setMailConfiguration (Properties properties) {
@@ -295,6 +309,23 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     public void setEncryption (EncryptionIface.Encryption encryption) {
         this.encryption = encryption;
+    }
+
+    public AuthenticationMethod getOAuth2passwordAuthentication () {
+        return OAuth2passwordAuthentication;
+    }
+
+    public void setOAuth2passwordAuthentication (
+            AuthenticationMethod oAuth2passwordAuthentication) {
+        OAuth2passwordAuthentication = oAuth2passwordAuthentication;
+    }
+
+    public String getNativeClientHost () {
+        return nativeClientHost;
+    }
+
+    public void setNativeClientHost (String nativeClientHost) {
+        this.nativeClientHost = nativeClientHost;
     }
 
 }

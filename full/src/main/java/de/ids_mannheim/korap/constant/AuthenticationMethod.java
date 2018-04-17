@@ -10,5 +10,5 @@ package de.ids_mannheim.korap.constant;
  *
  */
 public enum AuthenticationMethod {
-    LDAP, SHIBBOLETH, DATABASE; 
+    LDAP, SHIBBOLETH, DATABASE, TEST; 
 }

@@ -37,25 +37,18 @@ public class OAuth2Controller {
      *  requests representing user authorization for the client to access user 
      *  resources. 
      * 
-     *  EM: should we allow client_secret in the request body?
-     * 
-     * @param securityContext
-     * @param authorization
-     * @param grantType
-     * @param authorizationCode
-     * @param redirectURI
-     * @param client_id a client id required for authorization_code grant, otherwise optional
-     * @param username
-     * @param password
-     * @param scope
-     * @return
+     * @param request the request
+     * @param authorization authorization header
+     * @param form form parameters in a map
+     * @return a JSON object containing an access token, a refresh token, 
+     *  a token type and token expiry/life time (in seconds) if successful, 
+     *  an error code and an error description otherwise.
      */
     @POST
     @Path("token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response requestAccessToken (@Context HttpServletRequest request,
-            @Context SecurityContext securityContext,
             @HeaderParam("Authorization") String authorization,
             MultivaluedMap<String, String> form) {
 

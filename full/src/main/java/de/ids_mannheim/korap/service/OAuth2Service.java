@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -18,11 +20,12 @@ import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.FullConfiguration;
-import de.ids_mannheim.korap.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.entity.OAuth2Client;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 
 @Service
 public class OAuth2Service {
@@ -31,7 +34,8 @@ public class OAuth2Service {
     private OAuth2ClientService clientService;
     @Autowired
     private FullConfiguration config;
-
+    @Autowired
+    private AuthenticationManagerIface authenticationManager;
 
     /** 
      *  RFC 6749:
@@ -40,18 +44,11 @@ public class OAuth2Service {
      *  credentials, the client MUST authenticate with the authorization server.
      * @param request 
      *  
+     * @param oAuthRequest
      * @param authorization
-     * @param grantType
-     * @param scope 
-     * @param password 
-     * @param username 
-     * @param clientId required for authorization_code grant, otherwise optional
-     * @param redirectURI 
-     * @param authorizationCode 
-     * @return 
+     * @return
      * @throws KustvaktException
-     * @throws OAuthProblemException 
-     * @throws OAuthSystemException 
+     * @throws OAuthSystemException
      */
     public OAuthResponse requestAccessToken (OAuthTokenRequest oAuthRequest,
             String authorization)
@@ -67,7 +64,7 @@ public class OAuth2Service {
         else if (grantType.equals(GrantType.PASSWORD.toString())) {
             return requestAccessTokenWithPassword(authorization,
                     oAuthRequest.getUsername(), oAuthRequest.getPassword(),
-                    oAuthRequest.getScopes());
+                    oAuthRequest.getScopes(), oAuthRequest.getClientId());
         }
         else if (grantType.equals(GrantType.CLIENT_CREDENTIALS.toString())) {
             return requestAccessTokenWithClientCredentials(authorization,
@@ -95,39 +92,72 @@ public class OAuth2Service {
     private OAuthResponse requestAccessTokenWithAuthorizationCode (
             String authorization, String authorizationCode, String redirectURI,
             String clientId) throws KustvaktException {
-        OAuth2Client client;
-        if (authorization == null || authorization.isEmpty()) {
-            client = clientService.authenticateClientById(clientId);
-            if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
-                throw new KustvaktException(
-                        StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                        "Client authentication using authorization header is required.",
-                        OAuthError.TokenResponse.INVALID_CLIENT);
-            }
-        }
-        else {
-            client = clientService.authenticateClientByBasicAuthorization(
-                    authorization, clientId);
-        }
+        OAuth2Client client =
+                clientService.authenticateClient(authorization, clientId);
 
         // TODO
         return null;
     }
 
-    /** Confidential clients must authenticate
+
+
+    /**  Third party apps must not be allowed to use password grant.
+     * MH: password grant is only allowed for trusted clients (korap frontend)
+     *  
+     * A similar rule to that of authorization code grant is additionally 
+     * applied, namely client_id is required when authorization header is not 
+     * available.
+     * 
+     * According to RFC 6749, client_id is optional for password grant, 
+     * but without it, server would not be able to check the client 
+     * type, thus cannot make sure that confidential clients authenticate. 
      * 
      * @param authorization
      * @param username
      * @param password
      * @param scopes
+     * @param clientId
      * @return
+     * @throws KustvaktException
+     * @throws OAuthSystemException 
      */
     private OAuthResponse requestAccessTokenWithPassword (String authorization,
-            String username, String password, Set<String> scopes) {
+            String username, String password, Set<String> scopes,
+            String clientId) throws KustvaktException, OAuthSystemException {
 
+        OAuth2Client client =
+                clientService.authenticateClient(authorization, clientId);
 
+        if (!client.isNative()) {
+            throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
+                    "Password grant is not allowed for third party clients",
+                    OAuthError.TokenResponse.UNAUTHORIZED_CLIENT);
+        }
 
-        return null;
+        authenticateUser(username, password, scopes);
+        return createsAccessTokenResponse();
+    }
+
+    private void authenticateUser (String username, String password,
+            Set<String> scopes) throws KustvaktException {
+        if (username == null || username.isEmpty()) {
+            throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
+                    "username is missing.",
+                    OAuthError.TokenResponse.INVALID_REQUEST);
+        }
+        if (password == null || password.isEmpty()) {
+            throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
+                    "password is missing",
+                    OAuthError.TokenResponse.INVALID_REQUEST);
+        }
+
+        Map<String, Object> attributes = new HashMap<>();
+        if (scopes != null && !scopes.isEmpty()) {
+            attributes.put(Attributes.SCOPES, scopes);
+        }
+        authenticationManager.authenticate(
+                config.getOAuth2passwordAuthentication(), username, password,
+                attributes);
     }
 
     /** Clients must authenticate
@@ -174,7 +204,7 @@ public class OAuth2Service {
         r = OAuthASResponse.tokenResponse(HttpServletResponse.SC_OK)
                 .setAccessToken(accessToken)
                 .setTokenType(TokenType.BEARER.toString())
-                .setExpiresIn(String.valueOf(config.getLongTokenTTL()))
+                .setExpiresIn(String.valueOf(config.getTokenTTL()))
                 .setRefreshToken(refreshToken).buildJSONMessage();
         // scope
         return r;

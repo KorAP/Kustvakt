@@ -200,6 +200,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 			// IdM/LDAP: (09.02.17/FB)
 			user = authenticateIdM(username, password, attributes);
 			break;
+		// EM: added a dummy authentication for testing
+		case TEST:
+		    user = getUser(username);
+		    break;
 		default:
 			user = authenticate(username, password, attributes);
 			break;
