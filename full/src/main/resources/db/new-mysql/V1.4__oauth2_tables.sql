@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS oauth2_client (
 	url TEXT NOT NULL,
 	url_hashcode UNIQUE INTEGER NOT NULL,
 	redirect_uri TEXT NOT NULL,
-	registered_by VARCHAR(100) NOT NULL
+	registered_by VARCHAR(100) NOT NULL,
+	description VARCHAR(250) NOT NULL
 );
 
 --

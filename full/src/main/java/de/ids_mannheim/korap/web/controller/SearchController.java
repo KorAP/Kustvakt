@@ -233,7 +233,7 @@ public class SearchController {
      * @param pageLength number of results per page
      * @param pageIndex
      * @param startPage
-     * @param cq collection query
+     * @param cq corpus query
      * @return
      */
     // ref query parameter removed!

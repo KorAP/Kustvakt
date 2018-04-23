@@ -37,8 +37,9 @@ public class FormRequestWrapper extends HttpServletRequestWrapper {
     @Override
     public String getParameter (String name) {
         String value = super.getParameter(name);
-        if (value == null)
-            value = String.valueOf(form.getFirst(name));
+        if (value == null){
+            value = form.getFirst(name);
+        }
         return value;
     }
 

@@ -238,15 +238,15 @@ public abstract class User implements Serializable {
         }
 
 
-        public static ShibUser getShibInstance (String eduPersonID,
-                String mail, String cn) {
-            ShibUser u = new ShibUser(eduPersonID);
-            u.setAffiliation("");
-            u.setMail(mail);
-            u.setUsername(eduPersonID);
-            u.setCn(cn);
-            return u;
-        }
+//        public static ShibUser getShibInstance (String eduPersonID,
+//                String mail, String cn) {
+//            ShibUser u = new ShibUser(eduPersonID);
+//            u.setAffiliation("");
+//            u.setMail(mail);
+//            u.setUsername(eduPersonID);
+//            u.setCn(cn);
+//            return u;
+//        }
 
 
         public static KorAPUser toKorAPUser (Map<String, Object> map) {

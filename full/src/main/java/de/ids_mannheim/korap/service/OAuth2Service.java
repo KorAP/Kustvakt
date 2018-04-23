@@ -4,15 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response.Status;
 
-import org.apache.oltu.oauth2.as.issuer.MD5Generator;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
-import org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl;
-import org.apache.oltu.oauth2.as.request.OAuthTokenRequest;
+import org.apache.oltu.oauth2.as.request.AbstractOAuthTokenRequest;
 import org.apache.oltu.oauth2.as.response.OAuthASResponse;
 import org.apache.oltu.oauth2.common.error.OAuthError;
-import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.OAuthResponse;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
@@ -36,12 +33,27 @@ public class OAuth2Service {
     private FullConfiguration config;
     @Autowired
     private AuthenticationManagerIface authenticationManager;
+    @Autowired
+    private OAuthIssuer oauthIssuer;
 
     /** 
-     *  RFC 6749:
+     * OAuth2 describes various ways for requesting an access token. Kustvakt 
+     * supports:
+     * <ul>
+     * <li> Authorization code grant: obtains authorization from a third party
+     * application.
+     * </li>
+     * <li> Resource owner password grant: strictly for clients that are parts 
+     *   of KorAP. Clients use user credentials, e.g. Kalamar (front-end) with 
+     *   login form. 
+     * </li>
+     * <li> Client credentials grant: strictly for clients that are parts 
+     *   of KorAP. Clients access their own resources, not on behalf of a 
+     *   user.
+     * </li>
+     * </ul>  
      *  
-     *  If the client type is confidential or the client was issued client
-     *  credentials, the client MUST authenticate with the authorization server.
+     *  
      * @param request 
      *  
      * @param oAuthRequest
@@ -50,24 +62,25 @@ public class OAuth2Service {
      * @throws KustvaktException
      * @throws OAuthSystemException
      */
-    public OAuthResponse requestAccessToken (OAuthTokenRequest oAuthRequest,
-            String authorization)
+    public OAuthResponse requestAccessToken (
+            AbstractOAuthTokenRequest oAuthRequest)
             throws KustvaktException, OAuthSystemException {
 
         String grantType = oAuthRequest.getGrantType();
 
         if (grantType.equals(GrantType.AUTHORIZATION_CODE.toString())) {
-            return requestAccessTokenWithAuthorizationCode(authorization,
+            return requestAccessTokenWithAuthorizationCode(
                     oAuthRequest.getCode(), oAuthRequest.getRedirectURI(),
-                    oAuthRequest.getClientId());
+                    oAuthRequest.getClientId(), oAuthRequest.getClientSecret());
         }
         else if (grantType.equals(GrantType.PASSWORD.toString())) {
-            return requestAccessTokenWithPassword(authorization,
-                    oAuthRequest.getUsername(), oAuthRequest.getPassword(),
-                    oAuthRequest.getScopes(), oAuthRequest.getClientId());
+            return requestAccessTokenWithPassword(oAuthRequest.getUsername(),
+                    oAuthRequest.getPassword(), oAuthRequest.getScopes(),
+                    oAuthRequest.getClientId(), oAuthRequest.getClientSecret());
         }
         else if (grantType.equals(GrantType.CLIENT_CREDENTIALS.toString())) {
-            return requestAccessTokenWithClientCredentials(authorization,
+            return requestAccessTokenWithClientCredentials(
+                    oAuthRequest.getClientId(), oAuthRequest.getClientSecret(),
                     oAuthRequest.getScopes());
         }
         else {
@@ -78,25 +91,31 @@ public class OAuth2Service {
 
     }
 
-    /** Confidential clients must authenticate
+    /**
+     * RFC 6749: 
+     *  If the client type is confidential or the client was issued client
+     *  credentials, the client MUST authenticate with the authorization server.
      * 
-     * @param authorization
      * @param authorizationCode
-     * @param redirectURI
+     * @param redirectURI required if included in the authorization request
      * @param clientId required if there is no authorization header
+     * @param clientSecret clilent_secret, required if client_secret was issued 
+     *  for the client in client registration.
      * @return
      * @throws OAuthSystemException
      * @throws KustvaktException
-     * @throws OAuthProblemException 
      */
     private OAuthResponse requestAccessTokenWithAuthorizationCode (
-            String authorization, String authorizationCode, String redirectURI,
-            String clientId) throws KustvaktException {
-        OAuth2Client client =
-                clientService.authenticateClient(authorization, clientId);
+            String authorizationCode, String redirectURI, String clientId,
+            String clientSecret)
+            throws KustvaktException, OAuthSystemException {
+
+        clientService.authenticateClient(clientId, clientSecret);
 
         // TODO
-        return null;
+        // check authorization code
+        // check redirectURI
+        return createsAccessTokenResponse();
     }
 
 
@@ -104,30 +123,32 @@ public class OAuth2Service {
     /**  Third party apps must not be allowed to use password grant.
      * MH: password grant is only allowed for trusted clients (korap frontend)
      *  
-     * A similar rule to that of authorization code grant is additionally 
-     * applied, namely client_id is required when authorization header is not 
-     * available.
+     * According to RFC 6749, client authentication is only required for 
+     * confidential clients and whenever client credentials are provided.
+     * Moreover, client_id is optional for password grant, but without it, 
+     * the authentication server cannot check the client type. 
      * 
-     * According to RFC 6749, client_id is optional for password grant, 
-     * but without it, server would not be able to check the client 
-     * type, thus cannot make sure that confidential clients authenticate. 
+     * To make sure that confidential clients authenticate, client_id is made 
+     * required (similar to authorization code grant).
      * 
-     * @param authorization
-     * @param username
-     * @param password
+     * 
+     * @param username username, required
+     * @param password user password, required
      * @param scopes
-     * @param clientId
+     * @param clientId client_id, required
+     * @param clientSecret clilent_secret, required if client_secret was issued 
+     *  for the client in client registration.
      * @return
      * @throws KustvaktException
-     * @throws OAuthSystemException 
+     * @throws OAuthSystemException
      */
-    private OAuthResponse requestAccessTokenWithPassword (String authorization,
-            String username, String password, Set<String> scopes,
-            String clientId) throws KustvaktException, OAuthSystemException {
+    private OAuthResponse requestAccessTokenWithPassword (String username,
+            String password, Set<String> scopes, String clientId,
+            String clientSecret)
+            throws KustvaktException, OAuthSystemException {
 
         OAuth2Client client =
-                clientService.authenticateClient(authorization, clientId);
-
+                clientService.authenticateClient(clientId, clientSecret);
         if (!client.isNative()) {
             throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
                     "Password grant is not allowed for third party clients",
@@ -138,7 +159,7 @@ public class OAuth2Service {
         return createsAccessTokenResponse();
     }
 
-    private void authenticateUser (String username, String password,
+    public void authenticateUser (String username, String password,
             Set<String> scopes) throws KustvaktException {
         if (username == null || username.isEmpty()) {
             throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
@@ -162,50 +183,46 @@ public class OAuth2Service {
 
     /** Clients must authenticate
      * 
-     * @param authorization
+     * @param clientId client_id parameter, required
+     * @param clientSecret client_secret parameter, required
      * @param scopes
-     * @param request 
      * @return
-     * @throws KustvaktException 
-     * @throws OAuthSystemException 
+     * @throws KustvaktException
+     * @throws OAuthSystemException
      */
     private OAuthResponse requestAccessTokenWithClientCredentials (
-            String authorization, Set<String> scopes)
+            String clientId, String clientSecret, Set<String> scopes)
             throws KustvaktException, OAuthSystemException {
 
-        if (authorization == null || authorization.isEmpty()) {
+        if (clientSecret == null || clientSecret.isEmpty()) {
             throw new KustvaktException(
                     StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                    "Client authentication using authorization header is required.",
-                    OAuthError.TokenResponse.INVALID_CLIENT);
+                    "Missing parameters: client_secret", "invalid_request");
         }
-        else {
-            clientService.authenticateClientByBasicAuthorization(authorization,
-                    null);
-            return createsAccessTokenResponse();
-        }
+
+        clientService.authenticateClient(clientId, clientSecret);
+        return createsAccessTokenResponse();
     }
 
 
-    /**
-     * @param request  
-     * @return 
-     * @throws OAuthSystemException 
+
+    /** Creates an OAuthResponse containing an access token and a refresh token 
+     *  with type Bearer.
      * 
+     * @return an OAuthResponse containing an access token
+     * @throws OAuthSystemException
      */
     private OAuthResponse createsAccessTokenResponse ()
             throws OAuthSystemException {
-        OAuthIssuer oauthIssuerImpl = new OAuthIssuerImpl(new MD5Generator());
-        OAuthResponse r = null;
+        String accessToken = oauthIssuer.accessToken();
+        String refreshToken = oauthIssuer.refreshToken();
 
-        String accessToken = oauthIssuerImpl.accessToken();
-        String refreshToken = oauthIssuerImpl.refreshToken();
-
-        r = OAuthASResponse.tokenResponse(HttpServletResponse.SC_OK)
-                .setAccessToken(accessToken)
-                .setTokenType(TokenType.BEARER.toString())
-                .setExpiresIn(String.valueOf(config.getTokenTTL()))
-                .setRefreshToken(refreshToken).buildJSONMessage();
+        OAuthResponse r =
+                OAuthASResponse.tokenResponse(Status.OK.getStatusCode())
+                        .setAccessToken(accessToken)
+                        .setTokenType(TokenType.BEARER.toString())
+                        .setExpiresIn(String.valueOf(config.getTokenTTL()))
+                        .setRefreshToken(refreshToken).buildJSONMessage();
         // scope
         return r;
     }

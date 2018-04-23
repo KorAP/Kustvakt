@@ -1,5 +1,8 @@
 package de.ids_mannheim.korap.web;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -92,7 +95,9 @@ public class OAuth2ResponseHandler extends KustvaktExceptionHandler {
         OAuthResponse oAuthResponse = null;
         String errorCode = e.getEntity();
         try {
-            if (errorCode.equals(OAuthError.TokenResponse.INVALID_CLIENT)) {
+            if (errorCode.equals(OAuthError.TokenResponse.INVALID_CLIENT)
+                    || errorCode.equals(
+                            OAuthError.TokenResponse.UNAUTHORIZED_CLIENT)) {
                 oAuthResponse = createOAuthResponse(e,
                         Status.UNAUTHORIZED.getStatusCode());
             }
@@ -100,8 +105,6 @@ public class OAuth2ResponseHandler extends KustvaktExceptionHandler {
                     || errorCode
                             .equals(OAuthError.TokenResponse.INVALID_REQUEST)
                     || errorCode.equals(OAuthError.TokenResponse.INVALID_SCOPE)
-                    || errorCode
-                            .equals(OAuthError.TokenResponse.UNAUTHORIZED_CLIENT)
                     || errorCode.equals(
                             OAuthError.TokenResponse.UNSUPPORTED_GRANT_TYPE)) {
                 oAuthResponse = createOAuthResponse(e,
@@ -141,5 +144,17 @@ public class OAuth2ResponseHandler extends KustvaktExceptionHandler {
                     "Basic realm=\"Kustvakt\"");
         }
         return builder.build();
+    }
+
+    public Response sendRedirect (String locationUri) throws KustvaktException {
+        try {
+            ResponseBuilder builder =
+                    Response.temporaryRedirect(new URI(locationUri));
+            return builder.build();
+        }
+        catch (URISyntaxException e) {
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
+                    e.getMessage(), OAuthError.CodeResponse.INVALID_REQUEST);
+        }
     }
 }

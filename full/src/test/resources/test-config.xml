@@ -167,10 +167,10 @@
 
 	<!-- URLValidator -->
 	<bean id="urlValidator" class="org.apache.commons.validator.routines.UrlValidator">
-		<constructor-arg value="http,https"/>
+		<constructor-arg value="http,https" />
 	</bean>
 	<bean id="httpsValidator" class="org.apache.commons.validator.routines.UrlValidator">
-		<constructor-arg value="https"/>
+		<constructor-arg value="https" />
 	</bean>
 
 	<bean id="kustvakt_rewrite" class="de.ids_mannheim.korap.rewrite.FullRewriteHandler">
@@ -184,8 +184,16 @@
 	<bean id="kustvaktExceptionHandler" class="de.ids_mannheim.korap.web.KustvaktExceptionHandler">
 		<constructor-arg index="0" name="iface" ref="kustvakt_auditing" />
 	</bean>
+
+	<!-- OAuth -->
 	<bean id="oauth2ResponseHandler" class="de.ids_mannheim.korap.web.OAuth2ResponseHandler">
 		<constructor-arg index="0" name="iface" ref="kustvakt_auditing" />
+	</bean>
+
+	<bean id="mdGenerator" class="org.apache.oltu.oauth2.as.issuer.MD5Generator">
+	</bean>
+	<bean id="oauthIssuer" class="org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl">
+		<constructor-arg index="0" ref="mdGenerator" />
 	</bean>
 
 	<bean id="kustvakt_userdb" class="de.ids_mannheim.korap.handlers.EntityDao">
@@ -200,8 +208,7 @@
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
 
-	<bean name="kustvakt_encryption"
-		class="de.ids_mannheim.korap.encryption.KustvaktEncryption">
+	<bean name="kustvakt_encryption" class="de.ids_mannheim.korap.encryption.KustvaktEncryption">
 		<constructor-arg ref="kustvakt_config" />
 	</bean>
 
@@ -267,8 +274,8 @@
 	<!-- specify type for constructor argument -->
 	<bean id="kustvakt_authenticationmanager"
 		class="de.ids_mannheim.korap.authentication.KustvaktAuthenticationManager">
-		<constructor-arg
-			type="de.ids_mannheim.korap.interfaces.EntityHandlerIface" ref="kustvakt_userdb" />
+		<constructor-arg type="de.ids_mannheim.korap.interfaces.EntityHandlerIface"
+			ref="kustvakt_userdb" />
 		<constructor-arg type="de.ids_mannheim.korap.interfaces.EncryptionIface"
 			ref="kustvakt_encryption" />
 		<constructor-arg ref="kustvakt_config" />
@@ -309,8 +316,8 @@
 
 	<!-- mail -->
 	<bean id="authenticator" class="de.ids_mannheim.korap.service.MailAuthenticator">
-		<constructor-arg index="0" value="${mail.username}"/>
-		<constructor-arg index="1" value="${mail.password}"/>
+		<constructor-arg index="0" value="${mail.username}" />
+		<constructor-arg index="1" value="${mail.password}" />
 	</bean>
 	<bean id="smtpSession" class="javax.mail.Session" factory-method="getInstance">
 		<constructor-arg index="0">
@@ -323,7 +330,7 @@
 				<prop key="mail.smtp.connectiontimeout">${mail.connectiontimeout}</prop>
 			</props>
 		</constructor-arg>
-		<constructor-arg index="1" ref="authenticator"/>
+		<constructor-arg index="1" ref="authenticator" />
 	</bean>
 	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
 		<property name="session" ref="smtpSession" />

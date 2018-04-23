@@ -283,6 +283,12 @@
 			<version>4.0</version>
 		</dependency>
 		
+		<!-- OAuth -->
+		<dependency>
+			<groupId>org.apache.oltu.oauth2</groupId>
+			<artifactId>org.apache.oltu.oauth2.authzserver</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 
 </project>

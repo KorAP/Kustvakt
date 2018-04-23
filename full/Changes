@@ -1,5 +1,5 @@
 version 0.60.2
-17/04/2018
+23/04/2018
 	- implemented OAuth2 client registration (margaretha)
 	- implemented OAuth2 client authentication (margaretha)
 	- changed virtual corpus search to retrieval (margaretha)
@@ -10,6 +10,7 @@ version 0.60.2
 	- implemented OAuth2 exception handler (margaretha)
 	- implemented OAuth2 request access token with client credentials grant (margaretha)
 	- implemented OAuth2 request access token with resource owner password grant (margaretha)
+	- implemented OAuth2 authorization code request (margaretha)
 	
 version 0.60.1
 28/03/2018

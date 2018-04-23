@@ -6,7 +6,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Repository;
@@ -27,8 +26,9 @@ public class OAuth2ClientDao {
     private EntityManager entityManager;
 
     public void registerClient (String id, String secretHashcode, String name,
-            OAuth2ClientType type, boolean isNative, String url, int urlHashCode,
-            String redirectURI, String registeredBy) throws KustvaktException {
+            OAuth2ClientType type, boolean isNative, String url,
+            int urlHashCode, String redirectURI, String registeredBy,
+            String description) throws KustvaktException {
         ParameterChecker.checkStringValue(id, "client id");
         ParameterChecker.checkStringValue(name, "client name");
         ParameterChecker.checkObjectValue(type, "client type");
@@ -46,6 +46,7 @@ public class OAuth2ClientDao {
         client.setUrlHashCode(urlHashCode);
         client.setRedirectURI(redirectURI);
         client.setRegisteredBy(registeredBy);
+        client.setDescription(description);
         entityManager.persist(client);
     }
 
@@ -68,7 +69,7 @@ public class OAuth2ClientDao {
         }
         catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.CLIENT_NOT_FOUND,
-                    "Unknown client with "+clientId+".", "invalid_client");
+                    "Unknown client with " + clientId + ".", "invalid_client");
         }
         catch (Exception e) {
             throw new KustvaktException(StatusCodes.CLIENT_NOT_FOUND,

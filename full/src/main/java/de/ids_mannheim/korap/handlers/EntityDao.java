@@ -1,21 +1,11 @@
 package de.ids_mannheim.korap.handlers;
 
-import de.ids_mannheim.korap.config.ParamFields;
-import de.ids_mannheim.korap.config.URIParam;
-import de.ids_mannheim.korap.exceptions.EmptyResultException;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.exceptions.DatabaseException;
-import de.ids_mannheim.korap.interfaces.EntityHandlerIface;
-import de.ids_mannheim.korap.interfaces.KustvaktBaseDaoInterface;
-import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
-import de.ids_mannheim.korap.user.KorAPUser;
-import de.ids_mannheim.korap.user.ShibUser;
-import de.ids_mannheim.korap.user.DemoUser;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.User.UserFactory;
-import de.ids_mannheim.korap.utils.BooleanUtils;
-import de.ids_mannheim.korap.utils.TimeUtils;
+import java.sql.Date;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -26,11 +16,19 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-import java.sql.Date;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import de.ids_mannheim.korap.config.ParamFields;
+import de.ids_mannheim.korap.config.URIParam;
+import de.ids_mannheim.korap.exceptions.DatabaseException;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.interfaces.EntityHandlerIface;
+import de.ids_mannheim.korap.interfaces.KustvaktBaseDaoInterface;
+import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
+import de.ids_mannheim.korap.user.KorAPUser;
+import de.ids_mannheim.korap.user.ShibbolethUser;
+import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.BooleanUtils;
+import de.ids_mannheim.korap.utils.TimeUtils;
 
 /* WKP: In computer software, a data access object (DAO) is an object that provides an abstract interface to some type 
  * of database or other persistence mechanism. By mapping application calls to the persistence layer, the DAO provides 
@@ -154,14 +152,14 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
                     //                    "uri_expiration=:exp "
                     + "WHERE id=:id";
         }
-        else if (user instanceof ShibUser) {
-            ShibUser s = (ShibUser) user;
+        else if (user instanceof ShibbolethUser) {
+            ShibbolethUser s = (ShibbolethUser) user;
             //todo:
             //            np.addValue("ali", s.getAccountLink());
             np.addValue("ali", null);
             np.addValue("edu", s.getAffiliation());
             np.addValue("id", s.getId());
-            np.addValue("cn", s.getCn());
+            np.addValue("cn", s.getCommonName());
             np.addValue("mail", s.getMail());
 
             query = "UPDATE shibusers SET account_link=:ali"
@@ -225,8 +223,8 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
 
             //fixme: still applicable?
         }
-        else if (user instanceof ShibUser) {
-            ShibUser s = (ShibUser) user;
+        else if (user instanceof ShibbolethUser) {
+            ShibbolethUser s = (ShibbolethUser) user;
 
             query = "INSERT INTO shibusers (username, type, account_link, account_creation "
                     + "eduPersonScopedAffiliation, cn, mail) "
@@ -237,7 +235,7 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
             np.addValue("edu", s.getAffiliation());
             np.addValue("mail", s.getMail());
             np.addValue("type", user.getType());
-            np.addValue("cn", s.getCn());
+            np.addValue("cn", s.getCommonName());
             np.addValue("acr", System.currentTimeMillis());
 
             //todo: deprecate

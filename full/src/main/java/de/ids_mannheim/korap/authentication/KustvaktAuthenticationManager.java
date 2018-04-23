@@ -44,7 +44,7 @@ import de.ids_mannheim.korap.interfaces.defaults.ApacheValidator;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.DemoUser;
 import de.ids_mannheim.korap.user.KorAPUser;
-import de.ids_mannheim.korap.user.ShibUser;
+import de.ids_mannheim.korap.user.ShibbolethUser;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.user.User.Location;
@@ -389,7 +389,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 						StatusCodes.LOGIN_FAILED, username);
 			}
 
-		} else if (unknown instanceof ShibUser) {
+		} else if (unknown instanceof ShibbolethUser) {
 			// todo
 		}
 		jlog.debug("Authentication done: "+unknown);
@@ -521,7 +521,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 			 * username); }
 			 */
 
-		} else if (unknown instanceof ShibUser) {
+		} else if (unknown instanceof ShibbolethUser) {
 			// todo
 		}
 
@@ -753,17 +753,20 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	}
 
 	// todo:
-	private ShibUser createShibbUserAccount(Map<String, Object> attributes) throws KustvaktException {
+	private ShibbolethUser createShibbUserAccount(Map<String, Object> attributes) throws KustvaktException {
 		jlog.debug("creating shibboleth user account for user attr: {}", attributes);
 		Map<String, Object> safeMap = validator.validateMap(attributes);
 
 		// todo eppn non-unique.join with idp or use persistent_id as username
 		// identifier
-		ShibUser user = User.UserFactory.getShibInstance((String) safeMap.get(Attributes.EPPN),
-				(String) safeMap.get(Attributes.MAIL), (String) safeMap.get(Attributes.CN));
-		user.setAffiliation((String) safeMap.get(Attributes.EDU_AFFIL));
-		user.setAccountCreation(TimeUtils.getNow().getMillis());
+		// EM: disabled
+//		ShibbolethUser user = User.UserFactory.getShibInstance((String) safeMap.get(Attributes.EPPN),
+//				(String) safeMap.get(Attributes.MAIL), (String) safeMap.get(Attributes.CN));
+//		user.setAffiliation((String) safeMap.get(Attributes.EDU_AFFIL));
+//		user.setAccountCreation(TimeUtils.getNow().getMillis());
 
+		ShibbolethUser user = null;
+		
 		UserDetails d = new UserDetails();
 		d.read(attributes, true);
 

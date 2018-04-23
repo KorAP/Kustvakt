@@ -62,6 +62,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         json.setType(OAuth2ClientType.CONFIDENTIAL);
         json.setUrl("http://example.client.com");
         json.setRedirectURI("https://example.client.com/redirect");
+        json.setDescription("This is a confidential test client.");
 
         return resource().path("oauth2").path("client").path("register")
                 .header(Attributes.AUTHORIZATION,
@@ -89,8 +90,9 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
                 node.at("/error").asText());
 
+        testDeregisterConfidentialClientMissingParameters();
         testDeregisterClientIncorrectCredentials(clientId);
-        testDeregisterConfidentialClient(clientId, clientSecret);
+        testDeregisterConfidentialClient(clientId,clientSecret);
     }
 
     @Test
@@ -101,6 +103,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         json.setType(OAuth2ClientType.PUBLIC);
         json.setUrl("http://test.public.client.com");
         json.setRedirectURI("https://test.public.client.com/redirect");
+        json.setDescription("This is a public test client.");
 
         ClientResponse response = resource().path("oauth2").path("client")
                 .path("register")
@@ -129,6 +132,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         json.setType(OAuth2ClientType.PUBLIC);
         json.setUrl("http://korap.ids-mannheim.de/native");
         json.setRedirectURI("https://korap.ids-mannheim.de/native/redirect");
+        json.setDescription("This is a native test client.");
 
         ClientResponse response = resource().path("oauth2").path("client")
                 .path("register")
@@ -140,7 +144,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
                 .entity(json).post(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        
+
         //EM: need to check native
     }
 
@@ -167,8 +171,6 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
     private void testDeregisterConfidentialClient (String clientId,
             String clientSecret) throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("client_id", clientId);
 
         ClientResponse response = resource().path("oauth2").path("client")
                 .path("deregister").path("confidential")
@@ -178,16 +180,34 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).delete(ClientResponse.class);
+                .delete(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+
+    private void testDeregisterConfidentialClientMissingParameters ()
+            throws KustvaktException {
+
+        ClientResponse response = resource().path("oauth2").path("client")
+                .path("deregister").path("confidential")
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .delete(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
+                node.at("/error").asText());
+        assertEquals("Missing parameters: client_secret client_id",
+                node.at("/error_description").asText());
     }
 
     private void testDeregisterClientIncorrectCredentials (String clientId)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("client_id", clientId);
 
         ClientResponse response = resource().path("oauth2").path("client")
                 .path("deregister").path("confidential")
@@ -197,7 +217,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).delete(ClientResponse.class);
+                .delete(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -205,7 +225,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuthError.TokenResponse.INVALID_CLIENT,
                 node.at("/error").asText());
-        assertEquals("Invalid client credentials.",
+        assertEquals("Invalid client credentials",
                 node.at("/error_description").asText());
 
         checkWWWAuthenticateHeader(response);

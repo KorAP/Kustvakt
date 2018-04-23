@@ -37,11 +37,13 @@ public class OAuth2Client {
     private String redirectURI;
     @Column(name = "registered_by")
     private String registeredBy;
+    private String description;
 
     @Override
     public String toString () {
-        return "id=" + id + ", secret=" + secret + ", type=" + type + ", name="
-                + name + ", url=" + url + ", redirectURI=" + redirectURI
-                + ", registeredBy=" + registeredBy;
+        return "id=" + id + ", name=" + name + ", secret=" + secret + ", type="
+                + type + ", isNative=" + isNative + ", url=" + url
+                + ", redirectURI=" + redirectURI + ", registeredBy="
+                + registeredBy + ", description=" + description;
     }
 }

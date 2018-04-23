@@ -6,7 +6,7 @@ import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.KorAPUser;
-import de.ids_mannheim.korap.user.ShibUser;
+import de.ids_mannheim.korap.user.ShibbolethUser;
 import de.ids_mannheim.korap.user.User;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -39,9 +39,9 @@ public class RowMapperFactory {
                 case 0:
                     user = getKorAP(rs);
                     break;
-                case 1:
-                    user = getShib(rs);
-                    break;
+//                case 1:
+//                    user = getShib(rs);
+//                    break;
                 default:
                     user = User.UserFactory.getDemoUser();
                     user.setId(rs.getInt("id"));
@@ -71,13 +71,13 @@ public class RowMapperFactory {
         }
 
 
-        private ShibUser getShib (ResultSet rs) throws SQLException {
-            ShibUser user = User.UserFactory.getShibInstance(
-                    rs.getString(Attributes.USERNAME),
-                    rs.getString(Attributes.MAIL), rs.getString(Attributes.CN));
-            user.setId(rs.getInt(Attributes.ID));
-            return user;
-        }
+//        private ShibbolethUser getShib (ResultSet rs) throws SQLException {
+//            ShibbolethUser user = User.UserFactory.getShibInstance(
+//                    rs.getString(Attributes.USERNAME),
+//                    rs.getString(Attributes.MAIL), rs.getString(Attributes.CN));
+//            user.setId(rs.getInt(Attributes.ID));
+//            return user;
+//        }
 
     }
 

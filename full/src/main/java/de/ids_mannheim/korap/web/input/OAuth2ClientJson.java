@@ -20,4 +20,5 @@ public class OAuth2ClientJson {
     // redirect URI determines where the OAuth 2.0 service will return the user to 
     // after they have authorized a client. It must be https.
     private String redirectURI;
+    private String description;
 }
