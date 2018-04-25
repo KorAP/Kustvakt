@@ -17,52 +17,19 @@ import org.apache.oltu.oauth2.common.message.OAuthResponse;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 
-/** OAuth2ResponseHandler builds {@link Response}s from 
- * {@link OAuthResponse}s and handles exceptions by building 
- * OAuth error responses accordingly. 
+/**
+ * OAuth2ResponseHandler builds {@link Response}s from
+ * {@link OAuthResponse}s and handles exceptions by building
+ * OAuth error responses accordingly.
  * 
  * <br/><br/>
  * 
- * OAuth2 error response consists of error (required), 
+ * OAuth2 error response consists of error (required),
  * error_description (optional) and error_uri (optional).
  * 
- * According to RFC 6749, error indicates error code 
- * categorized into:
- * <ul>
- * <li>invalid_request: The request is missing a required parameter, 
- * includes an unsupported parameter value (other than grant type),
- * repeats a parameter, includes multiple credentials, utilizes 
- * more than one mechanism for authenticating the client, or is 
- * otherwise malformed.</li>
- * 
- * <li>invalid_client: Client authentication failed (e.g., unknown 
- * client, no client authentication included, or unsupported 
- * authentication method).  The authorization sever MAY return 
- * an HTTP 401 (Unauthorized) status code to indicate which 
- * HTTP authentication schemes are supported. If the client 
- * attempted to authenticate via the "Authorization" request 
- * header field, the authorization server MUST respond with 
- * an HTTP 401 (Unauthorized) status code and include 
- * the "WWW-Authenticate" response header field matching 
- * the authentication scheme used by the client</li>
- * 
- * <li>invalid_grant: The provided authorization grant 
- * (e.g., authorization code, resource owner credentials) or 
- * refresh token is invalid, expired, revoked, does not match 
- * the redirection URI used in the authorization request, or 
- * was issued to another client.</li>
- * 
- * <li>unauthorized_client:The authenticated client is not 
- * authorized to use this authorization grant type.</li>
- * 
- * <li>unsupported_grant_type: The authorization grant type 
- * is not supported by the authorization server.</li>
- * 
- * <li>invalid_scope: The requested scope is invalid, unknown, 
- * malformed, or exceeds the scope granted by the resource owner.</li>
- * </ul>
- * 
+ * @see OAuth2Error
  * 
  * @author margaretha
  *
@@ -95,21 +62,32 @@ public class OAuth2ResponseHandler extends KustvaktExceptionHandler {
         OAuthResponse oAuthResponse = null;
         String errorCode = e.getEntity();
         try {
-            if (errorCode.equals(OAuthError.TokenResponse.INVALID_CLIENT)
-                    || errorCode.equals(
-                            OAuthError.TokenResponse.UNAUTHORIZED_CLIENT)) {
+            if (errorCode.equals(OAuth2Error.INVALID_CLIENT)
+                    || errorCode.equals(OAuth2Error.UNAUTHORIZED_CLIENT)
+                    || errorCode.equals(OAuth2Error.INVALID_TOKEN)) {
                 oAuthResponse = createOAuthResponse(e,
                         Status.UNAUTHORIZED.getStatusCode());
             }
-            else if (errorCode.equals(OAuthError.TokenResponse.INVALID_GRANT)
-                    || errorCode
-                            .equals(OAuthError.TokenResponse.INVALID_REQUEST)
-                    || errorCode.equals(OAuthError.TokenResponse.INVALID_SCOPE)
-                    || errorCode.equals(
-                            OAuthError.TokenResponse.UNSUPPORTED_GRANT_TYPE)) {
+            else if (errorCode.equals(OAuth2Error.INVALID_GRANT)
+                    || errorCode.equals(OAuth2Error.INVALID_REQUEST)
+                    || errorCode.equals(OAuth2Error.INVALID_SCOPE)
+                    || errorCode.equals(OAuth2Error.UNSUPPORTED_GRANT_TYPE)
+                    || errorCode.equals(OAuth2Error.UNSUPPORTED_RESPONSE_TYPE)
+                    || errorCode.equals(OAuth2Error.ACCESS_DENIED)) {
                 oAuthResponse = createOAuthResponse(e,
                         Status.BAD_REQUEST.getStatusCode());
-
+            }
+            else if (errorCode.equals(OAuth2Error.INSUFFICIENT_SCOPE)) {
+                oAuthResponse = createOAuthResponse(e,
+                        Status.FORBIDDEN.getStatusCode());
+            }
+            else if (errorCode.equals(OAuth2Error.SERVER_ERROR)) {
+                oAuthResponse = createOAuthResponse(e,
+                        Status.INTERNAL_SERVER_ERROR.getStatusCode());
+            }
+            else if (errorCode.equals(OAuth2Error.TEMPORARILY_UNAVAILABLE)) {
+                oAuthResponse = createOAuthResponse(e,
+                        Status.SERVICE_UNAVAILABLE.getStatusCode());
             }
             else {
                 return super.throwit(e);

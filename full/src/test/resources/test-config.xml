@@ -123,7 +123,12 @@
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<!-- <property name="dataSource" ref="dataSource" /> -->
 		<property name="dataSource" ref="sqliteDataSource" />
-		<property name="packagesToScan" value="de.ids_mannheim.korap.entity" />
+		<property name="packagesToScan">
+			<array>
+				<value>de.ids_mannheim.korap.entity</value>
+				<value>de.ids_mannheim.korap.oauth2.entity</value>
+			</array>
+		</property>
 		<property name="jpaVendorAdapter">
 			<bean id="jpaVendorAdapter"
 				class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">

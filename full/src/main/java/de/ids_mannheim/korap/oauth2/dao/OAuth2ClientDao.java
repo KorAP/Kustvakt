@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.dao;
+package de.ids_mannheim.korap.oauth2.dao;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -11,11 +11,11 @@ import javax.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import de.ids_mannheim.korap.constant.OAuth2ClientType;
-import de.ids_mannheim.korap.entity.OAuth2Client;
-import de.ids_mannheim.korap.entity.OAuth2Client_;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
+import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
+import de.ids_mannheim.korap.oauth2.entity.OAuth2Client_;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
 @Transactional

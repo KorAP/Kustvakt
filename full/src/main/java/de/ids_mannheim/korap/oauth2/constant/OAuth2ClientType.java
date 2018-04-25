@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.constant;
+package de.ids_mannheim.korap.oauth2.constant;
 
 public enum OAuth2ClientType {
 

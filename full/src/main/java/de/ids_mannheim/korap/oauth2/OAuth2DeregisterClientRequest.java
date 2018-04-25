@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.oauth;
+package de.ids_mannheim.korap.oauth2;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -8,9 +8,9 @@ import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.utils.OAuthUtils;
 import org.apache.oltu.oauth2.common.validators.OAuthValidator;
 
-public class OAuthDeregisterClientRequest extends OAuthRequest {
+public class OAuth2DeregisterClientRequest extends OAuthRequest {
 
-    public OAuthDeregisterClientRequest (HttpServletRequest request)
+    public OAuth2DeregisterClientRequest (HttpServletRequest request)
             throws OAuthSystemException, OAuthProblemException {
         super(request);
     }

@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.error.OAuthError;
+import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         form.add("client_id", "fCBbQkAyYzI4NzUxMg");
         form.add("username", "dory");
         form.add("password", "password");
+
         ClientResponse response = requestAuthorizationConfidentialClient(form);
 
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
@@ -135,6 +137,36 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
                 .entity(form).post(ClientResponse.class);
     }
 
+    @Test
+    public void testRequestTokenAuthorizationConfidential ()
+            throws KustvaktException {
+        
+        MultivaluedMap<String, String> authForm = new MultivaluedMapImpl();
+        authForm.add("response_type", "code");
+        authForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        authForm.add("username", "dory");
+        authForm.add("password", "password");
+//        form.add("scope", "read");
+        ClientResponse response = requestAuthorizationConfidentialClient(authForm);
+        URI redirectUri = response.getLocation();
+        String code = redirectUri.getQuery().split("=")[1];
+        
+        MultivaluedMap<String, String> tokenForm = new MultivaluedMapImpl();
+        tokenForm.add("grant_type", "authorization_code");
+        tokenForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        tokenForm.add("client_secret", "secret");
+        tokenForm.add("code", code);
+        
+        response = requestToken(tokenForm);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertNotNull(node.at("/access_token").asText());
+        assertNotNull(node.at("/refresh_token").asText());
+        assertEquals(TokenType.BEARER.toString(),
+                node.at("/token_type").asText());
+        assertNotNull(node.at("/expires_in").asText());
+    }
+    
     @Test
     public void testRequestTokenPasswordGrantConfidential ()
             throws KustvaktException {

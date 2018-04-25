@@ -23,9 +23,9 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.oauth.OAuthDeregisterClientRequest;
+import de.ids_mannheim.korap.oauth2.OAuth2DeregisterClientRequest;
+import de.ids_mannheim.korap.oauth2.service.OAuth2ClientService;
 import de.ids_mannheim.korap.security.context.TokenContext;
-import de.ids_mannheim.korap.service.OAuth2ClientService;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
@@ -122,7 +122,7 @@ public class OAuthClientController {
             @Context HttpServletRequest request,
             MultivaluedMap<String, String> form) {
         try {
-            OAuthRequest oAuthRequest = new OAuthDeregisterClientRequest(
+            OAuthRequest oAuthRequest = new OAuth2DeregisterClientRequest(
                     new FormRequestWrapper(request, form));
 
             clientService.deregisterConfidentialClient(oAuthRequest);

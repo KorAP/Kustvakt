@@ -24,8 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.service.OAuth2AuthorizationService;
-import de.ids_mannheim.korap.service.OAuth2Service;
+import de.ids_mannheim.korap.oauth2.service.OAuth2AuthorizationService;
+import de.ids_mannheim.korap.oauth2.service.OAuth2Service;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
 import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 
@@ -40,15 +40,26 @@ public class OAuth2Controller {
     @Autowired
     private OAuth2AuthorizationService authorizationService;
 
-    /** Kustvakt supports authorization only with Kalamar as the authorization 
-     * web-frontend or user interface. Thus authorization code request requires
-     * user credentials in the request body, similar to access token request in
-     * resource owner password grant request. 
+    /**
+     * Requests an authorization code.
      * 
-     * @param request
-     * @param authorization
-     * @param form
-     * @return
+     * Kustvakt supports authorization only with Kalamar as the
+     * authorization web-frontend or user interface. Thus
+     * authorization code request requires user credentials in the
+     * request body, similar to access token request in
+     * resource owner password grant request.
+     * 
+     * <br /><br />
+     * RFC 6749:
+     * If the client omits the scope parameter when requesting
+     * authorization, the authorization server MUST either process the
+     * request using a pre-defined default value or fail the request
+     * indicating an invalid scope.
+     * 
+     * @param request HttpServletRequest
+     * @param authorization authorization header
+     * @param form form parameters
+     * @return a redirect URL
      */
     @POST
     @Path("authorize")
@@ -81,16 +92,50 @@ public class OAuth2Controller {
     }
 
 
-    /** Grants a client an access token, namely a string used in authenticated 
-     *  requests representing user authorization for the client to access user 
-     *  resources. 
+    /**
+     * Grants a client an access token, namely a string used in
+     * authenticated requests representing user authorization for
+     * the client to access user resources.
      * 
-     * @param request the request
-     * @param authorization authorization header
-     * @param form form parameters in a map
-     * @return a JSON object containing an access token, a refresh token, 
-     *  a token type and token expiry/life time (in seconds) if successful, 
-     *  an error code and an error description otherwise.
+     * <br /><br />
+     * 
+     * OAuth2 describes various ways of requesting an access token.
+     * Kustvakt supports:
+     * <ul>
+     * <li> Authorization code grant: obtains authorization from a
+     * third party application. Required parameters: grant_type,
+     * code, client_id, redirect_uri (if specified in the
+     * authorization request), client_secret (if the client is
+     * confidential or issued a secret).
+     * </li>
+     * <li> Resource owner password grant: strictly for clients that
+     * are parts of KorAP. Clients use user credentials, e.g. Kalamar
+     * (front-end) with login form. Required parameters: grant_type,
+     * username, password, client_id, client_secret (if the client is
+     * confidential or issued a secret). Optional parameters: scope.
+     * </li>
+     * <li> Client credentials grant: strictly for clients that are
+     * parts of KorAP. Clients access their own resources, not on
+     * behalf of a user. Required parameters: grant_type, client_id,
+     * client_secret. Optional parameters: scope.
+     * </li>
+     * </ul>
+     * 
+     * <br /><br />
+     * RFC 6749: The value of the scope parameter is expressed as a
+     * list of space-delimited, case-sensitive strings defined by the
+     * authorization server.
+     * 
+     * @param request
+     *            the request
+     * @param authorization
+     *            authorization header
+     * @param form
+     *            form parameters in a map
+     * @return a JSON object containing an access token, a refresh
+     *         token, a token type and the token expiration in seconds
+     *         if successful, an error code and an error description
+     *         otherwise.
      */
     @POST
     @Path("token")

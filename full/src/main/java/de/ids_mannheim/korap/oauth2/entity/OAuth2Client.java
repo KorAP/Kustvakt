@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.entity;
+package de.ids_mannheim.korap.oauth2.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -7,7 +7,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import de.ids_mannheim.korap.constant.OAuth2ClientType;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import lombok.Getter;
 import lombok.Setter;
 

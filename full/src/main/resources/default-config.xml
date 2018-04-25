@@ -122,7 +122,12 @@
 		<!-- <property name="dataSource" ref="dataSource" /> -->
 		<property name="dataSource" ref="sqliteDataSource" />
 
-		<property name="packagesToScan" value="de.ids_mannheim.korap.entity" />
+		<property name="packagesToScan">
+			<array>
+				<value>de.ids_mannheim.korap.entity</value>
+				<value>de.ids_mannheim.korap.oauth2.entity</value>
+			</array>
+		</property>
 		<property name="jpaVendorAdapter">
 			<bean id="jpaVendorAdapter"
 				class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
@@ -170,7 +175,7 @@
 		<constructor-arg value="http,https" />
 	</bean>
 	<bean id="httpsValidator" class="org.apache.commons.validator.routines.UrlValidator">
-		<constructor-arg value="https"/>
+		<constructor-arg value="https" />
 	</bean>
 
 	<bean id="kustvakt_rewrite" class="de.ids_mannheim.korap.rewrite.FullRewriteHandler">
@@ -184,12 +189,12 @@
 	<bean id="kustvaktResponseHandler" class="de.ids_mannheim.korap.web.KustvaktExceptionHandler">
 		<constructor-arg index="0" name="iface" ref="kustvakt_auditing" />
 	</bean>
-	
+
 	<!-- OAuth -->
 	<bean id="oauth2ResponseHandler" class="de.ids_mannheim.korap.web.OAuth2ResponseHandler">
 		<constructor-arg index="0" name="iface" ref="kustvakt_auditing" />
 	</bean>
-	
+
 	<bean id="mdGenerator" class="org.apache.oltu.oauth2.as.issuer.MD5Generator">
 	</bean>
 	<bean id="oauthIssuer" class="org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl">
@@ -208,8 +213,7 @@
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
 
-	<bean name="kustvakt_encryption"
-		class="de.ids_mannheim.korap.encryption.KustvaktEncryption">
+	<bean name="kustvakt_encryption" class="de.ids_mannheim.korap.encryption.KustvaktEncryption">
 		<constructor-arg ref="kustvakt_config" />
 	</bean>
 
@@ -217,9 +221,6 @@
 	<!-- <bean id="api_auth" class="de.ids_mannheim.korap.authentication.APIAuthentication"> 
 		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration" 
 		ref="kustvakt_config" /> </bean> -->
-
-	<bean id="client_auth"
-		class="de.ids_mannheim.korap.authentication.OAuth2ClientAuthentication" />
 
 	<bean id="ldap_auth" class="de.ids_mannheim.korap.authentication.LdapAuth3">
 		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"

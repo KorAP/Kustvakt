@@ -11,7 +11,6 @@ import java.util.Set;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.http.entity.ContentType;
-import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,8 +26,9 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
-import de.ids_mannheim.korap.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
@@ -87,7 +87,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         response = testRegisterConfidentialClient();
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         node = JsonUtils.readTree(response.getEntity(String.class));
-        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
+        assertEquals(OAuth2Error.INVALID_REQUEST,
                 node.at("/error").asText());
 
         testDeregisterConfidentialClientMissingParameters();
@@ -199,7 +199,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
+        assertEquals(OAuth2Error.INVALID_REQUEST,
                 node.at("/error").asText());
         assertEquals("Missing parameters: client_secret client_id",
                 node.at("/error_description").asText());
@@ -223,7 +223,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_CLIENT,
+        assertEquals(OAuth2Error.INVALID_CLIENT,
                 node.at("/error").asText());
         assertEquals("Invalid client credentials",
                 node.at("/error_description").asText());

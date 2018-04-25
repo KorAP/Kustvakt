@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.web.input;
 
-import de.ids_mannheim.korap.constant.OAuth2ClientType;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.service;
+package de.ids_mannheim.korap.oauth2.service;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -9,26 +9,28 @@ import java.sql.SQLException;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.log4j.Logger;
 import org.apache.oltu.oauth2.as.request.OAuthRequest;
-import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
-import de.ids_mannheim.korap.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.dao.AdminDao;
-import de.ids_mannheim.korap.dao.OAuth2ClientDao;
 import de.ids_mannheim.korap.dto.OAuth2ClientDto;
-import de.ids_mannheim.korap.entity.OAuth2Client;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
+import de.ids_mannheim.korap.oauth2.dao.OAuth2ClientDao;
+import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
-/** According to RFC 6749, an authorization server MUST: 
+/**
+ * According to RFC 6749, an authorization server MUST:
  * <ul>
  * <li>
  * require client authentication for confidential clients or for any
- * client that was issued client credentials (or with other authentication 
+ * client that was issued client credentials (or with other
+ * authentication
  * requirements),
  * </li>
  * 
@@ -62,13 +64,13 @@ public class OAuth2ClientService {
         if (!urlValidator.isValid(clientJson.getUrl())) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     clientJson.getUrl() + " is invalid.",
-                    OAuthError.TokenResponse.INVALID_REQUEST);
+                    OAuth2Error.INVALID_REQUEST);
         }
         if (!httpsValidator.isValid(clientJson.getRedirectURI())) {
             throw new KustvaktException(StatusCodes.HTTPS_REQUIRED,
                     clientJson.getRedirectURI()
                             + " is invalid. RedirectURI requires https.",
-                    OAuthError.TokenResponse.INVALID_REQUEST);
+                    OAuth2Error.INVALID_REQUEST);
         }
 
         boolean isNative = isNativeClient(clientJson.getUrl(),
@@ -107,8 +109,7 @@ public class OAuth2ClientService {
                 if (cause instanceof SQLException) {
                     throw new KustvaktException(
                             StatusCodes.CLIENT_REGISTRATION_FAILED,
-                            cause.getMessage(),
-                            OAuthError.TokenResponse.INVALID_REQUEST);
+                            cause.getMessage(), OAuth2Error.INVALID_REQUEST);
                 }
                 lastCause = cause;
             }
@@ -128,7 +129,7 @@ public class OAuth2ClientService {
         catch (MalformedURLException e) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "Invalid url :" + e.getMessage(),
-                    OAuthError.TokenResponse.INVALID_REQUEST);
+                    OAuth2Error.INVALID_REQUEST);
         }
         String uriHost = null;
         try {
@@ -137,7 +138,7 @@ public class OAuth2ClientService {
         catch (URISyntaxException e) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "Invalid redirectURI: " + e.getMessage(),
-                    OAuthError.TokenResponse.INVALID_REQUEST);
+                    OAuth2Error.INVALID_REQUEST);
         }
         boolean isNative =
                 urlHost.equals(nativeHost) && uriHost.equals(nativeHost);
@@ -159,7 +160,7 @@ public class OAuth2ClientService {
                     "Service is limited to public clients. To deregister "
                             + "confidential clients, use service at path: "
                             + "oauth2/client/deregister/confidential.",
-                    OAuthError.TokenResponse.INVALID_REQUEST);
+                    OAuth2Error.INVALID_REQUEST);
         }
         else if (client.getRegisteredBy().equals(username)) {
             clientDao.deregisterClient(client);
@@ -185,7 +186,8 @@ public class OAuth2ClientService {
         if (clientId == null || clientId.isEmpty()) {
             throw new KustvaktException(
                     StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                    "Missing parameters: client id", "invalid_request");
+                    "Missing parameters: client id",
+                    OAuth2Error.INVALID_REQUEST);
         }
 
         OAuth2Client client = clientDao.retrieveClientById(clientId);
@@ -194,7 +196,8 @@ public class OAuth2ClientService {
                     || client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
                 throw new KustvaktException(
                         StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                        "Missing parameters: client_secret", "invalid_request");
+                        "Missing parameters: client_secret",
+                        OAuth2Error.INVALID_REQUEST);
             }
             else
                 return client;
@@ -209,8 +212,7 @@ public class OAuth2ClientService {
         }
 
         throw new KustvaktException(StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                "Invalid client credentials",
-                OAuthError.TokenResponse.INVALID_CLIENT);
+                "Invalid client credentials", OAuth2Error.INVALID_CLIENT);
     }
 
 }

@@ -124,6 +124,8 @@ public class StatusCodes {
     public static final int CLIENT_AUTHORIZATION_FAILED = 1804;
     public static final int CLIENT_NOT_FOUND = 1805;
     public static final int INVALID_REDIRECT_URI = 1806;
+    public static final int INVALID_SCOPE = 1807;
+    public static final int INVALID_AUTHORIZATION = 1808;
     
     public static final int UNSUPPORTED_GRANT_TYPE = 1810;
     

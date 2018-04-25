@@ -1,5 +1,5 @@
 version 0.60.2
-23/04/2018
+25/04/2018
 	- implemented OAuth2 client registration (margaretha)
 	- implemented OAuth2 client authentication (margaretha)
 	- changed virtual corpus search to retrieval (margaretha)
@@ -7,10 +7,14 @@ version 0.60.2
 	- added client registration and deregistration tests (margaretha)
 	- implemented confidential client deregistration task (margaretha)
 	- fixed storing client secret (margaretha)
-	- implemented OAuth2 exception handler (margaretha)
+	- implemented OAuth2 response handler (margaretha)
 	- implemented OAuth2 request access token with client credentials grant (margaretha)
 	- implemented OAuth2 request access token with resource owner password grant (margaretha)
 	- implemented OAuth2 authorization code request (margaretha)
+	- added OAuth2 error codes (margaretha)
+	- added OAuth2 authorization, scope and access token tables for SQLite (margaretha)
+	- implemented OAuth2 authorization, scope and access token DAO (margaretha)
+	- implemented OAuth2 request access token with authorization code grant (margaretha)
 	
 version 0.60.1
 28/03/2018
