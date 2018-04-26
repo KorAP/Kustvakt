@@ -27,7 +27,7 @@ import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 
 @Service
-public class OAuth2Service {
+public class OAuth2TokenService {
 
     @Autowired
     private OAuth2ClientService clientService;

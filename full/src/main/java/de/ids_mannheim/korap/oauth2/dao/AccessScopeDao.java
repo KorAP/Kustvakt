@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.oauth2.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -29,5 +30,18 @@ public class AccessScopeDao {
         query.select(root);
         Query q = entityManager.createQuery(query);
         return q.getResultList();
+    }
+
+    public void storeAccessScopes (Set<String> scopes) {
+        List<AccessScope> existingScopes = retrieveAccessScopes();
+        AccessScope newScope;
+        for (String scope : scopes) {
+            newScope = new AccessScope(scope);
+            if (!existingScopes.contains(newScope)) {
+                entityManager.persist(newScope);
+            }
+            // else skip
+        }
+
     }
 }

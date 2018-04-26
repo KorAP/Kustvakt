@@ -33,18 +33,17 @@ CREATE TABLE IF NOT EXISTS oauth2_authorization (
 CREATE UNIQUE INDEX authorization_index on oauth2_authorization(code, client_id);
 
 CREATE TABLE IF NOT EXISTS oauth2_access_scope (
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	name VARCHAR(200) NOT NULL
+	id VARCHAR(200) PRIMARY KEY NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS oauth2_authorization_scope (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	authorization_id INTEGER NOT NULL,
-	scope_id INTEGER NOT NULL,
+	scope_id VARCHAR(200) NOT NULL,
 	FOREIGN KEY (authorization_id)
 	   REFERENCES oauth2_authorization(id),
 	FOREIGN KEY (scope_id)
-	   REFERENCES access_scope(id)
+	   REFERENCES oauth2_access_scope(id)
 );
 
 CREATE UNIQUE INDEX authorization_scope_index on 

@@ -51,11 +51,6 @@
 		class='org.springframework.cache.ehcache.EhCacheManagerFactoryBean'
 		p:configLocation='classpath:ehcache.xml' p:shared='true' />
 
-	<!-- props are injected from default-config.xml -->
-	<bean id="kustvakt_config" class="de.ids_mannheim.korap.config.FullConfiguration">
-		<constructor-arg name="properties" ref="props" />
-	</bean>
-
 	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
 		lazy-init="true">
 		<!-- <property name="driverClassName" value="${jdbc.driverClassName}" /> -->
@@ -163,7 +158,19 @@
 
 	<!-- Data access objects -->
 	<bean id="resourceDao" class="de.ids_mannheim.korap.dao.ResourceDao" />
-	<!-- <bean id="annotationDao" class="de.ids_mannheim.korap.dao.AnnotationDao"/> -->
+	<bean id="accessScopeDao" class="de.ids_mannheim.korap.oauth2.dao.AccessScopeDao" />
+
+	<!-- props are injected from default-config.xml -->
+	<bean id="kustvakt_config" class="de.ids_mannheim.korap.config.FullConfiguration">
+		<constructor-arg name="properties" ref="props" />
+	</bean>
+
+	<bean id="initializator" class="de.ids_mannheim.korap.config.Initializator"
+		init-method="init">
+		<constructor-arg name="config" ref="kustvakt_config" />
+		<constructor-arg name="accessScopeDao" ref="accessScopeDao" />
+	</bean>
+
 
 	<!-- Krill -->
 	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">

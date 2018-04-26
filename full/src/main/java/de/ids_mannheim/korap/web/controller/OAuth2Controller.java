@@ -25,7 +25,7 @@ import org.springframework.stereotype.Controller;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.service.OAuth2AuthorizationService;
-import de.ids_mannheim.korap.oauth2.service.OAuth2Service;
+import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
 import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 
@@ -36,7 +36,7 @@ public class OAuth2Controller {
     @Autowired
     private OAuth2ResponseHandler responseHandler;
     @Autowired
-    private OAuth2Service oAuth2Service;
+    private OAuth2TokenService oAuth2Service;
     @Autowired
     private OAuth2AuthorizationService authorizationService;
 

@@ -2,15 +2,20 @@ package de.ids_mannheim.korap.config;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import de.ids_mannheim.korap.constant.AuthenticationMethod;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 
-/** Configuration for Kustvakt full version including properties concerning
- *  authentication and licenses. 
+/**
+ * Configuration for Kustvakt full version including properties
+ * concerning
+ * authentication and licenses.
  * 
  * @author margaretha
  *
@@ -49,6 +54,8 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     private AuthenticationMethod OAuth2passwordAuthentication;
     private String nativeClientHost;
+    private Set<String> accessScopes;
+    private int maxAuthenticationAttempts;
 
     public FullConfiguration (Properties properties) throws IOException {
         super(properties);
@@ -75,10 +82,19 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     private void setOAuth2Configuration (Properties properties) {
         setOAuth2passwordAuthentication(
-                Enum.valueOf(AuthenticationMethod.class, properties
-                        .getProperty("oauth.password.authentication", "TEST")));
-        setNativeClientHost(properties.getProperty("oauth.native.client.host",
+                Enum.valueOf(AuthenticationMethod.class, properties.getProperty(
+                        "oauth2.password.authentication", "TEST")));
+        setNativeClientHost(properties.getProperty("oauth2.native.client.host",
                 "korap.ids-mannheim.de"));
+
+        setMaxAuthenticationAttempts(Integer
+                .parseInt(properties.getProperty("oauth2.max.attempts", "3")));
+
+        String scopes = properties.getProperty("oauth2.default.scopes",
+                "read_username read_email");
+        Set<String> scopeSet =
+                Arrays.stream(scopes.split(" ")).collect(Collectors.toSet());
+        setAccessScopes(scopeSet);
     }
 
     private void setMailConfiguration (Properties properties) {
@@ -326,6 +342,22 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     public void setNativeClientHost (String nativeClientHost) {
         this.nativeClientHost = nativeClientHost;
+    }
+
+    public int getMaxAuthenticationAttempts () {
+        return maxAuthenticationAttempts;
+    }
+
+    public void setMaxAuthenticationAttempts (int maxAuthenticationAttempts) {
+        this.maxAuthenticationAttempts = maxAuthenticationAttempts;
+    }
+
+    public Set<String> getAccessScopes () {
+        return accessScopes;
+    }
+
+    public void setAccessScopes (Set<String> accessScopes) {
+        this.accessScopes = accessScopes;
     }
 
 }

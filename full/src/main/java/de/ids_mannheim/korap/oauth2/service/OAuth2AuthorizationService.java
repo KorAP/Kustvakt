@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import com.sun.jersey.api.client.ClientResponse.Status;
 
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
@@ -35,12 +36,10 @@ public class OAuth2AuthorizationService {
     private static Logger jlog =
             LoggerFactory.getLogger(OAuth2AuthorizationService.class);
 
-    public static int MAX_ATTEMPTS = 3;
-    
     @Autowired
     private OAuth2ClientService clientService;
     @Autowired
-    private OAuth2Service auth2Service;
+    private OAuth2TokenService auth2Service;
     @Autowired
     private OAuthIssuer oauthIssuer;
 
@@ -48,6 +47,9 @@ public class OAuth2AuthorizationService {
     private AuthorizationDao authorizationDao;
     @Autowired
     private AccessScopeDao accessScopeDao;
+
+    @Autowired
+    private FullConfiguration config;
 
     public OAuthResponse requestAuthorizationCode (HttpServletRequest request,
             OAuthAuthzRequest authzRequest, String authorization)
@@ -96,7 +98,7 @@ public class OAuth2AuthorizationService {
                 new HashSet<AccessScope>(scopes.size());
         int index;
         for (String scope : scopes) {
-            index = definedScopes.indexOf(scope);
+            index = definedScopes.indexOf(new AccessScope(scope));
             if (index == -1) {
                 throw new KustvaktException(StatusCodes.INVALID_SCOPE,
                         scope + " is invalid.", OAuth2Error.INVALID_SCOPE);
@@ -190,17 +192,17 @@ public class OAuth2AuthorizationService {
             throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
                     "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
         }
-        
+
         authorization.setRevoked(true);
         authorizationDao.updateAuthorization(authorization);
     }
 
     public void addTotalAttempts (Authorization authorization) {
         int totalAttempts = authorization.getTotalAttempts() + 1;
-        if (totalAttempts > MAX_ATTEMPTS){
+        if (totalAttempts > config.getMaxAuthenticationAttempts()) {
             authorization.setRevoked(true);
         }
-        else{
+        else {
             authorization.setTotalAttempts(totalAttempts);
         }
         authorizationDao.updateAuthorization(authorization);

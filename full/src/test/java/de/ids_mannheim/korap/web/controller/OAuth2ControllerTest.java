@@ -11,7 +11,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.error.OAuthError;
-import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +34,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
 
     @Autowired
     private HttpAuthorizationHandler handler;
-
+    
     private ClientResponse requestAuthorizationConfidentialClient (
             MultivaluedMap<String, String> form) throws KustvaktException {
 
