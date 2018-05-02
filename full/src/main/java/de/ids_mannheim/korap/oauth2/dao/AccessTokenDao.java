@@ -20,6 +20,7 @@ public class AccessTokenDao {
         AccessToken accessToken = new AccessToken();
         accessToken.setAuthorization(authorization);
         accessToken.setToken(token);
+        accessToken.setScopes(authorization.getScopes());
         entityManager.persist(accessToken);
     }
 }

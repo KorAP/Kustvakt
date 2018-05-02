@@ -40,7 +40,6 @@ public class AccessScopeDao {
             if (!existingScopes.contains(newScope)) {
                 entityManager.persist(newScope);
             }
-            // else skip
         }
 
     }

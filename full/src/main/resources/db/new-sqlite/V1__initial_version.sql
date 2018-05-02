@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS annotation_pair(
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	annotation1 INTEGER NOT NULL,
 	annotation2 INTEGER NOT NULL,
-	description VARCHAR(300) NOT NULL,
+	description VARCHAR(255) NOT NULL,
 	FOREIGN KEY (annotation1)
 		REFERENCES annotation (id)
 		ON DELETE CASCADE,

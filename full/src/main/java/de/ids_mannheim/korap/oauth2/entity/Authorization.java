@@ -33,7 +33,7 @@ public class Authorization {
     private String userId;
     @Column(name = "redirect_uri")
     private String redirectURI;
-    @Column(name = "created_date")
+    @Column(name = "created_date", updatable=false)
     private ZonedDateTime createdDate;
     @Column(name = "is_revoked")
     private boolean isRevoked;

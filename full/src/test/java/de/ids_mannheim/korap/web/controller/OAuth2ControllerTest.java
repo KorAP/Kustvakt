@@ -145,7 +145,8 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         authForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
         authForm.add("username", "dory");
         authForm.add("password", "password");
-//        form.add("scope", "read");
+        authForm.add("scope", "read_username");
+        
         ClientResponse response = requestAuthorizationConfidentialClient(authForm);
         URI redirectUri = response.getLocation();
         String code = redirectUri.getQuery().split("=")[1];

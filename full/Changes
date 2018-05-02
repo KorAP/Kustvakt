@@ -1,5 +1,5 @@
 version 0.60.2
-26/04/2018
+02/05/2018
 	- implemented OAuth2 client registration (margaretha)
 	- implemented OAuth2 client authentication (margaretha)
 	- changed virtual corpus search to retrieval (margaretha)
@@ -17,6 +17,8 @@ version 0.60.2
 	- implemented OAuth2 request access token with authorization code grant (margaretha)
 	- added setting default scopes in the config file (margaretha)
 	- fixed loading spring config multiple times in the test suite (margaretha)
+	- added SQLite created_date trigger for access token (margaretha)  
+	- added a join table for access token scopes (margaretha)
 	
 version 0.60.1
 28/03/2018

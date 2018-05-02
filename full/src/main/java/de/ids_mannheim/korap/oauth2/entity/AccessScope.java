@@ -27,7 +27,10 @@ public class AccessScope {
     }
 
     @ManyToMany(mappedBy = "scopes", fetch = FetchType.LAZY)
-    private List<Authorization> authorizationCodes;
+    private List<Authorization> authorizations;
+    
+    @ManyToMany(mappedBy = "scopes", fetch = FetchType.LAZY)
+    private List<AccessToken> accessTokens;
 
     @Override
     public String toString () {

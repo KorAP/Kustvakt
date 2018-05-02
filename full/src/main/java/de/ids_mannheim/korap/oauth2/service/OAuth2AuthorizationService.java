@@ -167,7 +167,7 @@ public class OAuth2AuthorizationService {
     }
 
 
-    public void verifyAuthorization (String code, String clientId,
+    public Authorization verifyAuthorization (String code, String clientId,
             String redirectURI) throws KustvaktException {
         Authorization authorization =
                 authorizationDao.retrieveAuthorizationCode(code, clientId);
@@ -194,7 +194,9 @@ public class OAuth2AuthorizationService {
         }
 
         authorization.setRevoked(true);
-        authorizationDao.updateAuthorization(authorization);
+        authorization = authorizationDao.updateAuthorization(authorization);
+        
+        return authorization;
     }
 
     public void addTotalAttempts (Authorization authorization) {

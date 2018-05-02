@@ -96,10 +96,9 @@ public class OAuth2TokenService {
             throws KustvaktException, OAuthSystemException {
 
         clientService.authenticateClient(clientId, clientSecret);
-        authorizationService.verifyAuthorization(authorizationCode, clientId,
-                redirectURI);
-
-        return createsAccessTokenResponse();
+        Authorization authorization = authorizationService
+                .verifyAuthorization(authorizationCode, clientId, redirectURI);
+        return createsAccessTokenResponse(authorization);
     }
 
 
