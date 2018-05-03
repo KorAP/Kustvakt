@@ -23,6 +23,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
+import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 
@@ -33,6 +34,8 @@ public class OAuth2TokenService {
     private OAuth2ClientService clientService;
     @Autowired
     private OAuth2AuthorizationService authorizationService;
+    @Autowired
+    private OAuth2ScopeService scopeService;
     @Autowired
     private AccessTokenDao tokenDao;
 
@@ -86,7 +89,8 @@ public class OAuth2TokenService {
      * @param clientSecret
      *            clilent_secret, required if client_secret was issued
      *            for the client in client registration.
-     * @return
+     * @return an OAuthResponse containing an access token if
+     *         successful
      * @throws OAuthSystemException
      * @throws KustvaktException
      */
@@ -95,9 +99,17 @@ public class OAuth2TokenService {
             String clientSecret)
             throws KustvaktException, OAuthSystemException {
 
-        clientService.authenticateClient(clientId, clientSecret);
-        Authorization authorization = authorizationService
-                .verifyAuthorization(authorizationCode, clientId, redirectURI);
+        Authorization authorization =
+                authorizationService.retrieveAuthorization(authorizationCode);
+        try {
+            clientService.authenticateClient(clientId, clientSecret);
+            authorization = authorizationService
+                    .verifyAuthorization(authorization, clientId, redirectURI);
+        }
+        catch (KustvaktException e) {
+            authorizationService.addTotalAttempts(authorization);
+            throw e;
+        }
         return createsAccessTokenResponse(authorization);
     }
 
@@ -126,7 +138,8 @@ public class OAuth2TokenService {
      * @param clientSecret
      *            clilent_secret, required if client_secret was issued
      *            for the client in client registration.
-     * @return
+     * @return an OAuthResponse containing an access token if
+     *         successful
      * @throws KustvaktException
      * @throws OAuthSystemException
      */
@@ -144,7 +157,8 @@ public class OAuth2TokenService {
         }
 
         authenticateUser(username, password, scopes);
-        return createsAccessTokenResponse();
+        // verify or limit scopes ?
+        return createsAccessTokenResponse(scopes);
     }
 
     public void authenticateUser (String username, String password,
@@ -169,13 +183,15 @@ public class OAuth2TokenService {
 
     /**
      * Clients must authenticate.
+     * Client credentials grant is limited to native clients.
      * 
      * @param clientId
      *            client_id parameter, required
      * @param clientSecret
      *            client_secret parameter, required
      * @param scopes
-     * @return
+     * @return an OAuthResponse containing an access token if
+     *         successful
      * @throws KustvaktException
      * @throws OAuthSystemException
      */
@@ -190,10 +206,21 @@ public class OAuth2TokenService {
                     OAuth2Error.INVALID_REQUEST);
         }
 
+        // OAuth2Client client =
         clientService.authenticateClient(clientId, clientSecret);
-        return createsAccessTokenResponse();
-    }
 
+        // if (client.isNative()) {
+        // throw new KustvaktException(
+        // StatusCodes.CLIENT_AUTHENTICATION_FAILED,
+        // "Client credentials grant is not allowed for third party
+        // clients",
+        // OAuth2Error.UNAUTHORIZED_CLIENT);
+        // }
+
+        scopes = scopeService.filterScopes(scopes,
+                config.getClientCredentialsScopes());
+        return createsAccessTokenResponse(scopes);
+    }
 
     /**
      * Creates an OAuthResponse containing an access token and a
@@ -201,27 +228,45 @@ public class OAuth2TokenService {
      * 
      * @return an OAuthResponse containing an access token
      * @throws OAuthSystemException
+     * @throws KustvaktException
      */
 
-    private OAuthResponse createsAccessTokenResponse ()
-            throws OAuthSystemException {
-        return createsAccessTokenResponse(null);
+    private OAuthResponse createsAccessTokenResponse (Set<String> scopes)
+            throws OAuthSystemException, KustvaktException {
+
+        String accessToken = oauthIssuer.accessToken();
+        // String refreshToken = oauthIssuer.refreshToken();
+
+        Set<AccessScope> accessScopes =
+                scopeService.convertToAccessScope(scopes);
+        tokenDao.storeAccessToken(accessToken, accessScopes);
+
+        return OAuthASResponse.tokenResponse(Status.OK.getStatusCode())
+                .setAccessToken(accessToken)
+                .setTokenType(TokenType.BEARER.toString())
+                .setExpiresIn(String.valueOf(config.getTokenTTL()))
+                // .setRefreshToken(refreshToken)
+                .setScope(String.join(" ", scopes)).buildJSONMessage();
     }
 
     private OAuthResponse createsAccessTokenResponse (
-            Authorization authorization) throws OAuthSystemException {
+            Authorization authorization)
+            throws OAuthSystemException, KustvaktException {
         String accessToken = oauthIssuer.accessToken();
-        String refreshToken = oauthIssuer.refreshToken();
+        // String refreshToken = oauthIssuer.refreshToken();
 
         tokenDao.storeAccessToken(authorization, accessToken);
+
+        String scopes = scopeService
+                .convertAccessScopesToString(authorization.getScopes());
 
         OAuthResponse r =
                 OAuthASResponse.tokenResponse(Status.OK.getStatusCode())
                         .setAccessToken(accessToken)
                         .setTokenType(TokenType.BEARER.toString())
                         .setExpiresIn(String.valueOf(config.getTokenTTL()))
-                        .setRefreshToken(refreshToken).buildJSONMessage();
-        // scope
+                        // .setRefreshToken(refreshToken)
+                        .setScope(scopes).buildJSONMessage();
         return r;
     }
 }

@@ -1,8 +1,6 @@
 package de.ids_mannheim.korap.oauth2.service;
 
 import java.time.ZonedDateTime;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +22,6 @@ import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
-import de.ids_mannheim.korap.oauth2.dao.AccessScopeDao;
 import de.ids_mannheim.korap.oauth2.dao.AuthorizationDao;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
@@ -41,12 +38,12 @@ public class OAuth2AuthorizationService {
     @Autowired
     private OAuth2TokenService auth2Service;
     @Autowired
+    private OAuth2ScopeService scopeService;
+    @Autowired
     private OAuthIssuer oauthIssuer;
 
     @Autowired
     private AuthorizationDao authorizationDao;
-    @Autowired
-    private AccessScopeDao accessScopeDao;
 
     @Autowired
     private FullConfiguration config;
@@ -55,11 +52,7 @@ public class OAuth2AuthorizationService {
             OAuthAuthzRequest authzRequest, String authorization)
             throws KustvaktException, OAuthSystemException {
 
-        String responseType = authzRequest.getResponseType();
-        if (responseType == null || responseType.isEmpty()) {
-            throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
-                    "response_type is missing.", OAuth2Error.INVALID_REQUEST);
-        }
+        checkResponseType(authzRequest.getResponseType());
 
         OAuth2Client client = clientService.authenticateClient(
                 authzRequest.getClientId(), authzRequest.getClientSecret());
@@ -74,41 +67,40 @@ public class OAuth2AuthorizationService {
                 authzRequest.getScopes());
 
         String code = oauthIssuer.authorizationCode();
-        Set<AccessScope> scopes =
-                convertToAccessScope(authzRequest.getScopes());
+        Set<String> scopeSet = authzRequest.getScopes();
+        if (scopeSet == null || scopeSet.isEmpty()) {
+            scopeSet = config.getDefaultAccessScopes();
+        }
+        String scopeStr = String.join(" ", scopeSet);
+        Set<AccessScope> scopes = scopeService.convertToAccessScope(scopeSet);
 
         authorizationDao.storeAuthorizationCode(authzRequest.getClientId(),
                 username, code, scopes, authzRequest.getRedirectURI());
 
         return OAuthASResponse
                 .authorizationResponse(request, Status.FOUND.getStatusCode())
-                .setCode(code).location(redirectUri).buildQueryMessage();
+                .setCode(code).setScope(scopeStr).location(redirectUri)
+                .buildQueryMessage();
     }
 
-    private Set<AccessScope> convertToAccessScope (Set<String> scopes)
+    private void checkResponseType (String responseType)
             throws KustvaktException {
-
-        if (scopes.isEmpty()) {
-            // return default scopes
-            return null;
+        if (responseType == null || responseType.isEmpty()) {
+            throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
+                    "response_type is missing.", OAuth2Error.INVALID_REQUEST);
         }
-
-        List<AccessScope> definedScopes = accessScopeDao.retrieveAccessScopes();
-        Set<AccessScope> requestedScopes =
-                new HashSet<AccessScope>(scopes.size());
-        int index;
-        for (String scope : scopes) {
-            index = definedScopes.indexOf(new AccessScope(scope));
-            if (index == -1) {
-                throw new KustvaktException(StatusCodes.INVALID_SCOPE,
-                        scope + " is invalid.", OAuth2Error.INVALID_SCOPE);
-            }
-            else {
-                requestedScopes.add(definedScopes.get(index));
-            }
+        else if (responseType.equals("token")) {
+            throw new KustvaktException(StatusCodes.NOT_SUPPORTED,
+                    "response_type token is not supported.",
+                    OAuth2Error.INVALID_REQUEST);
         }
-        return requestedScopes;
+        else if (!responseType.equals("code")) {
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
+                    "unknown response_type", OAuth2Error.INVALID_REQUEST);
+        }
     }
+
+
 
     private boolean hasRedirectUri (String redirectURI) {
         if (redirectURI != null && !redirectURI.isEmpty()) {
@@ -152,7 +144,8 @@ public class OAuth2AuthorizationService {
         }
         else {
             // check if there is a redirect URI in the DB
-            // This should not happened as it is required in client registration!
+            // This should not happened as it is required in client
+            // registration!
             if (registeredUri != null && !registeredUri.isEmpty()) {
                 redirectUri = registeredUri;
             }
@@ -167,52 +160,55 @@ public class OAuth2AuthorizationService {
     }
 
 
-    public Authorization verifyAuthorization (String code, String clientId,
-            String redirectURI) throws KustvaktException {
-        Authorization authorization =
-                authorizationDao.retrieveAuthorizationCode(code, clientId);
+    public Authorization retrieveAuthorization (String code)
+            throws KustvaktException {
+        return authorizationDao.retrieveAuthorizationCode(code);
+    }
 
-        // EM: can Kustvakt be specific about the invalid request param?
-        if (authorization.isRevoked()) {
-            addTotalAttempts(authorization);
+    public Authorization verifyAuthorization (Authorization authorization,
+            String clientId, String redirectURI) throws KustvaktException {
+
+        // EM: can Kustvakt be specific about the invalid grant error
+        // description?
+        if (!authorization.getClientId().equals(clientId)) {
             throw new KustvaktException(StatusCodes.INVALID_AUTHORIZATION,
-                    "Invalid authorization", OAuth2Error.INVALID_REQUEST);
+                    "Invalid authorization", OAuth2Error.INVALID_GRANT);
+        }
+        if (authorization.isRevoked()) {
+            throw new KustvaktException(StatusCodes.INVALID_AUTHORIZATION,
+                    "Invalid authorization", OAuth2Error.INVALID_GRANT);
         }
 
         if (isExpired(authorization.getCreatedDate())) {
-            addTotalAttempts(authorization);
             throw new KustvaktException(StatusCodes.INVALID_AUTHORIZATION,
-                    "Authorization expired", OAuth2Error.INVALID_REQUEST);
+                    "Authorization expired", OAuth2Error.INVALID_GRANT);
         }
 
         String authorizedUri = authorization.getRedirectURI();
         if (authorizedUri != null && !authorizedUri.isEmpty()
                 && !authorizedUri.equals(redirectURI)) {
-            addTotalAttempts(authorization);
             throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
-                    "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
+                    "Invalid redirect URI", OAuth2Error.INVALID_GRANT);
         }
 
         authorization.setRevoked(true);
         authorization = authorizationDao.updateAuthorization(authorization);
-        
+
         return authorization;
     }
 
     public void addTotalAttempts (Authorization authorization) {
         int totalAttempts = authorization.getTotalAttempts() + 1;
-        if (totalAttempts > config.getMaxAuthenticationAttempts()) {
+        if (totalAttempts == config.getMaxAuthenticationAttempts()) {
             authorization.setRevoked(true);
         }
-        else {
-            authorization.setTotalAttempts(totalAttempts);
-        }
+        authorization.setTotalAttempts(totalAttempts);
         authorizationDao.updateAuthorization(authorization);
     }
 
     private boolean isExpired (ZonedDateTime createdDate) {
         jlog.debug("createdDate: " + createdDate);
-        ZonedDateTime expiration = createdDate.plusMinutes(10);
+        ZonedDateTime expiration = createdDate.plusSeconds(60);
         ZonedDateTime now = ZonedDateTime.now();
         jlog.debug("expiration: " + expiration + ", now: " + now);
 

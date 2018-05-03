@@ -112,13 +112,18 @@ public class OAuthClientController {
     }
 
 
+    /** Deregisters confidential clients. Clients must authenticate. 
+     * 
+     * @param securityContext
+     * @param request
+     * @param form
+     * @return
+     */
     @DELETE
     @Path("deregister/confidential")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deregisterConfidentialClient (
             @Context SecurityContext securityContext,
-            //            @HeaderParam("Authorization") String authorization,
-            //            @FormParam("client_id") String clientId
             @Context HttpServletRequest request,
             MultivaluedMap<String, String> form) {
         try {

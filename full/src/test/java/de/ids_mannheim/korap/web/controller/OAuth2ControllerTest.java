@@ -18,12 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
@@ -34,7 +36,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
 
     @Autowired
     private HttpAuthorizationHandler handler;
-    
+
     private ClientResponse requestAuthorizationConfidentialClient (
             MultivaluedMap<String, String> form) throws KustvaktException {
 
@@ -127,6 +129,25 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
                 node.at("/error_description").asText());
     }
 
+    @Test
+    public void testAuthorizeInvalidScope () throws KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("response_type", "code");
+        form.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        form.add("username", "dory");
+        form.add("password", "password");
+        form.add("scope", "read_address");
+
+        ClientResponse response = requestAuthorizationConfidentialClient(form);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuth2Error.INVALID_SCOPE, node.at("/error").asText());
+        assertEquals("read_address is an invalid scope",
+                node.at("/error_description").asText());
+    }
+
     private ClientResponse requestToken (MultivaluedMap<String, String> form)
             throws KustvaktException {
         return resource().path("oauth2").path("token")
@@ -139,24 +160,30 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
     @Test
     public void testRequestTokenAuthorizationConfidential ()
             throws KustvaktException {
-        
+
         MultivaluedMap<String, String> authForm = new MultivaluedMapImpl();
         authForm.add("response_type", "code");
         authForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
         authForm.add("username", "dory");
         authForm.add("password", "password");
         authForm.add("scope", "read_username");
-        
-        ClientResponse response = requestAuthorizationConfidentialClient(authForm);
+
+        ClientResponse response =
+                requestAuthorizationConfidentialClient(authForm);
         URI redirectUri = response.getLocation();
-        String code = redirectUri.getQuery().split("=")[1];
-        
+        MultivaluedMap<String, String> params =
+                UriComponent.decodeQuery(redirectUri, true);
+        String code = params.get("code").get(0);
+        String scopes = params.get("scope").get(0);
+
+        assertEquals(scopes, "read_username");
+
         MultivaluedMap<String, String> tokenForm = new MultivaluedMapImpl();
         tokenForm.add("grant_type", "authorization_code");
         tokenForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
         tokenForm.add("client_secret", "secret");
         tokenForm.add("code", code);
-        
+
         response = requestToken(tokenForm);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -165,8 +192,115 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         assertEquals(TokenType.BEARER.toString(),
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
+
+        testRequestTokenWithUsedAuthorization(tokenForm);
     }
-    
+
+    private void testRequestTokenWithUsedAuthorization (
+            MultivaluedMap<String, String> form) throws KustvaktException {
+        ClientResponse response = requestToken(form);
+        String entity = response.getEntity(String.class);
+
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuthError.TokenResponse.INVALID_GRANT,
+                node.at("/error").asText());
+        assertEquals("Invalid authorization",
+                node.at("/error_description").asText());
+    }
+
+    @Test
+    public void testRequestTokenInvalidAuthorizationCode ()
+            throws KustvaktException {
+        MultivaluedMap<String, String> tokenForm = new MultivaluedMapImpl();
+        tokenForm.add("grant_type", "authorization_code");
+        tokenForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        tokenForm.add("client_secret", "secret");
+        tokenForm.add("code", "blahblah");
+
+        ClientResponse response = requestToken(tokenForm);
+        String entity = response.getEntity(String.class);
+
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
+                node.at("/error").asText());
+    }
+
+    @Test
+    public void testRequestTokenAuthorizationReplyAttack ()
+            throws KustvaktException {
+        String uri = "https://korap.ids-mannheim.de/confidential/redirect";
+        MultivaluedMap<String, String> authForm = new MultivaluedMapImpl();
+        authForm.add("response_type", "code");
+        authForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        authForm.add("username", "dory");
+        authForm.add("password", "password");
+        authForm.add("scope", "read_username");
+        authForm.add("redirect_uri", uri);
+
+        ClientResponse response =
+                requestAuthorizationConfidentialClient(authForm);
+        URI redirectUri = response.getLocation();
+        MultivaluedMap<String, String> params =
+                UriComponent.decodeQuery(redirectUri, true);
+        String code = params.get("code").get(0);
+
+        testRequestTokenAuthorizationInvalidClient(code);
+        testRequestTokenAuthorizationInvalidRedirectUri(code);
+        testRequestTokenAuthorizationRevoked(code, uri);
+    }
+
+    private void testRequestTokenAuthorizationInvalidClient (String code)
+            throws KustvaktException {
+        MultivaluedMap<String, String> tokenForm = new MultivaluedMapImpl();
+        tokenForm.add("grant_type", "authorization_code");
+        tokenForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        tokenForm.add("client_secret", "blah");
+        tokenForm.add("code", code);
+
+        ClientResponse response = requestToken(tokenForm);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuth2Error.INVALID_CLIENT, node.at("/error").asText());
+    }
+
+    private void testRequestTokenAuthorizationInvalidRedirectUri (String code)
+            throws KustvaktException {
+        MultivaluedMap<String, String> tokenForm = new MultivaluedMapImpl();
+        tokenForm.add("grant_type", "authorization_code");
+        tokenForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        tokenForm.add("client_secret", "secret");
+        tokenForm.add("code", code);
+        tokenForm.add("redirect_uri", "https://blahblah.com");
+
+        ClientResponse response = requestToken(tokenForm);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
+    }
+
+    private void testRequestTokenAuthorizationRevoked (String code, String uri)
+            throws KustvaktException {
+        MultivaluedMap<String, String> tokenForm = new MultivaluedMapImpl();
+        tokenForm.add("grant_type", "authorization_code");
+        tokenForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        tokenForm.add("client_secret", "secret");
+        tokenForm.add("code", code);
+        tokenForm.add("redirect_uri", uri);
+
+        ClientResponse response = requestToken(tokenForm);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuthError.TokenResponse.INVALID_GRANT,
+                node.at("/error").asText());
+        assertEquals("Invalid authorization",
+                node.at("/error_description").asText());
+    }
+
+
     @Test
     public void testRequestTokenPasswordGrantConfidential ()
             throws KustvaktException {
@@ -228,7 +362,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         assertEquals("Missing parameters: client_id",
                 node.at("/error_description").asText());
     }
-    
+
     @Test
     public void testRequestTokenPasswordGrantPublic ()
             throws KustvaktException {
@@ -290,6 +424,30 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         assertEquals(TokenType.BEARER.toString(),
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
+    }
+
+    @Test
+    public void testRequestTokenClientCredentialsGrantReducedScope ()
+            throws KustvaktException {
+
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("grant_type", "client_credentials");
+        form.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        form.add("client_secret", "secret");
+        form.add("scope", "read_username read_client_info");
+
+        ClientResponse response = requestToken(form);
+        String entity = response.getEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        JsonNode node = JsonUtils.readTree(entity);
+        // length?
+        assertNotNull(node.at("/access_token").asText());
+        assertNotNull(node.at("/refresh_token").asText());
+        assertEquals(TokenType.BEARER.toString(),
+                node.at("/token_type").asText());
+        assertNotNull(node.at("/expires_in").asText());
+        assertEquals("read_client_info", node.at("/scope").asText());
     }
 
     @Test

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.Authorization_;
@@ -39,24 +41,29 @@ public class AuthorizationDao {
         // what if unique fails
     }
 
-    public Authorization retrieveAuthorizationCode (String code,
-            String clientId) throws KustvaktException {
+    public Authorization retrieveAuthorizationCode (String code)
+            throws KustvaktException {
         ParameterChecker.checkStringValue(code, "code");
-        ParameterChecker.checkStringValue(clientId, "client_id");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Authorization> query =
                 builder.createQuery(Authorization.class);
         Root<Authorization> root = query.from(Authorization.class);
 
-        Predicate restrictions = builder.and(
-                builder.equal(root.get(Authorization_.code), code),
-                builder.equal(root.get(Authorization_.clientId), clientId));
+        Predicate restrictions =
+                builder.equal(root.get(Authorization_.code), code);
 
         query.select(root);
         query.where(restrictions);
         Query q = entityManager.createQuery(query);
-        return (Authorization) q.getSingleResult();
+        try {
+            return (Authorization) q.getSingleResult();
+        }
+        catch (Exception e) {
+            throw new KustvaktException(StatusCodes.INVALID_AUTHORIZATION,
+                    "Invalid authorization: " + e.getMessage(),
+                    OAuth2Error.INVALID_REQUEST);
+        }
     }
 
     public Authorization updateAuthorization (Authorization authorization) {

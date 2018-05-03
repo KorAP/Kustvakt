@@ -34,7 +34,7 @@ public class AccessScope {
 
     @Override
     public String toString () {
-        return "id: " + id;
+        return id;
     }
 
     @Override

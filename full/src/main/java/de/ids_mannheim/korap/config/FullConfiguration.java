@@ -54,7 +54,8 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     private AuthenticationMethod OAuth2passwordAuthentication;
     private String nativeClientHost;
-    private Set<String> accessScopes;
+    private Set<String> defaultAccessScopes;
+    private Set<String> clientCredentialsScopes;
     private int maxAuthenticationAttempts;
 
     public FullConfiguration (Properties properties) throws IOException {
@@ -94,7 +95,12 @@ public class FullConfiguration extends KustvaktConfiguration {
                 "read_username read_email");
         Set<String> scopeSet =
                 Arrays.stream(scopes.split(" ")).collect(Collectors.toSet());
-        setAccessScopes(scopeSet);
+        setDefaultAccessScopes(scopeSet);
+
+        String clientScopes = properties.getProperty(
+                "oauth2.client.credentials.scopes", "read_client_info");
+        setClientCredentialsScopes(Arrays.stream(clientScopes.split(" "))
+                .collect(Collectors.toSet()));
     }
 
     private void setMailConfiguration (Properties properties) {
@@ -352,12 +358,21 @@ public class FullConfiguration extends KustvaktConfiguration {
         this.maxAuthenticationAttempts = maxAuthenticationAttempts;
     }
 
-    public Set<String> getAccessScopes () {
-        return accessScopes;
+    public Set<String> getDefaultAccessScopes () {
+        return defaultAccessScopes;
     }
 
-    public void setAccessScopes (Set<String> accessScopes) {
-        this.accessScopes = accessScopes;
+    public void setDefaultAccessScopes (Set<String> accessScopes) {
+        this.defaultAccessScopes = accessScopes;
+    }
+
+    public Set<String> getClientCredentialsScopes () {
+        return clientCredentialsScopes;
+    }
+
+    public void setClientCredentialsScopes (
+            Set<String> clientCredentialsScopes) {
+        this.clientCredentialsScopes = clientCredentialsScopes;
     }
 
 }

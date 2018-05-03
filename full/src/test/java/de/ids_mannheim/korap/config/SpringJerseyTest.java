@@ -11,6 +11,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AbstractRefreshableWebApplicationContext;
 
 import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
@@ -72,8 +73,9 @@ public abstract class SpringJerseyTest extends JerseyTest {
         return new WebAppDescriptor.Builder(classPackages)
                 .servletClass(SpringServlet.class)
                 .contextListenerClass(StaticContextLoaderListener.class)
-                //                .contextParam("contextConfigLocation",
-                //                        "classpath:test-config.xml")
+//                .contextListenerClass(ContextLoaderListener.class)
+//                                .contextParam("contextConfigLocation",
+//                                        "classpath:test-config.xml")
                 .build();
     }
 
