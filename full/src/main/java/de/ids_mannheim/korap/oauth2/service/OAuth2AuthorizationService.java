@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import com.sun.jersey.api.client.ClientResponse.Status;
 
-import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -36,8 +35,6 @@ public class OAuth2AuthorizationService {
     @Autowired
     private OAuth2ClientService clientService;
     @Autowired
-    private OAuth2TokenService auth2Service;
-    @Autowired
     private OAuth2ScopeService scopeService;
     @Autowired
     private OAuthIssuer oauthIssuer;
@@ -48,23 +45,29 @@ public class OAuth2AuthorizationService {
     @Autowired
     private FullConfiguration config;
 
+    /**
+     * Authorization code request does not require client
+     * authentication, but only checks if the client id exists.
+     * 
+     * @param request
+     * @param authzRequest
+     * @param username
+     * @return
+     * @throws KustvaktException
+     * @throws OAuthSystemException
+     */
     public OAuthResponse requestAuthorizationCode (HttpServletRequest request,
-            OAuthAuthzRequest authzRequest, String authorization)
+            OAuthAuthzRequest authzRequest, String username)
             throws KustvaktException, OAuthSystemException {
 
         checkResponseType(authzRequest.getResponseType());
 
-        OAuth2Client client = clientService.authenticateClient(
-                authzRequest.getClientId(), authzRequest.getClientSecret());
+        OAuth2Client client =
+                clientService.authenticateClientId(authzRequest.getClientId());
 
         String redirectUri = authzRequest.getRedirectURI();
         boolean hasRedirectUri = hasRedirectUri(redirectUri);
         redirectUri = verifyRedirectUri(client, hasRedirectUri, redirectUri);
-
-        String username = authzRequest.getParam(Attributes.USERNAME);
-        auth2Service.authenticateUser(username,
-                authzRequest.getParam(Attributes.PASSWORD),
-                authzRequest.getScopes());
 
         String code = oauthIssuer.authorizationCode();
         Set<String> scopeSet = authzRequest.getScopes();

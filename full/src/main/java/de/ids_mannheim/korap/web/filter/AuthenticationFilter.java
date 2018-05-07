@@ -56,21 +56,41 @@ public class AuthenticationFilter
                         .parseAuthorizationHeaderValue(authorization);
 
                 switch (authData.getAuthenticationScheme()) {
+                    // EM: For testing only, must be disabled for
+                    // production
                     case BASIC:
                         context = authenticationManager.getTokenContext(
                                 TokenType.BASIC, authData.getToken(), host, ua);
                         break;
-                      // EM: has not been tested yet
-//                    case SESSION:
-//                        context = authenticationManager.getTokenContext(
-//                                TokenType.SESSION, authData.getToken(), host,
-//                                ua);
-//                        break;
-                    // EM: bearer or api
-                    default:
+                    // EM: has not been tested yet
+                    // case SESSION:
+                    // context =
+                    // authenticationManager.getTokenContext(
+                    // TokenType.SESSION, authData.getToken(), host,
+                    // ua);
+                    // break;
+
+                    // OAuth2 authentication scheme
+                    case BEARER:
+                        if (request.getPath().equals("oauth2/authorize")) {
+                            throw new KustvaktException(
+                                    StatusCodes.AUTHENTICATION_FAILED,
+                                    "Bearer is not supported for user authentication at oauth2/authorize");
+                        }
+
+                        context = authenticationManager.getTokenContext(
+                                TokenType.BEARER, authData.getToken(), host,
+                                ua);
+                        break;
+                    // EM: JWT token-based authentication scheme
+                    case API:
                         context = authenticationManager.getTokenContext(
                                 TokenType.API, authData.getToken(), host, ua);
                         break;
+                    default:
+                        throw new KustvaktException(
+                                StatusCodes.AUTHENTICATION_FAILED,
+                                "Authentication scheme is not supported.");
                 }
                 checkContext(context, request);
                 request.setSecurityContext(new KustvaktContext(context));

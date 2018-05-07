@@ -42,8 +42,8 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
 
         return resource().path("oauth2").path("authorize")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(
-                                "fCBbQkAyYzI4NzUxMg", "secret"))
+                        handler.createBasicAuthorizationHeaderValue("dory",
+                                "password"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
@@ -55,8 +55,6 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("response_type", "code");
         form.add("client_id", "fCBbQkAyYzI4NzUxMg");
-        form.add("username", "dory");
-        form.add("password", "password");
 
         ClientResponse response = requestAuthorizationConfidentialClient(form);
 
@@ -73,8 +71,6 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("response_type", "code");
         form.add("client_id", "fCBbQkAyYzI4NzUxMg");
-        form.add("username", "dory");
-        form.add("password", "password");
         form.add("redirect_uri", redirectUri);
         ClientResponse response = requestAuthorizationConfidentialClient(form);
 
@@ -134,8 +130,6 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("response_type", "code");
         form.add("client_id", "fCBbQkAyYzI4NzUxMg");
-        form.add("username", "dory");
-        form.add("password", "password");
         form.add("scope", "read_address");
 
         ClientResponse response = requestAuthorizationConfidentialClient(form);
@@ -164,8 +158,6 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         MultivaluedMap<String, String> authForm = new MultivaluedMapImpl();
         authForm.add("response_type", "code");
         authForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
-        authForm.add("username", "dory");
-        authForm.add("password", "password");
         authForm.add("scope", "read_username");
 
         ClientResponse response =
@@ -236,8 +228,6 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         MultivaluedMap<String, String> authForm = new MultivaluedMapImpl();
         authForm.add("response_type", "code");
         authForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
-        authForm.add("username", "dory");
-        authForm.add("password", "password");
         authForm.add("scope", "read_username");
         authForm.add("redirect_uri", uri);
 

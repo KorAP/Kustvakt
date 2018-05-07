@@ -27,6 +27,13 @@ import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 
+/**
+ * OAuth2TokenService manages business logic related to OAuth2
+ * requesting and creating access token.
+ * 
+ * @author margaretha
+ *
+ */
 @Service
 public class OAuth2TokenService {
 
@@ -158,7 +165,7 @@ public class OAuth2TokenService {
 
         authenticateUser(username, password, scopes);
         // verify or limit scopes ?
-        return createsAccessTokenResponse(scopes);
+        return createsAccessTokenResponse(scopes, username);
     }
 
     public void authenticateUser (String username, String password,
@@ -219,7 +226,7 @@ public class OAuth2TokenService {
 
         scopes = scopeService.filterScopes(scopes,
                 config.getClientCredentialsScopes());
-        return createsAccessTokenResponse(scopes);
+        return createsAccessTokenResponse(scopes, null);
     }
 
     /**
@@ -231,15 +238,15 @@ public class OAuth2TokenService {
      * @throws KustvaktException
      */
 
-    private OAuthResponse createsAccessTokenResponse (Set<String> scopes)
-            throws OAuthSystemException, KustvaktException {
+    private OAuthResponse createsAccessTokenResponse (Set<String> scopes,
+            String userId) throws OAuthSystemException, KustvaktException {
 
         String accessToken = oauthIssuer.accessToken();
         // String refreshToken = oauthIssuer.refreshToken();
 
         Set<AccessScope> accessScopes =
                 scopeService.convertToAccessScope(scopes);
-        tokenDao.storeAccessToken(accessToken, accessScopes);
+        tokenDao.storeAccessToken(accessToken, accessScopes, userId);
 
         return OAuthASResponse.tokenResponse(Status.OK.getStatusCode())
                 .setAccessToken(accessToken)

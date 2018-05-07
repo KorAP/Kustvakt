@@ -31,6 +31,8 @@ public class AccessToken {
     private String token;
     @Column(name = "created_date")
     private ZonedDateTime createdDate;
+    @Column(name = "user_id")
+    private String userId;
     @Column(name = "is_revoked")
     private boolean isRevoked;
     @Column(name = "total_attempts")

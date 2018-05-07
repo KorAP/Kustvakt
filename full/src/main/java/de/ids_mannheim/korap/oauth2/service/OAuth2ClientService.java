@@ -80,13 +80,15 @@ public class OAuth2ClientService {
         String secretHashcode = null;
         if (clientJson.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
             // RFC 6749:
-            // The authorization server MUST NOT issue client passwords or other
-            // client credentials to native application (clients installed and 
-            // executed on the device used by the resource owner e.g. desktop  
-            // application, native mobile application) or user-agent-based
-            // application clients for client authentication.  The authorization
-            // server MAY issue a client password or other credentials
-            // for a specific installation of a native application client on a
+            // The authorization server MUST NOT issue client
+            // passwords or other client credentials to native
+            // application (clients installed and executed on the
+            // device used by the resource owner e.g. desktop
+            // application, native mobile application) or
+            // user-agent-based application clients for client
+            // authentication. The authorization server MAY issue a
+            // client password or other credentials for a specific
+            // installation of a native application client on a
             // specific device.
 
             secret = encryption.createToken();
@@ -215,4 +217,16 @@ public class OAuth2ClientService {
                 "Invalid client credentials", OAuth2Error.INVALID_CLIENT);
     }
 
+
+    public OAuth2Client authenticateClientId (String clientId)
+            throws KustvaktException {
+        if (clientId == null || clientId.isEmpty()) {
+            throw new KustvaktException(
+                    StatusCodes.CLIENT_AUTHENTICATION_FAILED,
+                    "Missing parameters: client id",
+                    OAuth2Error.INVALID_REQUEST);
+        }
+
+        return clientDao.retrieveClientById(clientId);
+    }
 }

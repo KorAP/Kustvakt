@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS oauth2_access_token (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	token VARCHAR(255) NOT NULL,
 	authorization_id INTEGER DEFAULT NULL,
+	user_id VARCHAR(100) DEFAULT NULL,
 	created_date timestamp DEFAULT (datetime('now','localtime')),
 	is_revoked BOOLEAN DEFAULT 0,
 	total_attempts INTEGER DEFAULT 0,

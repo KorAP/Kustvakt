@@ -3,7 +3,6 @@ package de.ids_mannheim.korap.web.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -11,9 +10,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 import org.apache.oltu.oauth2.as.request.AbstractOAuthTokenRequest;
-import org.apache.oltu.oauth2.as.request.OAuthAuthzRequest;
 import org.apache.oltu.oauth2.as.request.OAuthTokenRequest;
 import org.apache.oltu.oauth2.as.request.OAuthUnauthenticatedTokenRequest;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
@@ -23,10 +22,16 @@ import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import com.sun.jersey.spi.container.ResourceFilters;
+
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.oauth2.OAuth2AuthorizationRequest;
 import de.ids_mannheim.korap.oauth2.service.OAuth2AuthorizationService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
+import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
+import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
+import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 
 @Controller
@@ -45,9 +50,8 @@ public class OAuth2Controller {
      * 
      * Kustvakt supports authorization only with Kalamar as the
      * authorization web-frontend or user interface. Thus
-     * authorization code request requires user credentials in the
-     * request body, similar to access token request in
-     * resource owner password grant request.
+     * authorization code request requires user authentication
+     * using authentication header.
      * 
      * <br /><br />
      * RFC 6749:
@@ -56,28 +60,33 @@ public class OAuth2Controller {
      * request using a pre-defined default value or fail the request
      * indicating an invalid scope.
      * 
-     * @param request HttpServletRequest
-     * @param authorization authorization header
-     * @param form form parameters
+     * @param request
+     *            HttpServletRequest
+     * @param form
+     *            form parameters
      * @return a redirect URL
      */
     @POST
     @Path("authorize")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response requestAuthorizationCode (
             @Context HttpServletRequest request,
-            @HeaderParam("Authorization") String authorization,
+            @Context SecurityContext context,
             MultivaluedMap<String, String> form) {
+
+        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+        String username = tokenContext.getUsername();
 
         try {
             HttpServletRequest requestWithForm =
                     new FormRequestWrapper(request, form);
-            OAuthAuthzRequest authzRequest =
-                    new OAuthAuthzRequest(requestWithForm);
+            OAuth2AuthorizationRequest authzRequest =
+                    new OAuth2AuthorizationRequest(requestWithForm);
             OAuthResponse authResponse =
                     authorizationService.requestAuthorizationCode(
-                            requestWithForm, authzRequest, authorization);
+                            requestWithForm, authzRequest, username);
             return responseHandler.sendRedirect(authResponse.getLocationUri());
         }
         catch (OAuthSystemException e) {
@@ -95,7 +104,10 @@ public class OAuth2Controller {
     /**
      * Grants a client an access token, namely a string used in
      * authenticated requests representing user authorization for
-     * the client to access user resources.
+     * the client to access user resources. Client credentials for
+     * authentication can be provided either as an authorization
+     * header with Basic authentication scheme or as form parameters
+     * in the request body.
      * 
      * <br /><br />
      * 
@@ -128,8 +140,6 @@ public class OAuth2Controller {
      * 
      * @param request
      *            the request
-     * @param authorization
-     *            authorization header
      * @param form
      *            form parameters in a map
      * @return a JSON object containing an access token, a refresh
