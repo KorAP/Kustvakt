@@ -29,7 +29,13 @@ public class AuthorizationDao {
     private EntityManager entityManager;
 
     public void storeAuthorizationCode (String clientId, String userId,
-            String code, Set<AccessScope> scopes, String redirectURI) {
+            String code, Set<AccessScope> scopes, String redirectURI)
+            throws KustvaktException {
+        ParameterChecker.checkStringValue(clientId, "client_id");
+        ParameterChecker.checkStringValue(userId, "userId");
+        ParameterChecker.checkStringValue(code, "authorization code");
+        ParameterChecker.checkCollection(scopes, "scopes");
+        
         Authorization authCode = new Authorization();
         authCode.setCode(code);
         authCode.setClientId(clientId);
@@ -66,7 +72,9 @@ public class AuthorizationDao {
         }
     }
 
-    public Authorization updateAuthorization (Authorization authorization) {
+    public Authorization updateAuthorization (Authorization authorization)
+            throws KustvaktException {
+        ParameterChecker.checkObjectValue(authorization, "authorization");
         authorization = entityManager.merge(authorization);
         return authorization;
     }

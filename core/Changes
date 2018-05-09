@@ -1,8 +1,14 @@
+version 0.60.3
+09/05/2018
+	- added parameter checker for collection (margaretha)
+	
 version 0.60.2
-10/04/2018
+25/04/2018
 	- rearranged and cleaned up codes (margaretha)
 	- generalized some KustvaktException methods (margaretha)
 	- added status codes (margaretha)
+	- updated FormRequestWrapper constructor (margaretha)
+	- fixed get request null parameter in FormRequestWrapper (margaretha)
 	
 version 0.60.1
 14/03/2018

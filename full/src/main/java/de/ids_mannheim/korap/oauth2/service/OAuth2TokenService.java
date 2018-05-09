@@ -143,7 +143,7 @@ public class OAuth2TokenService {
      * @param clientId
      *            client_id, required
      * @param clientSecret
-     *            clilent_secret, required if client_secret was issued
+     *            client_secret, required if client_secret was issued
      *            for the client in client registration.
      * @return an OAuthResponse containing an access token if
      *         successful

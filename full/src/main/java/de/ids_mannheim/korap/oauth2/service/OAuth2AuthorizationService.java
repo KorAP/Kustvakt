@@ -200,7 +200,8 @@ public class OAuth2AuthorizationService {
         return authorization;
     }
 
-    public void addTotalAttempts (Authorization authorization) {
+    public void addTotalAttempts (Authorization authorization)
+            throws KustvaktException {
         int totalAttempts = authorization.getTotalAttempts() + 1;
         if (totalAttempts == config.getMaxAuthenticationAttempts()) {
             authorization.setRevoked(true);

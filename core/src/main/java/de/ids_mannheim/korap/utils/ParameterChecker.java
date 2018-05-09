@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.utils;
 
+import java.util.Collection;
+
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 
@@ -10,6 +12,18 @@ public class ParameterChecker {
         if (obj == null) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, name,
                     "null");
+        }
+    }
+    
+    public static void checkCollection (Collection<?> collection, String name)
+            throws KustvaktException {
+        if (collection == null) {
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, name,
+                    "null");
+        }
+        else if (collection.isEmpty()){
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, name,
+                    "empty");
         }
     }
 

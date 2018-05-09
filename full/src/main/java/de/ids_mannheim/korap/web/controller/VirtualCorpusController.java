@@ -59,7 +59,6 @@ public class VirtualCorpusController {
     @Autowired
     private VirtualCorpusService service;
 
-    // EM: should system admins be able to create VC for other users?
     /** Creates a user virtual corpus, also for system admins
      * 
      * @see VirtualCorpusJson
