@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.oauth2.dao;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken_;
@@ -50,7 +52,8 @@ public class AccessTokenDao {
     }
 
 
-    public AccessToken retrieveAccessToken (String accessToken) {
+    public AccessToken retrieveAccessToken (String accessToken)
+            throws KustvaktException {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<AccessToken> query =
                 builder.createQuery(AccessToken.class);
@@ -58,6 +61,12 @@ public class AccessTokenDao {
         query.select(root);
         query.where(builder.equal(root.get(AccessToken_.token), accessToken));
         Query q = entityManager.createQuery(query);
-        return (AccessToken) q.getSingleResult();
+        try {
+            return (AccessToken) q.getSingleResult();
+        }
+        catch (NoResultException e) {
+            throw new KustvaktException(StatusCodes.INVALID_ACCESS_TOKEN,
+                    "Access token is not found");
+        }
     }
 }

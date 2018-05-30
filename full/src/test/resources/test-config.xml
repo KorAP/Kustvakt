@@ -252,6 +252,10 @@
 		<constructor-arg type="de.ids_mannheim.korap.interfaces.EncryptionIface"
 			ref="kustvakt_encryption" />
 	</bean>
+	
+	<bean id="oauth2_auth"
+		class="de.ids_mannheim.korap.authentication.OAuth2Authentication" />
+	
 
 	<util:list id="kustvakt_authproviders"
 		value-type="de.ids_mannheim.korap.interfaces.AuthenticationIface">
@@ -260,6 +264,7 @@
 		<ref bean="session_auth" />
 		<!-- <ref bean="api_auth" /> -->
 		<ref bean="openid_auth" />
+		<ref bean="oauth2_auth" />
 	</util:list>
 
 

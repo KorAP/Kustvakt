@@ -159,6 +159,8 @@ public class StatusCodes {
     public static final int ACCOUNT_NOT_CONFIRMED = 2004;
     public static final int ACCOUNT_DEACTIVATED = 2005;
 
+    public static final int INVALID_ACCESS_TOKEN = 2006;
+    
     //    public static final int CLIENT_AUTHORIZATION_FAILED = 2013;
     public static final int AUTHORIZATION_FAILED = 2010;
 

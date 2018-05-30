@@ -192,7 +192,7 @@
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
 
-	<bean id="kustvaktResponseHandler" class="de.ids_mannheim.korap.web.KustvaktExceptionHandler">
+	<bean id="kustvaktExceptionHandler" class="de.ids_mannheim.korap.web.KustvaktExceptionHandler">
 		<constructor-arg index="0" name="iface" ref="kustvakt_auditing" />
 	</bean>
 
@@ -249,13 +249,16 @@
 			ref="kustvakt_encryption" />
 	</bean>
 
+	<bean id="oauth2_auth"
+		class="de.ids_mannheim.korap.authentication.OAuth2Authentication" />
+	
 	<util:list id="kustvakt_authproviders"
 		value-type="de.ids_mannheim.korap.interfaces.AuthenticationIface">
 		<ref bean="ldap_auth" />
 		<ref bean="session_auth" />
 		<!-- <ref bean="api_auth" /> -->
 		<ref bean="openid_auth" />
-		<ref bean="client_auth" />
+		<ref bean="oauth2_auth" />
 	</util:list>
 
 

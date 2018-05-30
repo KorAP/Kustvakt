@@ -36,7 +36,7 @@ public class OAuth2Authentication implements AuthenticationIface {
         if (accessToken.isRevoked()) {
             throw new KustvaktException(StatusCodes.EXPIRED);
         }
-        
+
         ZonedDateTime expiry =
                 accessToken.getCreatedDate().plusSeconds(config.getTokenTTL());
         String scopes = scopeService
@@ -44,7 +44,7 @@ public class OAuth2Authentication implements AuthenticationIface {
 
         TokenContext c = new TokenContext();
         c.setUsername(accessToken.getUserId());
-        c.setExpirationTime(expiry.toEpochSecond());
+        c.setExpirationTime(expiry.toInstant().toEpochMilli());
         c.setToken(authToken);
         c.setTokenType(TokenType.BEARER);
         c.addContextParameter(Attributes.SCOPES, scopes);

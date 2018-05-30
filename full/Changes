@@ -1,10 +1,11 @@
 version 0.60.3
-09/05/2018
+30/05/2018
 	- improved user authentication by using authentication filter for authorization code request (margaretha)
 	- limited client authentication to client id checking in authorization code request (margaretha)
-	- added user_id in the oauth2_access_token table (margaretha)
+	- added user_id in the oauth2_access_token database table (margaretha)
 	- implemented OAuth2Authentication provider for token context management (margaretha)
 	- added parameter checking for authorization DAO (margaretha)
+	- added controller tests using OAuth2 access token (margaretha)
 	
 version 0.60.2
 03/05/2018

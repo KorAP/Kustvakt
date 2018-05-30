@@ -120,7 +120,7 @@ public class AuthenticationFilter
         }
         else if (TimeUtils.isExpired(context.getExpirationTime())) {
             throw new KustvaktException(StatusCodes.EXPIRED,
-                    "Login is expired.");
+                    "Access token is expired");
         }
     }
 
