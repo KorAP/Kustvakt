@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
@@ -185,7 +186,7 @@ public class UserControllerTest extends FastJerseyTest {
 	// EM: cannot do test with LDAP
 	@Test
 	@Ignore
-	public void loginJWTExpired() throws InterruptedException, KustvaktException, ParseException {
+	public void loginJWTExpired() throws InterruptedException, KustvaktException, ParseException, JOSEException {
 
 		assertTrue(BeansFactory.getKustvaktContext().getConfiguration().getTokenTTL() < 10);
 
@@ -205,7 +206,7 @@ public class UserControllerTest extends FastJerseyTest {
 		SignedJWT jwt = sign.verifyToken(token);
 
 		while (true) {
-			if (TimeUtils.isExpired(jwt.getJWTClaimsSet().getExpirationTimeClaim()))
+			if (TimeUtils.isExpired(jwt.getJWTClaimsSet().getExpirationTime().getTime()))
 				break;
 		}
 

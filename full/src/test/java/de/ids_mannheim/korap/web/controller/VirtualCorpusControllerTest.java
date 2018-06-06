@@ -368,7 +368,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         node = testCheckHiddenGroup(groupId);
         assertEquals(StatusCodes.GROUP_NOT_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Group with id 5 is not found",
+        assertEquals("Group with id "+groupId+" is not found",
                 node.at("/errors/0/1").asText());
     }
 
@@ -387,13 +387,13 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testCreateVCWithExpiredToken ()
+    public void testCreateVCWithInvalidToken ()
             throws IOException, KustvaktException {
         String json = "{\"name\": \"new vc\",\"type\": \"PRIVATE\","
                 + "\"corpusQuery\": \"corpusSigle=GOE\"}";
 
         InputStream is = getClass().getClassLoader()
-                .getResourceAsStream("test-user.token");
+                .getResourceAsStream("test-invalid-signature.token");
 
         String authToken;
         try (BufferedReader reader =
@@ -410,6 +410,40 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                 .entity(json).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
 
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.INVALID_ACCESS_TOKEN, node.at("/errors/0/0").asInt());
+        assertEquals("Json Web Signature (JWS) object verification failed.",
+                node.at("/errors/0/1").asText());
+
+        checkWWWAuthenticateHeader(response);
+    }
+    
+    @Test
+    public void testCreateVCWithExpiredToken ()
+            throws IOException, KustvaktException {
+        String json = "{\"name\": \"new vc\",\"type\": \"PRIVATE\","
+                + "\"corpusQuery\": \"corpusSigle=GOE\"}";
+
+        InputStream is = getClass().getClassLoader()
+                .getResourceAsStream("test-expired.token");
+
+        String authToken;
+        try (BufferedReader reader =
+                new BufferedReader(new InputStreamReader(is));) {
+            authToken = reader.readLine();
+        }
+
+        ClientResponse response = resource().path("vc").path("create")
+                .header(Attributes.AUTHORIZATION,
+                        AuthenticationScheme.API.displayName() + " "
+                                + authToken)
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .entity(json).post(ClientResponse.class);
+        
+        String entity = response.getEntity(String.class);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);

@@ -71,6 +71,7 @@ import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 //todo: only allow oauth2 access_token requests GET methods?
 //todo: allow refresh tokens
 //@Path("/oauth2")
+@Deprecated
 public class OAuthController {
 
     @Autowired

@@ -26,6 +26,7 @@
  
 package de.ids_mannheim.korap.authentication;
 
+import com.nimbusds.jose.JOSEException;
 import com.unboundid.ldap.sdk.*;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
@@ -72,7 +73,7 @@ public class LdapAuth3 extends APIAuthentication {
 	public static final int LDAP_AUTH_RLOCKED	= 3;
 	public static final int LDAP_AUTH_RNOTREG	= 4;
 
-    public LdapAuth3 (KustvaktConfiguration config) {
+    public LdapAuth3 (KustvaktConfiguration config) throws JOSEException {
         super(config);
     }	
     

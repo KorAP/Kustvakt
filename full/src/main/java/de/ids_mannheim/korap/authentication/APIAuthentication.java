@@ -30,7 +30,7 @@ public class APIAuthentication implements AuthenticationIface {
     //private Cache id_tokens = CacheManager.getInstance().getCache("id_tokens");
 
 
-    public APIAuthentication (KustvaktConfiguration config) {
+    public APIAuthentication (KustvaktConfiguration config) throws JOSEException {
         this.signedToken = new JWTSigner(config.getSharedSecret(),
                 config.getIssuer(), config.getTokenTTL());
     }
@@ -67,7 +67,7 @@ public class APIAuthentication implements AuthenticationIface {
         c.setUsername(user.getUsername());
         SignedJWT jwt = signedToken.createJWT(user, attr);
         try {
-            c.setExpirationTime(jwt.getJWTClaimsSet().getExpirationTimeClaim());
+            c.setExpirationTime(jwt.getJWTClaimsSet().getExpirationTime().getTime());
         }
         catch (ParseException e) {
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);

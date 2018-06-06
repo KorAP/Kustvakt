@@ -4,6 +4,7 @@ import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.JWTClaimsSet.Builder;
 import com.nimbusds.jwt.SignedJWT;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -17,6 +18,8 @@ import org.joda.time.DateTime;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,7 +34,8 @@ public class JWTSigner {
     private final int defaultttl;
 
 
-    public JWTSigner (final byte[] secret, URL issuer, final int defaulttl) {
+    public JWTSigner (final byte[] secret, URL issuer, final int defaulttl)
+            throws JOSEException {
         this.issuer = issuer;
         this.signer = new MACSigner(secret);
         this.verifier = new MACVerifier(secret);
@@ -40,7 +44,7 @@ public class JWTSigner {
 
 
     public JWTSigner (final byte[] secret, String issuer)
-            throws MalformedURLException {
+            throws MalformedURLException, JOSEException {
         this(secret, new URL(issuer), 72 * 60 * 60);
     }
 
@@ -50,32 +54,35 @@ public class JWTSigner {
     }
 
 
-    public SignedJWT signContent (User user, Map<String, Object> attr, int ttl) {
+    public SignedJWT signContent (User user, Map<String, Object> attr,
+            int ttl) {
         String scopes;
 
-        JWTClaimsSet cs = new JWTClaimsSet();
-        cs.setIssuerClaim(this.issuer.toString());
+        Builder csBuilder = new JWTClaimsSet.Builder();
+        csBuilder.issuer(this.issuer.toString());
 
         if ((scopes = (String) attr.get(Attributes.SCOPES)) != null) {
             Userdata data = new GenericUserData();
             data.readQuietly(attr, false);
             Scopes claims = Scopes.mapScopes(scopes, data);
-            cs.setCustomClaims(claims.toMap());
+            Map<String, Object> map = claims.toMap();
+            for (String key : map.keySet()) {
+                csBuilder.claim(key, map.get(key));
+            }
         }
 
-        cs.setSubjectClaim(user.getUsername());
-        if (attr.get(Attributes.CLIENT_ID) != null)
-            cs.setAudienceClaim(new String[] { (String) attr
-                    .get(Attributes.CLIENT_ID) });
-        cs.setExpirationTimeClaim(TimeUtils.getNow().plusSeconds(ttl)
-                .getMillis());
+        csBuilder.subject(user.getUsername());
+        if (attr.get(Attributes.CLIENT_ID) != null) {
+            csBuilder.audience((String) attr.get(Attributes.CLIENT_ID));
+        }
+        csBuilder.expirationTime(TimeUtils.getNow().plusSeconds(ttl).toDate());
         SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256),
-                cs);
+                csBuilder.build());
         try {
             signedJWT.sign(signer);
         }
         catch (JOSEException e) {
-            return null;
+            e.printStackTrace();
         }
         return signedJWT;
     }
@@ -88,19 +95,16 @@ public class JWTSigner {
      */
     public SignedJWT signContent (String username, String userclient,
             String json, int ttl) {
-        JWTClaimsSet cs = new JWTClaimsSet();
-        cs.setSubjectClaim(username);
-        if (!json.isEmpty())
-            cs.setCustomClaim("data", json);
-        cs.setExpirationTimeClaim(TimeUtils.getNow().plusSeconds(ttl)
-                .getMillis());
-        cs.setIssuerClaim(this.issuer.toString());
+        Builder cs = new JWTClaimsSet.Builder();
+        cs.subject(username);
+        if (!json.isEmpty()) cs.claim("data", json);
+        cs.expirationTime(TimeUtils.getNow().plusSeconds(ttl).toDate());
+        cs.issuer(this.issuer.toString());
 
-        if (!userclient.isEmpty())
-            cs.setCustomClaim("userip", userclient);
+        if (!userclient.isEmpty()) cs.claim("userip", userclient);
 
-        SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256),
-                cs);
+        SignedJWT signedJWT =
+                new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), cs.build());
         try {
             signedJWT.sign(signer);
         }
@@ -133,15 +137,16 @@ public class JWTSigner {
         try {
             client = SignedJWT.parse(token);
             if (!client.verify(verifier))
-                throw new KustvaktException(StatusCodes.REQUEST_INVALID);
+                throw new KustvaktException(StatusCodes.INVALID_ACCESS_TOKEN,
+                        "Json Web Signature (JWS) object verification failed.");
 
-            if (!new DateTime(client.getJWTClaimsSet().getExpirationTimeClaim())
+            if (!new DateTime(client.getJWTClaimsSet().getExpirationTime())
                     .isAfterNow())
                 throw new KustvaktException(StatusCodes.EXPIRED,
                         "Authentication token is expired", token);
         }
         catch (ParseException | JOSEException e) {
-            //todo: message or entity, how to treat??!
+            // todo: message or entity, how to treat??!
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
                     "Token could not be verified", token);
         }
@@ -158,7 +163,7 @@ public class JWTSigner {
             if (!jwt.verify(verifier))
                 throw new KustvaktException(StatusCodes.REQUEST_INVALID,
                         "token invalid", signedContent);
-            return (String) jwt.getJWTClaimsSet().getCustomClaim("data");
+            return jwt.getJWTClaimsSet().getStringClaim("data");
         }
         catch (ParseException | JOSEException e) {
             return null;
@@ -166,19 +171,20 @@ public class JWTSigner {
     }
 
 
-    public TokenContext getTokenContext (String idtoken) throws ParseException,
-            JOSEException, KustvaktException {
+    public TokenContext getTokenContext (String idtoken)
+            throws ParseException, JOSEException, KustvaktException {
         SignedJWT signedJWT = verifyToken(idtoken);
 
         TokenContext c = new TokenContext();
-        c.setUsername(signedJWT.getJWTClaimsSet().getSubjectClaim());
-        if (signedJWT.getJWTClaimsSet().getAudienceClaim() != null)
-            c.addContextParameter(Attributes.CLIENT_ID, signedJWT
-                    .getJWTClaimsSet().getAudienceClaim()[0]);
-        c.setExpirationTime(signedJWT.getJWTClaimsSet()
-                .getExpirationTimeClaim());
+        c.setUsername(signedJWT.getJWTClaimsSet().getSubject());
+        List<String> audienceList = signedJWT.getJWTClaimsSet().getAudience();
+        if (audienceList != null && !audienceList.isEmpty())
+            c.addContextParameter(Attributes.CLIENT_ID,
+                    signedJWT.getJWTClaimsSet().getAudience().get(0));
+        c.setExpirationTime(
+                signedJWT.getJWTClaimsSet().getExpirationTime().getTime());
         c.setToken(idtoken);
-        c.addParams(signedJWT.getJWTClaimsSet().getCustomClaims());
+        c.addParams(signedJWT.getJWTClaimsSet().getClaims());
         return c;
     }
 

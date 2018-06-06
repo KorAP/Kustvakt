@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.authentication;
 
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 import de.ids_mannheim.korap.config.JWTSigner;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
@@ -40,26 +41,35 @@ public class OpenIDconnectAuthentication implements AuthenticationIface {
 
 
     @Override
-    public TokenContext getTokenContext(String authToken)
+    public TokenContext getTokenContext (String authToken)
             throws KustvaktException {
         return this.database.getContext(authToken);
     }
 
 
     @Override
-    public TokenContext createTokenContext(User user, Map<String, Object> attr)
+    public TokenContext createTokenContext (User user, Map<String, Object> attr)
             throws KustvaktException {
         String cl_secret = (String) attr.get(Attributes.CLIENT_SECRET);
         if (cl_secret == null)
             throw new KustvaktException(StatusCodes.REQUEST_INVALID);
         attr.remove(cl_secret);
-        JWTSigner signer = new JWTSigner(cl_secret.getBytes(),
-                config.getIssuer(), config.getTokenTTL());
+        JWTSigner signer;
+        try {
+            signer = new JWTSigner(cl_secret.getBytes(), config.getIssuer(),
+                    config.getTokenTTL());
+        }
+        catch (JOSEException e1) {
+            // e1.printStackTrace();
+            throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
+                    "Failed creating JWT.", e1);
+        }
         TokenContext c = new TokenContext();
         c.setUsername(user.getUsername());
         SignedJWT jwt = signer.createJWT(user, attr);
         try {
-            c.setExpirationTime(jwt.getJWTClaimsSet().getExpirationTimeClaim());
+            c.setExpirationTime(
+                    jwt.getJWTClaimsSet().getExpirationTime().getTime());
         }
         catch (ParseException e) {
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT);
@@ -79,13 +89,14 @@ public class OpenIDconnectAuthentication implements AuthenticationIface {
 
 
     @Override
-    public TokenContext refresh (TokenContext context) throws KustvaktException {
+    public TokenContext refresh (TokenContext context)
+            throws KustvaktException {
         throw new UnsupportedOperationException("method not supported");
     }
 
 
     @Override
-    public TokenType getTokenType() {
+    public TokenType getTokenType () {
         return TokenType.ID_TOKEN;
     }
 }

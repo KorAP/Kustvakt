@@ -68,8 +68,8 @@ public class OAuth2Controller {
      */
     @POST
     @Path("authorize")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response requestAuthorizationCode (
             @Context HttpServletRequest request,
@@ -182,4 +182,14 @@ public class OAuth2Controller {
             throw responseHandler.throwit(e);
         }
     }
+    
+//    @POST
+//    @Path("revoke")
+//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+//    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+//    public Response revokeAccessToken (@Context HttpServletRequest request,
+//            @FormParam("grant_type") String grantType,
+//            MultivaluedMap<String, String> form) {
+//        return null;
+//    }
 }

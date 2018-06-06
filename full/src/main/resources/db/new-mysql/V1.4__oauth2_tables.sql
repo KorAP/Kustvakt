@@ -2,16 +2,64 @@
 
 -- oauth2 db tables
 CREATE TABLE IF NOT EXISTS oauth2_client (
-	id VARCHAR(100) UNIQUE PRIMARY KEY,
+	id VARCHAR(100) PRIMARY KEY NOT NULL,
 	name VARCHAR(200) NOT NULL,
 	secret VARCHAR(200),
 	type VARCHAR(200) NOT NULL,
 	native BOOLEAN DEFAULT FALSE,
 	url TEXT NOT NULL,
-	url_hashcode UNIQUE INTEGER NOT NULL,
+	url_hashcode INTEGER NOT NULL,
 	redirect_uri TEXT NOT NULL,
 	registered_by VARCHAR(100) NOT NULL,
-	description VARCHAR(250) NOT NULL
+	description VARCHAR(250) NOT NULL,
+	UNIQUE INDEX unique_url(url_hashcode)
+);
+
+CREATE TABLE IF NOT EXISTS oauth2_authorization (
+	id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	code VARCHAR(255) NOT NULL,
+	client_id VARCHAR(100) NOT NULL,
+	user_id VARCHAR(100) NOT NULL,
+	redirect_uri TEXT DEFAULT NULL,
+	created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	is_revoked BOOLEAN DEFAULT 0,
+	total_attempts INTEGER DEFAULT 0,
+	FOREIGN KEY (client_id)
+	   REFERENCES oauth2_client(id),
+	UNIQUE INDEX authorization_index(code, client_id)
+);
+
+CREATE TABLE IF NOT EXISTS oauth2_access_scope (
+	id VARCHAR(255) PRIMARY KEY NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS oauth2_authorization_scope (
+	id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	authorization_id INTEGER NOT NULL,
+	scope_id VARCHAR(100) NOT NULL,
+	FOREIGN KEY (authorization_id)
+	   REFERENCES oauth2_authorization(id),
+	FOREIGN KEY (scope_id)
+	   REFERENCES oauth2_access_scope(id),
+	UNIQUE INDEX authorization_scope_index(authorization_id, scope_id)
+);
+
+CREATE TABLE IF NOT EXISTS oauth2_access_token (
+	id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	token VARCHAR(255) NOT NULL,
+	authorization_id INTEGER DEFAULT NULL,
+	user_id VARCHAR(100) DEFAULT NULL,
+	created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	is_revoked BOOLEAN DEFAULT 0,
+	total_attempts INTEGER DEFAULT 0,
+	FOREIGN KEY (authorization_id)
+	   REFERENCES oauth2_authorization(id)
+);
+
+CREATE TABLE oauth2_access_token_scope (
+	token_id INTEGER NOT NULL, 
+	scope_id VARCHAR(100) NOT NULL, 
+	CONSTRAINT primary_key PRIMARY KEY (token_id, scope_id)
 );
 
 --

@@ -9,6 +9,8 @@ import java.util.Map;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.nimbusds.jose.JOSEException;
+
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
@@ -24,8 +26,8 @@ public class APIAuthenticationTest extends SpringJerseyTest {
     private KustvaktConfiguration config;
 
     @Test
-    public void testCreateGetTokenContext ()
-            throws KustvaktException, IOException, InterruptedException {
+    public void testCreateGetTokenContext () throws KustvaktException,
+            IOException, InterruptedException, JOSEException {
         User user = new KorAPUser();
         user.setUsername("testUser");
 
@@ -38,6 +40,7 @@ public class APIAuthenticationTest extends SpringJerseyTest {
 
         // get token context
         String authToken = context.getToken();
+//        System.out.println(authToken);
         context = auth.getTokenContext(authToken);
 
         TokenType tokenType = context.getTokenType();

@@ -220,9 +220,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-		    <groupId>com.sun.jersey</groupId>
-		    <artifactId>jersey-json</artifactId>
-		    <version>${jersey.version}</version>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-json</artifactId>
+			<version>${jersey.version}</version>
 		</dependency>
 
 		<!-- Spring -->
@@ -269,11 +269,11 @@
 			<artifactId>activation</artifactId>
 			<version>1.1.1</version>
 		</dependency>
-		
+
 		<dependency>
-		    <groupId>javax.servlet</groupId>
-		    <artifactId>javax.servlet-api</artifactId>
-		    <version>4.0.0</version>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>4.0.0</version>
 		</dependency>
 
 		<!-- Flyway -->
@@ -282,13 +282,19 @@
 			<artifactId>flyway-core</artifactId>
 			<version>4.0</version>
 		</dependency>
-		
+
 		<!-- OAuth -->
 		<dependency>
 			<groupId>org.apache.oltu.oauth2</groupId>
 			<artifactId>org.apache.oltu.oauth2.authzserver</artifactId>
 			<version>1.0.0</version>
 		</dependency>
-	</dependencies>
 
+		<!-- JWT -->
+		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>nimbus-jose-jwt</artifactId>
+			<version>5.10</version>
+		</dependency>
+	</dependencies>
 </project>
