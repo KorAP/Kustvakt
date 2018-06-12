@@ -298,7 +298,7 @@ public class LiteService {
     @GET
     @Path("statistics")
     public Response getStatistics (
-            @QueryParam("collectionQuery") String collectionQuery) {
+            @QueryParam("corpusQuery") String collectionQuery) {
 
         KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
         builder.with(collectionQuery);

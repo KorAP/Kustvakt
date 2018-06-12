@@ -65,7 +65,7 @@ public class LiteServiceTest extends JerseyTest{
     public void testStatistics () throws KustvaktException{
         ClientResponse response = resource()
                 .path("statistics")
-                .queryParam("collectionQuery", "textType=Autobiographie & corpusSigle=GOE")
+                .queryParam("corpusQuery", "textType=Autobiographie & corpusSigle=GOE")
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
