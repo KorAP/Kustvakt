@@ -26,7 +26,7 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.OAuth2AuthorizationRequest;
-import de.ids_mannheim.korap.oauth2.service.OAuth2AuthorizationService;
+import de.ids_mannheim.korap.oauth2.oltu.service.OltuAuthorizationService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
@@ -43,7 +43,7 @@ public class OAuth2Controller {
     @Autowired
     private OAuth2TokenService oAuth2Service;
     @Autowired
-    private OAuth2AuthorizationService authorizationService;
+    private OltuAuthorizationService authorizationService;
 
     /**
      * Requests an authorization code.
@@ -84,10 +84,9 @@ public class OAuth2Controller {
                     new FormRequestWrapper(request, form);
             OAuth2AuthorizationRequest authzRequest =
                     new OAuth2AuthorizationRequest(requestWithForm);
-            OAuthResponse authResponse =
-                    authorizationService.requestAuthorizationCode(
-                            requestWithForm, authzRequest, username);
-            return responseHandler.sendRedirect(authResponse.getLocationUri());
+            String uri = authorizationService.requestAuthorizationCode(
+                    requestWithForm, authzRequest, username);
+            return responseHandler.sendRedirect(uri);
         }
         catch (OAuthSystemException e) {
             throw responseHandler.throwit(e);
@@ -182,14 +181,15 @@ public class OAuth2Controller {
             throw responseHandler.throwit(e);
         }
     }
-    
-//    @POST
-//    @Path("revoke")
-//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-//    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-//    public Response revokeAccessToken (@Context HttpServletRequest request,
-//            @FormParam("grant_type") String grantType,
-//            MultivaluedMap<String, String> form) {
-//        return null;
-//    }
+
+    // @POST
+    // @Path("revoke")
+    // @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    // @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    // public Response revokeAccessToken (@Context HttpServletRequest
+    // request,
+    // @FormParam("grant_type") String grantType,
+    // MultivaluedMap<String, String> form) {
+    // return null;
+    // }
 }

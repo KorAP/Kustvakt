@@ -3,19 +3,10 @@ package de.ids_mannheim.korap.oauth2.service;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
-import org.apache.oltu.oauth2.as.request.OAuthAuthzRequest;
-import org.apache.oltu.oauth2.as.response.OAuthASResponse;
-import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
-import org.apache.oltu.oauth2.common.message.OAuthResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.sun.jersey.api.client.ClientResponse.Status;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -26,7 +17,7 @@ import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 
-@Service
+@Service(value="authorizationService")
 public class OAuth2AuthorizationService {
 
     private static Logger jlog =
@@ -35,9 +26,7 @@ public class OAuth2AuthorizationService {
     @Autowired
     private OAuth2ClientService clientService;
     @Autowired
-    private OAuth2ScopeService scopeService;
-    @Autowired
-    private OAuthIssuer oauthIssuer;
+    protected OAuth2ScopeService scopeService;
 
     @Autowired
     private AuthorizationDao authorizationDao;
@@ -49,44 +38,38 @@ public class OAuth2AuthorizationService {
      * Authorization code request does not require client
      * authentication, but only checks if the client id exists.
      * 
-     * @param request
-     * @param authzRequest
      * @param username
+     * @param clientId
+     * @param responseType
+     * @param redirectUri
+     * @param scopeSet
+     * @param code
      * @return
      * @throws KustvaktException
-     * @throws OAuthSystemException
      */
-    public OAuthResponse requestAuthorizationCode (HttpServletRequest request,
-            OAuthAuthzRequest authzRequest, String username)
-            throws KustvaktException, OAuthSystemException {
+    public Authorization createAuthorization (String username, String clientId,
+            String responseType, String redirectUri, Set<String> scopeSet,
+            String code) throws KustvaktException {
 
-        checkResponseType(authzRequest.getResponseType());
+        checkResponseType(responseType);
 
-        OAuth2Client client =
-                clientService.authenticateClientId(authzRequest.getClientId());
+        OAuth2Client client = clientService.authenticateClientId(clientId);
 
-        String redirectUri = authzRequest.getRedirectURI();
-        boolean hasRedirectUri = hasRedirectUri(redirectUri);
-        redirectUri = verifyRedirectUri(client, hasRedirectUri, redirectUri);
+        String verifiedRedirectUri = verifyRedirectUri(client, redirectUri);
 
-        String code = oauthIssuer.authorizationCode();
-        Set<String> scopeSet = authzRequest.getScopes();
         if (scopeSet == null || scopeSet.isEmpty()) {
             scopeSet = config.getDefaultAccessScopes();
         }
-        String scopeStr = String.join(" ", scopeSet);
         Set<AccessScope> scopes = scopeService.convertToAccessScope(scopeSet);
 
-        authorizationDao.storeAuthorizationCode(authzRequest.getClientId(),
-                username, code, scopes, authzRequest.getRedirectURI());
+        Authorization authorization = authorizationDao.storeAuthorizationCode(
+                clientId, username, code, scopes, redirectUri);
 
-        return OAuthASResponse
-                .authorizationResponse(request, Status.FOUND.getStatusCode())
-                .setCode(code).setScope(scopeStr).location(redirectUri)
-                .buildQueryMessage();
+        authorization.setRedirectURI(verifiedRedirectUri);
+        return authorization;
     }
 
-    private void checkResponseType (String responseType)
+    public void checkResponseType (String responseType)
             throws KustvaktException {
         if (responseType == null || responseType.isEmpty()) {
             throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
@@ -101,15 +84,6 @@ public class OAuth2AuthorizationService {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "unknown response_type", OAuth2Error.INVALID_REQUEST);
         }
-    }
-
-
-
-    private boolean hasRedirectUri (String redirectURI) {
-        if (redirectURI != null && !redirectURI.isEmpty()) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -132,12 +106,11 @@ public class OAuth2AuthorizationService {
      * @return a client's redirect URI
      * @throws KustvaktException
      */
-    private String verifyRedirectUri (OAuth2Client client,
-            boolean hasRedirectUri, String redirectUri)
+    public String verifyRedirectUri (OAuth2Client client, String redirectUri)
             throws KustvaktException {
 
         String registeredUri = client.getRedirectURI();
-        if (hasRedirectUri) {
+        if (redirectUri != null && !redirectUri.isEmpty()) {
             // check if the redirect URI the same as that in DB
             if (!redirectUri.equals(registeredUri)) {
                 throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
@@ -153,7 +126,7 @@ public class OAuth2AuthorizationService {
                 redirectUri = registeredUri;
             }
             else {
-                throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
+                throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
                         "redirect_uri is required",
                         OAuth2Error.INVALID_REQUEST);
             }

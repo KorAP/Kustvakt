@@ -28,7 +28,7 @@ public class AuthorizationDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public void storeAuthorizationCode (String clientId, String userId,
+    public Authorization storeAuthorizationCode (String clientId, String userId,
             String code, Set<AccessScope> scopes, String redirectURI)
             throws KustvaktException {
         ParameterChecker.checkStringValue(clientId, "client_id");
@@ -45,6 +45,7 @@ public class AuthorizationDao {
 
         entityManager.persist(authCode);
         // what if unique fails
+        return authCode;
     }
 
     public Authorization retrieveAuthorizationCode (String code)

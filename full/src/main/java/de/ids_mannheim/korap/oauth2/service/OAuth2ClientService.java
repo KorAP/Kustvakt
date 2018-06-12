@@ -174,11 +174,10 @@ public class OAuth2ClientService {
     }
 
 
-    public void deregisterConfidentialClient (OAuthRequest oAuthRequest)
-            throws KustvaktException {
+    public void deregisterConfidentialClient (String clientId,
+            String clientSecret) throws KustvaktException {
 
-        OAuth2Client client = authenticateClient(oAuthRequest.getClientId(),
-                oAuthRequest.getClientSecret());
+        OAuth2Client client = authenticateClient(clientId, clientSecret);
         clientDao.deregisterClient(client);
     }
 

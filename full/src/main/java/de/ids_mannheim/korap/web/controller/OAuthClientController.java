@@ -33,8 +33,10 @@ import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 
 
-/** Defines controllers for OAuth2 clients, namely applications attempting
- * to access users' resources. 
+/**
+ * Defines controllers for OAuth2 clients, namely applications
+ * attempting
+ * to access users' resources.
  * 
  * @author margaretha
  *
@@ -48,20 +50,29 @@ public class OAuthClientController {
     @Autowired
     private OAuth2ResponseHandler responseHandler;
 
-    /** Registers a client application. Before starting an OAuth process, 
-     * client applications have to be registered first. Only registered
-     * users are allowed to register client applications. After registration,
-     * the client will receive a client_id and a client_secret, if the client 
-     * is confidential (capable of storing the client_secret), that are needed 
+    /**
+     * Registers a client application. Before starting an OAuth
+     * process,
+     * client applications have to be registered first. Only
+     * registered
+     * users are allowed to register client applications. After
+     * registration,
+     * the client will receive a client_id and a client_secret, if the
+     * client
+     * is confidential (capable of storing the client_secret), that
+     * are needed
      * in the authorization process.
      * 
      * From RFC 6749:
-     * The authorization server SHOULD document the size of any identifier 
+     * The authorization server SHOULD document the size of any
+     * identifier
      * it issues.
      * 
      * @param context
-     * @param clientJson a JSON object describing the client
-     * @return client_id and client_secret if the client type is confidential
+     * @param clientJson
+     *            a JSON object describing the client
+     * @return client_id and client_secret if the client type is
+     *         confidential
      * 
      * @see OAuth2ClientJson
      */
@@ -85,11 +96,13 @@ public class OAuthClientController {
     }
 
 
-    /** Deregisters a public client via owner authentication.
+    /**
+     * Deregisters a public client via owner authentication.
      * 
      * 
      * @param securityContext
-     * @param clientId the client id
+     * @param clientId
+     *            the client id
      * @return HTTP Response OK if successful.
      */
     @DELETE
@@ -112,7 +125,8 @@ public class OAuthClientController {
     }
 
 
-    /** Deregisters confidential clients. Clients must authenticate. 
+    /**
+     * Deregisters confidential clients. Clients must authenticate.
      * 
      * @param securityContext
      * @param request
@@ -130,7 +144,8 @@ public class OAuthClientController {
             OAuthRequest oAuthRequest = new OAuth2DeregisterClientRequest(
                     new FormRequestWrapper(request, form));
 
-            clientService.deregisterConfidentialClient(oAuthRequest);
+            clientService.deregisterConfidentialClient(
+                    oAuthRequest.getClientId(), oAuthRequest.getClientSecret());
             return Response.ok().build();
         }
         catch (KustvaktException e) {

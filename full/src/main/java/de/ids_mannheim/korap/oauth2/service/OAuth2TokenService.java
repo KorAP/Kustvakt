@@ -39,8 +39,10 @@ public class OAuth2TokenService {
 
     @Autowired
     private OAuth2ClientService clientService;
+    
     @Autowired
     private OAuth2AuthorizationService authorizationService;
+    
     @Autowired
     private OAuth2ScopeService scopeService;
     @Autowired
