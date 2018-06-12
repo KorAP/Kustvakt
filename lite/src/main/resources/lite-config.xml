@@ -45,10 +45,6 @@
         <constructor-arg index="0" name="properties" ref="properties"/>
     </bean>
 
-    <bean name="kustvakt_encryption"
-          class="de.ids_mannheim.korap.interfaces.defaults.DefaultEncryption">
-    </bean>
-    
     <bean id="kustvakt_rewrite" class="de.ids_mannheim.korap.resource.rewrite.RewriteHandler">
 		<constructor-arg ref="kustvakt_config" />
 	</bean>

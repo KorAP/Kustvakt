@@ -1,3 +1,8 @@
+version 0.60.1
+12/06/2018
+	- removed kustvakt_encryption (margaretha)
+	- updated kustvakt core version (margaretha)
+	
 version 0.60
 23/03/2018	
     - updated field type:date in the metadata test (margaretha)
