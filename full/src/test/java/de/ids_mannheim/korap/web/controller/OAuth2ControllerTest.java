@@ -2,7 +2,6 @@ package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
 
@@ -14,6 +13,8 @@ import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
@@ -55,13 +56,17 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("response_type", "code");
         form.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        form.add("state", "thisIsMyState");
 
         ClientResponse response = requestAuthorizationConfidentialClient(form);
 
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
                 response.getStatus());
         URI redirectUri = response.getLocation();
-        assertTrue(redirectUri.getQuery().startsWith("code"));
+        MultiValueMap<String, String> params = UriComponentsBuilder
+                .fromUri(redirectUri).build().getQueryParams();
+        assertNotNull(params.getFirst("code"));
+        assertEquals("thisIsMyState", params.getFirst("state"));
     }
 
     @Test
@@ -80,7 +85,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
                 node.at("/error").asText());
-        assertEquals(redirectUri + " is unknown",
+        assertEquals("Invalid redirect URI",
                 node.at("/error_description").asText());
     }
 

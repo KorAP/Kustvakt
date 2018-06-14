@@ -13,7 +13,7 @@ import com.sun.jersey.spi.container.ResourceFilter;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.security.context.TokenContext;
-import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
+import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 
 /**
  * EM: pretty much identical to {@link BlockingFilter}, should be deleted? 
@@ -30,7 +30,7 @@ public class NonDemoBlockingFilter
         implements ContainerRequestFilter, ResourceFilter {
 
     @Autowired
-    private KustvaktExceptionHandler kustvaktExceptionHandler;
+    private KustvaktResponseHandler kustvaktResponseHandler;
 
     @Override
     public ContainerRequest filter (ContainerRequest request) {
@@ -39,12 +39,12 @@ public class NonDemoBlockingFilter
             context = (TokenContext) request.getUserPrincipal();
         }
         catch (UnsupportedOperationException e) {
-            throw kustvaktExceptionHandler.throwit(new KustvaktException(
+            throw kustvaktResponseHandler.throwit(new KustvaktException(
                     StatusCodes.UNSUPPORTED_OPERATION, e.getMessage(), e));
         }
 
         if (context == null || context.isDemo()) {
-            throw kustvaktExceptionHandler.throwit(
+            throw kustvaktResponseHandler.throwit(
                     new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                             "Operation is not permitted for guest users"));
         }

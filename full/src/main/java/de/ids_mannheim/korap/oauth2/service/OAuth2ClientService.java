@@ -8,7 +8,6 @@ import java.sql.SQLException;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.log4j.Logger;
-import org.apache.oltu.oauth2.as.request.OAuthRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

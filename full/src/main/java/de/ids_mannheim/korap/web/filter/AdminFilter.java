@@ -27,7 +27,7 @@ import de.ids_mannheim.korap.security.context.KustvaktContext;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.StringUtils;
-import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
+import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 
 /**
  * @author hanl, margaretha
@@ -46,7 +46,7 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
     private AuthenticationManagerIface authManager;
 
     @Autowired
-    private KustvaktExceptionHandler kustvaktExceptionHandler;
+    private KustvaktResponseHandler kustvaktResponseHandler;
 
     @Autowired
     private HttpAuthorizationHandler authorizationHandler;
@@ -62,7 +62,7 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
             data = authorizationHandler.parseBasicToken(data);
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
 
         String host = cr.getHeaderValue(ContainerRequest.HOST);
@@ -82,7 +82,7 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
             properties.put("user", user);
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
 
         TokenContext c = new TokenContext();

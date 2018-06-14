@@ -28,7 +28,7 @@ import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.VirtualCorpusService;
-import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
+import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
@@ -55,7 +55,7 @@ import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
 public class VirtualCorpusController {
 
     @Autowired
-    private KustvaktExceptionHandler kustvaktExceptionHandler;
+    private KustvaktResponseHandler kustvaktResponseHandler;
     @Autowired
     private VirtualCorpusService service;
 
@@ -80,7 +80,7 @@ public class VirtualCorpusController {
             service.storeVC(vc, context.getUsername());
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -108,7 +108,7 @@ public class VirtualCorpusController {
             service.editVC(vc, context.getUsername());
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -130,7 +130,7 @@ public class VirtualCorpusController {
             return service.searchVCById(context.getUsername(), vcId);
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
     }
 
@@ -157,7 +157,7 @@ public class VirtualCorpusController {
             return service.listVCByUser(context.getUsername(), createdBy);
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
     }
 
@@ -178,7 +178,7 @@ public class VirtualCorpusController {
             return service.listOwnerVC(context.getUsername());
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
     }
 
@@ -207,7 +207,7 @@ public class VirtualCorpusController {
             return service.listVCByType(context.getUsername(), createdBy, type);
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
     }
 
@@ -229,7 +229,7 @@ public class VirtualCorpusController {
             service.deleteVC(context.getUsername(), vcId);
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -254,7 +254,7 @@ public class VirtualCorpusController {
             service.shareVC(context.getUsername(), vcId, groupId);
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -275,7 +275,7 @@ public class VirtualCorpusController {
             service.deleteVCAccess(accessId, context.getUsername());
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -303,7 +303,7 @@ public class VirtualCorpusController {
             return service.listVCAccessByVC(context.getUsername(), vcId);
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
     }
 
@@ -327,7 +327,7 @@ public class VirtualCorpusController {
             return service.listVCAccessByGroup(context.getUsername(), groupId);
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
     }
 }

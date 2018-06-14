@@ -82,7 +82,7 @@ public class SearchController {
             LoggerFactory.getLogger(SearchController.class);
 
     @Autowired
-    private CoreResponseHandler kustvaktExceptionHandler;
+    private CoreResponseHandler kustvaktResponseHandler;
     @Autowired
     private SearchKrill searchKrill;
     private ResourceCache resourceHandler;
@@ -215,7 +215,7 @@ public class SearchController {
             result = graphDBhandler.getResponse("distCollo", "q", query);
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok(result).build();
     }
@@ -323,7 +323,7 @@ public class SearchController {
             cquery.setBaseQuery(ss.toJSON());
         }
         catch (KustvaktException e1) {
-            throw kustvaktExceptionHandler.throwit(e1);
+            throw kustvaktResponseHandler.throwit(e1);
         }
 
         String query = "";
@@ -343,7 +343,7 @@ public class SearchController {
                 }
             }
             catch (KustvaktException e) {
-                throw kustvaktExceptionHandler.throwit(e);
+                throw kustvaktResponseHandler.throwit(e);
             }
         }
 
@@ -399,7 +399,7 @@ public class SearchController {
             // jsonld = this.processor.processQuery(jsonld, user);
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         jlog.info("Serialized search: {}", jsonld);
 
@@ -434,7 +434,7 @@ public class SearchController {
         catch (KustvaktException e) {
             jlog.error("Failed retrieving user in the search service: {}",
                     e.string());
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
 
         QuerySerializer serializer = new QuerySerializer();
@@ -451,7 +451,7 @@ public class SearchController {
             jlog.info("the serialized query {}", query);
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
 
         String result = doSearch(eng, query, pageLength, meta);
@@ -496,7 +496,7 @@ public class SearchController {
             MetaQueryBuilder meta, boolean raw) {
 
         if (raw) {
-            throw kustvaktExceptionHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+            throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     "raw not supported!", null);
         }
 
@@ -510,7 +510,7 @@ public class SearchController {
         }
         catch (KustvaktException e) {
             jlog.error("Failed searching in Neo4J: {}", e.string());
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
 
     }
@@ -535,7 +535,7 @@ public class SearchController {
         }
         catch (KustvaktException e) {
             jlog.error("Exception encountered: {}", e.string());
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
 
         VirtualCollection tmp = resourceHandler.getCache(cache.getId(),
@@ -548,7 +548,7 @@ public class SearchController {
                 cache.setStats(JsonUtils.convertToClass(stats, Map.class));
             }
             catch (KustvaktException e) {
-                throw kustvaktExceptionHandler.throwit(e);
+                throw kustvaktResponseHandler.throwit(e);
             }
             resourceHandler.cache(cache);
         }
@@ -562,7 +562,7 @@ public class SearchController {
             return Response.ok(JsonUtils.toJSON(vals)).build();
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
     }
 
@@ -599,7 +599,7 @@ public class SearchController {
         catch (KustvaktException e) {
             jlog.error("Failed getting user in the matchInfo service: {}",
                     e.string());
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
 
         CorpusAccess corpusAccess = user.getCorpusAccess();
@@ -642,7 +642,7 @@ public class SearchController {
         }
         catch (Exception e) {
             jlog.error("Exception in the MatchInfo service encountered!", e);
-            throw kustvaktExceptionHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
+            throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
                     e.getMessage(), "");
         }
         jlog.debug("MatchInfo results: " + results);

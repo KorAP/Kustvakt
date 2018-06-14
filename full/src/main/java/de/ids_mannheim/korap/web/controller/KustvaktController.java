@@ -26,7 +26,7 @@ public class KustvaktController {
 
     private static Logger jlog = LoggerFactory.getLogger(UserController.class);
     @Autowired
-    private CoreResponseHandler kustvaktExceptionHandler;
+    private CoreResponseHandler kustvaktResponseHandler;
 
 
     @Path("info")
@@ -39,7 +39,7 @@ public class KustvaktController {
             return Response.ok(JsonUtils.toJSON(m)).build();
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
     }
 

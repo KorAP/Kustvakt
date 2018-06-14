@@ -17,14 +17,14 @@ import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 
-@Service(value="authorizationService")
+@Service(value = "authorizationService")
 public class OAuth2AuthorizationService {
 
     private static Logger jlog =
             LoggerFactory.getLogger(OAuth2AuthorizationService.class);
 
     @Autowired
-    private OAuth2ClientService clientService;
+    protected OAuth2ClientService clientService;
     @Autowired
     protected OAuth2ScopeService scopeService;
 
@@ -40,36 +40,27 @@ public class OAuth2AuthorizationService {
      * 
      * @param username
      * @param clientId
-     * @param responseType
      * @param redirectUri
      * @param scopeSet
      * @param code
      * @return
      * @throws KustvaktException
      */
-    public Authorization createAuthorization (String username, String clientId,
-            String responseType, String redirectUri, Set<String> scopeSet,
-            String code) throws KustvaktException {
-
-        checkResponseType(responseType);
-
-        OAuth2Client client = clientService.authenticateClientId(clientId);
-
-        String verifiedRedirectUri = verifyRedirectUri(client, redirectUri);
+    public String createAuthorization (String username, String clientId,
+            String redirectUri, Set<String> scopeSet, String code)
+            throws KustvaktException {
 
         if (scopeSet == null || scopeSet.isEmpty()) {
             scopeSet = config.getDefaultAccessScopes();
         }
         Set<AccessScope> scopes = scopeService.convertToAccessScope(scopeSet);
 
-        Authorization authorization = authorizationDao.storeAuthorizationCode(
-                clientId, username, code, scopes, redirectUri);
-
-        authorization.setRedirectURI(verifiedRedirectUri);
-        return authorization;
+        authorizationDao.storeAuthorizationCode(clientId, username, code,
+                scopes, redirectUri);
+        return String.join(" ", scopeSet);
     }
 
-    public void checkResponseType (String responseType)
+    protected void checkResponseType (String responseType)
             throws KustvaktException {
         if (responseType == null || responseType.isEmpty()) {
             throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
@@ -82,7 +73,8 @@ public class OAuth2AuthorizationService {
         }
         else if (!responseType.equals("code")) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
-                    "unknown response_type", OAuth2Error.INVALID_REQUEST);
+                    "unsupported response_type: " + responseType,
+                    OAuth2Error.INVALID_REQUEST);
         }
     }
 
@@ -114,8 +106,7 @@ public class OAuth2AuthorizationService {
             // check if the redirect URI the same as that in DB
             if (!redirectUri.equals(registeredUri)) {
                 throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
-                        redirectUri + " is unknown",
-                        OAuth2Error.INVALID_REQUEST);
+                        "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
             }
         }
         else {
@@ -126,7 +117,7 @@ public class OAuth2AuthorizationService {
                 redirectUri = registeredUri;
             }
             else {
-                throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
+                throw new KustvaktException(StatusCodes.MISSING_REDIRECT_URI,
                         "redirect_uri is required",
                         OAuth2Error.INVALID_REQUEST);
             }

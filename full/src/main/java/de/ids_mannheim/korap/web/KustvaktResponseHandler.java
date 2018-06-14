@@ -17,9 +17,9 @@ import de.ids_mannheim.korap.interfaces.db.AuditingIface;
  * @author margaretha
  *
  */
-public class KustvaktExceptionHandler extends CoreResponseHandler {
+public class KustvaktResponseHandler extends CoreResponseHandler {
 
-    public KustvaktExceptionHandler (AuditingIface iface) {
+    public KustvaktResponseHandler (AuditingIface iface) {
         super(iface);
     }
 

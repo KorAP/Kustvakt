@@ -44,7 +44,7 @@ public class StatisticController {
     private static Logger jlog =
             LoggerFactory.getLogger(StatisticController.class);
     @Autowired
-    private CoreResponseHandler kustvaktExceptionHandler;
+    private CoreResponseHandler kustvaktResponseHandler;
     @Autowired
     private SearchKrill searchKrill;
 
@@ -68,7 +68,7 @@ public class StatisticController {
             @QueryParam("corpusQuery") String corpusQuery) {
 
         if (corpusQuery == null || corpusQuery.isEmpty()) {
-            throw kustvaktExceptionHandler
+            throw kustvaktResponseHandler
                     .throwit(new KustvaktException(StatusCodes.MISSING_PARAMETER,
                             "Parameter corpusQuery is missing.",
                             "corpusQuery"));
@@ -82,12 +82,12 @@ public class StatisticController {
             json = builder.toJSON();
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
 
         String stats = searchKrill.getStatistics(json);
         if (stats.contains("-1"))
-            throw kustvaktExceptionHandler.throwit(StatusCodes.NO_RESULT_FOUND);
+            throw kustvaktResponseHandler.throwit(StatusCodes.NO_RESULT_FOUND);
         jlog.debug("Stats: " + stats);
         return Response.ok(stats).build();
     }

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -19,12 +20,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import com.nimbusds.oauth2.sdk.ParseException;
-import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
+import com.nimbusds.oauth2.sdk.ResponseMode;
+import com.nimbusds.oauth2.sdk.id.State;
 import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.openid.service.OpenIdAuthorizationService;
 import de.ids_mannheim.korap.security.context.TokenContext;
+import de.ids_mannheim.korap.web.OpenIdResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.utils.MapUtils;
@@ -35,6 +38,8 @@ public class OAuth2WithOpenIdController {
 
     @Autowired
     private OpenIdAuthorizationService authzService;
+    @Autowired
+    private OpenIdResponseHandler openIdResponseHandler;
 
     /**
      * Required parameters for OpenID authentication requests:
@@ -51,23 +56,31 @@ public class OAuth2WithOpenIdController {
      * Other parameters:
      * 
      * <ul>
-     * <li>state (recommended): Opaque value used to maintain state between the request and the 
-     * callback.</li>
-     * <li>response_mode (optional) : mechanism to be used for returning parameters</li>
-     * <li>nonce (optional): String value used to associate a Client session with an ID Token, 
+     * <li>state (recommended): Opaque value used to maintain state
+     * between the request and the callback.</li>
+     * <li>response_mode (optional) : mechanism to be used for
+     * returning parameters</li>
+     * <li>nonce (optional): String value used to associate a Client
+     * session with an ID Token,
      * and to mitigate replay attacks. </li>
-     * <li>display (optional):  specifies how the Authorization Server displays the authentication 
-     * and consent user interface pages</li>
-     * <li>prompt (optional): specifies if the Authorization Server prompts the End-User 
-     * for reauthentication and consent. Defined values: none, login, consent, select_account </li>
+     * <li>display (optional): specifies how the Authorization Server
+     * displays the authentication and consent user interface
+     * pages. Options: page (default), popup, touch, wap. This
+     * parameter is more relevant for Kalamar. </li>
+     * <li>prompt (optional): specifies if the Authorization Server
+     * prompts the End-User for reauthentication and consent. Defined
+     * values: none, login, consent, select_account </li>
      * <li>max_age (optional): maximum Authentication Age.</li>
-     * <li>ui_locales (optional): preferred languages and scripts for the user interface 
-     * represented as a space-separated list of BCP47 [RFC5646] </li>
-     * <li>id_token_hint (optional): ID Token previously issued by the Authorization Server 
-     * being passed as a hint</li>
-     * <li>login_hint (optional): hint to the Authorization Server about the login identifier 
-     * the End-User might use to log in</li>
-     * <li>acr_values (optional): requested Authentication Context Class Reference values. </li>
+     * <li>ui_locales (optional): preferred languages and scripts for
+     * the user interface represented as a space-separated list of
+     * BCP47 [RFC5646] </li>
+     * <li>id_token_hint (optional): ID Token previously issued by the
+     * Authorization Server being passed as a hint</li>
+     * <li>login_hint (optional): hint to the Authorization Server
+     * about the login identifier the End-User might use to log
+     * in</li>
+     * <li>acr_values (optional): requested Authentication Context
+     * Class Reference values. </li>
      * </ul>
      * 
      * @see OpenID Connect Core 1.0 specification
@@ -87,30 +100,37 @@ public class OAuth2WithOpenIdController {
             @Context SecurityContext context,
             MultivaluedMap<String, String> form) {
 
-        Map<String, String> map = MapUtils.toMap(form);
-        AuthenticationRequest authRequest = null;
-        try {
-            authRequest = AuthenticationRequest.parse(map);
-        }
-        catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
-        }
-
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
         String username = tokenContext.getUsername();
 
+        Map<String, String> map = MapUtils.toMap(form);
+        State state = authzService.retrieveState(map);
+        ResponseMode responseMode = authzService.retrieveResponseMode(map);
+
+        boolean isAuthentication = false;
+        if (map.containsKey("scope") && map.get("scope").contains("openid")) {
+            isAuthentication = true;
+        }
+
         URI uri = null;
         try {
-            uri = authzService.requestAuthorizationCode(authRequest, username);
-            // System.out.println(uri.toString());
+            if (isAuthentication) {
+                authzService.checkRedirectUriParam(map);
+            }
+            uri = authzService.requestAuthorizationCode(map, username,
+                    isAuthentication);
+        }
+        catch (ParseException e) {
+            return openIdResponseHandler.createAuthorizationErrorResponse(e,
+                    isAuthentication, state);
         }
         catch (KustvaktException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            return openIdResponseHandler.createAuthorizationErrorResponse(e,
+                    isAuthentication, e.getRedirectUri(), state, responseMode);
         }
+
         ResponseBuilder builder = Response.temporaryRedirect(uri);
         return builder.build();
     }
+
 }

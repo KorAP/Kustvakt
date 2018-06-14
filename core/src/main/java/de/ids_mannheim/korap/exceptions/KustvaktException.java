@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.exceptions;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +25,7 @@ public class KustvaktException extends Exception {
     private String notification;
     private boolean isNotification;
 //    private TokenType authType;
+    private URI redirectUri;
 
     public KustvaktException (int status) {
         this.statusCode = status;

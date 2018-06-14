@@ -23,7 +23,7 @@ import de.ids_mannheim.korap.handlers.DocumentDao;
 import de.ids_mannheim.korap.resources.Document;
 import de.ids_mannheim.korap.server.KustvaktServer;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
+import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.AdminFilter;
 
 /**
@@ -40,7 +40,7 @@ import de.ids_mannheim.korap.web.filter.AdminFilter;
 public class DocumentController {
 
     @Autowired
-    private KustvaktExceptionHandler kustvaktExceptionHandler;
+    private KustvaktResponseHandler kustvaktResponseHandler;
 
     private static Logger jlog =
             LoggerFactory.getLogger(DocumentController.class);
@@ -57,7 +57,7 @@ public class DocumentController {
             this.documentDao.storeResource(doc, null);
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     }
@@ -78,7 +78,7 @@ public class DocumentController {
             return Response.ok(JsonUtils.toJSON(docs)).build();
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
     }
 

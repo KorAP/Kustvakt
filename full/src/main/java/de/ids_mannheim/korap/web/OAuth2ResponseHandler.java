@@ -34,7 +34,7 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
  * @author margaretha
  *
  */
-public class OAuth2ResponseHandler extends KustvaktExceptionHandler {
+public class OAuth2ResponseHandler extends KustvaktResponseHandler {
 
     public OAuth2ResponseHandler (AuditingIface iface) {
         super(iface);

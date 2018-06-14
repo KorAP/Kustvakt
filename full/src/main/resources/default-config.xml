@@ -192,7 +192,7 @@
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
 
-	<bean id="kustvaktExceptionHandler" class="de.ids_mannheim.korap.web.KustvaktExceptionHandler">
+	<bean id="kustvaktResponseHandler" class="de.ids_mannheim.korap.web.kustvaktResponseHandler">
 		<constructor-arg index="0" name="iface" ref="kustvakt_auditing" />
 	</bean>
 

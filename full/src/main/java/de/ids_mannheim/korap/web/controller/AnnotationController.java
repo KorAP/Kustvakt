@@ -22,7 +22,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.service.AnnotationService;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
+import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 
@@ -39,7 +39,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 public class AnnotationController {
 
     @Autowired
-    private KustvaktExceptionHandler kustvaktExceptionHandler;
+    private KustvaktResponseHandler kustvaktResponseHandler;
 
     @Autowired
     private AnnotationService annotationService;
@@ -71,7 +71,7 @@ public class AnnotationController {
     @Consumes(MediaType.APPLICATION_JSON)
     public List<FoundryDto> getFoundryDescriptions (String json) {
         if (json == null || json.isEmpty()) {
-            throw kustvaktExceptionHandler
+            throw kustvaktResponseHandler
                     .throwit(new KustvaktException(StatusCodes.MISSING_PARAMETER,
                             "Missing a json string.", ""));
         }
@@ -81,7 +81,7 @@ public class AnnotationController {
             node = JsonUtils.readTree(json);
         }
         catch (KustvaktException e1) {
-            throw kustvaktExceptionHandler.throwit(e1);
+            throw kustvaktResponseHandler.throwit(e1);
         }
 
         String language;
@@ -94,7 +94,7 @@ public class AnnotationController {
                 language = "en";
             }
             else if (!(language.equals("en") || language.equals("de"))) {
-                throw kustvaktExceptionHandler.throwit(
+                throw kustvaktResponseHandler.throwit(
                         new KustvaktException(StatusCodes.UNSUPPORTED_VALUE,
                                 "Unsupported value:", language));
             }
@@ -105,16 +105,16 @@ public class AnnotationController {
             codes = JsonUtils.convert(node.get("codes"), List.class);
         }
         catch (IOException | NullPointerException e) {
-            throw kustvaktExceptionHandler.throwit(new KustvaktException(
+            throw kustvaktResponseHandler.throwit(new KustvaktException(
                     StatusCodes.INVALID_ARGUMENT, "Bad argument:", json));
         }
         if (codes == null) {
-            throw kustvaktExceptionHandler.throwit(
+            throw kustvaktResponseHandler.throwit(
                     new KustvaktException(StatusCodes.MISSING_ATTRIBUTE,
                             "Missing attribute:", "codes"));
         }
         else if (codes.isEmpty()) {
-            throw kustvaktExceptionHandler
+            throw kustvaktResponseHandler
                     .throwit(new KustvaktException(StatusCodes.NO_RESULT_FOUND,
                             "No result found.", "codes:[]"));
         }
@@ -123,7 +123,7 @@ public class AnnotationController {
             return annotationService.getFoundryDtos(codes, language);
         }
         catch (KustvaktException e) {
-            throw kustvaktExceptionHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
     }
 }

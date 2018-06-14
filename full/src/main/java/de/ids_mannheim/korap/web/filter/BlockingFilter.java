@@ -13,7 +13,7 @@ import com.sun.jersey.spi.container.ResourceFilter;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.security.context.TokenContext;
-import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
+import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 
 /**
  * @author hanl
@@ -27,7 +27,7 @@ import de.ids_mannheim.korap.web.KustvaktExceptionHandler;
 public class BlockingFilter implements ContainerRequestFilter, ResourceFilter {
 
     @Autowired
-    private KustvaktExceptionHandler kustvaktExceptionHandler;
+    private KustvaktResponseHandler kustvaktResponseHandler;
 
     @Override
     public ContainerRequest filter (ContainerRequest request) {
@@ -37,12 +37,12 @@ public class BlockingFilter implements ContainerRequestFilter, ResourceFilter {
             context = (TokenContext) request.getUserPrincipal();
         }
         catch (UnsupportedOperationException e) {
-            throw kustvaktExceptionHandler.throwit(new KustvaktException(
+            throw kustvaktResponseHandler.throwit(new KustvaktException(
                     StatusCodes.UNSUPPORTED_OPERATION, e.getMessage(), e));
         }
 
         if (context == null || context.isDemo()) {
-            throw kustvaktExceptionHandler.throwit(new KustvaktException(
+            throw kustvaktResponseHandler.throwit(new KustvaktException(
                     StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: guest", "guest"));
         }
