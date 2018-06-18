@@ -140,11 +140,11 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         ClientResponse response = requestAuthorizationConfidentialClient(form);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
-        String entity = response.getEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuth2Error.INVALID_SCOPE, node.at("/error").asText());
-        assertEquals("read_address is an invalid scope",
-                node.at("/error_description").asText());
+        URI location = response.getLocation();
+        MultiValueMap<String, String> params =
+                UriComponentsBuilder.fromUri(location).build().getQueryParams();
+        assertEquals(OAuth2Error.INVALID_SCOPE, params.getFirst("error"));
+        assertEquals("read_address+is+an+invalid+scope", params.getFirst("error_description"));
     }
 
     private ClientResponse requestToken (MultivaluedMap<String, String> form)

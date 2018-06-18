@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -13,6 +14,7 @@ import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.OAuthResponse;
+import org.apache.oltu.oauth2.common.message.OAuthResponse.OAuthErrorResponseBuilder;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -105,10 +107,37 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
             int statusCode) throws OAuthSystemException {
         OAuthProblemException oAuthProblemException = OAuthProblemException
                 .error(e.getEntity()).description(e.getMessage());
-        return OAuthResponse.errorResponse(statusCode)
-                .error(oAuthProblemException).buildJSONMessage();
+
+        OAuthErrorResponseBuilder responseBuilder = OAuthResponse
+                .errorResponse(statusCode).error(oAuthProblemException);
+        URI redirectUri = e.getRedirectUri();
+        if (redirectUri != null) {
+            responseBuilder.location(redirectUri.toString());
+            return responseBuilder.buildQueryMessage();
+        }
+
+        return responseBuilder.buildJSONMessage();
     }
 
+    /**
+     * RFC 6749 regarding authorization error response:
+     * 
+     * If the request fails due to a missing, invalid, or mismatching
+     * redirection URI, or if the client identifier is missing or
+     * invalid, the authorization server SHOULD inform the resource
+     * owner of the error and MUST NOT automatically redirect the
+     * user-agent to the invalid redirection URI.
+     * 
+     * If the resource owner denies the access request or if the
+     * request fails for reasons other than a missing or invalid
+     * redirection URI, the authorization server informs the client by
+     * adding the following parameters to the query component of the
+     * redirection URI using the "application/x-www-form-urlencoded"
+     * format.
+     * 
+     * @param oAuthResponse
+     * @return
+     */
     public Response createResponse (OAuthResponse oAuthResponse) {
         ResponseBuilder builder =
                 Response.status(oAuthResponse.getResponseStatus());
@@ -121,6 +150,17 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
             builder.header(HttpHeaders.WWW_AUTHENTICATE,
                     "Basic realm=\"Kustvakt\"");
         }
+        String uri = oAuthResponse.getLocationUri();
+        if (uri != null && !uri.isEmpty()) {
+            try {
+                builder.location(new URI(uri));
+                builder.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+            }
+            catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
+
         return builder.build();
     }
 

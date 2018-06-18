@@ -79,9 +79,9 @@ public class OAuth2Controller {
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
         String username = tokenContext.getUsername();
 
+        HttpServletRequest requestWithForm =
+                new FormRequestWrapper(request, form);
         try {
-            HttpServletRequest requestWithForm =
-                    new FormRequestWrapper(request, form);
             OAuth2AuthorizationRequest authzRequest =
                     new OAuth2AuthorizationRequest(requestWithForm);
             String uri = authorizationService.requestAuthorizationCode(

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.net.URI;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.http.entity.ContentType;
@@ -167,7 +168,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
 
         ClientResponse response = sendAuthorizationRequest(form);
         URI location = response.getLocation();
-        // System.out.println(location);
+        assertEquals(MediaType.APPLICATION_FORM_URLENCODED, response.getType().toString());
 
         MultiValueMap<String, String> params =
                 UriComponentsBuilder.fromUri(location).build().getQueryParams();

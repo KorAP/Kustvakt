@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
@@ -104,7 +105,8 @@ public class OpenIdResponseHandler extends KustvaktResponseHandler {
                     state, responseMode).toURI();
         }
 
-        ResponseBuilder builder = Response.temporaryRedirect(uri);
+        ResponseBuilder builder = Response.temporaryRedirect(uri)
+                .type(MediaType.APPLICATION_FORM_URLENCODED);
         return builder.build();
     }
 
