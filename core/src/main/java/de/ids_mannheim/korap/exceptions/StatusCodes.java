@@ -129,6 +129,7 @@ public class StatusCodes {
     public static final int INVALID_AUTHORIZATION = 1809;
     
     public static final int UNSUPPORTED_GRANT_TYPE = 1810;
+    public static final int UNSUPPORTED_AUTHENTICATION_METHOD = 1811;
     
 
     /**

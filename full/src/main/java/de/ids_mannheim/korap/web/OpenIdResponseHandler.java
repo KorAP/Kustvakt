@@ -7,13 +7,17 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 
+import org.apache.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
+import com.nimbusds.oauth2.sdk.AccessTokenResponse;
 import com.nimbusds.oauth2.sdk.AuthorizationErrorResponse;
 import com.nimbusds.oauth2.sdk.ErrorObject;
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.ResponseMode;
+import com.nimbusds.oauth2.sdk.TokenErrorResponse;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.oauth2.sdk.token.BearerTokenError;
 import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
@@ -52,10 +56,12 @@ public class OpenIdResponseHandler extends KustvaktResponseHandler {
 
     final static Map<String, ErrorObject> tokenErrorObjectMap = new HashMap<>();
     {
-        errorObjectMap.put(OAuth2Error.INSUFFICIENT_SCOPE,
+        tokenErrorObjectMap.put(OAuth2Error.INSUFFICIENT_SCOPE,
                 BearerTokenError.INSUFFICIENT_SCOPE);
-        errorObjectMap.put(OAuth2Error.INVALID_TOKEN,
+        tokenErrorObjectMap.put(OAuth2Error.INVALID_TOKEN,
                 BearerTokenError.INVALID_TOKEN);
+        tokenErrorObjectMap.put(OAuth2Error.INVALID_REQUEST,
+                BearerTokenError.INVALID_REQUEST);
     }
 
     public OpenIdResponseHandler (AuditingIface iface) {
@@ -140,4 +146,71 @@ public class OpenIdResponseHandler extends KustvaktResponseHandler {
 
     }
 
+    public void createTokenErrorResponse (KustvaktException e) {
+
+        String errorCode = e.getEntity();
+        ErrorObject errorObject = tokenErrorObjectMap.get(errorCode);
+        if (errorObject == null) {
+            errorObject = errorObjectMap.get(errorCode);
+            if (errorObject == null) {
+                errorObject = new ErrorObject(e.getEntity(), e.getMessage());
+            }
+        }
+
+        TokenErrorResponse errorResponse = new TokenErrorResponse(errorObject);
+        Status status = determineErrorStatus(errorCode);
+        createResponse(errorResponse, status);
+    }
+
+    public Response createResponse (AccessTokenResponse tokenResponse,
+            Status status) {
+        String jsonString = tokenResponse.toJSONObject().toJSONString();
+        return createResponse(status, jsonString);
+    }
+    
+    public Response createResponse (TokenErrorResponse tokenResponse,
+            Status status) {
+        String jsonString = tokenResponse.toJSONObject().toJSONString();
+        return createResponse(status, jsonString);
+    }
+    
+    private Response createResponse(Status status, Object entity){
+        ResponseBuilder builder = Response.status(status);
+        builder.entity(entity);
+        builder.header(HttpHeaders.CACHE_CONTROL, "no-store");
+        builder.header(HttpHeaders.PRAGMA, "no-store");
+
+        if (status == Status.UNAUTHORIZED) {
+            builder.header(HttpHeaders.WWW_AUTHENTICATE,
+                    "Basic realm=\"Kustvakt\"");
+        }
+        return builder.build();
+    }
+
+    private Status determineErrorStatus (String errorCode) {
+        Status status = Status.BAD_REQUEST;
+        if (errorCode.equals(OAuth2Error.INVALID_CLIENT)
+                || errorCode.equals(OAuth2Error.UNAUTHORIZED_CLIENT)
+                || errorCode.equals(OAuth2Error.INVALID_TOKEN)) {
+            status = Status.UNAUTHORIZED;
+        }
+        else if (errorCode.equals(OAuth2Error.INVALID_GRANT)
+                || errorCode.equals(OAuth2Error.INVALID_REQUEST)
+                || errorCode.equals(OAuth2Error.INVALID_SCOPE)
+                || errorCode.equals(OAuth2Error.UNSUPPORTED_GRANT_TYPE)
+                || errorCode.equals(OAuth2Error.UNSUPPORTED_RESPONSE_TYPE)
+                || errorCode.equals(OAuth2Error.ACCESS_DENIED)) {
+            status = Status.BAD_REQUEST;
+        }
+        else if (errorCode.equals(OAuth2Error.INSUFFICIENT_SCOPE)) {
+            status = Status.FORBIDDEN;
+        }
+        else if (errorCode.equals(OAuth2Error.SERVER_ERROR)) {
+            status = Status.INTERNAL_SERVER_ERROR;
+        }
+        else if (errorCode.equals(OAuth2Error.TEMPORARILY_UNAVAILABLE)) {
+            status = Status.SERVICE_UNAVAILABLE;
+        }
+        return status;
+    }
 }

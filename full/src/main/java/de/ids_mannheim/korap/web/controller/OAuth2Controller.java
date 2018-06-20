@@ -25,9 +25,9 @@ import org.springframework.stereotype.Controller;
 import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.oauth2.OAuth2AuthorizationRequest;
+import de.ids_mannheim.korap.oauth2.oltu.OAuth2AuthorizationRequest;
 import de.ids_mannheim.korap.oauth2.oltu.service.OltuAuthorizationService;
-import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
+import de.ids_mannheim.korap.oauth2.oltu.service.OltuTokenService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
@@ -41,7 +41,7 @@ public class OAuth2Controller {
     @Autowired
     private OAuth2ResponseHandler responseHandler;
     @Autowired
-    private OAuth2TokenService oAuth2Service;
+    private OltuTokenService tokenService;
     @Autowired
     private OltuAuthorizationService authorizationService;
 
@@ -74,6 +74,7 @@ public class OAuth2Controller {
     public Response requestAuthorizationCode (
             @Context HttpServletRequest request,
             @Context SecurityContext context,
+            @FormParam("state") String state,
             MultivaluedMap<String, String> form) {
 
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
@@ -89,13 +90,13 @@ public class OAuth2Controller {
             return responseHandler.sendRedirect(uri);
         }
         catch (OAuthSystemException e) {
-            throw responseHandler.throwit(e);
+            throw responseHandler.throwit(e, state);
         }
         catch (OAuthProblemException e) {
-            throw responseHandler.throwit(e);
+            throw responseHandler.throwit(e, state);
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
+            throw responseHandler.throwit(e, state);
         }
     }
 
@@ -167,7 +168,7 @@ public class OAuth2Controller {
             }
 
             OAuthResponse oAuthResponse =
-                    oAuth2Service.requestAccessToken(oAuthRequest);
+                    tokenService.requestAccessToken(oAuthRequest);
 
             return responseHandler.createResponse(oAuthResponse);
         }

@@ -46,21 +46,44 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
         return throwit(StatusCodes.OAUTH2_SYSTEM_ERROR, e.getMessage());
     }
 
+    public WebApplicationException throwit (OAuthSystemException e,
+            String state) {
+        if (state != null && !state.isEmpty()) {
+            return throwit(StatusCodes.OAUTH2_SYSTEM_ERROR, e.getMessage(),
+                    "state=" + state);
+        }
+        return throwit(e);
+    }
+
     public WebApplicationException throwit (OAuthProblemException e) {
+        return throwit(e, null);
+    }
+
+    public WebApplicationException throwit (OAuthProblemException e,
+            String state) {
         OAuthResponse oAuthResponse = null;
         try {
-            oAuthResponse = OAuthResponse.errorResponse(e.getResponseStatus())
-                    .error(e).buildJSONMessage();
+             OAuthErrorResponseBuilder builder = OAuthResponse.errorResponse(e.getResponseStatus())
+                    .error(e);
+                    
+             if (state != null && !state.isEmpty()) {
+                 builder.setState(state);
+             }
+             oAuthResponse = builder.buildJSONMessage();
         }
         catch (OAuthSystemException e1) {
-            throwit(e1);
+            throwit(e1, state);
         }
         Response r = createResponse(oAuthResponse);
         return new WebApplicationException(r);
     }
 
     @Override
-    public WebApplicationException throwit (KustvaktException e) {
+    public WebApplicationException throwit (KustvaktException e){
+        return throwit(e, null);
+    }
+    
+    public WebApplicationException throwit (KustvaktException e, String state) {
         OAuthResponse oAuthResponse = null;
         String errorCode = e.getEntity();
         try {
@@ -68,7 +91,7 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
                     || errorCode.equals(OAuth2Error.UNAUTHORIZED_CLIENT)
                     || errorCode.equals(OAuth2Error.INVALID_TOKEN)) {
                 oAuthResponse = createOAuthResponse(e,
-                        Status.UNAUTHORIZED.getStatusCode());
+                        Status.UNAUTHORIZED.getStatusCode(), state);
             }
             else if (errorCode.equals(OAuth2Error.INVALID_GRANT)
                     || errorCode.equals(OAuth2Error.INVALID_REQUEST)
@@ -77,26 +100,26 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
                     || errorCode.equals(OAuth2Error.UNSUPPORTED_RESPONSE_TYPE)
                     || errorCode.equals(OAuth2Error.ACCESS_DENIED)) {
                 oAuthResponse = createOAuthResponse(e,
-                        Status.BAD_REQUEST.getStatusCode());
+                        Status.BAD_REQUEST.getStatusCode(), state);
             }
             else if (errorCode.equals(OAuth2Error.INSUFFICIENT_SCOPE)) {
                 oAuthResponse = createOAuthResponse(e,
-                        Status.FORBIDDEN.getStatusCode());
+                        Status.FORBIDDEN.getStatusCode(), state);
             }
             else if (errorCode.equals(OAuth2Error.SERVER_ERROR)) {
                 oAuthResponse = createOAuthResponse(e,
-                        Status.INTERNAL_SERVER_ERROR.getStatusCode());
+                        Status.INTERNAL_SERVER_ERROR.getStatusCode(), state);
             }
             else if (errorCode.equals(OAuth2Error.TEMPORARILY_UNAVAILABLE)) {
                 oAuthResponse = createOAuthResponse(e,
-                        Status.SERVICE_UNAVAILABLE.getStatusCode());
+                        Status.SERVICE_UNAVAILABLE.getStatusCode(), state);
             }
             else {
                 return super.throwit(e);
             }
         }
         catch (OAuthSystemException e1) {
-            return throwit(e1);
+            return throwit(e1, state);
         }
 
         Response r = createResponse(oAuthResponse);
@@ -104,12 +127,16 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
     }
 
     private OAuthResponse createOAuthResponse (KustvaktException e,
-            int statusCode) throws OAuthSystemException {
+            int statusCode, String state) throws OAuthSystemException {
         OAuthProblemException oAuthProblemException = OAuthProblemException
-                .error(e.getEntity()).description(e.getMessage());
+                .error(e.getEntity()).state(state).description(e.getMessage());
 
         OAuthErrorResponseBuilder responseBuilder = OAuthResponse
                 .errorResponse(statusCode).error(oAuthProblemException);
+        if (state!=null && !state.isEmpty()){
+            responseBuilder.setState(state);
+        }
+            
         URI redirectUri = e.getRedirectUri();
         if (redirectUri != null) {
             responseBuilder.location(redirectUri.toString());

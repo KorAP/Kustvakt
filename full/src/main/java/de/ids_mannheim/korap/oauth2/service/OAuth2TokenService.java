@@ -4,15 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.core.Response.Status;
-
-import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
-import org.apache.oltu.oauth2.as.request.AbstractOAuthTokenRequest;
-import org.apache.oltu.oauth2.as.response.OAuthASResponse;
-import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
-import org.apache.oltu.oauth2.common.message.OAuthResponse;
-import org.apache.oltu.oauth2.common.message.types.GrantType;
-import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +13,6 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
-import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
-import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 
@@ -39,50 +28,17 @@ public class OAuth2TokenService {
 
     @Autowired
     private OAuth2ClientService clientService;
-    
+
     @Autowired
     private OAuth2AuthorizationService authorizationService;
-    
-    @Autowired
-    private OAuth2ScopeService scopeService;
-    @Autowired
-    private AccessTokenDao tokenDao;
 
     @Autowired
-    private FullConfiguration config;
+    protected OAuth2ScopeService scopeService;
+
+    @Autowired
+    protected FullConfiguration config;
     @Autowired
     private AuthenticationManagerIface authenticationManager;
-    @Autowired
-    private OAuthIssuer oauthIssuer;
-
-    public OAuthResponse requestAccessToken (
-            AbstractOAuthTokenRequest oAuthRequest)
-            throws KustvaktException, OAuthSystemException {
-
-        String grantType = oAuthRequest.getGrantType();
-
-        if (grantType.equals(GrantType.AUTHORIZATION_CODE.toString())) {
-            return requestAccessTokenWithAuthorizationCode(
-                    oAuthRequest.getCode(), oAuthRequest.getRedirectURI(),
-                    oAuthRequest.getClientId(), oAuthRequest.getClientSecret());
-        }
-        else if (grantType.equals(GrantType.PASSWORD.toString())) {
-            return requestAccessTokenWithPassword(oAuthRequest.getUsername(),
-                    oAuthRequest.getPassword(), oAuthRequest.getScopes(),
-                    oAuthRequest.getClientId(), oAuthRequest.getClientSecret());
-        }
-        else if (grantType.equals(GrantType.CLIENT_CREDENTIALS.toString())) {
-            return requestAccessTokenWithClientCredentials(
-                    oAuthRequest.getClientId(), oAuthRequest.getClientSecret(),
-                    oAuthRequest.getScopes());
-        }
-        else {
-            throw new KustvaktException(StatusCodes.UNSUPPORTED_GRANT_TYPE,
-                    grantType + " is not supported.",
-                    OAuth2Error.UNSUPPORTED_GRANT_TYPE);
-        }
-
-    }
 
     /**
      * RFC 6749:
@@ -98,15 +54,13 @@ public class OAuth2TokenService {
      * @param clientSecret
      *            clilent_secret, required if client_secret was issued
      *            for the client in client registration.
-     * @return an OAuthResponse containing an access token if
-     *         successful
+     * @return an authorization
      * @throws OAuthSystemException
      * @throws KustvaktException
      */
-    private OAuthResponse requestAccessTokenWithAuthorizationCode (
+    protected Authorization requestAccessTokenWithAuthorizationCode (
             String authorizationCode, String redirectURI, String clientId,
-            String clientSecret)
-            throws KustvaktException, OAuthSystemException {
+            String clientSecret) throws KustvaktException {
 
         Authorization authorization =
                 authorizationService.retrieveAuthorization(authorizationCode);
@@ -119,7 +73,7 @@ public class OAuth2TokenService {
             authorizationService.addTotalAttempts(authorization);
             throw e;
         }
-        return createsAccessTokenResponse(authorization);
+        return authorization;
     }
 
 
@@ -152,10 +106,9 @@ public class OAuth2TokenService {
      * @throws KustvaktException
      * @throws OAuthSystemException
      */
-    private OAuthResponse requestAccessTokenWithPassword (String username,
+    protected void requestAccessTokenWithPassword (String username,
             String password, Set<String> scopes, String clientId,
-            String clientSecret)
-            throws KustvaktException, OAuthSystemException {
+            String clientSecret) throws KustvaktException {
 
         OAuth2Client client =
                 clientService.authenticateClient(clientId, clientSecret);
@@ -167,7 +120,6 @@ public class OAuth2TokenService {
 
         authenticateUser(username, password, scopes);
         // verify or limit scopes ?
-        return createsAccessTokenResponse(scopes, username);
     }
 
     public void authenticateUser (String username, String password,
@@ -204,9 +156,9 @@ public class OAuth2TokenService {
      * @throws KustvaktException
      * @throws OAuthSystemException
      */
-    private OAuthResponse requestAccessTokenWithClientCredentials (
+    protected Set<String> requestAccessTokenWithClientCredentials (
             String clientId, String clientSecret, Set<String> scopes)
-            throws KustvaktException, OAuthSystemException {
+            throws KustvaktException {
 
         if (clientSecret == null || clientSecret.isEmpty()) {
             throw new KustvaktException(
@@ -228,54 +180,9 @@ public class OAuth2TokenService {
 
         scopes = scopeService.filterScopes(scopes,
                 config.getClientCredentialsScopes());
-        return createsAccessTokenResponse(scopes, null);
+        return scopes;
     }
 
-    /**
-     * Creates an OAuthResponse containing an access token and a
-     * refresh token with type Bearer.
-     * 
-     * @return an OAuthResponse containing an access token
-     * @throws OAuthSystemException
-     * @throws KustvaktException
-     */
 
-    private OAuthResponse createsAccessTokenResponse (Set<String> scopes,
-            String userId) throws OAuthSystemException, KustvaktException {
 
-        String accessToken = oauthIssuer.accessToken();
-        // String refreshToken = oauthIssuer.refreshToken();
-
-        Set<AccessScope> accessScopes =
-                scopeService.convertToAccessScope(scopes);
-        tokenDao.storeAccessToken(accessToken, accessScopes, userId);
-
-        return OAuthASResponse.tokenResponse(Status.OK.getStatusCode())
-                .setAccessToken(accessToken)
-                .setTokenType(TokenType.BEARER.toString())
-                .setExpiresIn(String.valueOf(config.getTokenTTL()))
-                // .setRefreshToken(refreshToken)
-                .setScope(String.join(" ", scopes)).buildJSONMessage();
-    }
-
-    private OAuthResponse createsAccessTokenResponse (
-            Authorization authorization)
-            throws OAuthSystemException, KustvaktException {
-        String accessToken = oauthIssuer.accessToken();
-        // String refreshToken = oauthIssuer.refreshToken();
-
-        tokenDao.storeAccessToken(authorization, accessToken);
-
-        String scopes = scopeService
-                .convertAccessScopesToString(authorization.getScopes());
-
-        OAuthResponse r =
-                OAuthASResponse.tokenResponse(Status.OK.getStatusCode())
-                        .setAccessToken(accessToken)
-                        .setTokenType(TokenType.BEARER.toString())
-                        .setExpiresIn(String.valueOf(config.getTokenTTL()))
-                        // .setRefreshToken(refreshToken)
-                        .setScope(scopes).buildJSONMessage();
-        return r;
-    }
 }

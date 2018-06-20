@@ -77,6 +77,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         form.add("response_type", "code");
         form.add("client_id", "fCBbQkAyYzI4NzUxMg");
         form.add("redirect_uri", redirectUri);
+        form.add("state", "thisIsMyState");
         ClientResponse response = requestAuthorizationConfidentialClient(form);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -87,13 +88,15 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
                 node.at("/error").asText());
         assertEquals("Invalid redirect URI",
                 node.at("/error_description").asText());
+        assertEquals("thisIsMyState", node.at("/state").asText());
     }
 
     @Test
     public void testAuthorizeMissingRequiredParameters ()
             throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        // missing code
+        form.add("state", "thisIsMyState");
+        // missing response_type
         ClientResponse response = requestAuthorizationConfidentialClient(form);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -104,6 +107,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
                 node.at("/error").asText());
         assertEquals("Missing response_type parameter value",
                 node.at("/error_description").asText());
+        assertEquals("thisIsMyState", node.at("/state").asText());
 
         // missing client_id
         form.add("response_type", "code");
@@ -118,7 +122,8 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
     public void testAuthorizeInvalidResponseType () throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("response_type", "string");
-
+        form.add("state", "thisIsMyState");
+        
         ClientResponse response = requestAuthorizationConfidentialClient(form);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
@@ -128,6 +133,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
                 node.at("/error").asText());
         assertEquals("Invalid response_type parameter value",
                 node.at("/error_description").asText());
+        assertEquals("thisIsMyState", node.at("/state").asText());
     }
 
     @Test
@@ -136,7 +142,8 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         form.add("response_type", "code");
         form.add("client_id", "fCBbQkAyYzI4NzUxMg");
         form.add("scope", "read_address");
-
+        form.add("state", "thisIsMyState");
+        
         ClientResponse response = requestAuthorizationConfidentialClient(form);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
@@ -145,6 +152,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
                 UriComponentsBuilder.fromUri(location).build().getQueryParams();
         assertEquals(OAuth2Error.INVALID_SCOPE, params.getFirst("error"));
         assertEquals("read_address+is+an+invalid+scope", params.getFirst("error_description"));
+        assertEquals("thisIsMyState", params.getFirst("state"));
     }
 
     private ClientResponse requestToken (MultivaluedMap<String, String> form)

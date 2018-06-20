@@ -50,9 +50,14 @@ public class OAuth2ScopeService {
     }
 
     public String convertAccessScopesToString (Set<AccessScope> scopes) {
+        Set<String> set = convertAccessScopesToStringSet(scopes);
+        return String.join(" ", set);
+    }
+    
+    public Set<String> convertAccessScopesToStringSet (Set<AccessScope> scopes) {
         Set<String> set = scopes.stream().map(scope -> scope.toString())
                 .collect(Collectors.toSet());
-        return String.join(" ", set);
+        return set;
     }
 
     /**

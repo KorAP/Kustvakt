@@ -23,7 +23,7 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.oauth2.OAuth2DeregisterClientRequest;
+import de.ids_mannheim.korap.oauth2.oltu.OAuth2DeregisterClientRequest;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ClientService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;

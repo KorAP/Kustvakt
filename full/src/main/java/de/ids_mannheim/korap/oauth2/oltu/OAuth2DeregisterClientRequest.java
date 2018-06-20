@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.oauth2;
+package de.ids_mannheim.korap.oauth2.oltu;
 
 import javax.servlet.http.HttpServletRequest;
 

@@ -9,6 +9,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.http.entity.ContentType;
+import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MultiValueMap;
@@ -42,6 +43,15 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue("dory",
                                 "password"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
+    }
+    
+    private ClientResponse sendTokenRequest (MultivaluedMap<String, String> form)
+            throws KustvaktException {
+        return resource().path("oauth2").path("openid").path("token")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
@@ -175,5 +185,41 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         assertEquals("invalid_request", params.getFirst("error"));
         assertEquals("unsupported+response_type%3A+id_token",
                 params.getFirst("error_description"));
+    }
+    
+    @Test
+    public void testRequestAccessToken () throws KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("response_type", "code");
+        form.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        form.add("redirect_uri", redirectUri);
+        form.add("scope", "openid");
+        form.add("state", "thisIsMyState");
+
+        ClientResponse response = sendAuthorizationRequest(form);
+        URI location = response.getLocation();
+        MultiValueMap<String, String> params =
+                UriComponentsBuilder.fromUri(location).build().getQueryParams();
+        String code = params.getFirst("code");
+        
+        MultivaluedMap<String, String> tokenForm = new MultivaluedMapImpl();
+        tokenForm.add("grant_type", "authorization_code");
+        tokenForm.add("redirect_uri", redirectUri);
+        tokenForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        tokenForm.add("client_secret", "secret");
+        tokenForm.add("code", code);
+        
+        ClientResponse tokenResponse = sendTokenRequest(tokenForm);
+        String entity = tokenResponse.getEntity(String.class);
+//        System.out.println(entity);
+
+        JsonNode node = JsonUtils.readTree(entity);
+        assertNotNull(node.at("/access_token").asText());
+        assertNotNull(node.at("/refresh_token").asText());
+        assertEquals(TokenType.BEARER.toString(),
+                node.at("/token_type").asText());
+        assertNotNull(node.at("/expires_in").asText());
+        assertNotNull(node.at("/id_token").asText());
+
     }
 }
