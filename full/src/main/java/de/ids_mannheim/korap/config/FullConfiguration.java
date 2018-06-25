@@ -1,6 +1,19 @@
 package de.ids_mannheim.korap.config;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,6 +21,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.apache.commons.codec.binary.Base64;
 
 import de.ids_mannheim.korap.constant.AuthenticationMethod;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
@@ -58,12 +73,45 @@ public class FullConfiguration extends KustvaktConfiguration {
     private Set<String> clientCredentialsScopes;
     private int maxAuthenticationAttempts;
 
-    public FullConfiguration (Properties properties) throws IOException {
+    private URL issuer;
+    private URI issuerURI;
+    private RSAPrivateKey rsaPrivateKey;
+
+    public FullConfiguration (Properties properties)
+            throws IOException, URISyntaxException, InvalidKeySpecException,
+            NoSuchAlgorithmException {
         super(properties);
+        setRSAPrivateKey();
+    }
+
+    public void setRSAPrivateKey () throws IOException, InvalidKeySpecException,
+            NoSuchAlgorithmException {
+        InputStream is = getClass().getClassLoader()
+                .getResourceAsStream("kustvakt-private.key");
+
+        if (is == null){
+            this.rsaPrivateKey = null;
+            return;
+        }
+            
+        String privateKey = null;
+        try (BufferedReader reader =
+                new BufferedReader(new InputStreamReader(is));) {
+            privateKey = reader.readLine();
+        }
+        byte[] decodedKey = Base64.decodeBase64(privateKey);
+        KeySpec keySpec = new PKCS8EncodedKeySpec(decodedKey);
+        this.rsaPrivateKey = (RSAPrivateKey) KeyFactory.getInstance("RSA")
+                .generatePrivate(keySpec);
+    }
+
+    public RSAPrivateKey getRSAPrivateKey () {
+        return this.rsaPrivateKey;
     }
 
     @Override
-    public void load (Properties properties) throws IOException {
+    public void load (Properties properties)
+            throws IOException, URISyntaxException {
 
         super.load(properties);
         // EM: regex used for storing vc
@@ -79,6 +127,18 @@ public class FullConfiguration extends KustvaktConfiguration {
                 properties.getProperty("security.encryption", "BCRYPT")));
 
         setOAuth2Configuration(properties);
+        setOpenIdConfiguration(properties);
+    }
+
+    private void setOpenIdConfiguration (Properties properties)
+            throws URISyntaxException, MalformedURLException {
+        String issuerStr = properties.getProperty("security.jwt.issuer", "");
+
+        if (!issuerStr.startsWith("http")) {
+            issuerStr = "http://" + issuerStr;
+        }
+        setIssuer(new URL(issuerStr));
+        setIssuerURI(issuer.toURI());
     }
 
     private void setOAuth2Configuration (Properties properties) {
@@ -373,6 +433,22 @@ public class FullConfiguration extends KustvaktConfiguration {
     public void setClientCredentialsScopes (
             Set<String> clientCredentialsScopes) {
         this.clientCredentialsScopes = clientCredentialsScopes;
+    }
+
+    public URL getIssuer () {
+        return issuer;
+    }
+
+    public void setIssuer (URL issuer) {
+        this.issuer = issuer;
+    }
+
+    public URI getIssuerURI () {
+        return issuerURI;
+    }
+
+    public void setIssuerURI (URI issuerURI) {
+        this.issuerURI = issuerURI;
     }
 
 }

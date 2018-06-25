@@ -6,8 +6,8 @@ import java.util.Map;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.JWTSigner;
-import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -30,7 +30,7 @@ public class APIAuthentication implements AuthenticationIface {
     //private Cache id_tokens = CacheManager.getInstance().getCache("id_tokens");
 
 
-    public APIAuthentication (KustvaktConfiguration config) throws JOSEException {
+    public APIAuthentication (FullConfiguration config) throws JOSEException {
         this.signedToken = new JWTSigner(config.getSharedSecret(),
                 config.getIssuer(), config.getTokenTTL());
     }

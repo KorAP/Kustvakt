@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +40,6 @@ public class KustvaktConfiguration {
     private List<String> queryLanguages;
 
     private String serverHost;
-    private URL issuer;
 
     private int maxhits;
     private int returnhits;
@@ -83,7 +82,7 @@ public class KustvaktConfiguration {
     // deprec?!
     private final BACKENDS DEFAULT_ENGINE = BACKENDS.LUCENE;
 
-	public KustvaktConfiguration (Properties properties) throws IOException {
+	public KustvaktConfiguration (Properties properties) throws IOException, URISyntaxException {
         load(properties);
     }
 	
@@ -93,10 +92,11 @@ public class KustvaktConfiguration {
      * @param properties
      * @return
      * @throws IOException 
+     * @throws URISyntaxException 
      * @throws KustvaktException 
      */
     protected void load (Properties properties)
-            throws IOException {
+            throws IOException, URISyntaxException {
         baseURL = properties.getProperty("kustvakt.base.url", "/api/*");
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));
         returnhits = new Integer(properties.getProperty("returnhits", "50000"));
@@ -110,11 +110,6 @@ public class KustvaktConfiguration {
         queryLanguages = new ArrayList<>();
         for (String querylang : qls)
             queryLanguages.add(querylang.trim().toUpperCase());
-        String is = properties.getProperty("security.jwt.issuer", "");
-
-        if (!is.startsWith("http"))
-            is = "http://" + is;
-        issuer = new URL(is);
 
         default_const = properties
                 .getProperty("default.layer.constituent", "mate");
@@ -173,8 +168,9 @@ public class KustvaktConfiguration {
      * properties can be overloaded after spring init
      * 
      * @param stream
+     * @throws URISyntaxException 
      */
-    public void setPropertiesAsStream (InputStream stream) {
+    public void setPropertiesAsStream (InputStream stream) throws URISyntaxException {
         try {
 
             Properties p = new Properties();

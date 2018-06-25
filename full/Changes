@@ -1,5 +1,5 @@
 version 0.60.4
-19/06/2018
+25/06/2018
     - implemented OAuth2 authorization code request with OpenID Authentication (margaretha)
     - enabled OAuth2 authorization without OpenID authentication using Nimbus library (margaretha)
     - implemented response handler for OpenID authentication errors in authorization requests (margaretha)
@@ -7,6 +7,7 @@ version 0.60.4
     - implemented OAuth2 authorization error response via redirect URI instead of JSON (margaretha)
     - added state to OAuth2 authorization error response (margaretha)
     - implemented OpenID token service for authorization code flow (margaretha)
+    - implemented signed OpenID token with default algorithm RSA256 (margaretha)
     
 version 0.60.3
 06/06/2018

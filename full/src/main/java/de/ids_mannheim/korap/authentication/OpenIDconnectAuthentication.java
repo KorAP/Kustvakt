@@ -1,9 +1,14 @@
 package de.ids_mannheim.korap.authentication;
 
+import java.text.ParseException;
+import java.util.Map;
+
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
+
+import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.JWTSigner;
-import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -11,17 +16,9 @@ import de.ids_mannheim.korap.handlers.OAuthDb;
 import de.ids_mannheim.korap.interfaces.AuthenticationIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.security.context.TokenContext;
-import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.NamingUtils;
-import de.ids_mannheim.korap.utils.StringUtils;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-
-import java.text.ParseException;
-import java.util.Map;
 
 /**
  * @author hanl
@@ -30,10 +27,10 @@ import java.util.Map;
 public class OpenIDconnectAuthentication implements AuthenticationIface {
 
     private OAuthDb database;
-    private KustvaktConfiguration config;
+    private FullConfiguration config;
 
 
-    public OpenIDconnectAuthentication (KustvaktConfiguration config,
+    public OpenIDconnectAuthentication (FullConfiguration config,
                                         PersistenceClient client) {
         this.database = new OAuthDb(client);
         this.config = config;

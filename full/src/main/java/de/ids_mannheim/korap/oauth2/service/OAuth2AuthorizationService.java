@@ -66,13 +66,8 @@ public class OAuth2AuthorizationService {
             throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
                     "response_type is missing.", OAuth2Error.INVALID_REQUEST);
         }
-        else if (responseType.equals("token")) {
-            throw new KustvaktException(StatusCodes.NOT_SUPPORTED,
-                    "response_type token is not supported.",
-                    OAuth2Error.INVALID_REQUEST);
-        }
         else if (!responseType.equals("code")) {
-            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
+            throw new KustvaktException(StatusCodes.NOT_SUPPORTED,
                     "unsupported response_type: " + responseType,
                     OAuth2Error.INVALID_REQUEST);
         }

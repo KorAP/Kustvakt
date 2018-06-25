@@ -1,3 +1,8 @@
+version 0.60.4
+25/06/2018
+	- added the redirect URI property in KustvaktException (margaretha)
+	- added openid related status codes (margaretha)
+	
 version 0.60.3
 30/05/2018
 	- added parameter checker for collection (margaretha)

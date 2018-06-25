@@ -29,6 +29,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeansFactory;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.JWTSigner;
 import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -49,7 +50,8 @@ public class UserControllerTest extends FastJerseyTest {
 
     @Autowired
     HttpAuthorizationHandler handler;
-    
+    @Autowired
+    FullConfiguration config;
 	private static String[] credentials;
 
 	@Override
@@ -201,8 +203,8 @@ public class UserControllerTest extends FastJerseyTest {
 		String token = node.path("token").asText();
 
 		JWTSigner sign = new JWTSigner(BeansFactory.getKustvaktContext().getConfiguration().getSharedSecret(),
-				BeansFactory.getKustvaktContext().getConfiguration().getIssuer(), -1);
-
+				config.getIssuer(), -1);
+		        //BeansFactory.getKustvaktContext().getConfiguration().getIssuer(), -1);
 		SignedJWT jwt = sign.verifyToken(token);
 
 		while (true) {

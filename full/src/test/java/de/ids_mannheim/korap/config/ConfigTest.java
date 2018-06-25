@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Properties;
 
@@ -59,7 +60,7 @@ public class ConfigTest extends BeanConfigTest {
 
     @Test(expected = KustvaktException.class)
     @Ignore
-    public void testBeanOverrideInjection () throws KustvaktException {
+    public void testBeanOverrideInjection () throws KustvaktException, URISyntaxException {
         helper().getContext()
                 .getConfiguration()
                 .setPropertiesAsStream(

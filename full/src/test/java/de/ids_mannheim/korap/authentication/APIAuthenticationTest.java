@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.nimbusds.jose.JOSEException;
 
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -23,7 +23,7 @@ import de.ids_mannheim.korap.user.User;
 public class APIAuthenticationTest extends SpringJerseyTest {
 
     @Autowired
-    private KustvaktConfiguration config;
+    private FullConfiguration config;
 
     @Test
     public void testCreateGetTokenContext () throws KustvaktException,

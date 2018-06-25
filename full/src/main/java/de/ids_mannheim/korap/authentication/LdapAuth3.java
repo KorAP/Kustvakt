@@ -26,14 +26,22 @@
  
 package de.ids_mannheim.korap.authentication;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Properties;
+
 import com.nimbusds.jose.JOSEException;
-import com.unboundid.ldap.sdk.*;
+import com.unboundid.ldap.sdk.Attribute;
+import com.unboundid.ldap.sdk.LDAPConnection;
+import com.unboundid.ldap.sdk.LDAPException;
+import com.unboundid.ldap.sdk.LDAPSearchException;
+import com.unboundid.ldap.sdk.SearchResult;
+import com.unboundid.ldap.sdk.SearchResultEntry;
+import com.unboundid.ldap.sdk.SearchScope;
 
-import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.TokenType;
-
-import java.io.*;
-import java.util.*;
 
 
 /**
@@ -73,7 +81,7 @@ public class LdapAuth3 extends APIAuthentication {
 	public static final int LDAP_AUTH_RLOCKED	= 3;
 	public static final int LDAP_AUTH_RNOTREG	= 4;
 
-    public LdapAuth3 (KustvaktConfiguration config) throws JOSEException {
+    public LdapAuth3 (FullConfiguration config) throws JOSEException {
         super(config);
     }	
     

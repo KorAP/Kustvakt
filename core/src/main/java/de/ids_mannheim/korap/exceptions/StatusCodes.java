@@ -131,6 +131,9 @@ public class StatusCodes {
     public static final int UNSUPPORTED_GRANT_TYPE = 1810;
     public static final int UNSUPPORTED_AUTHENTICATION_METHOD = 1811;
     
+    public static final int ID_TOKEN_CLAIM_ERROR = 1812;
+    public static final int ID_TOKEN_SIGNING_FAILED = 1813;
+    
 
     /**
      * 1900 User account and logins

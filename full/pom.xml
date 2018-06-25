@@ -32,14 +32,15 @@
 		<testResources>
 			<testResource>
 				<directory>src/test/resources</directory>
-				<filtering>true</filtering>
+				<!-- <filtering>true</filtering>
 				<includes>
+					<include>**/*.key</include>
 					<include>**/*.token</include>
 					<include>**/*.xml</include>
 					<include>**/*.conf</include>
 					<include>**/*.info</include>
 					<include>**/*.properties</include>
-				</includes>
+				</includes> -->
 			</testResource>
 			<testResource>
 				<directory>src/main/resources</directory>
@@ -156,7 +157,7 @@
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Kustvakt-core</artifactId>
-			<version>0.60.3</version>
+			<version>0.60.4</version>
 		</dependency>
 		<!-- LDAP -->
 		<dependency>
