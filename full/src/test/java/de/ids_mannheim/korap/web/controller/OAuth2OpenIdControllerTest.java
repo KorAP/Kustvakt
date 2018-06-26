@@ -4,27 +4,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
-import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.text.ParseException;
 import java.util.Date;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.message.types.TokenType;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MultiValueMap;
@@ -35,6 +25,8 @@ import com.google.common.net.HttpHeaders;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.SignedJWT;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
@@ -59,19 +51,6 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
     private String redirectUri =
             "https://korap.ids-mannheim.de/confidential/redirect";
     private String username = "dory";
-
-    private static String publicKey;
-
-    @BeforeClass
-    public static void init () throws IOException {
-        InputStream is = OAuth2OpenIdControllerTest.class.getClassLoader()
-                .getResourceAsStream("kustvakt-public.key");
-
-        try (BufferedReader reader =
-                new BufferedReader(new InputStreamReader(is));) {
-            publicKey = reader.readLine();
-        }
-    }
 
     private ClientResponse sendAuthorizationRequest (
             MultivaluedMap<String, String> form) throws KustvaktException {
@@ -254,7 +233,8 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
      * <li>code id_token token</li>
      * </ul>
      * 
-     * @throws KustvaktException
+     * @throws KustvaktExceptiony);
+     *             assertTrue(signedJWT.verify(verifier));
      */
 
     @Test
@@ -317,10 +297,8 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
     private void verifyingIdToken (String id_token, String username,
             String client_id) throws ParseException, InvalidKeySpecException,
             NoSuchAlgorithmException, JOSEException {
-        byte[] decodedPuk = Base64.decodeBase64(publicKey);
-        KeySpec keySpec = new X509EncodedKeySpec(decodedPuk);
-        RSAPublicKey publicKey = (RSAPublicKey) KeyFactory.getInstance("RSA")
-                .generatePublic(keySpec);
+        JWKSet keySet = config.getPublicKeySet();
+        RSAKey publicKey = (RSAKey) keySet.getKeyByKeyId(config.getRsaKeyId());
 
         SignedJWT signedJWT = SignedJWT.parse(id_token);
         JWSVerifier verifier = new RSASSAVerifier(publicKey);
@@ -333,5 +311,19 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
                 signedJWT.getJWTClaimsSet().getIssuer());
         assertTrue(new Date()
                 .before(signedJWT.getJWTClaimsSet().getExpirationTime()));
+    }
+
+    @Test
+    public void testPublicKeyAPI () throws KustvaktException {
+        ClientResponse response = resource().path("oauth2").path("openid")
+                .path("key").path("public").get(ClientResponse.class);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(1,node.at("/keys").size());
+        node = node.at("/keys/0");
+        assertEquals("RSA", node.at("/kty").asText());
+        assertEquals(config.getRsaKeyId(), node.at("/kid").asText());
+        assertNotNull(node.at("/e").asText());
+        assertNotNull(node.at("/n").asText());
     }
 }

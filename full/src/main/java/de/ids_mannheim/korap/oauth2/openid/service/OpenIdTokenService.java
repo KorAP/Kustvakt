@@ -118,7 +118,7 @@ public class OpenIdTokenService extends OAuth2TokenService {
             SignedJWT idToken = signIdToken(claims,
                     // default
                     new JWSHeader(JWSAlgorithm.RS256),
-                    config.getRSAPrivateKey());
+                    config.getRsaPrivateKey());
             OIDCTokens tokens =
                     new OIDCTokens(idToken, accessToken, refreshToken);
             return new OIDCTokenResponse(tokens);

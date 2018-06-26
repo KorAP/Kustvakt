@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -31,6 +32,7 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.openid.OpenIdHttpRequestWrapper;
+import de.ids_mannheim.korap.oauth2.openid.service.JWKService;
 import de.ids_mannheim.korap.oauth2.openid.service.OpenIdAuthorizationService;
 import de.ids_mannheim.korap.oauth2.openid.service.OpenIdTokenService;
 import de.ids_mannheim.korap.security.context.TokenContext;
@@ -47,6 +49,8 @@ public class OAuth2WithOpenIdController {
     private OpenIdAuthorizationService authzService;
     @Autowired
     private OpenIdTokenService tokenService;
+    @Autowired
+    private JWKService jwkService;
     @Autowired
     private OpenIdResponseHandler openIdResponseHandler;
 
@@ -92,7 +96,7 @@ public class OAuth2WithOpenIdController {
      * Class Reference values. </li>
      * </ul>
      * 
-     * @see OpenID Connect Core 1.0 specification
+     * @see "OpenID Connect Core 1.0 specification"
      * 
      * @param request
      * @param context
@@ -183,5 +187,21 @@ public class OAuth2WithOpenIdController {
 
         return null;
 
+    }
+
+    /**
+     * Retrieves Kustvakt public keys of JWK (Json Web Key) set
+     * format.
+     * 
+     * @return json string representation of the public keys
+     * 
+     * @see "RFC 8017 regarding RSA specifications"
+     * @see "RFC 7517 regarding JWK (Json Web Key) and JWK Set"
+     */
+    @GET
+    @Path("key/public")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public String retrievePublicKeys () {
+        return jwkService.generatePublicKeySetJson();
     }
 }

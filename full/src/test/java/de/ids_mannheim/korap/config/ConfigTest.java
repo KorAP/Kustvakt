@@ -60,7 +60,7 @@ public class ConfigTest extends BeanConfigTest {
 
     @Test(expected = KustvaktException.class)
     @Ignore
-    public void testBeanOverrideInjection () throws KustvaktException, URISyntaxException {
+    public void testBeanOverrideInjection () throws Exception {
         helper().getContext()
                 .getConfiguration()
                 .setPropertiesAsStream(

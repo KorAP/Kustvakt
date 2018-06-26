@@ -1,19 +1,15 @@
 package de.ids_mannheim.korap.config;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
+import java.nio.charset.Charset;
 import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
-import java.security.spec.PKCS8EncodedKeySpec;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,15 +18,18 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.codec.binary.Base64;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.util.IOUtils;
 
 import de.ids_mannheim.korap.constant.AuthenticationMethod;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 
 /**
  * Configuration for Kustvakt full version including properties
- * concerning
- * authentication and licenses.
+ * concerning authentication and licenses.
  * 
  * @author margaretha
  *
@@ -76,42 +75,15 @@ public class FullConfiguration extends KustvaktConfiguration {
     private URL issuer;
     private URI issuerURI;
     private RSAPrivateKey rsaPrivateKey;
+    private JWKSet publicKeySet;
+    private String rsaKeyId;
 
-    public FullConfiguration (Properties properties)
-            throws IOException, URISyntaxException, InvalidKeySpecException,
-            NoSuchAlgorithmException {
+    public FullConfiguration (Properties properties) throws Exception {
         super(properties);
-        setRSAPrivateKey();
-    }
-
-    public void setRSAPrivateKey () throws IOException, InvalidKeySpecException,
-            NoSuchAlgorithmException {
-        InputStream is = getClass().getClassLoader()
-                .getResourceAsStream("kustvakt-private.key");
-
-        if (is == null){
-            this.rsaPrivateKey = null;
-            return;
-        }
-            
-        String privateKey = null;
-        try (BufferedReader reader =
-                new BufferedReader(new InputStreamReader(is));) {
-            privateKey = reader.readLine();
-        }
-        byte[] decodedKey = Base64.decodeBase64(privateKey);
-        KeySpec keySpec = new PKCS8EncodedKeySpec(decodedKey);
-        this.rsaPrivateKey = (RSAPrivateKey) KeyFactory.getInstance("RSA")
-                .generatePrivate(keySpec);
-    }
-
-    public RSAPrivateKey getRSAPrivateKey () {
-        return this.rsaPrivateKey;
     }
 
     @Override
-    public void load (Properties properties)
-            throws IOException, URISyntaxException {
+    public void load (Properties properties) throws Exception {
 
         super.load(properties);
         // EM: regex used for storing vc
@@ -128,6 +100,43 @@ public class FullConfiguration extends KustvaktConfiguration {
 
         setOAuth2Configuration(properties);
         setOpenIdConfiguration(properties);
+        setRSAKeys(properties);
+    }
+
+    private void setRSAKeys (Properties properties)
+            throws IOException, ParseException, JOSEException {
+        setRsaKeyId(properties.getProperty("rsa.key.id", ""));
+
+        String rsaPublic = properties.getProperty("rsa.public", "");
+        String rsaPrivate = properties.getProperty("rsa.private", "");
+
+        File rsaPublicFile = new File(rsaPublic);
+        JWKSet jwkSet = null;
+        if (rsaPublicFile.exists()) {
+            jwkSet = JWKSet.load(rsaPublicFile);
+        }
+        else {
+            InputStream is =
+                    getClass().getClassLoader().getResourceAsStream(rsaPublic);
+            jwkSet = JWKSet.load(is);
+        }
+        setPublicKeySet(jwkSet);
+
+        File rsaPrivateFile = new File(rsaPrivate);
+        String keyString = null;
+        if (rsaPrivateFile.exists()) {
+            keyString = IOUtils.readFileToString(rsaPrivateFile,
+                    Charset.forName("UTF-8"));
+        }
+        else {
+            InputStream is =
+                    getClass().getClassLoader().getResourceAsStream(rsaPrivate);
+            keyString = IOUtils.readInputStreamToString(is,
+                    Charset.forName("UTF-8"));
+        }
+        RSAKey rsaKey = (RSAKey) JWK.parse(keyString);
+        RSAPrivateKey privateKey = (RSAPrivateKey) rsaKey.toPrivateKey();
+        setRsaPrivateKey(privateKey);
     }
 
     private void setOpenIdConfiguration (Properties properties)
@@ -449,6 +458,30 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     public void setIssuerURI (URI issuerURI) {
         this.issuerURI = issuerURI;
+    }
+
+    public JWKSet getPublicKeySet () {
+        return publicKeySet;
+    }
+
+    public void setPublicKeySet (JWKSet publicKeySet) {
+        this.publicKeySet = publicKeySet;
+    }
+
+    public RSAPrivateKey getRsaPrivateKey () {
+        return rsaPrivateKey;
+    }
+
+    public void setRsaPrivateKey (RSAPrivateKey rsaPrivateKey) {
+        this.rsaPrivateKey = rsaPrivateKey;
+    }
+
+    public String getRsaKeyId () {
+        return rsaKeyId;
+    }
+
+    public void setRsaKeyId (String rsaKeyId) {
+        this.rsaKeyId = rsaKeyId;
     }
 
 }

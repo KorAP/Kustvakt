@@ -32,11 +32,12 @@ public class KustvaktConfiguration {
 
     public static final Map<String, Object> KUSTVAKT_USER = new HashMap<>();
 
-    private static final Logger jlog = LoggerFactory
-            .getLogger(KustvaktConfiguration.class);
+    private static final Logger jlog =
+            LoggerFactory.getLogger(KustvaktConfiguration.class);
     private String indexDir;
     private int port;
-    // todo: make exclusive so that the containg languages can really only be used then
+    // todo: make exclusive so that the containg languages can really
+    // only be used then
     private List<String> queryLanguages;
 
     private String serverHost;
@@ -58,7 +59,7 @@ public class KustvaktConfiguration {
     private int validationStringLength;
     @Deprecated
     private int validationEmaillength;
-    
+
     private byte[] sharedSecret;
     @Deprecated
     private String adminToken;
@@ -75,102 +76,105 @@ public class KustvaktConfiguration {
     private String default_const;
     private ArrayList<String> foundries;
     private ArrayList<String> layers;
-    
+
     private String baseURL;
-    
-    
+
+
     // deprec?!
     private final BACKENDS DEFAULT_ENGINE = BACKENDS.LUCENE;
 
-	public KustvaktConfiguration (Properties properties) throws IOException, URISyntaxException {
+    public KustvaktConfiguration (Properties properties)
+            throws Exception {
         load(properties);
     }
-	
+
     /**
      * loading of the properties and mapping to parameter variables
      * 
      * @param properties
      * @return
-     * @throws IOException 
-     * @throws URISyntaxException 
-     * @throws KustvaktException 
+     * @throws Exception
      */
-    protected void load (Properties properties)
-            throws IOException, URISyntaxException {
+    protected void load (Properties properties) throws Exception {
         baseURL = properties.getProperty("kustvakt.base.url", "/api/*");
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));
         returnhits = new Integer(properties.getProperty("returnhits", "50000"));
         indexDir = properties.getProperty("krill.indexDir", "");
         port = new Integer(properties.getProperty("server.port", "8095"));
         // server options
-        serverHost = String.valueOf(properties.getProperty("server.host",
-                "localhost"));
+        serverHost = String
+                .valueOf(properties.getProperty("server.host", "localhost"));
         String queries = properties.getProperty("korap.ql", "");
         String[] qls = queries.split(",");
         queryLanguages = new ArrayList<>();
         for (String querylang : qls)
             queryLanguages.add(querylang.trim().toUpperCase());
 
-        default_const = properties
-                .getProperty("default.layer.constituent", "mate");
-        default_dep = properties.getProperty("default.layer.dependency", "mate");
+        default_const =
+                properties.getProperty("default.layer.constituent", "mate");
+        default_dep =
+                properties.getProperty("default.layer.dependency", "mate");
         default_lemma = properties.getProperty("default.layer.lemma", "tt");
-        default_pos = properties.getProperty("default.layer.partOfSpeech", "tt");
-        default_token = properties.getProperty("default.layer.orthography",
-                "opennlp");
+        default_pos =
+                properties.getProperty("default.layer.partOfSpeech", "tt");
+        default_token =
+                properties.getProperty("default.layer.orthography", "opennlp");
 
         // security configuration
-        inactiveTime = TimeUtils.convertTimeToSeconds(properties.getProperty(
-                "security.idleTimeoutDuration", "10M"));
-        allowMultiLogIn = Boolean.valueOf(properties
-                .getProperty("security.multipleLogIn"));
+        inactiveTime = TimeUtils.convertTimeToSeconds(
+                properties.getProperty("security.idleTimeoutDuration", "10M"));
+        allowMultiLogIn = Boolean
+                .valueOf(properties.getProperty("security.multipleLogIn"));
 
-        loginAttemptNum = Long.parseLong(properties.getProperty(
-                "security.loginAttemptNum", "3"));
-        loginAttemptTTL = TimeUtils.convertTimeToSeconds(properties
-                .getProperty("security.authAttemptTTL", "30M"));
+        loginAttemptNum = Long.parseLong(
+                properties.getProperty("security.loginAttemptNum", "3"));
+        loginAttemptTTL = TimeUtils.convertTimeToSeconds(
+                properties.getProperty("security.authAttemptTTL", "30M"));
 
-        loadFactor = Integer.valueOf(properties.getProperty(
-                "security.encryption.loadFactor", "15"));
-        validationStringLength = Integer.valueOf(properties.getProperty(
-                "security.validation.stringLength", "150"));
-        validationEmaillength = Integer.valueOf(properties.getProperty(
-                "security.validation.emailLength", "40"));
-        
-        sharedSecret = properties.getProperty("security.sharedSecret", "")
-                .getBytes();
+        loadFactor = Integer.valueOf(
+                properties.getProperty("security.encryption.loadFactor", "15"));
+        validationStringLength = Integer.valueOf(properties
+                .getProperty("security.validation.stringLength", "150"));
+        validationEmaillength = Integer.valueOf(properties
+                .getProperty("security.validation.emailLength", "40"));
+
+        sharedSecret =
+                properties.getProperty("security.sharedSecret", "").getBytes();
         adminToken = properties.getProperty("security.adminToken");
 
-        longTokenTTL = TimeUtils.convertTimeToSeconds(properties.getProperty(
-                "security.longTokenTTL", "100D"));
-        tokenTTL = TimeUtils.convertTimeToSeconds(properties.getProperty(
-                "security.tokenTTL", "72H"));
-        shortTokenTTL = TimeUtils.convertTimeToSeconds(properties.getProperty(
-                "security.shortTokenTTL", "3H"));
+        longTokenTTL = TimeUtils.convertTimeToSeconds(
+                properties.getProperty("security.longTokenTTL", "100D"));
+        tokenTTL = TimeUtils.convertTimeToSeconds(
+                properties.getProperty("security.tokenTTL", "72H"));
+        shortTokenTTL = TimeUtils.convertTimeToSeconds(
+                properties.getProperty("security.shortTokenTTL", "3H"));
 
-//        passcodeSaltField = properties.getProperty("security.passcode.salt",
-//                "accountCreation");
-        
+        // passcodeSaltField =
+        // properties.getProperty("security.passcode.salt",
+        // "accountCreation");
+
     }
 
     /**
      * set properties
      * 
      * @param props
-     * @throws IOException 
+     * @throws IOException
      */
-//    public void setProperties (Properties props) throws IOException {
-//        this.load(props);
-//    }
+    // public void setProperties (Properties props) throws IOException
+    // {
+    // this.load(props);
+    // }
 
 
     /**
      * properties can be overloaded after spring init
      * 
      * @param stream
-     * @throws URISyntaxException 
+     * @throws Exception 
      */
-    public void setPropertiesAsStream (InputStream stream) throws URISyntaxException {
+    public void setPropertiesAsStream (InputStream stream)
+            throws Exception {
         try {
 
             Properties p = new Properties();
@@ -227,7 +231,8 @@ public class KustvaktConfiguration {
     @Deprecated
     private static void loadClassLogger () {
         Properties log4j = new Properties();
-        jlog.info("using class path logging properties file to configure logging system");
+        jlog.info(
+                "using class path logging properties file to configure logging system");
 
         try {
             log4j.load(KustvaktConfiguration.class.getClassLoader()
@@ -238,7 +243,8 @@ public class KustvaktConfiguration {
         }
 
         PropertyConfigurator.configure(log4j);
-        jlog.warn("No logger properties detected. Using default logger properties");
+        jlog.warn(
+                "No logger properties detected. Using default logger properties");
     }
 
     public enum BACKENDS {
