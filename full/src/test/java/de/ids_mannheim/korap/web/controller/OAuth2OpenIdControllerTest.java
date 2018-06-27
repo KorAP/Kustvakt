@@ -316,7 +316,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
     @Test
     public void testPublicKeyAPI () throws KustvaktException {
         ClientResponse response = resource().path("oauth2").path("openid")
-                .path("key").path("public").get(ClientResponse.class);
+                .path("jwks").get(ClientResponse.class);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(1,node.at("/keys").size());
@@ -325,5 +325,19 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         assertEquals(config.getRsaKeyId(), node.at("/kid").asText());
         assertNotNull(node.at("/e").asText());
         assertNotNull(node.at("/n").asText());
+    }
+ 
+    @Test
+    public void testOpenIDConfiguration () throws KustvaktException {
+        ClientResponse response = resource().path("oauth2").path("openid")
+                .path("config").get(ClientResponse.class);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertNotNull(node.at("/issuer"));
+        assertNotNull(node.at("/authorization_endpoint"));
+        assertNotNull(node.at("/token_endpoint"));
+        assertNotNull(node.at("/response_types_supported"));
+        assertNotNull(node.at("/subject_types_supported"));
+        assertNotNull(node.at("/id_token_signing_alg_values_supported"));
     }
 }

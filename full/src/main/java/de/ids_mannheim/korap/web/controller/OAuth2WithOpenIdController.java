@@ -31,9 +31,11 @@ import com.nimbusds.oauth2.sdk.id.State;
 import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.oauth2.openid.OpenIdConfiguration;
 import de.ids_mannheim.korap.oauth2.openid.OpenIdHttpRequestWrapper;
 import de.ids_mannheim.korap.oauth2.openid.service.JWKService;
 import de.ids_mannheim.korap.oauth2.openid.service.OpenIdAuthorizationService;
+import de.ids_mannheim.korap.oauth2.openid.service.OpenIdConfigService;
 import de.ids_mannheim.korap.oauth2.openid.service.OpenIdTokenService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OpenIdResponseHandler;
@@ -51,6 +53,9 @@ public class OAuth2WithOpenIdController {
     private OpenIdTokenService tokenService;
     @Autowired
     private JWKService jwkService;
+    @Autowired
+    private OpenIdConfigService configService;
+    
     @Autowired
     private OpenIdResponseHandler openIdResponseHandler;
 
@@ -199,9 +204,23 @@ public class OAuth2WithOpenIdController {
      * @see "RFC 7517 regarding JWK (Json Web Key) and JWK Set"
      */
     @GET
-    @Path("key/public")
+    @Path("jwks")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public String retrievePublicKeys () {
+    public String requestPublicKeys () {
         return jwkService.generatePublicKeySetJson();
+    }
+
+    /**
+     * When supporting discovery, must be available at
+     * {issuer_uri}/.well-known/openid-configuration
+     * @return 
+     * 
+     * @return
+     */
+    @GET
+    @Path("config")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public OpenIdConfiguration requestOpenIdConfig () {
+        return configService.retrieveOpenIdConfigInfo();
     }
 }

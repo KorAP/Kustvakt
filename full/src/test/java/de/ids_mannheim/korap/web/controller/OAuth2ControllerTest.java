@@ -171,7 +171,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         MultivaluedMap<String, String> authForm = new MultivaluedMapImpl();
         authForm.add("response_type", "code");
         authForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
-        authForm.add("scope", "read_username");
+        authForm.add("scope", "username");
 
         ClientResponse response =
                 requestAuthorizationConfidentialClient(authForm);
@@ -181,7 +181,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         String code = params.get("code").get(0);
         String scopes = params.get("scope").get(0);
 
-        assertEquals(scopes, "read_username");
+        assertEquals(scopes, "username");
 
         MultivaluedMap<String, String> tokenForm = new MultivaluedMapImpl();
         tokenForm.add("grant_type", "authorization_code");
@@ -241,7 +241,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         MultivaluedMap<String, String> authForm = new MultivaluedMapImpl();
         authForm.add("response_type", "code");
         authForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
-        authForm.add("scope", "read_username");
+        authForm.add("scope", "username");
         authForm.add("redirect_uri", uri);
 
         ClientResponse response =
@@ -437,7 +437,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         form.add("grant_type", "client_credentials");
         form.add("client_id", "fCBbQkAyYzI4NzUxMg");
         form.add("client_secret", "secret");
-        form.add("scope", "read_username read_client_info");
+        form.add("scope", "preferred_username client_info");
 
         ClientResponse response = requestToken(form);
         String entity = response.getEntity(String.class);
@@ -450,7 +450,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         assertEquals(TokenType.BEARER.toString(),
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
-        assertEquals("read_client_info", node.at("/scope").asText());
+        assertEquals("client_info", node.at("/scope").asText());
     }
 
     @Test

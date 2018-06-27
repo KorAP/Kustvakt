@@ -32,15 +32,9 @@
 		<testResources>
 			<testResource>
 				<directory>src/test/resources</directory>
-				<!-- <filtering>true</filtering>
-				<includes>
-					<include>**/*.key</include>
-					<include>**/*.token</include>
-					<include>**/*.xml</include>
-					<include>**/*.conf</include>
-					<include>**/*.info</include>
-					<include>**/*.properties</include>
-				</includes> -->
+				<!-- <filtering>true</filtering> <includes> <include>**/*.key</include> 
+					<include>**/*.token</include> <include>**/*.xml</include> <include>**/*.conf</include> 
+					<include>**/*.info</include> <include>**/*.properties</include> </includes> -->
 			</testResource>
 			<testResource>
 				<directory>src/main/resources</directory>
@@ -297,12 +291,12 @@
 			<artifactId>nimbus-jose-jwt</artifactId>
 			<version>5.10</version>
 		</dependency>
-		
+
 		<!-- OpenId -->
 		<dependency>
-		    <groupId>com.nimbusds</groupId>
-		    <artifactId>oauth2-oidc-sdk</artifactId>
-		    <version>5.62</version>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>oauth2-oidc-sdk</artifactId>
+			<version>5.62</version>
 		</dependency>
 	</dependencies>
 </project>

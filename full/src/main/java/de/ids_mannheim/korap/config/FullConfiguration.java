@@ -26,6 +26,7 @@ import com.nimbusds.jose.util.IOUtils;
 
 import de.ids_mannheim.korap.constant.AuthenticationMethod;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.oauth2.openid.OpenIdConfiguration;
 
 /**
  * Configuration for Kustvakt full version including properties
@@ -74,6 +75,8 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     private URL issuer;
     private URI issuerURI;
+    private OpenIdConfiguration openidConfig;
+
     private RSAPrivateKey rsaPrivateKey;
     private JWKSet publicKeySet;
     private String rsaKeyId;
@@ -101,6 +104,99 @@ public class FullConfiguration extends KustvaktConfiguration {
         setOAuth2Configuration(properties);
         setOpenIdConfiguration(properties);
         setRSAKeys(properties);
+    }
+
+    private void setOpenIdConfiguration (Properties properties)
+            throws URISyntaxException, MalformedURLException {
+        String issuerStr = properties.getProperty("security.jwt.issuer",
+                "https://korap.ids-mannheim.de");
+
+        if (!issuerStr.startsWith("http")) {
+            issuerStr = "http://" + issuerStr;
+        }
+        setIssuer(new URL(issuerStr));
+        setIssuerURI(issuer.toURI());
+
+        issuerStr = issuerURI.toString();
+
+        OpenIdConfiguration openidConfig = new OpenIdConfiguration();
+        openidConfig.setIssuer(issuerStr);
+        openidConfig.setJwks_uri(issuerStr + OpenIdConfiguration.JWKS_ENDPOINT);
+        openidConfig.setRegistration_endpoint(
+                issuerStr + OpenIdConfiguration.CLIENT_REGISTRATION_ENDPOINT);
+        openidConfig.setAuthorization_endpoint(
+                issuerStr + OpenIdConfiguration.AUTHORIZATION_ENDPOINT);
+        openidConfig.setToken_endpoint(
+                issuerStr + OpenIdConfiguration.TOKEN_ENDPOINT);
+
+        String grantTypes = properties.getProperty("openid.grant.types", "");
+        openidConfig.setGrant_types_supported(grantTypes.split(" "));
+
+        String responseTypes =
+                properties.getProperty("openid.response.types", "code");
+        openidConfig.setResponse_types_supported(responseTypes.split(" "));
+
+        String responseModes =
+                properties.getProperty("openid.response.modes", "");
+        openidConfig.setResponse_modes_supported(responseModes.split(" "));
+
+        String clientAuthMethods =
+                properties.getProperty("openid.client.auth.methods", "");
+        openidConfig.setToken_endpoint_auth_methods_supported(
+                clientAuthMethods.split(" "));
+
+        String tokenSigningAlgorithms = properties
+                .getProperty("openid.token.signing.algorithms", "RS256");
+        openidConfig.setToken_endpoint_auth_signing_alg_values_supported(
+                tokenSigningAlgorithms.split(" "));
+
+        String subjectTypes =
+                properties.getProperty("openid.subject.types", "public");
+        openidConfig.setSubject_types_supported(subjectTypes.split(" "));
+
+        String displayTypes =
+                properties.getProperty("openid.display.types", "");
+        openidConfig.setDisplay_values_supported(displayTypes.split(" "));
+
+        String supportedScopes =
+                properties.getProperty("openid.supported.scopes", "");
+        openidConfig.setScopes_supported(supportedScopes.split(" "));
+
+        String claimTypes =
+                properties.getProperty("openid.claim.types", "normal");
+        openidConfig.setClaim_types_supported(claimTypes.split(" "));
+
+        String supportedClaims =
+                properties.getProperty("openid.supported.claims", "");
+        openidConfig.setClaims_supported(supportedClaims.split(" "));
+
+        String claimLocales =
+                properties.getProperty("openid.supported.claim.locales", "");
+        openidConfig.setClaims_locales_supported(claimLocales.split(" "));
+
+        String uiLocales = properties.getProperty("openid.ui.locales", "en");
+        openidConfig.setUi_locales_supported(uiLocales.split(" "));
+
+        boolean supportClaimParam = Boolean.getBoolean(
+                properties.getProperty("openid.support.claim.param", "false"));
+        openidConfig.setClaims_parameter_supported(supportClaimParam);
+
+        openidConfig.setRequest_parameter_supported(false);
+        openidConfig.setRequest_uri_parameter_supported(false);
+        openidConfig.setRequire_request_uri_registration(false);
+        openidConfig.setMutual_tls_sender_constrained_access_tokens(false);
+
+        String privacyPolicy =
+                properties.getProperty("openid.privacy.policy", "");
+        openidConfig.setOp_policy_uri(privacyPolicy);
+
+        String termOfService =
+                properties.getProperty("openid.term.of.service", "");
+        openidConfig.setOp_tos_uri(termOfService);
+
+        String serviceDocURL = properties.getProperty("openid.service.doc", "");
+        openidConfig.setService_documentation(serviceDocURL);
+        this.setOpenidConfig(openidConfig);
     }
 
     private void setRSAKeys (Properties properties)
@@ -139,17 +235,6 @@ public class FullConfiguration extends KustvaktConfiguration {
         setRsaPrivateKey(privateKey);
     }
 
-    private void setOpenIdConfiguration (Properties properties)
-            throws URISyntaxException, MalformedURLException {
-        String issuerStr = properties.getProperty("security.jwt.issuer", "");
-
-        if (!issuerStr.startsWith("http")) {
-            issuerStr = "http://" + issuerStr;
-        }
-        setIssuer(new URL(issuerStr));
-        setIssuerURI(issuer.toURI());
-    }
-
     private void setOAuth2Configuration (Properties properties) {
         setOAuth2passwordAuthentication(
                 Enum.valueOf(AuthenticationMethod.class, properties.getProperty(
@@ -161,13 +246,13 @@ public class FullConfiguration extends KustvaktConfiguration {
                 .parseInt(properties.getProperty("oauth2.max.attempts", "3")));
 
         String scopes = properties.getProperty("oauth2.default.scopes",
-                "read_username read_email");
+                "openid preferred_username");
         Set<String> scopeSet =
                 Arrays.stream(scopes.split(" ")).collect(Collectors.toSet());
         setDefaultAccessScopes(scopeSet);
 
         String clientScopes = properties.getProperty(
-                "oauth2.client.credentials.scopes", "read_client_info");
+                "oauth2.client.credentials.scopes", "client_info");
         setClientCredentialsScopes(Arrays.stream(clientScopes.split(" "))
                 .collect(Collectors.toSet()));
     }
@@ -484,4 +569,11 @@ public class FullConfiguration extends KustvaktConfiguration {
         this.rsaKeyId = rsaKeyId;
     }
 
+    public OpenIdConfiguration getOpenidConfig () {
+        return openidConfig;
+    }
+
+    public void setOpenidConfig (OpenIdConfiguration openidConfig) {
+        this.openidConfig = openidConfig;
+    }
 }
