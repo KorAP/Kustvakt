@@ -5,6 +5,7 @@ import java.security.PrivateKey;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import com.nimbusds.oauth2.sdk.AuthorizationCodeGrant;
 import com.nimbusds.oauth2.sdk.AuthorizationGrant;
 import com.nimbusds.oauth2.sdk.GrantType;
 import com.nimbusds.oauth2.sdk.ParseException;
+import com.nimbusds.oauth2.sdk.ResourceOwnerPasswordCredentialsGrant;
 import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.TokenRequest;
 import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
@@ -28,6 +30,7 @@ import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod;
 import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
 import com.nimbusds.oauth2.sdk.auth.ClientSecretPost;
 import com.nimbusds.oauth2.sdk.id.Audience;
+import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.Issuer;
 import com.nimbusds.oauth2.sdk.id.Subject;
 import com.nimbusds.oauth2.sdk.token.AccessToken;
@@ -71,26 +74,18 @@ public class OpenIdTokenService extends OAuth2TokenService {
         GrantType grantType = grant.getType();
         ClientAuthentication clientAuthentication =
                 tokenRequest.getClientAuthentication();
-        String[] clientCredentials =
-                extractClientCredentials(clientAuthentication);
+        ClientID clientId = tokenRequest.getClientID();
 
         if (grantType.equals(GrantType.AUTHORIZATION_CODE)) {
-            AuthorizationCodeGrant codeGrant = (AuthorizationCodeGrant) grant;
-            String authorizationCode =
-                    codeGrant.getAuthorizationCode().getValue();
-            URI redirectionURI = codeGrant.getRedirectionURI();
-            String redirectURI = null;
-            if (redirectionURI != null) {
-                redirectURI = redirectionURI.toString();
-            }
-            Authorization authorization =
-                    requestAccessTokenWithAuthorizationCode(authorizationCode,
-                            redirectURI, clientCredentials[0],
-                            clientCredentials[1]);
-            return createsAccessTokenResponse(authorization);
+            return requestAccessTokenWithAuthorizationCode(grant,
+                    clientAuthentication, clientId);
         }
         else if (grantType.equals(GrantType.PASSWORD)) {
-
+            ResourceOwnerPasswordCredentialsGrant passwordGrant =
+                    (ResourceOwnerPasswordCredentialsGrant) grant;
+            return requestAccessTokenWithPassword(passwordGrant.getUsername(),
+                    passwordGrant.getPassword().getValue(),
+                    tokenRequest.getScope(), clientAuthentication, clientId);
         }
         else if (grantType.equals(GrantType.CLIENT_CREDENTIALS)) {
 
@@ -103,6 +98,75 @@ public class OpenIdTokenService extends OAuth2TokenService {
         return null;
     }
 
+    private AccessTokenResponse requestAccessTokenWithPassword (String username,
+            String password, Scope scope,
+            ClientAuthentication clientAuthentication, ClientID clientId)
+            throws KustvaktException {
+
+        Set<String> scopes = null;
+        if (scope != null) {
+            scopes = new HashSet<String>();
+            scopes.addAll(scope.toStringList());
+        }
+
+        ZonedDateTime authenticationTime;
+        String clientIdStr = null;
+        if (clientAuthentication == null) {
+            if (clientId == null) {
+                throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
+                        "Missing parameters: client_id",
+                        OAuth2Error.INVALID_REQUEST);
+            }
+            else {
+                authenticationTime = authenticateClientAndUser(username,
+                        password, scopes, clientId.getValue(), null);
+                clientIdStr = clientId.getValue();
+            }
+        }
+        else {
+            String[] clientCredentials =
+                    extractClientCredentials(clientAuthentication);
+            clientIdStr = clientCredentials[0];
+            authenticationTime = authenticateClientAndUser(username, password,
+                    scopes, clientCredentials[0], clientCredentials[1]);
+        }
+        return createsAccessTokenResponse(scope, clientIdStr, username,
+                authenticationTime, null);
+    }
+
+    private AccessTokenResponse requestAccessTokenWithAuthorizationCode (
+            AuthorizationGrant grant, ClientAuthentication clientAuthentication,
+            ClientID clientId) throws KustvaktException {
+        AuthorizationCodeGrant codeGrant = (AuthorizationCodeGrant) grant;
+        String authorizationCode = codeGrant.getAuthorizationCode().getValue();
+        URI redirectionURI = codeGrant.getRedirectionURI();
+        String redirectURI = null;
+        if (redirectionURI != null) {
+            redirectURI = redirectionURI.toString();
+        }
+
+        Authorization authorization = null;
+        if (clientAuthentication == null) {
+            if (clientId == null) {
+                throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
+                        "Missing parameters: client_id",
+                        OAuth2Error.INVALID_REQUEST);
+            }
+            else {
+                authorization = retrieveAuthorization(authorizationCode,
+                        redirectURI, clientId.getValue(), null);
+            }
+        }
+        else {
+            String[] clientCredentials =
+                    extractClientCredentials(clientAuthentication);
+            authorization = retrieveAuthorization(authorizationCode,
+                    redirectURI, clientCredentials[0], clientCredentials[1]);
+        }
+
+        return createsAccessTokenResponse(authorization);
+
+    }
 
     private AccessTokenResponse createsAccessTokenResponse (
             Authorization authorization) throws KustvaktException {
@@ -110,15 +174,24 @@ public class OpenIdTokenService extends OAuth2TokenService {
         String[] scopeArray = scopes.stream().map(scope -> scope.toString())
                 .toArray(String[]::new);
         Scope scope = new Scope(scopeArray);
+        return createsAccessTokenResponse(scope, authorization.getClientId(),
+                authorization.getUserId(),
+                authorization.getUserAuthenticationTime(),
+                authorization.getNonce());
+    }
+
+    private AccessTokenResponse createsAccessTokenResponse (Scope scope,
+            String clientId, String userId,
+            ZonedDateTime userAuthenticationTime, String nonce)
+            throws KustvaktException {
+
         AccessToken accessToken =
                 new BearerAccessToken(config.getTokenTTL(), scope);
         RefreshToken refreshToken = new RefreshToken();
 
-        if (scope.contains("openid")) {
-            JWTClaimsSet claims = createIdTokenClaims(
-                    authorization.getClientId(), authorization.getUserId(),
-                    authorization.getUserAuthenticationTime(),
-                    authorization.getNonce());
+        if (scope != null && scope.contains("openid")) {
+            JWTClaimsSet claims = createIdTokenClaims(clientId, userId,
+                    userAuthenticationTime, nonce);
             SignedJWT idToken = signIdToken(claims,
                     // default
                     new JWSHeader(JWSAlgorithm.RS256),

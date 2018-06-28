@@ -30,6 +30,7 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import com.nimbusds.oauth2.sdk.GrantType;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -286,7 +287,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testRequestAccessToken ()
+    public void testRequestAccessTokenWithAuthorizationCode ()
             throws KustvaktException, ParseException, InvalidKeySpecException,
             NoSuchAlgorithmException, JOSEException {
         String client_id = "fCBbQkAyYzI4NzUxMg";
@@ -307,15 +308,17 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         String code = params.getFirst("code");
 
         MultivaluedMap<String, String> tokenForm = new MultivaluedMapImpl();
+        testRequestAccessTokenMissingGrant(tokenForm);
         tokenForm.add("grant_type", "authorization_code");
-        tokenForm.add("redirect_uri", redirectUri);
-        tokenForm.add("client_id", client_id);
-        tokenForm.add("client_secret", "secret");
         tokenForm.add("code", code);
+        testRequestAccessTokenMissingClientId(tokenForm);
+        tokenForm.add("client_id", client_id);
+        testRequestAccessTokenMissingClientSecret(tokenForm);
+        tokenForm.add("client_secret", "secret");
+        tokenForm.add("redirect_uri", redirectUri);
 
         ClientResponse tokenResponse = sendTokenRequest(tokenForm);
         String entity = tokenResponse.getEntity(String.class);
-
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());
@@ -326,6 +329,36 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         assertNotNull(id_token);
 
         verifyingIdToken(id_token, username, client_id, nonce);
+    }
+
+    private void testRequestAccessTokenMissingGrant (
+            MultivaluedMap<String, String> tokenForm) throws KustvaktException {
+        ClientResponse response = sendTokenRequest(tokenForm);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
+        assertEquals("Invalid request: Missing \"grant_type\" parameter",
+                node.at("/error_description").asText());
+    }
+
+    private void testRequestAccessTokenMissingClientId (
+            MultivaluedMap<String, String> tokenForm) throws KustvaktException {
+        ClientResponse response = sendTokenRequest(tokenForm);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
+        assertEquals("Invalid request: Missing required \"client_id\" "
+                + "parameter", node.at("/error_description").asText());
+    }
+
+    private void testRequestAccessTokenMissingClientSecret (
+            MultivaluedMap<String, String> tokenForm) throws KustvaktException {
+        ClientResponse response = sendTokenRequest(tokenForm);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
+        assertEquals("Missing parameters: client_secret",
+                node.at("/error_description").asText());
     }
 
     private void verifyingIdToken (String id_token, String username,
@@ -345,6 +378,59 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         assertTrue(new Date().before(claimsSet.getExpirationTime()));
         assertNotNull(claimsSet.getClaim(Attributes.AUTHENTICATION_TIME));
         assertEquals(nonce, claimsSet.getClaim("nonce"));
+    }
+
+
+    // no openid
+    @Test
+    public void testRequestAccessTokenWithPassword ()
+            throws KustvaktException, ParseException, InvalidKeySpecException,
+            NoSuchAlgorithmException, JOSEException {
+        // public client
+        String client_id = "iBr3LsTCxOj7D2o0A5m";
+        MultivaluedMap<String, String> tokenForm = new MultivaluedMapImpl();
+        testRequestAccessTokenMissingGrant(tokenForm);
+
+        tokenForm.add("grant_type", GrantType.PASSWORD.toString());
+        testRequestAccessTokenMissingUsername(tokenForm);
+
+        tokenForm.add("username", username);
+        testRequestAccessTokenMissingPassword(tokenForm);
+
+        tokenForm.add("password", "pass");
+        tokenForm.add("client_id", client_id);
+
+        ClientResponse tokenResponse = sendTokenRequest(tokenForm);
+        String entity = tokenResponse.getEntity(String.class);
+        System.out.println(entity);
+        
+        JsonNode node = JsonUtils.readTree(entity);
+        assertNotNull(node.at("/access_token").asText());
+        assertNotNull(node.at("/refresh_token").asText());
+        assertEquals(TokenType.BEARER.toString(),
+                node.at("/token_type").asText());
+        assertNotNull(node.at("/expires_in").asText());
+    }
+
+
+    private void testRequestAccessTokenMissingUsername (
+            MultivaluedMap<String, String> tokenForm) throws KustvaktException {
+        ClientResponse response = sendTokenRequest(tokenForm);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
+        assertEquals("Invalid request: Missing or empty \"username\" parameter",
+                node.at("/error_description").asText());
+    }
+
+    private void testRequestAccessTokenMissingPassword (
+            MultivaluedMap<String, String> tokenForm) throws KustvaktException {
+        ClientResponse response = sendTokenRequest(tokenForm);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
+        assertEquals("Invalid request: Missing or empty \"password\" parameter",
+                node.at("/error_description").asText());
     }
 
     @Test

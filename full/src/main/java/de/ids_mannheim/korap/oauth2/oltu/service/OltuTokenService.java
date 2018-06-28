@@ -40,7 +40,7 @@ public class OltuTokenService extends OAuth2TokenService {
 
         if (grantType.equals(GrantType.AUTHORIZATION_CODE.toString())) {
             Authorization authorization =
-                    requestAccessTokenWithAuthorizationCode(
+                    retrieveAuthorization(
                             oAuthRequest.getCode(),
                             oAuthRequest.getRedirectURI(),
                             oAuthRequest.getClientId(),
@@ -48,7 +48,7 @@ public class OltuTokenService extends OAuth2TokenService {
             return createsAccessTokenResponse(authorization);
         }
         else if (grantType.equals(GrantType.PASSWORD.toString())) {
-            ZonedDateTime authenticationTime = requestAccessTokenWithPassword(
+            ZonedDateTime authenticationTime = authenticateClientAndUser(
                     oAuthRequest.getUsername(), oAuthRequest.getPassword(),
                     oAuthRequest.getScopes(), oAuthRequest.getClientId(),
                     oAuthRequest.getClientSecret());

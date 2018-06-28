@@ -54,13 +54,13 @@ public class OAuth2TokenService {
      * @param clientId
      *            required if there is no authorization header
      * @param clientSecret
-     *            clilent_secret, required if client_secret was issued
+     *            client_secret, required if client_secret was issued
      *            for the client in client registration.
      * @return an authorization
      * @throws OAuthSystemException
      * @throws KustvaktException
      */
-    protected Authorization requestAccessTokenWithAuthorizationCode (
+    protected Authorization retrieveAuthorization (
             String authorizationCode, String redirectURI, String clientId,
             String clientSecret) throws KustvaktException {
 
@@ -107,7 +107,7 @@ public class OAuth2TokenService {
      * @throws KustvaktException
      * @throws OAuthSystemException
      */
-    protected ZonedDateTime requestAccessTokenWithPassword (String username,
+    protected ZonedDateTime authenticateClientAndUser (String username,
             String password, Set<String> scopes, String clientId,
             String clientSecret) throws KustvaktException {
 

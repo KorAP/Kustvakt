@@ -10,7 +10,6 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.HttpHeaders;
-import org.apache.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.nimbusds.oauth2.sdk.AccessTokenResponse;
@@ -24,7 +23,6 @@ import com.nimbusds.oauth2.sdk.token.BearerTokenError;
 import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import net.minidev.json.JSONObject;
@@ -133,15 +131,14 @@ public class OpenIdResponseHandler extends KustvaktResponseHandler {
                     && !errorCode.equals("[]")) {
                 errorObject = new ErrorObject(e.getEntity(), e.getMessage());
             }
-            else{
+            else {
                 throw throwit(e);
             }
         }
         return errorObject;
     }
 
-    public Response createAuthorizationErrorResponse (ParseException e,
-            boolean isAuthentication, State state) {
+    public Response createErrorResponse (ParseException e, State state) {
         ErrorObject errorObject = e.getErrorObject();
         if (errorObject == null) {
             errorObject = com.nimbusds.oauth2.sdk.OAuth2Error.INVALID_REQUEST;
@@ -160,20 +157,25 @@ public class OpenIdResponseHandler extends KustvaktResponseHandler {
 
     }
 
-    public void createTokenErrorResponse (KustvaktException e) {
+    public Response createTokenErrorResponse (KustvaktException e) {
 
         String errorCode = e.getEntity();
         ErrorObject errorObject = tokenErrorObjectMap.get(errorCode);
         if (errorObject == null) {
             errorObject = errorObjectMap.get(errorCode);
-            if (errorObject == null) {
+            if (errorCode != null && !errorCode.isEmpty()
+                    && !errorCode.equals("[]")) {
                 errorObject = new ErrorObject(e.getEntity(), e.getMessage());
+            }
+            else {
+                throw throwit(e);
             }
         }
 
+        errorObject = errorObject.setDescription(e.getMessage());
         TokenErrorResponse errorResponse = new TokenErrorResponse(errorObject);
         Status status = determineErrorStatus(errorCode);
-        createResponse(errorResponse, status);
+        return createResponse(errorResponse, status);
     }
 
     public Response createResponse (AccessTokenResponse tokenResponse,

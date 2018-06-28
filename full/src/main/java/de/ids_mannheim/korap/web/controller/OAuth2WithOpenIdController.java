@@ -142,8 +142,7 @@ public class OAuth2WithOpenIdController {
                     isAuthentication, authTime);
         }
         catch (ParseException e) {
-            return openIdResponseHandler.createAuthorizationErrorResponse(e,
-                    isAuthentication, state);
+            return openIdResponseHandler.createErrorResponse(e, state);
         }
         catch (KustvaktException e) {
             return openIdResponseHandler.createAuthorizationErrorResponse(e,
@@ -186,15 +185,11 @@ public class OAuth2WithOpenIdController {
                     Status.OK);
         }
         catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            return openIdResponseHandler.createErrorResponse(e, null);
         }
         catch (KustvaktException e) {
-            openIdResponseHandler.createTokenErrorResponse(e);
+            return openIdResponseHandler.createTokenErrorResponse(e);
         }
-
-        return null;
-
     }
 
     /**
