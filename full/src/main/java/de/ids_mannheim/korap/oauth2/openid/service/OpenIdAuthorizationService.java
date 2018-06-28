@@ -2,6 +2,8 @@ package de.ids_mannheim.korap.oauth2.openid.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +22,9 @@ import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
+import com.nimbusds.openid.connect.sdk.Nonce;
 
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
@@ -53,7 +57,8 @@ public class OpenIdAuthorizationService extends OAuth2AuthorizationService {
     }
 
     public URI requestAuthorizationCode (Map<String, String> map,
-            String username, boolean isAuthentication)
+            String username, boolean isAuthentication,
+            ZonedDateTime authenticationTime)
             throws KustvaktException, ParseException {
 
         AuthorizationCode code = new AuthorizationCode();
@@ -61,15 +66,15 @@ public class OpenIdAuthorizationService extends OAuth2AuthorizationService {
         if (isAuthentication) {
             AuthenticationRequest authRequest = null;
             authRequest = AuthenticationRequest.parse(map);
-            redirectUri =
-                    handleAuthenticationRequest(authRequest, code, username);
+            redirectUri = handleAuthenticationRequest(authRequest, code,
+                    username, authenticationTime);
             return new AuthenticationSuccessResponse(redirectUri, code, null,
                     null, authRequest.getState(), null, null).toURI();
         }
         else {
             AuthorizationRequest authzRequest = AuthorizationRequest.parse(map);
-            redirectUri =
-                    handleAuthorizationRequest(authzRequest, code, username);
+            redirectUri = handleAuthorizationRequest(authzRequest, code,
+                    username, authenticationTime, null);
             return new AuthorizationSuccessResponse(redirectUri, code, null,
                     authzRequest.getState(), null).toURI();
 
@@ -77,7 +82,9 @@ public class OpenIdAuthorizationService extends OAuth2AuthorizationService {
     }
 
     private URI handleAuthorizationRequest (AuthorizationRequest authzRequest,
-            AuthorizationCode code, String username) throws KustvaktException {
+            AuthorizationCode code, String username,
+            ZonedDateTime authenticationTime, String nonce)
+            throws KustvaktException {
 
         URI redirectUri = authzRequest.getRedirectionURI();
         String redirectUriStr =
@@ -102,9 +109,8 @@ public class OpenIdAuthorizationService extends OAuth2AuthorizationService {
             Scope scope = authzRequest.getScope();
             Set<String> scopeSet = (scope != null)
                     ? new HashSet<>(scope.toStringList()) : null;
-
             createAuthorization(username, clientId, redirectUriStr, scopeSet,
-                    code.getValue());
+                    code.getValue(), authenticationTime, nonce);
         }
         catch (KustvaktException e) {
             e.setRedirectUri(redirectUri);
@@ -115,12 +121,89 @@ public class OpenIdAuthorizationService extends OAuth2AuthorizationService {
     }
 
 
+    /**
+     * Kustvakt does not support the following parameters:
+     * <em>claims</em>, <em>requestURI</em>, <em>requestObject</em>,
+     * <em>id_token_hint</em>, and ignores them if they are included
+     * in an authentication request. Kustvakt provides minimum support
+     * for <em>acr_values</em> by not throwing an error when it is
+     * included in an authentication request.
+     * 
+     * <p>Parameters related to user interface are also ignored,
+     * namely <em>display</em>, <em>prompt</em>,
+     * <em>ui_locales</em>, <em>login_hint</em>. However,
+     * <em>display</em>, <em>prompt</em>, and <em>ui_locales</em>
+     * must be supported by Kalamar. The minimum level of
+     * support required for these parameters is simply that its use
+     * must not result in an error.</p>
+     * 
+     * <p>Some Authentication request parameters in addition to
+     * OAuth2.0 authorization parameters according to OpenID connect
+     * core 1.0 Specification:</p>
+     * 
+     * <ul>
+     * 
+     * <li>nonce</li>
+     * <p> OPTIONAL. The value is passed through unmodified from the
+     * Authentication Request to the ID Token.</p>
+     * 
+     * <li>max_age</li>
+     * <p>OPTIONAL. Maximum Authentication Age in seconds. If the
+     * elapsed time is
+     * greater than this value, the OpenID Provider MUST attempt
+     * to actively re-authenticate the End-User. When max_age is used,
+     * the ID Token returned MUST include an auth_time Claim
+     * Value.</p>
+     * 
+     * <li>claims</li>
+     * <p>Support for the claims parameter is OPTIONAL. Should an OP
+     * (openid provider) not support this parameter and an RP (relying
+     * party /client) uses it, the OP SHOULD return a set of Claims to
+     * the RP that it believes would be useful to the RP and the
+     * End-User using whatever heuristics it believes are
+     * appropriate.</p>
+     * 
+     * </ul>
+     * 
+     * @see "OpenID Connect Core 1.0 specification"
+     * 
+     * @param authRequest
+     * @param code
+     * @param username
+     * @param authenticationTime
+     * @return
+     * @throws KustvaktException
+     */
     private URI handleAuthenticationRequest (AuthenticationRequest authRequest,
-            AuthorizationCode code, String username) throws KustvaktException {
+            AuthorizationCode code, String username,
+            ZonedDateTime authenticationTime) throws KustvaktException {
         // TO DO: extra checking for authentication params?
 
+        Nonce nonce = authRequest.getNonce();
+        String nonceValue = null;
+        if (nonce != null && !nonce.getValue().isEmpty()) {
+            nonceValue = nonce.getValue();
+        }
+        
+        checkMaxAge(authRequest.getMaxAge(), authenticationTime);
+
         AuthorizationRequest request = authRequest;
-        return handleAuthorizationRequest(request, code, username);
+        return handleAuthorizationRequest(request, code, username,
+                authenticationTime, nonceValue);
+    }
+    
+    private void checkMaxAge (int maxAge, ZonedDateTime authenticationTime) throws KustvaktException {
+        if (maxAge > 0) {
+            ZonedDateTime now =
+                    ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+
+            if (authenticationTime.plusSeconds(maxAge).isBefore(now)) {
+                throw new KustvaktException(
+                        StatusCodes.USER_REAUTHENTICATION_REQUIRED,
+                        "User reauthentication is required because the authentication "
+                                + "time is too old according to max_age");
+            }
+        }
     }
 
     @Override

@@ -10,6 +10,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.nimbusds.oauth2.sdk.AccessTokenResponse;
@@ -23,6 +24,7 @@ import com.nimbusds.oauth2.sdk.token.BearerTokenError;
 import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import net.minidev.json.JSONObject;
@@ -97,6 +99,12 @@ public class OpenIdResponseHandler extends KustvaktResponseHandler {
         ErrorObject errorObject = createErrorObject(e);
         errorObject = errorObject.setDescription(e.getMessage());
         if (redirectURI == null) {
+            // if (e.getStatusCode()
+            // .equals(StatusCodes.USER_REAUTHENTICATION_REQUIRED)) {
+            // return Response.status(HttpStatus.SC_UNAUTHORIZED)
+            // .entity(e.getMessage()).build();
+            // }
+
             return Response.status(errorObject.getHTTPStatusCode())
                     .entity(errorObject.toJSONObject()).build();
         }
@@ -121,7 +129,13 @@ public class OpenIdResponseHandler extends KustvaktResponseHandler {
 
         ErrorObject errorObject = errorObjectMap.get(errorCode);
         if (errorObject == null) {
-            errorObject = new ErrorObject(e.getEntity(), e.getMessage());
+            if (errorCode != null && !errorCode.isEmpty()
+                    && !errorCode.equals("[]")) {
+                errorObject = new ErrorObject(e.getEntity(), e.getMessage());
+            }
+            else{
+                throw throwit(e);
+            }
         }
         return errorObject;
     }
@@ -167,14 +181,14 @@ public class OpenIdResponseHandler extends KustvaktResponseHandler {
         String jsonString = tokenResponse.toJSONObject().toJSONString();
         return createResponse(status, jsonString);
     }
-    
+
     public Response createResponse (TokenErrorResponse tokenResponse,
             Status status) {
         String jsonString = tokenResponse.toJSONObject().toJSONString();
         return createResponse(status, jsonString);
     }
-    
-    private Response createResponse(Status status, Object entity){
+
+    private Response createResponse (Status status, Object entity) {
         ResponseBuilder builder = Response.status(status);
         builder.entity(entity);
         builder.header(HttpHeaders.CACHE_CONTROL, "no-store");

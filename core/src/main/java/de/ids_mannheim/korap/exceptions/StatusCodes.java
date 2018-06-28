@@ -133,6 +133,7 @@ public class StatusCodes {
     
     public static final int ID_TOKEN_CLAIM_ERROR = 1812;
     public static final int ID_TOKEN_SIGNING_FAILED = 1813;
+    public static final int USER_REAUTHENTICATION_REQUIRED = 1814;
     
 
     /**

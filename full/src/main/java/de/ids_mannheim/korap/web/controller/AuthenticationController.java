@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.web.controller;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Iterator; // 07.02.17/FB
 import java.util.List;
@@ -126,41 +128,42 @@ public class AuthenticationController {
     }
     
     // EM: testing using spring security authentication manager
-    @GET
-    @Path("ldap/token")
-    public Response requestToken (@Context HttpHeaders headers,
-            @Context Locale locale,
-            @HeaderParam(ContainerRequest.USER_AGENT) String agent,
-            @HeaderParam(ContainerRequest.HOST) String host,
-            @HeaderParam("referer-url") String referer,
-            @QueryParam("scope") String scopes,
-            //   @Context WebServiceContext wsContext, // FB
-            @Context SecurityContext securityContext) {
-        
-        Map<String, Object> attr = new HashMap<>();
-        if (scopes != null && !scopes.isEmpty())
-            attr.put(Attributes.SCOPES, scopes);
-        attr.put(Attributes.HOST, host);
-        attr.put(Attributes.USER_AGENT, agent);
-        
-        User user = new KorAPUser();
-        user.setUsername(securityContext.getUserPrincipal().getName());
-        controller.setAccessAndLocation(user, headers);
-        if (DEBUG_LOG == true) System.out.printf(
-                "Debug: /token/: location=%s, access='%s'.\n",
-                user.locationtoString(), user.accesstoString());
-        attr.put(Attributes.LOCATION, user.getLocation());
-        attr.put(Attributes.CORPUS_ACCESS, user.getCorpusAccess());
-        
-        try {
-            TokenContext context = controller.createTokenContext(user, attr,
-                    TokenType.API);
-            return Response.ok(context.toJson()).build();
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
-    }
+//    @Deprecated
+//    @GET
+//    @Path("ldap/token")
+//    public Response requestToken (@Context HttpHeaders headers,
+//            @Context Locale locale,
+//            @HeaderParam(ContainerRequest.USER_AGENT) String agent,
+//            @HeaderParam(ContainerRequest.HOST) String host,
+//            @HeaderParam("referer-url") String referer,
+//            @QueryParam("scope") String scopes,
+//            //   @Context WebServiceContext wsContext, // FB
+//            @Context SecurityContext securityContext) {
+//        
+//        Map<String, Object> attr = new HashMap<>();
+//        if (scopes != null && !scopes.isEmpty())
+//            attr.put(Attributes.SCOPES, scopes);
+//        attr.put(Attributes.HOST, host);
+//        attr.put(Attributes.USER_AGENT, agent);
+//        
+//        User user = new KorAPUser();
+//        user.setUsername(securityContext.getUserPrincipal().getName());
+//        controller.setAccessAndLocation(user, headers);
+//        if (DEBUG_LOG == true) System.out.printf(
+//                "Debug: /token/: location=%s, access='%s'.\n",
+//                user.locationtoString(), user.accesstoString());
+//        attr.put(Attributes.LOCATION, user.getLocation());
+//        attr.put(Attributes.CORPUS_ACCESS, user.getCorpusAccess());
+//        
+//        try {
+//            TokenContext context = controller.createTokenContext(user, attr,
+//                    TokenType.API);
+//            return Response.ok(context.toJson()).build();
+//        }
+//        catch (KustvaktException e) {
+//            throw kustvaktResponseHandler.throwit(e);
+//        }
+//    }
 
 
     @GET
@@ -256,6 +259,13 @@ public class AuthenticationController {
             // Userdata data = this.controller.getUserData(user, UserDetails.class); // Implem. by Hanl
             // todo: is this necessary?
             //            attr.putAll(data.fields());
+            
+            // EM: add authentication time
+            ZonedDateTime authenticationTime =
+                    ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+            attr.put(Attributes.AUTHENTICATION_TIME, authenticationTime);
+            // -- EM
+            
             controller.setAccessAndLocation(user, headers);
             if (DEBUG_LOG == true) System.out.printf(
                     "Debug: /apiToken/: location=%s, access='%s'.\n",

@@ -43,12 +43,15 @@ public class OAuth2AuthorizationService {
      * @param redirectUri
      * @param scopeSet
      * @param code
+     * @param authenticationTime
+     *            user authentication time
+     * @param nonce 
      * @return
      * @throws KustvaktException
      */
     public String createAuthorization (String username, String clientId,
-            String redirectUri, Set<String> scopeSet, String code)
-            throws KustvaktException {
+            String redirectUri, Set<String> scopeSet, String code,
+            ZonedDateTime authenticationTime, String nonce) throws KustvaktException {
 
         if (scopeSet == null || scopeSet.isEmpty()) {
             scopeSet = config.getDefaultAccessScopes();
@@ -56,7 +59,7 @@ public class OAuth2AuthorizationService {
         Set<AccessScope> scopes = scopeService.convertToAccessScope(scopeSet);
 
         authorizationDao.storeAuthorizationCode(clientId, username, code,
-                scopes, redirectUri);
+                scopes, redirectUri, authenticationTime, nonce);
         return String.join(" ", scopeSet);
     }
 

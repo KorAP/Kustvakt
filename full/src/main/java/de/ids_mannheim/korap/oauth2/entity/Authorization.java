@@ -33,12 +33,16 @@ public class Authorization {
     private String userId;
     @Column(name = "redirect_uri")
     private String redirectURI;
-    @Column(name = "created_date", updatable=false)
+    @Column(name = "created_date", updatable = false)
     private ZonedDateTime createdDate;
     @Column(name = "is_revoked")
     private boolean isRevoked;
     @Column(name = "total_attempts")
     private int totalAttempts;
+    @Column(name = "user_auth_time", updatable = false)
+    private ZonedDateTime userAuthenticationTime;
+    @Column(updatable = false)
+    private String nonce;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "oauth2_authorization_scope",
@@ -49,7 +53,7 @@ public class Authorization {
             uniqueConstraints = @UniqueConstraint(
                     columnNames = { "authorization_id", "scope_id" }))
     private Set<AccessScope> scopes;
-    
+
     @Override
     public String toString () {
         return "code: " + code + ", " + "clientId: " + clientId + ", "

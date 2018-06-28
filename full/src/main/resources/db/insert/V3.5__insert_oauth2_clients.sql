@@ -33,9 +33,9 @@ VALUES ("iBr3LsTCxOj7D2o0A5m","test public client",null,
   "This is a test native public client."); 
   
   
-INSERT INTO oauth2_access_token(token,user_id)
-VALUES("249c64a77f40e2b5504982cc5521b596","dory");
+INSERT INTO oauth2_access_token(token,user_id, user_auth_time)
+VALUES("249c64a77f40e2b5504982cc5521b596","dory","2018-05-30 16:24:10");
 
-INSERT INTO oauth2_access_token(token,user_id,created_date)
-VALUES("fia0123ikBWn931470H8s5gRqx7Moc4p","marlin","2018-05-30 16:25:50")
-  
+INSERT INTO oauth2_access_token(token,user_id,created_date, user_auth_time)
+VALUES("fia0123ikBWn931470H8s5gRqx7Moc4p","marlin","2018-05-30 16:25:50",
+"2018-05-30 16:23:10");

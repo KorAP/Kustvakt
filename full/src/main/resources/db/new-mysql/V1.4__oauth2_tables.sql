@@ -24,6 +24,8 @@ CREATE TABLE IF NOT EXISTS oauth2_authorization (
 	created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	is_revoked BOOLEAN DEFAULT 0,
 	total_attempts INTEGER DEFAULT 0,
+	user_auth_time TIMESTAMP NOT NULL,
+	nonce TEXT DEFAULT NULL,
 	FOREIGN KEY (client_id)
 	   REFERENCES oauth2_client(id),
 	UNIQUE INDEX authorization_index(code, client_id)
@@ -52,6 +54,7 @@ CREATE TABLE IF NOT EXISTS oauth2_access_token (
 	created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	is_revoked BOOLEAN DEFAULT 0,
 	total_attempts INTEGER DEFAULT 0,
+	user_auth_time TIMESTAMP NOT NULL,
 	FOREIGN KEY (authorization_id)
 	   REFERENCES oauth2_authorization(id)
 );

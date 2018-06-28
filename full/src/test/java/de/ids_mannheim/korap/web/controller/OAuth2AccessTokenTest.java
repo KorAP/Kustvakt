@@ -25,18 +25,9 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class OAuth2AccessTokenTest extends SpringJerseyTest {
 
     // test access token for username: dory
-    private static String testAccessToken;
-
-    @BeforeClass
-    public static void init () throws IOException {
-        InputStream is = OAuth2AccessTokenTest.class.getClassLoader()
-                .getResourceAsStream("test-oauth2.token");
-
-        try (BufferedReader reader =
-                new BufferedReader(new InputStreamReader(is));) {
-            testAccessToken = reader.readLine();
-        }
-    }
+    // see:
+    // full/src/main/resources/db/insert/V3.5__insert_oauth2_clients.sql
+    private static String testAccessToken = "249c64a77f40e2b5504982cc5521b596";
 
     @Test
     public void testListVC () throws KustvaktException {
@@ -84,7 +75,8 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Access token is not found", node.at("/errors/0/1").asText());
+        assertEquals("Access token is not found",
+                node.at("/errors/0/1").asText());
     }
 
     @Test
@@ -97,12 +89,13 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
-        
+
         assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
                 response.getStatus());
 
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(StatusCodes.EXPIRED, node.at("/errors/0/0").asInt());
-        assertEquals("Access token is expired", node.at("/errors/0/1").asText());
+        assertEquals("Access token is expired",
+                node.at("/errors/0/1").asText());
     }
 }

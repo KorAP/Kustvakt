@@ -27,7 +27,8 @@ public class KustvaktResponseHandler extends CoreResponseHandler {
     public WebApplicationException throwit (KustvaktException e) {
         Response r;
 
-        if (e.getStatusCode() == StatusCodes.AUTHORIZATION_FAILED
+        if (e.getStatusCode() == StatusCodes.USER_REAUTHENTICATION_REQUIRED
+                || e.getStatusCode() == StatusCodes.AUTHORIZATION_FAILED
                 || e.getStatusCode() >= StatusCodes.AUTHENTICATION_FAILED) {
             String notification = buildNotification(e.getStatusCode(),
                     e.getMessage(), e.getEntity());
@@ -38,8 +39,10 @@ public class KustvaktResponseHandler extends CoreResponseHandler {
                     .entity(e.getNotification()).build();
         }
         else {
+            String notification = buildNotification(e.getStatusCode(),
+                    e.getMessage(), e.getEntity());
             r = Response.status(getStatus(e.getStatusCode()))
-                    .entity(buildNotification(e)).build();
+                    .entity(notification).build();
         }
         return new WebApplicationException(r);
     }

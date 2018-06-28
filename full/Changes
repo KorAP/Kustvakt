@@ -8,8 +8,10 @@ version 0.60.4
     - added state to OAuth2 authorization error response (margaretha)
     - implemented OpenID token service for authorization code flow (margaretha)
     - implemented signed OpenID token with default algorithm RSA256 (margaretha)
-    - added JSON Web Key (JWK) set web-controller listing kustvakt public keys (margaretha)
+    - implemented JSON Web Key (JWK) set web-controller listing kustvakt public keys (margaretha)
     - implemented OpenId configuration (margaretha) 
+    - added authentication time and support for auth_time in id_token (margaretha)
+    - implemented support for nonce and max_age parameters in OpenID authentication (margaretha)
     
 version 0.60.3
 06/06/2018

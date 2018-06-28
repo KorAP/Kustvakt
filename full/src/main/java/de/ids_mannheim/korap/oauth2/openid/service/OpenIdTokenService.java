@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.oauth2.openid.service;
 
 import java.net.URI;
 import java.security.PrivateKey;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Set;
@@ -33,6 +34,7 @@ import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import com.nimbusds.oauth2.sdk.token.Tokens;
+import com.nimbusds.openid.connect.sdk.Nonce;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import com.nimbusds.openid.connect.sdk.claims.IDTokenClaimsSet;
 import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
@@ -114,7 +116,9 @@ public class OpenIdTokenService extends OAuth2TokenService {
 
         if (scope.contains("openid")) {
             JWTClaimsSet claims = createIdTokenClaims(
-                    authorization.getClientId(), authorization.getUserId());
+                    authorization.getClientId(), authorization.getUserId(),
+                    authorization.getUserAuthenticationTime(),
+                    authorization.getNonce());
             SignedJWT idToken = signIdToken(claims,
                     // default
                     new JWSHeader(JWSAlgorithm.RS256),
@@ -157,7 +161,8 @@ public class OpenIdTokenService extends OAuth2TokenService {
         return new String[] { clientId, clientSecret };
     }
 
-    private JWTClaimsSet createIdTokenClaims (String client_id, String username)
+    private JWTClaimsSet createIdTokenClaims (String client_id, String username,
+            ZonedDateTime authenticationTime, String nonce)
             throws KustvaktException {
         // A locally unique and never reassigned identifier within the
         // Issuer for the End-User
@@ -172,6 +177,13 @@ public class OpenIdTokenService extends OAuth2TokenService {
 
         IDTokenClaimsSet claims =
                 new IDTokenClaimsSet(iss, sub, audList, exp, iat);
+
+        Date authTime = Date.from(authenticationTime.toInstant());
+        claims.setAuthenticationTime(authTime);
+        if (nonce != null && !nonce.isEmpty()) {
+            claims.setNonce(new Nonce(nonce));
+        }
+
         try {
             return claims.toJWTClaimsSet();
         }

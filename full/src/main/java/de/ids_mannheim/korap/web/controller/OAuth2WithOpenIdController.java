@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.web.controller;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,7 +56,7 @@ public class OAuth2WithOpenIdController {
     private JWKService jwkService;
     @Autowired
     private OpenIdConfigService configService;
-    
+
     @Autowired
     private OpenIdResponseHandler openIdResponseHandler;
 
@@ -64,11 +65,12 @@ public class OAuth2WithOpenIdController {
      * 
      * <ul>
      * <li>scope: MUST contain "openid" for OpenID Connect
-     * requests,</li>
-     * <li>response_type,</li>
-     * <li>client_id,</li>
+     * requests</li>
+     * <li>response_type: only "code" is supported</li>
+     * <li>client_id: client identifier given by Kustvakt during
+     * client registration</li>
      * <li>redirect_uri: MUST match a pre-registered redirect uri
-     * during client registration.</li>
+     * during client registration</li>
      * </ul>
      * 
      * Other parameters:
@@ -77,7 +79,7 @@ public class OAuth2WithOpenIdController {
      * <li>state (recommended): Opaque value used to maintain state
      * between the request and the callback.</li>
      * <li>response_mode (optional) : mechanism to be used for
-     * returning parameters</li>
+     * returning parameters, only "query" is supported</li>
      * <li>nonce (optional): String value used to associate a Client
      * session with an ID Token,
      * and to mitigate replay attacks. </li>
@@ -120,6 +122,7 @@ public class OAuth2WithOpenIdController {
 
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
         String username = tokenContext.getUsername();
+        ZonedDateTime authTime = tokenContext.getAuthenticationTime();
 
         Map<String, String> map = MapUtils.toMap(form);
         State state = authzService.retrieveState(map);
@@ -136,7 +139,7 @@ public class OAuth2WithOpenIdController {
                 authzService.checkRedirectUriParam(map);
             }
             uri = authzService.requestAuthorizationCode(map, username,
-                    isAuthentication);
+                    isAuthentication, authTime);
         }
         catch (ParseException e) {
             return openIdResponseHandler.createAuthorizationErrorResponse(e,
@@ -213,7 +216,8 @@ public class OAuth2WithOpenIdController {
     /**
      * When supporting discovery, must be available at
      * {issuer_uri}/.well-known/openid-configuration
-     * @return 
+     * 
+     * @return
      * 
      * @return
      */

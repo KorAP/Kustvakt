@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.oauth2.dao;
 
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -38,16 +39,22 @@ public class AccessTokenDao {
         accessToken.setUserId(authorization.getUserId());
         accessToken.setToken(token);
         accessToken.setScopes(authorization.getScopes());
+        accessToken.setUserAuthenticationTime(
+                authorization.getUserAuthenticationTime());
         entityManager.persist(accessToken);
     }
 
     public void storeAccessToken (String token, Set<AccessScope> scopes,
-            String userId) throws KustvaktException {
+            String userId, ZonedDateTime authenticationTime)
+            throws KustvaktException {
         ParameterChecker.checkObjectValue(scopes, "scopes");
+        ParameterChecker.checkObjectValue(authenticationTime,
+                "authentication time");
         AccessToken accessToken = new AccessToken();
         accessToken.setToken(token);
         accessToken.setScopes(scopes);
         accessToken.setUserId(userId);
+        accessToken.setUserAuthenticationTime(authenticationTime);
         entityManager.persist(accessToken);
     }
 

@@ -18,6 +18,7 @@ import org.joda.time.DateTime;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +77,8 @@ public class JWTSigner {
             csBuilder.audience((String) attr.get(Attributes.CLIENT_ID));
         }
         csBuilder.expirationTime(TimeUtils.getNow().plusSeconds(ttl).toDate());
+        csBuilder.claim(Attributes.AUTHENTICATION_TIME,
+                attr.get(Attributes.AUTHENTICATION_TIME));
         SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256),
                 csBuilder.build());
         try {
@@ -183,6 +186,8 @@ public class JWTSigner {
                     signedJWT.getJWTClaimsSet().getAudience().get(0));
         c.setExpirationTime(
                 signedJWT.getJWTClaimsSet().getExpirationTime().getTime());
+        c.setAuthenticationTime((ZonedDateTime) signedJWT.getJWTClaimsSet()
+                .getClaim(Attributes.AUTHENTICATION_TIME));
         c.setToken(idtoken);
         c.addParams(signedJWT.getJWTClaimsSet().getClaims());
         return c;

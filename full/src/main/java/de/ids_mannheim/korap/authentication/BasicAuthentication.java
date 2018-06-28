@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.authentication;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +21,15 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 
-/** 
- * Implementation of encoding and decoding access token is moved to 
- * {@link TransferEncoding}. Moreover, implementation of HTTP 
- * Authentication framework, i.e. creation of authorization header, 
- * is defined in {@link HttpAuthorizationHandler}. 
+/**
+ * Implementation of encoding and decoding access token is moved to
+ * {@link TransferEncoding}. Moreover, implementation of HTTP
+ * Authentication framework, i.e. creation of authorization header,
+ * is defined in {@link HttpAuthorizationHandler}.
  * 
- * Basic authentication is intended to be used with a database. It is 
- * currently only used for testing using a dummy DAO (@see {@link UserDao}) 
+ * Basic authentication is intended to be used with a database. It is
+ * currently only used for testing using a dummy DAO (@see
+ * {@link UserDao})
  * without passwords.
  * 
  * <br /><br />
@@ -49,8 +52,8 @@ public class BasicAuthentication implements AuthenticationIface {
     private TransferEncoding transferEncoding;
     @Autowired
     private FullConfiguration config;
-//    @Autowired
-//    private EncryptionIface crypto;
+    // @Autowired
+    // private EncryptionIface crypto;
     @Autowired
     private UserDao dao;
 
@@ -59,10 +62,13 @@ public class BasicAuthentication implements AuthenticationIface {
             throws KustvaktException {
         String[] values = transferEncoding.decodeBase64(authToken);
         User user = dao.getAccount(values[0]);
+        ZonedDateTime authenticationTime =
+                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
         
         if (user != null) {
             TokenContext c = new TokenContext();
             c.setUsername(values[0]);
+            c.setAuthenticationTime(authenticationTime);
             c.setExpirationTime(TimeUtils.plusSeconds(this.config.getTokenTTL())
                     .getMillis());
             c.setTokenType(getTokenType());
@@ -70,7 +76,8 @@ public class BasicAuthentication implements AuthenticationIface {
             c.setSecureRequired(false);
             // EM: is this secure?
             c.setToken(StringUtils.stripTokenType(authToken));
-            //            fixme: you can make queries, but user sensitive data is off limits?!
+            // fixme: you can make queries, but user sensitive data is
+            // off limits?!
             c.addContextParameter(Attributes.SCOPES,
                     Scopes.Scope.search.toString());
             return c;

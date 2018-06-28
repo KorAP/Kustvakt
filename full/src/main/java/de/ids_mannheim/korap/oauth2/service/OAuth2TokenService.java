@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.oauth2.service;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -101,12 +103,11 @@ public class OAuth2TokenService {
      * @param clientSecret
      *            client_secret, required if client_secret was issued
      *            for the client in client registration.
-     * @return an OAuthResponse containing an access token if
-     *         successful
+     * @return authentication time
      * @throws KustvaktException
      * @throws OAuthSystemException
      */
-    protected void requestAccessTokenWithPassword (String username,
+    protected ZonedDateTime requestAccessTokenWithPassword (String username,
             String password, Set<String> scopes, String clientId,
             String clientSecret) throws KustvaktException {
 
@@ -118,11 +119,11 @@ public class OAuth2TokenService {
                     OAuth2Error.UNAUTHORIZED_CLIENT);
         }
 
-        authenticateUser(username, password, scopes);
+        return authenticateUser(username, password, scopes);
         // verify or limit scopes ?
     }
 
-    public void authenticateUser (String username, String password,
+    public ZonedDateTime authenticateUser (String username, String password,
             Set<String> scopes) throws KustvaktException {
         if (username == null || username.isEmpty()) {
             throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
@@ -140,6 +141,10 @@ public class OAuth2TokenService {
         authenticationManager.authenticate(
                 config.getOAuth2passwordAuthentication(), username, password,
                 attributes);
+
+        ZonedDateTime authenticationTime =
+                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+        return authenticationTime;
     }
 
     /**
@@ -151,12 +156,11 @@ public class OAuth2TokenService {
      * @param clientSecret
      *            client_secret parameter, required
      * @param scopes
-     * @return an OAuthResponse containing an access token if
-     *         successful
+     * @return authentication time
      * @throws KustvaktException
      * @throws OAuthSystemException
      */
-    protected Set<String> requestAccessTokenWithClientCredentials (
+    protected ZonedDateTime requestAccessTokenWithClientCredentials (
             String clientId, String clientSecret, Set<String> scopes)
             throws KustvaktException {
 
@@ -170,17 +174,16 @@ public class OAuth2TokenService {
         // OAuth2Client client =
         clientService.authenticateClient(clientId, clientSecret);
 
-        // if (client.isNative()) {
+        // if (!client.isNative()) {
         // throw new KustvaktException(
         // StatusCodes.CLIENT_AUTHENTICATION_FAILED,
         // "Client credentials grant is not allowed for third party
         // clients",
         // OAuth2Error.UNAUTHORIZED_CLIENT);
         // }
-
-        scopes = scopeService.filterScopes(scopes,
-                config.getClientCredentialsScopes());
-        return scopes;
+        ZonedDateTime authenticationTime =
+                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+        return authenticationTime;
     }
 
 

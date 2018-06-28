@@ -37,6 +37,8 @@ public class AccessToken {
     private boolean isRevoked;
     @Column(name = "total_attempts")
     private int totalAttempts;
+    @Column(name = "user_auth_time", updatable = false)
+    private ZonedDateTime userAuthenticationTime;
     
     @OneToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="authorization_id")

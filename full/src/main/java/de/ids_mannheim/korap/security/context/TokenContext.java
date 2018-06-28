@@ -1,6 +1,8 @@
 package de.ids_mannheim.korap.security.context;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,7 +12,6 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.User.UserFactory;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.AccessLevel;
@@ -19,12 +20,17 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
+ * EM: 
+ * - change datatype of tokenType from string to enum
+ * - added authenticationTime
+ * 
  * @author hanl
  * @date 27/01/2014
  */
 @Data
 public class TokenContext implements java.security.Principal, Serializable {
 
+    private ZonedDateTime authenticationTime;
     /**
      * session relevant data. Are never persisted into a database
      */
@@ -71,8 +77,9 @@ public class TokenContext implements java.security.Principal, Serializable {
     public boolean match (TokenContext other) {
         if (other.getToken().equals(this.token))
             if (this.getHostAddress().equals(this.hostAddress))
-                // user agent should be irrelvant -- what about os system version?
-                //                if (other.getUserAgent().equals(this.userAgent))
+                // user agent should be irrelvant -- what about os
+                // system version?
+                // if (other.getUserAgent().equals(this.userAgent))
                 return true;
         return false;
     }
@@ -99,7 +106,7 @@ public class TokenContext implements java.security.Principal, Serializable {
     }
 
 
-    //todo: complete
+    // todo: complete
     public static TokenContext fromJSON (String s) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(s);
         TokenContext c = new TokenContext();
@@ -116,11 +123,10 @@ public class TokenContext implements java.security.Principal, Serializable {
         TokenContext c = new TokenContext();
         if (node != null) {
             c.setToken(node.path("token").asText());
-            c.setTokenType(TokenType.valueOf(
-                    node.path("token_type").asText()));
+            c.setTokenType(TokenType.valueOf(node.path("token_type").asText()));
             c.setExpirationTime(node.path("expires_in").asLong());
-            c.addContextParameter("refresh_token", node.path("refresh_token")
-                    .asText());
+            c.addContextParameter("refresh_token",
+                    node.path("refresh_token").asText());
 
         }
         return c;
@@ -139,12 +145,12 @@ public class TokenContext implements java.security.Principal, Serializable {
     }
 
 
-    public String toJson() throws KustvaktException {
+    public String toJson () throws KustvaktException {
         return JsonUtils.toJSON(this.statusMap());
     }
 
 
-    public boolean isDemo() {
+    public boolean isDemo () {
         return User.UserFactory.isDemo(this.username);
     }
 
@@ -153,6 +159,16 @@ public class TokenContext implements java.security.Principal, Serializable {
     @Override
     public String getName () {
         return this.getUsername();
+    }
+
+
+    public ZonedDateTime getAuthenticationTime () {
+        return authenticationTime;
+    }
+
+
+    public void setAuthenticationTime (ZonedDateTime authTime) {
+        this.authenticationTime = authTime;
     }
 
 }

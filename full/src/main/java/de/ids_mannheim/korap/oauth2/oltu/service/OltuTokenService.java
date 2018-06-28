@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.oauth2.oltu.service;
 
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 import javax.ws.rs.core.Response.Status;
@@ -47,17 +48,24 @@ public class OltuTokenService extends OAuth2TokenService {
             return createsAccessTokenResponse(authorization);
         }
         else if (grantType.equals(GrantType.PASSWORD.toString())) {
-            requestAccessTokenWithPassword(oAuthRequest.getUsername(),
-                    oAuthRequest.getPassword(), oAuthRequest.getScopes(),
-                    oAuthRequest.getClientId(), oAuthRequest.getClientSecret());
+            ZonedDateTime authenticationTime = requestAccessTokenWithPassword(
+                    oAuthRequest.getUsername(), oAuthRequest.getPassword(),
+                    oAuthRequest.getScopes(), oAuthRequest.getClientId(),
+                    oAuthRequest.getClientSecret());
             return createsAccessTokenResponse(oAuthRequest.getScopes(),
-                    oAuthRequest.getUsername());
+                    oAuthRequest.getUsername(), authenticationTime);
         }
         else if (grantType.equals(GrantType.CLIENT_CREDENTIALS.toString())) {
-             Set<String> scopes = requestAccessTokenWithClientCredentials(
-                    oAuthRequest.getClientId(), oAuthRequest.getClientSecret(),
-                    oAuthRequest.getScopes());
-            return createsAccessTokenResponse(scopes, null);
+            ZonedDateTime authenticationTime =
+                    requestAccessTokenWithClientCredentials(
+                            oAuthRequest.getClientId(),
+                            oAuthRequest.getClientSecret(),
+                            oAuthRequest.getScopes());
+
+            Set<String> scopes =
+                    scopeService.filterScopes(oAuthRequest.getScopes(),
+                            config.getClientCredentialsScopes());
+            return createsAccessTokenResponse(scopes, null, authenticationTime);
         }
         else {
             throw new KustvaktException(StatusCodes.UNSUPPORTED_GRANT_TYPE,
@@ -71,19 +79,23 @@ public class OltuTokenService extends OAuth2TokenService {
      * Creates an OAuthResponse containing an access token and a
      * refresh token with type Bearer.
      * 
+     * @param authenticationTime
+     * 
      * @return an OAuthResponse containing an access token
      * @throws OAuthSystemException
      * @throws KustvaktException
      */
     private OAuthResponse createsAccessTokenResponse (Set<String> scopes,
-            String userId) throws OAuthSystemException, KustvaktException {
+            String userId, ZonedDateTime authenticationTime)
+            throws OAuthSystemException, KustvaktException {
 
         String accessToken = oauthIssuer.accessToken();
         // String refreshToken = oauthIssuer.refreshToken();
 
         Set<AccessScope> accessScopes =
                 scopeService.convertToAccessScope(scopes);
-        tokenDao.storeAccessToken(accessToken, accessScopes, userId);
+        tokenDao.storeAccessToken(accessToken, accessScopes, userId,
+                authenticationTime);
 
         return OAuthASResponse.tokenResponse(Status.OK.getStatusCode())
                 .setAccessToken(accessToken)

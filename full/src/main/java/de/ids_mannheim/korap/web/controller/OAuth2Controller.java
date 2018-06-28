@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.web.controller;
 
+import java.time.ZonedDateTime;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
@@ -79,6 +81,7 @@ public class OAuth2Controller {
 
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
         String username = tokenContext.getUsername();
+        ZonedDateTime authTime = tokenContext.getAuthenticationTime();
 
         HttpServletRequest requestWithForm =
                 new FormRequestWrapper(request, form);
@@ -86,7 +89,7 @@ public class OAuth2Controller {
             OAuth2AuthorizationRequest authzRequest =
                     new OAuth2AuthorizationRequest(requestWithForm);
             String uri = authorizationService.requestAuthorizationCode(
-                    requestWithForm, authzRequest, username);
+                    requestWithForm, authzRequest, username, authTime);
             return responseHandler.sendRedirect(uri);
         }
         catch (OAuthSystemException e) {

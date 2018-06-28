@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.oauth2.dao;
 
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -29,19 +30,23 @@ public class AuthorizationDao {
     private EntityManager entityManager;
 
     public Authorization storeAuthorizationCode (String clientId, String userId,
-            String code, Set<AccessScope> scopes, String redirectURI)
-            throws KustvaktException {
+            String code, Set<AccessScope> scopes, String redirectURI,
+            ZonedDateTime authenticationTime, String nonce) throws KustvaktException {
         ParameterChecker.checkStringValue(clientId, "client_id");
         ParameterChecker.checkStringValue(userId, "userId");
         ParameterChecker.checkStringValue(code, "authorization code");
         ParameterChecker.checkCollection(scopes, "scopes");
-        
+        ParameterChecker.checkObjectValue(authenticationTime,
+                "user authentication time");
+
         Authorization authCode = new Authorization();
         authCode.setCode(code);
         authCode.setClientId(clientId);
         authCode.setUserId(userId);
         authCode.setScopes(scopes);
         authCode.setRedirectURI(redirectURI);
+        authCode.setUserAuthenticationTime(authenticationTime);
+        authCode.setNonce(nonce);
 
         entityManager.persist(authCode);
         // what if unique fails

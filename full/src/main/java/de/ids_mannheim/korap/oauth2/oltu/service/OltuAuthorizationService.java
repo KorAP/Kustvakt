@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.oauth2.oltu.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.ZonedDateTime;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -40,6 +41,7 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
      * @param request
      * @param authzRequest
      * @param username
+     * @param authTime
      * @return redirect URI containing authorization code if
      *         successful.
      * 
@@ -47,7 +49,8 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
      * @throws OAuthSystemException
      */
     public String requestAuthorizationCode (HttpServletRequest request,
-            OAuthAuthzRequest authzRequest, String username)
+            OAuthAuthzRequest authzRequest, String username,
+            ZonedDateTime authenticationTime)
             throws OAuthSystemException, KustvaktException {
 
         String code = oauthIssuer.authorizationCode();
@@ -71,7 +74,8 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
         String scope;
         try {
             scope = createAuthorization(username, authzRequest.getClientId(),
-                    redirectUri, authzRequest.getScopes(), code);
+                    redirectUri, authzRequest.getScopes(), code,
+                    authenticationTime, null);
         }
         catch (KustvaktException e) {
             e.setRedirectUri(redirectURI);

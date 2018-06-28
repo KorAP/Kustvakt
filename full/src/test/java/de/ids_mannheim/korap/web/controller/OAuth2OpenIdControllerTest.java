@@ -13,6 +13,7 @@ import java.util.Date;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.http.HttpStatus;
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.junit.Test;
@@ -27,6 +28,7 @@ import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
@@ -38,6 +40,7 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
@@ -185,7 +188,6 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
             throws KustvaktException {
 
         ClientResponse response = sendAuthorizationRequest(form);
-        System.out.println(response.getEntity(String.class));
         URI location = response.getLocation();
         assertEquals(MediaType.APPLICATION_FORM_URLENCODED,
                 response.getType().toString());
@@ -254,21 +256,54 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
     }
 
     @Test
+    public void testRequestAuthorizationCodeAuthenticationTooOld ()
+            throws KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("response_type", "code");
+        form.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        form.add("redirect_uri", redirectUri);
+        form.add("scope", "openid");
+        form.add("max_age", "1800");
+
+        ClientResponse response =
+                resource().path("oauth2").path("openid").path("authorize")
+                        .header(Attributes.AUTHORIZATION,
+                                "Bearer 249c64a77f40e2b5504982cc5521b596")
+                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                        .header(HttpHeaders.CONTENT_TYPE,
+                                ContentType.APPLICATION_FORM_URLENCODED)
+                        .entity(form).post(ClientResponse.class);
+
+        assertEquals(HttpStatus.SC_UNAUTHORIZED, response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.USER_REAUTHENTICATION_REQUIRED,
+                node.at("/errors/0/0").asInt());
+        assertEquals(
+                "User reauthentication is required because the authentication "
+                        + "time is too old according to max_age",
+                node.at("/errors/0/1").asText());
+    }
+
+    @Test
     public void testRequestAccessToken ()
             throws KustvaktException, ParseException, InvalidKeySpecException,
             NoSuchAlgorithmException, JOSEException {
         String client_id = "fCBbQkAyYzI4NzUxMg";
+        String nonce = "thisIsMyNonce";
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("response_type", "code");
         form.add("client_id", client_id);
         form.add("redirect_uri", redirectUri);
         form.add("scope", "openid");
         form.add("state", "thisIsMyState");
+        form.add("nonce", nonce);
 
         ClientResponse response = sendAuthorizationRequest(form);
         URI location = response.getLocation();
         MultiValueMap<String, String> params =
                 UriComponentsBuilder.fromUri(location).build().getQueryParams();
+        assertEquals("thisIsMyState", params.getFirst("state"));
         String code = params.getFirst("code");
 
         MultivaluedMap<String, String> tokenForm = new MultivaluedMapImpl();
@@ -280,7 +315,6 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
 
         ClientResponse tokenResponse = sendTokenRequest(tokenForm);
         String entity = tokenResponse.getEntity(String.class);
-        // System.out.println(entity);
 
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
@@ -291,12 +325,12 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         String id_token = node.at("/id_token").asText();
         assertNotNull(id_token);
 
-        verifyingIdToken(id_token, username, client_id);
+        verifyingIdToken(id_token, username, client_id, nonce);
     }
 
     private void verifyingIdToken (String id_token, String username,
-            String client_id) throws ParseException, InvalidKeySpecException,
-            NoSuchAlgorithmException, JOSEException {
+            String client_id, String nonce) throws ParseException,
+            InvalidKeySpecException, NoSuchAlgorithmException, JOSEException {
         JWKSet keySet = config.getPublicKeySet();
         RSAKey publicKey = (RSAKey) keySet.getKeyByKeyId(config.getRsaKeyId());
 
@@ -304,13 +338,13 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         JWSVerifier verifier = new RSASSAVerifier(publicKey);
         assertTrue(signedJWT.verify(verifier));
 
-        assertEquals(client_id,
-                signedJWT.getJWTClaimsSet().getAudience().get(0));
-        assertEquals(username, signedJWT.getJWTClaimsSet().getSubject());
-        assertEquals(config.getIssuerURI().toString(),
-                signedJWT.getJWTClaimsSet().getIssuer());
-        assertTrue(new Date()
-                .before(signedJWT.getJWTClaimsSet().getExpirationTime()));
+        JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
+        assertEquals(client_id, claimsSet.getAudience().get(0));
+        assertEquals(username, claimsSet.getSubject());
+        assertEquals(config.getIssuerURI().toString(), claimsSet.getIssuer());
+        assertTrue(new Date().before(claimsSet.getExpirationTime()));
+        assertNotNull(claimsSet.getClaim(Attributes.AUTHENTICATION_TIME));
+        assertEquals(nonce, claimsSet.getClaim("nonce"));
     }
 
     @Test
@@ -319,14 +353,14 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
                 .path("jwks").get(ClientResponse.class);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(1,node.at("/keys").size());
+        assertEquals(1, node.at("/keys").size());
         node = node.at("/keys/0");
         assertEquals("RSA", node.at("/kty").asText());
         assertEquals(config.getRsaKeyId(), node.at("/kid").asText());
         assertNotNull(node.at("/e").asText());
         assertNotNull(node.at("/n").asText());
     }
- 
+
     @Test
     public void testOpenIDConfiguration () throws KustvaktException {
         ClientResponse response = resource().path("oauth2").path("openid")
