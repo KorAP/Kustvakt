@@ -301,16 +301,23 @@ public class LiteService {
             @QueryParam("corpusQuery") String collectionQuery) {
 
         KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
-        builder.with(collectionQuery);
-        String json;
-        try {
-            json = builder.toJSON();
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
 
-        String stats = searchKrill.getStatistics(json);
+		String stats;
+		if (collectionQuery != null && !collectionQuery.equals("")) {
+			builder.with(collectionQuery);
+			String json;
+			try {
+				json = builder.toJSON();
+			}
+			catch (KustvaktException e) {
+				throw kustvaktResponseHandler.throwit(e);
+			}
+			stats = searchKrill.getStatistics(json);
+		}
+		else {
+			stats = searchKrill.getStatistics(null);
+		};
+
         if (stats.contains("-1"))
             throw kustvaktResponseHandler.throwit(StatusCodes.NO_RESULT_FOUND);
         jlog.debug("Stats: " + stats);
