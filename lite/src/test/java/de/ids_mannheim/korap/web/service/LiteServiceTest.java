@@ -77,6 +77,35 @@ public class LiteServiceTest extends JerseyTest{
         assertEquals(514, node.at("/paragraphs").asInt());
     }
 
+	@Test
+    public void testEmptyStatistics () throws KustvaktException{
+        ClientResponse response = resource()
+			.path("statistics")
+			.queryParam("corpusQuery", "")
+			.method("GET", ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String query = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(query);
+        assertEquals(11, node.at("/documents").asInt());
+        assertEquals(665842, node.at("/tokens").asInt());
+        assertEquals(25074, node.at("/sentences").asInt());
+        assertEquals(772, node.at("/paragraphs").asInt());
+
+		response = resource()
+                .path("statistics")
+                .method("GET", ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+		query = response.getEntity(String.class);
+		node = JsonUtils.readTree(query);
+        assertEquals(11, node.at("/documents").asInt());
+        assertEquals(665842, node.at("/tokens").asInt());
+        assertEquals(25074, node.at("/sentences").asInt());
+        assertEquals(772, node.at("/paragraphs").asInt());
+	}
+
+	
     @Test
     public void testGetJSONQuery () throws KustvaktException{
         ClientResponse response = resource()
