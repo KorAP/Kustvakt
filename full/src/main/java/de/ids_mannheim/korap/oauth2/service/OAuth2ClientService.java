@@ -50,9 +50,7 @@ public class OAuth2ClientService {
     @Autowired
     private AdminDao adminDao;
     @Autowired
-    private UrlValidator urlValidator;
-    @Autowired
-    private UrlValidator httpsValidator;
+    private UrlValidator redirectURIValidator;
     @Autowired
     private EncryptionIface encryption;
     @Autowired
@@ -60,18 +58,12 @@ public class OAuth2ClientService {
 
     public OAuth2ClientDto registerClient (OAuth2ClientJson clientJson,
             String registeredBy) throws KustvaktException {
-        if (!urlValidator.isValid(clientJson.getUrl())) {
+        if (!redirectURIValidator.isValid(clientJson.getUrl())) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     clientJson.getUrl() + " is invalid.",
                     OAuth2Error.INVALID_REQUEST);
         }
-        if (!httpsValidator.isValid(clientJson.getRedirectURI())) {
-            throw new KustvaktException(StatusCodes.HTTPS_REQUIRED,
-                    clientJson.getRedirectURI()
-                            + " is invalid. RedirectURI requires https.",
-                    OAuth2Error.INVALID_REQUEST);
-        }
-
+        
         boolean isNative = isNativeClient(clientJson.getUrl(),
                 clientJson.getRedirectURI());
 

@@ -1,11 +1,25 @@
 package de.ids_mannheim.korap.config;
 
-import com.nimbusds.jose.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.ParseException;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
+
+import org.joda.time.DateTime;
+
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTClaimsSet.Builder;
 import com.nimbusds.jwt.SignedJWT;
+
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.security.context.TokenContext;
@@ -13,15 +27,6 @@ import de.ids_mannheim.korap.user.GenericUserData;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.Userdata;
 import de.ids_mannheim.korap.utils.TimeUtils;
-import org.joda.time.DateTime;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.ParseException;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author hanl

@@ -178,12 +178,15 @@
 	</bean>
 
 	<!-- URLValidator -->
-	<bean id="urlValidator" class="org.apache.commons.validator.routines.UrlValidator">
-		<constructor-arg value="http,https" />
+	<bean id="redirectURIValidator" class="org.apache.commons.validator.routines.UrlValidator">
+		<constructor-arg value="http,https" index="0" />
+		<constructor-arg index="1" type="long">
+			<util:constant
+				static-field="org.apache.commons.validator.routines.UrlValidator.NO_FRAGMENTS" />
+		</constructor-arg>
 	</bean>
-	<bean id="httpsValidator" class="org.apache.commons.validator.routines.UrlValidator">
-		<constructor-arg value="https" />
-	</bean>
+	<!-- <bean id="httpsValidator" class="org.apache.commons.validator.routines.UrlValidator"> 
+		<constructor-arg value="https" /> </bean> -->
 
 	<bean id="kustvakt_rewrite" class="de.ids_mannheim.korap.rewrite.FullRewriteHandler">
 		<constructor-arg ref="kustvakt_config" />
@@ -252,10 +255,10 @@
 		<constructor-arg type="de.ids_mannheim.korap.interfaces.EncryptionIface"
 			ref="kustvakt_encryption" />
 	</bean>
-	
+
 	<bean id="oauth2_auth"
 		class="de.ids_mannheim.korap.authentication.OAuth2Authentication" />
-	
+
 
 	<util:list id="kustvakt_authproviders"
 		value-type="de.ids_mannheim.korap.interfaces.AuthenticationIface">

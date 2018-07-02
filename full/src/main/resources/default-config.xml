@@ -177,11 +177,12 @@
 	</bean>
 
 	<!-- URLValidator -->
-	<bean id="urlValidator" class="org.apache.commons.validator.routines.UrlValidator">
-		<constructor-arg value="http,https" />
-	</bean>
-	<bean id="httpsValidator" class="org.apache.commons.validator.routines.UrlValidator">
-		<constructor-arg value="https" />
+	<bean id="redirectURIValidator" class="org.apache.commons.validator.routines.UrlValidator">
+		<constructor-arg value="http,https" index="0" />
+		<constructor-arg index="1" type="long">
+			<util:constant
+				static-field="org.apache.commons.validator.routines.UrlValidator.NO_FRAGMENTS" />
+		</constructor-arg>
 	</bean>
 
 	<bean id="kustvakt_rewrite" class="de.ids_mannheim.korap.rewrite.FullRewriteHandler">

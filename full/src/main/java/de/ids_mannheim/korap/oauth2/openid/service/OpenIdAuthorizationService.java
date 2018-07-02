@@ -35,14 +35,14 @@ import de.ids_mannheim.korap.oauth2.service.OAuth2AuthorizationService;
 public class OpenIdAuthorizationService extends OAuth2AuthorizationService {
 
     @Autowired
-    private UrlValidator urlValidator;
+    private UrlValidator redirectURIValidator;
 
     public void checkRedirectUriParam (Map<String, String> map)
             throws KustvaktException {
         if (map.containsKey("redirect_uri")) {
             String redirect_uri = map.get("redirect_uri");
             if (redirect_uri != null && !redirect_uri.isEmpty()) {
-                if (!urlValidator.isValid(redirect_uri)) {
+                if (!redirectURIValidator.isValid(redirect_uri)) {
                     throw new KustvaktException(
                             StatusCodes.INVALID_REDIRECT_URI,
                             "Invalid redirect URI",

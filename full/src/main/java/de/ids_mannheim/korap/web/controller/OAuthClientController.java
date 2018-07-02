@@ -52,21 +52,17 @@ public class OAuthClientController {
 
     /**
      * Registers a client application. Before starting an OAuth
-     * process,
-     * client applications have to be registered first. Only
-     * registered
-     * users are allowed to register client applications. After
-     * registration,
-     * the client will receive a client_id and a client_secret, if the
-     * client
-     * is confidential (capable of storing the client_secret), that
-     * are needed
-     * in the authorization process.
+     * process, client applications have to be registered first. Only
+     * registered users are allowed to register client applications.
+     * 
+     * After registration, the client receives a client_id and a
+     * client_secret, if the client is confidential (capable of
+     * storing the client_secret), that are needed in the
+     * authorization process.
      * 
      * From RFC 6749:
      * The authorization server SHOULD document the size of any
-     * identifier
-     * it issues.
+     * identifier it issues.
      * 
      * @param context
      * @param clientJson
@@ -86,6 +82,7 @@ public class OAuthClientController {
             OAuth2ClientJson clientJson) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
+
         try {
             return clientService.registerClient(clientJson,
                     context.getUsername());
