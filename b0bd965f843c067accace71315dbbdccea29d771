@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ac1aa08c_67b66154",
+        "filename": "lite/src/main/java/de/ids_mannheim/korap/web/service/lite/LiteService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2018-07-02T11:34:14Z",
+      "side": 1,
+      "message": "is this necessary? see de.ids_mannheim.korap.web.controller.StatisticController.getStatistics(SecurityContext, Locale, String). Eventually it needs updates so that both controllers behave identically.",
+      "range": {
+        "startLine": 318,
+        "startChar": 3,
+        "endLine": 318,
+        "endChar": 43
+      },
+      "revId": "b0bd965f843c067accace71315dbbdccea29d771",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c",
+      "unresolved": true
+    }
+  ]
+}
