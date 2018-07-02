@@ -184,6 +184,10 @@
 				static-field="org.apache.commons.validator.routines.UrlValidator.NO_FRAGMENTS" />
 		</constructor-arg>
 	</bean>
+	<bean id="urlValidator" class="org.apache.commons.validator.routines.UrlValidator">
+		<constructor-arg value="http,https" />
+	</bean>
+	
 
 	<bean id="kustvakt_rewrite" class="de.ids_mannheim.korap.rewrite.FullRewriteHandler">
 		<constructor-arg ref="kustvakt_config" />
@@ -193,7 +197,7 @@
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
 
-	<bean id="kustvaktResponseHandler" class="de.ids_mannheim.korap.web.kustvaktResponseHandler">
+	<bean id="kustvaktResponseHandler" class="de.ids_mannheim.korap.web.KustvaktResponseHandler">
 		<constructor-arg index="0" name="iface" ref="kustvakt_auditing" />
 	</bean>
 

@@ -37,7 +37,7 @@ import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 
 @Controller
-@Path("/oauth2")
+@Path("oauth2")
 public class OAuth2Controller {
 
     @Autowired

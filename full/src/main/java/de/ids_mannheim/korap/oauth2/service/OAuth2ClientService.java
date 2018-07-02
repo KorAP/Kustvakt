@@ -43,7 +43,8 @@ import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 @Service
 public class OAuth2ClientService {
 
-    private Logger jlog = Logger.getLogger(OAuth2ClientService.class);
+    // private Logger jlog =
+    // Logger.getLogger(OAuth2ClientService.class);
 
     @Autowired
     private OAuth2ClientDao clientDao;
@@ -52,20 +53,32 @@ public class OAuth2ClientService {
     @Autowired
     private UrlValidator redirectURIValidator;
     @Autowired
+    private UrlValidator urlValidator;
+    @Autowired
     private EncryptionIface encryption;
     @Autowired
     private FullConfiguration config;
 
     public OAuth2ClientDto registerClient (OAuth2ClientJson clientJson,
             String registeredBy) throws KustvaktException {
-        if (!redirectURIValidator.isValid(clientJson.getUrl())) {
-            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
-                    clientJson.getUrl() + " is invalid.",
-                    OAuth2Error.INVALID_REQUEST);
+        String url = clientJson.getUrl();
+        int urlHashCode = 0;
+        if (url != null && !url.isEmpty()) {
+            urlHashCode = clientJson.getUrl().hashCode();
+            if (!redirectURIValidator.isValid(url)) {
+                throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
+                        url + " is invalid.", OAuth2Error.INVALID_REQUEST);
+            }
         }
-        
-        boolean isNative = isNativeClient(clientJson.getUrl(),
-                clientJson.getRedirectURI());
+
+        String redirectURI = clientJson.getRedirectURI();
+        if (redirectURI != null && !redirectURI.isEmpty()
+                && !urlValidator.isValid(redirectURI)) {
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
+                    redirectURI + " is invalid.", OAuth2Error.INVALID_REQUEST);
+        }
+
+        boolean isNative = isNativeClient(url, redirectURI);
 
         String secret = null;
         String secretHashcode = null;
@@ -90,9 +103,8 @@ public class OAuth2ClientService {
         String id = encryption.createRandomNumber();
         try {
             clientDao.registerClient(id, secretHashcode, clientJson.getName(),
-                    clientJson.getType(), isNative, clientJson.getUrl(),
-                    clientJson.getUrl().hashCode(), clientJson.getRedirectURI(),
-                    registeredBy, clientJson.getDescription());
+                    clientJson.getType(), isNative, url, urlHashCode,
+                    redirectURI, registeredBy, clientJson.getDescription());
         }
         catch (Exception e) {
             Throwable cause = e;
@@ -114,6 +126,11 @@ public class OAuth2ClientService {
 
     private boolean isNativeClient (String url, String redirectURI)
             throws KustvaktException {
+        if (url == null || url.isEmpty() || redirectURI == null
+                || redirectURI.isEmpty()) {
+            return false;
+        }
+
         String nativeHost = config.getNativeClientHost();
         String urlHost = null;
         try {
@@ -124,6 +141,11 @@ public class OAuth2ClientService {
                     "Invalid url :" + e.getMessage(),
                     OAuth2Error.INVALID_REQUEST);
         }
+
+        if (!urlHost.equals(nativeHost)) {
+            return false;
+        }
+
         String uriHost = null;
         try {
             uriHost = new URI(redirectURI).getHost();
@@ -133,10 +155,11 @@ public class OAuth2ClientService {
                     "Invalid redirectURI: " + e.getMessage(),
                     OAuth2Error.INVALID_REQUEST);
         }
-        boolean isNative =
-                urlHost.equals(nativeHost) && uriHost.equals(nativeHost);
-        jlog.debug(urlHost + " " + uriHost + " " + isNative);
-        return isNative;
+        if (!uriHost.equals(nativeHost)) {
+            return false;
+        }
+
+        return true;
     }
 
 

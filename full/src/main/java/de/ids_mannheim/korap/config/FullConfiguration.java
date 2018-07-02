@@ -203,36 +203,11 @@ public class FullConfiguration extends KustvaktConfiguration {
             throws IOException, ParseException, JOSEException {
         setRsaKeyId(properties.getProperty("rsa.key.id", ""));
 
-        String rsaPublic = properties.getProperty("rsa.public", "");
-        String rsaPrivate = properties.getProperty("rsa.private", "");
+        String rsaPublic = properties.getProperty("rsa.public", null);
+        setPublicKeySet(rsaPublic);
 
-        File rsaPublicFile = new File(rsaPublic);
-        JWKSet jwkSet = null;
-        if (rsaPublicFile.exists()) {
-            jwkSet = JWKSet.load(rsaPublicFile);
-        }
-        else {
-            InputStream is =
-                    getClass().getClassLoader().getResourceAsStream(rsaPublic);
-            jwkSet = JWKSet.load(is);
-        }
-        setPublicKeySet(jwkSet);
-
-        File rsaPrivateFile = new File(rsaPrivate);
-        String keyString = null;
-        if (rsaPrivateFile.exists()) {
-            keyString = IOUtils.readFileToString(rsaPrivateFile,
-                    Charset.forName("UTF-8"));
-        }
-        else {
-            InputStream is =
-                    getClass().getClassLoader().getResourceAsStream(rsaPrivate);
-            keyString = IOUtils.readInputStreamToString(is,
-                    Charset.forName("UTF-8"));
-        }
-        RSAKey rsaKey = (RSAKey) JWK.parse(keyString);
-        RSAPrivateKey privateKey = (RSAPrivateKey) rsaKey.toPrivateKey();
-        setRsaPrivateKey(privateKey);
+        String rsaPrivate = properties.getProperty("rsa.private", null);
+        setRsaPrivateKey(rsaPrivate);
     }
 
     private void setOAuth2Configuration (Properties properties) {
@@ -251,8 +226,8 @@ public class FullConfiguration extends KustvaktConfiguration {
                 Arrays.stream(scopes.split(" ")).collect(Collectors.toSet());
         setDefaultAccessScopes(scopeSet);
 
-        String clientScopes = properties.getProperty(
-                "oauth2.client.credentials.scopes", "client_info");
+        String clientScopes = properties
+                .getProperty("oauth2.client.credentials.scopes", "client_info");
         setClientCredentialsScopes(Arrays.stream(clientScopes.split(" "))
                 .collect(Collectors.toSet()));
     }
@@ -549,16 +524,48 @@ public class FullConfiguration extends KustvaktConfiguration {
         return publicKeySet;
     }
 
-    public void setPublicKeySet (JWKSet publicKeySet) {
-        this.publicKeySet = publicKeySet;
+    public void setPublicKeySet (String rsaPublic)
+            throws IOException, ParseException {
+        if (rsaPublic == null || rsaPublic.isEmpty()) {
+            return;
+        }
+
+        File rsaPublicFile = new File(rsaPublic);
+        JWKSet jwkSet = null;
+        InputStream is = null;
+        if (rsaPublicFile.exists()) {
+            jwkSet = JWKSet.load(rsaPublicFile);
+        }
+        else if ((is = getClass().getClassLoader()
+                .getResourceAsStream(rsaPublic)) != null) {
+            jwkSet = JWKSet.load(is);
+        }
+        this.publicKeySet = jwkSet;
     }
 
     public RSAPrivateKey getRsaPrivateKey () {
         return rsaPrivateKey;
     }
 
-    public void setRsaPrivateKey (RSAPrivateKey rsaPrivateKey) {
-        this.rsaPrivateKey = rsaPrivateKey;
+    public void setRsaPrivateKey (String rsaPrivate)
+            throws IOException, ParseException, JOSEException {
+        if (rsaPrivate == null || rsaPrivate.isEmpty()) {
+            return;
+        }
+        File rsaPrivateFile = new File(rsaPrivate);
+        String keyString = null;
+        InputStream is = null;
+        if (rsaPrivateFile.exists()) {
+            keyString = IOUtils.readFileToString(rsaPrivateFile,
+                    Charset.forName("UTF-8"));
+        }
+        else if ((is = getClass().getClassLoader()
+                .getResourceAsStream(rsaPrivate)) != null) {
+            keyString = IOUtils.readInputStreamToString(is,
+                    Charset.forName("UTF-8"));
+        }
+        RSAKey rsaKey = (RSAKey) JWK.parse(keyString);
+        this.rsaPrivateKey = (RSAPrivateKey) rsaKey.toPrivateKey();
     }
 
     public String getRsaKeyId () {

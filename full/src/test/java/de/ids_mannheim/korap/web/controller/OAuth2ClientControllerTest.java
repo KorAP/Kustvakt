@@ -87,12 +87,11 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         response = testRegisterConfidentialClient();
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         node = JsonUtils.readTree(response.getEntity(String.class));
-        assertEquals(OAuth2Error.INVALID_REQUEST,
-                node.at("/error").asText());
+        assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
 
         testDeregisterConfidentialClientMissingParameters();
         testDeregisterClientIncorrectCredentials(clientId);
-        testDeregisterConfidentialClient(clientId,clientSecret);
+        testDeregisterConfidentialClient(clientId, clientSecret);
     }
 
     @Test
@@ -145,7 +144,32 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        //EM: need to check native
+        // EM: need to check native
+    }
+
+    @Test
+    public void testRegisterDesktopApp () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        OAuth2ClientJson json = new OAuth2ClientJson();
+        json.setName("OAuth2DesktopClient");
+        json.setType(OAuth2ClientType.PUBLIC);
+        json.setDescription("This is a desktop test client.");
+
+        ClientResponse response = resource().path("oauth2").path("client")
+                .path("register")
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(username,
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .entity(json).post(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        JsonNode node = JsonUtils.readTree(entity);
+        String clientId = node.at("/client_id").asText();
+        assertNotNull(clientId);
+        assertTrue(node.at("/client_secret").isMissingNode());
     }
 
     private void testDeregisterPublicClient (String clientId)
@@ -199,8 +223,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuth2Error.INVALID_REQUEST,
-                node.at("/error").asText());
+        assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
         assertEquals("Missing parameters: client_secret client_id",
                 node.at("/error_description").asText());
     }
@@ -223,8 +246,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuth2Error.INVALID_CLIENT,
-                node.at("/error").asText());
+        assertEquals(OAuth2Error.INVALID_CLIENT, node.at("/error").asText());
         assertEquals("Invalid client credentials",
                 node.at("/error_description").asText());
 

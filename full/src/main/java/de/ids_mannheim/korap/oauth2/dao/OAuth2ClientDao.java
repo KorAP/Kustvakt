@@ -32,8 +32,10 @@ public class OAuth2ClientDao {
         ParameterChecker.checkStringValue(id, "client id");
         ParameterChecker.checkStringValue(name, "client name");
         ParameterChecker.checkObjectValue(type, "client type");
-        ParameterChecker.checkStringValue(url, "client url");
-        ParameterChecker.checkStringValue(redirectURI, "client redirect uri");
+        ParameterChecker.checkStringValue(description, "client description");
+        // ParameterChecker.checkStringValue(url, "client url");
+        // ParameterChecker.checkStringValue(redirectURI, "client
+        // redirect uri");
         ParameterChecker.checkStringValue(registeredBy, "registeredBy");
 
         OAuth2Client client = new OAuth2Client();

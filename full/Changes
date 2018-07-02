@@ -1,5 +1,5 @@
 version 0.60.4
-28/06/2018
+02/07/2018
     - implemented OAuth2 authorization code request with OpenID Authentication (margaretha)
     - enabled OAuth2 authorization without OpenID authentication using Nimbus library (margaretha)
     - implemented response handler for OpenID authentication errors in authorization requests (margaretha)
@@ -13,6 +13,9 @@ version 0.60.4
     - added authentication time and support for auth_time in id_token (margaretha)
     - implemented support for nonce and max_age parameters in OpenID authentication (margaretha)
     - implemented OAuth2 token request with password grant using Nimbus library (margaretha)
+    - updated redirect URI validator (margaretha)
+    - updated client registration requirement to allow desktop applications (margaretha)
+    - fixed RSA key configuration (margaretha)
     
 version 0.60.3
 06/06/2018

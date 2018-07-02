@@ -45,7 +45,7 @@ import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.utils.MapUtils;
 
 @Controller
-@Path("/oauth2/openid")
+@Path("oauth2/openid")
 public class OAuth2WithOpenIdController {
 
     @Autowired

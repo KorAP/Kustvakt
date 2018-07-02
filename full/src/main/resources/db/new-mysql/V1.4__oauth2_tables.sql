@@ -4,14 +4,14 @@
 CREATE TABLE IF NOT EXISTS oauth2_client (
 	id VARCHAR(100) PRIMARY KEY NOT NULL,
 	name VARCHAR(200) NOT NULL,
-	secret VARCHAR(200),
+	secret VARCHAR(200) DEFAULT NULL,
 	type VARCHAR(200) NOT NULL,
 	native BOOLEAN DEFAULT FALSE,
-	url TEXT NOT NULL,
-	url_hashcode INTEGER NOT NULL,
-	redirect_uri TEXT NOT NULL,
-	registered_by VARCHAR(100) NOT NULL,
+	url TEXT DEFAULT NULL,
+	url_hashcode INTEGER,
+	redirect_uri TEXT DEFAULT NULL,
 	description VARCHAR(250) NOT NULL,
+	registered_by VARCHAR(100) NOT NULL,
 	UNIQUE INDEX unique_url(url_hashcode)
 );
 

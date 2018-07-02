@@ -42,7 +42,7 @@ import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
  *
  */
 @Controller
-@Path("/oauth2/client")
+@Path("oauth2/client")
 public class OAuthClientController {
 
     @Autowired
