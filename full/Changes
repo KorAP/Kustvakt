@@ -1,5 +1,5 @@
 version 0.60.4
-02/07/2018
+03/07/2018
     - implemented OAuth2 authorization code request with OpenID Authentication (margaretha)
     - enabled OAuth2 authorization without OpenID authentication using Nimbus library (margaretha)
     - implemented response handler for OpenID authentication errors in authorization requests (margaretha)
@@ -16,6 +16,7 @@ version 0.60.4
     - updated redirect URI validator (margaretha)
     - updated client registration requirement to allow desktop applications (margaretha)
     - fixed RSA key configuration (margaretha)
+    - merged OAuth2 client deregistration controllers (margaretha)
     
 version 0.60.3
 06/06/2018

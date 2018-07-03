@@ -54,8 +54,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
             if (header.getKey().equals(ContainerRequest.WWW_AUTHENTICATE)) {
                 assertEquals("Api realm=\"Kustvakt\"",
                         header.getValue().get(0));
-//                assertEquals("Session realm=\"Kustvakt\"",
-//                        header.getValue().get(1));
+                // assertEquals("Session realm=\"Kustvakt\"",
+                // header.getValue().get(1));
                 assertEquals("Bearer realm=\"Kustvakt\"",
                         header.getValue().get(1));
                 assertEquals("Basic realm=\"Kustvakt\"",
@@ -67,15 +67,14 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     private JsonNode testSearchVC (String username, String vcId)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        ClientResponse response =
-                resource().path("vc").path(vcId)
-                        .header(Attributes.AUTHORIZATION,
-                                handler.createBasicAuthorizationHeaderValue(
-                                        username, "pass"))
-                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                        .get(ClientResponse.class);
+        ClientResponse response = resource().path("vc").path(vcId)
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(username,
+                                "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
-        //        System.out.println(entity);
+        // System.out.println(entity);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         return JsonUtils.readTree(entity);
@@ -94,7 +93,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.getEntity(String.class);
-        //                System.out.println(entity);
+        // System.out.println(entity);
         return JsonUtils.readTree(entity);
     }
 
@@ -114,7 +113,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         String entity = response.getEntity(String.class);
-        //        System.out.println(entity);
+        // System.out.println(entity);
         return JsonUtils.readTree(entity);
     }
 
@@ -142,7 +141,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
-        //                System.out.println(entity);
+        // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         return node;
     }
@@ -231,7 +230,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         assertEquals(VirtualCorpusType.PUBLISHED.displayName(),
                 node.at("/type").asText());
 
-        // EM: need admin to check if VirtualCorpusControllerTest is added to the hidden group
+        // EM: need admin to check if VirtualCorpusControllerTest is
+        // added to the hidden group
     }
 
     @Test
@@ -362,14 +362,14 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         node = testCheckHiddenGroup(groupId);
         assertEquals("HIDDEN", node.at("/status").asText());
 
-        //EM: delete vc
+        // EM: delete vc
         testDeleteVC(vcId, "VirtualCorpusControllerTest");
 
-        //EM: check if the hidden groups are deleted as well
+        // EM: check if the hidden groups are deleted as well
         node = testCheckHiddenGroup(groupId);
         assertEquals(StatusCodes.GROUP_NOT_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Group with id "+groupId+" is not found",
+        assertEquals("Group with id " + groupId + " is not found",
                 node.at("/errors/0/1").asText());
     }
 
@@ -414,28 +414,25 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.INVALID_ACCESS_TOKEN, node.at("/errors/0/0").asInt());
+        assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
+                node.at("/errors/0/0").asInt());
         assertEquals("Json Web Signature (JWS) object verification failed.",
                 node.at("/errors/0/1").asText());
 
         checkWWWAuthenticateHeader(response);
     }
-    
+
     @Test
     public void testCreateVCWithExpiredToken ()
             throws IOException, KustvaktException {
         String json = "{\"name\": \"new vc\",\"type\": \"PRIVATE\","
                 + "\"corpusQuery\": \"corpusSigle=GOE\"}";
 
-        InputStream is = getClass().getClassLoader()
-                .getResourceAsStream("test-expired.token");
-
-        String authToken;
-        try (BufferedReader reader =
-                new BufferedReader(new InputStreamReader(is));) {
-            authToken = reader.readLine();
-        }
-
+        String authToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0VXNlci"
+                + "IsImlzcyI6Imh0dHBzOlwvXC9rb3JhcC5pZHMtbWFubmhlaW0uZG"
+                + "UiLCJleHAiOjE1MzA2MTgyOTR9.JUMvTQZ4tvdRXFBpQKzoNxrq7"
+                + "CuYAfytr_LWqY8woJs";
+        
         ClientResponse response = resource().path("vc").path("create")
                 .header(Attributes.AUTHORIZATION,
                         AuthenticationScheme.API.displayName() + " "
@@ -443,7 +440,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
-        
+
         String entity = response.getEntity(String.class);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
@@ -512,7 +509,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
-        //        System.out.println(entity);
+        // System.out.println(entity);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
@@ -534,7 +531,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
-        //        System.out.println(entity);
+        // System.out.println(entity);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
@@ -556,7 +553,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
-        //        System.out.println(entity);
+        // System.out.println(entity);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
@@ -641,7 +638,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .post(ClientResponse.class, json);
         String entity = response.getEntity(String.class);
-        //        System.out.println(entity);
+        // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
@@ -680,7 +677,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         assertEquals(VirtualCorpusType.PUBLISHED.displayName(),
                 n.get("type").asText());
 
-        //check hidden VC access
+        // check hidden VC access
         node = testlistAccessByVC("admin", vcId);
         assertEquals(2, node.size());
 
@@ -701,7 +698,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         assertEquals(VirtualCorpusType.PROJECT.displayName(),
                 node.get(1).get("type").asText());
 
-        //check VC access
+        // check VC access
         node = testlistAccessByVC("admin", vcId);
         assertEquals(1, node.size());
     }
@@ -739,7 +736,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
-        //        System.out.println(entity);
+        // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(1, node.at("/0/accessId").asInt());
         assertEquals(2, node.at("/0/vcId").asInt());
@@ -809,7 +806,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         form.add("groupId", "1");
 
         // share VC
-        // dory is VCA in marlin group 
+        // dory is VCA in marlin group
         ClientResponse response = resource().path("vc").path("access")
                 .path("share").type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(Attributes.AUTHORIZATION,
@@ -838,7 +835,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         form.add("groupId", "1");
 
         // share VC
-        // nemo is not VCA in marlin group 
+        // nemo is not VCA in marlin group
         ClientResponse response = resource().path("vc").path("access")
                 .path("share").type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(Attributes.AUTHORIZATION,
@@ -882,7 +879,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                 .delete(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
-        //        System.out.println(entity);
+        // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,

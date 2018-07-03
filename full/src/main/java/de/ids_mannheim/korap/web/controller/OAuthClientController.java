@@ -1,21 +1,17 @@
 package de.ids_mannheim.korap.web.controller;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import org.apache.oltu.oauth2.as.request.OAuthRequest;
-import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
-import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -23,14 +19,12 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.oauth2.oltu.OAuth2DeregisterClientRequest;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ClientService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
-import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 
 
 /**
@@ -82,7 +76,6 @@ public class OAuthClientController {
             OAuth2ClientJson clientJson) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
-
         try {
             return clientService.registerClient(clientJson,
                     context.getUsername());
@@ -94,64 +87,33 @@ public class OAuthClientController {
 
 
     /**
-     * Deregisters a public client via owner authentication.
+     * Deregisters a client requires client owner authentication. For
+     * confidential clients, client authentication is also required.
      * 
      * 
      * @param securityContext
      * @param clientId
      *            the client id
+     * @param clientSecret
+     *            the client secret
      * @return HTTP Response OK if successful.
      */
     @DELETE
-    @Path("deregister/public")
+    @Path("deregister/{client_id}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     public Response deregisterPublicClient (
             @Context SecurityContext securityContext,
-            @FormParam("client_id") String clientId) {
+            @PathParam("client_id") String clientId,
+            @FormParam("client_secret") String clientSecret) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            clientService.deregisterPublicClient(clientId,
+            clientService.deregisterClient(clientId, clientSecret,
                     context.getUsername());
             return Response.ok().build();
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
-        }
-    }
-
-
-    /**
-     * Deregisters confidential clients. Clients must authenticate.
-     * 
-     * @param securityContext
-     * @param request
-     * @param form
-     * @return
-     */
-    @DELETE
-    @Path("deregister/confidential")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response deregisterConfidentialClient (
-            @Context SecurityContext securityContext,
-            @Context HttpServletRequest request,
-            MultivaluedMap<String, String> form) {
-        try {
-            OAuthRequest oAuthRequest = new OAuth2DeregisterClientRequest(
-                    new FormRequestWrapper(request, form));
-
-            clientService.deregisterConfidentialClient(
-                    oAuthRequest.getClientId(), oAuthRequest.getClientSecret());
-            return Response.ok().build();
-        }
-        catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
-        }
-        catch (OAuthSystemException e) {
-            throw responseHandler.throwit(e);
-        }
-        catch (OAuthProblemException e) {
             throw responseHandler.throwit(e);
         }
     }

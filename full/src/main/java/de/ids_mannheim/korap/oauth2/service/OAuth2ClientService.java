@@ -7,7 +7,6 @@ import java.net.URL;
 import java.sql.SQLException;
 
 import org.apache.commons.validator.routines.UrlValidator;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -163,36 +162,22 @@ public class OAuth2ClientService {
     }
 
 
-    public void deregisterPublicClient (String clientId, String username)
-            throws KustvaktException {
+    public void deregisterClient (String clientId, String clientSecret,
+            String username) throws KustvaktException {
 
         OAuth2Client client = clientDao.retrieveClientById(clientId);
-        if (adminDao.isAdmin(username)) {
-            clientDao.deregisterClient(client);
+        if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
+            authenticateClient(clientId, clientSecret);
         }
-        else if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
-            throw new KustvaktException(
-                    StatusCodes.CLIENT_DEREGISTRATION_FAILED,
-                    "Service is limited to public clients. To deregister "
-                            + "confidential clients, use service at path: "
-                            + "oauth2/client/deregister/confidential.",
-                    OAuth2Error.INVALID_REQUEST);
-        }
-        else if (client.getRegisteredBy().equals(username)) {
+
+        if (adminDao.isAdmin(username)
+                || client.getRegisteredBy().equals(username)) {
             clientDao.deregisterClient(client);
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
-    }
-
-
-    public void deregisterConfidentialClient (String clientId,
-            String clientSecret) throws KustvaktException {
-
-        OAuth2Client client = authenticateClient(clientId, clientSecret);
-        clientDao.deregisterClient(client);
     }
 
     public OAuth2Client authenticateClient (String clientId,
@@ -206,28 +191,34 @@ public class OAuth2ClientService {
         }
 
         OAuth2Client client = clientDao.retrieveClientById(clientId);
-        if (clientSecret == null || clientSecret.isEmpty()) {
-            if (client.getSecret() != null
-                    || client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
+        authenticateClient(client, clientSecret);
+        return client;
+    }
+
+    public void authenticateClient (OAuth2Client client, String clientSecret)
+            throws KustvaktException {
+        if (clientSecret == null) {
+            if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
                 throw new KustvaktException(
                         StatusCodes.CLIENT_AUTHENTICATION_FAILED,
                         "Missing parameters: client_secret",
                         OAuth2Error.INVALID_REQUEST);
             }
-            else
-                return client;
         }
-        else {
-            if (client.getSecret() != null) {
-                if (encryption.checkHash(clientSecret, client.getSecret(),
-                        config.getPasscodeSaltField())) {
-                    return client;
-                }
+        else if (clientSecret.isEmpty()) {
+            if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
+                throw new KustvaktException(
+                        StatusCodes.CLIENT_AUTHENTICATION_FAILED,
+                        "Missing parameters: client_secret",
+                        OAuth2Error.INVALID_REQUEST);
             }
         }
-
-        throw new KustvaktException(StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                "Invalid client credentials", OAuth2Error.INVALID_CLIENT);
+        else if (!encryption.checkHash(clientSecret, client.getSecret(),
+                config.getPasscodeSaltField())) {
+            throw new KustvaktException(
+                    StatusCodes.CLIENT_AUTHENTICATION_FAILED,
+                    "Invalid client credentials", OAuth2Error.INVALID_CLIENT);
+        }
     }
 
 

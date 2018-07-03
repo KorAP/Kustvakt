@@ -27,6 +27,7 @@ import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -89,7 +90,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         node = JsonUtils.readTree(response.getEntity(String.class));
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
 
-        testDeregisterConfidentialClientMissingParameters();
+        testDeregisterConfidentialClientMissingSecret(clientId);
         testDeregisterClientIncorrectCredentials(clientId);
         testDeregisterConfidentialClient(clientId, clientSecret);
     }
@@ -120,6 +121,8 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         assertNotNull(clientId);
         assertTrue(node.at("/client_secret").isMissingNode());
 
+        testDeregisterPublicClientMissingUserAuthentication(clientId);
+        testDeregisterPublicClientMissingId();
         testDeregisterPublicClient(clientId);
     }
 
@@ -172,22 +175,43 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         assertTrue(node.at("/client_secret").isMissingNode());
     }
 
+    private void testDeregisterPublicClientMissingUserAuthentication (
+            String clientId) throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+
+        ClientResponse response = resource().path("oauth2").path("client")
+                .path("deregister").path(clientId).delete(ClientResponse.class);
+
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+    }
+
+    private void testDeregisterPublicClientMissingId ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+
+        ClientResponse response = resource().path("oauth2").path("client")
+                .path("deregister")
+                .header(Attributes.AUTHORIZATION, handler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .delete(ClientResponse.class);
+
+        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+    }
+
     private void testDeregisterPublicClient (String clientId)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
 
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("client_id", clientId);
-
         ClientResponse response = resource().path("oauth2").path("client")
-                .path("deregister").path("public")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(username,
-                                "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).delete(ClientResponse.class);
+                .path("deregister").path(clientId)
+                .header(Attributes.AUTHORIZATION, handler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .delete(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
@@ -196,35 +220,40 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
             String clientSecret) throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
 
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("client_secret", clientSecret);
+
         ClientResponse response = resource().path("oauth2").path("client")
-                .path("deregister").path("confidential")
+                .path("deregister").path(clientId)
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(clientId,
-                                clientSecret))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                        handler.createBasicAuthorizationHeaderValue(username,
+                                "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
-                .delete(ClientResponse.class);
+                .entity(form).delete(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
-    private void testDeregisterConfidentialClientMissingParameters ()
+    private void testDeregisterConfidentialClientMissingSecret (String clientId)
             throws KustvaktException {
 
         ClientResponse response = resource().path("oauth2").path("client")
-                .path("deregister").path("confidential")
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .path("deregister").path(clientId)
+                .header(Attributes.AUTHORIZATION,
+                        handler.createBasicAuthorizationHeaderValue(username,
+                                "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .delete(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
+        System.out.println(entity);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
-        assertEquals("Missing parameters: client_secret client_id",
+        assertEquals("Missing parameters: client_secret",
                 node.at("/error_description").asText());
     }
 
@@ -232,17 +261,20 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
 
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("client_secret", "xxx");
+
         ClientResponse response = resource().path("oauth2").path("client")
-                .path("deregister").path("confidential")
+                .path("deregister").path(clientId)
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(clientId,
+                        handler.createBasicAuthorizationHeaderValue(username,
                                 "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
-                .delete(ClientResponse.class);
+                .entity(form).delete(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
+        System.out.println(entity);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
