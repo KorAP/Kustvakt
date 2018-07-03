@@ -14,7 +14,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 
 /** 
- * @author margaretha
+ * @author margaretha, diewald
  * @date 27/09/2017
  *
  */
@@ -122,14 +122,14 @@ public class StatisticsControllerTest extends SpringJerseyTest {
                 .path("statistics")
                 .get(ClientResponse.class);
 
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
-                response.getStatus());
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+					 response.getStatus());
         String ent = response.getEntity(String.class);
-//        System.out.println(ent);
-        JsonNode node = mapper.readTree(ent);
-        assertEquals(node.at("/errors/0/0").asInt(), 105);
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Parameter corpusQuery is missing.");
-        assertEquals(node.at("/errors/0/2").asText(), "corpusQuery");
+
+		JsonNode node = mapper.readTree(ent);
+		assertEquals(11, node.at("/documents").asInt());
+        assertEquals(665842, node.at("/tokens").asInt());
+        assertEquals(25074, node.at("/sentences").asInt());
+        assertEquals(772, node.at("/paragraphs").asInt());
     }
 }

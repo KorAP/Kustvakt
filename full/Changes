@@ -17,6 +17,7 @@ version 0.60.4
     - updated client registration requirement to allow desktop applications (margaretha)
     - fixed RSA key configuration (margaretha)
     - merged OAuth2 client deregistration controllers (margaretha)
+    - Added support for unrestricted corpus statistics (ndiewald)
     
 version 0.60.3
 06/06/2018
