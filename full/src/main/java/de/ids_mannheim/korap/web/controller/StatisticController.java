@@ -67,25 +67,24 @@ public class StatisticController {
             @Context Locale locale,
             @QueryParam("corpusQuery") String corpusQuery) {
 
-        if (corpusQuery == null || corpusQuery.isEmpty()) {
-            throw kustvaktResponseHandler
-                    .throwit(new KustvaktException(StatusCodes.MISSING_PARAMETER,
-                            "Parameter corpusQuery is missing.",
-                            "corpusQuery"));
-        }
-
-
         KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
-        builder.with(corpusQuery);
-        String json = null;
-        try {
-            json = builder.toJSON();
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
 
-        String stats = searchKrill.getStatistics(json);
+		String stats;
+		if (corpusQuery != null && !corpusQuery.isEmpty()) {
+			builder.with(corpusQuery);
+			String json = null;
+			try {
+				json = builder.toJSON();
+			}
+			catch (KustvaktException e) {
+				throw kustvaktResponseHandler.throwit(e);
+			}
+			stats = searchKrill.getStatistics(json);
+		}
+		else {
+			stats = searchKrill.getStatistics(null);
+		};
+
         if (stats.contains("-1"))
             throw kustvaktResponseHandler.throwit(StatusCodes.NO_RESULT_FOUND);
         jlog.debug("Stats: " + stats);
