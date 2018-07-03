@@ -15,6 +15,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
+import de.ids_mannheim.korap.oauth2.entity.OAuth2ClientUrl;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client_;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
@@ -44,8 +45,12 @@ public class OAuth2ClientDao {
         client.setSecret(secretHashcode);
         client.setType(type);
         client.setNative(isNative);
-        client.setUrl(url);
-        client.setUrlHashCode(urlHashCode);
+        if (urlHashCode != 0) {
+            OAuth2ClientUrl clientUrl = new OAuth2ClientUrl();
+            clientUrl.setUrl(url);
+            clientUrl.setUrlHashCode(urlHashCode);
+            client.setClientUrl(clientUrl);
+        }
         client.setRedirectURI(redirectURI);
         client.setRegisteredBy(registeredBy);
         client.setDescription(description);

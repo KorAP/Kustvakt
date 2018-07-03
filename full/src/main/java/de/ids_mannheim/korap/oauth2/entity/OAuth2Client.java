@@ -1,10 +1,14 @@
 package de.ids_mannheim.korap.oauth2.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
@@ -30,20 +34,21 @@ public class OAuth2Client {
     private OAuth2ClientType type;
     @Column(name = "native")
     private boolean isNative;
-    private String url;
-    @Column(name = "url_hashcode")
-    private int urlHashCode;
     @Column(name = "redirect_uri")
     private String redirectURI;
     @Column(name = "registered_by")
     private String registeredBy;
     private String description;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
+    @JoinColumn(name = "url_id")
+    private OAuth2ClientUrl clientUrl;
+
     @Override
     public String toString () {
         return "id=" + id + ", name=" + name + ", secret=" + secret + ", type="
-                + type + ", isNative=" + isNative + ", url=" + url
-                + ", redirectURI=" + redirectURI + ", registeredBy="
-                + registeredBy + ", description=" + description;
+                + type + ", isNative=" + isNative + ", redirectURI="
+                + redirectURI + ", registeredBy=" + registeredBy
+                + ", description=" + description;
     }
 }

@@ -1,5 +1,10 @@
 -- EM: modified from Michael Hanl version
 
+CREATE TABLE IF NOT EXISTS oauth2_client_url (
+	url_hashcode INTEGER PRIMARY KEY NOT NULL,	
+	url TEXT DEFAULT NULL	
+);
+
 -- oauth2 db tables
 CREATE TABLE IF NOT EXISTS oauth2_client (
 	id VARCHAR(100) PRIMARY KEY NOT NULL,
@@ -7,12 +12,12 @@ CREATE TABLE IF NOT EXISTS oauth2_client (
 	secret VARCHAR(200) DEFAULT NULL,
 	type VARCHAR(200) NOT NULL,
 	native BOOLEAN DEFAULT FALSE,
-	url TEXT DEFAULT NULL,
-	url_hashcode INTEGER,
 	redirect_uri TEXT DEFAULT NULL,
 	description VARCHAR(250) NOT NULL,
 	registered_by VARCHAR(100) NOT NULL,
-	UNIQUE INDEX unique_url(url_hashcode)
+	url_id INTEGER,
+	FOREIGN KEY (url_id)
+	   REFERENCES oauth2_client_url(url_hashcode)
 );
 
 CREATE TABLE IF NOT EXISTS oauth2_authorization (
@@ -24,7 +29,7 @@ CREATE TABLE IF NOT EXISTS oauth2_authorization (
 	created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	is_revoked BOOLEAN DEFAULT 0,
 	total_attempts INTEGER DEFAULT 0,
-	user_auth_time TIMESTAMP NOT NULL,
+	user_auth_time TIMESTAMP NULL,
 	nonce TEXT DEFAULT NULL,
 	FOREIGN KEY (client_id)
 	   REFERENCES oauth2_client(id),
@@ -54,7 +59,7 @@ CREATE TABLE IF NOT EXISTS oauth2_access_token (
 	created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	is_revoked BOOLEAN DEFAULT 0,
 	total_attempts INTEGER DEFAULT 0,
-	user_auth_time TIMESTAMP NOT NULL,
+	user_auth_time TIMESTAMP NULL,
 	FOREIGN KEY (authorization_id)
 	   REFERENCES oauth2_authorization(id)
 );

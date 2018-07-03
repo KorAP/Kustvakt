@@ -17,6 +17,7 @@ version 0.60.4
     - updated client registration requirement to allow desktop applications (margaretha)
     - fixed RSA key configuration (margaretha)
     - merged OAuth2 client deregistration controllers (margaretha)
+    - fixed OAuth2 client unique URL-hashcode (margaretha)
     
 version 0.60.3
 06/06/2018

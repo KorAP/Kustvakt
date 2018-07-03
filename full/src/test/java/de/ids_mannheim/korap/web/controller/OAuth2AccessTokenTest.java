@@ -3,18 +3,18 @@ package de.ids_mannheim.korap.web.controller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
-import org.junit.BeforeClass;
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.apache.http.entity.ContentType;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
@@ -24,15 +24,34 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 
 public class OAuth2AccessTokenTest extends SpringJerseyTest {
 
-    // test access token for username: dory
-    // see:
-    // full/src/main/resources/db/insert/V3.5__insert_oauth2_clients.sql
-    private static String testAccessToken = "249c64a77f40e2b5504982cc5521b596";
+    private String testAccessToken = null;
+
+    private String requestToken()
+            throws KustvaktException {
+        if (testAccessToken == null) {
+            MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+            form.add("grant_type", "password");
+            form.add("client_id", "fCBbQkAyYzI4NzUxMg");
+            form.add("client_secret", "secret");
+            form.add("username", "dory");
+            form.add("password", "password");
+
+            ClientResponse response = resource().path("oauth2").path("token")
+                    .header(HttpHeaders.CONTENT_TYPE,
+                            ContentType.APPLICATION_FORM_URLENCODED)
+                    .entity(form).post(ClientResponse.class);
+
+            String entity = response.getEntity(String.class);
+            JsonNode node = JsonUtils.readTree(entity);
+            testAccessToken = node.at("/access_token").asText();
+        }
+        return testAccessToken;
+    }
 
     @Test
     public void testListVC () throws KustvaktException {
         ClientResponse response = resource().path("vc").path("list")
-                .header(Attributes.AUTHORIZATION, "Bearer " + testAccessToken)
+                .header(Attributes.AUTHORIZATION, "Bearer " + requestToken())
                 .get(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -46,7 +65,7 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
             throws KustvaktException, IOException {
         ClientResponse response = resource().path("search")
                 .queryParam("q", "Wasser").queryParam("ql", "poliqarp")
-                .header(Attributes.AUTHORIZATION, "Bearer " + testAccessToken)
+                .header(Attributes.AUTHORIZATION, "Bearer " + requestToken())
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
 

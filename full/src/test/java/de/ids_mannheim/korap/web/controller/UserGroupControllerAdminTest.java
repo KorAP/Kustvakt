@@ -14,8 +14,8 @@ import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -66,7 +66,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.getEntity(String.class);
-        //        System.out.println(entity);
+        // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(3, node.size());
     }
@@ -84,7 +84,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.getEntity(String.class);
-        //        System.out.println(entity);
+        // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.size());
     }
@@ -119,9 +119,14 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.getEntity(String.class);
-
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(4, node.size());
+        boolean containsHiddenStatus = false;
+        for (int i = 0; i < node.size(); i++) {
+            if (node.get(i).at("/status").asText().equals("HIDDEN")) {
+                containsHiddenStatus = true;
+            }
+        }
+        assertEquals(true, containsHiddenStatus);
     }
 
     @Test
@@ -278,7 +283,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     private void testDeleteGroup (String groupId)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        //delete group
+        // delete group
         ClientResponse response = resource().path("group").path("delete")
                 .queryParam("groupId", groupId)
                 .header(Attributes.AUTHORIZATION,
@@ -308,7 +313,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
                 .delete(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        
+
         // check group member
         JsonNode node = listGroup(testUsername);
         node = node.get(0);

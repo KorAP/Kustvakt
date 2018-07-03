@@ -111,12 +111,12 @@ public class OAuth2ClientService {
             while ((cause = cause.getCause()) != null
                     && !cause.equals(lastCause)) {
                 if (cause instanceof SQLException) {
-                    throw new KustvaktException(
-                            StatusCodes.CLIENT_REGISTRATION_FAILED,
-                            cause.getMessage(), OAuth2Error.INVALID_REQUEST);
+                    break;
                 }
                 lastCause = cause;
             }
+            throw new KustvaktException(StatusCodes.CLIENT_REGISTRATION_FAILED,
+                    cause.getMessage(), OAuth2Error.INVALID_REQUEST);
         }
 
         return new OAuth2ClientDto(id, secret);
