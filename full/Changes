@@ -20,6 +20,7 @@ version 0.60.4
     - fixed OAuth2 client unique URL-hashcode (margaretha)
     - migrated logging to log4j 2 and adapted java.util.logging to log4j(margaretha)
     - Added support for unrestricted corpus statistics (ndiewald)
+    - updated paths of user-group deletion-controllers (margaretha)
     
 version 0.60.3
 06/06/2018

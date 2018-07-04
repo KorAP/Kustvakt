@@ -171,9 +171,9 @@ public class UserGroupController {
      * @return HTTP 200, if successful.
      */
     @DELETE
-    @Path("delete")
+    @Path("delete/{groupId}")
     public Response deleteUserGroup (@Context SecurityContext securityContext,
-            @QueryParam("groupId") int groupId) {
+            @PathParam("groupId") int groupId) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
@@ -193,11 +193,11 @@ public class UserGroupController {
      * @return if successful, HTTP response status OK
      */
     @DELETE
-    @Path("member/delete")
+    @Path("member/delete/{groupId}/{memberId}")
     public Response deleteUserFromGroup (
             @Context SecurityContext securityContext,
-            @QueryParam("memberId") String memberId,
-            @QueryParam("groupId") int groupId) {
+            @PathParam("memberId") String memberId,
+            @PathParam("groupId") int groupId) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {

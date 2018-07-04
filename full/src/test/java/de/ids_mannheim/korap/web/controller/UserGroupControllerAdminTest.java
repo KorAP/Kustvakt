@@ -286,13 +286,13 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         // delete group
-        ClientResponse response = resource().path("group").path("delete")
-                .queryParam("groupId", groupId)
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(
-                                adminUsername, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .delete(ClientResponse.class);
+        ClientResponse response =
+                resource().path("group").path("delete").path(groupId)
+                        .header(Attributes.AUTHORIZATION,
+                                handler.createBasicAuthorizationHeaderValue(
+                                        adminUsername, "pass"))
+                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                        .delete(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
@@ -306,8 +306,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
             KustvaktException {
         // delete marlin from group
         ClientResponse response = resource().path("group").path("member")
-                .path("delete").queryParam("memberId", "marlin")
-                .queryParam("groupId", groupId)
+                .path("delete").path(groupId).path("marlin")
                 .header(Attributes.AUTHORIZATION,
                         handler.createBasicAuthorizationHeaderValue(
                                 adminUsername, "pass"))
