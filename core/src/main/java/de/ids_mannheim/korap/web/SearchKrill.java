@@ -265,12 +265,26 @@ public class SearchKrill {
      *            JSON-LD string with potential meta filters.
      */
     public String getStatistics (String json) {
-        jlog.trace(json);
         if (this.index == null) {
             return "{\"documents\" : -1, error\" : \"No index given\" }";
         };
-        // Create Virtual collection from json search
-        KrillCollection kc = new KrillCollection(json);
+
+		// Define a virtual corpus
+		KrillCollection kc;
+		if (json != null && !json.equals("")) {
+			jlog.trace(json);
+
+			// Create Virtual collection from json search
+			kc = new KrillCollection(json);
+		}
+
+		// There is no json string defined
+		else {
+
+			// Create Virtual collection of everything
+			kc = new KrillCollection();
+		};
+
         // Set index
         kc.setIndex(this.index);
         long docs = 0, tokens = 0, sentences = 0, paragraphs = 0;
