@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.lucene.store.MMapDirectory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.ids_mannheim.korap.Krill;
 import de.ids_mannheim.korap.KrillCollection;
@@ -29,7 +29,7 @@ import de.ids_mannheim.korap.util.QueryException;
  * @author Nils Diewald
  */
 public class SearchKrill {
-    private final static Logger jlog = LoggerFactory
+    private final static Logger jlog = LogManager
             .getLogger(SearchKrill.class);
 
     // Temporary - shouldn't be here.
@@ -59,7 +59,7 @@ public class SearchKrill {
             };
         }
         catch (IOException e) {
-            jlog.error("Unable to loadSubTypes index: {}", e.getMessage());
+            jlog.error("Unable to loadSubTypes index:"+ e.getMessage());
         };
     };
 

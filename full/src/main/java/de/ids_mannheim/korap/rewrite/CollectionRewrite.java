@@ -4,8 +4,8 @@ package de.ids_mannheim.korap.rewrite;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
@@ -49,7 +49,7 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 public class CollectionRewrite implements RewriteTask.RewriteQuery {
 
     private static Logger jlog =
-            LoggerFactory.getLogger(CollectionRewrite.class);
+            LogManager.getLogger(CollectionRewrite.class);
 
     public CollectionRewrite () {
         super();

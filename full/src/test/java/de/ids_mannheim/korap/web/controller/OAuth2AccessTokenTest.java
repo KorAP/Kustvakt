@@ -24,28 +24,23 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 
 public class OAuth2AccessTokenTest extends SpringJerseyTest {
 
-    private String testAccessToken = null;
 
-    private String requestToken()
-            throws KustvaktException {
-        if (testAccessToken == null) {
-            MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-            form.add("grant_type", "password");
-            form.add("client_id", "fCBbQkAyYzI4NzUxMg");
-            form.add("client_secret", "secret");
-            form.add("username", "dory");
-            form.add("password", "password");
+    private String requestToken () throws KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("grant_type", "password");
+        form.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        form.add("client_secret", "secret");
+        form.add("username", "dory");
+        form.add("password", "password");
 
-            ClientResponse response = resource().path("oauth2").path("token")
-                    .header(HttpHeaders.CONTENT_TYPE,
-                            ContentType.APPLICATION_FORM_URLENCODED)
-                    .entity(form).post(ClientResponse.class);
+        ClientResponse response = resource().path("oauth2").path("token")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
 
-            String entity = response.getEntity(String.class);
-            JsonNode node = JsonUtils.readTree(entity);
-            testAccessToken = node.at("/access_token").asText();
-        }
-        return testAccessToken;
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        return node.at("/access_token").asText();
     }
 
     @Test
@@ -95,26 +90,6 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
         assertEquals("Access token is not found",
-                node.at("/errors/0/1").asText());
-    }
-
-    @Test
-    public void testSearchWithExpiredToken ()
-            throws KustvaktException, IOException {
-        ClientResponse response = resource().path("search")
-                .queryParam("q", "Wasser").queryParam("ql", "poliqarp")
-                .header(Attributes.AUTHORIZATION,
-                        "Bearer fia0123ikBWn931470H8s5gRqx7Moc4p")
-                .get(ClientResponse.class);
-
-        String ent = response.getEntity(String.class);
-
-        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
-                response.getStatus());
-
-        JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(StatusCodes.EXPIRED, node.at("/errors/0/0").asInt());
-        assertEquals("Access token is expired",
                 node.at("/errors/0/1").asText());
     }
 }

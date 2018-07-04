@@ -8,9 +8,9 @@ import java.security.SecureRandom;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mindrot.jbcrypt.BCrypt;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
@@ -18,7 +18,7 @@ import de.ids_mannheim.korap.interfaces.EncryptionIface;
 public class KustvaktEncryption implements EncryptionIface {
 
     private static final String ALGORITHM = "SHA-256";
-    private static Logger jlog = LoggerFactory
+    private static Logger jlog = LogManager
             .getLogger(KustvaktEncryption.class);
 
     private final FullConfiguration config;
@@ -83,7 +83,7 @@ public class KustvaktEncryption implements EncryptionIface {
                 hashString = bcryptHash(input, salt);
                 break;
             default:
-                jlog.warn("Invalid value: {}", config.getEncryption());
+                jlog.warn("Invalid value: "+ config.getEncryption());
                 break;
         }
         return hashString;

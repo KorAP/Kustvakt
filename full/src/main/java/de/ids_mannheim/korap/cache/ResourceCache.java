@@ -11,10 +11,11 @@ import de.ids_mannheim.korap.resources.ResourceFactory;
 import de.ids_mannheim.korap.user.User;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author hanl
@@ -31,7 +32,7 @@ import java.util.Collection;
 @SuppressWarnings("all")
 public class ResourceCache extends KustvaktCacheable {
 
-    private static Logger jlog = LoggerFactory.getLogger(ResourceCache.class);
+    private static Logger jlog = LogManager.getLogger(ResourceCache.class);
 
     public ResourceCache () {
         super("resources", "key:resources");

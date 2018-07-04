@@ -227,7 +227,7 @@ public class CollectionQueryBuilderTest {
         KoralCollectionQueryBuilder test = new KoralCollectionQueryBuilder();
         test.with("corpusSigle=WPD");
         String json = test.toJSON();
-        System.out.println(json);
+//        System.out.println(json);
         //JsonNode node = (JsonNode) test.rebaseCollection(null);
         //node = b.mergeWith(node);
         //assertNotNull(node);
@@ -249,7 +249,7 @@ public class CollectionQueryBuilderTest {
         // operator is not supposed to be here!
         test.and().with("corpusSigle=WPD");
         String json = test.toJSON();
-        System.out.println(json);
+//        System.out.println(json);
         //JsonNode node = (JsonNode) test.rebaseCollection(null);
         //node = b.mergeWith(node);
         //assertNotNull(node);
@@ -335,7 +335,7 @@ public class CollectionQueryBuilderTest {
         builder.setBaseQuery(resource.getData());
         builder.or().with("pubPlace=Mannheim");
 
-        System.out.println("query " + builder.toJSON());
+//        System.out.println("query " + builder.toJSON());
         // todo: assertions
     }
 
@@ -354,7 +354,7 @@ public class CollectionQueryBuilderTest {
         builder.setBaseQuery(resource.getData());
         builder.or().with("pubPlace=Mannheim");
 
-        System.out.println("query " + builder.toJSON());
+//        System.out.println("query " + builder.toJSON());
         // todo: assertions
     }
 

@@ -8,8 +8,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,7 +30,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class RewriteHandler{
     //implements BeanInjectable {
 
-    private static Logger jlog = LoggerFactory.getLogger(RewriteHandler.class);
+    private static Logger jlog = LogManager.getLogger(RewriteHandler.class);
     private Collection<RewriteTask.IterableRewritePath> node_processors;
     private Collection<RewriteTask.RewriteKoralToken> token_node_processors;
     private Collection<RewriteTask> query_processors;
@@ -208,7 +208,7 @@ public class RewriteHandler{
 
 
         private JsonNode start (boolean result) throws KustvaktException {
-            jlog.debug("Running rewrite process on query {}", root);
+            jlog.debug("Running rewrite process on query "+ root);
             if (root != null) {
                 Iterator<Map.Entry<String, JsonNode>> it = root.fields();
                 while (it.hasNext()) {

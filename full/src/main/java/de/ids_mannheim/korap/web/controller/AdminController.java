@@ -11,9 +11,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -44,7 +44,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class AdminController {
 
-    private static Logger jlog = LoggerFactory.getLogger(AdminController.class);
+    private static Logger jlog = LogManager.getLogger(AdminController.class);
     @Autowired
     private AuditingIface auditingController;
 

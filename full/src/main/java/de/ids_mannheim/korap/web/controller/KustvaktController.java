@@ -1,21 +1,20 @@
 package de.ids_mannheim.korap.web.controller;
 
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.server.KustvaktServer;
-import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.utils.ServiceInfo;
-import de.ids_mannheim.korap.web.CoreResponseHandler;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.server.KustvaktServer;
+import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.utils.ServiceInfo;
+import de.ids_mannheim.korap.web.CoreResponseHandler;
 
 /**
  * Created by hanl on 29.04.16.
@@ -24,7 +23,6 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class KustvaktController {
 
-    private static Logger jlog = LoggerFactory.getLogger(UserController.class);
     @Autowired
     private CoreResponseHandler kustvaktResponseHandler;
 

@@ -4,18 +4,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.PropertyConfigurator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+//import org.apache.logging.log4j.PropertyConfigurator;
 
-import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.Getter;
 
@@ -33,7 +31,7 @@ public class KustvaktConfiguration {
     public static final Map<String, Object> KUSTVAKT_USER = new HashMap<>();
 
     private static final Logger jlog =
-            LoggerFactory.getLogger(KustvaktConfiguration.class);
+            LogManager.getLogger(KustvaktConfiguration.class);
     private String indexDir;
     private int port;
     // todo: make exclusive so that the containg languages can really
@@ -198,54 +196,54 @@ public class KustvaktConfiguration {
 
 
     public static void loadLogger () {
-        InputStream stream = ConfigLoader.loadConfigStream("log4j.properties");
-        PropertyConfigurator.configure(stream);
+//        InputStream stream = ConfigLoader.loadConfigStream("log4j.properties");
+//        PropertyConfigurator.configure(stream);
         jlog.info("Done loading logging framework Log4j!");
     }
 
 
 
-    @Deprecated
-    public static void loadLog4jLogger () {
-        /** loadSubTypes log4j configuration file programmatically */
-        Properties log4j = new Properties();
-        try {
-            File f = new File(System.getProperty("user.dir"),
-                    "log4j.properties");
-            if (f.exists()) {
-                log4j.load(new FileInputStream(f));
-                PropertyConfigurator.configure(log4j);
-                jlog.info(
-                        "using local logging properties file ({}) to configure logging system",
-                        "./log4j.properties");
-                return;
-            }
-        }
-        catch (Exception e) {
-            // do nothing
-        }
-        loadClassLogger();
-    }
+//    @Deprecated
+//    public static void loadLog4jLogger () {
+//        /** loadSubTypes log4j configuration file programmatically */
+//        Properties log4j = new Properties();
+//        try {
+//            File f = new File(System.getProperty("user.dir"),
+//                    "log4j.properties");
+//            if (f.exists()) {
+//                log4j.load(new FileInputStream(f));
+//                PropertyConfigurator.configure(log4j);
+//                jlog.info(
+//                        "using local logging properties file ({}) to configure logging system",
+//                        "./log4j.properties");
+//                return;
+//            }
+//        }
+//        catch (Exception e) {
+//            // do nothing
+//        }
+//        loadClassLogger();
+//    }
 
 
-    @Deprecated
-    private static void loadClassLogger () {
-        Properties log4j = new Properties();
-        jlog.info(
-                "using class path logging properties file to configure logging system");
-
-        try {
-            log4j.load(KustvaktConfiguration.class.getClassLoader()
-                    .getResourceAsStream("log4j.properties"));
-        }
-        catch (IOException e) {
-            // do nothing
-        }
-
-        PropertyConfigurator.configure(log4j);
-        jlog.warn(
-                "No logger properties detected. Using default logger properties");
-    }
+//    @Deprecated
+//    private static void loadClassLogger () {
+//        Properties log4j = new Properties();
+//        jlog.info(
+//                "using class path logging properties file to configure logging system");
+//
+//        try {
+//            log4j.load(KustvaktConfiguration.class.getClassLoader()
+//                    .getResourceAsStream("log4j.properties"));
+//        }
+//        catch (IOException e) {
+//            // do nothing
+//        }
+//
+//        PropertyConfigurator.configure(log4j);
+//        jlog.warn(
+//                "No logger properties detected. Using default logger properties");
+//    }
 
     public enum BACKENDS {
         NEO4J, LUCENE

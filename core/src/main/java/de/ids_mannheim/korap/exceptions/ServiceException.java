@@ -4,12 +4,13 @@ import de.ids_mannheim.korap.auditing.AuditRecord;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author hanl
@@ -22,7 +23,7 @@ import java.util.List;
 public class ServiceException extends Exception {
 
     protected List<AuditRecord> records = new ArrayList<>();
-    private static final Logger jlog = LoggerFactory
+    private static final Logger jlog = LogManager
             .getLogger(ServiceException.class);
 
     private int status;

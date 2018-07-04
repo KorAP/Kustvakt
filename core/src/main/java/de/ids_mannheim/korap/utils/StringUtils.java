@@ -1,15 +1,15 @@
 package de.ids_mannheim.korap.utils;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class StringUtils {
-    private final static Logger jlog = LoggerFactory
+    private final static Logger jlog = LogManager
             .getLogger(StringUtils.class);
 
     private static final String SEP = ";";

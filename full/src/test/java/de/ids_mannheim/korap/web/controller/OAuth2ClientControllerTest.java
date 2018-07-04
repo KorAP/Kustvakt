@@ -248,7 +248,6 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
                 .delete(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
-        System.out.println(entity);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
@@ -274,7 +273,6 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
                 .entity(form).delete(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
-        System.out.println(entity);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);

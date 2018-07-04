@@ -1,13 +1,13 @@
 package de.ids_mannheim.korap.utils;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -30,7 +30,7 @@ public class TimeUtils {
     private static DateTimeFormatter dtf = DateTimeFormat
             .forPattern("dd/MM/yyyy");
     private static final DateTimeZone dtz = DateTimeZone.forID("Europe/Berlin");
-    private static Logger jlog = LoggerFactory.getLogger(TimeUtils.class);
+    private static Logger jlog = LogManager.getLogger(TimeUtils.class);
 
 
     public static int convertTimeToSeconds (String expirationVal) {
@@ -38,7 +38,7 @@ public class TimeUtils {
         int finIndex = expirationVal.length() - 1;
         char entity = expirationVal.charAt(finIndex);
         int returnSec = Integer.valueOf(expirationVal.substring(0, finIndex));
-        jlog.debug("setting time value to {} with time in {}", returnSec,
+        jlog.debug("setting time value to "+returnSec+" with time in "+
                 entity);
         switch (entity) {
             case 'D':

@@ -1,7 +1,7 @@
 package de.ids_mannheim.korap.handlers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
@@ -21,7 +21,7 @@ public class BatchBuilder {
     private static final int SMALL_MEDIUM_BATCH = 6;
     private static final int MEDIUM_BATCH = 8;
     private static final int LARGE_BATCH = 12;
-    private Logger log = LoggerFactory.getLogger(BatchBuilder.class);
+    private Logger log = LogManager.getLogger(BatchBuilder.class);
 
     private JdbcOperations operations;
 

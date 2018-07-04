@@ -2,7 +2,8 @@ package de.ids_mannheim.korap.config;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.runner.RunWith;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.InitializationError;
@@ -26,7 +27,7 @@ import net.jcip.annotations.NotThreadSafe;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class BeanConfigBaseTest {
 
-    private static Logger jlog = Logger.getLogger(BeanConfigBaseTest.class);
+    private static Logger jlog = LogManager.getLogger(BeanConfigBaseTest.class);
     @Autowired
     protected ApplicationContext context;
     

@@ -6,11 +6,11 @@ import java.nio.charset.StandardCharsets;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.context.Context;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -23,8 +23,10 @@ import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
-/** Manages mail related services, such as sending group member invitations 
- * per email.  
+/**
+ * Manages mail related services, such as sending group member
+ * invitations
+ * per email.
  * 
  * @author margaretha
  *
@@ -32,7 +34,7 @@ import de.ids_mannheim.korap.utils.ParameterChecker;
 @Service
 public class MailService {
 
-    private static Logger jlog = LoggerFactory.getLogger(MailService.class);
+    private static Logger jlog = LogManager.getLogger(MailService.class);
 
     @Autowired
     private AuthenticationManagerIface authManager;
@@ -49,7 +51,7 @@ public class MailService {
         ParameterChecker.checkStringValue(inviteeName, "inviteeName");
         ParameterChecker.checkStringValue(groupName, "groupName");
         ParameterChecker.checkStringValue(inviter, "inviter");
-        
+
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
 
             public void prepare (MimeMessage mimeMessage) throws Exception {

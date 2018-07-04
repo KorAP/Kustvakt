@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -23,7 +22,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -41,10 +41,8 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.security.context.TokenContext;
-import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.ServiceInfo;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
@@ -75,7 +73,7 @@ public class AuthenticationController {
     //todo: bootstrap function to transmit certain default configuration settings and examples (example user queries,
     // default usersettings, etc.)
     private static Logger jlog =
-            KustvaktLogger.getLogger(AuthenticationController.class);
+            LogManager.getLogger(AuthenticationController.class);
 
     @Autowired
     private AuthenticationManagerIface controller;
@@ -415,7 +413,7 @@ public class AuthenticationController {
             controller.logout(context);
         }
         catch (KustvaktException e) {
-            jlog.error("Logout Exception: {}", e.string());
+            jlog.error("Logout Exception:"+ e.string());
             throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();

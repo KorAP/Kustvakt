@@ -26,8 +26,8 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -73,7 +73,7 @@ public class UserController {
     @Autowired
     private KustvaktResponseHandler kustvaktResponseHandler;
 
-    private static Logger jlog = LoggerFactory.getLogger(UserController.class);
+    private static Logger jlog = LogManager.getLogger(UserController.class);
     @Autowired
     private AuthenticationManagerIface controller;
 
@@ -113,7 +113,7 @@ public class UserController {
                             uri.getUriFragment())
                     .queryParam(Attributes.QUERY_PARAM_USER,
                             user.getUsername());
-            jlog.info("registration was successful for user '{}'",
+            jlog.info("registration was successful for user "+
                     user.getUsername());
             Map<String, Object> object = new HashMap<String, Object>();
             object.put("confirm_uri", uriBuilder.build());
@@ -226,7 +226,7 @@ public class UserController {
                     .append(username);
         }
         catch (KustvaktException e) {
-            jlog.error("Eoxception encountered!", e.string());
+            jlog.error("Eoxception encountered! "+ e.string());
             throw kustvaktResponseHandler.throwit(e);
         }
 
@@ -364,7 +364,7 @@ public class UserController {
                 result = data.serialize();
         }
         catch (KustvaktException e) {
-            jlog.error("Exception encountered: {}", e.string());
+            jlog.error("Exception encountered: "+ e.string());
             throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok(result).build();

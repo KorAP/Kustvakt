@@ -8,8 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +43,7 @@ import de.ids_mannheim.korap.web.input.UserGroupJson;
 public class UserGroupService {
 
     private static Logger jlog =
-            LoggerFactory.getLogger(UserGroupService.class);
+            LogManager.getLogger(UserGroupService.class);
     @Autowired
     private UserGroupDao userGroupDao;
     @Autowired

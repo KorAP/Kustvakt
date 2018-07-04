@@ -1,14 +1,15 @@
 package de.ids_mannheim.korap.user;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Getter
 @Setter
 public class KorAPUser extends User {
-    private static Logger jlog = LoggerFactory.getLogger(KorAPUser.class);
+    private static Logger jlog = LogManager.getLogger(KorAPUser.class);
     private static final long serialVersionUID = -7108308497625884584L;
 
     //fixme: accountlink to shibboleth account

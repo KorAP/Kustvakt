@@ -12,8 +12,8 @@ import java.util.Map;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 // import com.novell.ldap.*; search() funktioniert nicht korrekt, ausgewechselt gegen unboundID's Bibliothek 20.04.17/FB
@@ -62,7 +62,7 @@ import de.ids_mannheim.korap.utils.TimeUtils;
  */
 public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
-	private static Logger jlog = LoggerFactory.getLogger(KustvaktAuthenticationManager.class);
+	private static Logger jlog = LogManager.getLogger(KustvaktAuthenticationManager.class);
 	private EncryptionIface crypto;
 	private EntityHandlerIface entHandler;
 	@Autowired
@@ -233,7 +233,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 	    {
 	    	// to be absolutely sure:
 	    	user.setCorpusAccess(User.CorpusAccess.FREE);
-	    	jlog.debug("setAccessAndLocation: DemoUser: location=%s, access=%s.\n", user.locationtoString(), user.accesstoString());
+	    	jlog.debug("setAccessAndLocation: DemoUser: location="+user.locationtoString()+" access="+ user.accesstoString());
 	     	return;
 	    }
 		
@@ -266,7 +266,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 			user.setLocation(location);
 			user.setCorpusAccess(corpusAccess);
 	    	
-	    	jlog.debug("setAccessAndLocation: KorAPUser: location=%s, access=%s.\n", user.locationtoString(), user.accesstoString());
+	    	jlog.debug("setAccessAndLocation: KorAPUser: location="+user.locationtoString()+", access="+ user.accesstoString());
 
 		}
 	} // getAccess
@@ -371,9 +371,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 				URIParam param = (URIParam) user.getField(URIParam.class);
 
 				if (param.hasValues()) {
-					jlog.debug("Account is not yet activated for user '{}'", user.getUsername());
+					jlog.debug("Account is not yet activated for user '"+user.getUsername()+"'" );
 					if (TimeUtils.getNow().isAfter(param.getUriExpiration())) {
-						jlog.error("URI token is expired. Deleting account for user {}", user.getUsername());
+						jlog.error("URI token is expired. Deleting account for user "+ user.getUsername());
 						deleteAccount(user);
 						throw new WrappedException(
 								new KustvaktException(unknown.getId(), StatusCodes.EXPIRED,
@@ -384,7 +384,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 							new KustvaktException(unknown.getId(), StatusCodes.ACCOUNT_NOT_CONFIRMED),
 							StatusCodes.LOGIN_FAILED, username);
 				}
-				jlog.error("ACCESS DENIED: account not active for '{}'", unknown.getUsername());
+				jlog.error("ACCESS DENIED: account not active for '"+unknown.getUsername()+"'");
 				throw new WrappedException(new KustvaktException(unknown.getId(), StatusCodes.ACCOUNT_DEACTIVATED),
 						StatusCodes.LOGIN_FAILED, username);
 			}
@@ -434,8 +434,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 			int ret = LdapAuth3.login(username, password, config.getLdapConfig());
 			System.out.printf("Debug: autenticationIdM: Ldap.login(%s) returns: %d.\n", username, ret);
 			if (ret != LdapAuth3.LDAP_AUTH_ROK) {
-				jlog.error("LdapAuth3.login(username='{}') returns '{}'='{}'!", username, ret,
-						LdapAuth3.getErrMessage(ret));
+				jlog.error("LdapAuth3.login(username='"+username+"') returns '"+ret+"'='"+LdapAuth3.getErrMessage(ret)+"'!");
 
 				// mask exception to disable user guessing in possible attacks
 				/*
@@ -448,7 +447,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 			}
 		} catch (LDAPException e) {
 
-			jlog.error("Error: username='{}' -> '{}'!", username, e);
+			jlog.error("Error: username='"+username+"' -> '"+e+"'!");
 			// mask exception to disable user guessing in possible attacks
 			/*
 			 * by Hanl: throw new WrappedException(new
@@ -540,11 +539,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 		try {
 			user = entHandler.getAccount(username);
 		} catch (EmptyResultException e) {
-			jlog.debug("user does not exist ({})", username);
+			jlog.debug("user does not exist: "+ username);
 			return false;
 
 		} catch (KustvaktException e) {
-			jlog.error("KorAPException", e.string());
+			jlog.error("KorAPException "+ e.string());
 			return false;
 			// throw new KustvaktException(username,
 			// StatusCodes.ILLEGAL_ARGUMENT,
@@ -590,7 +589,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
 		KorAPUser u = (KorAPUser) user;
 		u.setAccountLocked(true);
-		jlog.info("locking account for user: {}", user.getUsername());
+		jlog.info("locking account for user: "+ user.getUsername());
 		entHandler.updateAccount(u);
 	}
 
@@ -628,7 +627,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 			validator.validateEntry(username, Attributes.USERNAME);
 			validator.validateEntry(newPassphrase, Attributes.PASSWORD);
 		} catch (KustvaktException e) {
-			jlog.error("Error: {}", e.string());
+			jlog.error("Error: "+ e.string());
 			throw new WrappedException(
 					new KustvaktException(username, StatusCodes.ILLEGAL_ARGUMENT, "password invalid", newPassphrase),
 					StatusCodes.PASSWORD_RESET_FAILED, username, newPassphrase);
@@ -649,14 +648,14 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 					new KustvaktException(username, StatusCodes.EXPIRED, "URI fragment expired", uriFragment),
 					StatusCodes.PASSWORD_RESET_FAILED, username, uriFragment);
 		else if (result == 1)
-			jlog.info("successfully reset password for user {}", username);
+			jlog.info("successfully reset password for user "+ username);
 	}
 
 	public void confirmRegistration(String uriFragment, String username) throws KustvaktException {
 		try {
 			validator.validateEntry(username, Attributes.USERNAME);
 		} catch (KustvaktException e) {
-			jlog.error("Error: {}", e.string());
+			jlog.error("Error: "+ e.string());
 			throw new WrappedException(e, StatusCodes.ACCOUNT_CONFIRMATION_FAILED, username, uriFragment);
 		}
 		int r = entHandler.activateAccount(username, uriFragment);
@@ -672,7 +671,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 			throw new WrappedException(new KustvaktException(user.getId(), StatusCodes.EXPIRED),
 					StatusCodes.ACCOUNT_CONFIRMATION_FAILED, username, uriFragment);
 		} else if (r == 1)
-			jlog.info("successfully confirmed user registration for user {}", username);
+			jlog.info("successfully confirmed user registration for user "+ username);
 		// register successful audit!
 	}
 
@@ -727,7 +726,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 			UserSettings settings = new UserSettings();
 			settings.read(safeMap, true);
 
-			jlog.info("Creating new user account for user {}", user.getUsername());
+			jlog.info("Creating new user account for user "+ user.getUsername());
 			entHandler.createAccount(user);
 //			if (user.isSystemAdmin() && user instanceof KorAPUser) {
 //				adminDao.addAccount(user);
@@ -744,7 +743,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 			assert dao != null;
 			dao.store(settings);
 		} catch (KustvaktException e) {
-			jlog.error("Error: {}", e.string());
+			jlog.error("Error: "+ e.string());
 			throw new WrappedException(e, StatusCodes.CREATE_ACCOUNT_FAILED, user.toString());
 		}
 
@@ -754,7 +753,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 
 	// todo:
 	private ShibbolethUser createShibbUserAccount(Map<String, Object> attributes) throws KustvaktException {
-		jlog.debug("creating shibboleth user account for user attr: {}", attributes);
+		jlog.debug("creating shibboleth user account for user attr: "+ attributes);
 		Map<String, Object> safeMap = validator.validateMap(attributes);
 
 		// todo eppn non-unique.join with idp or use persistent_id as username
@@ -841,7 +840,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 			try {
 				result = entHandler.updateAccount(user) > 0;
 			} catch (KustvaktException e) {
-				jlog.error("Error: {}", e.string());
+				jlog.error("Error: "+ e.string());
 				throw new WrappedException(e, StatusCodes.UPDATE_ACCOUNT_FAILED);
 			}
 		}
@@ -861,7 +860,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 			try {
 				result = entHandler.deleteAccount(user.getId()) > 0;
 			} catch (KustvaktException e) {
-				jlog.error("Error: {}", e.string());
+				jlog.error("Error: "+ e.string());
 				throw new WrappedException(e, StatusCodes.DELETE_ACCOUNT_FAILED);
 			}
 		}
@@ -906,7 +905,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 		try {
 			entHandler.updateAccount(user);
 		} catch (KustvaktException e) {
-			jlog.error("Error ", e.string());
+			jlog.error("Error "+ e.string());
 			throw new WrappedException(e, StatusCodes.PASSWORD_RESET_FAILED);
 		}
 		return new Object[] { uritoken, TimeUtils.format(param.getUriExpiration()) };
@@ -927,7 +926,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 						clazz.getSimpleName());
 			return data;
 		} catch (KustvaktException e) {
-			jlog.error("Error during user data retrieval: {}", e.getEntity());
+			jlog.error("Error during user data retrieval: "+ e.getEntity());
 			throw new WrappedException(e, StatusCodes.GET_ACCOUNT_FAILED);
 		}
 	}
@@ -942,7 +941,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
 			if (dao != null)
 				dao.update(data);
 		} catch (KustvaktException e) {
-			jlog.error("Error during update of user data!", e.getEntity());
+			jlog.error("Error during update of user data! "+ e.getEntity());
 			throw new WrappedException(e, StatusCodes.UPDATE_ACCOUNT_FAILED);
 		}
 	}

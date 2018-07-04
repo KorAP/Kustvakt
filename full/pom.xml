@@ -32,9 +32,6 @@
 		<testResources>
 			<testResource>
 				<directory>src/test/resources</directory>
-				<!-- <filtering>true</filtering> <includes> <include>**/*.key</include> 
-					<include>**/*.token</include> <include>**/*.xml</include> <include>**/*.conf</include> 
-					<include>**/*.info</include> <include>**/*.properties</include> </includes> -->
 			</testResource>
 			<testResource>
 				<directory>src/main/resources</directory>
@@ -86,9 +83,11 @@
 					<reuseForks>false</reuseForks>
 					<forkCount>2</forkCount>
 					<threadCount>4</threadCount>
-					<argLine>-Xmx512m -XX:MaxPermSize=256m</argLine>
+					<argLine>-Xmx512m -XX:MaxPermSize=256m 
+						-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager</argLine>
 					<excludes>
 						<exclude>de/ids_mannheim/korap/authentication/*.java</exclude>
+						<exclude>de/ids_mannheim/korap/web/controller/TokenExpiryTest.java</exclude>
 					</excludes>
 					<includes>
 						<include>de/ids_mannheim/korap/**/*.java</include>

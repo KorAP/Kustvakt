@@ -24,8 +24,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,7 +54,6 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
-import de.ids_mannheim.korap.utils.KustvaktLogger;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.web.ClientsHandler;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
@@ -79,7 +78,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 public class SearchController {
 
     private static Logger jlog =
-            LoggerFactory.getLogger(SearchController.class);
+            LogManager.getLogger(SearchController.class);
 
     @Autowired
     private CoreResponseHandler kustvaktResponseHandler;
@@ -401,11 +400,11 @@ public class SearchController {
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
-        jlog.info("Serialized search: {}", jsonld);
+        jlog.info("Serialized search: "+ jsonld);
 
         String result = searchKrill.search(jsonld);
         // todo: logging
-        KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
+        jlog.trace("The result set: "+ result);
         return Response.ok(result).build();
     }
 
@@ -432,7 +431,7 @@ public class SearchController {
             //            System.out.printf("Debug: /search/: location=%s, access='%s'.\n", user.locationtoString(), user.accesstoString());
         }
         catch (KustvaktException e) {
-            jlog.error("Failed retrieving user in the search service: {}",
+            jlog.error("Failed retrieving user in the search service: "+
                     e.string());
             throw kustvaktResponseHandler.throwit(e);
         }
@@ -448,7 +447,7 @@ public class SearchController {
         String query;
         try {
             query = this.processor.processQuery(serializer.toJSON(), user);
-            jlog.info("the serialized query {}", query);
+            jlog.info("the serialized query "+ query);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -486,7 +485,7 @@ public class SearchController {
         else {
             result = searchKrill.search(query);
         }
-        KustvaktLogger.QUERY_LOGGER.trace("The result set: {}", result);
+        jlog.trace("The result set: "+ result);
         return result;
 
     }
@@ -509,7 +508,7 @@ public class SearchController {
             return this.graphDBhandler.getResponse(map, "distKwic");
         }
         catch (KustvaktException e) {
-            jlog.error("Failed searching in Neo4J: {}", e.string());
+            jlog.error("Failed searching in Neo4J: "+ e.string());
             throw kustvaktResponseHandler.throwit(e);
         }
 
@@ -534,7 +533,7 @@ public class SearchController {
             user = controller.getUser(c.getUsername());
         }
         catch (KustvaktException e) {
-            jlog.error("Exception encountered: {}", e.string());
+            jlog.error("Exception encountered: "+ e.string());
             throw kustvaktResponseHandler.throwit(e);
         }
 
@@ -597,7 +596,7 @@ public class SearchController {
                     user.locationtoString(), user.accesstoString());
         }
         catch (KustvaktException e) {
-            jlog.error("Failed getting user in the matchInfo service: {}",
+            jlog.error("Failed getting user in the matchInfo service: "+
                     e.string());
             throw kustvaktResponseHandler.throwit(e);
         }

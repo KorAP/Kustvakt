@@ -13,10 +13,8 @@ import java.util.Date;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.apache.http.HttpStatus;
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.message.types.TokenType;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MultiValueMap;
@@ -42,7 +40,6 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
@@ -107,36 +104,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         assertEquals("thisIsMyState", params.getFirst("state"));
     }
 
-    @Ignore
-    // cannot be tested dynamically
-    public void testRequestAuthorizationCodeAuthenticationTooOld ()
-            throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("response_type", "code");
-        form.add("client_id", "fCBbQkAyYzI4NzUxMg");
-        form.add("redirect_uri", redirectUri);
-        form.add("scope", "openid");
-        form.add("max_age", "1");
-
-        ClientResponse response =
-                resource().path("oauth2").path("openid").path("authorize")
-                        .header(Attributes.AUTHORIZATION,
-                                "Bearer ")
-                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                        .header(HttpHeaders.CONTENT_TYPE,
-                                ContentType.APPLICATION_FORM_URLENCODED)
-                        .entity(form).post(ClientResponse.class);
-
-        assertEquals(HttpStatus.SC_UNAUTHORIZED, response.getStatus());
-        String entity = response.getEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.USER_REAUTHENTICATION_REQUIRED,
-                node.at("/errors/0/0").asInt());
-        assertEquals(
-                "User reauthentication is required because the authentication "
-                        + "time is too old according to max_age",
-                node.at("/errors/0/1").asText());
-    }
+    
 
     private void testRequestAuthorizationCodeWithoutOpenID (
             MultivaluedMap<String, String> form, String redirectUri)

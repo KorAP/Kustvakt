@@ -1,36 +1,37 @@
 package de.ids_mannheim.korap.handlers;
 
-import de.ids_mannheim.korap.config.ClientInfo;
-import de.ids_mannheim.korap.constant.TokenType;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.exceptions.DatabaseException;
-import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
-import de.ids_mannheim.korap.security.context.TokenContext;
-import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.BooleanUtils;
-import de.ids_mannheim.korap.utils.TimeUtils;
-import edu.emory.mathcs.backport.java.util.Collections;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.List;
+import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.ClientInfo;
+import de.ids_mannheim.korap.constant.TokenType;
+import de.ids_mannheim.korap.exceptions.DatabaseException;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
+import de.ids_mannheim.korap.security.context.TokenContext;
+import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.BooleanUtils;
+import de.ids_mannheim.korap.utils.TimeUtils;
+import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * Created by hanl on 7/14/14.
  */
 public class OAuthDb {
 
-    private static final Logger jlog = LoggerFactory.getLogger(OAuthDb.class);
+    private static final Logger jlog = LogManager.getLogger(OAuthDb.class);
     private NamedParameterJdbcTemplate jdbcTemplate;
 
 
@@ -64,7 +65,7 @@ public class OAuthDb {
                     });
         }
         catch (EmptyResultDataAccessException ex) {
-            jlog.error("'{}' client found", clientid, ex.fillInStackTrace());
+            jlog.error(clientid+" client found "+ ex.fillInStackTrace());
             return null;
         }
     }
@@ -98,7 +99,7 @@ public class OAuthDb {
             this.jdbcTemplate.update(tokens, source);
         }
         catch (DataAccessException e) {
-            jlog.error("authorization could not be revoked for user '{}'",
+            jlog.error("authorization could not be revoked for user "+
                     user.getUsername());
             return false;
         }
@@ -126,7 +127,7 @@ public class OAuthDb {
         }
         catch (DataAccessException e) {
             e.printStackTrace();
-            jlog.error("token '{}' could not be added for user '{}'", token,
+            jlog.error("token "+token+" could not be added for user "+ 
                     userid);
             return false;
         }
@@ -144,11 +145,11 @@ public class OAuthDb {
             return this.jdbcTemplate.queryForObject(sql, s, String.class);
         }
         catch (EmptyResultDataAccessException ex) {
-            jlog.error("no token found for user '{}'", userid);
+            jlog.error("no token found for user "+ userid);
             return null;
         }
         catch (DataAccessException ex) {
-            jlog.error("token retrieval failed for user '{}'", userid);
+            jlog.error("token retrieval failed for user "+ userid);
             return null;
         }
     }
@@ -219,12 +220,12 @@ public class OAuthDb {
             return context;
         }
         catch (EmptyResultDataAccessException ee) {
-            jlog.error("no context found for token '{}'", token);
+            jlog.error("no context found for token "+ token);
             revokeToken(token);
             throw new KustvaktException(StatusCodes.EXPIRED, "token", token);
         }
         catch (DataAccessException e) {
-            jlog.error("token context retrieval failed for '{}'", token);
+            jlog.error("token context retrieval failed for "+ token);
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
                     "invalid token", token);
         }
@@ -246,7 +247,7 @@ public class OAuthDb {
         }
         catch (DataAccessException e) {
             e.printStackTrace();
-            jlog.error("removing client '{}' failed", info.getClient_id());
+            jlog.error("removing client "+info.getClient_id()+" failed");
             throw new DatabaseException(new KustvaktException(user.getId(),
                     StatusCodes.ILLEGAL_ARGUMENT, "arguments given not valid",
                     info.toJSON()), StatusCodes.CLIENT_DEREGISTRATION_FAILED,
@@ -272,7 +273,7 @@ public class OAuthDb {
         }
         catch (DataAccessException e) {
             e.printStackTrace();
-            jlog.error("registering client '{}' failed", info.getClient_id());
+            jlog.error("registering client "+info.getClient_id()+" failed");
             throw new DatabaseException(new KustvaktException(user.getId(),
                     StatusCodes.ILLEGAL_ARGUMENT, "arguments given not valid",
                     info.toJSON()), StatusCodes.CLIENT_REGISTRATION_FAILED,

@@ -1,20 +1,20 @@
 package de.ids_mannheim.korap.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Created by hanl on 08.06.16.
  */
 public class ConfigLoader {
 
-    private static final Logger jlog = LoggerFactory.getLogger(ConfigLoader.class);
+    private static final Logger jlog = LogManager.getLogger(ConfigLoader.class);
 
 
     private ConfigLoader () {}

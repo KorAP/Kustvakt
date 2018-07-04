@@ -2,12 +2,13 @@ package de.ids_mannheim.korap.authentication;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.utils.TimeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author hanl
@@ -15,7 +16,7 @@ import java.util.Map;
  */
 public class LoginCounter {
 
-    private static Logger jlog = LoggerFactory.getLogger(LoginCounter.class);
+    private static Logger jlog = LogManager.getLogger(LoginCounter.class);
     private final Map<String, Long[]> failedLogins;
     private KustvaktConfiguration config;
 
@@ -45,7 +46,7 @@ public class LoginCounter {
         set[1] = expires;
 
         failedLogins.put(username, set);
-        jlog.warn("user failed to login ({}) ",
+        jlog.warn("user failed to login "+
                 Arrays.asList(failedLogins.get(username)));
     }
 

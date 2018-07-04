@@ -1,5 +1,22 @@
 package de.ids_mannheim.korap.web.filter;
 
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Random;
+
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.ext.Provider;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
@@ -10,23 +27,15 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
+
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.security.context.TokenContext;
-import de.ids_mannheim.korap.user.*;
+import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.user.UserSettings;
+import de.ids_mannheim.korap.user.Userdata;
 import net.minidev.json.JSONArray;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.ext.Provider;
-import java.security.SecureRandom;
-import java.util.*;
 
 /**
  * @author hanl
@@ -39,7 +48,7 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
     private WebResource service;
     //    private static final String SERVICE = "http://localhost:8888";
     private static final String SERVICE = "http://10.0.10.13";
-    private static Logger jlog = LoggerFactory.getLogger(PiwikFilter.class);
+    private static Logger jlog = LogManager.getLogger(PiwikFilter.class);
     public static boolean ENABLED = false;
     private Map<String, String> customVars;
     @Autowired

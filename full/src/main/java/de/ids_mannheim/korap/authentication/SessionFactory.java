@@ -6,9 +6,10 @@ import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.DemoUser;
 import de.ids_mannheim.korap.utils.ConcurrentMultiMap;
 import de.ids_mannheim.korap.utils.TimeUtils;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -31,7 +32,7 @@ import java.util.concurrent.ConcurrentMap;
 //todo: use simple ehcache!
 public class SessionFactory implements Runnable {
 
-    private static Logger jlog = LoggerFactory.getLogger(SessionFactory.class);
+    private static Logger jlog = LogManager.getLogger(SessionFactory.class);
 
     public static ConcurrentMap<String, TokenContext> sessionsObject;
     public static ConcurrentMap<String, DateTime> timeCheck;
@@ -42,7 +43,7 @@ public class SessionFactory implements Runnable {
 
 
     public SessionFactory (boolean multipleEnabled, int inactive) {
-        jlog.debug("allow multiple sessions per user: '{}'", multipleEnabled);
+        jlog.debug("allow multiple sessions per user: "+ multipleEnabled);
         this.multipleEnabled = multipleEnabled;
         this.inactive = inactive;
         this.sessionsObject = new ConcurrentHashMap<>();
@@ -62,7 +63,7 @@ public class SessionFactory implements Runnable {
     // todo: remove this!
     @Cacheable("session")
     public TokenContext getSession (String token) throws KustvaktException {
-        jlog.debug("logged in users: {}", loggedInRecord);
+        jlog.debug("logged in users: "+ loggedInRecord);
         TokenContext context = sessionsObject.get(token);
         if (context != null) {
             // fixme: set context to respecitve expiratin interval and return context. handler checks expiration later!
@@ -137,7 +138,7 @@ public class SessionFactory implements Runnable {
                 return true;
             }
             else
-                jlog.debug("user with token {} has an invalid session", token);
+                jlog.debug("user with token "+token+" has an invalid session");
         }
         return false;
     }
@@ -153,7 +154,7 @@ public class SessionFactory implements Runnable {
         for (Entry<String, DateTime> entry : timeCheck.entrySet()) {
             if (!isUserSessionValid(entry.getKey())) {
                 TokenContext user = sessionsObject.get(entry.getKey());
-                jlog.trace("removing user session for user {}",
+                jlog.trace("removing user session for user "+
                         user.getUsername());
                 inactive.add(user.getUsername());
                 removeSession(entry.getKey());
@@ -161,7 +162,7 @@ public class SessionFactory implements Runnable {
         }
         // fixme: not doing anything!
         if (inactive.size() > 0)
-            jlog.trace("removing inactive user session for users '{}' ",
+            jlog.trace("removing inactive user session for users "+
                     inactive);
     }
 
@@ -173,6 +174,6 @@ public class SessionFactory implements Runnable {
     public void run () {
         timeoutMaintenance();
         if (loggedInRecord.size() > 0)
-            jlog.debug("logged users: {}", loggedInRecord.toString());
+            jlog.debug("logged users: "+ loggedInRecord.toString());
     }
 }

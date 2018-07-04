@@ -8,8 +8,8 @@ import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.web.utils.KustvaktMap;
 import org.apache.commons.validator.routines.*;
 import org.apache.commons.validator.routines.RegexValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.*;
@@ -19,7 +19,7 @@ import java.util.*;
  */
 public class ApacheValidator implements ValidatorIface {
 
-    private static Logger jlog = LoggerFactory.getLogger(ApacheValidator.class);
+    private static Logger jlog = LogManager.getLogger(ApacheValidator.class);
 
     private static final String STRING_PATTERN = "^[\\.;:,&\\|@\\[\\]\\=\\*\\/\\/_()\\-0-9\\p{L}\\p{Space}]{0,1024}$";
 
@@ -117,8 +117,8 @@ public class ApacheValidator implements ValidatorIface {
             else
                 return this.isValid(input, "string");
         }
-        jlog.debug("validating entry '{}' of type '{}': {}", input, type,
-                valid ? "Is valid!" : "Is not valid!");
+        jlog.debug("validating entry "+input+" of type "+type+": "+ (
+                valid ? "Is valid!" : "Is not valid!"));
         return valid;
     }
 }

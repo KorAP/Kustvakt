@@ -3,8 +3,8 @@ package de.ids_mannheim.korap.oauth2.service;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,7 @@ import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 public class OAuth2AuthorizationService {
 
     private static Logger jlog =
-            LoggerFactory.getLogger(OAuth2AuthorizationService.class);
+            LogManager.getLogger(OAuth2AuthorizationService.class);
 
     @Autowired
     protected OAuth2ClientService clientService;

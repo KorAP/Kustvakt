@@ -10,9 +10,10 @@ import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.TimeUtils;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -27,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class SessionAuthentication implements AuthenticationIface {
 
-    private static final Logger jlog = LoggerFactory
+    private static final Logger jlog = LogManager
             .getLogger(SessionAuthentication.class);
     public static SessionFactory sessions;
     private ScheduledThreadPoolExecutor scheduled;
@@ -52,7 +53,7 @@ public class SessionAuthentication implements AuthenticationIface {
     @Override
     public TokenContext getTokenContext(String authenticationToken)
             throws KustvaktException {
-        jlog.debug("retrieving user session for user '{}'", authenticationToken);
+        jlog.debug("retrieving user session for user "+ authenticationToken);
         return this.sessions.getSession(authenticationToken);
     }
 

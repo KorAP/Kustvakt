@@ -7,8 +7,9 @@ import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
@@ -26,7 +27,7 @@ import java.util.HashMap;
  */
 public class UserSettingsDao implements UserDataDbIface<UserSettings> {
 
-    private static final Logger jlog = LoggerFactory
+    private static final Logger jlog = LogManager
             .getLogger(UserSettingsDao.class);
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
@@ -52,7 +53,7 @@ public class UserSettingsDao implements UserDataDbIface<UserSettings> {
             return id;
         }
         catch (DataAccessException e) {
-            jlog.error("couldn't store data in db for user with id '{}'",
+            jlog.error("couldn't store data in db for user with id "+
                     data.getUserId());
             return -1;
         }

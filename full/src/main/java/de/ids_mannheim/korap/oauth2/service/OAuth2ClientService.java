@@ -42,9 +42,6 @@ import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 @Service
 public class OAuth2ClientService {
 
-    // private Logger jlog =
-    // Logger.getLogger(OAuth2ClientService.class);
-
     @Autowired
     private OAuth2ClientDao clientDao;
     @Autowired

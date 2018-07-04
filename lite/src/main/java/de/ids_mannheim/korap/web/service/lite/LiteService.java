@@ -17,8 +17,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -55,7 +55,7 @@ import de.ids_mannheim.korap.web.SearchKrill;
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class LiteService {
 
-    private static Logger jlog = LoggerFactory.getLogger(LiteService.class);
+    private static Logger jlog = LogManager.getLogger(LiteService.class);
 
     @Autowired
     CoreResponseHandler kustvaktResponseHandler;
@@ -145,10 +145,10 @@ public class LiteService {
             throw kustvaktResponseHandler.throwit(e);
         }
         // todo: should be possible to add the meta part to the query serialization
-        jlog.info("Serialized search: {}", jsonld);
+        jlog.info("Serialized search: "+jsonld);
         try {
             String result = searchKrill.search(jsonld);
-            jlog.debug("The result set: {}", result);
+            jlog.debug("The result set: "+result);
             return Response.ok(result).build();
         }
         catch (Exception e) {
@@ -188,7 +188,7 @@ public class LiteService {
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
-        jlog.info("the serialized query {}", query);
+        jlog.info("the serialized query "+ query);
 
         // This may not work with the the KoralQuery
         if (eng.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
@@ -209,7 +209,7 @@ public class LiteService {
         }
         else
             result = searchKrill.search(query);
-        jlog.debug("The result set: {}", result);
+        jlog.debug("The result set: "+ result);
         return Response.ok(result).build();
     }
 
@@ -290,7 +290,7 @@ public class LiteService {
             throw kustvaktResponseHandler.throwit(500, e.getMessage(), null);
         }
 
-        jlog.debug("The result set: {}", result);
+        jlog.debug("The result set: "+ result);
         return Response.ok(result).build();
     }
 

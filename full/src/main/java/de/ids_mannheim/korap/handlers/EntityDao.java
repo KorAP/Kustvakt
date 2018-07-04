@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -41,7 +41,7 @@ import de.ids_mannheim.korap.utils.TimeUtils;
  */
 public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
 
-    private static Logger jlog = LoggerFactory.getLogger(EntityDao.class);
+    private static Logger jlog = LogManager.getLogger(EntityDao.class);
     private NamedParameterJdbcTemplate jdbcTemplate;
 
 
@@ -67,7 +67,7 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
             return user;
         	}
         catch (EmptyResultDataAccessException ae) {
-            jlog.warn("No user found for name '{}'", username);
+            jlog.warn("No user found for name "+ username);
         	}
         catch (DataAccessException e) {
             jlog.warn("Could not retrieve user for name: " + username, e);
@@ -261,7 +261,7 @@ public class EntityDao implements EntityHandlerIface, KustvaktBaseDaoInterface {
             user.setId(holder.getKey().intValue());
         }
         catch (DuplicateKeyException e) {
-            jlog.error("Could not create user account with username: {}",
+            jlog.error("Could not create user account with username: "+
                     user.getUsername());
             throw new DatabaseException(e, user.getUsername(), "korap_users",
                     StatusCodes.DB_ENTRY_EXISTS, "Username exists.",
