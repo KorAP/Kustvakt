@@ -453,6 +453,21 @@ public class SearchController {
             throw kustvaktResponseHandler.throwit(e);
         }
 
+		JsonNode node;
+        try {
+			node = JsonUtils.readTree(query);
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+
+		// No errors in query processing
+		if (!node.at("/errors").isMissingNode()) {
+
+			// Do not pass further to backend
+			return Response.status(Response.Status.BAD_REQUEST).entity(query).build();		
+		};
+
         String result = doSearch(eng, query, pageLength, meta);
         jlog.debug("Query result: " + result);
         return Response.ok(result).build();

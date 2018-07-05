@@ -3,6 +3,8 @@ package de.ids_mannheim.korap.web.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.*;
@@ -166,6 +168,27 @@ public class LiteServiceTest extends JerseyTest{
         assertEquals("base/s:s", node.at("/meta/context").asText());
         assertEquals("13", node.at("/meta/count").asText());
         assertNotEquals(0, node.at("/matches").size());
+    }
+
+	@Test
+    public void testQueryFailure () throws KustvaktException{
+        ClientResponse response = resource()
+                .path("search").queryParam("q", "[orth=das")
+                .queryParam("ql", "poliqarp")
+                .queryParam("cq", "corpusSigle=WPD | corpusSigle=GOE")
+			.queryParam("count", "13")
+			.get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+                response.getStatus());
+        String query = response.getEntity(String.class);
+
+		JsonNode node = JsonUtils.readTree(query);
+        assertNotNull(node);
+        assertEquals(302, node.at("/errors/0/0").asInt());
+        assertEquals(302, node.at("/errors/1/0").asInt());
+		assertTrue(node.at("/errors/2").isMissingNode());
+		assertFalse(node.at("/collection").isMissingNode());
+        assertEquals(13, node.at("/meta/count").asInt());
     }
 
 

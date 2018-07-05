@@ -1,5 +1,5 @@
 version 0.60.4
-04/07/2018
+05/07/2018
     - implemented OAuth2 authorization code request with OpenID Authentication (margaretha)
     - enabled OAuth2 authorization without OpenID authentication using Nimbus library (margaretha)
     - implemented response handler for OpenID authentication errors in authorization requests (margaretha)
@@ -20,6 +20,7 @@ version 0.60.4
     - fixed OAuth2 client unique URL-hashcode (margaretha)
     - migrated logging to log4j 2 and adapted java.util.logging to log4j(margaretha)
     - Added support for unrestricted corpus statistics (ndiewald)
+    - Do not pass broken queries to Krill (diewald)
     
 version 0.60.3
 06/06/2018
