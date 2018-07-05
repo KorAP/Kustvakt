@@ -123,7 +123,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("response_type", "string");
         form.add("state", "thisIsMyState");
-        
+
         ClientResponse response = requestAuthorizationConfidentialClient(form);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
@@ -143,7 +143,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         form.add("client_id", "fCBbQkAyYzI4NzUxMg");
         form.add("scope", "read_address");
         form.add("state", "thisIsMyState");
-        
+
         ClientResponse response = requestAuthorizationConfidentialClient(form);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
@@ -151,7 +151,8 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         MultiValueMap<String, String> params =
                 UriComponentsBuilder.fromUri(location).build().getQueryParams();
         assertEquals(OAuth2Error.INVALID_SCOPE, params.getFirst("error"));
-        assertEquals("read_address+is+an+invalid+scope", params.getFirst("error_description"));
+        assertEquals("read_address+is+an+invalid+scope",
+                params.getFirst("error_description"));
         assertEquals("thisIsMyState", params.getFirst("state"));
     }
 
@@ -317,6 +318,31 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         ClientResponse response = requestToken(form);
         String entity = response.getEntity(String.class);
 
+        JsonNode node = JsonUtils.readTree(entity);
+        assertNotNull(node.at("/access_token").asText());
+        assertNotNull(node.at("/refresh_token").asText());
+        assertEquals(TokenType.BEARER.toString(),
+                node.at("/token_type").asText());
+        assertNotNull(node.at("/expires_in").asText());
+    }
+
+    @Test
+    public void testRequestTokenPasswordGrantAuthorizationHeader ()
+            throws KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("grant_type", "password");
+        form.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        form.add("username", "dory");
+        form.add("password", "password");
+
+        ClientResponse response = resource().path("oauth2").path("token")
+                .header(HttpHeaders.AUTHORIZATION,
+                        "Basic ZkNCYlFrQXlZekk0TnpVeE1nOnNlY3JldA==")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
+        String entity = response.getEntity(String.class);
+        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());

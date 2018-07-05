@@ -1,13 +1,15 @@
 package de.ids_mannheim.korap.web.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.util.Iterator;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.*;
 
 import org.apache.lucene.LucenePackage;
 import org.junit.Test;
@@ -60,7 +62,16 @@ public class LiteServiceTest extends JerseyTest{
 
     @Override
     protected int getPort (int defaultPort) {
-        return ThreadLocalRandom.current().nextInt(5000, 8000 + 1);
+        int port = ThreadLocalRandom.current().nextInt(5000, 8000 + 1);
+        try {
+            ServerSocket socket = new ServerSocket(port);
+            socket.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            port = getPort(port);
+        }
+        return port;
     }
     
     @Test
