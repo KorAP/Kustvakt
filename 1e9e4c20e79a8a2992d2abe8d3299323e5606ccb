@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8f45d6f6_6534614f",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/web/controller/SearchController.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2018-07-05T09:59:55Z",
+      "side": 1,
+      "message": "Since processor/rewrite handler does not add an error node, this checking can be moved before passing the serialized KoralQuery to the rewritehandler. See line #449.",
+      "range": {
+        "startLine": 465,
+        "startChar": 2,
+        "endLine": 469,
+        "endChar": 4
+      },
+      "revId": "1e9e4c20e79a8a2992d2abe8d3299323e5606ccb",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c",
+      "unresolved": true
+    }
+  ]
+}
