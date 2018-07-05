@@ -444,6 +444,14 @@ public class SearchController {
                 pageLength, cutoff);
         serializer.setMeta(meta.raw());
 
+		// There is an error in query processing
+		// - either query, corpus or meta
+		if (serializer.hasErrors()) {
+
+			// Do not pass further to backend
+			return Response.status(Response.Status.BAD_REQUEST).entity(serializer.toJSON()).build();		
+		};
+		
         String query;
         try {
             query = this.processor.processQuery(serializer.toJSON(), user);

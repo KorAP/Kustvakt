@@ -1,6 +1,7 @@
 version 0.60.2
-29/06/2018
+05/07/2018
     - Added support for unrestricted corpus statistics (ndiewald)
+    - Do not pass broken queries to Krill (diewald)
 
 version 0.60.1
 12/06/2018

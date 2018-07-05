@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import javax.ws.rs.core.MediaType;
 
@@ -42,7 +43,6 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
-//        System.out.println(ent);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("koral:doc", node.at("/collection/@type").asText());
@@ -52,6 +52,28 @@ public class SearchControllerTest extends SpringJerseyTest {
                 node.at("/collection/rewrites/0/scope").asText());
         assertEquals("operation:insertion",
                 node.at("/collection/rewrites/0/operation").asText());
+    }
+
+	
+    @Test
+    public void testSearchQueryFailure () throws KustvaktException{
+        ClientResponse response = resource()
+			.path("search").queryParam("q", "[orth=der")
+			.queryParam("ql", "poliqarp")
+			.queryParam("cq", "corpusSigle=WPD | corpusSigle=GOE")
+			.queryParam("count", "13")
+			.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+                response.getStatus());
+
+        String ent = response.getEntity(String.class);
+		JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertEquals(302, node.at("/errors/0/0").asInt());
+        assertEquals(302, node.at("/errors/1/0").asInt());
+		assertTrue(node.at("/errors/2").isMissingNode());
+		assertFalse(node.at("/collection").isMissingNode());
+        assertEquals(13, node.at("/meta/count").asInt());
     }
 
 
