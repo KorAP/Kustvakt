@@ -45,13 +45,14 @@ public class OAuth2AuthorizationService {
      * @param code
      * @param authenticationTime
      *            user authentication time
-     * @param nonce 
+     * @param nonce
      * @return
      * @throws KustvaktException
      */
     public String createAuthorization (String username, String clientId,
             String redirectUri, Set<String> scopeSet, String code,
-            ZonedDateTime authenticationTime, String nonce) throws KustvaktException {
+            ZonedDateTime authenticationTime, String nonce)
+            throws KustvaktException {
 
         if (scopeSet == null || scopeSet.isEmpty()) {
             scopeSet = config.getDefaultAccessScopes();
@@ -102,15 +103,14 @@ public class OAuth2AuthorizationService {
         String registeredUri = client.getRedirectURI();
         if (redirectUri != null && !redirectUri.isEmpty()) {
             // check if the redirect URI the same as that in DB
-            if (!redirectUri.equals(registeredUri)) {
+            if (registeredUri != null && !registeredUri.isEmpty()
+                    && !redirectUri.equals(registeredUri)) {
                 throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
                         "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
             }
         }
         else {
-            // check if there is a redirect URI in the DB
-            // This should not happened as it is required in client
-            // registration!
+            // redirect_uri is not required in client registration!
             if (registeredUri != null && !registeredUri.isEmpty()) {
                 redirectUri = registeredUri;
             }

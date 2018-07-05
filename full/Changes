@@ -22,6 +22,8 @@ version 0.60.4
     - Added support for unrestricted corpus statistics (ndiewald)
     - updated paths of user-group deletion-controllers (margaretha)
     - Do not pass broken queries to Krill (diewald)
+    - added OAuth2 token request with client authentication via Authorization header (margaretha)
+    - added port checking in test suite (margaretha)
     
 version 0.60.3
 06/06/2018

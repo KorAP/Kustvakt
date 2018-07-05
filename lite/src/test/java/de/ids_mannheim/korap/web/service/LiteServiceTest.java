@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.*;
 
 import org.apache.lucene.LucenePackage;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.web.context.ContextLoaderListener;
 
@@ -41,6 +42,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class LiteServiceTest extends JerseyTest{
 
     public static final String classPackage = "de.ids_mannheim.korap.web.service.light";
+    public static int port = 5000;
 
     @Override
     protected TestContainerFactory getTestContainerFactory ()
@@ -60,7 +62,8 @@ public class LiteServiceTest extends JerseyTest{
 
     @Override
     protected int getPort (int defaultPort) {
-        return ThreadLocalRandom.current().nextInt(5000, 8000 + 1);
+//        return ThreadLocalRandom.current().nextInt(5000, 8000 + 1);
+        return port++;
     }
     
     @Test

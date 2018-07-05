@@ -1,6 +1,9 @@
 package de.ids_mannheim.korap.config;
 
 import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.junit.runner.RunWith;
@@ -11,7 +14,6 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AbstractRefreshableWebApplicationContext;
 
 import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
@@ -73,15 +75,24 @@ public abstract class SpringJerseyTest extends JerseyTest {
         return new WebAppDescriptor.Builder(classPackages)
                 .servletClass(SpringServlet.class)
                 .contextListenerClass(StaticContextLoaderListener.class)
-//                .contextListenerClass(ContextLoaderListener.class)
-//                                .contextParam("contextConfigLocation",
-//                                        "classpath:test-config.xml")
+                // .contextListenerClass(ContextLoaderListener.class)
+                // .contextParam("contextConfigLocation",
+                // "classpath:test-config.xml")
                 .build();
     }
-
+    
     @Override
     protected int getPort (int defaultPort) {
-        return ThreadLocalRandom.current().nextInt(5000, 8000 + 1);
+        int port = ThreadLocalRandom.current().nextInt(5000, 8000 + 1);
+        try {
+            ServerSocket socket = new ServerSocket(port);
+            socket.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            port = getPort(port);
+        }
+        return port;
     }
 
 }
