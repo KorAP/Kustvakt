@@ -24,6 +24,8 @@ import org.springframework.stereotype.Controller;
 
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.QueryBuilderUtil;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -35,6 +37,7 @@ import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.web.ClientsHandler;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
+import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
  * @author hanl
@@ -144,17 +147,18 @@ public class LiteService {
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
-        // todo: should be possible to add the meta part to the query serialization
-        jlog.info("Serialized search: "+jsonld);
-        try {
-            String result = searchKrill.search(jsonld);
-            jlog.debug("The result set: "+result);
-            return Response.ok(result).build();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        return Response.ok().build();
+
+		// todo: should be possible to add the meta part to the query serialization
+		jlog.info("Serialized search: "+jsonld);
+		try {
+			String result = searchKrill.search(jsonld);
+			jlog.debug("The result set: "+result);
+			return Response.ok(result).build();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		};
+		return Response.ok().build();
     }
 
 
@@ -181,6 +185,15 @@ public class LiteService {
         serializer.setMeta(meta.raw());
         if (cq != null) serializer.setCollection(cq);
 
+
+		// There is an error in query processing
+		// - either query, corpus or meta
+		if (serializer.hasErrors()) {
+			// Do not pass further to backend
+			return Response.status(Response.Status.BAD_REQUEST).entity(serializer.toJSON()).build();		
+		}
+
+		
         String query;
         try {
             query = this.processor.processQuery(serializer.toJSON(), null);
@@ -188,7 +201,8 @@ public class LiteService {
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
-        jlog.info("the serialized query "+ query);
+
+		jlog.info("the serialized query "+ query);
 
         // This may not work with the the KoralQuery
         if (eng.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
