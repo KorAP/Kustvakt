@@ -212,8 +212,8 @@ public class OAuthDb {
                             c.setToken(token);
                             c.setTokenType(TokenType.BEARER);
 //                            c.setTokenType(Attributes.OAUTH2_AUTHORIZATION);
-                            c.addContextParameter(Attributes.SCOPES,
-                                    rs.getString(Attributes.SCOPES));
+                            c.addContextParameter(Attributes.SCOPE,
+                                    rs.getString(Attributes.SCOPE));
                             return c;
                         }
                     });

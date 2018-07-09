@@ -224,7 +224,7 @@ public class OAuthController {
             StringBuilder scopes = new StringBuilder();
             for (String scope : oauthRequest.getScopes())
                 scopes.append(scope + " ");
-            attr.put(Attributes.SCOPES, scopes.toString());
+            attr.put(Attributes.SCOPE, scopes.toString());
 
             try {
                 user = controller.getUser(c.getUsername());
@@ -486,7 +486,7 @@ public class OAuthController {
             Map<String, Object> attr = new HashMap<>();
             attr.put(Attributes.HOST, host);
             attr.put(Attributes.USER_AGENT, agent);
-            attr.put(Attributes.SCOPES,
+            attr.put(Attributes.SCOPE,
                     StringUtils.toString(oauthRequest.getScopes(), " "));
 
             // support code (for external clients only) and password grant type
@@ -534,7 +534,7 @@ public class OAuthController {
                 }
                 // todo: errors for invalid scopes or different scopes then during authorization request?
                 //todo ??
-                attr.put(Attributes.SCOPES, codeInfo.getScopes());
+                attr.put(Attributes.SCOPE, codeInfo.getScopes());
 
             }
             else if (oauthRequest.getGrantType().equalsIgnoreCase(

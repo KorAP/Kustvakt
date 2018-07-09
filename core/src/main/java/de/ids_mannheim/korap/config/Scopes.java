@@ -68,7 +68,7 @@ public class Scopes {
             }
             if (scopes.contains(Scope.profile.toString()))
                 m.values.putAll(Scopes.getProfileScopes(details).values);
-            m.values.put(Attributes.SCOPES, scopes);
+            m.values.put(Attributes.SCOPE, scopes);
         }
         return m;
     }

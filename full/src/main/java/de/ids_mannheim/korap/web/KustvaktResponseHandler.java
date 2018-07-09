@@ -12,7 +12,9 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 
-/** KustvaktResponseHandler includes exceptions regarding authorization. 
+/**
+ * KustvaktResponseHandler includes exceptions regarding
+ * authorization.
  * 
  * @author margaretha
  *
@@ -27,7 +29,12 @@ public class KustvaktResponseHandler extends CoreResponseHandler {
     public WebApplicationException throwit (KustvaktException e) {
         Response r;
 
-        if (e.getStatusCode() == StatusCodes.USER_REAUTHENTICATION_REQUIRED
+        // KustvaktException just wraps another exception
+        if (e.getStatusCode() == null && e.hasNotification()) {
+            r = Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getNotification()).build();
+        }
+        else if (e.getStatusCode() == StatusCodes.USER_REAUTHENTICATION_REQUIRED
                 || e.getStatusCode() == StatusCodes.AUTHORIZATION_FAILED
                 || e.getStatusCode() >= StatusCodes.AUTHENTICATION_FAILED) {
             String notification = buildNotification(e.getStatusCode(),

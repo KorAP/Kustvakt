@@ -172,7 +172,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         MultivaluedMap<String, String> authForm = new MultivaluedMapImpl();
         authForm.add("response_type", "code");
         authForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
-        authForm.add("scope", "username");
+        authForm.add("scope", "search");
 
         ClientResponse response =
                 requestAuthorizationConfidentialClient(authForm);
@@ -182,7 +182,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         String code = params.get("code").get(0);
         String scopes = params.get("scope").get(0);
 
-        assertEquals(scopes, "username");
+        assertEquals(scopes, "search");
 
         MultivaluedMap<String, String> tokenForm = new MultivaluedMapImpl();
         tokenForm.add("grant_type", "authorization_code");
@@ -242,7 +242,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         MultivaluedMap<String, String> authForm = new MultivaluedMapImpl();
         authForm.add("response_type", "code");
         authForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
-        authForm.add("scope", "username");
+        authForm.add("scope", "search");
         authForm.add("redirect_uri", uri);
 
         ClientResponse response =
@@ -342,7 +342,6 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
-        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());

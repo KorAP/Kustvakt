@@ -67,7 +67,7 @@ public class JWTSigner {
         Builder csBuilder = new JWTClaimsSet.Builder();
         csBuilder.issuer(this.issuer.toString());
 
-        if ((scopes = (String) attr.get(Attributes.SCOPES)) != null) {
+        if ((scopes = (String) attr.get(Attributes.SCOPE)) != null) {
             Userdata data = new GenericUserData();
             data.readQuietly(attr, false);
             Scopes claims = Scopes.mapScopes(scopes, data);

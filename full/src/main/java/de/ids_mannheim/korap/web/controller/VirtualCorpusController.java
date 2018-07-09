@@ -26,6 +26,8 @@ import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
+import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.VirtualCorpusService;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
@@ -34,14 +36,15 @@ import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
 
-/** VirtualCorpusController defines web APIs related to virtual corpus (VC)
- * such as creating, deleting and listing user virtual corpora.
+/**
+ * VirtualCorpusController defines web APIs related to virtual corpus
+ * (VC) such as creating, deleting and listing user virtual corpora.
  * 
- * This class also includes APIs related to virtual corpus access (VCA) 
- * such as sharing and publishing VC. When a VC is published, it is shared 
- * with all users, but not always listed like system VC. It is listed for 
- * a user, once when he/she have searched for the VC. A VC can be published 
- * by creating or editing the VC. 
+ * This class also includes APIs related to virtual corpus access
+ * (VCA) such as sharing and publishing VC. When a VC is published,
+ * it is shared with all users, but not always listed like system
+ * VC. It is listed for a user, once when he/she have searched for the
+ * VC. A VC can be published by creating or editing the VC.
  * 
  * All the APIs in this class are available to logged-in users.
  * 
@@ -58,13 +61,17 @@ public class VirtualCorpusController {
     private KustvaktResponseHandler kustvaktResponseHandler;
     @Autowired
     private VirtualCorpusService service;
+    @Autowired
+    private OAuth2ScopeService scopeService;
 
-    /** Creates a user virtual corpus, also for system admins
+    /**
+     * Creates a user virtual corpus, also for system admins
      * 
      * @see VirtualCorpusJson
      * 
      * @param securityContext
-     * @param vc a JSON object describing the virtual corpus
+     * @param vc
+     *            a JSON object describing the virtual corpus
      * @return HTTP Response OK if successful
      */
     @POST
@@ -77,6 +84,7 @@ public class VirtualCorpusController {
             TokenContext context =
                     (TokenContext) securityContext.getUserPrincipal();
 
+            scopeService.verifyScope(context, OAuth2Scope.CREATE_VC);
             service.storeVC(vc, context.getUsername());
         }
         catch (KustvaktException e) {
@@ -85,14 +93,16 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
 
-    /** Edits a virtual corpus attributes including name, type and corpus 
-     *  query. Only the virtual corpus owner and system admins can edit 
-     *  a virtual corpus.
+    /**
+     * Edits a virtual corpus attributes including name, type and
+     * corpus query. Only the virtual corpus owner and system admins
+     * can edit a virtual corpus.
      * 
      * @see VirtualCorpusJson
      * 
      * @param securityContext
-     * @param vc a JSON object describing the virtual corpus
+     * @param vc
+     *            a JSON object describing the virtual corpus
      * @return HTTP Response OK if successful
      * @throws KustvaktException
      */
@@ -105,6 +115,7 @@ public class VirtualCorpusController {
                 (TokenContext) securityContext.getUserPrincipal();
 
         try {
+            scopeService.verifyScope(context, OAuth2Scope.EDIT_VC);
             service.editVC(vc, context.getUsername());
         }
         catch (KustvaktException e) {
@@ -113,20 +124,24 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
 
-    /** Searches for a specific VC given the VC id. 
+    /**
+     * Searches for a specific VC given the VC id.
      * 
      * @param securityContext
-     * @param vcId a virtual corpus id
+     * @param vcId
+     *            a virtual corpus id
      * @return a list of virtual corpora
      */
     @GET
     @Path("{vcId}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public VirtualCorpusDto retrieveVC (@Context SecurityContext securityContext,
+    public VirtualCorpusDto retrieveVC (
+            @Context SecurityContext securityContext,
             @PathParam("vcId") int vcId) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
             return service.searchVCById(context.getUsername(), vcId);
         }
         catch (KustvaktException e) {
@@ -134,15 +149,17 @@ public class VirtualCorpusController {
         }
     }
 
-    /** Lists not only private virtual corpora but all virtual corpora 
-     *  available to a user.
-     *  
-     *  Users, except system admins, cannot list virtual corpora of 
-     *  other users. Thus, createdBy parameter is only relevant for 
-     *  requests from system admins.
+    /**
+     * Lists not only private virtual corpora but all virtual corpora
+     * available to a user.
+     * 
+     * Users, except system admins, cannot list virtual corpora of
+     * other users. Thus, createdBy parameter is only relevant for
+     * requests from system admins.
      * 
      * @param securityContext
-     * @param createdBy username of virtual corpus creator (optional)
+     * @param createdBy
+     *            username of virtual corpus creator (optional)
      * @return a list of virtual corpora
      */
     @GET
@@ -154,6 +171,7 @@ public class VirtualCorpusController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
             return service.listVCByUser(context.getUsername(), createdBy);
         }
         catch (KustvaktException e) {
@@ -161,11 +179,12 @@ public class VirtualCorpusController {
         }
     }
 
-    /** Lists all virtual corpora created by a user
+    /**
+     * Lists all virtual corpora created by a user
      * 
      * @param securityContext
-     * @return a list of virtual corpora created by the user 
-     * in the security context.
+     * @return a list of virtual corpora created by the user
+     *         in the security context.
      */
     @GET
     @Path("list/user")
@@ -175,6 +194,7 @@ public class VirtualCorpusController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
             return service.listOwnerVC(context.getUsername());
         }
         catch (KustvaktException e) {
@@ -182,16 +202,19 @@ public class VirtualCorpusController {
         }
     }
 
-    /** Lists virtual corpora by creator and type. This is a controller for 
-     *  system admin requiring valid system admin authentication. 
-     *  
-     *  If type is not specified, retrieves virtual corpora of all types. 
-     *  If createdBy is not specified, retrieves virtual corpora of all 
-     *  users.
-     *  
+    /**
+     * Lists virtual corpora by creator and type. This is a controller
+     * for system admin requiring valid system admin authentication.
+     * 
+     * If type is not specified, retrieves virtual corpora of all
+     * types. If createdBy is not specified, retrieves virtual corpora
+     * of all users.
+     * 
      * @param securityContext
-     * @param createdBy username of virtual corpus creator
-     * @param type {@link VirtualCorpusType}
+     * @param createdBy
+     *            username of virtual corpus creator
+     * @param type
+     *            {@link VirtualCorpusType}
      * @return a list of virtual corpora
      */
     @GET
@@ -211,12 +234,14 @@ public class VirtualCorpusController {
         }
     }
 
-    /** Only the VC owner and system admins can delete VC. VCA admins 
-     *  can delete VC-accesses e.g. of project VC, but not the VC 
-     *  themselves. 
+    /**
+     * Only the VC owner and system admins can delete VC. VCA admins
+     * can delete VC-accesses e.g. of project VC, but not the VC
+     * themselves.
      * 
      * @param securityContext
-     * @param vcId the id of the virtual corpus
+     * @param vcId
+     *            the id of the virtual corpus
      * @return HTTP status 200, if successful
      */
     @DELETE
@@ -234,13 +259,19 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
 
-    /** VC can only be shared with a group, not individuals. 
-     *  Only VCA admins are allowed to share VC and 
-     *  the VC must have been created by themselves.
+    /**
+     * VC can only be shared with a group, not individuals.
+     * Only VCA admins are allowed to share VC and the VC must have
+     * been created by themselves.
+     * 
+     * <br /><br />
+     * Not allowed via third-party apps.
      * 
      * @param securityContext
-     * @param vcId a virtual corpus id
-     * @param groupId a user group id
+     * @param vcId
+     *            a virtual corpus id
+     * @param groupId
+     *            a user group id
      * @return HTTP status 200, if successful
      */
     @POST
@@ -259,7 +290,12 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
 
-    /** Only VCA Admins and system admins are allowed to delete a VC-access.
+    /**
+     * Only VCA Admins and system admins are allowed to delete a
+     * VC-access.
+     * 
+     * <br /><br />
+     * Not allowed via third-party apps.
      * 
      * @param securityContext
      * @param accessId
@@ -281,14 +317,19 @@ public class VirtualCorpusController {
     }
 
 
-    /** Lists active VC accesses to the specified VC.
-     *  Only available to VCA and system admins.
-     *  For system admins, lists all VCA of the VC.
+    /**
+     * Lists active VC accesses to the specified VC.
+     * Only available to VCA and system admins.
+     * For system admins, lists all VCA of the VC.
+     * 
+     * <br /><br />
+     * Not allowed via third-party apps.
      * 
      * @see VirtualCorpusAccessStatus
      * 
      * @param securityContext
-     * @param vcId virtual corpus id
+     * @param vcId
+     *            virtual corpus id
      * @return a list of access to the specified virtual corpus
      */
     @GET
@@ -307,12 +348,17 @@ public class VirtualCorpusController {
         }
     }
 
-    /** Lists active VC-accesses available for a user-group. 
-     *  Only available to VCA and system admins. 
-     *  For system admins, list all VCA for the group.
+    /**
+     * Lists active VC-accesses available for a user-group.
+     * Only available to VCA and system admins.
+     * For system admins, list all VCA for the group.
+     * 
+     * <br /><br />
+     * Not allowed via third-party apps.
      * 
      * @param securityContext
-     * @param groupId a group id
+     * @param groupId
+     *            a group id
      * @return a list of VC-access
      */
     @GET

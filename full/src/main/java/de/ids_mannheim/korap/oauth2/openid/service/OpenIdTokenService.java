@@ -47,6 +47,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
+import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
 import de.ids_mannheim.korap.utils.TimeUtils;
 
@@ -98,6 +99,30 @@ public class OpenIdTokenService extends OAuth2TokenService {
         return null;
     }
 
+    /**
+     * Third party apps must not be allowed to use password grant.
+     * MH: password grant is only allowed for trusted clients (korap
+     * frontend)
+     * 
+     * According to RFC 6749, client authentication is only required
+     * for confidential clients and whenever client credentials are
+     * provided. Moreover, client_id is optional for password grant,
+     * but without it, the authentication server cannot check the
+     * client type. To make sure that confidential clients
+     * authenticate, client_id is made required (similar to
+     * authorization code grant).
+     * 
+     * @param username
+     *            username, required
+     * @param password
+     *            password, required
+     * @param scope
+     *            scope, optional
+     * @param clientAuthentication
+     * @param clientId
+     * @return
+     * @throws KustvaktException
+     */
     private AccessTokenResponse requestAccessTokenWithPassword (String username,
             String password, Scope scope,
             ClientAuthentication clientAuthentication, ClientID clientId)
@@ -111,6 +136,7 @@ public class OpenIdTokenService extends OAuth2TokenService {
 
         ZonedDateTime authenticationTime;
         String clientIdStr = null;
+        OAuth2Client client;
         if (clientAuthentication == null) {
             if (clientId == null) {
                 throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
@@ -118,18 +144,29 @@ public class OpenIdTokenService extends OAuth2TokenService {
                         OAuth2Error.INVALID_REQUEST);
             }
             else {
-                authenticationTime = authenticateClientAndUser(username,
-                        password, scopes, clientId.getValue(), null);
                 clientIdStr = clientId.getValue();
+                client = clientService.authenticateClient(clientIdStr,
+                        null);
             }
         }
         else {
             String[] clientCredentials =
                     extractClientCredentials(clientAuthentication);
             clientIdStr = clientCredentials[0];
-            authenticationTime = authenticateClientAndUser(username, password,
-                    scopes, clientCredentials[0], clientCredentials[1]);
+            client = clientService.authenticateClient(clientCredentials[0],
+                    clientCredentials[1]);
         }
+        
+        if (!client.isNative()) {
+            throw new KustvaktException(
+                    StatusCodes.CLIENT_AUTHORIZATION_FAILED,
+                    "Password grant is not allowed for third party clients",
+                    OAuth2Error.UNAUTHORIZED_CLIENT);
+        }
+        
+        authenticationTime =
+                authenticateUser(username, password, scopes);
+        
         return createsAccessTokenResponse(scope, clientIdStr, username,
                 authenticationTime, null);
     }

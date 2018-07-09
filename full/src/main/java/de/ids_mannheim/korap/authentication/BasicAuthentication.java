@@ -78,7 +78,7 @@ public class BasicAuthentication implements AuthenticationIface {
             c.setToken(StringUtils.stripTokenType(authToken));
             // fixme: you can make queries, but user sensitive data is
             // off limits?!
-            c.addContextParameter(Attributes.SCOPES,
+            c.addContextParameter(Attributes.SCOPE,
                     Scopes.Scope.search.toString());
             return c;
         }

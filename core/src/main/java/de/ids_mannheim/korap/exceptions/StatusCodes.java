@@ -26,17 +26,23 @@ public class StatusCodes {
     public static final int HTTPS_REQUIRED = 110;
 
     /**
+     * 200 status codes general JSON serialization error
+     */
+
+    public static final int SERIALIZATION_FAILED = 200;
+    public static final int DESERIALIZATION_FAILED = 201;
+    public static final int MISSING_ATTRIBUTE = 202;
+    public static final int INVALID_ATTRIBUTE = 203;
+    public static final int UNSUPPORTED_VALUE = 204;
+
+    /**
      * 300 status codes for query language and serialization
      */
 
     public static final int NO_QUERY = 301;
-    //    public static final int INVALID_TYPE = 302;
-    public static final int MISSING_ATTRIBUTE = 303;
-    public static final int INVALID_ATTRIBUTE = 304;
-    public static final int UNSUPPORTED_VALUE = 305;
-    public static final int SERIALIZATION_FAILED = 306;
-    public static final int DESERIALIZATION_FAILED = 307;
-
+//    public static final int INVALID_TYPE = 302;
+//    public static final int SERIALIZATION_FAILED = 300;
+    
     /**
      *  400 status codes for authorization and rewrite functions
      */
@@ -83,15 +89,6 @@ public class StatusCodes {
     public static final int DB_ENTRY_EXISTS = 508;
 
 
-    // User group and member 
-    public static final int GROUP_MEMBER_EXISTS = 601;
-    public static final int GROUP_MEMBER_INACTIVE = 602;
-    public static final int GROUP_MEMBER_DELETED = 603;
-    public static final int GROUP_MEMBER_NOT_FOUND = 604;
-    public static final int INVITATION_EXPIRED = 605;
-    public static final int GROUP_NOT_FOUND = 606;
-    public static final int GROUP_DELETED = 607;
-
     //    public static final int ARGUMENT_VALIDATION_FAILURE = 700;
     // public static final int ARGUMENT_VALIDATION_FAILURE = 701;
 
@@ -112,6 +109,16 @@ public class StatusCodes {
     public static final int REQUEST_INVALID = 1002;
     public static final int ACCESS_DENIED = 1003;
 
+    
+    // User group and member 
+    public static final int GROUP_MEMBER_EXISTS = 1601;
+    public static final int GROUP_MEMBER_INACTIVE = 1602;
+    public static final int GROUP_MEMBER_DELETED = 1603;
+    public static final int GROUP_MEMBER_NOT_FOUND = 1604;
+    public static final int INVITATION_EXPIRED = 1605;
+    public static final int GROUP_NOT_FOUND = 1606;
+    public static final int GROUP_DELETED = 1607;
+    
     /**
      * 1800 Oauth2 and OpenID
      */

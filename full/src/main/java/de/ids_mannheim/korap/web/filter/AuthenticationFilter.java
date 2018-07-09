@@ -72,11 +72,14 @@ public class AuthenticationFilter
 
                     // OAuth2 authentication scheme
                     case BEARER:
-//                        if (request.getPath().equals("oauth2/authorize")) {
-//                            throw new KustvaktException(
-//                                    StatusCodes.AUTHENTICATION_FAILED,
-//                                    "Bearer is not supported for user authentication at oauth2/authorize");
-//                        }
+                        if (request.getPath().startsWith("vc/access")
+                                || request.getPath().startsWith("vc/delete")
+                                || request.getPath().startsWith("group")
+                                || request.getPath().startsWith("user")) {
+                            throw new KustvaktException(
+                                    StatusCodes.AUTHENTICATION_FAILED,
+                                    "Token type Bearer is not allowed.");
+                        }
 
                         context = authenticationManager.getTokenContext(
                                 TokenType.BEARER, authData.getToken(), host,

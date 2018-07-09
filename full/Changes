@@ -1,3 +1,11 @@
+version 0.60.5
+09/07/2018
+	- Added service layer to the search controller (margaretha)
+	- Added OAuth2 scope checking in search and VC controllers (margaretha)
+	- Added handling OAuth2 bearer token for VC access and User group controllers (margaretha)
+	- Added default scope to password grant (margaretha)
+	
+	
 version 0.60.4
 05/07/2018
     - implemented OAuth2 authorization code request with OpenID Authentication (margaretha)

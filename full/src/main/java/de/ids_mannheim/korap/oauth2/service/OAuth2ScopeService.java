@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.oauth2.service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -9,11 +10,16 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.constant.TokenType;
+import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
 import de.ids_mannheim.korap.oauth2.dao.AccessScopeDao;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
+import de.ids_mannheim.korap.security.context.TokenContext;
 
 @Service
 public class OAuth2ScopeService {
@@ -21,6 +27,9 @@ public class OAuth2ScopeService {
     @Autowired
     private AccessScopeDao accessScopeDao;
 
+    @Autowired
+    private AdminDao adminDao;
+    
     /**
      * Converts a set of scope strings to a set of {@link AccessScope}
      * 
@@ -53,8 +62,9 @@ public class OAuth2ScopeService {
         Set<String> set = convertAccessScopesToStringSet(scopes);
         return String.join(" ", set);
     }
-    
-    public Set<String> convertAccessScopesToStringSet (Set<AccessScope> scopes) {
+
+    public Set<String> convertAccessScopesToStringSet (
+            Set<AccessScope> scopes) {
         Set<String> set = scopes.stream().map(scope -> scope.toString())
                 .collect(Collectors.toSet());
         return set;
@@ -75,5 +85,18 @@ public class OAuth2ScopeService {
                 stream.filter(scope -> defaultScopes.contains(scope))
                         .collect(Collectors.toSet());
         return filteredScopes;
+    }
+
+    public void verifyScope (TokenContext context, OAuth2Scope requestScope)
+            throws KustvaktException {
+        if (!adminDao.isAdmin(context.getUsername())
+                && context.getTokenType().equals(TokenType.BEARER)) {
+            Map<String, Object> parameters = context.getParameters();
+            String scope = (String) parameters.get(Attributes.SCOPE);
+            if (!scope.contains(requestScope.toString())) {
+                throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                        "Scope " + requestScope + " is not authorized");
+            }
+        }
     }
 }

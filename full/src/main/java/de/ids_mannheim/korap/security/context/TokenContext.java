@@ -41,7 +41,7 @@ public class TokenContext implements java.security.Principal, Serializable {
     private String token;
     private boolean secureRequired;
 
-    @Getter(AccessLevel.PRIVATE)
+//    @Getter(AccessLevel.PRIVATE)
     @Setter(AccessLevel.PRIVATE)
     private Map<String, Object> parameters;
     private String hostAddress;
@@ -72,8 +72,7 @@ public class TokenContext implements java.security.Principal, Serializable {
     public Map<String, Object> params () {
         return new HashMap<>(parameters);
     }
-
-
+    
     public boolean match (TokenContext other) {
         if (other.getToken().equals(this.token))
             if (this.getHostAddress().equals(this.hostAddress))

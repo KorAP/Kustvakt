@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,6 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
-import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 
 /**
  * OAuth2TokenService manages business logic related to OAuth2
@@ -29,7 +29,7 @@ import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 public class OAuth2TokenService {
 
     @Autowired
-    private OAuth2ClientService clientService;
+    protected OAuth2ClientService clientService;
 
     @Autowired
     private OAuth2AuthorizationService authorizationService;
@@ -107,21 +107,6 @@ public class OAuth2TokenService {
      * @throws KustvaktException
      * @throws OAuthSystemException
      */
-    protected ZonedDateTime authenticateClientAndUser (String username,
-            String password, Set<String> scopes, String clientId,
-            String clientSecret) throws KustvaktException {
-
-        OAuth2Client client =
-                clientService.authenticateClient(clientId, clientSecret);
-        if (!client.isNative()) {
-            throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
-                    "Password grant is not allowed for third party clients",
-                    OAuth2Error.UNAUTHORIZED_CLIENT);
-        }
-
-        return authenticateUser(username, password, scopes);
-        // verify or limit scopes ?
-    }
 
     public ZonedDateTime authenticateUser (String username, String password,
             Set<String> scopes) throws KustvaktException {
@@ -136,7 +121,7 @@ public class OAuth2TokenService {
 
         Map<String, Object> attributes = new HashMap<>();
         if (scopes != null && !scopes.isEmpty()) {
-            attributes.put(Attributes.SCOPES, scopes);
+            attributes.put(Attributes.SCOPE, scopes);
         }
         authenticationManager.authenticate(
                 config.getOAuth2passwordAuthentication(), username, password,

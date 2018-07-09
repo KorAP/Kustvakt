@@ -20,7 +20,7 @@ public class Attributes {
     
     public static final String CLIENT_ID = "client_id";
     public static final String CLIENT_SECRET = "client_secret";
-    public static final String SCOPES = "scopes";
+    public static final String SCOPE = "scope";
 
     public static final String PUBLIC_GROUP = "public";
 

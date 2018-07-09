@@ -107,6 +107,11 @@ public class KustvaktException extends Exception {
 
 
 
+    public KustvaktException (String notification) {
+        this.notification = notification;
+        isNotification = true;
+    }
+
     public String string () {
         return "Excpt{" + "status=" + getStatusCode() + ", message="
                 + getMessage() + ", args=" + getEntity() + ", userid=" + userid

@@ -245,7 +245,7 @@ public class AuthenticationController {
 
         Map<String, Object> attr = new HashMap<>();
         if (scopes != null && !scopes.isEmpty())
-            attr.put(Attributes.SCOPES, scopes);
+            attr.put(Attributes.SCOPE, scopes);
         attr.put(Attributes.HOST, host);
         attr.put(Attributes.USER_AGENT, agent);
 

@@ -6,6 +6,7 @@ import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.security.context.KustvaktContext;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
@@ -69,6 +70,7 @@ public class DemoUserFilter implements ContainerRequestFilter, ResourceFilter {
         c.setExpirationTime(TimeUtils.plusSeconds(
                 config
                         .getShortTokenTTL()).getMillis());
+        c.setTokenType(TokenType.BASIC);
         return c;
     }
 

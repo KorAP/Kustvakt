@@ -38,7 +38,8 @@ import de.ids_mannheim.korap.web.input.UserGroupJson;
  * adding members to a group and subscribing (confirming an
  * invitation) to a group.
  * 
- * These APIs are only available to logged-in users.
+ * These APIs are only available to logged-in users and not available
+ * via third-party apps.
  * 
  * @author margaretha
  *
@@ -54,9 +55,12 @@ public class UserGroupController {
     @Autowired
     private UserGroupService service;
 
-    /** Returns all user-groups in which a user is an active or a pending member.
-     *  Not suitable for system-admin, instead use {@link UserGroupController#
-     *  getUserGroupBySystemAdmin(SecurityContext, String, UserGroupStatus)} 
+    /**
+     * Returns all user-groups in which a user is an active or a
+     * pending member.
+     * Not suitable for system-admin, instead use
+     * {@link UserGroupController#
+     * getUserGroupBySystemAdmin(SecurityContext, String, UserGroupStatus)}
      * 
      * @param securityContext
      * @return a list of user-groups
@@ -78,13 +82,18 @@ public class UserGroupController {
     }
 
 
-    /** Lists user-groups for system-admin purposes. If username parameter 
-     *  is not specified, list user-groups of all users. If status is not
-     *  specified, list user-groups of all statuses.
+    /**
+     * Lists user-groups for system-admin purposes. If username
+     * parameter
+     * is not specified, list user-groups of all users. If status is
+     * not
+     * specified, list user-groups of all statuses.
      * 
      * @param securityContext
-     * @param username username
-     * @param status {@link UserGroupStatus}
+     * @param username
+     *            username
+     * @param status
+     *            {@link UserGroupStatus}
      * @return a list of user-groups
      */
     @GET
@@ -105,10 +114,12 @@ public class UserGroupController {
         }
     }
 
-    /** Retrieves a specific user-group for system admins.
+    /**
+     * Retrieves a specific user-group for system admins.
      * 
      * @param securityContext
-     * @param groupId group id
+     * @param groupId
+     *            group id
      * @return a user-group
      */
     @GET
@@ -128,23 +139,25 @@ public class UserGroupController {
 
     }
 
-    /** Creates a user group where the user in token context is the 
-     * group owner, and assigns the listed group members with status 
-     * GroupMemberStatus.PENDING. 
+    /**
+     * Creates a user group where the user in token context is the
+     * group owner, and assigns the listed group members with status
+     * GroupMemberStatus.PENDING.
      * 
      * Invitations must be sent to these proposed members. If a member
-     * accepts the invitation, update his GroupMemberStatus to 
-     * GroupMemberStatus.ACTIVE by using 
+     * accepts the invitation, update his GroupMemberStatus to
+     * GroupMemberStatus.ACTIVE by using
      * {@link UserGroupController#subscribeToGroup(SecurityContext, String)}.
      * 
-     * If he rejects the invitation, update his GroupMemberStatus 
-     * to GroupMemberStatus.DELETED using 
+     * If he rejects the invitation, update his GroupMemberStatus
+     * to GroupMemberStatus.DELETED using
      * {@link UserGroupController#unsubscribeFromGroup(SecurityContext, String)}.
      * 
-     *  
+     * 
      * 
      * @param securityContext
-     * @param group UserGroupJson
+     * @param group
+     *            UserGroupJson
      * @return if successful, HTTP response status OK
      */
     @POST
@@ -163,8 +176,10 @@ public class UserGroupController {
         }
     }
 
-    /** Deletes a user-group specified by the group id. Only group owner 
-     *  and system admins can delete groups. 
+    /**
+     * Deletes a user-group specified by the group id. Only group
+     * owner
+     * and system admins can delete groups.
      * 
      * @param securityContext
      * @param groupId
@@ -185,11 +200,14 @@ public class UserGroupController {
         }
     }
 
-    /** Deletes a user-group member. Group owner cannot be deleted.
+    /**
+     * Deletes a user-group member. Group owner cannot be deleted.
      * 
      * @param securityContext
-     * @param memberId a username of a group member
-     * @param groupId a group id
+     * @param memberId
+     *            a username of a group member
+     * @param groupId
+     *            a group id
      * @return if successful, HTTP response status OK
      */
     @DELETE
@@ -209,12 +227,16 @@ public class UserGroupController {
         }
     }
 
-    /** Invites group members to join a user-group specified in the JSON object.
-     * Only user-group admins and system admins are allowed. 
+    /**
+     * Invites group members to join a user-group specified in the
+     * JSON object.
+     * Only user-group admins and system admins are allowed.
      * 
      * @param securityContext
-     * @param group UserGroupJson containing groupId and usernames to be invited
-     * as members 
+     * @param group
+     *            UserGroupJson containing groupId and usernames to be
+     *            invited
+     *            as members
      * @return if successful, HTTP response status OK
      */
     @POST
@@ -233,13 +255,18 @@ public class UserGroupController {
         }
     }
 
-    /** Adds roles of an active member of a user-group. Only user-group admins
+    /**
+     * Adds roles of an active member of a user-group. Only user-group
+     * admins
      * and system admins are allowed.
      * 
      * @param securityContext
-     * @param groupId a group id
-     * @param memberUsername the username of a group member
-     * @param roleIds list of role ids
+     * @param groupId
+     *            a group id
+     * @param memberUsername
+     *            the username of a group member
+     * @param roleIds
+     *            list of role ids
      * @return if successful, HTTP response status OK
      */
     @POST
@@ -261,13 +288,18 @@ public class UserGroupController {
         }
     }
 
-    /** Deletes roles of a member of a user-group. Only user-group admins
+    /**
+     * Deletes roles of a member of a user-group. Only user-group
+     * admins
      * and system admins are allowed.
      * 
      * @param securityContext
-     * @param groupId a group id
-     * @param memberUsername the username of a group member
-     * @param roleIds list of role ids
+     * @param groupId
+     *            a group id
+     * @param memberUsername
+     *            the username of a group member
+     * @param roleIds
+     *            list of role ids
      * @return if successful, HTTP response status OK
      */
     @POST
@@ -289,11 +321,14 @@ public class UserGroupController {
         }
     }
 
-    /** Handles requests to accept membership invitation. Only invited users 
-     * can subscribe to the corresponding user-group. 
+    /**
+     * Handles requests to accept membership invitation. Only invited
+     * users
+     * can subscribe to the corresponding user-group.
      * 
      * @param securityContext
-     * @param groupId a group id
+     * @param groupId
+     *            a group id
      * @return if successful, HTTP response status OK
      */
     @POST
@@ -312,8 +347,10 @@ public class UserGroupController {
         }
     }
 
-    /** Handles requests to reject membership invitation. A member can only 
-     * unsubscribe him/herself from a group. 
+    /**
+     * Handles requests to reject membership invitation. A member can
+     * only
+     * unsubscribe him/herself from a group.
      * 
      * Implemented identical to delete group member.
      * 

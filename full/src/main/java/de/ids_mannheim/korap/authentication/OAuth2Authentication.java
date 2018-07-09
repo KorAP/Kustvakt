@@ -47,7 +47,7 @@ public class OAuth2Authentication implements AuthenticationIface {
         c.setExpirationTime(expiry.toInstant().toEpochMilli());
         c.setToken(authToken);
         c.setTokenType(TokenType.BEARER);
-        c.addContextParameter(Attributes.SCOPES, scopes);
+        c.addContextParameter(Attributes.SCOPE, scopes);
         c.setAuthenticationTime(accessToken.getUserAuthenticationTime());
         return c;
     }

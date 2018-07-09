@@ -167,7 +167,6 @@
 
 	<bean id="initializator" class="de.ids_mannheim.korap.config.Initializator"
 		init-method="init">
-		<constructor-arg name="config" ref="kustvakt_config" />
 		<constructor-arg name="accessScopeDao" ref="accessScopeDao" />
 	</bean>
 

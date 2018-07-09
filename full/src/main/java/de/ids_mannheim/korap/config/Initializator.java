@@ -1,7 +1,10 @@
 package de.ids_mannheim.korap.config;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
 import de.ids_mannheim.korap.oauth2.dao.AccessScopeDao;
 
 /**
@@ -12,13 +15,9 @@ import de.ids_mannheim.korap.oauth2.dao.AccessScopeDao;
  */
 public class Initializator {
 
-    private FullConfiguration config;
     private AccessScopeDao accessScopeDao;
 
-
-    public Initializator (FullConfiguration config,
-                          AccessScopeDao accessScopeDao) {
-        this.config = config;
+    public Initializator (AccessScopeDao accessScopeDao) {
         this.accessScopeDao = accessScopeDao;
     }
 
@@ -27,7 +26,11 @@ public class Initializator {
     }
 
     private void setAccessScope () {
-        accessScopeDao.storeAccessScopes(config.getDefaultAccessScopes());
-        accessScopeDao.storeAccessScopes(config.getClientCredentialsScopes());
+        OAuth2Scope[] enums = OAuth2Scope.values();
+        Set<String> scopes = new HashSet<>(enums.length);
+        for (OAuth2Scope s : enums) {
+            scopes.add(s.toString());
+        }
+        accessScopeDao.storeAccessScopes(scopes);
     }
 }

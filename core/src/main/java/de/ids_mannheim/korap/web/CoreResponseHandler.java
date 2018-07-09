@@ -19,11 +19,11 @@ import de.ids_mannheim.korap.response.Notifications;
 public class CoreResponseHandler {
 
     private AuditingIface auditing;
-    
+
     public CoreResponseHandler (AuditingIface iface) {
         this.auditing = iface;
     }
-    
+
     private void register (List<AuditRecord> records) {
         if (auditing != null && !records.isEmpty())
             auditing.audit(records);
@@ -34,11 +34,18 @@ public class CoreResponseHandler {
 
     public WebApplicationException throwit (KustvaktException e) {
         Response s;
-        if (e.hasNotification()){
-            s = Response.status(getStatus(e.getStatusCode()))
-                    .entity(e.getNotification()).build();
+        if (e.hasNotification()) {
+            if (e.getStatusCode() != null) {
+                s = Response.status(getStatus(e.getStatusCode()))
+                        .entity(e.getNotification()).build();
+            }
+            // KustvaktException just wraps another exception 
+            else {
+                s=Response.status(Response.Status.BAD_REQUEST)
+                        .entity(e.getNotification()).build();
+            }
         }
-        else{
+        else {
             s = Response.status(getStatus(e.getStatusCode()))
                     .entity(buildNotification(e)).build();
         }
@@ -58,10 +65,10 @@ public class CoreResponseHandler {
     }
 
     public WebApplicationException throwit (int code, String notification) {
-        return new WebApplicationException(Response.status(getStatus(code))
-                .entity(notification).build());
+        return new WebApplicationException(
+                Response.status(getStatus(code)).entity(notification).build());
     }
-    
+
     protected String buildNotification (KustvaktException e) {
         register(e.getRecords());
         return buildNotification(e.getStatusCode(), e.getMessage(),
@@ -78,9 +85,9 @@ public class CoreResponseHandler {
     protected Response.Status getStatus (int code) {
         Response.Status status = Response.Status.BAD_REQUEST;
         switch (code) {
-//            case StatusCodes.NO_VALUE_FOUND:
-//                status = Response.Status.NO_CONTENT;
-//                break;
+            // case StatusCodes.NO_VALUE_FOUND:
+            // status = Response.Status.NO_CONTENT;
+            // break;
             case StatusCodes.ILLEGAL_ARGUMENT:
                 status = Response.Status.NOT_ACCEPTABLE;
                 break;
