@@ -132,45 +132,4 @@ public class OAuth2TokenService {
         return authenticationTime;
     }
 
-    /**
-     * Clients must authenticate.
-     * Client credentials grant is limited to native clients.
-     * 
-     * @param clientId
-     *            client_id parameter, required
-     * @param clientSecret
-     *            client_secret parameter, required
-     * @param scopes
-     * @return authentication time
-     * @throws KustvaktException
-     * @throws OAuthSystemException
-     */
-    protected ZonedDateTime requestAccessTokenWithClientCredentials (
-            String clientId, String clientSecret, Set<String> scopes)
-            throws KustvaktException {
-
-        if (clientSecret == null || clientSecret.isEmpty()) {
-            throw new KustvaktException(
-                    StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                    "Missing parameters: client_secret",
-                    OAuth2Error.INVALID_REQUEST);
-        }
-
-        // OAuth2Client client =
-        clientService.authenticateClient(clientId, clientSecret);
-
-        // if (!client.isNative()) {
-        // throw new KustvaktException(
-        // StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-        // "Client credentials grant is not allowed for third party
-        // clients",
-        // OAuth2Error.UNAUTHORIZED_CLIENT);
-        // }
-        ZonedDateTime authenticationTime =
-                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
-        return authenticationTime;
-    }
-
-
-
 }

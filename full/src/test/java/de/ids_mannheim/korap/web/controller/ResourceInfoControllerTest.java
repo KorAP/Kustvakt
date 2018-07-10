@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
@@ -17,24 +16,22 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.FastJerseyTest;
+
 /**
  * @author hanl, margaretha
  * @lastUpdate 19/04/2017
- * EM: FIX ME: Database restructure
+ *             EM: FIX ME: Database restructure
  */
 @Ignore
 public class ResourceInfoControllerTest extends FastJerseyTest {
 
-    @Autowired
-    HttpAuthorizationHandler handler;
-    
     @Override
     public void initMethod () throws KustvaktException {
-//        helper().runBootInterfaces();
+        // helper().runBootInterfaces();
     }
 
     @Test
-    public void testGetPublicVirtualCollectionInfo () throws KustvaktException{
+    public void testGetPublicVirtualCollectionInfo () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("collection").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -47,11 +44,14 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetVirtualCollectionInfoWithAuthentication () throws KustvaktException{
+    public void testGetVirtualCollectionInfoWithAuthentication ()
+            throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("collection")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue("kustvakt",
+                                        "kustvakt2015"))
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -64,7 +64,7 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetVirtualCollectionInfoById () throws KustvaktException{
+    public void testGetVirtualCollectionInfoById () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("collection").path("GOE-VC").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -73,14 +73,14 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.size());
-        assertEquals("Goethe Virtual Collection",
-                node.path("name").asText());
+        assertEquals("Goethe Virtual Collection", node.path("name").asText());
         assertEquals("Goethe works from 1810",
                 node.path("description").asText());
     }
-    
+
     @Test
-    public void testGetVirtualCollectionInfoByIdUnauthorized () throws KustvaktException{
+    public void testGetVirtualCollectionInfoByIdUnauthorized ()
+            throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("collection").path("WPD15-VC").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
@@ -90,12 +90,13 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
         assertNotNull(node);
         assertNotEquals(0, node.size());
         assertEquals(101, node.at("/errors/0/0").asInt());
-        assertEquals("[Cannot found public VirtualCollection with ids: [WPD15-VC]]",
+        assertEquals(
+                "[Cannot found public VirtualCollection with ids: [WPD15-VC]]",
                 node.at("/errors/0/2").asText());
     }
-    
+
     @Test
-    public void testGetPublicCorporaInfo () throws KustvaktException{
+    public void testGetPublicCorporaInfo () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -109,14 +110,14 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetCorpusInfoById () throws KustvaktException{
+    public void testGetCorpusInfoById () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus").path("WPD13").get(ClientResponse.class);
-        
+
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
-//        System.out.println(ent);
+        // System.out.println(ent);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertTrue(node.isObject());
@@ -125,7 +126,7 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetCorpusInfoById2 () throws KustvaktException{
+    public void testGetCorpusInfoById2 () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus").path("GOE").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -139,7 +140,7 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetPublicFoundriesInfo () throws KustvaktException{
+    public void testGetPublicFoundriesInfo () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("foundry").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -153,7 +154,7 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetFoundryInfoById () throws KustvaktException{
+    public void testGetFoundryInfoById () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("foundry").path("tt").get(ClientResponse.class);
         String ent = response.getEntity(String.class);
@@ -167,7 +168,7 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
 
     @Test
-    public void testGetUnexistingCorpusInfo () throws KustvaktException{
+    public void testGetUnexistingCorpusInfo () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus").path("ZUW19").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
@@ -182,10 +183,12 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
     }
 
 
-    // EM: queries for an unauthorized corpus get the same responses / treatment as 
-    // asking for an unexisting corpus info. Does it need a specific exception instead?
+    // EM: queries for an unauthorized corpus get the same responses /
+    // treatment as
+    // asking for an unexisting corpus info. Does it need a specific
+    // exception instead?
     @Test
-    public void testGetUnauthorizedCorpusInfo () throws KustvaktException{
+    public void testGetUnauthorizedCorpusInfo () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("corpus").path("BRZ10").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),

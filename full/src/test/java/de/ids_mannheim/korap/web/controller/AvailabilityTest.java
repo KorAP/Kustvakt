@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
@@ -20,8 +19,6 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 public class AvailabilityTest extends SpringJerseyTest {
-    @Autowired
-    private HttpAuthorizationHandler handler;
 
     private void checkAndFree (String json) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(json);
@@ -147,14 +144,15 @@ public class AvailabilityTest extends SpringJerseyTest {
     }
 
 
-    private ClientResponse searchQueryWithIP (String collectionQuery,
-            String ip) throws UniformInterfaceException, ClientHandlerException,
+    private ClientResponse searchQueryWithIP (String collectionQuery, String ip)
+            throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         return resource().path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("cq", collectionQuery)
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("kustvakt",
-                                "kustvakt2015"))
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue("kustvakt",
+                                        "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, ip)
                 .get(ClientResponse.class);
     }
@@ -162,8 +160,7 @@ public class AvailabilityTest extends SpringJerseyTest {
 
     @Test
     public void testAvailabilityFreeAuthorized () throws KustvaktException {
-        ClientResponse response =
-                searchQuery("availability = CC-BY-SA");
+        ClientResponse response = searchQuery("availability = CC-BY-SA");
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -175,8 +172,7 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testAvailabilityRegexFreeAuthorized ()
             throws KustvaktException {
-        ClientResponse response =
-                searchQuery("availability = /.*BY.*/");
+        ClientResponse response = searchQuery("availability = /.*BY.*/");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
@@ -186,8 +182,7 @@ public class AvailabilityTest extends SpringJerseyTest {
 
     @Test
     public void testAvailabilityFreeUnauthorized () throws KustvaktException {
-        ClientResponse response =
-                searchQuery("availability = ACA-NC");
+        ClientResponse response = searchQuery("availability = ACA-NC");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
@@ -198,8 +193,7 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testAvailabilityRegexFreeUnauthorized ()
             throws KustvaktException {
-        ClientResponse response =
-                searchQuery("availability = /ACA.*/");
+        ClientResponse response = searchQuery("availability = /ACA.*/");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
@@ -236,11 +230,10 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testAvailabilityRegexFreeUnauthorized3 ()
             throws KustvaktException {
-        ClientResponse response =
-                searchQuery("availability = /.*NC.*/");
+        ClientResponse response = searchQuery("availability = /.*NC.*/");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
-        //        System.out.println(response.getEntity(String.class));
+        // System.out.println(response.getEntity(String.class));
         checkAndFree(response.getEntity(String.class));
     }
 
@@ -249,8 +242,7 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testNegationAvailabilityFreeUnauthorized ()
             throws KustvaktException {
-        ClientResponse response =
-                searchQuery("availability != /CC-BY.*/");
+        ClientResponse response = searchQuery("availability != /CC-BY.*/");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
@@ -260,8 +252,7 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testNegationAvailabilityFreeUnauthorized2 ()
             throws KustvaktException {
-        ClientResponse response =
-                searchQuery("availability != /.*BY.*/");
+        ClientResponse response = searchQuery("availability != /.*BY.*/");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
@@ -281,8 +272,8 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testComplexNegationAvailabilityFreeUnauthorized ()
             throws KustvaktException {
-        ClientResponse response = searchQuery(
-                "textClass=politik & availability != /CC-BY.*/");
+        ClientResponse response =
+                searchQuery("textClass=politik & availability != /CC-BY.*/");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
@@ -293,8 +284,8 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testComplexAvailabilityFreeUnauthorized ()
             throws KustvaktException {
-        ClientResponse response = searchQuery(
-                "textClass=politik & availability=ACA-NC");
+        ClientResponse response =
+                searchQuery("textClass=politik & availability=ACA-NC");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
@@ -305,8 +296,8 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testComplexAvailabilityFreeUnauthorized3 ()
             throws KustvaktException {
-        ClientResponse response = searchQuery(
-                "textClass=politik & availability=/.*NC.*/");
+        ClientResponse response =
+                searchQuery("textClass=politik & availability=/.*NC.*/");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
@@ -327,8 +318,8 @@ public class AvailabilityTest extends SpringJerseyTest {
 
     @Test
     public void testAvailabilityPublicUnauthorized () throws KustvaktException {
-        ClientResponse response = searchQueryWithIP(
-                "availability=QAO-NC-LOC:ids", "149.27.0.32");
+        ClientResponse response =
+                searchQueryWithIP("availability=QAO-NC-LOC:ids", "149.27.0.32");
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -340,8 +331,8 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testAvailabilityRegexPublicAuthorized ()
             throws KustvaktException {
-        ClientResponse response = searchQueryWithIP(
-                "availability= /ACA.*/", "149.27.0.32");
+        ClientResponse response =
+                searchQueryWithIP("availability= /ACA.*/", "149.27.0.32");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
@@ -352,8 +343,8 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testNegationAvailabilityPublicUnauthorized ()
             throws KustvaktException {
-        ClientResponse response = searchQueryWithIP(
-                "availability != ACA-NC", "149.27.0.32");
+        ClientResponse response =
+                searchQueryWithIP("availability != ACA-NC", "149.27.0.32");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
@@ -364,8 +355,8 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testNegationAvailabilityRegexPublicUnauthorized ()
             throws KustvaktException {
-        ClientResponse response = searchQueryWithIP(
-                "availability != /ACA.*/", "149.27.0.32");
+        ClientResponse response =
+                searchQueryWithIP("availability != /ACA.*/", "149.27.0.32");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
@@ -402,8 +393,8 @@ public class AvailabilityTest extends SpringJerseyTest {
 
     @Test
     public void testAvailabilityRegexAllAuthorized () throws KustvaktException {
-        ClientResponse response = searchQueryWithIP(
-                "availability= /ACA.*/", "10.27.0.32");
+        ClientResponse response =
+                searchQueryWithIP("availability= /ACA.*/", "10.27.0.32");
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
 
@@ -412,8 +403,8 @@ public class AvailabilityTest extends SpringJerseyTest {
 
     @Test
     public void testAvailabilityOr () throws KustvaktException {
-        ClientResponse response = searchQuery(
-                "availability=/CC-BY.*/ | availability=/ACA.*/");
+        ClientResponse response =
+                searchQuery("availability=/CC-BY.*/ | availability=/ACA.*/");
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -438,8 +429,8 @@ public class AvailabilityTest extends SpringJerseyTest {
 
     @Test
     public void testAvailabilityOrCorpusSigle () throws KustvaktException {
-        ClientResponse response = searchQuery(
-                "availability=/CC-BY.*/ | corpusSigle=GOE");
+        ClientResponse response =
+                searchQuery("availability=/CC-BY.*/ | corpusSigle=GOE");
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -449,8 +440,8 @@ public class AvailabilityTest extends SpringJerseyTest {
 
     @Test
     public void testOrWithoutAvailability () throws KustvaktException {
-        ClientResponse response = searchQuery(
-                "corpusSigle=GOE | textClass=politik");
+        ClientResponse response =
+                searchQuery("corpusSigle=GOE | textClass=politik");
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());

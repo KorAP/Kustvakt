@@ -1,14 +1,10 @@
 package de.ids_mannheim.korap.config;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -28,15 +24,11 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 import de.ids_mannheim.korap.authentication.KustvaktAuthenticationManager;
-import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.JDBCClient;
-import de.ids_mannheim.korap.handlers.ResourceDao;
-import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.KustvaktBaseDaoInterface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
-import de.ids_mannheim.korap.resources.KustvaktResource;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.TimeUtils;
 
@@ -222,36 +214,6 @@ public class TestHelper {
     public static Map<String, Object> getUserCredentials () {
         return new HashMap<>(data);
     }
-
-    public int setupResource (KustvaktResource resource)
-            throws KustvaktException {
-        ResourceDao dao = new ResourceDao(
-                (PersistenceClient) getBean(ContextHolder.KUSTVAKT_DB));
-        return dao.storeResource(resource, getUser());
-    }
-
-
-    public KustvaktResource getResource (String name) throws KustvaktException {
-        ResourceDao dao = new ResourceDao(
-                (PersistenceClient) getBean(ContextHolder.KUSTVAKT_DB));
-        KustvaktResource res = dao.findbyId(name, getUser());
-        if (res == null)
-            throw new RuntimeException("resource with name " + name
-                    + " not found ...");
-        return res;
-    }
-
-
-    public TestHelper dropResource (String ... names) throws KustvaktException {
-        ResourceDao dao = new ResourceDao(
-                (PersistenceClient) getBean(ContextHolder.KUSTVAKT_DB));
-        if (names == null || names.length == 0)
-            dao.truncate();
-        for (String name : names)
-            dao.deleteResource(name, null);
-        return this;
-    }
-
 
     public void close () {
         BeansFactory.closeApplication();

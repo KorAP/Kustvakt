@@ -1,21 +1,12 @@
 package de.ids_mannheim.korap.cache;
 
-import de.ids_mannheim.korap.config.KustvaktCacheable;
-import de.ids_mannheim.korap.exceptions.EmptyResultException;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.NotAuthorizedException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.resources.KustvaktResource;
-import de.ids_mannheim.korap.resources.Permissions;
-import de.ids_mannheim.korap.resources.ResourceFactory;
-import de.ids_mannheim.korap.user.User;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
-import java.util.Collection;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import de.ids_mannheim.korap.config.KustvaktCacheable;
+import de.ids_mannheim.korap.resources.KustvaktResource;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 /**
  * @author hanl

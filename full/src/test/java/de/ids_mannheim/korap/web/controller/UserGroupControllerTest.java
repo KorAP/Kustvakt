@@ -6,7 +6,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
@@ -32,8 +31,6 @@ import de.ids_mannheim.korap.web.input.UserGroupJson;
  */
 public class UserGroupControllerTest extends SpringJerseyTest {
 
-    @Autowired
-    private HttpAuthorizationHandler handler;
     private String username = "UserGroupControllerTest";
     private String admin = "admin";
 
@@ -41,9 +38,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         ClientResponse response = resource().path("group").path("list")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(username,
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
@@ -57,9 +53,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     @Test
     public void testListDoryGroups () throws KustvaktException {
         ClientResponse response = resource().path("group").path("list")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("dory",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
@@ -78,9 +73,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     @Test
     public void testListNemoGroups () throws KustvaktException {
         ClientResponse response = resource().path("group").path("list")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("nemo",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("nemo", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
@@ -100,9 +94,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testListMarlinGroups () throws KustvaktException {
         ClientResponse response = resource().path("group").path("list")
                 .queryParam("username", "marlin")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("marlin",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("marlin", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
@@ -138,9 +131,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path("group").path("create")
                 .type(MediaType.APPLICATION_JSON)
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(username,
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(json)
                 .post(ClientResponse.class);
 
@@ -148,9 +140,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         // list user group
         response = resource().path("group").path("list")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(username,
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
 
@@ -194,17 +185,15 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         // delete marlin from group
         ClientResponse response = resource().path("group").path("member")
                 .path("delete").path(groupId).path("marlin")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(username,
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .delete(ClientResponse.class);
 
         // check group member
         response = resource().path("group").path("list")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(username,
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
@@ -219,9 +208,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         // nemo is a group member
         ClientResponse response = resource().path("group").path("member")
                 .path("delete").path(groupId).path("marlin")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("nemo",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("nemo", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .delete(ClientResponse.class);
 
@@ -242,9 +230,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("member")
                 // dory group
                 .path("delete").path("2").path("pearl")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("dory",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .delete(ClientResponse.class);
 
@@ -260,9 +247,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
             ClientHandlerException, KustvaktException {
         ClientResponse response = resource().path("group").path("member")
                 .path("delete").path("2").path("pearl")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("dory",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .delete(ClientResponse.class);
 
@@ -281,13 +267,12 @@ public class UserGroupControllerTest extends SpringJerseyTest {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         // delete group
-        ClientResponse response =
-                resource().path("group").path("delete").path(groupId)
-                        .header(Attributes.AUTHORIZATION,
-                                handler.createBasicAuthorizationHeaderValue(
-                                        username, "pass"))
-                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                        .delete(ClientResponse.class);
+        ClientResponse response = resource().path("group").path("delete")
+                .path(groupId)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .delete(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
@@ -295,9 +280,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         response = resource().path("group").path("list").path("system-admin")
                 .queryParam("username", username)
                 .queryParam("status", "DELETED")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(admin,
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(admin, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
@@ -317,13 +301,12 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testDeleteGroupUnauthorized () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         // dory is a group admin in marlin group
-        ClientResponse response =
-                resource().path("group").path("delete").path("1")
-                        .header(Attributes.AUTHORIZATION,
-                                handler.createBasicAuthorizationHeaderValue(
-                                        "dory", "pass"))
-                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                        .delete(ClientResponse.class);
+        ClientResponse response = resource().path("group").path("delete")
+                .path("1")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("dory", "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .delete(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
         // System.out.println(entity);
@@ -338,13 +321,12 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     @Test
     public void testDeleteDeletedGroup () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        ClientResponse response =
-                resource().path("group").path("delete").path("4")
-                        .header(Attributes.AUTHORIZATION,
-                                handler.createBasicAuthorizationHeaderValue(
-                                        "dory", "pass"))
-                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                        .delete(ClientResponse.class);
+        ClientResponse response = resource().path("group").path("delete")
+                .path("4")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("dory", "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .delete(ClientResponse.class);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
@@ -363,9 +345,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         // dory is a group admin in marlin group
         ClientResponse response = resource().path("group").path("member")
                 .path("delete").path("1").path("marlin")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("dory",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .delete(ClientResponse.class);
 
@@ -390,18 +371,16 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("member")
                 .path("invite").type(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(username,
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
                 .entity(userGroup).post(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         // list group
         response = resource().path("group").path("list")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(username,
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
 
@@ -429,9 +408,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("member")
                 .path("invite").type(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("dory",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .entity(userGroup).post(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -459,9 +437,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("member")
                 .path("invite").type(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("dory",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .entity(userGroup).post(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -490,9 +467,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("member")
                 .path("invite").type(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("dory",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .entity(userGroup).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
         // System.out.println(entity);
@@ -523,9 +499,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("member")
                 .path("invite").type(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("dory",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .entity(userGroup).post(ClientResponse.class);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -556,9 +531,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("member")
                 .path("invite").type(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("dory",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .entity(userGroup).post(ClientResponse.class);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -580,9 +554,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("subscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("marlin",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("marlin", "pass"))
                 .entity(form).post(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -624,9 +597,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("subscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("pearl",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("pearl", "pass"))
                 .entity(form).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -642,7 +614,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testSubscribeMissingGroupId () throws KustvaktException {
         ClientResponse response = resource().path("group").path("subscribe")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION, handler
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("bruce", "pass"))
                 .post(ClientResponse.class);
         String entity = response.getEntity(String.class);
@@ -663,9 +635,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("subscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("bruce",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("bruce", "pass"))
                 .entity(form).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
         // System.out.println(entity);
@@ -686,9 +657,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("subscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("pearl",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("pearl", "pass"))
                 .entity(form).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
         // System.out.println(entity);
@@ -710,9 +680,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("subscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("nemo",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("nemo", "pass"))
                 .entity(form).post(ClientResponse.class);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -731,9 +700,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("unsubscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("marlin",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("marlin", "pass"))
                 .entity(form).post(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -745,9 +713,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     private void checkGroupMemberRole (String groupId, String deletedMemberName)
             throws KustvaktException {
         ClientResponse response = resource().path("group").path(groupId)
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(admin,
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(admin, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
@@ -777,9 +744,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("unsubscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("pearl",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("pearl", "pass"))
                 .entity(form).post(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
@@ -808,9 +774,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("unsubscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("marlin",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("marlin", "pass"))
                 .entity(form).post(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -830,9 +795,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("unsubscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("marlin",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("marlin", "pass"))
                 .entity(form).post(ClientResponse.class);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -854,9 +818,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("unsubscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("bruce",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("bruce", "pass"))
                 .entity(form).post(ClientResponse.class);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -878,9 +841,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("unsubscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("pearl",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("pearl", "pass"))
                 .entity(form).post(ClientResponse.class);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -903,9 +865,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path("group").path("unsubscribe")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("nemo",
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("nemo", "pass"))
                 .entity(form).post(ClientResponse.class);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());

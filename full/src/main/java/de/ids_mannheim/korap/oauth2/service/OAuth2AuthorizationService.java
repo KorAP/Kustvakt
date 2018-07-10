@@ -12,10 +12,10 @@ import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
-import de.ids_mannheim.korap.oauth2.dao.AuthorizationDao;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
+import de.ids_mannheim.korap.oauth2.interfaces.AuthorizationDaoInterface;
 
 @Service(value = "authorizationService")
 public class OAuth2AuthorizationService {
@@ -27,12 +27,11 @@ public class OAuth2AuthorizationService {
     protected OAuth2ClientService clientService;
     @Autowired
     protected OAuth2ScopeService scopeService;
+    @Autowired
+    private AuthorizationDaoInterface authorizationDao;
 
     @Autowired
-    private AuthorizationDao authorizationDao;
-
-    @Autowired
-    private FullConfiguration config;
+    protected FullConfiguration config;
 
     /**
      * Authorization code request does not require client
@@ -178,7 +177,8 @@ public class OAuth2AuthorizationService {
 
     private boolean isExpired (ZonedDateTime createdDate) {
         jlog.debug("createdDate: " + createdDate);
-        ZonedDateTime expiration = createdDate.plusSeconds(60);
+        ZonedDateTime expiration =
+                createdDate.plusSeconds(config.getAuthorizationCodeExpiry());
         ZonedDateTime now = ZonedDateTime.now();
         jlog.debug("expiration: " + expiration + ", now: " + now);
 

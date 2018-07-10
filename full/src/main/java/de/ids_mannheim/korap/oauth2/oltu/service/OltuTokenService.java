@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.oauth2.oltu.service;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
@@ -15,6 +16,7 @@ import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
@@ -58,7 +60,8 @@ public class OltuTokenService extends OAuth2TokenService {
             Set<String> scopes =
                     scopeService.filterScopes(oAuthRequest.getScopes(),
                             config.getClientCredentialsScopes());
-            return createsAccessTokenResponse(scopes, null, authenticationTime);
+            return createsAccessTokenResponse(scopes,
+                    oAuthRequest.getClientId(), null, authenticationTime);
         }
         else {
             throw new KustvaktException(StatusCodes.UNSUPPORTED_GRANT_TYPE,
@@ -88,9 +91,49 @@ public class OltuTokenService extends OAuth2TokenService {
         ZonedDateTime authenticationTime = authenticateUser(
                 oAuthRequest.getUsername(), oAuthRequest.getPassword(), scopes);
 
-        return createsAccessTokenResponse(scopes, oAuthRequest.getUsername(),
-                authenticationTime);
+        return createsAccessTokenResponse(scopes, oAuthRequest.getClientId(),
+                oAuthRequest.getUsername(), authenticationTime);
+    }
 
+    /**
+     * Clients must authenticate.
+     * Client credentials grant is limited to native clients.
+     * 
+     * @param clientId
+     *            client_id parameter, required
+     * @param clientSecret
+     *            client_secret parameter, required
+     * @param scopes
+     * @return
+     * @return authentication time
+     * @throws KustvaktException
+     * @throws OAuthSystemException
+     */
+    protected ZonedDateTime requestAccessTokenWithClientCredentials (
+            String clientId, String clientSecret, Set<String> scopes)
+            throws KustvaktException {
+
+        if (clientSecret == null || clientSecret.isEmpty()) {
+            throw new KustvaktException(
+                    StatusCodes.CLIENT_AUTHENTICATION_FAILED,
+                    "Missing parameters: client_secret",
+                    OAuth2Error.INVALID_REQUEST);
+        }
+
+        // OAuth2Client client =
+        clientService.authenticateClient(clientId, clientSecret);
+
+        // if (!client.isNative()) {
+        // throw new KustvaktException(
+        // StatusCodes.CLIENT_AUTHENTICATION_FAILED,
+        // "Client credentials grant is not allowed for third party
+        // clients",
+        // OAuth2Error.UNAUTHORIZED_CLIENT);
+        // }
+
+        ZonedDateTime authenticationTime =
+                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+        return authenticationTime;
     }
 
     /**
@@ -104,7 +147,7 @@ public class OltuTokenService extends OAuth2TokenService {
      * @throws KustvaktException
      */
     private OAuthResponse createsAccessTokenResponse (Set<String> scopes,
-            String userId, ZonedDateTime authenticationTime)
+            String clientId, String userId, ZonedDateTime authenticationTime)
             throws OAuthSystemException, KustvaktException {
 
         String accessToken = oauthIssuer.accessToken();
@@ -112,7 +155,7 @@ public class OltuTokenService extends OAuth2TokenService {
 
         Set<AccessScope> accessScopes =
                 scopeService.convertToAccessScope(scopes);
-        tokenDao.storeAccessToken(accessToken, accessScopes, userId,
+        tokenDao.storeAccessToken(accessToken, accessScopes, userId, clientId,
                 authenticationTime);
 
         return OAuthASResponse.tokenResponse(Status.OK.getStatusCode())
@@ -129,7 +172,9 @@ public class OltuTokenService extends OAuth2TokenService {
         String accessToken = oauthIssuer.accessToken();
         // String refreshToken = oauthIssuer.refreshToken();
 
-        tokenDao.storeAccessToken(authorization, accessToken);
+        tokenDao.storeAccessToken(accessToken, authorization.getScopes(),
+                authorization.getUserId(), authorization.getClientId(),
+                authorization.getUserAuthenticationTime());
 
         String scopes = scopeService
                 .convertAccessScopesToString(authorization.getScopes());

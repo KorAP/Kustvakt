@@ -19,7 +19,7 @@ public class MetaQueryBuilderTest {
         System.out.println("____________________-");
         MetaQueryBuilder m = QueryBuilderUtil.defaultMetaBuilder(0, 1, 5,
                 "sentence", false);
-        Map map = m.raw();
+        Map<?, ?> map = m.raw();
         assertEquals("sentence", map.get("context"));
         assertEquals(1, map.get("startPage"));
         assertEquals(0, map.get("startIndex"));

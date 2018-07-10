@@ -59,14 +59,13 @@ CREATE UNIQUE INDEX authorization_scope_index on
 CREATE TABLE IF NOT EXISTS oauth2_access_token (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	token VARCHAR(255) NOT NULL,
-	authorization_id INTEGER DEFAULT NULL,
 	user_id VARCHAR(100) DEFAULT NULL,
+	client_id VARCHAR(100) DEFAULT NULL,
 	created_date TIMESTAMP DEFAULT (datetime('now','localtime')),
 	is_revoked BOOLEAN DEFAULT 0,
-	total_attempts INTEGER DEFAULT 0,
 	user_auth_time TIMESTAMP NOT NULL,
-	FOREIGN KEY (authorization_id)
-	   REFERENCES oauth2_authorization(id)
+	FOREIGN KEY (client_id)
+	   REFERENCES oauth2_client(id)
 );
 
 CREATE TABLE oauth2_access_token_scope (

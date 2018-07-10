@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.nimbusds.jose.JOSEException;
@@ -45,6 +46,7 @@ import com.nimbusds.openid.connect.sdk.token.OIDCTokens;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
+import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
@@ -68,6 +70,9 @@ import de.ids_mannheim.korap.utils.TimeUtils;
  */
 @Service
 public class OpenIdTokenService extends OAuth2TokenService {
+
+    @Autowired
+    private AccessTokenDao tokenDao;
 
     public AccessTokenResponse requestAccessToken (TokenRequest tokenRequest)
             throws KustvaktException {
@@ -128,10 +133,14 @@ public class OpenIdTokenService extends OAuth2TokenService {
             ClientAuthentication clientAuthentication, ClientID clientId)
             throws KustvaktException {
 
-        Set<String> scopes = null;
+        Set<String> scopeSet = null;
         if (scope != null) {
-            scopes = new HashSet<String>();
-            scopes.addAll(scope.toStringList());
+            scopeSet = new HashSet<String>();
+            scopeSet.addAll(scope.toStringList());
+        }
+        else {
+            scopeSet = config.getDefaultAccessScopes();
+            scope = new Scope(scopeSet.toArray(new String[scopeSet.size()]));
         }
 
         ZonedDateTime authenticationTime;
@@ -145,8 +154,7 @@ public class OpenIdTokenService extends OAuth2TokenService {
             }
             else {
                 clientIdStr = clientId.getValue();
-                client = clientService.authenticateClient(clientIdStr,
-                        null);
+                client = clientService.authenticateClient(clientIdStr, null);
             }
         }
         else {
@@ -156,19 +164,24 @@ public class OpenIdTokenService extends OAuth2TokenService {
             client = clientService.authenticateClient(clientCredentials[0],
                     clientCredentials[1]);
         }
-        
+
         if (!client.isNative()) {
-            throw new KustvaktException(
-                    StatusCodes.CLIENT_AUTHORIZATION_FAILED,
+            throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
                     "Password grant is not allowed for third party clients",
                     OAuth2Error.UNAUTHORIZED_CLIENT);
         }
-        
-        authenticationTime =
-                authenticateUser(username, password, scopes);
-        
-        return createsAccessTokenResponse(scope, clientIdStr, username,
-                authenticationTime, null);
+
+        authenticationTime = authenticateUser(username, password, scopeSet);
+
+        AccessToken accessToken =
+                new BearerAccessToken(config.getTokenTTL(), scope);
+
+        tokenDao.storeAccessToken(accessToken.getValue(),
+                scopeService.convertToAccessScope(scopeSet), username,
+                clientIdStr, authenticationTime);
+
+        return createsAccessTokenResponse(accessToken, scope, clientIdStr,
+                username, authenticationTime, null);
     }
 
     private AccessTokenResponse requestAccessTokenWithAuthorizationCode (
@@ -211,22 +224,26 @@ public class OpenIdTokenService extends OAuth2TokenService {
         String[] scopeArray = scopes.stream().map(scope -> scope.toString())
                 .toArray(String[]::new);
         Scope scope = new Scope(scopeArray);
-        return createsAccessTokenResponse(scope, authorization.getClientId(),
-                authorization.getUserId(),
+        AccessToken accessToken =
+                new BearerAccessToken(config.getTokenTTL(), scope);
+        tokenDao.storeAccessToken(accessToken.getValue(), scopes,
+                authorization.getUserId(), authorization.getClientId(),
+                authorization.getUserAuthenticationTime());
+
+        return createsAccessTokenResponse(accessToken, scope,
+                authorization.getClientId(), authorization.getUserId(),
                 authorization.getUserAuthenticationTime(),
                 authorization.getNonce());
     }
 
-    private AccessTokenResponse createsAccessTokenResponse (Scope scope,
-            String clientId, String userId,
-            ZonedDateTime userAuthenticationTime, String nonce)
+    private AccessTokenResponse createsAccessTokenResponse (
+            AccessToken accessToken, Scope scope, String clientId,
+            String userId, ZonedDateTime userAuthenticationTime, String nonce)
             throws KustvaktException {
 
-        AccessToken accessToken =
-                new BearerAccessToken(config.getTokenTTL(), scope);
         RefreshToken refreshToken = new RefreshToken();
 
-        if (scope != null && scope.contains("openid")) {
+        if (scope.contains("openid")) {
             JWTClaimsSet claims = createIdTokenClaims(clientId, userId,
                     userAuthenticationTime, nonce);
             SignedJWT idToken = signIdToken(claims,

@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.oauth2.entity;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -15,7 +16,9 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "oauth2_access_scope")
-public class AccessScope {
+public class AccessScope implements Serializable{
+
+    private static final long serialVersionUID = -7356877266702636705L;
 
     @Id
     private String id;

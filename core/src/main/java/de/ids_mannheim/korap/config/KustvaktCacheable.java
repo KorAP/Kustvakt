@@ -39,8 +39,8 @@ public abstract class KustvaktCacheable {
                 new CacheConfiguration(name, 20000)
                         .memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
                         .eternal(false)
-                        .timeToLiveSeconds(20000)
-                        .timeToIdleSeconds(15000)
+                        .timeToLiveSeconds(15000)
+                        .timeToIdleSeconds(5000)
                         .diskExpiryThreadIntervalSeconds(0)
                         .persistence(new PersistenceConfiguration().strategy(PersistenceConfiguration.Strategy.LOCALTEMPSWAP)));
         if (!CacheManager.getInstance().cacheExists(name))

@@ -9,16 +9,13 @@ import org.joda.time.DateTime;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
-import de.ids_mannheim.korap.authentication.http.TransferEncoding;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.TestHelper;
-import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.user.User;
@@ -34,11 +31,7 @@ import de.ids_mannheim.korap.web.FastJerseyTest;
 @Ignore
 public class AuthenticationControllerTest extends FastJerseyTest {
 
-    @Autowired
-    HttpAuthorizationHandler handler;
-    
     private static String[] credentials;
-    
     
     @BeforeClass
     public static void configure () throws Exception {
@@ -61,7 +54,7 @@ public class AuthenticationControllerTest extends FastJerseyTest {
 
     @Test
     public void testSessionToken() throws KustvaktException {
-        String auth = handler.createBasicAuthorizationHeaderValue( 
+        String auth = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue( 
                 credentials[0], credentials[1]);
         ClientResponse response = resource().path("auth")
                 .path("sessionToken").header(Attributes.AUTHORIZATION, auth)
@@ -98,7 +91,7 @@ public class AuthenticationControllerTest extends FastJerseyTest {
 
     @Test
     public void testSessionTokenExpire() throws KustvaktException {
-        String auth = handler.createBasicAuthorizationHeaderValue(
+        String auth = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
                 credentials[0], credentials[1]);
         ClientResponse response = resource().path("auth")
                 .path("sessionToken").header(Attributes.AUTHORIZATION, auth)

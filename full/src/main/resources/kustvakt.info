@@ -4,5 +4,5 @@ kustvakt.name=${project.name}
 # use this file to define the properties and logging file names
 kustvakt.properties=./kustvakt.conf
 kustvakt.logging=./log4j.properties
-kustvakt.caching=true
+kustvakt.cache=true
 kustvakt.cache_store=./store

@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.oauth2.service;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,7 @@ public class OAuth2ScopeService {
      * @return
      * @throws KustvaktException
      */
-    public Set<AccessScope> convertToAccessScope (Set<String> scopes)
+    public Set<AccessScope> convertToAccessScope (Collection<String> scopes)
             throws KustvaktException {
 
         List<AccessScope> definedScopes = accessScopeDao.retrieveAccessScopes();

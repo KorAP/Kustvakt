@@ -12,7 +12,6 @@ import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -35,16 +34,13 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  */
 public class OAuth2ControllerTest extends SpringJerseyTest {
 
-    @Autowired
-    private HttpAuthorizationHandler handler;
-
     private ClientResponse requestAuthorizationConfidentialClient (
             MultivaluedMap<String, String> form) throws KustvaktException {
 
-        return resource().path("oauth2").path("authorize")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("dory",
-                                "password"))
+        return resource().path("oauth2").path("authorize").header(
+                Attributes.AUTHORIZATION,
+                HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
+                        "dory", "password"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)

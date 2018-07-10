@@ -1,18 +1,15 @@
 package de.ids_mannheim.korap.misc;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.junit.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
-import de.ids_mannheim.korap.resources.KustvaktResource;
-import de.ids_mannheim.korap.resources.VirtualCollection;
-import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 
 /**
  * @author hanl
@@ -226,7 +223,7 @@ public class CollectionQueryBuilderTest {
 
         KoralCollectionQueryBuilder test = new KoralCollectionQueryBuilder();
         test.with("corpusSigle=WPD");
-        String json = test.toJSON();
+//        String json = test.toJSON();
 //        System.out.println(json);
         //JsonNode node = (JsonNode) test.rebaseCollection(null);
         //node = b.mergeWith(node);
@@ -248,7 +245,7 @@ public class CollectionQueryBuilderTest {
         KoralCollectionQueryBuilder test = new KoralCollectionQueryBuilder();
         // operator is not supposed to be here!
         test.and().with("corpusSigle=WPD");
-        String json = test.toJSON();
+//        String json = test.toJSON();
 //        System.out.println(json);
         //JsonNode node = (JsonNode) test.rebaseCollection(null);
         //node = b.mergeWith(node);
@@ -319,71 +316,6 @@ public class CollectionQueryBuilderTest {
         assertEquals("operation:and", node.at("/collection/operation").asText());
         assertEquals(2, node.at("/collection/operands/1/operands").size());
     }
-
-
-    @Test
-    public void testCollectionMergeWithFromResource () throws KustvaktException {
-        KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
-        builder.with("textClass=politik & corpusSigle=WPD");
-        KustvaktResource resource = new VirtualCollection();
-        resource.setName("collection_1");
-        String json = builder.toJSON();
-        resource.setFields(json);
-
-        assertEquals(json, resource.getStringData());
-        builder = new KoralCollectionQueryBuilder();
-        builder.setBaseQuery(resource.getData());
-        builder.or().with("pubPlace=Mannheim");
-
-//        System.out.println("query " + builder.toJSON());
-        // todo: assertions
-    }
-
-
-    @Test
-    public void testCollectionMergeWithFromResourceNoCollection () throws KustvaktException {
-        KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
-        builder.with("textClass=politik & corpusSigle=WPD");
-        KustvaktResource resource = new VirtualCollection();
-        resource.setName("collection_1");
-        String json = builder.toJSON();
-        resource.setFields(json);
-
-        assertEquals(json, resource.getStringData());
-        builder = new KoralCollectionQueryBuilder();
-        builder.setBaseQuery(resource.getData());
-        builder.or().with("pubPlace=Mannheim");
-
-//        System.out.println("query " + builder.toJSON());
-        // todo: assertions
-    }
-
-
-    @Test
-    public void testCollectionMergeFromQuerySerializer () throws KustvaktException {
-        QuerySerializer s = new QuerySerializer();
-        s.setQuery("[base=Haus]", "poliqarp");
-        KoralCollectionQueryBuilder total = new KoralCollectionQueryBuilder();
-        total.setBaseQuery(s.toJSON());
-
-
-        KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
-        builder.with("textClass=politik & corpusSigle=WPD");
-        KustvaktResource resource = new VirtualCollection();
-        resource.setName("collection_1");
-        String json = builder.toJSON();
-        resource.setFields(json);
-        // operator is irrelevant here
-        JsonNode node = total.or().mergeWith(resource.getData());
-        assertNotNull(node);
-        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
-        assertEquals("operation:and", node.at("/collection/operation").asText());
-        assertEquals("textClass", node.at("/collection/operands/0/key")
-                .asText());
-        assertEquals("corpusSigle", node.at("/collection/operands/1/key")
-                .asText());
-    }
-
 
     @Test
     public void testBaseCollectionNull () throws KustvaktException {

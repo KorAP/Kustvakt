@@ -4,7 +4,10 @@ version 0.60.5
 	- Added OAuth2 scope checking in search and VC controllers (margaretha)
 	- Added handling OAuth2 bearer token for VC access and User group controllers (margaretha)
 	- Added default scope to password grant (margaretha)
-	
+	- Made createBasicAuthorizationHeaderValue static (margaretha)
+	- Added store access token in openID token service (margaretha)
+	- Fixed empty scope in openID authorization and token service (margaretha)
+	- Implemented storing authorization code in cache (margaretha)
 	
 version 0.60.4
 05/07/2018

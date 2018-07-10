@@ -46,8 +46,6 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
 
     @Autowired
-    private HttpAuthorizationHandler handler;
-    @Autowired
     private FullConfiguration config;
 
     private String redirectUri =
@@ -58,8 +56,9 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
             MultivaluedMap<String, String> form) throws KustvaktException {
         return resource().path("oauth2").path("openid").path("authorize")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(username,
-                                "password"))
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue(username,
+                                        "password"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
@@ -104,7 +103,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         assertEquals("thisIsMyState", params.getFirst("state"));
     }
 
-    
+
 
     private void testRequestAuthorizationCodeWithoutOpenID (
             MultivaluedMap<String, String> form, String redirectUri)
@@ -289,6 +288,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
 
         ClientResponse tokenResponse = sendTokenRequest(tokenForm);
         String entity = tokenResponse.getEntity(String.class);
+        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());

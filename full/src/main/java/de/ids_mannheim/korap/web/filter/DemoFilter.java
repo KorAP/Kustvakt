@@ -3,8 +3,6 @@ package de.ids_mannheim.korap.web.filter;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
@@ -23,13 +21,10 @@ import de.ids_mannheim.korap.security.context.TokenContext;
 @Provider
 public class DemoFilter implements ContainerRequestFilter, ResourceFilter {
 
-    @Autowired
-    private HttpAuthorizationHandler handler;
-    
     @Override
     public ContainerRequest filter (ContainerRequest request) {
-        String authentication = request
-                .getHeaderValue(ContainerRequest.AUTHORIZATION);
+        String authentication =
+                request.getHeaderValue(ContainerRequest.AUTHORIZATION);
         if (authentication == null || authentication.isEmpty()) {
             try {
                 request.getUserPrincipal();
@@ -46,7 +41,8 @@ public class DemoFilter implements ContainerRequestFilter, ResourceFilter {
         TokenContext context = new TokenContext();
         String token = null;
         try {
-            token = handler.createBasicAuthorizationHeaderValue("demo", "demo2015");
+            token = HttpAuthorizationHandler
+                    .createBasicAuthorizationHeaderValue("demo", "demo2015");
         }
         catch (KustvaktException e) {
             e.printStackTrace();

@@ -1,4 +1,6 @@
 package de.ids_mannheim.korap.misc;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.IOException;
 
 import org.junit.AfterClass;
@@ -67,6 +69,8 @@ public class LocalQueryTest extends BeanConfigTest {
         c.setIndex(new SearchKrill(index).getIndex());
         long sent = c.numberOf("base/sentences");
         long docs = c.numberOf("documents");
+        assertNotNull(sent);
+        assertNotNull(docs);
     }
 
 

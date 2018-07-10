@@ -27,6 +27,7 @@ import com.nimbusds.jose.util.IOUtils;
 import de.ids_mannheim.korap.constant.AuthenticationMethod;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.oauth2.openid.OpenIdConfiguration;
+import de.ids_mannheim.korap.utils.TimeUtils;
 
 /**
  * Configuration for Kustvakt full version including properties
@@ -72,6 +73,10 @@ public class FullConfiguration extends KustvaktConfiguration {
     private Set<String> defaultAccessScopes;
     private Set<String> clientCredentialsScopes;
     private int maxAuthenticationAttempts;
+
+    private int accessTokenExpiry;
+    private int refreshTokenExpiry;
+    private int authorizationCodeExpiry;
 
     private URL issuer;
     private URI issuerURI;
@@ -218,7 +223,7 @@ public class FullConfiguration extends KustvaktConfiguration {
                 "korap.ids-mannheim.de"));
 
         setMaxAuthenticationAttempts(Integer
-                .parseInt(properties.getProperty("oauth2.max.attempts", "3")));
+                .parseInt(properties.getProperty("oauth2.max.attempts", "1")));
 
         String scopes = properties.getProperty("oauth2.default.scopes",
                 "openid preferred_username");
@@ -230,6 +235,13 @@ public class FullConfiguration extends KustvaktConfiguration {
                 .getProperty("oauth2.client.credentials.scopes", "client_info");
         setClientCredentialsScopes(Arrays.stream(clientScopes.split(" "))
                 .collect(Collectors.toSet()));
+
+        accessTokenExpiry = TimeUtils.convertTimeToSeconds(
+                properties.getProperty("oauth2.access.token.expiry", "1D"));
+        refreshTokenExpiry = TimeUtils.convertTimeToSeconds(
+                properties.getProperty("oauth2.refresh.token.expiry", "90D"));
+        authorizationCodeExpiry = TimeUtils.convertTimeToSeconds(properties
+                .getProperty("oauth2.authorization.code.expiry", "10M"));
     }
 
     private void setMailConfiguration (Properties properties) {
@@ -582,5 +594,29 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     public void setOpenidConfig (OpenIdConfiguration openidConfig) {
         this.openidConfig = openidConfig;
+    }
+
+    public int getAccessTokenExpiry () {
+        return accessTokenExpiry;
+    }
+
+    public void setAccessTokenExpiry (int accessTokenExpiry) {
+        this.accessTokenExpiry = accessTokenExpiry;
+    }
+
+    public int getRefreshTokenExpiry () {
+        return refreshTokenExpiry;
+    }
+
+    public void setRefreshTokenExpiry (int refreshTokenExpiry) {
+        this.refreshTokenExpiry = refreshTokenExpiry;
+    }
+
+    public int getAuthorizationCodeExpiry () {
+        return authorizationCodeExpiry;
+    }
+
+    public void setAuthorizationCodeExpiry (int authorizationCodeExpiry) {
+        this.authorizationCodeExpiry = authorizationCodeExpiry;
     }
 }

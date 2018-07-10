@@ -49,8 +49,6 @@ import de.ids_mannheim.korap.web.FastJerseyTest;
 public class UserControllerTest extends FastJerseyTest {
 
     @Autowired
-    HttpAuthorizationHandler handler;
-    @Autowired
     FullConfiguration config;
 	private static String[] credentials;
 
@@ -86,7 +84,7 @@ public class UserControllerTest extends FastJerseyTest {
 
 		// map.putSingle("address", "Mannheim");
 
-		String enc = handler.createBasicAuthorizationHeaderValue("testuser", "testPassword1234");
+		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("testuser", "testPassword1234");
 		response = resource().path("user").path("info")
 				.header("Content-Type", MediaType.APPLICATION_JSON).header(Attributes.AUTHORIZATION, enc)
 				.get(ClientResponse.class);
@@ -111,7 +109,7 @@ public class UserControllerTest extends FastJerseyTest {
 
 		// run login/ status --> exception or information about locked account
 		// should appear
-		String enc = handler.createBasicAuthorizationHeaderValue("testuser2", "testPassword1234");
+		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("testuser2", "testPassword1234");
 		response = resource().path("user").path("info").header(Attributes.AUTHORIZATION, enc)
 				.get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
@@ -144,7 +142,7 @@ public class UserControllerTest extends FastJerseyTest {
 		response = resource().uri(URI.create(conf_uri)).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
-		String enc = handler.createBasicAuthorizationHeaderValue("testuser", "testPassword1234");
+		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("testuser", "testPassword1234");
 		response = resource().path("user").path("info").header(Attributes.AUTHORIZATION, enc)
 				.get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
@@ -152,7 +150,7 @@ public class UserControllerTest extends FastJerseyTest {
 
 	@Test
 	public void loginHTTP() throws KustvaktException {
-		String enc = handler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
+		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
 		ClientResponse response = resource().path("user").path("info")
 				.header(Attributes.AUTHORIZATION, enc).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
@@ -162,7 +160,7 @@ public class UserControllerTest extends FastJerseyTest {
 	@Test
 	@Ignore
 	public void loginJWT() throws KustvaktException{
-		String en = handler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
+		String en = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
 		/* lauffähige Version von Hanl: */
 		ClientResponse response = resource().path("auth").path("apiToken")
 				.header(Attributes.AUTHORIZATION, en).get(ClientResponse.class);
@@ -192,7 +190,7 @@ public class UserControllerTest extends FastJerseyTest {
 
 		assertTrue(BeansFactory.getKustvaktContext().getConfiguration().getTokenTTL() < 10);
 
-		String en = handler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
+		String en = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
 		ClientResponse response = resource().path("auth").path("apiToken")
 				.header(Attributes.AUTHORIZATION, en).get(ClientResponse.class);
 
@@ -220,7 +218,7 @@ public class UserControllerTest extends FastJerseyTest {
 
 	@Test
 	public void testGetUserDetails() throws KustvaktException {
-		String enc = handler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
+		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
 		ClientResponse response = resource().path("user").path("details")
 				.header(Attributes.AUTHORIZATION, enc).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
@@ -228,7 +226,7 @@ public class UserControllerTest extends FastJerseyTest {
 
 	@Test
 	public void testGetUserDetailsEmbeddedPointer() throws KustvaktException {
-		String enc = handler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
+		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
 		Map m = new LinkedMap();
 		m.put("test", "[100, \"error message\", true, \"another message\"]");
 
@@ -246,7 +244,7 @@ public class UserControllerTest extends FastJerseyTest {
 
 	@Test
 	public void testUpdateUserDetailsMerge() throws KustvaktException{
-		String enc = handler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
+		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
 		Map m = new LinkedMap();
 		m.put("test", "test value 1");
 
@@ -268,7 +266,7 @@ public class UserControllerTest extends FastJerseyTest {
 
 	@Test
 	public void testGetUserDetailsPointer() throws KustvaktException {
-		String enc = handler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
+		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
 		ClientResponse response = resource().path("user").path("details")
 				.queryParam("pointer", "email").header(Attributes.AUTHORIZATION, enc).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
@@ -280,7 +278,7 @@ public class UserControllerTest extends FastJerseyTest {
 	public void testGetUserDetailsNonExistent() throws KustvaktException {
 //		helper().setupSimpleAccount("userservicetest", "servicepass");
 
-		String enc = handler.createBasicAuthorizationHeaderValue("userservicetest", "servicepass");
+		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("userservicetest", "servicepass");
 		ClientResponse response = resource().path("user").path("details")
 				.header(Attributes.AUTHORIZATION, enc).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -294,7 +292,7 @@ public class UserControllerTest extends FastJerseyTest {
 
 	@Test
 	public void testGetUserSettings() throws KustvaktException {
-		String enc = handler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
+		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
 		ClientResponse response = resource().path("user").path("settings")
 				.header(Attributes.AUTHORIZATION, enc).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
@@ -302,7 +300,7 @@ public class UserControllerTest extends FastJerseyTest {
 
 	@Test
 	public void testUpdateUserDetailsJson() throws KustvaktException{
-		String enc = handler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
+		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
 		Map m = new LinkedMap();
 		m.put("firstName", "newName");
 		m.put("lastName", "newLastName");
@@ -337,7 +335,7 @@ public class UserControllerTest extends FastJerseyTest {
 	@Test
 	@Ignore
 	public void testUpdateUserSettingsForm() throws IOException, KustvaktException{
-		String enc = handler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
+		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
 		MultivaluedMap m = new MultivaluedMapImpl();
 		m.putSingle("queryLanguage", "poliqarp_test");
 		m.putSingle("pageLength", "200");
@@ -375,7 +373,7 @@ public class UserControllerTest extends FastJerseyTest {
 
 	@Test
 	public void testUpdateUserSettingsJson() throws IOException, KustvaktException {
-		String enc = handler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
+		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
 		Map m = new HashMap<>();
 		m.put("queryLanguage", "poliqarp_test");
 		m.put("pageLength", "200");

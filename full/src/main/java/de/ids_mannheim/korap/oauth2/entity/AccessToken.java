@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.oauth2.entity;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
@@ -12,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -23,7 +23,9 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "oauth2_access_token")
-public class AccessToken {
+public class AccessToken implements Serializable{
+
+    private static final long serialVersionUID = 8452701765986475302L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,16 +35,16 @@ public class AccessToken {
     private ZonedDateTime createdDate;
     @Column(name = "user_id")
     private String userId;
+    @Column(name = "client_id")
+    private String clientId;
     @Column(name = "is_revoked")
     private boolean isRevoked;
-    @Column(name = "total_attempts")
-    private int totalAttempts;
     @Column(name = "user_auth_time", updatable = false)
     private ZonedDateTime userAuthenticationTime;
     
-    @OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="authorization_id")
-    private Authorization authorization;
+//    @OneToOne(fetch=FetchType.LAZY, cascade=CascadeType.REMOVE)
+//    @JoinColumn(name="authorization_id")
+//    private Authorization authorization;
     
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "oauth2_access_token_scope",

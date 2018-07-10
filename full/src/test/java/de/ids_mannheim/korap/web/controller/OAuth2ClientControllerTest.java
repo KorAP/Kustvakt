@@ -12,7 +12,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.http.entity.ContentType;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
@@ -39,8 +38,6 @@ import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
  */
 public class OAuth2ClientControllerTest extends SpringJerseyTest {
 
-    @Autowired
-    private HttpAuthorizationHandler handler;
     private String username = "OAuth2ClientControllerTest";
 
     private void checkWWWAuthenticateHeader (ClientResponse response) {
@@ -66,9 +63,8 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         json.setDescription("This is a confidential test client.");
 
         return resource().path("oauth2").path("client").path("register")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(username,
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
@@ -107,9 +103,8 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path("oauth2").path("client")
                 .path("register")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(username,
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
@@ -138,9 +133,8 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path("oauth2").path("client")
                 .path("register")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(username,
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
@@ -160,9 +154,8 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path("oauth2").path("client")
                 .path("register")
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(username,
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
@@ -196,7 +189,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path("oauth2").path("client")
                 .path("deregister")
-                .header(Attributes.AUTHORIZATION, handler
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .delete(ClientResponse.class);
 
@@ -209,7 +202,7 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path("oauth2").path("client")
                 .path("deregister").path(clientId)
-                .header(Attributes.AUTHORIZATION, handler
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .delete(ClientResponse.class);
 
@@ -225,9 +218,8 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path("oauth2").path("client")
                 .path("deregister").path(clientId)
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(username,
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).delete(ClientResponse.class);
@@ -240,9 +232,8 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path("oauth2").path("client")
                 .path("deregister").path(clientId)
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(username,
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .delete(ClientResponse.class);
@@ -265,9 +256,8 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path("oauth2").path("client")
                 .path("deregister").path(clientId)
-                .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(username,
-                                "pass"))
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).delete(ClientResponse.class);

@@ -107,8 +107,13 @@ public class OpenIdAuthorizationService extends OAuth2AuthorizationService {
             checkResponseType(responseType.toString());
 
             Scope scope = authzRequest.getScope();
-            Set<String> scopeSet = (scope != null)
-                    ? new HashSet<>(scope.toStringList()) : null;
+            Set<String> scopeSet = null;
+            if (scope != null) {
+                scopeSet = new HashSet<>(scope.toStringList());
+            }
+            else {
+                scopeSet = config.getDefaultAccessScopes();
+            }
             createAuthorization(username, clientId, redirectUriStr, scopeSet,
                     code.getValue(), authenticationTime, nonce);
         }
@@ -184,15 +189,16 @@ public class OpenIdAuthorizationService extends OAuth2AuthorizationService {
         if (nonce != null && !nonce.getValue().isEmpty()) {
             nonceValue = nonce.getValue();
         }
-        
+
         checkMaxAge(authRequest.getMaxAge(), authenticationTime);
 
         AuthorizationRequest request = authRequest;
         return handleAuthorizationRequest(request, code, username,
                 authenticationTime, nonceValue);
     }
-    
-    private void checkMaxAge (int maxAge, ZonedDateTime authenticationTime) throws KustvaktException {
+
+    private void checkMaxAge (int maxAge, ZonedDateTime authenticationTime)
+            throws KustvaktException {
         if (maxAge > 0) {
             ZonedDateTime now =
                     ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));

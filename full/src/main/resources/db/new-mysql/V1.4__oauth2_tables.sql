@@ -54,14 +54,13 @@ CREATE TABLE IF NOT EXISTS oauth2_authorization_scope (
 CREATE TABLE IF NOT EXISTS oauth2_access_token (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT,
 	token VARCHAR(255) NOT NULL,
-	authorization_id INTEGER DEFAULT NULL,
 	user_id VARCHAR(100) DEFAULT NULL,
+	client_id VARCHAR(100) DEFAULT NULL,
 	created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	is_revoked BOOLEAN DEFAULT 0,
-	total_attempts INTEGER DEFAULT 0,
 	user_auth_time TIMESTAMP NULL,
-	FOREIGN KEY (authorization_id)
-	   REFERENCES oauth2_authorization(id)
+	FOREIGN KEY (client_id)
+	   REFERENCES oauth2_client(id)
 );
 
 CREATE TABLE oauth2_access_token_scope (

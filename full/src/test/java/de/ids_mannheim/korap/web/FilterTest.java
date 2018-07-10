@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import org.eclipse.jetty.server.Response;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
@@ -14,7 +13,6 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.TestHelper;
-import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 
 /** EM: fix tests. new DB does not save users.
@@ -24,19 +22,14 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 @Ignore
 public class FilterTest extends FastJerseyTest {
 
-    @Autowired
-    HttpAuthorizationHandler handler;
-
-
     @Test
     public void testTestUserAuth () throws UniformInterfaceException, ClientHandlerException, 
         KustvaktException {
         
         ClientResponse resp = resource()
-                
                 .path("user/info")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(
+                        HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
                                 (String) TestHelper.getUserCredentials().get(Attributes.USERNAME),
                                 (String) TestHelper.getUserCredentials().get(Attributes.PASSWORD)))
                 .get(ClientResponse.class);
@@ -60,7 +53,7 @@ public class FilterTest extends FastJerseyTest {
         ClientResponse resp = resource()
                 .path("user/info")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue(
+                        HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
                                 "kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
         String entity = resp.getEntity(String.class);

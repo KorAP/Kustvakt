@@ -1,19 +1,17 @@
 package de.ids_mannheim.korap.handlers;
 
-import de.ids_mannheim.korap.auditing.AuditRecord;
-import de.ids_mannheim.korap.config.URIParam;
-import de.ids_mannheim.korap.resources.KustvaktResource;
-import de.ids_mannheim.korap.resources.ResourceFactory;
-import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.user.KorAPUser;
-import de.ids_mannheim.korap.user.ShibbolethUser;
-import de.ids_mannheim.korap.user.User;
-import org.springframework.jdbc.core.RowMapper;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Map;
+
+import org.springframework.jdbc.core.RowMapper;
+
+import de.ids_mannheim.korap.auditing.AuditRecord;
+import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.URIParam;
+import de.ids_mannheim.korap.user.KorAPUser;
+import de.ids_mannheim.korap.user.User;
 
 /**
  * @author hanl
@@ -21,10 +19,10 @@ import java.util.Map;
  */
 public class RowMapperFactory {
 
-    public static class UserMapMapper implements RowMapper<Map> {
+    public static class UserMapMapper implements RowMapper<Map<?,?>> {
 
         @Override
-        public Map mapRow (ResultSet rs, int rowNum) throws SQLException {
+        public Map<?, ?> mapRow (ResultSet rs, int rowNum) throws SQLException {
             User user = new UserMapper().mapRow(rs, rowNum);
             return user.toMap();
         }
@@ -98,24 +96,4 @@ public class RowMapperFactory {
         }
     }
 
-    public static class ResourceMapper implements RowMapper<KustvaktResource> {
-
-        @Override
-        public KustvaktResource mapRow (ResultSet rs, int rowNum)
-                throws SQLException {
-            KustvaktResource r = ResourceFactory.getResource(rs.getInt("type"));
-            if (r != null) {
-                r.setId(rs.getInt("id"));
-                r.setName(rs.getString("name"));
-
-                r.setFields(rs.getString("data"));
-                r.setDescription(rs.getString("description"));
-                r.setCreated(rs.getLong("created"));
-                r.setPath(rs.getString("name_path"));
-                r.setPersistentID(rs.getString("persistent_id"));
-            }
-            return r;
-        }
-
-    }
 }

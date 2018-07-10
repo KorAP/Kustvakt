@@ -37,8 +37,8 @@ public class OAuth2Authentication implements AuthenticationIface {
             throw new KustvaktException(StatusCodes.EXPIRED);
         }
 
-        ZonedDateTime expiry =
-                accessToken.getCreatedDate().plusSeconds(config.getTokenTTL());
+        ZonedDateTime expiry = accessToken.getCreatedDate()
+                .plusSeconds(config.getAccessTokenExpiry());
         String scopes = scopeService
                 .convertAccessScopesToString(accessToken.getScopes());
 

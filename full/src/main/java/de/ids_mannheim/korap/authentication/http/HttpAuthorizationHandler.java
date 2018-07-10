@@ -1,6 +1,5 @@
 package de.ids_mannheim.korap.authentication.http;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.constant.AuthenticationScheme;
@@ -18,15 +17,12 @@ import de.ids_mannheim.korap.utils.ParameterChecker;
 @Component
 public class HttpAuthorizationHandler {
 
-    @Autowired
-    private TransferEncoding transferEncoding;
-
-    public String createBasicAuthorizationHeaderValue (String username, 
+    public static String createBasicAuthorizationHeaderValue (String username, 
             String password) throws KustvaktException {
         ParameterChecker.checkStringValue(username, "username");
         ParameterChecker.checkStringValue(password, "password");
 
-        String credentials = transferEncoding.encodeBase64(username, password);
+        String credentials = TransferEncoding.encodeBase64(username, password);
         return AuthenticationScheme.BASIC.displayName()+" " + credentials;
     }
 
@@ -54,7 +50,7 @@ public class HttpAuthorizationHandler {
 
     public AuthorizationData parseBasicToken (AuthorizationData data)
             throws KustvaktException {
-        String[] credentials = transferEncoding.decodeBase64(data.getToken());
+        String[] credentials = TransferEncoding.decodeBase64(data.getToken());
         data.setUsername(credentials[0]);
         data.setPassword(credentials[1]);
         return data;

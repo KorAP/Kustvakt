@@ -159,7 +159,8 @@
 	<!-- Data access objects -->
 	<bean id="resourceDao" class="de.ids_mannheim.korap.dao.ResourceDao" />
 	<bean id="accessScopeDao" class="de.ids_mannheim.korap.oauth2.dao.AccessScopeDao" />
-
+	<bean id="authorizationDao" class="de.ids_mannheim.korap.oauth2.dao.AuthorizationCacheDao" />
+	
 	<!-- props are injected from default-config.xml -->
 	<bean id="kustvakt_config" class="de.ids_mannheim.korap.config.FullConfiguration">
 		<constructor-arg name="properties" ref="props" />
@@ -212,10 +213,6 @@
 	</bean>
 
 	<bean id="kustvakt_userdb" class="de.ids_mannheim.korap.handlers.EntityDao">
-		<constructor-arg ref="kustvakt_db" />
-	</bean>
-
-	<bean id="resource_provider" class="de.ids_mannheim.korap.handlers.ResourceDao">
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
 
@@ -288,7 +285,6 @@
 	<util:list id="kustvakt_resources"
 		value-type="de.ids_mannheim.korap.interfaces.db.ResourceOperationIface">
 		<ref bean="document_provider" />
-		<ref bean="resource_provider" />
 	</util:list>
 
 	<!-- specify type for constructor argument -->

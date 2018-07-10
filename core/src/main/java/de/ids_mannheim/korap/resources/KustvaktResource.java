@@ -1,5 +1,10 @@
 package de.ids_mannheim.korap.resources;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.joda.time.DateTime;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -9,11 +14,6 @@ import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.time.DateTime;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by hanl on 5/21/14.

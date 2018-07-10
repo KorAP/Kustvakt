@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -14,10 +13,8 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
-import de.ids_mannheim.korap.authentication.http.TransferEncoding;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.TestHelper;
-import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.FastJerseyTest;
@@ -29,8 +26,6 @@ import de.ids_mannheim.korap.web.FastJerseyTest;
 @Ignore
 // todo: in combination with other tests, causes failures!
 public class OAuth2EndpointTest extends FastJerseyTest {
-    @Autowired
-    HttpAuthorizationHandler handler;
     
     @Override
     public void initMethod () throws KustvaktException {
@@ -40,7 +35,7 @@ public class OAuth2EndpointTest extends FastJerseyTest {
 
     @Test
     public void testAuthorizeClient () throws ClientHandlerException, UniformInterfaceException, KustvaktException {
-        String auth = handler.createBasicAuthorizationHeaderValue(
+        String auth = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
                 helper().getUser().getUsername(),
                 (String) TestHelper.getUserCredentials().get(Attributes.PASSWORD));
         ClientResponse response = resource().path(getAPIVersion()).path("oauth2")
@@ -78,7 +73,7 @@ public class OAuth2EndpointTest extends FastJerseyTest {
     @Ignore
     public void authenticate () throws KustvaktException {
         Map<String, Object> cred = TestHelper.getUserCredentials();
-        String enc = handler.createBasicAuthorizationHeaderValue( 
+        String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue( 
                 (String) cred.get(Attributes.USERNAME), (String) cred.get(Attributes.PASSWORD));
         ClientResponse response = resource().path(getAPIVersion()).path("oauth2")
                 .path("register")

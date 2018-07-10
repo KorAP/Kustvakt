@@ -8,7 +8,6 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.config.BeanConfigTest;
-import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.TestVariables;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
@@ -23,13 +22,9 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  */
 public class CollectionRewriteTest extends BeanConfigTest {
 
-    private static KustvaktConfiguration config;
-
-
     @Override
     public void initMethod () throws KustvaktException {
 //        helper().runBootInterfaces();
-        config = helper().getContext().getConfiguration();
     }
 
 

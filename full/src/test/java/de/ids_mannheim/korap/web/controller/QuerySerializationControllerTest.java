@@ -14,14 +14,12 @@ import java.util.Iterator;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.FastJerseyTest;
@@ -31,17 +29,15 @@ import de.ids_mannheim.korap.web.FastJerseyTest;
 @Ignore
 public class QuerySerializationControllerTest extends FastJerseyTest {
 
-    @Autowired
-    HttpAuthorizationHandler handler;
-    
     @Override
     public void initMethod () throws KustvaktException {
-        //        helper().runBootInterfaces();
+        // helper().runBootInterfaces();
     }
 
 
     @Test
-    public void testQuerySerializationFilteredPublic () throws KustvaktException {
+    public void testQuerySerializationFilteredPublic ()
+            throws KustvaktException {
         ClientResponse response = resource()
 
                 .path("corpus/WPD13/query").queryParam("q", "[orth=der]")
@@ -59,11 +55,11 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
 
 
     @Test
-    public void testQuerySerializationUnexistingResource () throws KustvaktException {
-        ClientResponse response = resource()
-
-                .path("corpus/ZUW19/query").queryParam("q", "[orth=der]")
-                .queryParam("ql", "poliqarp").queryParam("context", "base/s:s")
+    public void testQuerySerializationUnexistingResource ()
+            throws KustvaktException {
+        ClientResponse response = resource().path("corpus/ZUW19/query")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("context", "base/s:s")
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
@@ -76,7 +72,8 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
 
 
     @Test
-    public void testQuerySerializationWithNonPublicCorpus () throws KustvaktException {
+    public void testQuerySerializationWithNonPublicCorpus ()
+            throws KustvaktException {
         ClientResponse response = resource()
 
                 .path("corpus/BRZ10/query").queryParam("q", "[orth=der]")
@@ -93,13 +90,16 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
 
 
     @Test
-    public void testQuerySerializationWithAuthentication () throws KustvaktException {
+    public void testQuerySerializationWithAuthentication ()
+            throws KustvaktException {
         ClientResponse response = resource()
 
                 .path("corpus/BRZ10/query").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue("kustvakt",
+                                        "kustvakt2015"))
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -113,7 +113,8 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
 
 
     @Test
-    public void testQuerySerializationWithNewCollection () throws KustvaktException {
+    public void testQuerySerializationWithNewCollection ()
+            throws KustvaktException {
         // Add Virtual Collection
         ClientResponse response = resource()
 
@@ -123,7 +124,9 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
                 .queryParam("name", "Weimarer Werke")
                 .queryParam("description", "Goethe-Werke in Weimar (seit 1775)")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue("kustvakt",
+                                        "kustvakt2015"))
                 .post(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -140,7 +143,9 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
 
                 .path("collection")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue("kustvakt",
+                                        "kustvakt2015"))
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -165,7 +170,9 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("context", "base/s:s")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue("kustvakt",
+                                        "kustvakt2015"))
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -195,7 +202,8 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
 
 
     @Test
-    public void testQuerySerializationOfVirtualCollection () throws KustvaktException {
+    public void testQuerySerializationOfVirtualCollection ()
+            throws KustvaktException {
         ClientResponse response = resource()
 
                 .path("collection/GOE-VC/query").queryParam("q", "[orth=der]")
@@ -249,7 +257,8 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
 
 
     @Test
-    public void testMetaQuerySerializationWithOffset () throws KustvaktException{
+    public void testMetaQuerySerializationWithOffset ()
+            throws KustvaktException {
         ClientResponse response = resource()
 
                 .path("query").queryParam("context", "sentence")

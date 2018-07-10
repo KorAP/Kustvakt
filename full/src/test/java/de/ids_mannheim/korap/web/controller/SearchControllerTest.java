@@ -1,16 +1,15 @@
 package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 
 import javax.ws.rs.core.MediaType;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
@@ -30,15 +29,10 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  */
 public class SearchControllerTest extends SpringJerseyTest {
 
-    @Autowired
-    private HttpAuthorizationHandler handler;
-    
-
     @Test
     public void testSearchQueryPublicCorpora () throws KustvaktException{
-        ClientResponse response = resource()
-                .path("search").queryParam("q", "[orth=der]")
-                .queryParam("ql", "poliqarp")
+        ClientResponse response = resource().path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -54,36 +48,35 @@ public class SearchControllerTest extends SpringJerseyTest {
                 node.at("/collection/rewrites/0/operation").asText());
     }
 
-	
+
     @Test
-    public void testSearchQueryFailure () throws KustvaktException{
-        ClientResponse response = resource()
-			.path("search").queryParam("q", "[orth=der")
-			.queryParam("ql", "poliqarp")
-			.queryParam("cq", "corpusSigle=WPD | corpusSigle=GOE")
-			.queryParam("count", "13")
-			.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+    public void testSearchQueryFailure () throws KustvaktException {
+        ClientResponse response = resource().path("search")
+                .queryParam("q", "[orth=der").queryParam("ql", "poliqarp")
+                .queryParam("cq", "corpusSigle=WPD | corpusSigle=GOE")
+                .queryParam("count", "13").accept(MediaType.APPLICATION_JSON)
+                .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
 
         String ent = response.getEntity(String.class);
-		JsonNode node = JsonUtils.readTree(ent);
+        JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals(302, node.at("/errors/0/0").asInt());
         assertEquals(302, node.at("/errors/1/0").asInt());
-		assertTrue(node.at("/errors/2").isMissingNode());
-		assertFalse(node.at("/collection").isMissingNode());
+        assertTrue(node.at("/errors/2").isMissingNode());
+        assertFalse(node.at("/collection").isMissingNode());
         assertEquals(13, node.at("/meta/count").asInt());
     }
 
 
     @Test
-    public void testSearchQueryWithMeta () throws KustvaktException{
-        ClientResponse response = resource()
-                .path("search").queryParam("q", "[orth=der]")
-                .queryParam("ql", "poliqarp").queryParam("cutoff", "true")
-                .queryParam("count", "5").queryParam("page", "1")
-                .queryParam("context", "40-t,30-t").get(ClientResponse.class);
+    public void testSearchQueryWithMeta () throws KustvaktException {
+        ClientResponse response = resource().path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("cutoff", "true").queryParam("count", "5")
+                .queryParam("page", "1").queryParam("context", "40-t,30-t")
+                .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
@@ -99,10 +92,9 @@ public class SearchControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testSearchQueryFreeExtern () throws KustvaktException{
-        ClientResponse response = resource()
-                .path("search").queryParam("q", "[orth=die]")
-                .queryParam("ql", "poliqarp")
+    public void testSearchQueryFreeExtern () throws KustvaktException {
+        ClientResponse response = resource().path("search")
+                .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -119,12 +111,11 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals("operation:insertion",
                 node.at("/collection/rewrites/0/operation").asText());
     }
-    
+
     @Test
-    public void testSearchQueryFreeIntern () throws KustvaktException{
-        ClientResponse response = resource()
-                .path("search").queryParam("q", "[orth=die]")
-                .queryParam("ql", "poliqarp")
+    public void testSearchQueryFreeIntern () throws KustvaktException {
+        ClientResponse response = resource().path("search")
+                .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .header(HttpHeaders.X_FORWARDED_FOR, "172.27.0.32")
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -141,29 +132,32 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals("operation:insertion",
                 node.at("/collection/rewrites/0/operation").asText());
     }
-    
-    
+
+
     @Test
-    public void testSearchQueryExternAuthorized () throws KustvaktException{
-        ClientResponse response = resource()
-                .path("search").queryParam("q", "[orth=die]")
-                .queryParam("ql", "poliqarp")
+    public void testSearchQueryExternAuthorized () throws KustvaktException {
+        ClientResponse response = resource().path("search")
+                .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue("kustvakt",
+                                        "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-//        System.out.println(entity);
+        // System.out.println(entity);
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
         assertEquals("koral:docGroup", node.at("/collection/@type").asText());
         assertEquals("CC-BY.*",
                 node.at("/collection/operands/0/value").asText());
-        assertEquals("ACA.*", node.at("/collection/operands/1/operands/0/value").asText());
-        assertEquals("QAO-NC", node.at("/collection/operands/1/operands/1/value").asText());
+        assertEquals("ACA.*",
+                node.at("/collection/operands/1/operands/0/value").asText());
+        assertEquals("QAO-NC",
+                node.at("/collection/operands/1/operands/1/value").asText());
         assertEquals("operation:or", node.at("/collection/operation").asText());
         assertEquals("availability(PUB)",
                 node.at("/collection/rewrites/0/scope").asText());
@@ -172,12 +166,13 @@ public class SearchControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testSearchQueryInternAuthorized () throws KustvaktException{
-        ClientResponse response = resource()
-                .path("search").queryParam("q", "[orth=die]")
-                .queryParam("ql", "poliqarp")
+    public void testSearchQueryInternAuthorized () throws KustvaktException {
+        ClientResponse response = resource().path("search")
+                .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue("kustvakt",
+                                        "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "172.27.0.32")
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -186,30 +181,35 @@ public class SearchControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
-        //EM: no rewrite is needed
-//        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
-//        assertEquals("QAO.*", node.at("/collection/operands/0/value").asText());
-//        assertEquals("ACA.*",
-//                node.at("/collection/operands/1/operands/0/value").asText());
-//        assertEquals("CC-BY.*",
-//                node.at("/collection/operands/1/operands/1/value").asText());
-//        assertEquals("operation:or", node.at("/collection/operation").asText());
-//        assertEquals("availability(ALL)",
-//                node.at("/collection/rewrites/0/scope").asText());
-//        assertEquals("operation:insertion",
-//                node.at("/collection/rewrites/0/operation").asText());
+        // EM: no rewrite is needed
+        // assertEquals("koral:docGroup",
+        // node.at("/collection/@type").asText());
+        // assertEquals("QAO.*",
+        // node.at("/collection/operands/0/value").asText());
+        // assertEquals("ACA.*",
+        // node.at("/collection/operands/1/operands/0/value").asText());
+        // assertEquals("CC-BY.*",
+        // node.at("/collection/operands/1/operands/1/value").asText());
+        // assertEquals("operation:or",
+        // node.at("/collection/operation").asText());
+        // assertEquals("availability(ALL)",
+        // node.at("/collection/rewrites/0/scope").asText());
+        // assertEquals("operation:insertion",
+        // node.at("/collection/rewrites/0/operation").asText());
     }
 
- // EM: shouldn't this case gets CorpusAccess.PUB ? 
+    // EM: shouldn't this case gets CorpusAccess.PUB ?
     @Test
     @Ignore
-    public void testSearchQueryWithCollectionQueryAuthorizedWithoutIP () throws KustvaktException{
-        ClientResponse response = resource()
-                .path("search").queryParam("q", "[orth=das]")
-                .queryParam("ql", "poliqarp")
+    public void testSearchQueryWithCollectionQueryAuthorizedWithoutIP ()
+            throws KustvaktException {
+        ClientResponse response = resource().path("search")
+                .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "textClass=politik & corpusSigle=BRZ10")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue("kustvakt",
+                                        "kustvakt2015"))
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -230,15 +230,16 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals("corpusSigle",
                 node.at("/collection/operands/1/operands/1/key").asText());
     }
-    
+
     @Test
     @Ignore
-    public void testSearchQueryAuthorizedWithoutIP () throws KustvaktException{
-        ClientResponse response = resource()
-                .path("search").queryParam("q", "[orth=die]")
-                .queryParam("ql", "poliqarp")
+    public void testSearchQueryAuthorizedWithoutIP () throws KustvaktException {
+        ClientResponse response = resource().path("search")
+                .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue("kustvakt",
+                                        "kustvakt2015"))
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -254,16 +255,16 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals("availability(PUB)",
                 node.at("/collection/rewrites/0/scope").asText());
     }
-    
-    
+
+
 
     @Test
     @Ignore
-    public void testSearchForPublicCorpusWithStringId () throws KustvaktException {
-        ClientResponse response = resource()
-                .path("corpus").path("GOE").path("search")
-                .queryParam("q", "blau").queryParam("ql", "poliqarp")
-                .get(ClientResponse.class);
+    public void testSearchForPublicCorpusWithStringId ()
+            throws KustvaktException {
+        ClientResponse response = resource().path("corpus").path("GOE")
+                .path("search").queryParam("q", "blau")
+                .queryParam("ql", "poliqarp").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
@@ -285,11 +286,11 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     @Ignore
-    public void testSearchForVirtualCollectionWithStringId () throws KustvaktException{
-        ClientResponse response = resource()
-                .path("collection").path("GOE-VC").path("search")
-                .queryParam("q", "blau").queryParam("ql", "poliqarp")
-                .get(ClientResponse.class);
+    public void testSearchForVirtualCollectionWithStringId ()
+            throws KustvaktException {
+        ClientResponse response = resource().path("collection").path("GOE-VC")
+                .path("search").queryParam("q", "blau")
+                .queryParam("ql", "poliqarp").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
@@ -311,11 +312,11 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     @Ignore
-    public void testSearchForCorpusWithStringIdUnauthorized () throws KustvaktException {
-        ClientResponse response = resource()
-                .path("corpus").path("WPD15").path("search")
-                .queryParam("q", "blau").queryParam("ql", "poliqarp")
-                .get(ClientResponse.class);
+    public void testSearchForCorpusWithStringIdUnauthorized ()
+            throws KustvaktException {
+        ClientResponse response = resource().path("corpus").path("WPD15")
+                .path("search").queryParam("q", "blau")
+                .queryParam("ql", "poliqarp").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
@@ -328,12 +329,14 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     @Ignore
-    public void testSearchForSpecificCorpus () throws KustvaktException{
-        ClientResponse response = resource()
-                .path("corpus").path("GOE").path("search")
-                .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
+    public void testSearchForSpecificCorpus () throws KustvaktException {
+        ClientResponse response = resource().path("corpus").path("GOE")
+                .path("search").queryParam("q", "[orth=das]")
+                .queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
-                        handler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015"))
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue("kustvakt",
+                                        "kustvakt2015"))
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -354,13 +357,11 @@ public class SearchControllerTest extends SpringJerseyTest {
 
 
 
-
     @Test
-    public void testSearchSentenceMeta () throws KustvaktException{
-        ClientResponse response = resource()
-                .path("search").queryParam("q", "[orth=der]")
-                .queryParam("ql", "poliqarp").queryParam("context", "sentence")
-                .get(ClientResponse.class);
+    public void testSearchSentenceMeta () throws KustvaktException {
+        ClientResponse response = resource().path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("context", "sentence").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
@@ -372,12 +373,12 @@ public class SearchControllerTest extends SpringJerseyTest {
 
 
     @Test
-    public void testSearchSimpleCQL () throws KustvaktException{
+    public void testSearchSimpleCQL () throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("(der) or (das)", "CQL");
 
-        ClientResponse response = resource()
-                .path("search").post(ClientResponse.class, s.toJSON());
+        ClientResponse response = resource().path("search")
+                .post(ClientResponse.class, s.toJSON());
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
@@ -385,20 +386,20 @@ public class SearchControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
-        //        assertEquals(17027, node.at("/meta/totalResults").asInt());
+        // assertEquals(17027, node.at("/meta/totalResults").asInt());
     }
 
 
     @Test
-    public void testSearchRawQuery () throws KustvaktException{
+    public void testSearchRawQuery () throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[orth=der]", "poliqarp");
         s.setCollection("corpusSigle=GOE");
 
         s.setQuery("Wasser", "poliqarp");
-//        System.out.println(s.toJSON());
-        ClientResponse response = resource()
-                .path("search").post(ClientResponse.class, s.toJSON());
+        // System.out.println(s.toJSON());
+        ClientResponse response = resource().path("search")
+                .post(ClientResponse.class, s.toJSON());
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
@@ -407,7 +408,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
-        //        assertEquals(10993, node.at("/meta/totalResults").asInt());
+        // assertEquals(10993, node.at("/meta/totalResults").asInt());
     }
 
 }

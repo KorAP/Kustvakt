@@ -21,7 +21,7 @@ public class TransferEncoding {
      * @param password password
      * @return
      */
-    public String encodeBase64 (String username, String password) {
+    public static String encodeBase64 (String username, String password) {
         String s = username + ":" + password;
         return new String(Base64.encodeBase64(s.getBytes()));
     }
@@ -32,7 +32,7 @@ public class TransferEncoding {
      * @return username and password as an array of strings.
      * @throws KustvaktException 
      */
-    public String[] decodeBase64 (String encodedStr)
+    public static String[] decodeBase64 (String encodedStr)
             throws KustvaktException {
 
         ParameterChecker.checkStringValue(encodedStr, "encoded string");
