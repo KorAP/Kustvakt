@@ -53,9 +53,6 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
             ZonedDateTime authenticationTime)
             throws OAuthSystemException, KustvaktException {
 
-        String code = oauthIssuer.authorizationCode();
-        checkResponseType(authzRequest.getResponseType());
-
         String clientId = authzRequest.getClientId();
         OAuth2Client client = clientService.authenticateClientId(clientId);
 
@@ -71,8 +68,10 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
                     "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
         }
 
-        String scope;
+        String scope, code;
         try {
+            code = oauthIssuer.authorizationCode();
+            checkResponseType(authzRequest.getResponseType());
             scope = createAuthorization(username, authzRequest.getClientId(),
                     redirectUri, authzRequest.getScopes(), code,
                     authenticationTime, null);

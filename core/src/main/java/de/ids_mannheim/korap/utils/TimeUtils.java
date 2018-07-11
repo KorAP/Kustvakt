@@ -9,6 +9,8 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
+import de.ids_mannheim.korap.config.Attributes;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -29,7 +31,7 @@ public class TimeUtils {
     private static DecimalFormat df = new DecimalFormat("#.#############");
     private static DateTimeFormatter dtf = DateTimeFormat
             .forPattern("dd/MM/yyyy");
-    private static final DateTimeZone dtz = DateTimeZone.forID("Europe/Berlin");
+    private static final DateTimeZone dtz = DateTimeZone.forID(Attributes.DEFAULT_TIME_ZONE);
     private static Logger jlog = LogManager.getLogger(TimeUtils.class);
 
 

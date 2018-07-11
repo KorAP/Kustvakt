@@ -1,7 +1,6 @@
 package de.ids_mannheim.korap.web.controller;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator; // 07.02.17/FB
 import java.util.List;
@@ -44,6 +43,7 @@ import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.ServiceInfo;
+import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
@@ -259,8 +259,7 @@ public class AuthenticationController {
             //            attr.putAll(data.fields());
             
             // EM: add authentication time
-            ZonedDateTime authenticationTime =
-                    ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+            Date authenticationTime = TimeUtils.getNow().toDate();
             attr.put(Attributes.AUTHENTICATION_TIME, authenticationTime);
             // -- EM
             

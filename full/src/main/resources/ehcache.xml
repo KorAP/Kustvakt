@@ -11,6 +11,13 @@
            maxEntriesLocalHeap="50"
            overflowToDisk='true'/>
 
+	<cache name='id_tokens_inv'
+           eternal='true'
+           maxElementsOnDisk="10000000"
+           memoryStoreEvictionPolicy="LRU"
+           maxEntriesLocalHeap="50"
+           overflowToDisk='true'/>
+           
     <cache name='auth_codes'
            timeToIdleSeconds="600"
            eternal='false'

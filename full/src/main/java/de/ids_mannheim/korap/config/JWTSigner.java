@@ -3,10 +3,14 @@ package de.ids_mannheim.korap.config;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 
 import com.nimbusds.jose.JOSEException;
@@ -34,6 +38,8 @@ import de.ids_mannheim.korap.utils.TimeUtils;
  */
 public class JWTSigner {
 
+    private static Logger jlog = LogManager.getLogger(JWTSigner.class);
+    
     private URL issuer;
     private JWSSigner signer;
     private JWSVerifier verifier;
@@ -84,8 +90,11 @@ public class JWTSigner {
         csBuilder.expirationTime(TimeUtils.getNow().plusSeconds(ttl).toDate());
         csBuilder.claim(Attributes.AUTHENTICATION_TIME,
                 attr.get(Attributes.AUTHENTICATION_TIME));
-        SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256),
-                csBuilder.build());
+        
+        JWTClaimsSet jwtClaimsSet = csBuilder.build();
+        jlog.debug(jwtClaimsSet.getClaim(Attributes.AUTHENTICATION_TIME));
+        SignedJWT signedJWT =
+                new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), jwtClaimsSet);
         try {
             signedJWT.sign(signer);
         }
@@ -191,8 +200,12 @@ public class JWTSigner {
                     signedJWT.getJWTClaimsSet().getAudience().get(0));
         c.setExpirationTime(
                 signedJWT.getJWTClaimsSet().getExpirationTime().getTime());
-        c.setAuthenticationTime((ZonedDateTime) signedJWT.getJWTClaimsSet()
+
+        Instant instant = Instant.ofEpochMilli((long) signedJWT.getJWTClaimsSet()
                 .getClaim(Attributes.AUTHENTICATION_TIME));
+        ZonedDateTime zonedAuthTime = ZonedDateTime.ofInstant(
+                instant, ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+        c.setAuthenticationTime(zonedAuthTime);
         c.setToken(idtoken);
         c.addParams(signedJWT.getJWTClaimsSet().getClaims());
         return c;
