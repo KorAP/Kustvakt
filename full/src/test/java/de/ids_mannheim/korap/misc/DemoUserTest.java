@@ -56,9 +56,9 @@ public class DemoUserTest extends FastJerseyTest {
                 .path("search").queryParam("q", "[base=Wort]")
                 .queryParam("ql", "poliqarp").get(ClientResponse.class);
 
-        System.out.println("_____________________________");
-        System.out.println(response);
-        System.out.println("entity " + response.getEntity(String.class));
+//        System.out.println("_____________________________");
+//        System.out.println(response);
+//        System.out.println("entity " + response.getEntity(String.class));
     }
 
 }

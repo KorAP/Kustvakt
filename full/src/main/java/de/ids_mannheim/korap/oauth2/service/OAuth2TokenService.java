@@ -79,35 +79,6 @@ public class OAuth2TokenService {
     }
 
 
-    /**
-     * Third party apps must not be allowed to use password grant.
-     * MH: password grant is only allowed for trusted clients (korap
-     * frontend)
-     * 
-     * According to RFC 6749, client authentication is only required
-     * for confidential clients and whenever client credentials are
-     * provided. Moreover, client_id is optional for password grant,
-     * but without it, the authentication server cannot check the
-     * client type. To make sure that confidential clients
-     * authenticate, client_id is made required (similar to
-     * authorization code grant).
-     * 
-     * 
-     * @param username
-     *            username, required
-     * @param password
-     *            user password, required
-     * @param scopes
-     * @param clientId
-     *            client_id, required
-     * @param clientSecret
-     *            client_secret, required if client_secret was issued
-     *            for the client in client registration.
-     * @return authentication time
-     * @throws KustvaktException
-     * @throws OAuthSystemException
-     */
-
     public ZonedDateTime authenticateUser (String username, String password,
             Set<String> scopes) throws KustvaktException {
         if (username == null || username.isEmpty()) {

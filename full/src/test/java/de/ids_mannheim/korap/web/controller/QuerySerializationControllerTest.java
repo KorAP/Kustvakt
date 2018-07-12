@@ -179,7 +179,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
         ent = response.getEntity(String.class);
         node = JsonUtils.readTree(ent);
         assertNotNull(node);
-        System.out.println("NODE " + ent);
+//        System.out.println("NODE " + ent);
         assertEquals("koral:docGroup", node.at("/collection/@type").asText());
         assertEquals("koral:doc",
                 node.at("/collection/operands/0/@type").asText());

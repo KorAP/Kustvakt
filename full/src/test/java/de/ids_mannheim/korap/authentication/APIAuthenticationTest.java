@@ -19,6 +19,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.TimeUtils;
 
 public class APIAuthenticationTest extends SpringJerseyTest {
 
@@ -34,6 +35,7 @@ public class APIAuthenticationTest extends SpringJerseyTest {
         Map<String, Object> attr = new HashMap<>();
         attr.put(Attributes.HOST, "localhost");
         attr.put(Attributes.USER_AGENT, "java");
+        attr.put(Attributes.AUTHENTICATION_TIME, TimeUtils.getNow().toDate());
 
         APIAuthentication auth = new APIAuthentication(config);
         TokenContext context = auth.createTokenContext(user, attr);

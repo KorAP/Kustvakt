@@ -72,18 +72,17 @@ public class AuthenticationFilter
 
                     // OAuth2 authentication scheme
                     case BEARER:
+                        context = authenticationManager.getTokenContext(
+                                TokenType.BEARER, authData.getToken(), host,
+                                ua);
                         if (request.getPath().startsWith("vc/access")
                                 || request.getPath().startsWith("vc/delete")
                                 || request.getPath().startsWith("group")
                                 || request.getPath().startsWith("user")) {
                             throw new KustvaktException(
-                                    StatusCodes.AUTHENTICATION_FAILED,
-                                    "Token type Bearer is not allowed.");
+                                    StatusCodes.AUTHORIZATION_FAILED,
+                                    "Token type Bearer is not allowed");
                         }
-
-                        context = authenticationManager.getTokenContext(
-                                TokenType.BEARER, authData.getToken(), host,
-                                ua);
                         break;
                     // EM: JWT token-based authentication scheme
                     case API:

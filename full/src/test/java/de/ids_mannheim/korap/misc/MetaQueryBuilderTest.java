@@ -16,7 +16,6 @@ public class MetaQueryBuilderTest {
 
     @Test
     public void testSpanContext () {
-        System.out.println("____________________-");
         MetaQueryBuilder m = QueryBuilderUtil.defaultMetaBuilder(0, 1, 5,
                 "sentence", false);
         Map<?, ?> map = m.raw();

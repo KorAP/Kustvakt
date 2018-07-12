@@ -57,7 +57,7 @@ public class FilterTest extends FastJerseyTest {
                                 "kustvakt", "kustvakt2015"))
                 .get(ClientResponse.class);
         String entity = resp.getEntity(String.class);
-        System.out.println(entity);
+//        System.out.println(entity);
         assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(), resp.getStatus());
     }
 

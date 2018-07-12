@@ -21,11 +21,13 @@ import org.springframework.stereotype.Controller;
 
 import com.sun.jersey.spi.container.ResourceFilters;
 
+import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
@@ -227,6 +229,11 @@ public class VirtualCorpusController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            if (context.getTokenType().equals(TokenType.BEARER)){
+                throw new KustvaktException(
+                        StatusCodes.AUTHENTICATION_FAILED,
+                        "Token type Bearer is not allowed");   
+            }
             return service.listVCByType(context.getUsername(), createdBy, type);
         }
         catch (KustvaktException e) {

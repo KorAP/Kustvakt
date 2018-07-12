@@ -288,7 +288,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
 
         ClientResponse tokenResponse = sendTokenRequest(tokenForm);
         String entity = tokenResponse.getEntity(String.class);
-        System.out.println(entity);
+
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());
@@ -372,7 +372,6 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
 
         ClientResponse tokenResponse = sendTokenRequest(tokenForm);
         String entity = tokenResponse.getEntity(String.class);
-        System.out.println(entity);
 
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());

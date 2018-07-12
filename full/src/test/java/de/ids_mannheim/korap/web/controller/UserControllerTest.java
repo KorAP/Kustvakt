@@ -178,7 +178,7 @@ public class UserControllerTest extends FastJerseyTest {
 
 //		assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 		String entity = response.getEntity(String.class);
-		System.out.println(entity);
+//		System.out.println(entity);
 		JsonNode node = JsonUtils.readTree(entity);
 		assertEquals(2022, node.at("/errors/0/0").asInt());
 	}

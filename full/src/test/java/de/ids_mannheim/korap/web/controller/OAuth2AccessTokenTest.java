@@ -93,7 +93,25 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
         assertEquals("Scope vc_info is not authorized",
                 node.at("/errors/0/1").asText());
 
+        testListVCAccessBearerNotAuthorize(accessToken);
         testSearchWithOAuth2Token(accessToken);
+    }
+
+    private void testListVCAccessBearerNotAuthorize (String accessToken)
+            throws KustvaktException {
+        ClientResponse response =
+                resource().path("vc").path("access").path("list")
+                        .header(Attributes.AUTHORIZATION,
+                                "Bearer " + accessToken)
+                        .get(ClientResponse.class);
+        String entity = response.getEntity(String.class);
+        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
+                response.getStatus());
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Token type Bearer is not allowed",
+                node.at("/errors/0/1").asText());
     }
 
     private void testSearchWithOAuth2Token (String accessToken)

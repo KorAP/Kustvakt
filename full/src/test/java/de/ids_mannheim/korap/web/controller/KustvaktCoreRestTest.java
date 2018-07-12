@@ -79,7 +79,7 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
                 .queryParam("q", "[base=Haus & surface=Hauses]")
                 .queryParam("ql", "poliqarp").queryParam("cutOff", "true")
                 .queryParam("page", "1").get(ClientResponse.class);
-        System.out.println("RESPONSE " + response.getEntity(String.class));
+//        System.out.println("RESPONSE " + response.getEntity(String.class));
     }
     
 }

@@ -42,26 +42,19 @@ public class OltuTokenService extends OAuth2TokenService {
         String grantType = oAuthRequest.getGrantType();
 
         if (grantType.equals(GrantType.AUTHORIZATION_CODE.toString())) {
-            Authorization authorization = retrieveAuthorization(
+            return requestAccessTokenWithAuthorizationCode(
                     oAuthRequest.getCode(), oAuthRequest.getRedirectURI(),
                     oAuthRequest.getClientId(), oAuthRequest.getClientSecret());
-            return createsAccessTokenResponse(authorization);
         }
         else if (grantType.equals(GrantType.PASSWORD.toString())) {
-            return requestAccessTokenWithPassword(oAuthRequest);
+            return requestAccessTokenWithPassword(oAuthRequest.getClientId(),
+                    oAuthRequest.getClientSecret(), oAuthRequest.getUsername(),
+                    oAuthRequest.getPassword(), oAuthRequest.getScopes());
         }
         else if (grantType.equals(GrantType.CLIENT_CREDENTIALS.toString())) {
-            ZonedDateTime authenticationTime =
-                    requestAccessTokenWithClientCredentials(
-                            oAuthRequest.getClientId(),
-                            oAuthRequest.getClientSecret(),
-                            oAuthRequest.getScopes());
-
-            Set<String> scopes =
-                    scopeService.filterScopes(oAuthRequest.getScopes(),
-                            config.getClientCredentialsScopes());
-            return createsAccessTokenResponse(scopes,
-                    oAuthRequest.getClientId(), null, authenticationTime);
+            return requestAccessTokenWithClientCredentials(
+                    oAuthRequest.getClientId(), oAuthRequest.getClientSecret(),
+                    oAuthRequest.getScopes());
         }
         else {
             throw new KustvaktException(StatusCodes.UNSUPPORTED_GRANT_TYPE,
@@ -71,28 +64,89 @@ public class OltuTokenService extends OAuth2TokenService {
 
     }
 
-    private OAuthResponse requestAccessTokenWithPassword (
-            AbstractOAuthTokenRequest oAuthRequest)
-            throws KustvaktException, OAuthSystemException {
+    /**
+     * Issues an access token for the specified client if the
+     * authorization code is valid and client successfully
+     * authenticates.
+     * 
+     * @param code
+     *            authorization code, required
+     * @param redirectUri
+     *            client redirect uri, required if specified in the
+     *            authorization request
+     * @param clientId
+     *            client id, required
+     * @param clientSecret
+     *            client secret, required
+     * @return an {@link OAuthResponse}
+     * @throws OAuthSystemException
+     * @throws KustvaktException
+     */
+    private OAuthResponse requestAccessTokenWithAuthorizationCode (String code,
+            String redirectUri, String clientId, String clientSecret)
+            throws OAuthSystemException, KustvaktException {
+        Authorization authorization = retrieveAuthorization(code, redirectUri,
+                clientId, clientSecret);
 
-        OAuth2Client client = clientService.authenticateClient(
-                oAuthRequest.getClientId(), oAuthRequest.getClientSecret());
+        Set<String> scopes = scopeService
+                .convertAccessScopesToStringSet(authorization.getScopes());
+        return createsAccessTokenResponse(scopes, authorization.getScopes(),
+                authorization.getClientId(), authorization.getUserId(),
+                authorization.getUserAuthenticationTime());
+
+    }
+
+    /**
+     * Third party apps must not be allowed to use password grant.
+     * MH: password grant is only allowed for trusted clients (korap
+     * frontend)
+     * 
+     * According to RFC 6749, client authentication is only required
+     * for confidential clients and whenever client credentials are
+     * provided. Moreover, client_id is optional for password grant,
+     * but without it, the authentication server cannot check the
+     * client type. To make sure that confidential clients
+     * authenticate, client_id is made required (similar to
+     * authorization code grant).
+     * 
+     * @param clientId
+     *            client_id, required
+     * @param clientSecret
+     *            client_secret, required if client_secret was issued
+     *            for the client in client registration.
+     * @param username
+     *            username, required
+     * @param password
+     *            password, required
+     * @param scopes
+     *            authorization scopes, optional
+     * @return an {@link OAuthResponse}
+     * @throws KustvaktException
+     * @throws OAuthSystemException
+     */
+    private OAuthResponse requestAccessTokenWithPassword (String clientId,
+            String clientSecret, String username, String password,
+            Set<String> scopes) throws KustvaktException, OAuthSystemException {
+
+        OAuth2Client client =
+                clientService.authenticateClient(clientId, clientSecret);
         if (!client.isNative()) {
             throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
                     "Password grant is not allowed for third party clients",
                     OAuth2Error.UNAUTHORIZED_CLIENT);
         }
 
-        Set<String> scopes = oAuthRequest.getScopes();
         if (scopes == null || scopes.isEmpty()) {
             scopes = config.getDefaultAccessScopes();
         }
 
-        ZonedDateTime authenticationTime = authenticateUser(
-                oAuthRequest.getUsername(), oAuthRequest.getPassword(), scopes);
+        ZonedDateTime authenticationTime =
+                authenticateUser(username, password, scopes);
 
-        return createsAccessTokenResponse(scopes, oAuthRequest.getClientId(),
-                oAuthRequest.getUsername(), authenticationTime);
+        Set<AccessScope> accessScopes =
+                scopeService.convertToAccessScope(scopes);
+        return createsAccessTokenResponse(scopes, accessScopes, clientId,
+                username, authenticationTime);
     }
 
     /**
@@ -104,14 +158,14 @@ public class OltuTokenService extends OAuth2TokenService {
      * @param clientSecret
      *            client_secret parameter, required
      * @param scopes
-     * @return
-     * @return authentication time
+     *            authorization scopes, optional
+     * @return an {@link OAuthResponse}
      * @throws KustvaktException
      * @throws OAuthSystemException
      */
-    protected ZonedDateTime requestAccessTokenWithClientCredentials (
+    protected OAuthResponse requestAccessTokenWithClientCredentials (
             String clientId, String clientSecret, Set<String> scopes)
-            throws KustvaktException {
+            throws KustvaktException, OAuthSystemException {
 
         if (clientSecret == null || clientSecret.isEmpty()) {
             throw new KustvaktException(
@@ -133,7 +187,13 @@ public class OltuTokenService extends OAuth2TokenService {
 
         ZonedDateTime authenticationTime =
                 ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
-        return authenticationTime;
+
+        scopes = scopeService.filterScopes(scopes,
+                config.getClientCredentialsScopes());
+        Set<AccessScope> accessScopes =
+                scopeService.convertToAccessScope(scopes);
+        return createsAccessTokenResponse(scopes, accessScopes, clientId, null,
+                authenticationTime);
     }
 
     /**
@@ -147,14 +207,13 @@ public class OltuTokenService extends OAuth2TokenService {
      * @throws KustvaktException
      */
     private OAuthResponse createsAccessTokenResponse (Set<String> scopes,
-            String clientId, String userId, ZonedDateTime authenticationTime)
+            Set<AccessScope> accessScopes, String clientId, String userId,
+            ZonedDateTime authenticationTime)
             throws OAuthSystemException, KustvaktException {
 
         String accessToken = oauthIssuer.accessToken();
         // String refreshToken = oauthIssuer.refreshToken();
 
-        Set<AccessScope> accessScopes =
-                scopeService.convertToAccessScope(scopes);
         tokenDao.storeAccessToken(accessToken, accessScopes, userId, clientId,
                 authenticationTime);
 
@@ -166,26 +225,4 @@ public class OltuTokenService extends OAuth2TokenService {
                 .setScope(String.join(" ", scopes)).buildJSONMessage();
     }
 
-    private OAuthResponse createsAccessTokenResponse (
-            Authorization authorization)
-            throws OAuthSystemException, KustvaktException {
-        String accessToken = oauthIssuer.accessToken();
-        // String refreshToken = oauthIssuer.refreshToken();
-
-        tokenDao.storeAccessToken(accessToken, authorization.getScopes(),
-                authorization.getUserId(), authorization.getClientId(),
-                authorization.getUserAuthenticationTime());
-
-        String scopes = scopeService
-                .convertAccessScopesToString(authorization.getScopes());
-
-        OAuthResponse r =
-                OAuthASResponse.tokenResponse(Status.OK.getStatusCode())
-                        .setAccessToken(accessToken)
-                        .setTokenType(TokenType.BEARER.toString())
-                        .setExpiresIn(String.valueOf(config.getTokenTTL()))
-                        // .setRefreshToken(refreshToken)
-                        .setScope(scopes).buildJSONMessage();
-        return r;
-    }
 }

@@ -87,26 +87,26 @@ public class JDBCAuditing extends AuditingIface {
 
     @Override
     public void apply () {
-        String sql;
-        sql = "INSERT INTO audit_records (aud_target, aud_category, aud_user, aud_location, aud_timestamp, "
-                + "aud_status, aud_field_1, aud_args) "
-                + "VALUES (:target, :category, :account, :loc, :timestamp, :status, :field, :args);";
+//        String sql;
+//        sql = "INSERT INTO audit_records (aud_target, aud_category, aud_user, aud_location, aud_timestamp, "
+//                + "aud_status, aud_field_1, aud_args) "
+//                + "VALUES (:target, :category, :account, :loc, :timestamp, :status, :field, :args);";
         List<AuditRecord> records = getRecordsToSave();
-        SqlParameterSource[] s = new SqlParameterSource[records.size()];
-        for (int i = 0; i < records.size(); i++) {
-            AuditRecord rec = records.get(i);
-            MapSqlParameterSource source = new MapSqlParameterSource();
-            source.addValue("category", rec.getCategory().toString());
-            source.addValue("account", rec.getUserid());
-            source.addValue("target", rec.getTarget());
-            source.addValue("loc", rec.getLoc());
-            source.addValue("timestamp", new Timestamp(rec.getTimestamp()));
-            source.addValue("status", rec.getStatus());
-            source.addValue("field", rec.getField_1());
-            source.addValue("args", rec.getArgs());
-            s[i] = source;
-        }
-        this.template.batchUpdate(sql, s);
+//        SqlParameterSource[] s = new SqlParameterSource[records.size()];
+//        for (int i = 0; i < records.size(); i++) {
+//            AuditRecord rec = records.get(i);
+//            MapSqlParameterSource source = new MapSqlParameterSource();
+//            source.addValue("category", rec.getCategory().toString());
+//            source.addValue("account", rec.getUserid());
+//            source.addValue("target", rec.getTarget());
+//            source.addValue("loc", rec.getLoc());
+//            source.addValue("timestamp", new Timestamp(rec.getTimestamp()));
+//            source.addValue("status", rec.getStatus());
+//            source.addValue("field", rec.getField_1());
+//            source.addValue("args", rec.getArgs());
+//            s[i] = source;
+//        }
+//        this.template.batchUpdate(sql, s);
         records.clear();
     }
 

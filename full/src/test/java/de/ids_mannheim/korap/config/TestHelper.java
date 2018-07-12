@@ -204,7 +204,7 @@ public class TestHelper {
 
             }
         });
-        System.out.println(queries);
+//        System.out.println(queries);
         for (String query : queries)
             source.update(query, new HashMap<String, Object>());
         return this;
