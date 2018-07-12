@@ -30,7 +30,7 @@ public class OAuth2ScopeService {
 
     @Autowired
     private AdminDao adminDao;
-    
+
     /**
      * Converts a set of scope strings to a set of {@link AccessScope}
      * 
@@ -99,5 +99,30 @@ public class OAuth2ScopeService {
                         "Scope " + requestScope + " is not authorized");
             }
         }
+    }
+
+    /**
+     * Verify scopes given in a refresh request. The scopes must not
+     * include other scopes than those authorized in the original
+     * access token issued together with the refresh token.
+     * 
+     * @param requestScopes
+     *            requested scopes
+     * @param originalScopes
+     *            authorized scopes
+     * @return a set of requested {@link AccessScope}
+     * @throws KustvaktException
+     */
+    public Set<AccessScope> verifyRefreshScope (Set<String> requestScopes,
+            Set<AccessScope> originalScopes) throws KustvaktException {
+        Set<AccessScope> requestedScopes = convertToAccessScope(requestScopes);
+        for (AccessScope scope : requestedScopes) {
+            if (!originalScopes.contains(scope)) {
+                throw new KustvaktException(StatusCodes.INVALID_SCOPE,
+                        "Scope " + scope.getId() + " is not authorized.",
+                        OAuth2Error.INVALID_SCOPE);
+            }
+        }
+        return requestedScopes;
     }
 }

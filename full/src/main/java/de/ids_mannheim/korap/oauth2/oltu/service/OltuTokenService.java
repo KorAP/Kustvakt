@@ -6,6 +6,7 @@ import java.util.Set;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
 import org.apache.oltu.oauth2.as.request.AbstractOAuthTokenRequest;
 import org.apache.oltu.oauth2.as.response.OAuthASResponse;
@@ -22,6 +23,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
+import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
@@ -56,12 +58,64 @@ public class OltuTokenService extends OAuth2TokenService {
                     oAuthRequest.getClientId(), oAuthRequest.getClientSecret(),
                     oAuthRequest.getScopes());
         }
+        else if (grantType.equals(GrantType.REFRESH_TOKEN.toString())) {
+            return requestAccessTokenWithRefreshToken(
+                    oAuthRequest.getRefreshToken(), oAuthRequest.getScopes(),
+                    oAuthRequest.getClientId(), oAuthRequest.getClientSecret());
+        }
         else {
             throw new KustvaktException(StatusCodes.UNSUPPORTED_GRANT_TYPE,
                     grantType + " is not supported.",
                     OAuth2Error.UNSUPPORTED_GRANT_TYPE);
         }
 
+    }
+
+    private OAuthResponse requestAccessTokenWithRefreshToken (
+            String refreshToken, Set<String> scopes, String clientId,
+            String clientSecret)
+            throws KustvaktException, OAuthSystemException {
+
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
+                    "Missing parameters: refresh_token",
+                    OAuth2Error.INVALID_REQUEST);
+        }
+
+        clientService.authenticateClient(clientId, clientSecret);
+        AccessToken accessToken =
+                tokenDao.retrieveAccessTokenByRefreshToken(refreshToken);
+
+        if (!clientId.equals(accessToken.getClientId())) {
+            throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
+                    "Client " + clientId + "is not authorized",
+                    OAuth2Error.INVALID_CLIENT);
+        }
+
+        if (accessToken.isRefreshTokenRevoked()) {
+            throw new KustvaktException(StatusCodes.INVALID_REFRESH_TOKEN,
+                    "Refresh token has been revoked.",
+                    OAuth2Error.INVALID_GRANT);
+        }
+        else if (ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE))
+                .isAfter(accessToken.getCreatedDate()
+                        .plusSeconds(config.getRefreshTokenExpiry()))) {
+            throw new KustvaktException(StatusCodes.INVALID_REFRESH_TOKEN,
+                    "Refresh token is expired.", OAuth2Error.INVALID_GRANT);
+        }
+
+        Set<AccessScope> requestedScopes = accessToken.getScopes();
+        if (scopes != null && !scopes.isEmpty()) {
+            requestedScopes = scopeService.verifyRefreshScope(scopes,
+                    accessToken.getScopes());
+        }
+
+        accessToken.setRefreshTokenRevoked(true);
+        accessToken = tokenDao.updateAccessToken(accessToken);
+
+        return createsAccessTokenResponse(scopes, requestedScopes, clientId,
+                accessToken.getUserId(),
+                accessToken.getUserAuthenticationTime());
     }
 
     /**
@@ -197,12 +251,28 @@ public class OltuTokenService extends OAuth2TokenService {
     }
 
     /**
-     * Creates an OAuthResponse containing an access token and a
-     * refresh token with type Bearer.
+     * Creates an OAuthResponse containing an access token of type
+     * Bearer. By default, MD generator is used to generates access
+     * token of 128 bit values, represented in hexadecimal comprising
+     * 32 bytes. The generated value is subsequently encoded in
+     * Base64.
      * 
+     * <br /><br />
+     * Additionally, a refresh token is issued. It can be used to
+     * request a new access token without requiring user
+     * reauthentication.
+     * 
+     * @param scopes
+     *            a set of access token scopes in String
+     * @param accessScopes
+     *            a set of access token scopes in {@link AccessScope}
+     * @param clientId
+     *            a client id
+     * @param userId
+     *            a user id
      * @param authenticationTime
-     * 
-     * @return an OAuthResponse containing an access token
+     *            the user authentication time
+     * @return an {@link OAuthResponse}
      * @throws OAuthSystemException
      * @throws KustvaktException
      */
@@ -212,17 +282,19 @@ public class OltuTokenService extends OAuth2TokenService {
             throws OAuthSystemException, KustvaktException {
 
         String accessToken = oauthIssuer.accessToken();
-        // String refreshToken = oauthIssuer.refreshToken();
+//        accessToken = Base64.encodeBase64String(accessToken.getBytes());
 
-        tokenDao.storeAccessToken(accessToken, accessScopes, userId, clientId,
-                authenticationTime);
+        String refreshToken = oauthIssuer.refreshToken();
+//        refreshToken = Base64.encodeBase64String(refreshToken.getBytes());
+
+        tokenDao.storeAccessToken(accessToken, refreshToken, accessScopes,
+                userId, clientId, authenticationTime);
 
         return OAuthASResponse.tokenResponse(Status.OK.getStatusCode())
                 .setAccessToken(accessToken)
                 .setTokenType(TokenType.BEARER.toString())
                 .setExpiresIn(String.valueOf(config.getTokenTTL()))
-                // .setRefreshToken(refreshToken)
+                .setRefreshToken(refreshToken)
                 .setScope(String.join(" ", scopes)).buildJSONMessage();
     }
-
 }

@@ -8,8 +8,10 @@ import java.net.URI;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.error.OAuthError;
+import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.junit.Test;
 import org.springframework.util.MultiValueMap;
@@ -316,7 +318,6 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
 
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
-        assertNotNull(node.at("/refresh_token").asText());
         assertEquals(TokenType.BEARER.toString(),
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
@@ -420,21 +421,30 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
     @Test
     public void testRequestTokenPasswordGrantPublic ()
             throws KustvaktException {
+        String clientId = "iBr3LsTCxOj7D2o0A5m";
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("grant_type", "password");
         form.add("username", "dory");
         form.add("password", "password");
-        form.add("client_id", "iBr3LsTCxOj7D2o0A5m");
+        form.add("client_id", clientId);
 
         ClientResponse response = requestToken(form);
         String entity = response.getEntity(String.class);
 
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
-        assertNotNull(node.at("/refresh_token").asText());
         assertEquals(TokenType.BEARER.toString(),
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
+
+        String refreshToken = node.at("/refresh_token").asText();
+        testRequestRefreshTokenInvalidScope(clientId, refreshToken);
+        testRequestRefreshTokenPublicClient(clientId, refreshToken);
+        testRequestRefreshTokenInvalidClient(refreshToken);
+        testRequestRefreshTokenInvalidRefreshToken(clientId);
+        testRevokedRefreshToken(clientId, refreshToken);
     }
 
     @Test
@@ -536,6 +546,103 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
                 node.get("error_description").asText());
         assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
                 node.get("error").asText());
+    }
+
+    private void testRequestRefreshTokenInvalidScope (String clientId,
+            String refreshToken) throws KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("grant_type", GrantType.REFRESH_TOKEN.toString());
+        form.add("client_id", clientId);
+        form.add("refresh_token", refreshToken);
+        form.add("scope", "search serialize_query");
+
+        ClientResponse response = resource().path("oauth2").path("token")
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuth2Error.INVALID_SCOPE, node.at("/error").asText());
+    }
+
+    private void testRequestRefreshTokenPublicClient (String clientId,
+            String refreshToken) throws KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("grant_type", GrantType.REFRESH_TOKEN.toString());
+        form.add("client_id", clientId);
+        form.add("refresh_token", refreshToken);
+
+        ClientResponse response = resource().path("oauth2").path("token")
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        JsonNode node = JsonUtils.readTree(entity);
+        assertNotNull(node.at("/access_token").asText());
+        assertNotNull(node.at("/refresh_token").asText());
+        assertEquals(TokenType.BEARER.toString(),
+                node.at("/token_type").asText());
+        assertNotNull(node.at("/expires_in").asText());
+    }
+
+    private void testRequestRefreshTokenInvalidClient (String refreshToken)
+            throws KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("grant_type", GrantType.REFRESH_TOKEN.toString());
+        form.add("client_id", "8bIDtZnH6NvRkW2Fq");
+        form.add("refresh_token", refreshToken);
+
+        ClientResponse response = resource().path("oauth2").path("token")
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuth2Error.INVALID_CLIENT, node.at("/error").asText());
+    }
+
+    private void testRequestRefreshTokenInvalidRefreshToken (String clientId)
+            throws KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("grant_type", GrantType.REFRESH_TOKEN.toString());
+        form.add("client_id", clientId);
+        form.add("refresh_token", "Lia8s8w8tJeZSBlaQDrYV8ion3l");
+
+        ClientResponse response = resource().path("oauth2").path("token")
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
+    }
+
+    private void testRevokedRefreshToken (String clientId, String refreshToken)
+            throws KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("grant_type", GrantType.REFRESH_TOKEN.toString());
+        form.add("client_id", clientId);
+        form.add("refresh_token", refreshToken);
+
+        ClientResponse response = resource().path("oauth2").path("token")
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
     }
 
 }

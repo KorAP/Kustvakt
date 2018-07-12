@@ -75,8 +75,7 @@ public class OAuth2Controller {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response requestAuthorizationCode (
             @Context HttpServletRequest request,
-            @Context SecurityContext context,
-            @FormParam("state") String state,
+            @Context SecurityContext context, @FormParam("state") String state,
             MultivaluedMap<String, String> form) {
 
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
@@ -159,8 +158,9 @@ public class OAuth2Controller {
             MultivaluedMap<String, String> form) {
 
         try {
+            boolean grantTypeExist = grantType != null && !grantType.isEmpty();
             AbstractOAuthTokenRequest oAuthRequest = null;
-            if (grantType != null && !grantType.isEmpty() && grantType
+            if (grantTypeExist && grantType
                     .equals(GrantType.CLIENT_CREDENTIALS.toString())) {
                 oAuthRequest = new OAuthTokenRequest(
                         new FormRequestWrapper(request, form));

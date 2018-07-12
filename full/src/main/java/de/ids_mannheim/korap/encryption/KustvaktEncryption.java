@@ -179,7 +179,7 @@ public class KustvaktEncryption implements EncryptionIface {
     @Override
     public String createRandomNumber (Object ... obj) {
         final byte[] rNumber = SecureRGenerator
-                .getNextSecureRandom(SecureRGenerator.CORPUS_RANDOM_SIZE);
+                .getNextSecureRandom(SecureRGenerator.ID_RANDOM_SIZE);
         if (obj.length == 0) {
             obj = new Object[1];
             obj[0] = rNumber;
@@ -245,8 +245,8 @@ public class KustvaktEncryption implements EncryptionIface {
         private static final String SHA1_PRNG = "SHA1PRNG";
         protected static final int DEFAULT_RANDOM_SIZE = 128;
         protected static final int TOKEN_RANDOM_SIZE = 128;
-        protected static final int USERID_RANDOM_SIZE = 64;
-        protected static final int CORPUS_RANDOM_SIZE = 48;
+        protected static final int ID_RANDOM_SIZE = 128;
+        protected static final int CORPUS_RANDOM_SIZE = 64;
         private static final char[] HEX_DIGIT = { '0', '1', '2', '3', '4', '5',
                 '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'z', 'x',
                 'h', 'q', 'w' };

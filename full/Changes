@@ -11,6 +11,7 @@ version 0.60.5
 	- Fixed authentication time in authentication controller (margaretha)
 	- Added OAuth2 access token tests (margaretha)
 	- Updated maven surefire setting for faster test suite runtime (margaretha)
+	- Implemented refreshing OAuth2 access token (margaretha)
 	
 version 0.60.4
 05/07/2018

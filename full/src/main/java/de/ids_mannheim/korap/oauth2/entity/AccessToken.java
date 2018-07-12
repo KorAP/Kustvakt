@@ -23,7 +23,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "oauth2_access_token")
-public class AccessToken implements Serializable{
+public class AccessToken implements Serializable {
 
     private static final long serialVersionUID = 8452701765986475302L;
 
@@ -41,11 +41,15 @@ public class AccessToken implements Serializable{
     private boolean isRevoked;
     @Column(name = "user_auth_time", updatable = false)
     private ZonedDateTime userAuthenticationTime;
-    
-//    @OneToOne(fetch=FetchType.LAZY, cascade=CascadeType.REMOVE)
-//    @JoinColumn(name="authorization_id")
-//    private Authorization authorization;
-    
+    @Column(name = "refresh_token", updatable = false)
+    private String refreshToken;
+    @Column(name = "is_refresh_revoked")
+    private boolean isRefreshTokenRevoked;
+
+    // @OneToOne(fetch=FetchType.LAZY, cascade=CascadeType.REMOVE)
+    // @JoinColumn(name="authorization_id")
+    // private Authorization authorization;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "oauth2_access_token_scope",
             joinColumns = @JoinColumn(name = "token_id",
@@ -55,5 +59,5 @@ public class AccessToken implements Serializable{
             uniqueConstraints = @UniqueConstraint(
                     columnNames = { "token_id", "scope_id" }))
     private Set<AccessScope> scopes;
-    
+
 }

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import de.ids_mannheim.korap.config.KustvaktCacheable;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken_;
@@ -50,14 +51,20 @@ public class AccessTokenDao extends KustvaktCacheable {
         entityManager.persist(accessToken);
     }
 
-    public void storeAccessToken (String token, Set<AccessScope> scopes,
-            String userId, String clientId, ZonedDateTime authenticationTime)
-            throws KustvaktException {
+    public void storeAccessToken (String token, String refreshToken,
+            Set<AccessScope> scopes, String userId, String clientId,
+            ZonedDateTime authenticationTime) throws KustvaktException {
+        ParameterChecker.checkStringValue(token, "access token");
+        ParameterChecker.checkStringValue(refreshToken, "refresh token");
         ParameterChecker.checkObjectValue(scopes, "scopes");
+//        ParameterChecker.checkStringValue(userId, "username");
+        ParameterChecker.checkStringValue(clientId, "client_id");
         ParameterChecker.checkObjectValue(authenticationTime,
                 "authentication time");
+
         AccessToken accessToken = new AccessToken();
         accessToken.setToken(token);
+        accessToken.setRefreshToken(refreshToken);
         accessToken.setScopes(scopes);
         accessToken.setUserId(userId);
         accessToken.setClientId(clientId);
@@ -88,7 +95,42 @@ public class AccessTokenDao extends KustvaktCacheable {
         }
         catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.INVALID_ACCESS_TOKEN,
-                    "Access token is not found");
+                    "Access token is not found", OAuth2Error.INVALID_TOKEN);
         }
+    }
+
+    public AccessToken retrieveAccessTokenByRefreshToken (String refreshToken)
+            throws KustvaktException {
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<AccessToken> query =
+                builder.createQuery(AccessToken.class);
+        Root<AccessToken> root = query.from(AccessToken.class);
+        query.select(root);
+        query.where(builder.equal(root.get(AccessToken_.refreshToken),
+                refreshToken));
+        Query q = entityManager.createQuery(query);
+        try {
+            AccessToken token = (AccessToken) q.getSingleResult();
+            return token;
+        }
+        catch (NoResultException e) {
+            throw new KustvaktException(StatusCodes.INVALID_REFRESH_TOKEN,
+                    "Refresh token is not found", OAuth2Error.INVALID_GRANT);
+        }
+
+    }
+
+    public AccessToken updateAccessToken (AccessToken accessToken)
+            throws KustvaktException {
+        ParameterChecker.checkObjectValue(accessToken, "access token");
+        AccessToken cachedToken =
+                (AccessToken) this.getCacheValue(accessToken.getId());
+        if (cachedToken != null) {
+            this.removeCacheEntry(cachedToken);
+        }
+
+        accessToken = entityManager.merge(accessToken);
+        return accessToken;
     }
 }

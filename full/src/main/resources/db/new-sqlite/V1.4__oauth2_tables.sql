@@ -64,6 +64,8 @@ CREATE TABLE IF NOT EXISTS oauth2_access_token (
 	created_date TIMESTAMP DEFAULT (datetime('now','localtime')),
 	is_revoked BOOLEAN DEFAULT 0,
 	user_auth_time TIMESTAMP NOT NULL,
+	refresh_token VARCHAR(255) DEFAULT NULL,
+	is_refresh_revoked BOOLEAN DEFAULT 0,
 	FOREIGN KEY (client_id)
 	   REFERENCES oauth2_client(id)
 );

@@ -176,12 +176,15 @@ public class OpenIdTokenService extends OAuth2TokenService {
         AccessToken accessToken =
                 new BearerAccessToken(config.getTokenTTL(), scope);
 
+        RefreshToken refreshToken = new RefreshToken();
+
         tokenDao.storeAccessToken(accessToken.getValue(),
+                refreshToken.getValue(),
                 scopeService.convertToAccessScope(scopeSet), username,
                 clientIdStr, authenticationTime);
 
-        return createsAccessTokenResponse(accessToken, scope, clientIdStr,
-                username, authenticationTime, null);
+        return createsAccessTokenResponse(accessToken, refreshToken, scope,
+                clientIdStr, username, authenticationTime, null);
     }
 
     private AccessTokenResponse requestAccessTokenWithAuthorizationCode (
@@ -226,22 +229,24 @@ public class OpenIdTokenService extends OAuth2TokenService {
         Scope scope = new Scope(scopeArray);
         AccessToken accessToken =
                 new BearerAccessToken(config.getTokenTTL(), scope);
-        tokenDao.storeAccessToken(accessToken.getValue(), scopes,
-                authorization.getUserId(), authorization.getClientId(),
+        RefreshToken refreshToken = new RefreshToken();
+
+        tokenDao.storeAccessToken(accessToken.getValue(),
+                refreshToken.getValue(), scopes, authorization.getUserId(),
+                authorization.getClientId(),
                 authorization.getUserAuthenticationTime());
 
-        return createsAccessTokenResponse(accessToken, scope,
+        return createsAccessTokenResponse(accessToken, refreshToken, scope,
                 authorization.getClientId(), authorization.getUserId(),
                 authorization.getUserAuthenticationTime(),
                 authorization.getNonce());
     }
 
     private AccessTokenResponse createsAccessTokenResponse (
-            AccessToken accessToken, Scope scope, String clientId,
-            String userId, ZonedDateTime userAuthenticationTime, String nonce)
+            AccessToken accessToken, RefreshToken refreshToken, Scope scope,
+            String clientId, String userId,
+            ZonedDateTime userAuthenticationTime, String nonce)
             throws KustvaktException {
-
-        RefreshToken refreshToken = new RefreshToken();
 
         if (scope.contains("openid")) {
             JWTClaimsSet claims = createIdTokenClaims(clientId, userId,

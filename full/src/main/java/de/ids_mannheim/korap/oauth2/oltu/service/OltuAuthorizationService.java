@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
 import org.apache.oltu.oauth2.as.request.OAuthAuthzRequest;
 import org.apache.oltu.oauth2.as.response.OAuthASResponse;
@@ -70,8 +71,11 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
 
         String scope, code;
         try {
-            code = oauthIssuer.authorizationCode();
             checkResponseType(authzRequest.getResponseType());
+
+            code = oauthIssuer.authorizationCode();
+//            code = Base64.encodeBase64String(code.getBytes());
+            
             scope = createAuthorization(username, authzRequest.getClientId(),
                     redirectUri, authzRequest.getScopes(), code,
                     authenticationTime, null);
