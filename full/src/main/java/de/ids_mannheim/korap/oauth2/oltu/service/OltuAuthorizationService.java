@@ -1,13 +1,13 @@
 package de.ids_mannheim.korap.oauth2.oltu.service;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.time.ZonedDateTime;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
 import org.apache.oltu.oauth2.as.request.OAuthAuthzRequest;
 import org.apache.oltu.oauth2.as.response.OAuthASResponse;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import com.sun.jersey.api.client.ClientResponse.Status;
 
+import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
@@ -33,7 +34,7 @@ import de.ids_mannheim.korap.oauth2.service.OAuth2AuthorizationService;
 public class OltuAuthorizationService extends OAuth2AuthorizationService {
 
     @Autowired
-    private OAuthIssuer oauthIssuer;
+    private RandomCodeGenerator codeGenerator;
 
     /**
      * Authorization code request does not require client
@@ -57,8 +58,8 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
         String clientId = authzRequest.getClientId();
         OAuth2Client client = clientService.authenticateClientId(clientId);
 
-        String redirectUri = authzRequest.getRedirectURI();
-        String verifiedRedirectUri = verifyRedirectUri(client, redirectUri);
+        String redirectUriStr = authzRequest.getRedirectURI();
+        String verifiedRedirectUri = verifyRedirectUri(client, redirectUriStr);
 
         URI redirectURI;
         try {
@@ -72,17 +73,20 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
         String scope, code;
         try {
             checkResponseType(authzRequest.getResponseType());
-
-            code = oauthIssuer.authorizationCode();
-//            code = Base64.encodeBase64String(code.getBytes());
-            
+            code = URLEncoder.encode(codeGenerator.createRandomCode(), "UTF-8");
             scope = createAuthorization(username, authzRequest.getClientId(),
-                    redirectUri, authzRequest.getScopes(), code,
+                    redirectUriStr, authzRequest.getScopes(), code,
                     authenticationTime, null);
         }
         catch (KustvaktException e) {
             e.setRedirectUri(redirectURI);
             throw e;
+        }
+        catch (UnsupportedEncodingException e) {
+            KustvaktException ke = new KustvaktException(
+                    StatusCodes.GENERAL_ERROR, e.getMessage());
+            ke.setRedirectUri(redirectURI);
+            throw ke;
         }
 
         OAuthResponse oAuthResponse;

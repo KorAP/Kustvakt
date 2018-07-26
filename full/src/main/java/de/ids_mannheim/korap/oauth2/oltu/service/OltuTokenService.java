@@ -6,8 +6,6 @@ import java.util.Set;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.oltu.oauth2.as.issuer.OAuthIssuer;
 import org.apache.oltu.oauth2.as.request.AbstractOAuthTokenRequest;
 import org.apache.oltu.oauth2.as.response.OAuthASResponse;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
@@ -18,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
@@ -30,10 +29,10 @@ import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
 
 @Service
 public class OltuTokenService extends OAuth2TokenService {
-
+    
     @Autowired
-    private OAuthIssuer oauthIssuer;
-
+    private RandomCodeGenerator randomGenerator; 
+    
     @Autowired
     private AccessTokenDao tokenDao;
 
@@ -281,11 +280,8 @@ public class OltuTokenService extends OAuth2TokenService {
             ZonedDateTime authenticationTime)
             throws OAuthSystemException, KustvaktException {
 
-        String accessToken = oauthIssuer.accessToken();
-//        accessToken = Base64.encodeBase64String(accessToken.getBytes());
-
-        String refreshToken = oauthIssuer.refreshToken();
-//        refreshToken = Base64.encodeBase64String(refreshToken.getBytes());
+        String accessToken = randomGenerator.createRandomCode();
+        String refreshToken = randomGenerator.createRandomCode();
 
         tokenDao.storeAccessToken(accessToken, refreshToken, accessScopes,
                 userId, clientId, authenticationTime);

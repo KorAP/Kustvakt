@@ -66,7 +66,9 @@ public class FullConfiguration extends KustvaktConfiguration {
     private boolean isSoftDeleteGroup;
     private boolean isSoftDeleteGroupMember;
 
-    private EncryptionIface.Encryption encryption;
+    private EncryptionIface.Encryption secureHashAlgorithm;
+    private String secureRandomAlgorithm;
+    private String messageDigestAlgorithm;
 
     private AuthenticationMethod OAuth2passwordAuthentication;
     private String nativeClientHost;
@@ -103,12 +105,22 @@ public class FullConfiguration extends KustvaktConfiguration {
         setMailConfiguration(properties);
         ldapConfig = properties.getProperty("ldap.config");
 
-        setEncryption(Enum.valueOf(EncryptionIface.Encryption.class,
-                properties.getProperty("security.encryption", "BCRYPT")));
-
+        setSecurityConfiguration(properties);
         setOAuth2Configuration(properties);
         setOpenIdConfiguration(properties);
         setRSAKeys(properties);
+    }
+
+    private void setSecurityConfiguration (Properties properties) {
+        setSecureHashAlgorithm(Enum.valueOf(EncryptionIface.Encryption.class,
+                properties.getProperty("security.secure.hash.algorithm",
+                        "BCRYPT")));
+
+        setSecureRandomAlgorithm(properties
+                .getProperty("security.secure.random.algorithm", "SHA1PRNG"));
+
+        setMessageDigestAlgorithm(
+                properties.getProperty("security.md.algorithm", "MD5"));
     }
 
     private void setOpenIdConfiguration (Properties properties)
@@ -466,12 +478,13 @@ public class FullConfiguration extends KustvaktConfiguration {
         this.emailAddressRetrieval = emailAddressRetrieval;
     }
 
-    public EncryptionIface.Encryption getEncryption () {
-        return encryption;
+    public EncryptionIface.Encryption getSecureHashAlgorithm () {
+        return secureHashAlgorithm;
     }
 
-    public void setEncryption (EncryptionIface.Encryption encryption) {
-        this.encryption = encryption;
+    public void setSecureHashAlgorithm (
+            EncryptionIface.Encryption secureHashAlgorithm) {
+        this.secureHashAlgorithm = secureHashAlgorithm;
     }
 
     public AuthenticationMethod getOAuth2passwordAuthentication () {
@@ -618,5 +631,21 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     public void setAuthorizationCodeExpiry (int authorizationCodeExpiry) {
         this.authorizationCodeExpiry = authorizationCodeExpiry;
+    }
+
+    public String getSecureRandomAlgorithm () {
+        return secureRandomAlgorithm;
+    }
+
+    public void setSecureRandomAlgorithm (String secureRandomAlgorithm) {
+        this.secureRandomAlgorithm = secureRandomAlgorithm;
+    }
+
+    public String getMessageDigestAlgorithm () {
+        return messageDigestAlgorithm;
+    }
+
+    public void setMessageDigestAlgorithm (String messageDigestAlgorithm) {
+        this.messageDigestAlgorithm = messageDigestAlgorithm;
     }
 }

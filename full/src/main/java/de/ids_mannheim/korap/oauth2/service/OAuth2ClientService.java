@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.dto.OAuth2ClientDto;
+import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
@@ -53,6 +54,8 @@ public class OAuth2ClientService {
     @Autowired
     private EncryptionIface encryption;
     @Autowired
+    private RandomCodeGenerator codeGenerator;
+    @Autowired
     private FullConfiguration config;
 
     public OAuth2ClientDto registerClient (OAuth2ClientJson clientJson,
@@ -91,12 +94,12 @@ public class OAuth2ClientService {
             // installation of a native application client on a
             // specific device.
 
-            secret = encryption.createToken();
+            secret = codeGenerator.createRandomCode();
             secretHashcode = encryption.secureHash(secret,
                     config.getPasscodeSaltField());
         }
 
-        String id = encryption.createRandomNumber();
+        String id = codeGenerator.createRandomCode();
         try {
             clientDao.registerClient(id, secretHashcode, clientJson.getName(),
                     clientJson.getType(), isNative, url, urlHashCode,

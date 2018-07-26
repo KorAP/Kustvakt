@@ -13,7 +13,7 @@ public class StatusCodes {
     /**
      * 100 status codes for standard system errors
      */
-    public static final int DEFAULT_ERROR = 100;
+    public static final int GENERAL_ERROR = 100;
     public static final int NO_RESULT_FOUND = 101;
     public static final int UNSUPPORTED_AUTHENTICATION_SCHEME = 102;
     public static final int UNSUPPORTED_OPERATION = 103;
@@ -24,6 +24,7 @@ public class StatusCodes {
     public static final int NOT_SUPPORTED = 108;
     public static final int NOT_ALLOWED = 109;
     public static final int HTTPS_REQUIRED = 110;
+    public static final int INVALID_ALGORITHM = 111;
 
     /**
      * 200 status codes general JSON serialization error

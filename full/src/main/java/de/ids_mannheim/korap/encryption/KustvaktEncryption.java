@@ -63,7 +63,7 @@ public class KustvaktEncryption implements EncryptionIface {
     @Override
     public String secureHash (String input, String salt) {
         String hashString = "";
-        switch (config.getEncryption()) {
+        switch (config.getSecureHashAlgorithm()) {
             case ESAPICYPHER:
                 break;
             case SIMPLE:
@@ -83,7 +83,7 @@ public class KustvaktEncryption implements EncryptionIface {
                 hashString = bcryptHash(input, salt);
                 break;
             default:
-                jlog.warn("Invalid value: "+ config.getEncryption());
+                jlog.warn("Invalid value: "+ config.getSecureHashAlgorithm());
                 break;
         }
         return hashString;
@@ -191,7 +191,7 @@ public class KustvaktEncryption implements EncryptionIface {
     @Override
     public boolean checkHash (String plain, String hash, String salt) {
         String pw = "";
-        switch (config.getEncryption()) {
+        switch (config.getSecureHashAlgorithm()) {
             case ESAPICYPHER:
                 pw = secureHash(plain, salt);
                 break;
@@ -212,7 +212,7 @@ public class KustvaktEncryption implements EncryptionIface {
 
     @Override
     public boolean checkHash (String plain, String hash) {
-        switch (config.getEncryption()) {
+        switch (config.getSecureHashAlgorithm()) {
             case ESAPICYPHER:
                 return secureHash(plain).equals(hash);
             case BCRYPT:
