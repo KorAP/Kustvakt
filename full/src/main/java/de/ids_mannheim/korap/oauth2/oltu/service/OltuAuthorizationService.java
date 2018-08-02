@@ -73,7 +73,7 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
         String scope, code;
         try {
             checkResponseType(authzRequest.getResponseType());
-            code = URLEncoder.encode(codeGenerator.createRandomCode(), "UTF-8");
+            code = codeGenerator.createRandomCode();
             scope = createAuthorization(username, authzRequest.getClientId(),
                     redirectUriStr, authzRequest.getScopes(), code,
                     authenticationTime, null);
@@ -81,12 +81,6 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
         catch (KustvaktException e) {
             e.setRedirectUri(redirectURI);
             throw e;
-        }
-        catch (UnsupportedEncodingException e) {
-            KustvaktException ke = new KustvaktException(
-                    StatusCodes.GENERAL_ERROR, e.getMessage());
-            ke.setRedirectUri(redirectURI);
-            throw ke;
         }
 
         OAuthResponse oAuthResponse;

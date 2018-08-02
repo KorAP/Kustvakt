@@ -1,5 +1,5 @@
 version 0.60.5
-12/07/2018
+02/08/2018
 	- Added service layer to the search controller (margaretha)
 	- Added OAuth2 scope checking in search and VC controllers (margaretha)
 	- Added handling OAuth2 bearer token for VC access and User group controllers (margaretha)
@@ -12,6 +12,8 @@ version 0.60.5
 	- Added OAuth2 access token tests (margaretha)
 	- Updated maven surefire setting for faster test suite runtime (margaretha)
 	- Implemented refreshing OAuth2 access token (margaretha)
+	- Fixed issue #27 (margaretha)
+	- Fixed clientId encoding in OAuth2ClientControllerTest (margaretha)
 	
 version 0.60.4
 05/07/2018

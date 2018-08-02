@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.encryption;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -50,7 +52,7 @@ public class RandomCodeGenerator {
                     .getInstance(config.getMessageDigestAlgorithm());
             md.update(bytes);
             byte[] digest = md.digest();
-            String code = Base64.encodeBase64String(digest);
+            String code = Base64.encodeBase64URLSafeString(digest);
             md.reset();
             return code;
         }
