@@ -1,3 +1,7 @@
+version 0.61.0
+02/08/2018
+	- Updated Krill and Koral versions enabling VC caching and referencing (margaretha)
+	
 version 0.60.5
 09/07/2018
 	- Fixed status codes (margaretha)

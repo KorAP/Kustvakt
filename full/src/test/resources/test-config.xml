@@ -167,8 +167,7 @@
 	</bean>
 
 	<bean id="initializator" class="de.ids_mannheim.korap.config.Initializator"
-		init-method="init">
-		<constructor-arg name="accessScopeDao" ref="accessScopeDao" />
+		init-method="initTest">
 	</bean>
 
 

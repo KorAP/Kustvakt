@@ -87,6 +87,8 @@ public class FullConfiguration extends KustvaktConfiguration {
     private RSAPrivateKey rsaPrivateKey;
     private JWKSet publicKeySet;
     private String rsaKeyId;
+    
+    private String namedVCPath;
 
     public FullConfiguration (Properties properties) throws Exception {
         super(properties);
@@ -109,6 +111,9 @@ public class FullConfiguration extends KustvaktConfiguration {
         setOAuth2Configuration(properties);
         setOpenIdConfiguration(properties);
         setRSAKeys(properties);
+        
+        setNamedVCPath(properties
+                .getProperty("krill.namedVC", "vc"));
     }
 
     private void setSecurityConfiguration (Properties properties) {
@@ -647,5 +652,13 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     public void setMessageDigestAlgorithm (String messageDigestAlgorithm) {
         this.messageDigestAlgorithm = messageDigestAlgorithm;
+    }
+
+    public String getNamedVCPath () {
+        return namedVCPath;
+    }
+
+    public void setNamedVCPath (String namedVCPath) {
+        this.namedVCPath = namedVCPath;
     }
 }

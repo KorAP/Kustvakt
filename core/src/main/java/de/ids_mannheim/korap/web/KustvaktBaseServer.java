@@ -54,9 +54,6 @@ public abstract class KustvaktBaseServer {
                     System.out.println(b.toString());
                     System.out.println();
                     return (KustvaktArgs) null;
-                case "--init":
-                    kargs.init = true;
-                    break;
             }
         }
         return kargs;
@@ -112,15 +109,11 @@ public abstract class KustvaktBaseServer {
         @Getter
         private String springConfig;
         private int port;
-        private String[] rootPackages;
-        private boolean init;
 
 
         public KustvaktArgs () {
             this.port = -1;
             this.springConfig = null;
-            this.init = false;
         }
-
     }
 }

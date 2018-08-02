@@ -8,7 +8,6 @@ import java.net.URI;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
@@ -187,6 +186,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         tokenForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
         tokenForm.add("client_secret", "secret");
         tokenForm.add("code", code);
+        System.out.println(code);
 
         response = requestToken(tokenForm);
         String entity = response.getEntity(String.class);

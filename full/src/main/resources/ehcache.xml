@@ -1,5 +1,6 @@
-<ehcache xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-       xsi:schemaLocation='http://ehcache.org/ehcache.xsd'>
+<ehcache xsi:noNamespaceSchemaLocation="http://www.ehcache.org/ehcache.xsd"
+	updateCheck="true" monitoring="autodetect" dynamicConfig="true">
+	
     <defaultCache eternal='true' overflowToDisk='false'/>
     <!--maxBytesLocalHeap="200M"-->
     <diskStore path="./cache_store"/>
@@ -50,5 +51,14 @@
            eternal='false'
            memoryStoreEvictionPolicy="LRU"
            maxEntriesLocalHeap="500"
-           overflowToDisk='false'/>          
+           overflowToDisk='false'/>  
+           
+    <cache name="named_vc" 
+		eternal="true" 
+		memoryStoreEvictionPolicy="LRU"
+		maxBytesLocalHeap="256M" 
+		maxBytesLocalDisk="1G"
+		diskExpiryThreadIntervalSeconds = "120" > 
+		<persistence strategy="localTempSwap"/>
+	</cache>        
 </ehcache>
