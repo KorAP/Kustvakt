@@ -101,6 +101,7 @@ public class UserGroupMemberDao {
 
     }
 
+    @SuppressWarnings("unchecked")
     public List<UserGroupMember> retrieveMemberByRole (int groupId, int roleId)
             throws KustvaktException {
         ParameterChecker.checkIntegerValue(roleId, "roleId");
@@ -139,6 +140,7 @@ public class UserGroupMemberDao {
         return retrieveMemberByGroupId(groupId, false);
     }
 
+    @SuppressWarnings("unchecked")
     public List<UserGroupMember> retrieveMemberByGroupId (int groupId,
             boolean isAdmin) throws KustvaktException {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();

@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.oauth2.dao;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -9,6 +10,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Repository;
@@ -55,9 +57,9 @@ public class AccessTokenDao extends KustvaktCacheable {
             Set<AccessScope> scopes, String userId, String clientId,
             ZonedDateTime authenticationTime) throws KustvaktException {
         ParameterChecker.checkStringValue(token, "access token");
-        ParameterChecker.checkStringValue(refreshToken, "refresh token");
+        ParameterChecker.checkObjectValue(refreshToken, "refresh token");
         ParameterChecker.checkObjectValue(scopes, "scopes");
-//        ParameterChecker.checkStringValue(userId, "username");
+        // ParameterChecker.checkStringValue(userId, "username");
         ParameterChecker.checkStringValue(clientId, "client_id");
         ParameterChecker.checkObjectValue(authenticationTime,
                 "authentication time");
@@ -75,7 +77,7 @@ public class AccessTokenDao extends KustvaktCacheable {
 
     public AccessToken retrieveAccessToken (String accessToken)
             throws KustvaktException {
-
+        ParameterChecker.checkStringValue(accessToken, "access_token");
         AccessToken token = (AccessToken) this.getCacheValue(accessToken);
         if (token != null) {
             return token;
@@ -99,31 +101,29 @@ public class AccessTokenDao extends KustvaktCacheable {
         }
     }
 
-    public AccessToken retrieveAccessTokenByRefreshToken (String refreshToken)
-            throws KustvaktException {
+    @SuppressWarnings("unchecked")
+    public List<AccessToken> retrieveAccessTokenByRefreshToken (
+            String refreshToken) throws KustvaktException {
 
+        ParameterChecker.checkStringValue(refreshToken, "refresh_token");
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<AccessToken> query =
                 builder.createQuery(AccessToken.class);
         Root<AccessToken> root = query.from(AccessToken.class);
-        query.select(root);
-        query.where(builder.equal(root.get(AccessToken_.refreshToken),
-                refreshToken));
-        Query q = entityManager.createQuery(query);
-        try {
-            AccessToken token = (AccessToken) q.getSingleResult();
-            return token;
-        }
-        catch (NoResultException e) {
-            throw new KustvaktException(StatusCodes.INVALID_REFRESH_TOKEN,
-                    "Refresh token is not found", OAuth2Error.INVALID_GRANT);
-        }
+        Predicate condition = builder.equal(root.get(AccessToken_.refreshToken),
+                refreshToken);
 
+        query.select(root);
+        query.where(condition);
+        query.orderBy(builder.desc(root.get(AccessToken_.createdDate)));
+
+        Query q = entityManager.createQuery(query);
+        return q.getResultList();
     }
 
     public AccessToken updateAccessToken (AccessToken accessToken)
             throws KustvaktException {
-        ParameterChecker.checkObjectValue(accessToken, "access token");
+        ParameterChecker.checkObjectValue(accessToken, "access_token");
         AccessToken cachedToken =
                 (AccessToken) this.getCacheValue(accessToken.getId());
         if (cachedToken != null) {
@@ -132,5 +132,37 @@ public class AccessTokenDao extends KustvaktCacheable {
 
         accessToken = entityManager.merge(accessToken);
         return accessToken;
+    }
+
+    public AccessToken retrieveAccessTokenByAnynomousToken (String token)
+            throws KustvaktException {
+        ParameterChecker.checkObjectValue(token, "token");
+        AccessToken accessToken = (AccessToken) this.getCacheValue(token);
+        if (accessToken != null) {
+            return accessToken;
+        }
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<AccessToken> query =
+                builder.createQuery(AccessToken.class);
+
+        Root<AccessToken> root = query.from(AccessToken.class);
+        Predicate condition = builder.or(
+                builder.equal(root.get(AccessToken_.token), token),
+                builder.equal(root.get(AccessToken_.refreshToken), token));
+
+
+        query.select(root);
+        query.where(condition);
+        Query q = entityManager.createQuery(query);
+
+        try {
+            accessToken = (AccessToken) q.getSingleResult();
+            return accessToken;
+        }
+        catch (NoResultException e) {
+            throw new KustvaktException(StatusCodes.INVALID_ACCESS_TOKEN,
+                    "Access token is not found", OAuth2Error.INVALID_TOKEN);
+        }
     }
 }

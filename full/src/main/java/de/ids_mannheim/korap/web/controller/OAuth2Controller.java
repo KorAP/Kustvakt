@@ -24,10 +24,12 @@ import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2AuthorizationRequest;
+import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
 import de.ids_mannheim.korap.oauth2.oltu.service.OltuAuthorizationService;
 import de.ids_mannheim.korap.oauth2.oltu.service.OltuTokenService;
 import de.ids_mannheim.korap.security.context.TokenContext;
@@ -106,15 +108,26 @@ public class OAuth2Controller {
     /**
      * Grants a client an access token, namely a string used in
      * authenticated requests representing user authorization for
-     * the client to access user resources. Client credentials for
-     * authentication can be provided either as an authorization
-     * header with Basic authentication scheme or as form parameters
-     * in the request body.
+     * the client to access user resources. An additional refresh
+     * token strictly associated to the access token is also granted.
      * 
      * <br /><br />
      * 
-     * OAuth2 describes various ways of requesting an access token.
-     * Kustvakt supports:
+     * Clients may refreshing access token using this endpoint. This
+     * request will revoke all access token associated with the given
+     * refresh token, and grants a new access token. The refresh token
+     * is not changed and can be used until it expires.
+     * 
+     * <br /><br />
+     * 
+     * Client credentials for authentication can be provided either as
+     * an authorization header with Basic authentication scheme or as
+     * form parameters in the request body.
+     * 
+     * <br /><br />
+     * 
+     * OAuth2 specification describes various ways of requesting an
+     * access token. Kustvakt supports:
      * <ul>
      * <li> Authorization code grant: obtains authorization from a
      * third party application. Required parameters: grant_type,
@@ -135,7 +148,6 @@ public class OAuth2Controller {
      * </li>
      * </ul>
      * 
-     * <br /><br />
      * RFC 6749: The value of the scope parameter is expressed as a
      * list of space-delimited, case-sensitive strings defined by the
      * authorization server.
@@ -186,14 +198,40 @@ public class OAuth2Controller {
         }
     }
 
-    // @POST
-    // @Path("revoke")
-    // @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    // @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    // public Response revokeAccessToken (@Context HttpServletRequest
-    // request,
-    // @FormParam("grant_type") String grantType,
-    // MultivaluedMap<String, String> form) {
-    // return null;
-    // }
+    /**
+     * Revoking an access token also revokes its refresh token, vice
+     * versa.
+     * 
+     * RFC 7009
+     * Client authentication for confidential client
+     * 
+     * @param request
+     * @param form
+     * @return 200 if token invalidation is successful or the given
+     *         token is invalid
+     */
+    @POST
+    @Path("revoke")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public Response revokeAccessToken (@Context HttpServletRequest request,
+            MultivaluedMap<String, String> form) {
+
+        try {
+            OAuth2RevokeTokenRequest revokeTokenRequest =
+                    new OAuth2RevokeTokenRequest(
+                            new FormRequestWrapper(request, form));
+            tokenService.revokeToken(revokeTokenRequest);
+            return Response.ok().build();
+        }
+        catch (OAuthProblemException e) {
+            throw responseHandler.throwit(e);
+        }
+        catch (OAuthSystemException e) {
+            throw responseHandler.throwit(e);
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
 }

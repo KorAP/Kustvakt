@@ -54,6 +54,7 @@ public class PrivilegeDao {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<Privilege> retrievePrivilegeByRoleId (int roleId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Privilege> query =

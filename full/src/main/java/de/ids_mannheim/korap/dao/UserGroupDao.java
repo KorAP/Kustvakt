@@ -163,6 +163,7 @@ public class UserGroupDao {
      * @return a list of UserGroup
      * @throws KustvaktException
      */
+    @SuppressWarnings("unchecked")
     public List<UserGroup> retrieveGroupByUserId (String userId)
             throws KustvaktException {
         ParameterChecker.checkStringValue(userId, "userId");
@@ -268,6 +269,7 @@ public class UserGroupDao {
      * @return a list of {@link UserGroup}s
      * @throws KustvaktException
      */
+    @SuppressWarnings("unchecked")
     public List<UserGroup> retrieveGroupByStatus (String userId,
             UserGroupStatus status) throws KustvaktException {
 

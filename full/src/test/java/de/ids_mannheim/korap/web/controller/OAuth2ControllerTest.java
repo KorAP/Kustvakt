@@ -35,7 +35,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  */
 public class OAuth2ControllerTest extends SpringJerseyTest {
 
-    private ClientResponse requestAuthorizationConfidentialClient (
+    private ClientResponse requestAuthorization (
             MultivaluedMap<String, String> form) throws KustvaktException {
 
         return resource().path("oauth2").path("authorize").header(
@@ -55,7 +55,25 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         form.add("client_id", "fCBbQkAyYzI4NzUxMg");
         form.add("state", "thisIsMyState");
 
-        ClientResponse response = requestAuthorizationConfidentialClient(form);
+        ClientResponse response = requestAuthorization(form);
+
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
+                response.getStatus());
+        URI redirectUri = response.getLocation();
+        MultiValueMap<String, String> params = UriComponentsBuilder
+                .fromUri(redirectUri).build().getQueryParams();
+        assertNotNull(params.getFirst("code"));
+        assertEquals("thisIsMyState", params.getFirst("state"));
+    }
+
+    @Test
+    public void testAuthorizePublicClient () throws KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("response_type", "code");
+        form.add("client_id", "8bIDtZnH6NvRkW2Fq");
+        form.add("state", "thisIsMyState");
+
+        ClientResponse response = requestAuthorization(form);
 
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
                 response.getStatus());
@@ -75,7 +93,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         form.add("client_id", "fCBbQkAyYzI4NzUxMg");
         form.add("redirect_uri", redirectUri);
         form.add("state", "thisIsMyState");
-        ClientResponse response = requestAuthorizationConfidentialClient(form);
+        ClientResponse response = requestAuthorization(form);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
@@ -94,7 +112,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("state", "thisIsMyState");
         // missing response_type
-        ClientResponse response = requestAuthorizationConfidentialClient(form);
+        ClientResponse response = requestAuthorization(form);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
@@ -108,7 +126,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
 
         // missing client_id
         form.add("response_type", "code");
-        response = requestAuthorizationConfidentialClient(form);
+        response = requestAuthorization(form);
         entity = response.getEntity(String.class);
         node = JsonUtils.readTree(entity);
         assertEquals("Missing parameters: client_id",
@@ -121,7 +139,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         form.add("response_type", "string");
         form.add("state", "thisIsMyState");
 
-        ClientResponse response = requestAuthorizationConfidentialClient(form);
+        ClientResponse response = requestAuthorization(form);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         String entity = response.getEntity(String.class);
@@ -141,7 +159,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         form.add("scope", "read_address");
         form.add("state", "thisIsMyState");
 
-        ClientResponse response = requestAuthorizationConfidentialClient(form);
+        ClientResponse response = requestAuthorization(form);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         URI location = response.getLocation();
@@ -171,8 +189,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         authForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
         authForm.add("scope", "search");
 
-        ClientResponse response =
-                requestAuthorizationConfidentialClient(authForm);
+        ClientResponse response = requestAuthorization(authForm);
         URI redirectUri = response.getLocation();
         MultivaluedMap<String, String> params =
                 UriComponent.decodeQuery(redirectUri, true);
@@ -243,8 +260,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         authForm.add("scope", "search");
         authForm.add("redirect_uri", uri);
 
-        ClientResponse response =
-                requestAuthorizationConfidentialClient(authForm);
+        ClientResponse response = requestAuthorization(authForm);
         URI redirectUri = response.getLocation();
         MultivaluedMap<String, String> params =
                 UriComponent.decodeQuery(redirectUri, true);
@@ -434,17 +450,22 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
-        assertNotNull(node.at("/access_token").asText());
+        String accessToken = node.at("/access_token").asText();
         assertEquals(TokenType.BEARER.toString(),
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
+
+
+        testRevokeTokenPublicClient(accessToken, clientId, "access_token");
 
         String refreshToken = node.at("/refresh_token").asText();
         testRequestRefreshTokenInvalidScope(clientId, refreshToken);
         testRequestRefreshTokenPublicClient(clientId, refreshToken);
         testRequestRefreshTokenInvalidClient(refreshToken);
         testRequestRefreshTokenInvalidRefreshToken(clientId);
-        testRevokedRefreshToken(clientId, refreshToken);
+        
+        testRevokeTokenPublicClient(refreshToken, clientId, "refresh_token");
+        testRequestRefreshWithRevokedRefreshToken(clientId, refreshToken);
     }
 
     @Test
@@ -488,6 +509,29 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         assertEquals(TokenType.BEARER.toString(),
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
+    }
+
+    /**
+     * Client credentials grant is only allowed for confidential
+     * clients.
+     */
+    @Test
+    public void testRequestTokenClientCredentialsGrantPublic ()
+            throws KustvaktException {
+
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("grant_type", "client_credentials");
+        form.add("client_id", "8bIDtZnH6NvRkW2Fq");
+        form.add("client_secret", "");
+        ClientResponse response = requestToken(form);
+
+        String entity = response.getEntity(String.class);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
+                node.at("/error").asText());
+        assertEquals("Missing parameters: client_secret",
+                node.at("/error_description").asText());
     }
 
     @Test
@@ -627,8 +671,8 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
     }
 
-    private void testRevokedRefreshToken (String clientId, String refreshToken)
-            throws KustvaktException {
+    private void testRequestRefreshWithRevokedRefreshToken (String clientId,
+            String refreshToken) throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("grant_type", GrantType.REFRESH_TOKEN.toString());
         form.add("client_id", clientId);
@@ -643,6 +687,21 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
+    }
+
+    private void testRevokeTokenPublicClient (String token,
+            String clientId, String tokenType) {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("token_type", tokenType);
+        form.add("token", token);
+        form.add("client_id", clientId);
+
+        ClientResponse response = resource().path("oauth2").path("revoke")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
+        
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
 }

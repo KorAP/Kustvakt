@@ -116,6 +116,7 @@ public class VirtualCorpusDao {
      * @return a list of {@link VirtualCorpus}
      * @throws KustvaktException
      */
+    @SuppressWarnings("unchecked")
     public List<VirtualCorpus> retrieveVCByType (VirtualCorpusType type,
             String createdBy) throws KustvaktException {
 
@@ -171,6 +172,7 @@ public class VirtualCorpusDao {
         return vc;
     }
 
+    @SuppressWarnings("unchecked")
     public List<VirtualCorpus> retrieveOwnerVC (String userId)
             throws KustvaktException {
         ParameterChecker.checkStringValue(userId, "userId");
@@ -188,6 +190,7 @@ public class VirtualCorpusDao {
         return q.getResultList();
     }
 
+    @SuppressWarnings("unchecked")
     public List<VirtualCorpus> retrieveOwnerVCByType (String userId,
             VirtualCorpusType type) throws KustvaktException {
         ParameterChecker.checkStringValue(userId, "userId");
@@ -209,6 +212,7 @@ public class VirtualCorpusDao {
         return q.getResultList();
     }
 
+    @SuppressWarnings("unchecked")
     public List<VirtualCorpus> retrieveGroupVCByUser (String userId)
             throws KustvaktException {
         ParameterChecker.checkStringValue(userId, "userId");
@@ -272,6 +276,7 @@ public class VirtualCorpusDao {
         query.distinct(true);
         Query q = entityManager.createQuery(query);
 
+        @SuppressWarnings("unchecked")
         List<VirtualCorpus> vcList = q.getResultList();
         List<VirtualCorpus> groupVC = retrieveGroupVCByUser(userId);
         Set<VirtualCorpus> vcSet = new HashSet<VirtualCorpus>();
@@ -285,6 +290,7 @@ public class VirtualCorpusDao {
     }
 
     // for admins
+    @SuppressWarnings("unchecked")
     public List<VirtualCorpus> retrieveVCByGroup (int groupId)
             throws KustvaktException {
         ParameterChecker.checkIntegerValue(groupId, "groupId");

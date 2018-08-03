@@ -1,7 +1,9 @@
 version 0.61.0
-02/08/2018
+03/08/2018
 	- Added VC referencing tests (margaretha)
 	- Implemented loading and caching named VCs (margaretha)
+	- Implemented OAuth2 revoke token (margaretha)
+	- Updated OAuth2 refresh token implementation (margaretha)
 
 version 0.60.5
 02/08/2018

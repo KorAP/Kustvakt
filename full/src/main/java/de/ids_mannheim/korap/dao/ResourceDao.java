@@ -30,6 +30,7 @@ public class ResourceDao {
      *  
      * @return a list of resources
      */
+    @SuppressWarnings("unchecked")
     public List<Resource> getAllResources () {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Resource> query =

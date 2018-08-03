@@ -36,6 +36,7 @@ public class AnnotationDao {
      * 
      * @return a list of foundry-layer pairs.
      */
+    @SuppressWarnings("unchecked")
     public List<AnnotationPair> getAllFoundryLayerPairs () {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<AnnotationPair> query =
@@ -61,6 +62,7 @@ public class AnnotationDao {
      *            a layer code
      * @return a list of foundry-layer pairs.
      */
+    @SuppressWarnings("unchecked")
     public List<AnnotationPair> getAnnotationDescriptions (String foundry,
             String layer) {
 

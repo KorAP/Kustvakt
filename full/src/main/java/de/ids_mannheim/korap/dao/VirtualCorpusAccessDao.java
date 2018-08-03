@@ -58,6 +58,7 @@ public class VirtualCorpusAccessDao {
     }
 
     // for vca admins
+    @SuppressWarnings("unchecked")
     public List<VirtualCorpusAccess> retrieveActiveAccessByVC (int vcId)
             throws KustvaktException {
         ParameterChecker.checkIntegerValue(vcId, "vcId");
@@ -82,6 +83,7 @@ public class VirtualCorpusAccessDao {
     }
 
     // for system admins
+    @SuppressWarnings("unchecked")
     public List<VirtualCorpusAccess> retrieveAllAccessByVC (int vcId)
             throws KustvaktException {
         ParameterChecker.checkIntegerValue(vcId, "vcId");
@@ -101,6 +103,7 @@ public class VirtualCorpusAccessDao {
         return q.getResultList();
     }
 
+    @SuppressWarnings("unchecked")
     public List<VirtualCorpusAccess> retrieveAllAccessByGroup (int groupId)
             throws KustvaktException {
         ParameterChecker.checkIntegerValue(groupId, "groupId");
@@ -120,6 +123,7 @@ public class VirtualCorpusAccessDao {
         return q.getResultList();
     }
 
+    @SuppressWarnings("unchecked")
     public List<VirtualCorpusAccess> retrieveActiveAccessByGroup (int groupId)
             throws KustvaktException {
         ParameterChecker.checkIntegerValue(groupId, "groupId");

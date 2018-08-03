@@ -77,9 +77,16 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testListVCScopeNotAuthorized ()
-            throws KustvaktException, IOException {
+    public void testTokenAccessScope () throws KustvaktException, IOException {
         String accessToken = requestToken();
+        testListVCScopeNotAuthorized(accessToken);
+        testListVCAccessBearerNotAuthorize(accessToken);
+        testSearchWithOAuth2Token(accessToken);
+
+    }
+
+    private void testListVCScopeNotAuthorized (String accessToken)
+            throws KustvaktException {
         ClientResponse response = resource().path("vc").path("list")
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .get(ClientResponse.class);
@@ -92,9 +99,6 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
                 node.at("/errors/0/0").asInt());
         assertEquals("Scope vc_info is not authorized",
                 node.at("/errors/0/1").asText());
-
-        testListVCAccessBearerNotAuthorize(accessToken);
-        testSearchWithOAuth2Token(accessToken);
     }
 
     private void testListVCAccessBearerNotAuthorize (String accessToken)
@@ -150,5 +154,42 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
                 node.at("/errors/0/0").asInt());
         assertEquals("Access token is not found",
                 node.at("/errors/0/1").asText());
+    }
+
+    @Test
+    public void testRevokeAccessTokenConfidentialClient ()
+            throws KustvaktException {
+        String accessToken = requestToken();
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("token", accessToken);
+        form.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        form.add("client_secret", "secret");
+
+        ClientResponse response = resource().path("oauth2").path("revoke")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
+        testSearchWithRevokedToken(accessToken);
+    }
+
+    private void testSearchWithRevokedToken (String accessToken)
+            throws KustvaktException {
+        ClientResponse response = resource().path("search")
+                .queryParam("q", "Wasser").queryParam("ql", "poliqarp")
+                .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
+                response.getStatus());
+        
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.INVALID_ACCESS_TOKEN, node.at("/errors/0/0").asInt());
+        assertEquals("Access token has been revoked", node.at("/errors/0/1").asText());
+
     }
 }

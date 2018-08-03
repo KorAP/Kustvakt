@@ -22,6 +22,7 @@ public class AccessScopeDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @SuppressWarnings("unchecked")
     public List<AccessScope> retrieveAccessScopes () {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<AccessScope> query =

@@ -78,6 +78,7 @@ public class RoleDao {
         return (Role) q.getSingleResult();
     }
 
+    @SuppressWarnings("unchecked")
     public List<Role> retrieveRoleByGroupMemberId (int userId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Role> query = criteriaBuilder.createQuery(Role.class);
