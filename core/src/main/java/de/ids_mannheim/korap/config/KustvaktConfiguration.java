@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 //import org.apache.logging.log4j.PropertyConfigurator;
 
+import de.ids_mannheim.korap.util.KrillProperties;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.Getter;
 
@@ -76,7 +77,7 @@ public class KustvaktConfiguration {
     private ArrayList<String> layers;
 
     private String baseURL;
-
+    private Properties properties;
 
     // deprec?!
     private final BACKENDS DEFAULT_ENGINE = BACKENDS.LUCENE;
@@ -84,6 +85,7 @@ public class KustvaktConfiguration {
     public KustvaktConfiguration (Properties properties)
             throws Exception {
         load(properties);
+        KrillProperties.setProp(properties);
     }
 
     /**

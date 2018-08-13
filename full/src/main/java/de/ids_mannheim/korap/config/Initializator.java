@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
@@ -35,7 +33,7 @@ public class Initializator {
     public void initTest () {
         setInitialAccessScope();
     }
-    
+
     private void setInitialAccessScope () {
         OAuth2Scope[] enums = OAuth2Scope.values();
         Set<String> scopes = new HashSet<>(enums.length);

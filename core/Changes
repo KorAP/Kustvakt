@@ -1,6 +1,7 @@
 version 0.61.0
-02/08/2018
+13/08/2018
 	- Updated Krill and Koral versions enabling VC caching and referencing (margaretha)
+	- Set kustvakt configuration as Krill properties (margaretha)
 	
 version 0.60.5
 09/07/2018
