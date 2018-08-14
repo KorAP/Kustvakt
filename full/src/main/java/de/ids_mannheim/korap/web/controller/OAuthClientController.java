@@ -29,8 +29,8 @@ import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
 /**
  * Defines controllers for OAuth2 clients, namely applications
- * attempting
- * to access users' resources.
+ * performing actions such as searching and retrieving match
+ * information on behalf of users.
  * 
  * @author margaretha
  *
@@ -117,4 +117,35 @@ public class OAuthClientController {
             throw responseHandler.throwit(e);
         }
     }
+
+    /**
+     * Resets client secret of the given client. This controller
+     * requires client owner and client authentication. Only
+     * confidential clients are issued client secrets.
+     * 
+     * @param securityContext
+     * @param clientId
+     * @param clientSecret
+     * @return a new client secret
+     */
+    @POST
+    @Path("reset")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
+    public OAuth2ClientDto resetClientSecret (
+            @Context SecurityContext securityContext,
+            @FormParam("client_id") String clientId,
+            @FormParam("client_secret") String clientSecret) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            return clientService.resetSecret(clientId, clientSecret,
+                    context.getUsername());
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
+
 }

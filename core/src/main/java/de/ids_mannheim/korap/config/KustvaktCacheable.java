@@ -1,5 +1,8 @@
 package de.ids_mannheim.korap.config;
 
+import java.io.InputStream;
+import java.util.Map;
+
 import de.ids_mannheim.korap.utils.ServiceInfo;
 import de.ids_mannheim.korap.utils.StringUtils;
 import net.sf.ehcache.Cache;
@@ -8,8 +11,6 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.PersistenceConfiguration;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
-
-import java.io.InputStream;
 
 /**
  * @author hanl
@@ -104,5 +105,10 @@ public abstract class KustvaktCacheable {
 
     private String createKey(String input) {
         return StringUtils.toSHAHash(this.prefix+ "@" + input);
+    }
+    
+    public Map<Object, Element> getAllCacheElements () {
+        Cache cache = getCache(name);
+        return cache.getAll(cache.getKeysWithExpiryCheck());
     }
 }

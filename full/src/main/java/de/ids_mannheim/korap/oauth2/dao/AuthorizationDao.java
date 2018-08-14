@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.oauth2.dao;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -25,14 +26,15 @@ import de.ids_mannheim.korap.utils.ParameterChecker;
 
 @Transactional
 @Repository
-public class AuthorizationDao implements AuthorizationDaoInterface{
+public class AuthorizationDao implements AuthorizationDaoInterface {
 
     @PersistenceContext
     private EntityManager entityManager;
 
     public Authorization storeAuthorizationCode (String clientId, String userId,
             String code, Set<AccessScope> scopes, String redirectURI,
-            ZonedDateTime authenticationTime, String nonce) throws KustvaktException {
+            ZonedDateTime authenticationTime, String nonce)
+            throws KustvaktException {
         ParameterChecker.checkStringValue(clientId, "client_id");
         ParameterChecker.checkStringValue(userId, "userId");
         ParameterChecker.checkStringValue(code, "authorization code");
@@ -84,5 +86,22 @@ public class AuthorizationDao implements AuthorizationDaoInterface{
         ParameterChecker.checkObjectValue(authorization, "authorization");
         authorization = entityManager.merge(authorization);
         return authorization;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Authorization> retrieveAuthorizationsByClientId (String clientId) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Authorization> query =
+                builder.createQuery(Authorization.class);
+        Root<Authorization> root = query.from(Authorization.class);
+
+        Predicate restrictions =
+                builder.equal(root.get(Authorization_.clientId), clientId);
+
+        query.select(root);
+        query.where(restrictions);
+        Query q = entityManager.createQuery(query);
+        return q.getResultList();
     }
 }

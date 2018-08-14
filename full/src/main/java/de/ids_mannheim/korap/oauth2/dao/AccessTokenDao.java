@@ -74,6 +74,18 @@ public class AccessTokenDao extends KustvaktCacheable {
         entityManager.persist(accessToken);
     }
 
+    public AccessToken updateAccessToken (AccessToken accessToken)
+            throws KustvaktException {
+        ParameterChecker.checkObjectValue(accessToken, "access_token");
+        AccessToken cachedToken =
+                (AccessToken) this.getCacheValue(accessToken.getToken());
+        if (cachedToken != null) {
+            this.removeCacheEntry(accessToken.getToken());
+        }
+
+        accessToken = entityManager.merge(accessToken);
+        return accessToken;
+    }
 
     public AccessToken retrieveAccessToken (String accessToken)
             throws KustvaktException {
@@ -121,19 +133,6 @@ public class AccessTokenDao extends KustvaktCacheable {
         return q.getResultList();
     }
 
-    public AccessToken updateAccessToken (AccessToken accessToken)
-            throws KustvaktException {
-        ParameterChecker.checkObjectValue(accessToken, "access_token");
-        AccessToken cachedToken =
-                (AccessToken) this.getCacheValue(accessToken.getId());
-        if (cachedToken != null) {
-            this.removeCacheEntry(cachedToken);
-        }
-
-        accessToken = entityManager.merge(accessToken);
-        return accessToken;
-    }
-
     public AccessToken retrieveAccessTokenByAnynomousToken (String token)
             throws KustvaktException {
         ParameterChecker.checkObjectValue(token, "token");
@@ -164,5 +163,17 @@ public class AccessTokenDao extends KustvaktCacheable {
             throw new KustvaktException(StatusCodes.INVALID_ACCESS_TOKEN,
                     "Access token is not found", OAuth2Error.INVALID_TOKEN);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<AccessToken> retrieveAccessTokenByClientId (String clientId) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<AccessToken> query =
+                builder.createQuery(AccessToken.class);
+        Root<AccessToken> root = query.from(AccessToken.class);
+        query.select(root);
+        query.where(builder.equal(root.get(AccessToken_.clientId), clientId));
+        Query q = entityManager.createQuery(query);
+        return q.getResultList();
     }
 }

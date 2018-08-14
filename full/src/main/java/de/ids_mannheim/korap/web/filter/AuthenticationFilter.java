@@ -75,7 +75,8 @@ public class AuthenticationFilter
                         context = authenticationManager.getTokenContext(
                                 TokenType.BEARER, authData.getToken(), host,
                                 ua);
-                        if (request.getPath().startsWith("vc/access")
+                        if (request.getPath().startsWith("oauth2")
+                                || request.getPath().startsWith("vc/access")
                                 || request.getPath().startsWith("vc/delete")
                                 || request.getPath().startsWith("group")
                                 || request.getPath().startsWith("user")) {

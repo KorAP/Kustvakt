@@ -84,11 +84,17 @@ public class OAuth2ClientDao {
         }
     }
 
-    public void deregisterClient (OAuth2Client client) {
+    public void deregisterClient (OAuth2Client client) throws KustvaktException {
+        ParameterChecker.checkObjectValue(client, "client");
         if (!entityManager.contains(client)) {
             client = entityManager.merge(client);
         }
         entityManager.remove(client);
+    }
+
+    public void updateClient (OAuth2Client client) throws KustvaktException {
+        ParameterChecker.checkObjectValue(client, "client");
+        client = entityManager.merge(client);
     }
 
 }

@@ -1,28 +1,46 @@
-version 0.61.0
-03/08/2018
-	- Added VC referencing tests (margaretha)
-	- Implemented loading and caching named VCs (margaretha)
-	- Implemented OAuth2 revoke token (margaretha)
-	- Updated OAuth2 refresh token implementation (margaretha)
+# version 0.61.0
 
-version 0.60.5
 02/08/2018
+	- Added VC referencing tests (margaretha)	
+	- Implemented loading and caching named VCs (margaretha)
+03/08/2018	
+    - Implemented OAuth2 revoke token (margaretha)
+	- Updated OAuth2 refresh token implementation (margaretha)
+14/08/2018	
+    - Disallow OAuth2 access token (type Bearer) usage for authentication 
+      in OAuth2 controllers (margaretha)
+	- Implemented revoke all OAuth2 access tokens and authorization codes of client  
+	  users when deregistering/deleting a client (margaretha)
+	- Fixed update OAuth2 access token (margaretha)
+	- Implemented reset client secret (margaretha)
+	  
+
+# version 0.60.5
+
+09/07/2018
 	- Added service layer to the search controller (margaretha)
 	- Added OAuth2 scope checking in search and VC controllers (margaretha)
 	- Added handling OAuth2 bearer token for VC access and User group controllers (margaretha)
 	- Added default scope to password grant (margaretha)
+10/07/2018
 	- Made createBasicAuthorizationHeaderValue static (margaretha)
 	- Added store access token in openID token service (margaretha)
 	- Fixed empty scope in openID authorization and token service (margaretha)
 	- Implemented storing authorization code in cache (margaretha)
+11/07/2018	
 	- Fixed authentication time in authentication controller (margaretha)
 	- Added OAuth2 access token tests (margaretha)
+12/07/2018	
 	- Updated maven surefire setting for faster test suite runtime (margaretha)
 	- Implemented refreshing OAuth2 access token (margaretha)
+26/07/2018	
 	- Fixed issue #27 (margaretha)
+02/08/2018	
 	- Fixed clientId encoding in OAuth2ClientControllerTest (margaretha)
+
 	
-version 0.60.4
+# version 0.60.4
+
 05/07/2018
     - implemented OAuth2 authorization code request with OpenID Authentication (margaretha)
     - enabled OAuth2 authorization without OpenID authentication using Nimbus library (margaretha)
@@ -49,7 +67,8 @@ version 0.60.4
     - added OAuth2 token request with client authentication via Authorization header (margaretha)
     - added port checking in test suite (margaretha)
     
-version 0.60.3
+# version 0.60.3
+
 06/06/2018
     - improved user authentication by using authentication filter for authorization code request (margaretha)
     - limited client authentication to client id checking in authorization code request (margaretha)
@@ -60,7 +79,8 @@ version 0.60.3
     - added database tables for MySQL (margaretha)
     - updated JWT library and related codes (margaretha)    
     
-version 0.60.2
+# version 0.60.2
+
 03/05/2018
     - implemented OAuth2 client registration (margaretha)
     - implemented OAuth2 client authentication (margaretha)
@@ -84,7 +104,8 @@ version 0.60.2
     - added access scopes handling (margaretha)
     - added tests about request token with authorization code (margaretha)
     
-version 0.60.1
+# version 0.60.1
+
 28/03/2018
     - added admin-related SQL codes (margaretha)
     - updated AdminDao (margaretha)
@@ -106,7 +127,8 @@ version 0.60.1
     - added member role removal after deleting members (margaretha)
     - added add and delete member role controllers (margaretha)
     
-version 0.60
+# version 0.60
+
 14/03/2018
     - set up mail settings using localhost port 25 (margaretha)
     - added mail template in kustvakt configuration (margaretha)
@@ -122,7 +144,8 @@ version 0.60
     - fixed member invitation to join deleted group (margaretha)
     - added checking deleted group (margaretha)
 
-version 0.59.10    
+# version 0.59.10
+    
 20/02/2018 
     - added sort VC by id (margaretha)
     - added test cases regarding VC sharing (margaretha)
@@ -145,7 +168,8 @@ version 0.59.10
     - fixed unrecognized application/json (margaretha)
     - fixed and updated velocity template (margaretha)
     
-version 0.59.9 
+# version 0.59.9 
+
 19/01/2018
     - restructured basic authentication (margaretha)
     - fixed AuthenticationException to include authentication scheme (margaretha)
@@ -172,7 +196,8 @@ version 0.59.9
     - removed PredefinedUserGroup.ALL and related codes (margaretha)
     - implemented search for published VC (margaretha)
     
-version 0.59.8 
+# version 0.59.8
+ 
 21/09/2017
     - restructured statistics service (margaretha)
     - removed deprecated loader codes and tests (margaretha)
@@ -191,7 +216,8 @@ version 0.59.8
     - implemented create/store VC (margaretha)
     - fixed collection rewrite bug regarding availability with operation or (margaretha)    
 
-version 0.59.7
+# version 0.59.7
+
 13/10/2016
     - MOD: updated search to use new siglen (diewald)
     - MOD: fixed matchinfo retrieval in light service (diewald)

@@ -1,6 +1,9 @@
 package de.ids_mannheim.korap.oauth2.dao;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.ids_mannheim.korap.config.KustvaktCacheable;
@@ -11,6 +14,7 @@ import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.interfaces.AuthorizationDaoInterface;
 import de.ids_mannheim.korap.utils.ParameterChecker;
+import net.sf.ehcache.Element;
 
 public class AuthorizationCacheDao extends KustvaktCacheable
         implements AuthorizationDaoInterface {
@@ -67,6 +71,21 @@ public class AuthorizationCacheDao extends KustvaktCacheable
         Authorization auth =
                 (Authorization) this.getCacheValue(authorization.getCode());
         return auth;
+    }
+
+    @Override
+    public List<Authorization> retrieveAuthorizationsByClientId (
+            String clientId) {
+        List<Authorization> authList = new ArrayList<>();
+        
+        Map<Object, Element> map = getAllCacheElements();
+        for (Object key : map.keySet()){
+            Authorization auth =  (Authorization) map.get(key).getObjectValue();
+            if (auth.getClientId().equals(clientId)){
+                authList.add(auth);
+            }
+        }
+        return authList;
     }
 
 }

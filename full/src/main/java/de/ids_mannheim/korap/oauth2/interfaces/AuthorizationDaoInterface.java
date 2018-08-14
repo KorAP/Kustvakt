@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.oauth2.interfaces;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Set;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -18,4 +19,6 @@ public interface AuthorizationDaoInterface {
     
     public Authorization updateAuthorization (Authorization authorization)
             throws KustvaktException;
+
+    public List<Authorization> retrieveAuthorizationsByClientId (String clientId);
 }

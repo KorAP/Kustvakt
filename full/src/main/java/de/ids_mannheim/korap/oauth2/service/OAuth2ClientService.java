@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,12 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
+import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
 import de.ids_mannheim.korap.oauth2.dao.OAuth2ClientDao;
+import de.ids_mannheim.korap.oauth2.entity.AccessToken;
+import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
+import de.ids_mannheim.korap.oauth2.interfaces.AuthorizationDaoInterface;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
 /**
@@ -45,6 +50,10 @@ public class OAuth2ClientService {
 
     @Autowired
     private OAuth2ClientDao clientDao;
+    @Autowired
+    private AccessTokenDao tokenDao;
+    @Autowired
+    private AuthorizationDaoInterface authorizationDao;
     @Autowired
     private AdminDao adminDao;
     @Autowired
@@ -172,7 +181,52 @@ public class OAuth2ClientService {
 
         if (adminDao.isAdmin(username)
                 || client.getRegisteredBy().equals(username)) {
+
             clientDao.deregisterClient(client);
+
+            // revoke all related authorization tokens
+            List<Authorization> authList = authorizationDao
+                    .retrieveAuthorizationsByClientId(clientId);
+            for (Authorization authorization : authList){
+                authorization.setRevoked(true);
+                authorizationDao.updateAuthorization(authorization);
+            }
+            
+            // revoke all related access tokens
+            List<AccessToken> tokens =
+                    tokenDao.retrieveAccessTokenByClientId(clientId);
+            for (AccessToken token : tokens) {
+                token.setRevoked(true);
+                token.setRefreshTokenRevoked(true);
+                tokenDao.updateAccessToken(token);
+            }
+        }
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
+    }
+
+    public OAuth2ClientDto resetSecret (String clientId, String clientSecret,
+            String username) throws KustvaktException {
+
+        OAuth2Client client = authenticateClient(clientId, clientSecret);
+        if (!client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
+            throw new KustvaktException(
+                    StatusCodes.NOT_ALLOWED,
+                    "Operation is not allowed for public clients",
+                    OAuth2Error.INVALID_REQUEST);
+        }
+        if (adminDao.isAdmin(username)
+                || client.getRegisteredBy().equals(username)) {
+
+            String secret = codeGenerator.createRandomCode();
+            String secretHashcode = encryption.secureHash(secret,
+                    config.getPasscodeSaltField());
+
+            client.setSecret(secretHashcode);
+            clientDao.updateClient(client);
+            return new OAuth2ClientDto(clientId, secret);
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
@@ -197,15 +251,7 @@ public class OAuth2ClientService {
 
     public void authenticateClient (OAuth2Client client, String clientSecret)
             throws KustvaktException {
-        if (clientSecret == null) {
-            if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
-                throw new KustvaktException(
-                        StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                        "Missing parameters: client_secret",
-                        OAuth2Error.INVALID_REQUEST);
-            }
-        }
-        else if (clientSecret.isEmpty()) {
+        if (clientSecret == null || clientSecret.isEmpty()) {
             if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
                 throw new KustvaktException(
                         StatusCodes.CLIENT_AUTHENTICATION_FAILED,
