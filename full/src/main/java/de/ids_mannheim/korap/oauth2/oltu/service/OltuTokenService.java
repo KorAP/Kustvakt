@@ -136,6 +136,7 @@ public class OltuTokenService extends OAuth2TokenService {
         }
 
         if (!latestAccessToken.isRevoked()) {
+            latestAccessToken.setRevoked(true);
             tokenDao.updateAccessToken(latestAccessToken);
         }
 
@@ -324,7 +325,7 @@ public class OltuTokenService extends OAuth2TokenService {
         return OAuthASResponse.tokenResponse(Status.OK.getStatusCode())
                 .setAccessToken(accessToken)
                 .setTokenType(TokenType.BEARER.toString())
-                .setExpiresIn(String.valueOf(config.getTokenTTL()))
+                .setExpiresIn(String.valueOf(config.getAccessTokenExpiry()))
                 .setRefreshToken(refreshToken)
                 .setScope(String.join(" ", scopes)).buildJSONMessage();
     }

@@ -21,6 +21,13 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
+/**
+ * Before running this test:
+ * set oauth2.access.token.expiry = 3S
+ * 
+ * @author margaretha
+ *
+ */
 public class TokenExpiryTest extends SpringJerseyTest {
 
     @Test
@@ -45,7 +52,7 @@ public class TokenExpiryTest extends SpringJerseyTest {
         Thread.sleep(1000);
 
         testRequestAuthorizationCodeAuthenticationTooOld(token);
-        
+
         Thread.sleep(1500);
         testSearchWithExpiredToken(token);
     }

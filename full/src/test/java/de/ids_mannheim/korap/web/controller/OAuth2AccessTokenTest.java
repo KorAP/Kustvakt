@@ -9,6 +9,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
+import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,10 +27,12 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 
 public class OAuth2AccessTokenTest extends SpringJerseyTest {
 
-    private String requestToken () throws KustvaktException {
+    private String clientId = "fCBbQkAyYzI4NzUxMg";
+
+    private JsonNode requestToken () throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("grant_type", "password");
-        form.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        form.add("client_id", clientId);
         form.add("client_secret", "secret");
         form.add("username", "dory");
         form.add("password", "password");
@@ -41,7 +44,7 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
 
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        return node.at("/access_token").asText();
+        return node;
     }
 
     @Test
@@ -78,11 +81,10 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
 
     @Test
     public void testTokenAccessScope () throws KustvaktException, IOException {
-        String accessToken = requestToken();
+        String accessToken = requestToken().at("/access_token").asText();
         testListVCScopeNotAuthorized(accessToken);
         testListVCAccessBearerNotAuthorize(accessToken);
         testSearchWithOAuth2Token(accessToken);
-
     }
 
     private void testListVCScopeNotAuthorized (String accessToken)
@@ -159,7 +161,7 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
     @Test
     public void testRevokeAccessTokenConfidentialClient ()
             throws KustvaktException {
-        String accessToken = requestToken();
+        String accessToken = requestToken().at("/access_token").asText();
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("token", accessToken);
         form.add("client_id", "fCBbQkAyYzI4NzUxMg");
@@ -171,7 +173,7 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
                 .entity(form).post(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        
+
         testSearchWithRevokedToken(accessToken);
     }
 
@@ -186,10 +188,41 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
                 response.getStatus());
-        
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.INVALID_ACCESS_TOKEN, node.at("/errors/0/0").asInt());
-        assertEquals("Access token has been revoked", node.at("/errors/0/1").asText());
 
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Access token has been revoked",
+                node.at("/errors/0/1").asText());
+
+    }
+
+    @Test
+    public void testRevocationAfterRequestRefreshToken ()
+            throws KustvaktException {
+        JsonNode node = requestToken();
+        String accessToken = node.at("/access_token").asText();
+        String refreshToken = node.at("/refresh_token").asText();
+        
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("grant_type", GrantType.REFRESH_TOKEN.toString());
+        form.add("client_id", clientId);
+        form.add("client_secret", "secret");
+        form.add("refresh_token", refreshToken);
+
+        ClientResponse response = resource().path("oauth2").path("token")
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        node = JsonUtils.readTree(entity);
+        assertNotNull(node.at("/access_token").asText());
+        assertEquals(refreshToken,node.at("/refresh_token").asText());
+        
+        testSearchWithRevokedToken(accessToken);
     }
 }

@@ -174,7 +174,7 @@ public class OpenIdTokenService extends OAuth2TokenService {
         authenticationTime = authenticateUser(username, password, scopeSet);
 
         AccessToken accessToken =
-                new BearerAccessToken(config.getTokenTTL(), scope);
+                new BearerAccessToken(config.getAccessTokenExpiry(), scope);
 
         RefreshToken refreshToken = new RefreshToken();
 
@@ -228,7 +228,7 @@ public class OpenIdTokenService extends OAuth2TokenService {
                 .toArray(String[]::new);
         Scope scope = new Scope(scopeArray);
         AccessToken accessToken =
-                new BearerAccessToken(config.getTokenTTL(), scope);
+                new BearerAccessToken(config.getAccessTokenExpiry(), scope);
         RefreshToken refreshToken = new RefreshToken();
 
         tokenDao.storeAccessToken(accessToken.getValue(),

@@ -198,14 +198,20 @@ public class OAuth2Controller {
     }
 
     /**
-     * Revoking an access token also revokes its refresh token, vice
-     * versa.
+     * Revokes either an access token or a refresh token. Revoking a
+     * refresh token also revokes all access token associated with the
+     * refresh token.
      * 
      * RFC 7009
      * Client authentication for confidential client
      * 
      * @param request
      * @param form
+     *            containing
+     *            client_id,
+     *            client_secret (required for confidential clients),
+     *            token,
+     *            token_type (optional)
      * @return 200 if token invalidation is successful or the given
      *         token is invalid
      */

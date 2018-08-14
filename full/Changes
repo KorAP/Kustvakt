@@ -13,6 +13,7 @@
 	  users when deregistering/deleting a client (margaretha)
 	- Fixed update OAuth2 access token (margaretha)
 	- Implemented reset client secret (margaretha)
+	- Fixed revoking latest access token when refreshing OAuth2 access token (margaretha)
 	  
 
 # version 0.60.5
