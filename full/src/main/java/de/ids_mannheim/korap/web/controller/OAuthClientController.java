@@ -169,7 +169,7 @@ public class OAuthClientController {
 
     /**
      * Facilitates editing client privileges for admin purposes, e.g.
-     * setting a specific client to be a super client, and vice versa.
+     * setting a specific client to be a super client.
      * Only confidential clients are allowed to be super clients.
      * 
      * @param securityContext
@@ -189,7 +189,8 @@ public class OAuthClientController {
         try {
             scopeService.verifyScope(context, OAuth2Scope.ADMIN);
             clientService.updatePrivilege(context.getUsername(), clientId,
-                    Boolean.valueOf(isSuper));
+                    true);
+//                    Boolean.valueOf(isSuper));
             return Response.ok().build();
         }
         catch (KustvaktException e) {
