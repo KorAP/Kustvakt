@@ -103,8 +103,6 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         assertEquals("thisIsMyState", params.getFirst("state"));
     }
 
-
-
     private void testRequestAuthorizationCodeWithoutOpenID (
             MultivaluedMap<String, String> form, String redirectUri)
             throws KustvaktException {
@@ -350,14 +348,13 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         assertEquals(nonce, claimsSet.getClaim("nonce"));
     }
 
-
     // no openid
     @Test
     public void testRequestAccessTokenWithPassword ()
             throws KustvaktException, ParseException, InvalidKeySpecException,
             NoSuchAlgorithmException, JOSEException {
         // public client
-        String client_id = "iBr3LsTCxOj7D2o0A5m";
+        String client_id = "8bIDtZnH6NvRkW2Fq";
         MultivaluedMap<String, String> tokenForm = new MultivaluedMapImpl();
         testRequestAccessTokenMissingGrant(tokenForm);
 
@@ -373,13 +370,12 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         ClientResponse tokenResponse = sendTokenRequest(tokenForm);
         String entity = tokenResponse.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertNotNull(node.at("/access_token").asText());
-        assertNotNull(node.at("/refresh_token").asText());
-        assertEquals(TokenType.BEARER.toString(),
-                node.at("/token_type").asText());
-        assertNotNull(node.at("/expires_in").asText());
-    }
 
+        assertEquals(OAuth2Error.UNAUTHORIZED_CLIENT,
+                node.at("/error").asText());
+        assertEquals("Password grant is not allowed for third party clients",
+                node.at("/error_description").asText());
+    }
 
     private void testRequestAccessTokenMissingUsername (
             MultivaluedMap<String, String> tokenForm) throws KustvaktException {

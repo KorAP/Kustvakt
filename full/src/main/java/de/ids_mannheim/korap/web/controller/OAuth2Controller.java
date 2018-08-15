@@ -27,10 +27,12 @@ import org.springframework.stereotype.Controller;
 import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2AuthorizationRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
 import de.ids_mannheim.korap.oauth2.oltu.service.OltuAuthorizationService;
 import de.ids_mannheim.korap.oauth2.oltu.service.OltuTokenService;
+import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
@@ -47,6 +49,8 @@ public class OAuth2Controller {
     private OltuTokenService tokenService;
     @Autowired
     private OltuAuthorizationService authorizationService;
+    @Autowired
+    private OAuth2ScopeService scopeService;
 
     /**
      * Requests an authorization code.
@@ -73,7 +77,6 @@ public class OAuth2Controller {
     @Path("authorize")
     @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response requestAuthorizationCode (
             @Context HttpServletRequest request,
             @Context SecurityContext context, @FormParam("state") String state,
@@ -82,10 +85,12 @@ public class OAuth2Controller {
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
         String username = tokenContext.getUsername();
         ZonedDateTime authTime = tokenContext.getAuthenticationTime();
-
-        HttpServletRequest requestWithForm =
-                new FormRequestWrapper(request, form);
+        
         try {
+            scopeService.verifyScope(tokenContext, OAuth2Scope.AUTHORIZE);
+        
+            HttpServletRequest requestWithForm =
+                    new FormRequestWrapper(request, form);
             OAuth2AuthorizationRequest authzRequest =
                     new OAuth2AuthorizationRequest(requestWithForm);
             String uri = authorizationService.requestAuthorizationCode(
@@ -218,7 +223,6 @@ public class OAuth2Controller {
     @POST
     @Path("revoke")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response revokeAccessToken (@Context HttpServletRequest request,
             MultivaluedMap<String, String> form) {
 

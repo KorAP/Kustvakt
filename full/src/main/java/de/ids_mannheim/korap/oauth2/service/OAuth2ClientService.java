@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.dao.AdminDao;
-import de.ids_mannheim.korap.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -22,6 +21,8 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
 import de.ids_mannheim.korap.oauth2.dao.OAuth2ClientDao;
+import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientDto;
+import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientInfoDto;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
@@ -86,7 +87,7 @@ public class OAuth2ClientService {
                     redirectURI + " is invalid.", OAuth2Error.INVALID_REQUEST);
         }
 
-        boolean isNative = isNativeClient(url, redirectURI);
+        // boolean isNative = isNativeClient(url, redirectURI);
 
         String secret = null;
         String secretHashcode = null;
@@ -111,8 +112,8 @@ public class OAuth2ClientService {
         String id = codeGenerator.createRandomCode();
         try {
             clientDao.registerClient(id, secretHashcode, clientJson.getName(),
-                    clientJson.getType(), isNative, url, urlHashCode,
-                    redirectURI, registeredBy, clientJson.getDescription());
+                    clientJson.getType(), url, urlHashCode, redirectURI,
+                    registeredBy, clientJson.getDescription());
         }
         catch (Exception e) {
             Throwable cause = e;
@@ -131,7 +132,7 @@ public class OAuth2ClientService {
         return new OAuth2ClientDto(id, secret);
     }
 
-
+    @Deprecated
     private boolean isNativeClient (String url, String redirectURI)
             throws KustvaktException {
         if (url == null || url.isEmpty() || redirectURI == null
@@ -170,7 +171,6 @@ public class OAuth2ClientService {
         return true;
     }
 
-
     public void deregisterClient (String clientId, String clientSecret,
             String username) throws KustvaktException {
 
@@ -185,13 +185,13 @@ public class OAuth2ClientService {
             clientDao.deregisterClient(client);
 
             // revoke all related authorization tokens
-            List<Authorization> authList = authorizationDao
-                    .retrieveAuthorizationsByClientId(clientId);
-            for (Authorization authorization : authList){
+            List<Authorization> authList =
+                    authorizationDao.retrieveAuthorizationsByClientId(clientId);
+            for (Authorization authorization : authList) {
                 authorization.setRevoked(true);
                 authorizationDao.updateAuthorization(authorization);
             }
-            
+
             // revoke all related access tokens
             List<AccessToken> tokens =
                     tokenDao.retrieveAccessTokenByClientId(clientId);
@@ -212,8 +212,7 @@ public class OAuth2ClientService {
 
         OAuth2Client client = authenticateClient(clientId, clientSecret);
         if (!client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
-            throw new KustvaktException(
-                    StatusCodes.NOT_ALLOWED,
+            throw new KustvaktException(StatusCodes.NOT_ALLOWED,
                     "Operation is not allowed for public clients",
                     OAuth2Error.INVALID_REQUEST);
         }
@@ -259,6 +258,14 @@ public class OAuth2ClientService {
                         OAuth2Error.INVALID_REQUEST);
             }
         }
+        else if (client.getSecret() == null || client.getSecret().isEmpty()){
+            if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)){
+                throw new KustvaktException(
+                        StatusCodes.CLIENT_AUTHENTICATION_FAILED,
+                        "Client secret was not registered",
+                        OAuth2Error.INVALID_CLIENT);
+            }
+        }
         else if (!encryption.checkHash(clientSecret, client.getSecret(),
                 config.getPasscodeSaltField())) {
             throw new KustvaktException(
@@ -266,7 +273,6 @@ public class OAuth2ClientService {
                     "Invalid client credentials", OAuth2Error.INVALID_CLIENT);
         }
     }
-
 
     public OAuth2Client authenticateClientId (String clientId)
             throws KustvaktException {
@@ -278,5 +284,37 @@ public class OAuth2ClientService {
         }
 
         return clientDao.retrieveClientById(clientId);
+    }
+
+    public void updatePrivilege (String username, String clientId,
+            boolean isSuper) throws KustvaktException {
+
+        if (adminDao.isAdmin(username)) {
+            OAuth2Client client = clientDao.retrieveClientById(clientId);
+            if (isSuper && !client.getType()
+                    .equals(OAuth2ClientType.CONFIDENTIAL)) {
+                throw new KustvaktException(StatusCodes.NOT_ALLOWED,
+                        "Only confidential clients are allowed to be super clients.");
+            }
+            client.setSuper(isSuper);
+            clientDao.updateClient(client);
+        }
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
+    }
+
+    public OAuth2ClientInfoDto retrieveClientInfo (String username,
+            String clientId) throws KustvaktException {
+        OAuth2Client client = clientDao.retrieveClientById(clientId);
+        if (adminDao.isAdmin(username)
+                || username.equals(client.getRegisteredBy())) {
+            return new OAuth2ClientInfoDto(client);
+        }
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
     }
 }

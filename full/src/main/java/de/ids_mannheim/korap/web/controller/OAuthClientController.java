@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.web.controller;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -17,30 +18,49 @@ import org.springframework.stereotype.Controller;
 
 import com.sun.jersey.spi.container.ResourceFilters;
 
-import de.ids_mannheim.korap.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
+import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientDto;
+import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientInfoDto;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ClientService;
+import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
-
 /**
  * Defines controllers for OAuth2 clients, namely applications
  * performing actions such as searching and retrieving match
  * information on behalf of users.
+ * 
+ * <br /><br />
+ * According to its privileges, clients are categorized into super and
+ * normal clients. Super clients are intended only for clients that
+ * are part of KorAP. They has special privileges to use controllers
+ * that usually are not allowed for normal clients, for instance using
+ * OAuth2 password grant to obtain access tokens.
+ * 
+ * <br /><br />
+ * By default, clients are set as normal clients. Super clients has to
+ * be set manually by an admin, e.g by using
+ * {@link #updateClientPrivilege(SecurityContext, String, boolean)}
+ * controller. Only confidential clients are allowed to be super
+ * clients.
  * 
  * @author margaretha
  *
  */
 @Controller
 @Path("oauth2/client")
+@ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
 public class OAuthClientController {
 
     @Autowired
     private OAuth2ClientService clientService;
+    @Autowired
+    private OAuth2ScopeService scopeService;
     @Autowired
     private OAuth2ResponseHandler responseHandler;
 
@@ -70,13 +90,13 @@ public class OAuthClientController {
     @Path("register")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     public OAuth2ClientDto registerClient (
             @Context SecurityContext securityContext,
             OAuth2ClientJson clientJson) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.REGISTER_CLIENT);
             return clientService.registerClient(clientJson,
                     context.getUsername());
         }
@@ -84,7 +104,6 @@ public class OAuthClientController {
             throw responseHandler.throwit(e);
         }
     }
-
 
     /**
      * Deregisters a client requires client owner authentication. For
@@ -101,7 +120,6 @@ public class OAuthClientController {
     @DELETE
     @Path("deregister/{client_id}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     public Response deregisterPublicClient (
             @Context SecurityContext securityContext,
             @PathParam("client_id") String clientId,
@@ -109,6 +127,7 @@ public class OAuthClientController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.DEREGISTER_CLIENT);
             clientService.deregisterClient(clientId, clientSecret,
                     context.getUsername());
             return Response.ok().build();
@@ -132,7 +151,6 @@ public class OAuthClientController {
     @Path("reset")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     public OAuth2ClientDto resetClientSecret (
             @Context SecurityContext securityContext,
             @FormParam("client_id") String clientId,
@@ -140,6 +158,7 @@ public class OAuthClientController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.RESET_CLIENT_SECRET);
             return clientService.resetSecret(clientId, clientSecret,
                     context.getUsername());
         }
@@ -148,4 +167,51 @@ public class OAuthClientController {
         }
     }
 
+    /**
+     * Facilitates editing client privileges for admin purposes, e.g.
+     * setting a specific client to be a super client, and vice versa.
+     * Only confidential clients are allowed to be super clients.
+     * 
+     * @param securityContext
+     * @param clientId
+     * @param super true indicating super client, false otherwise
+     * @return Response status OK, if successful 
+     */
+    @POST
+    @Path("privilege")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response updateClientPrivilege (
+            @Context SecurityContext securityContext,
+            @FormParam("client_id") String clientId,
+            @FormParam("super") String isSuper) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            scopeService.verifyScope(context, OAuth2Scope.ADMIN);
+            clientService.updatePrivilege(context.getUsername(), clientId,
+                    Boolean.valueOf(isSuper));
+            return Response.ok().build();
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
+
+    @GET
+    @Path("info/{client_id}")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public OAuth2ClientInfoDto retrieveClientInfo (
+            @Context SecurityContext securityContext,
+            @PathParam("client_id") String clientId) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            scopeService.verifyScope(context, OAuth2Scope.CLIENT_INFO);
+            return clientService.retrieveClientInfo(context.getUsername(),
+                    clientId);
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
 }

@@ -94,7 +94,6 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         testDeregisterConfidentialClient(clientId, newclientSecret);
     }
 
-
     private void testRegisterClientNonUniqueURL () throws KustvaktException {
         ClientResponse response = registerConfidentialClient();
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -127,9 +126,8 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         assertNotNull(clientId);
         assertTrue(node.at("/client_secret").isMissingNode());
 
-        testDeregisterPublicClientMissingUserAuthentication(clientId);
-        testDeregisterPublicClientMissingId();
-        testDeregisterPublicClient(clientId);
+        testResetPublicClientSecret(clientId);
+        testAccessTokenAfterDeregistration(clientId);
     }
 
     @Test
@@ -155,35 +153,9 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         assertNotNull(clientId);
         assertTrue(node.at("/client_secret").isMissingNode());
 
-        testResetPublicClientSecret(clientId);
-    }
-
-    @Test
-    public void testRegisterNativeClient () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
-        OAuth2ClientJson json = new OAuth2ClientJson();
-        json.setName("NativeClient");
-        json.setType(OAuth2ClientType.PUBLIC);
-        json.setUrl("http://korap.ids-mannheim.de/native");
-        json.setRedirectURI("https://korap.ids-mannheim.de/native/redirect");
-        json.setDescription("This is a native test client.");
-
-        ClientResponse response = resource().path("oauth2").path("client")
-                .path("register")
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .entity(json).post(ClientResponse.class);
-
-        String entity = response.getEntity(String.class);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        JsonNode node = JsonUtils.readTree(entity);
-        String clientId = node.at("/client_id").asText();
-
-        // EM: need to check native
-
-        testAccessTokenAfterDeregistration(clientId);
+        testDeregisterPublicClientMissingUserAuthentication(clientId);
+        testDeregisterPublicClientMissingId();
+        testDeregisterPublicClient(clientId);
     }
 
     private void testAccessTokenAfterDeregistration (String clientId)
@@ -419,5 +391,56 @@ public class OAuth2ClientControllerTest extends SpringJerseyTest {
         assertTrue(!clientSecret.equals(newClientSecret));
 
         return newClientSecret;
+    }
+
+    @Test
+    public void testUpdateClientPrivilege () throws KustvaktException {
+        ClientResponse response = registerConfidentialClient();
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        String clientId = node.at("/client_id").asText();
+
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("client_id", clientId);
+        form.add("super", "true");
+
+        updateClientPrivilege(form);
+        node = retrieveClientInfo(clientId, "admin");
+        assertTrue(node.at("/isSuper").asBoolean());
+
+        form.remove("super");
+        form.add("super", "false");
+        updateClientPrivilege(form);
+        node = retrieveClientInfo(clientId, username);
+        assertTrue(node.at("/isSuper").isMissingNode());
+
+    }
+
+    private void updateClientPrivilege (MultivaluedMap<String, String> form)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        ClientResponse response = resource().path("oauth2").path("client")
+                .path("privilege")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("admin", "pass"))
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+
+    private JsonNode retrieveClientInfo (String clientId, String username)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        ClientResponse response = resource().path("oauth2").path("client")
+                .path("info").path(clientId)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .get(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        String entity = response.getEntity(String.class);
+        return JsonUtils.readTree(entity);
     }
 }

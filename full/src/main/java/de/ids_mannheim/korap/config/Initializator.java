@@ -1,8 +1,7 @@
 package de.ids_mannheim.korap.config;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.EnumSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -35,11 +34,7 @@ public class Initializator {
     }
 
     private void setInitialAccessScope () {
-        OAuth2Scope[] enums = OAuth2Scope.values();
-        Set<String> scopes = new HashSet<>(enums.length);
-        for (OAuth2Scope s : enums) {
-            scopes.add(s.toString());
-        }
+        EnumSet<OAuth2Scope> scopes = EnumSet.allOf(OAuth2Scope.class);
         accessScopeDao.storeAccessScopes(scopes);
     }
 }

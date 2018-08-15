@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.oauth2.oltu.service;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -211,14 +212,16 @@ public class OltuTokenService extends OAuth2TokenService {
 
         OAuth2Client client =
                 clientService.authenticateClient(clientId, clientSecret);
-        if (!client.isNative()) {
+        if (!client.isSuper()) {
             throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
                     "Password grant is not allowed for third party clients",
                     OAuth2Error.UNAUTHORIZED_CLIENT);
         }
 
         if (scopes == null || scopes.isEmpty()) {
-            scopes = config.getDefaultAccessScopes();
+            scopes = new HashSet<String>(1);
+            scopes.add("all");
+//            scopes = config.getDefaultAccessScopes();
         }
 
         ZonedDateTime authenticationTime =

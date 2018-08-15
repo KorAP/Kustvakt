@@ -1,9 +1,7 @@
 package de.ids_mannheim.korap.oauth2.oltu.service;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.time.ZonedDateTime;
 
 import javax.servlet.http.HttpServletRequest;

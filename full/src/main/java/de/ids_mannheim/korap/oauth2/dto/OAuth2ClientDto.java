@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.dto;
+package de.ids_mannheim.korap.oauth2.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

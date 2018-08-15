@@ -24,6 +24,8 @@ import com.sun.jersey.spi.container.ResourceFilters;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.dto.UserGroupDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
+import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.UserGroupService;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
@@ -54,6 +56,8 @@ public class UserGroupController {
     private KustvaktResponseHandler kustvaktResponseHandler;
     @Autowired
     private UserGroupService service;
+    @Autowired
+    private OAuth2ScopeService scopeService;
 
     /**
      * Returns all user-groups in which a user is an active or a
@@ -74,6 +78,7 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.USER_GROUP_INFO);
             return service.retrieveUserGroup(context.getUsername());
         }
         catch (KustvaktException e) {
@@ -106,6 +111,7 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.ADMIN);
             return service.retrieveUserGroupByStatus(username,
                     context.getUsername(), status);
         }
@@ -131,6 +137,7 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.ADMIN);
             return service.searchById(context.getUsername(), groupId);
         }
         catch (KustvaktException e) {
@@ -168,6 +175,7 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.CREATE_USER_GROUP);
             service.createUserGroup(group, context.getUsername());
             return Response.ok().build();
         }
@@ -178,8 +186,7 @@ public class UserGroupController {
 
     /**
      * Deletes a user-group specified by the group id. Only group
-     * owner
-     * and system admins can delete groups.
+     * owner and system admins can delete groups.
      * 
      * @param securityContext
      * @param groupId
@@ -192,6 +199,7 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.DELETE_USER_GROUP);
             service.deleteGroup(groupId, context.getUsername());
             return Response.ok().build();
         }
@@ -219,6 +227,7 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.DELETE_USER_GROUP_MEMBER);
             service.deleteGroupMember(memberId, groupId, context.getUsername());
             return Response.ok().build();
         }
@@ -247,6 +256,7 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.ADD_USER_GROUP_MEMBER);
             service.inviteGroupMembers(group, context.getUsername());
             return Response.ok().build();
         }
@@ -279,6 +289,7 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.ADD_USER_GROUP_MEMBER_ROLE);
             service.addMemberRoles(context.getUsername(), groupId,
                     memberUsername, roleIds);
             return Response.ok().build();
@@ -290,8 +301,7 @@ public class UserGroupController {
 
     /**
      * Deletes roles of a member of a user-group. Only user-group
-     * admins
-     * and system admins are allowed.
+     * admins and system admins are allowed.
      * 
      * @param securityContext
      * @param groupId
@@ -312,6 +322,7 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.DELETE_USER_GROUP_MEMBER_ROLE);
             service.deleteMemberRoles(context.getUsername(), groupId,
                     memberUsername, roleIds);
             return Response.ok().build();
@@ -339,6 +350,7 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.ADD_USER_GROUP_MEMBER);
             service.acceptInvitation(groupId, context.getUsername());
             return Response.ok().build();
         }
@@ -367,6 +379,7 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.DELETE_USER_GROUP_MEMBER);
             service.deleteGroupMember(context.getUsername(), groupId,
                     context.getUsername());
             return Response.ok().build();

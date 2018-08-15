@@ -181,6 +181,46 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
     }
 
     @Test
+    public void testRequestTokenAuthorizationPublic () throws KustvaktException {
+        String clientId = "8bIDtZnH6NvRkW2Fq";
+        MultivaluedMap<String, String> authForm = new MultivaluedMapImpl();
+        authForm.add("response_type", "code");
+        authForm.add("client_id", clientId);
+
+        ClientResponse response = requestAuthorization(authForm);
+        URI redirectUri = response.getLocation();
+        MultiValueMap<String, String> params = UriComponentsBuilder
+                .fromUri(redirectUri).build().getQueryParams();
+        String code = params.get("code").get(0);
+        
+        MultivaluedMap<String, String> tokenForm = new MultivaluedMapImpl();
+        tokenForm.add("grant_type", "authorization_code");
+        tokenForm.add("client_id", clientId);
+        tokenForm.add("code", code);
+
+        response = requestToken(tokenForm);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        
+        String accessToken = node.at("/access_token").asText();
+        String refreshToken = node.at("/refresh_token").asText();
+        
+        assertEquals(TokenType.BEARER.toString(),
+                node.at("/token_type").asText());
+        assertNotNull(node.at("/expires_in").asText());
+        
+        testRevokeTokenPublicClient(accessToken, clientId, "access_token");
+        
+        testRequestRefreshTokenInvalidScope(clientId, refreshToken);
+        testRequestRefreshTokenPublicClient(clientId, refreshToken);
+        testRequestRefreshTokenInvalidClient(refreshToken);
+        testRequestRefreshTokenInvalidRefreshToken(clientId);
+        
+        testRevokeTokenPublicClient(refreshToken, clientId, "refresh_token");
+        testRequestRefreshWithRevokedRefreshToken(clientId, refreshToken);
+    }
+    
+    @Test
     public void testRequestTokenAuthorizationConfidential ()
             throws KustvaktException {
 
@@ -203,7 +243,6 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         tokenForm.add("client_id", "fCBbQkAyYzI4NzUxMg");
         tokenForm.add("client_secret", "secret");
         tokenForm.add("code", code);
-        System.out.println(code);
 
         response = requestToken(tokenForm);
         String entity = response.getEntity(String.class);
@@ -437,7 +476,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
     @Test
     public void testRequestTokenPasswordGrantPublic ()
             throws KustvaktException {
-        String clientId = "iBr3LsTCxOj7D2o0A5m";
+        String clientId = "8bIDtZnH6NvRkW2Fq";
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("grant_type", "password");
         form.add("username", "dory");
@@ -447,35 +486,23 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
         ClientResponse response = requestToken(form);
         String entity = response.getEntity(String.class);
 
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
-        String accessToken = node.at("/access_token").asText();
-        assertEquals(TokenType.BEARER.toString(),
-                node.at("/token_type").asText());
-        assertNotNull(node.at("/expires_in").asText());
-
-
-        testRevokeTokenPublicClient(accessToken, clientId, "access_token");
-
-        String refreshToken = node.at("/refresh_token").asText();
-        testRequestRefreshTokenInvalidScope(clientId, refreshToken);
-        testRequestRefreshTokenPublicClient(clientId, refreshToken);
-        testRequestRefreshTokenInvalidClient(refreshToken);
-        testRequestRefreshTokenInvalidRefreshToken(clientId);
-        
-        testRevokeTokenPublicClient(refreshToken, clientId, "refresh_token");
-        testRequestRefreshWithRevokedRefreshToken(clientId, refreshToken);
+        assertEquals(OAuth2Error.UNAUTHORIZED_CLIENT,
+                node.at("/error").asText());
+        assertEquals("Password grant is not allowed for third party clients",
+                node.at("/error_description").asText());
     }
 
     @Test
-    public void testRequestTokenPasswordGrantNonNative ()
+    public void testRequestTokenPasswordGrantConfidentialNonSuper ()
             throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("grant_type", "password");
         form.add("username", "dory");
         form.add("password", "password");
-        // confidential nonnative
+        // confidential non-super
         form.add("client_id", "9aHsGW6QflV13ixNpez");
         form.add("client_secret", "secret");
 
@@ -639,7 +666,7 @@ public class OAuth2ControllerTest extends SpringJerseyTest {
             throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("grant_type", GrantType.REFRESH_TOKEN.toString());
-        form.add("client_id", "8bIDtZnH6NvRkW2Fq");
+        form.add("client_id", "iBr3LsTCxOj7D2o0A5m");
         form.add("refresh_token", refreshToken);
 
         ClientResponse response = resource().path("oauth2").path("token")

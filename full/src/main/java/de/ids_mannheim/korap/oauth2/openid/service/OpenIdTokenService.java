@@ -165,7 +165,7 @@ public class OpenIdTokenService extends OAuth2TokenService {
                     clientCredentials[1]);
         }
 
-        if (!client.isNative()) {
+        if (!client.isSuper()) {
             throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
                     "Password grant is not allowed for third party clients",
                     OAuth2Error.UNAUTHORIZED_CLIENT);

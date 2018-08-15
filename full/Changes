@@ -7,14 +7,19 @@
     - Implemented OAuth2 revoke token (margaretha)
 	- Updated OAuth2 refresh token implementation (margaretha)
 14/08/2018	
-    - Disallow OAuth2 access token (type Bearer) usage for authentication 
-      in OAuth2 controllers (margaretha)
 	- Implemented revoke all OAuth2 access tokens and authorization codes of client  
 	  users when deregistering/deleting a client (margaretha)
 	- Fixed update OAuth2 access token (margaretha)
 	- Implemented reset client secret (margaretha)
 	- Fixed revoking latest access token when refreshing OAuth2 access token (margaretha)
-	  
+15/08/2018
+    - Implemented OAuth2 client info controller (margaretha)
+    - Implemented update OAuth2 client privilege controller for admins (margaretha)
+    - Implemented unlimited authorization scope for super clients with OAuth2 password grant (margaretha)
+    - Marked native clients implementation to deprecated in favour of super clients (margaretha)
+    - Enabled using Bearer tokens as user authentication tokens (Authorization header value) for many 
+      controllers including OAuth2 controllers (margaretha)
+
 
 # version 0.60.5
 

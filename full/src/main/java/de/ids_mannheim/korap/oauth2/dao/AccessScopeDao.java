@@ -13,6 +13,7 @@ import javax.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 
 @Repository
@@ -33,10 +34,10 @@ public class AccessScopeDao {
         return q.getResultList();
     }
 
-    public void storeAccessScopes (Set<String> scopes) {
+    public void storeAccessScopes (Set<OAuth2Scope> scopes) {
         List<AccessScope> existingScopes = retrieveAccessScopes();
         AccessScope newScope;
-        for (String scope : scopes) {
+        for (OAuth2Scope scope : scopes) {
             newScope = new AccessScope(scope);
             if (!existingScopes.contains(newScope)) {
                 entityManager.persist(newScope);

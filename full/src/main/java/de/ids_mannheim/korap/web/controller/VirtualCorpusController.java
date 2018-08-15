@@ -21,13 +21,11 @@ import org.springframework.stereotype.Controller;
 
 import com.sun.jersey.spi.container.ResourceFilters;
 
-import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
@@ -229,11 +227,7 @@ public class VirtualCorpusController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            if (context.getTokenType().equals(TokenType.BEARER)){
-                throw new KustvaktException(
-                        StatusCodes.AUTHENTICATION_FAILED,
-                        "Token type Bearer is not allowed");   
-            }
+            scopeService.verifyScope(context, OAuth2Scope.ADMIN);
             return service.listVCByType(context.getUsername(), createdBy, type);
         }
         catch (KustvaktException e) {
@@ -258,6 +252,7 @@ public class VirtualCorpusController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.DELETE_VC);
             service.deleteVC(context.getUsername(), vcId);
         }
         catch (KustvaktException e) {
@@ -289,6 +284,7 @@ public class VirtualCorpusController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.SHARE_VC);
             service.shareVC(context.getUsername(), vcId, groupId);
         }
         catch (KustvaktException e) {
@@ -315,6 +311,7 @@ public class VirtualCorpusController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.DELETE_VC_ACCESS);
             service.deleteVCAccess(accessId, context.getUsername());
         }
         catch (KustvaktException e) {
@@ -348,6 +345,7 @@ public class VirtualCorpusController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.VC_ACCESS_INFO);
             return service.listVCAccessByVC(context.getUsername(), vcId);
         }
         catch (KustvaktException e) {
@@ -377,6 +375,7 @@ public class VirtualCorpusController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
+            scopeService.verifyScope(context, OAuth2Scope.VC_ACCESS_INFO);
             return service.listVCAccessByGroup(context.getUsername(), groupId);
         }
         catch (KustvaktException e) {

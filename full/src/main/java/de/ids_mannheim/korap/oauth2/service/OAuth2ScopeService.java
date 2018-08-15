@@ -45,8 +45,18 @@ public class OAuth2ScopeService {
         Set<AccessScope> requestedScopes =
                 new HashSet<AccessScope>(scopes.size());
         int index;
+        OAuth2Scope oauth2Scope = null;
         for (String scope : scopes) {
-            index = definedScopes.indexOf(new AccessScope(scope));
+            try{
+                oauth2Scope = Enum.valueOf(OAuth2Scope.class, scope.toUpperCase());
+            }
+            catch (IllegalArgumentException e) {
+                throw new KustvaktException(StatusCodes.INVALID_SCOPE,
+                        scope + " is an invalid scope",
+                        OAuth2Error.INVALID_SCOPE);
+            }
+            
+            index = definedScopes.indexOf(new AccessScope(oauth2Scope));
             if (index == -1) {
                 throw new KustvaktException(StatusCodes.INVALID_SCOPE,
                         scope + " is an invalid scope",
@@ -88,15 +98,16 @@ public class OAuth2ScopeService {
         return filteredScopes;
     }
 
-    public void verifyScope (TokenContext context, OAuth2Scope requestScope)
+    public void verifyScope (TokenContext context, OAuth2Scope requiredScope)
             throws KustvaktException {
         if (!adminDao.isAdmin(context.getUsername())
                 && context.getTokenType().equals(TokenType.BEARER)) {
             Map<String, Object> parameters = context.getParameters();
-            String scope = (String) parameters.get(Attributes.SCOPE);
-            if (!scope.contains(requestScope.toString())) {
+            String authorizedScope = (String) parameters.get(Attributes.SCOPE);
+            if (!authorizedScope.contains(OAuth2Scope.ALL.toString())
+                    && !authorizedScope.contains(requiredScope.toString())) {
                 throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                        "Scope " + requestScope + " is not authorized");
+                        "Scope " + requiredScope + " is not authorized");
             }
         }
     }

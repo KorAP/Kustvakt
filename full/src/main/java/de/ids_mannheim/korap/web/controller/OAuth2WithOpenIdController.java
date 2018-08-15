@@ -32,12 +32,14 @@ import com.nimbusds.oauth2.sdk.id.State;
 import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
 import de.ids_mannheim.korap.oauth2.openid.OpenIdConfiguration;
 import de.ids_mannheim.korap.oauth2.openid.OpenIdHttpRequestWrapper;
 import de.ids_mannheim.korap.oauth2.openid.service.JWKService;
 import de.ids_mannheim.korap.oauth2.openid.service.OpenIdAuthorizationService;
 import de.ids_mannheim.korap.oauth2.openid.service.OpenIdConfigService;
 import de.ids_mannheim.korap.oauth2.openid.service.OpenIdTokenService;
+import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OpenIdResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
@@ -56,7 +58,9 @@ public class OAuth2WithOpenIdController {
     private JWKService jwkService;
     @Autowired
     private OpenIdConfigService configService;
-
+    @Autowired
+    private OAuth2ScopeService scopeService;
+    
     @Autowired
     private OpenIdResponseHandler openIdResponseHandler;
 
@@ -135,6 +139,8 @@ public class OAuth2WithOpenIdController {
 
         URI uri = null;
         try {
+            scopeService.verifyScope(tokenContext, OAuth2Scope.AUTHORIZE);
+            
             if (isAuthentication) {
                 authzService.checkRedirectUriParam(map);
             }

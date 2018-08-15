@@ -111,9 +111,6 @@ public class OpenIdAuthorizationService extends OAuth2AuthorizationService {
             if (scope != null) {
                 scopeSet = new HashSet<>(scope.toStringList());
             }
-            else {
-                scopeSet = config.getDefaultAccessScopes();
-            }
             createAuthorization(username, clientId, redirectUriStr, scopeSet,
                     code.getValue(), authenticationTime, nonce);
         }
