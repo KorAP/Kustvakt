@@ -183,27 +183,32 @@ public class OAuth2ClientService {
                 || client.getRegisteredBy().equals(username)) {
 
             clientDao.deregisterClient(client);
-
-            // revoke all related authorization tokens
-            List<Authorization> authList =
-                    authorizationDao.retrieveAuthorizationsByClientId(clientId);
-            for (Authorization authorization : authList) {
-                authorization.setRevoked(true);
-                authorizationDao.updateAuthorization(authorization);
-            }
-
-            // revoke all related access tokens
-            List<AccessToken> tokens =
-                    tokenDao.retrieveAccessTokenByClientId(clientId);
-            for (AccessToken token : tokens) {
-                token.setRevoked(true);
-                token.setRefreshTokenRevoked(true);
-                tokenDao.updateAccessToken(token);
-            }
+            revokeAllAuthorizationsByClientId(clientId);
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
+        }
+    }
+
+    private void revokeAllAuthorizationsByClientId (String clientId)
+            throws KustvaktException {
+
+        // revoke all related authorization codes
+        List<Authorization> authList =
+                authorizationDao.retrieveAuthorizationsByClientId(clientId);
+        for (Authorization authorization : authList) {
+            authorization.setRevoked(true);
+            authorizationDao.updateAuthorization(authorization);
+        }
+
+        // revoke all related access tokens
+        List<AccessToken> tokens =
+                tokenDao.retrieveAccessTokenByClientId(clientId);
+        for (AccessToken token : tokens) {
+            token.setRevoked(true);
+            token.setRefreshTokenRevoked(true);
+            tokenDao.updateAccessToken(token);
         }
     }
 
@@ -258,8 +263,8 @@ public class OAuth2ClientService {
                         OAuth2Error.INVALID_REQUEST);
             }
         }
-        else if (client.getSecret() == null || client.getSecret().isEmpty()){
-            if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)){
+        else if (client.getSecret() == null || client.getSecret().isEmpty()) {
+            if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
                 throw new KustvaktException(
                         StatusCodes.CLIENT_AUTHENTICATION_FAILED,
                         "Client secret was not registered",
@@ -291,11 +296,16 @@ public class OAuth2ClientService {
 
         if (adminDao.isAdmin(username)) {
             OAuth2Client client = clientDao.retrieveClientById(clientId);
-            if (isSuper && !client.getType()
-                    .equals(OAuth2ClientType.CONFIDENTIAL)) {
-                throw new KustvaktException(StatusCodes.NOT_ALLOWED,
-                        "Only confidential clients are allowed to be super clients.");
+            if (isSuper) {
+                if (!client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
+                    throw new KustvaktException(StatusCodes.NOT_ALLOWED,
+                            "Only confidential clients are allowed to be super clients.");
+                }
             }
+            else {
+                revokeAllAuthorizationsByClientId(clientId);
+            }
+
             client.setSuper(isSuper);
             clientDao.updateClient(client);
         }

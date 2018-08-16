@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.constant;
 
+import org.apache.commons.lang.StringUtils;
+
 public enum TokenType {
     BASIC, API, SESSION, 
     // openid token, e.g. within oauth2 response (json body)
@@ -10,6 +12,6 @@ public enum TokenType {
     CLIENT; 
 
     public String displayName () {
-        return name().toLowerCase();
+        return StringUtils.capitalize(name().toLowerCase());
     }
 }

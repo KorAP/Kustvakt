@@ -172,10 +172,17 @@ public class OAuthClientController {
      * setting a specific client to be a super client.
      * Only confidential clients are allowed to be super clients.
      * 
+     * When upgrading clients to super clients, existing access tokens
+     * and authorization codes retain their scopes.
+     * 
+     * When degrading super clients, all existing tokens and
+     * authorization codes are invalidated.
+     * 
      * @param securityContext
-     * @param clientId
-     * @param super true indicating super client, false otherwise
-     * @return Response status OK, if successful 
+     * @param clientId OAuth2 client id
+     * @param super
+     *            true indicating super client, false otherwise
+     * @return Response status OK, if successful
      */
     @POST
     @Path("privilege")
@@ -189,8 +196,7 @@ public class OAuthClientController {
         try {
             scopeService.verifyScope(context, OAuth2Scope.ADMIN);
             clientService.updatePrivilege(context.getUsername(), clientId,
-                    true);
-//                    Boolean.valueOf(isSuper));
+                    Boolean.valueOf(isSuper));
             return Response.ok().build();
         }
         catch (KustvaktException e) {

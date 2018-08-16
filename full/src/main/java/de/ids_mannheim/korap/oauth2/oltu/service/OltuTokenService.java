@@ -341,7 +341,6 @@ public class OltuTokenService extends OAuth2TokenService {
         String tokenType = revokeTokenRequest.getTokenType();
 
         clientService.authenticateClient(clientId, clientSecret);
-        tokenDao.removeCacheEntry(token);
         if (tokenType != null && tokenType.equals("refresh_token")) {
             if (!revokeRefreshToken(token)) {
                 revokeAccessToken(token);

@@ -5,17 +5,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.net.URI;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
-import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.junit.Test;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
@@ -24,102 +20,29 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.SpringJerseyTest;
+import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
-public class OAuth2AccessTokenTest extends SpringJerseyTest {
+public class OAuth2AccessTokenTest extends OAuth2TestBase {
 
-    // normal client
-    private String clientId = "9aHsGW6QflV13ixNpez";
-    private String superClientId = "fCBbQkAyYzI4NzUxMg";
-    private String clientSecret = "secret";
+    private String userAuthHeader;
+    private String clientAuthHeader;
 
-    private String requestAuthorizationCode (String scope, String authHeader)
-            throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("response_type", "code");
-        form.add("client_id", clientId);
-        form.add("client_secret", clientSecret);
-        if (scope != null) {
-            form.add("scope", scope);
-        }
-
-        ClientResponse response = resource().path("oauth2").path("authorize")
-                .header(Attributes.AUTHORIZATION, authHeader)
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
-
-        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
-                response.getStatus());
-        URI redirectUri = response.getLocation();
-        MultiValueMap<String, String> params = UriComponentsBuilder
-                .fromUri(redirectUri).build().getQueryParams();
-        return params.getFirst("code");
-    }
-
-    // client credentials as form params
-    private JsonNode requestTokenWithAuthorizationCodeGrant ()
-            throws KustvaktException {
-        String authHeader = HttpAuthorizationHandler
+    public OAuth2AccessTokenTest () throws KustvaktException {
+        userAuthHeader = HttpAuthorizationHandler
                 .createBasicAuthorizationHeaderValue("dory", "password");
-        String code = requestAuthorizationCode(null, authHeader);
-
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("grant_type", "authorization_code");
-        form.add("client_id", clientId);
-        form.add("client_secret", clientSecret);
-        form.add("code", code);
-
-        ClientResponse response = resource().path("oauth2").path("token")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
-
-        String entity = response.getEntity(String.class);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        JsonNode node = JsonUtils.readTree(entity);
-        return node;
-    }
-
-    // client credentials in authorization header
-    private JsonNode requestTokenWithAuthorizationHeader (String code)
-            throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("grant_type", "authorization_code");
-        form.add("client_id", clientId);
-        form.add("code", code);
-
-        ClientResponse response = resource().path("oauth2").path("token")
-                .header(Attributes.AUTHORIZATION,
-                        HttpAuthorizationHandler
-                                .createBasicAuthorizationHeaderValue(clientId,
-                                        clientSecret))
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
-
-        String entity = response.getEntity(String.class);
-        return JsonUtils.readTree(entity);
+        clientAuthHeader =
+                HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
+                        confidentialClientId, clientSecret);
     }
 
     @Test
     public void testScopeWithSuperClient () throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("grant_type", "password");
-        form.add("client_id", superClientId);
-        form.add("client_secret", clientSecret);
-        form.add("username", "dory");
-        form.add("password", "password");
-
-        ClientResponse response = resource().path("oauth2").path("token")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+        ClientResponse response =
+                requestTokenWithPassword(superClientId, clientSecret);
 
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         assertEquals("all", node.at("/scope").asText());
@@ -136,18 +59,19 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testCustomAuthorizationScope () throws KustvaktException {
-        String authHeader = HttpAuthorizationHandler
-                .createBasicAuthorizationHeaderValue("dory", "password");
-        String code = requestAuthorizationCode(OAuth2Scope.VC_INFO.toString(),
-                authHeader);
-        JsonNode node = requestTokenWithAuthorizationHeader(code);
+    public void testCustomScope () throws KustvaktException {
+        String code = requestAuthorizationCode(confidentialClientId,
+                clientSecret, OAuth2Scope.VC_INFO.toString(), userAuthHeader);
+        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
+                confidentialClientId, clientSecret, code);
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
 
         String token = node.at("/access_token").asText();
         assertTrue(node.at("/scope").asText()
                 .contains(OAuth2Scope.VC_INFO.toString()));
 
-        ClientResponse response = resource().path("vc").path("list")
+        // test list vc using the token
+        response = resource().path("vc").path("list")
                 .header(Attributes.AUTHORIZATION, "Bearer " + token)
                 .get(ClientResponse.class);
 
@@ -158,14 +82,20 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
 
     @Test
     public void testDefaultScope () throws KustvaktException, IOException {
-        String accessToken = requestTokenWithAuthorizationCodeGrant()
-                .at("/access_token").asText();
-        testListVCScopeNotAuthorized(accessToken);
-        testListVCAccessBearerNotAuthorize(accessToken);
+        String code = requestAuthorizationCode(confidentialClientId, clientSecret,
+                null, userAuthHeader);
+        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
+                confidentialClientId, clientSecret, code);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        String accessToken = node.at("/access_token").asText();
+        testScopeNotAuthorized(accessToken);
+        testScopeNotAuthorize2(accessToken);
         testSearchWithOAuth2Token(accessToken);
     }
 
-    private void testListVCScopeNotAuthorized (String accessToken)
+    private void testScopeNotAuthorized (String accessToken)
             throws KustvaktException {
         ClientResponse response = resource().path("vc").path("list")
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
@@ -181,7 +111,7 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
                 node.at("/errors/0/1").asText());
     }
 
-    private void testListVCAccessBearerNotAuthorize (String accessToken)
+    private void testScopeNotAuthorize2 (String accessToken)
             throws KustvaktException {
         ClientResponse response =
                 resource().path("vc").path("access").path("list")
@@ -200,18 +130,11 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
 
     private void testSearchWithOAuth2Token (String accessToken)
             throws KustvaktException, IOException {
-        ClientResponse response = resource().path("search")
-                .queryParam("q", "Wasser").queryParam("ql", "poliqarp")
-                .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
-
-        String ent = response.getEntity(String.class);
-
+        ClientResponse response = searchWithAccessToken(accessToken);
+        String entity = response.getEntity(String.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
-
-        JsonNode node = JsonUtils.readTree(ent);
+        JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
         assertEquals(25, node.at("/matches").size());
     }
@@ -219,11 +142,8 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
     @Test
     public void testSearchWithUnknownToken ()
             throws KustvaktException, IOException {
-        ClientResponse response = resource().path("search")
-                .queryParam("q", "Wasser").queryParam("ql", "poliqarp")
-                .header(Attributes.AUTHORIZATION,
-                        "Bearer ljsa8tKNRSczJhk20öhq92zG8z350")
-                .get(ClientResponse.class);
+        ClientResponse response =
+                searchWithAccessToken("ljsa8tKNRSczJhk20öhq92zG8z350");
 
         assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
                 response.getStatus());
@@ -239,11 +159,15 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
     @Test
     public void testRevokeAccessTokenConfidentialClient ()
             throws KustvaktException {
-        String accessToken = requestTokenWithAuthorizationCodeGrant()
-                .at("/access_token").asText();
+        String code = requestAuthorizationCode(confidentialClientId,
+                clientSecret, null, userAuthHeader);
+        JsonNode node = requestTokenWithAuthorizationCodeAndHeader(
+                confidentialClientId, code, clientAuthHeader);
+
+        String accessToken = node.at("/access_token").asText();
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("token", accessToken);
-        form.add("client_id", clientId);
+        form.add("client_id", confidentialClientId);
         form.add("client_secret", "secret");
 
         ClientResponse response = resource().path("oauth2").path("revoke")
@@ -253,17 +177,12 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        testSearchWithRevokedToken(accessToken);
+        testSearchWithRevokedAccessToken(accessToken);
     }
 
-    private void testSearchWithRevokedToken (String accessToken)
+    private void testSearchWithRevokedAccessToken (String accessToken)
             throws KustvaktException {
-        ClientResponse response = resource().path("search")
-                .queryParam("q", "Wasser").queryParam("ql", "poliqarp")
-                .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
-
+        ClientResponse response = searchWithAccessToken(accessToken);
         String entity = response.getEntity(String.class);
         assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
                 response.getStatus());
@@ -273,19 +192,22 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
                 node.at("/errors/0/0").asInt());
         assertEquals("Access token has been revoked",
                 node.at("/errors/0/1").asText());
-
     }
 
     @Test
-    public void testRevocationAfterRequestRefreshToken ()
+    public void testRevokedAccessTokenAfterRequestRefreshToken ()
             throws KustvaktException {
-        JsonNode node = requestTokenWithAuthorizationCodeGrant();
+        String code = requestAuthorizationCode(confidentialClientId,
+                clientSecret, null, userAuthHeader);
+        JsonNode node = requestTokenWithAuthorizationCodeAndHeader(
+                confidentialClientId, code, clientAuthHeader);
+
         String accessToken = node.at("/access_token").asText();
         String refreshToken = node.at("/refresh_token").asText();
 
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("grant_type", GrantType.REFRESH_TOKEN.toString());
-        form.add("client_id", clientId);
+        form.add("client_id", confidentialClientId);
         form.add("client_secret", "secret");
         form.add("refresh_token", refreshToken);
 
@@ -302,17 +224,21 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
         assertNotNull(node.at("/access_token").asText());
         assertEquals(refreshToken, node.at("/refresh_token").asText());
 
-        testSearchWithRevokedToken(accessToken);
+        testSearchWithRevokedAccessToken(accessToken);
     }
 
     @Test
-    public void testRequestAuthorizationWithBearerTokenUnauthorized () throws KustvaktException {
-        String userAuthToken = requestTokenWithAuthorizationCodeGrant()
-                .at("/access_token").asText();
+    public void testRequestAuthorizationWithBearerTokenUnauthorized ()
+            throws KustvaktException {
+        String code = requestAuthorizationCode(confidentialClientId,
+                clientSecret, null, userAuthHeader);
+        JsonNode node = requestTokenWithAuthorizationCodeAndHeader(
+                confidentialClientId, code, clientAuthHeader);
+        String userAuthToken = node.at("/access_token").asText();
 
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("response_type", "code");
-        form.add("client_id", clientId);
+        form.add("client_id", confidentialClientId);
         form.add("client_secret", clientSecret);
 
         ClientResponse response = resource().path("oauth2").path("authorize")
@@ -323,8 +249,8 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
                 .entity(form).post(ClientResponse.class);
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-        
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+
+        node = JsonUtils.readTree(response.getEntity(String.class));
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
         assertEquals("Scope authorize is not authorized",
@@ -334,31 +260,20 @@ public class OAuth2AccessTokenTest extends SpringJerseyTest {
     @Test
     public void testRequestAuthorizationWithBearerToken ()
             throws KustvaktException {
-        String userAuthToken = requestTokenWithPasswordGrant();
-        String code = requestAuthorizationCode(null, "Bearer " + userAuthToken);
+        ClientResponse response =
+                requestTokenWithPassword(superClientId, clientSecret);
+        String entity = response.getEntity(String.class);
+        
+        JsonNode node = JsonUtils.readTree(entity);
+        String userAuthToken = node.at("/access_token").asText();
+        assertNotNull(userAuthToken);
+        assertEquals(TokenType.BEARER.displayName(),
+                node.at("/token_type").asText());
+        assertNotNull(node.at("/expires_in").asText());
+
+        String code = requestAuthorizationCode(superClientId,
+                clientSecret, null, "Bearer " + userAuthToken);
         assertNotNull(code);
     }
 
-    private String requestTokenWithPasswordGrant () throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("grant_type", "password");
-        form.add("client_id", superClientId);
-        form.add("client_secret", clientSecret);
-        form.add("username", "dory");
-        form.add("password", "password");
-
-        ClientResponse response = resource().path("oauth2").path("token")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
-        String entity = response.getEntity(String.class);
-
-        JsonNode node = JsonUtils.readTree(entity);
-        String token = node.at("/access_token").asText();
-        assertNotNull(token);
-        assertEquals(TokenType.BEARER.toString(),
-                node.at("/token_type").asText());
-        assertNotNull(node.at("/expires_in").asText());
-        return token;
-    }
 }

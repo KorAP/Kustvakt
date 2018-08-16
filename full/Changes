@@ -19,6 +19,9 @@
     - Marked native clients implementation to deprecated in favour of super clients (margaretha)
     - Enabled using Bearer tokens as user authentication tokens (Authorization header value) for many 
       controllers including OAuth2 controllers (margaretha)
+16/08/2018
+    - Implemented degrading super clients (margaretha)
+    - Improved and added OAuth2 tests (margaretha)    
 
 
 # version 0.60.5
