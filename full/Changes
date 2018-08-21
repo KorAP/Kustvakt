@@ -21,8 +21,9 @@
       controllers including OAuth2 controllers (margaretha)
 16/08/2018
     - Implemented degrading super clients (margaretha)
-    - Improved and added OAuth2 tests (margaretha)    
-
+    - Improved and added OAuth2 tests (margaretha)
+21/08/2018
+    - Added VC name pattern check (margaretha)
 
 # version 0.60.5
 

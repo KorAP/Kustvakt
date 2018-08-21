@@ -464,6 +464,25 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
         checkWWWAuthenticateHeader(response);
     }
+    
+    @Test
+    public void testCreateVCInvalidName () throws KustvaktException {
+        String json = "{\"name\": \"new $vc\",\"type\": \"PRIVATE\","
+                + "\"corpusQuery\": \"creationDate since 1820\"}";
+
+        ClientResponse response = resource().path("vc").path("create").header(
+                Attributes.AUTHORIZATION,
+                HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
+                        "VirtualCorpusControllerTest", "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .entity(json).post(ClientResponse.class);
+        String entity = response.getEntity(String.class);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.INVALID_ARGUMENT,
+                node.at("/errors/0/0").asInt());
+    }
 
     @Test
     public void testCreateVCUnauthorized () throws KustvaktException {

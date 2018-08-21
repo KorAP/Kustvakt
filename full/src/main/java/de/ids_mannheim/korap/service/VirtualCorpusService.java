@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,9 +40,11 @@ import de.ids_mannheim.korap.web.SearchKrill;
 import de.ids_mannheim.korap.web.controller.VirtualCorpusController;
 import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
 
-/** VirtualCorpusService handles the logic behind {@link VirtualCorpusController}. 
- *  It communicates with {@link VirtualCorpusDao} and returns 
- *  {@link VirtualCorpusDto} to {@link VirtualCorpusController}.
+/**
+ * VirtualCorpusService handles the logic behind
+ * {@link VirtualCorpusController}.
+ * It communicates with {@link VirtualCorpusDao} and returns
+ * {@link VirtualCorpusDto} to {@link VirtualCorpusController}.
  * 
  * @author margaretha
  *
@@ -51,6 +54,8 @@ public class VirtualCorpusService {
 
     private static Logger jlog =
             LogManager.getLogger(VirtualCorpusService.class);
+
+    public static Pattern wordPattern = Pattern.compile("[\\w ]+");
 
     @Autowired
     private VirtualCorpusDao vcDao;
@@ -127,11 +132,14 @@ public class VirtualCorpusService {
         return dtos;
     }
 
-    /** Only admin and the owner of the virtual corpus are allowed to 
-     *  delete a virtual corpus.
-     *  
-     * @param username username
-     * @param vcId virtual corpus id
+    /**
+     * Only admin and the owner of the virtual corpus are allowed to
+     * delete a virtual corpus.
+     * 
+     * @param username
+     *            username
+     * @param vcId
+     *            virtual corpus id
      * @throws KustvaktException
      */
     public void deleteVC (String username, int vcId) throws KustvaktException {
@@ -219,11 +227,16 @@ public class VirtualCorpusService {
 
     public int storeVC (VirtualCorpusJson vc, String username)
             throws KustvaktException {
-
         ParameterChecker.checkStringValue(vc.getName(), "name");
         ParameterChecker.checkObjectValue(vc.getType(), "type");
         ParameterChecker.checkStringValue(vc.getCorpusQuery(), "corpusQuery");
 
+        String name = vc.getName();
+        if (!wordPattern.matcher(name).matches()) {
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
+                    "Virtual corpus name must only contains letters, numbers, underscores and spaces",
+                    name);
+        }
 
         if (vc.getType().equals(VirtualCorpusType.SYSTEM)
                 && !adminDao.isAdmin(username)) {
@@ -331,20 +344,21 @@ public class VirtualCorpusService {
         return false;
     }
 
-    //    public void editVCAccess (VirtualCorpusAccess access, String username)
-    //            throws KustvaktException {
+    // public void editVCAccess (VirtualCorpusAccess access, String
+    // username)
+    // throws KustvaktException {
     //
-    //        // get all the VCA admins
-    //        UserGroup userGroup = access.getUserGroup();
-    //        List<UserGroupMember> accessAdmins =
-    //                userGroupService.retrieveVCAccessAdmins(userGroup);
+    // // get all the VCA admins
+    // UserGroup userGroup = access.getUserGroup();
+    // List<UserGroupMember> accessAdmins =
+    // userGroupService.retrieveVCAccessAdmins(userGroup);
     //
-    //        User user = authManager.getUser(username);
-    //        if (!user.isSystemAdmin()) {
-    //            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-    //                    "Unauthorized operation for user: " + username, username);
-    //        }
-    //    }
+    // User user = authManager.getUser(username);
+    // if (!user.isSystemAdmin()) {
+    // throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+    // "Unauthorized operation for user: " + username, username);
+    // }
+    // }
 
     public List<VirtualCorpusAccessDto> listVCAccessByVC (String username,
             int vcId) throws KustvaktException {
@@ -419,7 +433,7 @@ public class VirtualCorpusService {
             }
 
             else if (VirtualCorpusType.PUBLISHED.equals(type)) {
-                // add user in the VC's auto group 
+                // add user in the VC's auto group
                 UserGroup userGroup =
                         userGroupService.retrieveHiddenUserGroupByVC(vcId);
                 try {
