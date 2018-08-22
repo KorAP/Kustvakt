@@ -139,6 +139,7 @@
 				</prop>
 				<prop key="hibernate.cache.provider_class">${hibernate.cache.provider}</prop>
 				<prop key="hibernate.cache.region.factory_class">${hibernate.cache.region.factory}</prop>
+				<prop key="hibernate.jdbc.time_zone">${hibernate.jdbc.time_zone}</prop>
 				<!-- <prop key="net.sf.ehcache.configurationResourceName">classpath:ehcache.xml</prop> -->
 			</props>
 		</property>

@@ -1,11 +1,16 @@
 package de.ids_mannheim.korap.oauth2.dao;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.KustvaktCacheable;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -18,6 +23,9 @@ import net.sf.ehcache.Element;
 
 public class AuthorizationCacheDao extends KustvaktCacheable
         implements AuthorizationDaoInterface {
+
+    @Autowired
+    private FullConfiguration config;
 
     public AuthorizationCacheDao () {
         super("authorization", "key:authorization");
@@ -43,7 +51,12 @@ public class AuthorizationCacheDao extends KustvaktCacheable
         authorization.setRedirectURI(redirectURI);
         authorization.setUserAuthenticationTime(authenticationTime);
         authorization.setNonce(nonce);
-        authorization.setCreatedDate(ZonedDateTime.now());
+
+        ZonedDateTime now =
+                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+        authorization.setCreatedDate(now);
+        authorization.setExpiryDate(
+                now.plusSeconds(config.getAuthorizationCodeExpiry()));
 
         this.storeInCache(code, authorization);
         return authorization;
@@ -77,11 +90,11 @@ public class AuthorizationCacheDao extends KustvaktCacheable
     public List<Authorization> retrieveAuthorizationsByClientId (
             String clientId) {
         List<Authorization> authList = new ArrayList<>();
-        
+
         Map<Object, Element> map = getAllCacheElements();
-        for (Object key : map.keySet()){
-            Authorization auth =  (Authorization) map.get(key).getObjectValue();
-            if (auth.getClientId().equals(clientId)){
+        for (Object key : map.keySet()) {
+            Authorization auth = (Authorization) map.get(key).getObjectValue();
+            if (auth.getClientId().equals(clientId)) {
                 authList.add(auth);
             }
         }

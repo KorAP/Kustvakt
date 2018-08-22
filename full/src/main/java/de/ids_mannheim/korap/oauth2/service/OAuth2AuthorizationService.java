@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.oauth2.service;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
@@ -8,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -123,7 +125,6 @@ public class OAuth2AuthorizationService {
         return redirectUri;
     }
 
-
     public Authorization retrieveAuthorization (String code)
             throws KustvaktException {
         return authorizationDao.retrieveAuthorizationCode(code);
@@ -143,7 +144,7 @@ public class OAuth2AuthorizationService {
                     "Invalid authorization", OAuth2Error.INVALID_GRANT);
         }
 
-        if (isExpired(authorization.getCreatedDate())) {
+        if (isExpired(authorization.getExpiryDate())) {
             throw new KustvaktException(StatusCodes.INVALID_AUTHORIZATION,
                     "Authorization expired", OAuth2Error.INVALID_GRANT);
         }
@@ -175,14 +176,13 @@ public class OAuth2AuthorizationService {
         authorizationDao.updateAuthorization(authorization);
     }
 
-    private boolean isExpired (ZonedDateTime createdDate) {
-        jlog.debug("createdDate: " + createdDate);
-        ZonedDateTime expiration =
-                createdDate.plusSeconds(config.getAuthorizationCodeExpiry());
-        ZonedDateTime now = ZonedDateTime.now();
-        jlog.debug("expiration: " + expiration + ", now: " + now);
+    private boolean isExpired (ZonedDateTime expiryDate) {
+        ZonedDateTime now =
+                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+        jlog.debug("createdDate: " + expiryDate);
+        jlog.debug("expiration: " + expiryDate + ", now: " + now);
 
-        if (expiration.isAfter(now)) {
+        if (expiryDate.isAfter(now)) {
             return false;
         }
         return true;

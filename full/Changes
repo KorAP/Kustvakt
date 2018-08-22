@@ -24,6 +24,9 @@
     - Improved and added OAuth2 tests (margaretha)
 21/08/2018
     - Added VC name pattern check (margaretha)
+22/08/2018
+    - Implemented loading VC from gz files (margaretha)
+    - Updated OAuth2 authorization codes' & access tokens' expiry check (margaretha)
 
 # version 0.60.5
 

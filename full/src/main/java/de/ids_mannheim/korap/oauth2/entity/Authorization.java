@@ -35,6 +35,8 @@ public class Authorization {
     private String redirectURI;
     @Column(name = "created_date", updatable = false)
     private ZonedDateTime createdDate;
+    @Column(name = "expiry_date")
+    private ZonedDateTime expiryDate;
     @Column(name = "is_revoked")
     private boolean isRevoked;
     @Column(name = "total_attempts")

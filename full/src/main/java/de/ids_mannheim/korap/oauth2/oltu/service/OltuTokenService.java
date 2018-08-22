@@ -124,8 +124,7 @@ public class OltuTokenService extends OAuth2TokenService {
                     OAuth2Error.INVALID_GRANT);
         }
         else if (ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE))
-                .isAfter(origin.getCreatedDate()
-                        .plusSeconds(config.getRefreshTokenExpiry()))) {
+                .isAfter(origin.getRefreshTokenExpiryDate())) {
             throw new KustvaktException(StatusCodes.INVALID_REFRESH_TOKEN,
                     "Refresh token is expired.", OAuth2Error.INVALID_GRANT);
         }
@@ -221,7 +220,7 @@ public class OltuTokenService extends OAuth2TokenService {
         if (scopes == null || scopes.isEmpty()) {
             scopes = new HashSet<String>(1);
             scopes.add("all");
-//            scopes = config.getDefaultAccessScopes();
+            // scopes = config.getDefaultAccessScopes();
         }
 
         ZonedDateTime authenticationTime =

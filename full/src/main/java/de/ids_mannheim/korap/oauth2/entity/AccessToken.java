@@ -31,8 +31,10 @@ public class AccessToken implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String token;
-    @Column(name = "created_date")
+    @Column(name = "created_date", updatable = false)
     private ZonedDateTime createdDate;
+    @Column(name = "expiry_date", updatable = false)
+    private ZonedDateTime expiryDate;
     @Column(name = "user_id")
     private String userId;
     @Column(name = "client_id")
@@ -43,6 +45,8 @@ public class AccessToken implements Serializable {
     private ZonedDateTime userAuthenticationTime;
     @Column(name = "refresh_token", updatable = false)
     private String refreshToken;
+    @Column(name = "refresh_expiry_date", updatable = false)
+    private ZonedDateTime refreshTokenExpiryDate;
     @Column(name = "is_refresh_revoked")
     private boolean isRefreshTokenRevoked;
 

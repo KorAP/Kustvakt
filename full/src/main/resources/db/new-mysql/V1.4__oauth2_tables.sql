@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS oauth2_client (
 	name VARCHAR(200) NOT NULL,
 	secret VARCHAR(200) DEFAULT NULL,
 	type VARCHAR(200) NOT NULL,
-	native BOOLEAN DEFAULT FALSE,
+	super BOOLEAN DEFAULT FALSE,
 	redirect_uri TEXT DEFAULT NULL,
 	description VARCHAR(250) NOT NULL,
 	registered_by VARCHAR(100) NOT NULL,
@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS oauth2_authorization (
 	user_id VARCHAR(100) NOT NULL,
 	redirect_uri TEXT DEFAULT NULL,
 	created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	expiry_date TIMESTAMP NULL,
 	is_revoked BOOLEAN DEFAULT 0,
 	total_attempts INTEGER DEFAULT 0,
 	user_auth_time TIMESTAMP NULL,
@@ -57,9 +58,11 @@ CREATE TABLE IF NOT EXISTS oauth2_access_token (
 	user_id VARCHAR(100) DEFAULT NULL,
 	client_id VARCHAR(100) DEFAULT NULL,
 	created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	expiry_date TIMESTAMP NULL,
 	is_revoked BOOLEAN DEFAULT 0,
 	user_auth_time TIMESTAMP NULL,
     refresh_token VARCHAR(255) DEFAULT NULL,
+    refresh_expiry_date TIMESTAMP NULL,
 	is_refresh_revoked BOOLEAN DEFAULT 0,
 	FOREIGN KEY (client_id)
 	   REFERENCES oauth2_client(id)

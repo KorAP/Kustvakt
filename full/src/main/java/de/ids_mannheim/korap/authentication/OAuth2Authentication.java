@@ -1,13 +1,11 @@
 package de.ids_mannheim.korap.authentication;
 
-import java.time.ZonedDateTime;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -25,8 +23,6 @@ public class OAuth2Authentication implements AuthenticationIface {
     private AccessTokenDao accessDao;
     @Autowired
     private OAuth2ScopeService scopeService;
-    @Autowired
-    private FullConfiguration config;
 
     @Override
     public TokenContext getTokenContext (String authToken)
@@ -38,14 +34,12 @@ public class OAuth2Authentication implements AuthenticationIface {
                     "Access token has been revoked");
         }
 
-        ZonedDateTime expiry = accessToken.getCreatedDate()
-                .plusSeconds(config.getAccessTokenExpiry());
         String scopes = scopeService
                 .convertAccessScopesToString(accessToken.getScopes());
 
         TokenContext c = new TokenContext();
         c.setUsername(accessToken.getUserId());
-        c.setExpirationTime(expiry.toInstant().toEpochMilli());
+        c.setExpirationTime(accessToken.getExpiryDate().toInstant().toEpochMilli());
         c.setToken(authToken);
         c.setTokenType(TokenType.BEARER);
         c.addContextParameter(Attributes.SCOPE, scopes);

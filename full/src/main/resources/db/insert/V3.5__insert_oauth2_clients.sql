@@ -47,6 +47,7 @@ VALUES("http://korap.ids-mannheim.de/public", 1360724310);
 --  "https://korap.ids-mannheim.de/public/redirect","system", 
 --  "This is a test super public client."); 
 
-INSERT INTO oauth2_access_token(token,user_id,created_date, user_auth_time)
-VALUES("fia0123ikBWn931470H8s5gRqx7Moc4p","marlin","2018-05-30 16:25:50",
-"2018-05-30 16:23:10");
+INSERT INTO oauth2_access_token(token,user_id,created_date, 
+expiry_date, refresh_expiry_date, user_auth_time)
+VALUES("fia0123ikBWn931470H8s5gRqx7Moc4p","marlin","2018-05-30 16:25:50", 
+"2018-05-31 16:25:50", "2018-08-30 16:25:50", "2018-05-30 16:23:10");

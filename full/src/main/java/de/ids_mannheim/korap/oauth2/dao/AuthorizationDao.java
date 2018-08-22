@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.oauth2.dao;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
@@ -12,9 +13,12 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
@@ -30,7 +34,9 @@ public class AuthorizationDao implements AuthorizationDaoInterface {
 
     @PersistenceContext
     private EntityManager entityManager;
-
+    @Autowired
+    private FullConfiguration config;
+    
     public Authorization storeAuthorizationCode (String clientId, String userId,
             String code, Set<AccessScope> scopes, String redirectURI,
             ZonedDateTime authenticationTime, String nonce)
@@ -50,6 +56,12 @@ public class AuthorizationDao implements AuthorizationDaoInterface {
         authorization.setRedirectURI(redirectURI);
         authorization.setUserAuthenticationTime(authenticationTime);
         authorization.setNonce(nonce);
+        
+        ZonedDateTime now =
+                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+        authorization.setCreatedDate(now);
+        authorization.setExpiryDate(
+                now.plusSeconds(config.getAuthorizationCodeExpiry()));
 
         entityManager.persist(authorization);
         // what if unique fails

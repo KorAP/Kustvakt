@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.oauth2.dao;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
@@ -13,9 +14,12 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.KustvaktCacheable;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -30,12 +34,14 @@ import de.ids_mannheim.korap.utils.ParameterChecker;
 @Transactional
 public class AccessTokenDao extends KustvaktCacheable {
 
+    @PersistenceContext
+    private EntityManager entityManager;
+    @Autowired
+    private FullConfiguration config;
+
     public AccessTokenDao () {
         super("access_token", "key:access_token");
     }
-
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @Deprecated
     public void storeAccessToken (Authorization authorization, String token)
@@ -64,7 +70,15 @@ public class AccessTokenDao extends KustvaktCacheable {
         ParameterChecker.checkObjectValue(authenticationTime,
                 "authentication time");
 
+        ZonedDateTime now =
+                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+        
         AccessToken accessToken = new AccessToken();
+        accessToken.setCreatedDate(now);
+        accessToken
+                .setExpiryDate(now.plusSeconds(config.getAccessTokenExpiry()));
+        accessToken.setRefreshTokenExpiryDate(
+                now.plusSeconds(config.getRefreshTokenExpiry()));
         accessToken.setToken(token);
         accessToken.setRefreshToken(refreshToken);
         accessToken.setScopes(scopes);
@@ -149,7 +163,6 @@ public class AccessTokenDao extends KustvaktCacheable {
         Predicate condition = builder.or(
                 builder.equal(root.get(AccessToken_.token), token),
                 builder.equal(root.get(AccessToken_.refreshToken), token));
-
 
         query.select(root);
         query.where(condition);
