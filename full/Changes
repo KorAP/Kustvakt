@@ -27,6 +27,9 @@
 22/08/2018
     - Implemented loading VC from gz files (margaretha)
     - Updated OAuth2 authorization codes' & access tokens' expiry check (margaretha)
+23/08/2018    
+    - Updated RefreshToken implementations with separate DB tables (margaretha)
+    - Allows multiple access tokens per refresh token (margaretha)
 
 # version 0.60.5
 

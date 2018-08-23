@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -43,12 +44,6 @@ public class AccessToken implements Serializable {
     private boolean isRevoked;
     @Column(name = "user_auth_time", updatable = false)
     private ZonedDateTime userAuthenticationTime;
-    @Column(name = "refresh_token", updatable = false)
-    private String refreshToken;
-    @Column(name = "refresh_expiry_date", updatable = false)
-    private ZonedDateTime refreshTokenExpiryDate;
-    @Column(name = "is_refresh_revoked")
-    private boolean isRefreshTokenRevoked;
 
     // @OneToOne(fetch=FetchType.LAZY, cascade=CascadeType.REMOVE)
     // @JoinColumn(name="authorization_id")
@@ -64,4 +59,7 @@ public class AccessToken implements Serializable {
                     columnNames = { "token_id", "scope_id" }))
     private Set<AccessScope> scopes;
 
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="refresh_token")
+    private RefreshToken refreshToken;
 }

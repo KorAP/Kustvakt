@@ -21,11 +21,13 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
 import de.ids_mannheim.korap.oauth2.dao.OAuth2ClientDao;
+import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientInfoDto;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
+import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
 import de.ids_mannheim.korap.oauth2.interfaces.AuthorizationDaoInterface;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
@@ -53,6 +55,8 @@ public class OAuth2ClientService {
     private OAuth2ClientDao clientDao;
     @Autowired
     private AccessTokenDao tokenDao;
+    @Autowired
+    private RefreshTokenDao refreshDao;
     @Autowired
     private AuthorizationDaoInterface authorizationDao;
     @Autowired
@@ -207,8 +211,14 @@ public class OAuth2ClientService {
                 tokenDao.retrieveAccessTokenByClientId(clientId);
         for (AccessToken token : tokens) {
             token.setRevoked(true);
-            token.setRefreshTokenRevoked(true);
             tokenDao.updateAccessToken(token);
+        }
+
+        List<RefreshToken> refreshTokens =
+                refreshDao.retrieveRefreshTokenByClientId(clientId);
+        for (RefreshToken token : refreshTokens) {
+            token.setRevoked(true);
+            refreshDao.updateRefreshToken(token);
         }
     }
 

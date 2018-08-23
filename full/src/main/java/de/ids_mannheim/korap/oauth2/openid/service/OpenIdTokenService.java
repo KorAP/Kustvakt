@@ -47,6 +47,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
+import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
@@ -73,6 +74,8 @@ public class OpenIdTokenService extends OAuth2TokenService {
 
     @Autowired
     private AccessTokenDao tokenDao;
+    @Autowired
+    private RefreshTokenDao refreshDao;
 
     public AccessTokenResponse requestAccessToken (TokenRequest tokenRequest)
             throws KustvaktException {
@@ -177,10 +180,11 @@ public class OpenIdTokenService extends OAuth2TokenService {
                 new BearerAccessToken(config.getAccessTokenExpiry(), scope);
 
         RefreshToken refreshToken = new RefreshToken();
-
-        tokenDao.storeAccessToken(accessToken.getValue(),
-                refreshToken.getValue(),
-                scopeService.convertToAccessScope(scopeSet), username,
+        Set<AccessScope> scopes = scopeService.convertToAccessScope(scopeSet);
+        de.ids_mannheim.korap.oauth2.entity.RefreshToken rt =
+                refreshDao.storeRefreshToken(refreshToken.getValue(), username,
+                        authenticationTime, clientId.getValue(), scopes);
+        tokenDao.storeAccessToken(accessToken.getValue(), rt, scopes, username,
                 clientIdStr, authenticationTime);
 
         return createsAccessTokenResponse(accessToken, refreshToken, scope,
@@ -230,10 +234,14 @@ public class OpenIdTokenService extends OAuth2TokenService {
         AccessToken accessToken =
                 new BearerAccessToken(config.getAccessTokenExpiry(), scope);
         RefreshToken refreshToken = new RefreshToken();
+        de.ids_mannheim.korap.oauth2.entity.RefreshToken rt =
+                refreshDao.storeRefreshToken(refreshToken.getValue(),
+                        authorization.getUserId(),
+                        authorization.getUserAuthenticationTime(),
+                        authorization.getClientId(), scopes);
 
-        tokenDao.storeAccessToken(accessToken.getValue(),
-                refreshToken.getValue(), scopes, authorization.getUserId(),
-                authorization.getClientId(),
+        tokenDao.storeAccessToken(accessToken.getValue(), rt, scopes,
+                authorization.getUserId(), authorization.getClientId(),
                 authorization.getUserAuthenticationTime());
 
         return createsAccessTokenResponse(accessToken, refreshToken, scope,
@@ -264,7 +272,6 @@ public class OpenIdTokenService extends OAuth2TokenService {
             return new AccessTokenResponse(tokens);
         }
     }
-
 
     private String[] extractClientCredentials (
             ClientAuthentication clientAuthentication)

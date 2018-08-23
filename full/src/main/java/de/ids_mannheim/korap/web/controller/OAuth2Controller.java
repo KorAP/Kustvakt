@@ -85,10 +85,10 @@ public class OAuth2Controller {
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
         String username = tokenContext.getUsername();
         ZonedDateTime authTime = tokenContext.getAuthenticationTime();
-        
+
         try {
             scopeService.verifyScope(tokenContext, OAuth2Scope.AUTHORIZE);
-        
+
             HttpServletRequest requestWithForm =
                     new FormRequestWrapper(request, form);
             OAuth2AuthorizationRequest authzRequest =
@@ -108,7 +108,6 @@ public class OAuth2Controller {
         }
     }
 
-
     /**
      * Grants a client an access token, namely a string used in
      * authenticated requests representing user authorization for
@@ -117,9 +116,8 @@ public class OAuth2Controller {
      * 
      * <br /><br />
      * 
-     * Clients may refreshing access token using this endpoint. This
-     * request will revoke all access token associated with the given
-     * refresh token, and grants a new access token. The refresh token
+     * Clients may request refresh access token using this endpoint.
+     * This request will grants a new access token. The refresh token
      * is not changed and can be used until it expires.
      * 
      * <br /><br />

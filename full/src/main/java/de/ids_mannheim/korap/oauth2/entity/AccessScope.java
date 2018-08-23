@@ -38,6 +38,9 @@ public class AccessScope implements Serializable{
     
     @ManyToMany(mappedBy = "scopes", fetch = FetchType.LAZY)
     private List<AccessToken> accessTokens;
+    
+    @ManyToMany(mappedBy = "scopes", fetch = FetchType.LAZY)
+    private List<RefreshToken> refreshTokens;
 
     @Override
     public String toString () {

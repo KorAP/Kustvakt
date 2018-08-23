@@ -30,7 +30,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * @author margaretha
  *
  */
-public class OAuth2TestBase extends SpringJerseyTest {
+public abstract class OAuth2TestBase extends SpringJerseyTest {
 
     protected String publicClientId = "8bIDtZnH6NvRkW2Fq";
     protected String confidentialClientId = "9aHsGW6QflV13ixNpez";

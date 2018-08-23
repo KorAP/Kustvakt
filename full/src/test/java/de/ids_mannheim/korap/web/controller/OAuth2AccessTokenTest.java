@@ -195,8 +195,8 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
     }
 
     @Test
-    public void testRevokedAccessTokenAfterRequestRefreshToken ()
-            throws KustvaktException {
+    public void testAccessTokenAfterRequestRefreshToken ()
+            throws KustvaktException, IOException {
         String code = requestAuthorizationCode(confidentialClientId,
                 clientSecret, null, userAuthHeader);
         JsonNode node = requestTokenWithAuthorizationCodeAndHeader(
@@ -224,7 +224,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         assertNotNull(node.at("/access_token").asText());
         assertEquals(refreshToken, node.at("/refresh_token").asText());
 
-        testSearchWithRevokedAccessToken(accessToken);
+        testSearchWithOAuth2Token(accessToken);
     }
 
     @Test

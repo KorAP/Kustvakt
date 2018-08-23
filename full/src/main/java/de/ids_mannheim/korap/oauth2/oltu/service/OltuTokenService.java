@@ -3,9 +3,9 @@ package de.ids_mannheim.korap.oauth2.oltu.service;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
+import javax.persistence.NoResultException;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.oltu.oauth2.as.request.AbstractOAuthTokenRequest;
@@ -23,10 +23,12 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
+import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
+import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
 import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
 
@@ -38,6 +40,8 @@ public class OltuTokenService extends OAuth2TokenService {
 
     @Autowired
     private AccessTokenDao tokenDao;
+    @Autowired
+    private RefreshTokenDao refreshDao;
 
     public OAuthResponse requestAccessToken (
             AbstractOAuthTokenRequest oAuthRequest)
@@ -82,7 +86,7 @@ public class OltuTokenService extends OAuth2TokenService {
      * Client authentication is done using the given client
      * credentials.
      * 
-     * @param refreshToken
+     * @param refreshTokenStr
      * @param scopes
      * @param clientId
      * @param clientSecret
@@ -91,58 +95,52 @@ public class OltuTokenService extends OAuth2TokenService {
      * @throws OAuthSystemException
      */
     private OAuthResponse requestAccessTokenWithRefreshToken (
-            String refreshToken, Set<String> scopes, String clientId,
+            String refreshTokenStr, Set<String> scopes, String clientId,
             String clientSecret)
             throws KustvaktException, OAuthSystemException {
 
-        if (refreshToken == null || refreshToken.isEmpty()) {
+        if (refreshTokenStr == null || refreshTokenStr.isEmpty()) {
             throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
                     "Missing parameters: refresh_token",
                     OAuth2Error.INVALID_REQUEST);
         }
 
         clientService.authenticateClient(clientId, clientSecret);
-        List<AccessToken> accessTokenList =
-                tokenDao.retrieveAccessTokenByRefreshToken(refreshToken);
-        if (accessTokenList.isEmpty()) {
+
+        RefreshToken refreshToken;
+        try {
+            refreshToken = refreshDao.retrieveRefreshToken(refreshTokenStr);
+        }
+        catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.INVALID_REFRESH_TOKEN,
                     "Refresh token is not found", OAuth2Error.INVALID_GRANT);
         }
 
-        AccessToken latestAccessToken = accessTokenList.get(0);
-        AccessToken origin = accessTokenList.get(accessTokenList.size() - 1);
-
-        if (!clientId.equals(latestAccessToken.getClientId())) {
+        if (!clientId.equals(refreshToken.getClientId())) {
             throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
                     "Client " + clientId + "is not authorized",
                     OAuth2Error.INVALID_CLIENT);
         }
-
-        if (latestAccessToken.isRefreshTokenRevoked()) {
+        else if (refreshToken.isRevoked()) {
             throw new KustvaktException(StatusCodes.INVALID_REFRESH_TOKEN,
                     "Refresh token has been revoked.",
                     OAuth2Error.INVALID_GRANT);
         }
         else if (ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE))
-                .isAfter(origin.getRefreshTokenExpiryDate())) {
+                .isAfter(refreshToken.getExpiryDate())) {
             throw new KustvaktException(StatusCodes.INVALID_REFRESH_TOKEN,
                     "Refresh token is expired.", OAuth2Error.INVALID_GRANT);
         }
 
-        Set<AccessScope> requestedScopes = latestAccessToken.getScopes();
+        Set<AccessScope> requestedScopes = refreshToken.getScopes();
         if (scopes != null && !scopes.isEmpty()) {
-            requestedScopes = scopeService.verifyRefreshScope(scopes,
-                    latestAccessToken.getScopes());
-        }
-
-        if (!latestAccessToken.isRevoked()) {
-            latestAccessToken.setRevoked(true);
-            tokenDao.updateAccessToken(latestAccessToken);
+            requestedScopes =
+                    scopeService.verifyRefreshScope(scopes, requestedScopes);
         }
 
         return createsAccessTokenResponse(scopes, requestedScopes, clientId,
-                latestAccessToken.getUserId(),
-                latestAccessToken.getUserAuthenticationTime(), refreshToken);
+                refreshToken.getUserId(),
+                refreshToken.getUserAuthenticationTime(), refreshToken);
     }
 
     /**
@@ -310,17 +308,19 @@ public class OltuTokenService extends OAuth2TokenService {
             ZonedDateTime authenticationTime)
             throws OAuthSystemException, KustvaktException {
 
-        String refreshToken = randomGenerator.createRandomCode();
+        String random = randomGenerator.createRandomCode();
+        RefreshToken refreshToken = refreshDao.storeRefreshToken(random, userId,
+                authenticationTime, clientId, accessScopes);
         return createsAccessTokenResponse(scopes, accessScopes, clientId,
                 userId, authenticationTime, refreshToken);
     }
 
     private OAuthResponse createsAccessTokenResponse (Set<String> scopes,
             Set<AccessScope> accessScopes, String clientId, String userId,
-            ZonedDateTime authenticationTime, String refreshToken)
+            ZonedDateTime authenticationTime, RefreshToken refreshToken)
             throws OAuthSystemException, KustvaktException {
-        String accessToken = randomGenerator.createRandomCode();
 
+        String accessToken = randomGenerator.createRandomCode();
         tokenDao.storeAccessToken(accessToken, refreshToken, accessScopes,
                 userId, clientId, authenticationTime);
 
@@ -328,7 +328,7 @@ public class OltuTokenService extends OAuth2TokenService {
                 .setAccessToken(accessToken)
                 .setTokenType(TokenType.BEARER.toString())
                 .setExpiresIn(String.valueOf(config.getAccessTokenExpiry()))
-                .setRefreshToken(refreshToken)
+                .setRefreshToken(refreshToken.getToken())
                 .setScope(String.join(" ", scopes)).buildJSONMessage();
     }
 
@@ -368,17 +368,23 @@ public class OltuTokenService extends OAuth2TokenService {
     }
 
     private boolean revokeRefreshToken (String token) throws KustvaktException {
-        List<AccessToken> accessTokenList =
-                tokenDao.retrieveAccessTokenByRefreshToken(token);
-        if (accessTokenList.isEmpty()) {
+        RefreshToken refreshToken = null;
+        try {
+            refreshToken = refreshDao.retrieveRefreshToken(token);
+        }
+        catch (NoResultException e) {
             return false;
         }
 
+        refreshToken.setRevoked(true);
+        refreshDao.updateRefreshToken(refreshToken);
+
+        Set<AccessToken> accessTokenList = refreshToken.getAccessTokens();
         for (AccessToken accessToken : accessTokenList) {
             accessToken.setRevoked(true);
-            accessToken.setRefreshTokenRevoked(true);
             tokenDao.updateAccessToken(accessToken);
         }
+
         return true;
     }
 }

@@ -11,7 +11,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,7 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken_;
-import de.ids_mannheim.korap.oauth2.entity.Authorization;
+import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
 @Repository
@@ -43,23 +42,7 @@ public class AccessTokenDao extends KustvaktCacheable {
         super("access_token", "key:access_token");
     }
 
-    @Deprecated
-    public void storeAccessToken (Authorization authorization, String token)
-            throws KustvaktException {
-        ParameterChecker.checkObjectValue(authorization, "Authorization");
-        ParameterChecker.checkStringValue(token, "accessToken");
-
-        AccessToken accessToken = new AccessToken();
-        // accessToken.setAuthorization(authorization);
-        accessToken.setUserId(authorization.getUserId());
-        accessToken.setToken(token);
-        accessToken.setScopes(authorization.getScopes());
-        accessToken.setUserAuthenticationTime(
-                authorization.getUserAuthenticationTime());
-        entityManager.persist(accessToken);
-    }
-
-    public void storeAccessToken (String token, String refreshToken,
+    public void storeAccessToken (String token, RefreshToken refreshToken,
             Set<AccessScope> scopes, String userId, String clientId,
             ZonedDateTime authenticationTime) throws KustvaktException {
         ParameterChecker.checkStringValue(token, "access token");
@@ -77,8 +60,6 @@ public class AccessTokenDao extends KustvaktCacheable {
         accessToken.setCreatedDate(now);
         accessToken
                 .setExpiryDate(now.plusSeconds(config.getAccessTokenExpiry()));
-        accessToken.setRefreshTokenExpiryDate(
-                now.plusSeconds(config.getRefreshTokenExpiry()));
         accessToken.setToken(token);
         accessToken.setRefreshToken(refreshToken);
         accessToken.setScopes(scopes);
@@ -120,57 +101,6 @@ public class AccessTokenDao extends KustvaktCacheable {
             token = (AccessToken) q.getSingleResult();
             this.storeInCache(accessToken, token);
             return token;
-        }
-        catch (NoResultException e) {
-            throw new KustvaktException(StatusCodes.INVALID_ACCESS_TOKEN,
-                    "Access token is not found", OAuth2Error.INVALID_TOKEN);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<AccessToken> retrieveAccessTokenByRefreshToken (
-            String refreshToken) throws KustvaktException {
-
-        ParameterChecker.checkStringValue(refreshToken, "refresh_token");
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<AccessToken> query =
-                builder.createQuery(AccessToken.class);
-        Root<AccessToken> root = query.from(AccessToken.class);
-        Predicate condition = builder.equal(root.get(AccessToken_.refreshToken),
-                refreshToken);
-
-        query.select(root);
-        query.where(condition);
-        query.orderBy(builder.desc(root.get(AccessToken_.createdDate)));
-
-        Query q = entityManager.createQuery(query);
-        return q.getResultList();
-    }
-
-    public AccessToken retrieveAccessTokenByAnynomousToken (String token)
-            throws KustvaktException {
-        ParameterChecker.checkObjectValue(token, "token");
-        AccessToken accessToken = (AccessToken) this.getCacheValue(token);
-        if (accessToken != null) {
-            return accessToken;
-        }
-
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<AccessToken> query =
-                builder.createQuery(AccessToken.class);
-
-        Root<AccessToken> root = query.from(AccessToken.class);
-        Predicate condition = builder.or(
-                builder.equal(root.get(AccessToken_.token), token),
-                builder.equal(root.get(AccessToken_.refreshToken), token));
-
-        query.select(root);
-        query.where(condition);
-        Query q = entityManager.createQuery(query);
-
-        try {
-            accessToken = (AccessToken) q.getSingleResult();
-            return accessToken;
         }
         catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.INVALID_ACCESS_TOKEN,
