@@ -54,28 +54,6 @@ CREATE TABLE IF NOT EXISTS oauth2_access_scope (
 --	UNIQUE INDEX authorization_scope_index(authorization_id, scope_id)
 --);
 
-CREATE TABLE IF NOT EXISTS oauth2_access_token (
-	id INTEGER PRIMARY KEY AUTO_INCREMENT,
-	token VARCHAR(255) NOT NULL,
-	user_id VARCHAR(100) DEFAULT NULL,
-	client_id VARCHAR(100) DEFAULT NULL,
-	created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	expiry_date TIMESTAMP NULL,
-	is_revoked BOOLEAN DEFAULT 0,
-	user_auth_time TIMESTAMP NULL,
-    refresh_token VARCHAR(255) DEFAULT NULL,
-	FOREIGN KEY (client_id)
-	   REFERENCES oauth2_client(id),
-	FOREIGN KEY (refresh_token)
-	   REFERENCES oauth2_refresh_token(id)
-);
-
-CREATE TABLE oauth2_access_token_scope (
-	token_id INTEGER NOT NULL, 
-	scope_id VARCHAR(100) NOT NULL, 
-	CONSTRAINT primary_key PRIMARY KEY (token_id, scope_id)
-);
-
 CREATE TABLE IF NOT EXISTS oauth2_refresh_token (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT,
 	token VARCHAR(255) NOT NULL,
@@ -93,3 +71,26 @@ CREATE TABLE oauth2_refresh_token_scope (
 	scope_id VARCHAR(100) NOT NULL, 
 	CONSTRAINT primary_key PRIMARY KEY (token_id, scope_id)
 );
+
+CREATE TABLE IF NOT EXISTS oauth2_access_token (
+	id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	token VARCHAR(255) NOT NULL,
+	user_id VARCHAR(100) DEFAULT NULL,
+	client_id VARCHAR(100) DEFAULT NULL,
+	created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	expiry_date TIMESTAMP NULL,
+	is_revoked BOOLEAN DEFAULT 0,
+	user_auth_time TIMESTAMP NULL,
+    refresh_token INTEGER DEFAULT NULL,
+	FOREIGN KEY (client_id)
+	   REFERENCES oauth2_client(id),
+	FOREIGN KEY (refresh_token)
+	   REFERENCES oauth2_refresh_token(id)
+);
+
+CREATE TABLE oauth2_access_token_scope (
+	token_id INTEGER NOT NULL, 
+	scope_id VARCHAR(100) NOT NULL, 
+	CONSTRAINT primary_key PRIMARY KEY (token_id, scope_id)
+);
+

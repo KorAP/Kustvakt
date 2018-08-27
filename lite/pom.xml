@@ -83,9 +83,9 @@
 					<forkCount>2</forkCount>
 					<threadCount>4</threadCount>
 					<argLine>-Xmx512m -XX:MaxPermSize=256m</argLine>
-					<includes>
-						<include>de/ids_mannheim/korap/**/*.java</include>
-					</includes>
+					<excludes>
+						<exclude>**/VCReferenceTest.java</exclude>>
+					</excludes>
 				</configuration>
 			</plugin>
 			<plugin>

@@ -30,6 +30,9 @@
 23/08/2018    
     - Updated RefreshToken implementations with separate DB tables (margaretha)
     - Allows multiple access tokens per refresh token (margaretha)
+27/08/2018
+    - Added statistic with VC reference tests (margaretha)
+    - Fixed OAuth2 SQL files (margaretha) 
 
 # version 0.60.5
 

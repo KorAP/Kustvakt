@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.web.controller;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -24,7 +25,7 @@ public class VCReferenceTest extends SpringJerseyTest {
         testSearchWithVCRefEqual();
         testSearchWithVCRefNotEqual();
     }
-    
+
     private void testSearchWithoutVCRefOr () throws KustvaktException {
         ClientResponse response = resource().path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
@@ -36,7 +37,7 @@ public class VCReferenceTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertTrue(node.at("/matches").size() > 0);
     }
-    
+
     private void testSearchWithoutVCRefAnd () throws KustvaktException {
         ClientResponse response = resource().path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
@@ -58,9 +59,9 @@ public class VCReferenceTest extends SpringJerseyTest {
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertTrue(node.at("/matches").size() > 0);
-        
+
     }
-    
+
     public void testSearchWithVCRefNotEqual () throws KustvaktException {
         ClientResponse response = resource().path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
@@ -72,4 +73,22 @@ public class VCReferenceTest extends SpringJerseyTest {
         assertTrue(node.at("/matches").size() > 0);
     }
 
+    @Test
+    public void testStatisticsWithVCReference () throws KustvaktException {
+        String corpusQuery = "availability = /CC-BY.*/ & referTo named-vc1";
+        ClientResponse response = resource().path("statistics")
+                .queryParam("corpusQuery", corpusQuery)
+                .get(ClientResponse.class);
+
+        String ent = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertEquals(2, node.at("/documents").asInt());
+    }
+
+    @Test
+    public void testStatisticsWithAutoCachingAndVCReference ()
+            throws KustvaktException {
+        testSearchWithVCRefEqual();
+        testStatisticsWithVCReference();
+    }
 }

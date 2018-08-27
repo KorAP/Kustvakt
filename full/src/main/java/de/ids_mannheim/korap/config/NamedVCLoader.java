@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.KrillCollection;
+import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.web.SearchKrill;
 
 @Component
@@ -24,7 +25,7 @@ public class NamedVCLoader {
 
     private static Logger jlog = LogManager.getLogger(NamedVCLoader.class);
 
-    public void loadVCToCache () throws IOException {
+    public void loadVCToCache () throws IOException, QueryException {
 
         String dir = config.getNamedVCPath();
         File d = new File(dir);

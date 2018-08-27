@@ -2,6 +2,8 @@ version 0.60.2
 05/07/2018
     - Added support for unrestricted corpus statistics (ndiewald)
     - Do not pass broken queries to Krill (diewald)
+27/08/2018
+    - Added vc reference test (margaretha)
 
 version 0.60.1
 12/06/2018

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
 import de.ids_mannheim.korap.oauth2.dao.AccessScopeDao;
+import de.ids_mannheim.korap.util.QueryException;
 
 /**
  * Initializes values in the database from kustvakt configuration and
@@ -24,7 +25,7 @@ public class Initializator {
 
     public Initializator () {}
 
-    public void init () throws IOException {
+    public void init () throws IOException, QueryException {
         setInitialAccessScope();
         loader.loadVCToCache();
     }

@@ -132,4 +132,5 @@ public class StatisticsControllerTest extends SpringJerseyTest {
         assertEquals(25074, node.at("/sentences").asInt());
         assertEquals(772, node.at("/paragraphs").asInt());
     }
+   
 }
