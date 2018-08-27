@@ -19,7 +19,7 @@ public class VCReferenceTest extends SpringJerseyTest {
         testSearchWithoutVCRefOr();
         testSearchWithoutVCRefAnd();
         // auto caching
-        testSearchWithVCRefEqual();
+        testStatisticsWithVCReference();
         testSearchWithVCRefNotEqual();
         // retrieve from cache
         testSearchWithVCRefEqual();
@@ -73,7 +73,6 @@ public class VCReferenceTest extends SpringJerseyTest {
         assertTrue(node.at("/matches").size() > 0);
     }
 
-    @Test
     public void testStatisticsWithVCReference () throws KustvaktException {
         String corpusQuery = "availability = /CC-BY.*/ & referTo named-vc1";
         ClientResponse response = resource().path("statistics")
@@ -85,10 +84,4 @@ public class VCReferenceTest extends SpringJerseyTest {
         assertEquals(2, node.at("/documents").asInt());
     }
 
-    @Test
-    public void testStatisticsWithAutoCachingAndVCReference ()
-            throws KustvaktException {
-        testSearchWithVCRefEqual();
-        testStatisticsWithVCReference();
-    }
 }
