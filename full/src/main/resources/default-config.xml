@@ -18,9 +18,6 @@
 	<context:component-scan base-package="de.ids_mannheim.korap" />
 	<context:annotation-config />
 
-	<!-- <bean id="test" class="de.ids_mannheim.korap.web.Test"> <property name="config" 
-		ref="kustvakt_config" /> </bean> -->
-
 	<bean id="props"
 		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
 		<property name="ignoreResourceNotFound" value="true" />
@@ -70,8 +67,22 @@
 		<property name="maxTotal" value="4" />
 		<property name="maxIdle" value="2" />
 		<property name="minIdle" value="1" />
-		<property name="maxWaitMillis" value="15000" />
+		<property name="maxWaitMillis" value="-1" />
 		<!--<property name="poolPreparedStatements" value="true"/> -->
+	</bean>
+	
+	<bean id="c3p0DataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close" lazy-init="true">
+		<property name="driverClass" value="${jdbc.driverClassName}" />
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		<property name="user" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="maxPoolSize" value="4" />
+		<property name="minPoolSize" value="1" />
+		<property name="maxStatements" value="100" />
+		<!-- <property name="testConnectionOnCheckOut" value="true" /> -->
+		<property name="idleConnectionTestPeriod" value="60" />
+		<property name="testConnectionOnCheckin" value="true" />
 	</bean>
 
 	<bean id="sqliteDataSource"
@@ -102,7 +113,9 @@
 		<!-- <property name="cleanOnValidationError" value="true" /> -->
 		<property name="locations" value="${jdbc.schemaPath}" />
 		<!-- <property name="dataSource" ref="dataSource" /> -->
-		<property name="dataSource" ref="sqliteDataSource" />
+		<!-- <property name="dataSource" ref="sqliteDataSource" /> -->
+		<property name="dataSource" ref="c3p0DataSource" />
+		
 	</bean>
 
 
@@ -115,7 +128,8 @@
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<!-- <property name="dataSource" ref="dataSource" /> -->
-		<property name="dataSource" ref="sqliteDataSource" />
+		<!-- <property name="dataSource" ref="sqliteDataSource" /> -->
+		<property name="dataSource" ref="c3p0DataSource" />
 
 		<property name="packagesToScan">
 			<array>
@@ -140,11 +154,6 @@
 				<prop key="hibernate.cache.provider_class">${hibernate.cache.provider}</prop>
 				<prop key="hibernate.cache.region.factory_class">${hibernate.cache.region.factory}</prop>
 				<prop key="hibernate.jdbc.time_zone">${hibernate.jdbc.time_zone}</prop>
-				<!-- <prop key="net.sf.ehcache.configurationResourceName">classpath:ehcache.xml</prop> -->
-				
-				<prop key="connection.autoReconnect">true</prop>
-				<prop key="connection.autoReconnectForPools">true</prop>
-				<prop key="connection.is-connection-validation-required">true</prop>
 			</props>
 		</property>
 	</bean>
@@ -328,7 +337,8 @@
 	<bean id="txManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<!-- <property name="dataSource" ref="dataSource" /> -->
-		<property name="dataSource" ref="sqliteDataSource" />
+		<!-- <property name="dataSource" ref="sqliteDataSource" /> -->
+		<property name="dataSource" ref="c3p0DataSource" />
 	</bean>
 
 	<!-- mail -->

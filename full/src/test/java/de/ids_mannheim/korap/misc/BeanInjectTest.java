@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.config;
+package de.ids_mannheim.korap.misc;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -8,6 +8,7 @@ import java.util.Collection;
 import org.junit.Test;
 import org.springframework.aop.support.AopUtils;
 
+import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.handlers.DocumentDao;
 import de.ids_mannheim.korap.handlers.UserDetailsDao;
 import de.ids_mannheim.korap.handlers.UserSettingsDao;

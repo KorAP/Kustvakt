@@ -33,6 +33,12 @@
 27/08/2018
     - Added statistic with VC reference tests (margaretha)
     - Fixed OAuth2 SQL files (margaretha) 
+28/08/2018
+    - Added c3p0 datasource configuration to Spring default-config-xml (margaretha)
+    - Added running Kustvakt server with custom spring config in the readme (margaretha)
+    - Removed old OAuth2 codes (margaretha)    
+    - Moved non-config test codes to misc (margaretha)
+    
 
 # version 0.60.5
 

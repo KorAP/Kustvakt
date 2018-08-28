@@ -124,6 +124,16 @@ cd target/
 java -jar target/Kustvakt-[lite/full]-[version].jar    
 </pre>
 
+To run Kustvakt with a custom spring XML config, the config must be included in the classpath. For instance:
+
+<pre>
+cd target/
+java -cp Kustvakt-full-[version].jar:config de.ids_mannheim.korap.server.KustvaktServer 
+--spring-config custom-spring-config.xml
+</pre>
+
+where ```custom-spring-config.xml``` is in the ```config``` folder.
+
 
 # Futher Setup
 

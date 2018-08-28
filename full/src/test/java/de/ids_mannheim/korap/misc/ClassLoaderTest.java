@@ -1,10 +1,13 @@
-package de.ids_mannheim.korap.config;
+package de.ids_mannheim.korap.misc;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import de.ids_mannheim.korap.config.BeanConfigTest;
+import de.ids_mannheim.korap.config.ContextHolder;
+import de.ids_mannheim.korap.config.DefaultHandler;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.handlers.JDBCAuditing;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;

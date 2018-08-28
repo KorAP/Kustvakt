@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.config;
+package de.ids_mannheim.korap.misc;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -13,6 +13,8 @@ import java.util.Properties;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import de.ids_mannheim.korap.config.BeanConfigTest;
+import de.ids_mannheim.korap.config.ConfigLoader;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.utils.ServiceInfo;
