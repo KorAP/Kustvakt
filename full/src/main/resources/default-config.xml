@@ -113,8 +113,8 @@
 		<!-- <property name="cleanOnValidationError" value="true" /> -->
 		<property name="locations" value="${jdbc.schemaPath}" />
 		<!-- <property name="dataSource" ref="dataSource" /> -->
-		<!-- <property name="dataSource" ref="sqliteDataSource" /> -->
-		<property name="dataSource" ref="c3p0DataSource" />
+		<property name="dataSource" ref="sqliteDataSource" />
+		<!-- <property name="dataSource" ref="c3p0DataSource" /> -->
 		
 	</bean>
 
@@ -128,8 +128,8 @@
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<!-- <property name="dataSource" ref="dataSource" /> -->
-		<!-- <property name="dataSource" ref="sqliteDataSource" /> -->
-		<property name="dataSource" ref="c3p0DataSource" />
+		<property name="dataSource" ref="sqliteDataSource" />
+		<!-- <property name="dataSource" ref="c3p0DataSource" /> -->
 
 		<property name="packagesToScan">
 			<array>
@@ -337,8 +337,8 @@
 	<bean id="txManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<!-- <property name="dataSource" ref="dataSource" /> -->
-		<!-- <property name="dataSource" ref="sqliteDataSource" /> -->
-		<property name="dataSource" ref="c3p0DataSource" />
+		<property name="dataSource" ref="sqliteDataSource" />
+		<!-- <property name="dataSource" ref="c3p0DataSource" /> -->
 	</bean>
 
 	<!-- mail -->
