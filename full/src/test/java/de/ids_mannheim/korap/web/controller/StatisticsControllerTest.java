@@ -27,7 +27,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     public void testGetStatisticsNoResource ()
             throws JsonProcessingException, IOException {
         String corpusQuery = "corpusSigle=WPD15";
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", corpusQuery)
                 .get(ClientResponse.class);
@@ -45,7 +45,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     public void testGetStatisticsWithcorpusQuery1 ()
             throws JsonProcessingException, IOException {
         String corpusQuery = "corpusSigle=GOE";
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", corpusQuery)
                 .get(ClientResponse.class);
@@ -62,7 +62,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     @Test
     public void testGetStatisticsWithcorpusQuery2 ()
             throws JsonProcessingException, IOException {
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", "creationDate since 1810")
                 .get(ClientResponse.class);
@@ -79,7 +79,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     @Test
     public void testGetStatisticsWithWrongcorpusQuery ()
             throws JsonProcessingException, IOException {
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", "creationDate geq 1810")
                 .get(ClientResponse.class);
@@ -99,7 +99,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     @Test
     public void testGetStatisticsWithWrongcorpusQuery2 ()
             throws JsonProcessingException, IOException {
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", "creationDate >= 1810")
                 .get(ClientResponse.class);
@@ -118,7 +118,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     @Test
     public void testGetStatisticsWithoutcorpusQuery ()
             throws JsonProcessingException, IOException {
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
                 .get(ClientResponse.class);
 

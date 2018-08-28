@@ -54,7 +54,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
 
     private ClientResponse sendAuthorizationRequest (
             MultivaluedMap<String, String> form) throws KustvaktException {
-        return resource().path("oauth2").path("openid").path("authorize")
+        return resource().path(API_VERSION).path("oauth2").path("openid").path("authorize")
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(username,
@@ -67,7 +67,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
 
     private ClientResponse sendTokenRequest (
             MultivaluedMap<String, String> form) throws KustvaktException {
-        return resource().path("oauth2").path("openid").path("token")
+        return resource().path(API_VERSION).path("oauth2").path("openid").path("token")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
@@ -399,7 +399,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
 
     @Test
     public void testPublicKeyAPI () throws KustvaktException {
-        ClientResponse response = resource().path("oauth2").path("openid")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("openid")
                 .path("jwks").get(ClientResponse.class);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -413,7 +413,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
 
     @Test
     public void testOpenIDConfiguration () throws KustvaktException {
-        ClientResponse response = resource().path("oauth2").path("openid")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("openid")
                 .path("config").get(ClientResponse.class);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);

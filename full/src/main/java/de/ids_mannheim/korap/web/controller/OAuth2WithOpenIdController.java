@@ -42,12 +42,14 @@ import de.ids_mannheim.korap.oauth2.openid.service.OpenIdTokenService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OpenIdResponseHandler;
+import de.ids_mannheim.korap.web.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.utils.MapUtils;
 
 @Controller
-@Path("oauth2/openid")
+@Path("{version}/oauth2/openid")
+@ResourceFilters({APIVersionFilter.class})
 public class OAuth2WithOpenIdController {
 
     @Autowired

@@ -16,8 +16,6 @@ import de.ids_mannheim.korap.web.KustvaktBaseServer;
  */
 public class KustvaktServer extends KustvaktBaseServer {
 
-    public static final String API_VERSION = "v0.1";
-    
     public static void main (String[] args) throws Exception {
         KustvaktServer server = new KustvaktServer();
         kargs = server.readAttributes(args);

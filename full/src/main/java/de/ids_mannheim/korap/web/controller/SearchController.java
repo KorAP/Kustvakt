@@ -21,7 +21,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.sun.jersey.spi.container.ResourceFilters;
 
@@ -31,6 +30,7 @@ import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.SearchService;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
+import de.ids_mannheim.korap.web.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
@@ -43,10 +43,9 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
  * 
  */
 @Controller
-@Path("/")
-@RequestMapping("/")
-@ResourceFilters({ AuthenticationFilter.class, DemoUserFilter.class,
-        PiwikFilter.class })
+@Path("/{version}/")
+@ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
+        DemoUserFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class SearchController {
 
@@ -127,7 +126,6 @@ public class SearchController {
         return Response.ok(result).build();
     }
 
-
     @GET
     @Path("search")
     public Response searchGet (@Context SecurityContext securityContext,
@@ -180,7 +178,6 @@ public class SearchController {
         return Response.ok(results).build();
     }
 
-
     /*
      * Returns the meta data fields of a certain document
      */
@@ -196,7 +193,6 @@ public class SearchController {
                 searchService.retrieveDocMetadata(corpusId, docId, textId);
         return Response.ok(results).build();
     }
-
 
     @POST
     @Path("colloc")
@@ -251,7 +247,6 @@ public class SearchController {
     // }
     // return Response.ok(result).build();
     // }
-
 
     // /**
     // * @param locale

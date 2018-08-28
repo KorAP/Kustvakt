@@ -138,7 +138,7 @@ public class AvailabilityTest extends SpringJerseyTest {
 
 
     private ClientResponse searchQuery (String collectionQuery) {
-        return resource().path("search").queryParam("q", "[orth=das]")
+        return resource().path(API_VERSION).path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("cq", collectionQuery)
                 .get(ClientResponse.class);
     }
@@ -147,7 +147,7 @@ public class AvailabilityTest extends SpringJerseyTest {
     private ClientResponse searchQueryWithIP (String collectionQuery, String ip)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        return resource().path("search").queryParam("q", "[orth=das]")
+        return resource().path(API_VERSION).path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("cq", collectionQuery)
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler

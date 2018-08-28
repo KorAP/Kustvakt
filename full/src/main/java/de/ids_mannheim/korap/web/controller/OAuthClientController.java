@@ -26,6 +26,7 @@ import de.ids_mannheim.korap.oauth2.service.OAuth2ClientService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
+import de.ids_mannheim.korap.web.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
@@ -53,8 +54,8 @@ import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
  *
  */
 @Controller
-@Path("oauth2/client")
-@ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
+@Path("{version}/oauth2/client")
+@ResourceFilters({APIVersionFilter.class, AuthenticationFilter.class, BlockingFilter.class })
 public class OAuthClientController {
 
     @Autowired

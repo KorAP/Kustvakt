@@ -368,7 +368,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.add("username", "dory");
         form.add("password", "password");
 
-        ClientResponse response = resource().path("oauth2").path("token")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
                 .header(HttpHeaders.AUTHORIZATION,
                         "Basic ZkNCYlFrQXlZekk0TnpVeE1nOnNlY3JldA==")
                 .header(HttpHeaders.CONTENT_TYPE,
@@ -398,7 +398,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.add("username", "dory");
         form.add("password", "password");
 
-        ClientResponse response = resource().path("oauth2").path("token")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
                 .header(HttpHeaders.AUTHORIZATION,
                         "Basic ZkNCYlFrQXlZekk0TnpVeE1nOnNlY3JldA==")
                 .header(HttpHeaders.CONTENT_TYPE,
@@ -528,7 +528,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("grant_type", "blahblah");
 
-        ClientResponse response = resource().path("oauth2").path("token")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
@@ -552,7 +552,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.add("refresh_token", refreshToken);
         form.add("scope", "search serialize_query");
 
-        ClientResponse response = resource().path("oauth2").path("token")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
@@ -570,7 +570,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.add("client_id", clientId);
         form.add("refresh_token", refreshToken);
 
-        ClientResponse response = resource().path("oauth2").path("token")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
@@ -594,7 +594,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.add("client_id", "iBr3LsTCxOj7D2o0A5m");
         form.add("refresh_token", refreshToken);
 
-        ClientResponse response = resource().path("oauth2").path("token")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
@@ -612,7 +612,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.add("client_id", clientId);
         form.add("refresh_token", "Lia8s8w8tJeZSBlaQDrYV8ion3l");
 
-        ClientResponse response = resource().path("oauth2").path("token")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
@@ -630,7 +630,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.add("client_id", clientId);
         form.add("refresh_token", refreshToken);
 
-        ClientResponse response = resource().path("oauth2").path("token")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
@@ -648,7 +648,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.add("token", token);
         form.add("client_id", clientId);
 
-        ClientResponse response = resource().path("oauth2").path("revoke")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("revoke")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).post(ClientResponse.class);

@@ -12,16 +12,16 @@ import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.FastJerseyTest;
 
-public class MatchInfoControllerTest extends FastJerseyTest {
+public class MatchInfoControllerTest extends SpringJerseyTest {
 
     @Test
     public void testGetMatchInfoPublicCorpus () throws KustvaktException {
 
-        ClientResponse response = resource().path("corpus").path("GOE")
+        ClientResponse response = resource().path(API_VERSION).path("corpus").path("GOE")
                 .path("AGA").path("01784").path("p36-100").path("matchInfo")
                 .queryParam("foundry", "*").get(ClientResponse.class);
 
@@ -44,7 +44,7 @@ public class MatchInfoControllerTest extends FastJerseyTest {
     public void testGetMatchInfoNotAllowed () throws KustvaktException {
 
         ClientResponse response =
-                resource().path("corpus").path("GOE").path("AGI").path("04846")
+                resource().path(API_VERSION).path("corpus").path("GOE").path("AGI").path("04846")
                         .path("p36875-36876").path("matchInfo")
                         .queryParam("foundry", "*").get(ClientResponse.class);
 
@@ -63,7 +63,7 @@ public class MatchInfoControllerTest extends FastJerseyTest {
 
     @Test
     public void testGetMatchInfoWithAuthentication () throws KustvaktException {
-        ClientResponse response = resource().path("corpus").path("GOE")
+        ClientResponse response = resource().path(API_VERSION).path("corpus").path("GOE")
                 .path("AGI").path("04846").path("p36875-36876")
                 .path("matchInfo").queryParam("foundry", "*")
                 .header(Attributes.AUTHORIZATION,
@@ -90,27 +90,5 @@ public class MatchInfoControllerTest extends FastJerseyTest {
                 .startsWith("<span class=\"context-left\"></span>"
                         + "<span class=\"match\">"));
         assertEquals("QAO-NC-LOC:ids", node.at("/availability").asText());
-    }
-    // @Test
-    // public void testMatchInfoSave () {
-    //
-    // }
-    //
-    //
-    // @Test
-    // public void testMatchInfoDelete () {
-    //
-    // }
-    //
-    //
-    // @Test
-    // public void testGetMatches () {
-    //
-    // }
-
-
-    @Override
-    public void initMethod () throws KustvaktException {
-        // helper().runBootInterfaces();
     }
 }

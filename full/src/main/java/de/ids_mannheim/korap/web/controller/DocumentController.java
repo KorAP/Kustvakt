@@ -24,6 +24,7 @@ import de.ids_mannheim.korap.resources.Document;
 import de.ids_mannheim.korap.server.KustvaktServer;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
+import de.ids_mannheim.korap.web.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AdminFilter;
 
 /**
@@ -34,8 +35,8 @@ import de.ids_mannheim.korap.web.filter.AdminFilter;
  */
 @Deprecated
 @Controller
-@Path(KustvaktServer.API_VERSION + "/doc")
-@ResourceFilters({ AdminFilter.class })
+@Path("/v0.1/doc")
+@ResourceFilters({APIVersionFilter.class, AdminFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class DocumentController {
 

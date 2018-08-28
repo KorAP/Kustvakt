@@ -11,7 +11,6 @@ import java.net.ServerSocket;
 import java.util.Iterator;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.lucene.LucenePackage;
 import org.junit.Test;
 import org.springframework.web.context.ContextLoaderListener;
 
@@ -42,7 +41,8 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  */
 public class LiteServiceTest extends JerseyTest{
 
-    public static final String classPackage = "de.ids_mannheim.korap.web.service.light";
+    public static final String API_VERSION = "v0.1";
+    public static final String classPackage = "de.ids_mannheim.korap.web.service.lite";
 
     @Override
     protected TestContainerFactory getTestContainerFactory ()
@@ -76,7 +76,7 @@ public class LiteServiceTest extends JerseyTest{
     
     @Test
     public void testStatistics () throws KustvaktException{
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", "textType=Autobiographie & corpusSigle=GOE")
                 .method("GET", ClientResponse.class);
@@ -92,7 +92,7 @@ public class LiteServiceTest extends JerseyTest{
 
 	@Test
     public void testEmptyStatistics () throws KustvaktException{
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
 			.path("statistics")
 			.queryParam("corpusQuery", "")
 			.method("GET", ClientResponse.class);
@@ -105,7 +105,7 @@ public class LiteServiceTest extends JerseyTest{
         assertEquals(25074, node.at("/sentences").asInt());
         assertEquals(772, node.at("/paragraphs").asInt());
 
-		response = resource()
+		response = resource().path(API_VERSION)
                 .path("statistics")
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -121,7 +121,7 @@ public class LiteServiceTest extends JerseyTest{
 	
     @Test
     public void testGetJSONQuery () throws KustvaktException{
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("query").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("context", "sentence")
                 .queryParam("count", "13")
@@ -141,7 +141,7 @@ public class LiteServiceTest extends JerseyTest{
 
     @Test
     public void testbuildAndPostQuery () throws KustvaktException{
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("query").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp")
                 .queryParam("cq", "corpusSigle=WPD | corpusSigle=GOE")
@@ -153,7 +153,7 @@ public class LiteServiceTest extends JerseyTest{
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
 
-        response = resource().path("search")
+        response = resource().path(API_VERSION).path("search")
                 .post(ClientResponse.class, query);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -166,7 +166,7 @@ public class LiteServiceTest extends JerseyTest{
 
     @Test
     public void testQueryGet () throws KustvaktException{
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("context", "sentence")
                 .queryParam("count", "13").get(ClientResponse.class);
@@ -183,7 +183,7 @@ public class LiteServiceTest extends JerseyTest{
 
 	@Test
     public void testQueryFailure () throws KustvaktException{
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("search").queryParam("q", "[orth=das")
                 .queryParam("ql", "poliqarp")
                 .queryParam("cq", "corpusSigle=WPD | corpusSigle=GOE")
@@ -205,7 +205,7 @@ public class LiteServiceTest extends JerseyTest{
 
     @Test
     public void testFoundryRewrite () throws KustvaktException{
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("context", "sentence")
                 .queryParam("count", "13").get(ClientResponse.class);
@@ -224,7 +224,7 @@ public class LiteServiceTest extends JerseyTest{
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[orth=das]", "poliqarp");
 
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("search").post(ClientResponse.class, s.toJSON());
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -238,7 +238,7 @@ public class LiteServiceTest extends JerseyTest{
 
     @Test
     public void testParameterField () throws KustvaktException{
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp")
                 .queryParam("fields", "author, docSigle")
@@ -257,7 +257,7 @@ public class LiteServiceTest extends JerseyTest{
 
 	@Test
 	public void testMatchInfoGetWithoutSpans () throws KustvaktException{
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
 			.path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42/matchInfo")
 			.queryParam("foundry", "*")
 			.queryParam("spans", "false")
@@ -275,7 +275,7 @@ public class LiteServiceTest extends JerseyTest{
 
 	@Test
 	public void testMatchInfoGetWithoutHighlights () throws KustvaktException{
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
 			.path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42/matchInfo")
 			.queryParam("foundry", "xy")
 			.queryParam("spans", "false")
@@ -296,7 +296,7 @@ public class LiteServiceTest extends JerseyTest{
 	
 	@Test
 	public void testMatchInfoGetWithHighlights () throws KustvaktException{
-        ClientResponse response = resource()			
+        ClientResponse response = resource().path(API_VERSION)			
 			.path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42/matchInfo")
 			.queryParam("foundry", "xy")
 			.queryParam("spans", "false")
@@ -318,7 +318,7 @@ public class LiteServiceTest extends JerseyTest{
 	
 	@Test
 	public void testMatchInfoGet2 () throws KustvaktException{
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
 			
 			.path("corpus/GOE/AGA/01784/p36-46/matchInfo")
 			.queryParam("foundry", "*")
@@ -334,7 +334,7 @@ public class LiteServiceTest extends JerseyTest{
 
     @Test
     public void testCollectionQueryParameter () throws KustvaktException{
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("query").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp")
                 .queryParam("fields", "author, docSigle")
@@ -351,13 +351,13 @@ public class LiteServiceTest extends JerseyTest{
                 .asText());
         assertEquals("WPD", node.at("/collection/operands/1/value").asText());
 
-        response = resource().path("search")
+        response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("fields", "author, docSigle")
                 .queryParam("context", "sentence").queryParam("count", "13")
                 .queryParam("cq", "textClass=Politik & corpus=WPD")
                 .get(ClientResponse.class);
-        String version = LucenePackage.get().getImplementationVersion();;
+//        String version = LucenePackage.get().getImplementationVersion();;
 //        System.out.println("VERSION "+ version);
 //        System.out.println("RESPONSE "+ response);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -373,7 +373,7 @@ public class LiteServiceTest extends JerseyTest{
 
 	@Test
 	public void testMetaFields () throws KustvaktException {
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("/corpus/GOE/AGA/01784")
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),

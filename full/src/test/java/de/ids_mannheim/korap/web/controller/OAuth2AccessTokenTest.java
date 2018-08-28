@@ -49,7 +49,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         String accessToken = node.at("/access_token").asText();
 
         // test list user group
-        response = resource().path("group").path("list")
+        response = resource().path(API_VERSION).path("group").path("list")
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .get(ClientResponse.class);
 
@@ -71,7 +71,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
                 .contains(OAuth2Scope.VC_INFO.toString()));
 
         // test list vc using the token
-        response = resource().path("vc").path("list")
+        response = resource().path(API_VERSION).path("vc").path("list")
                 .header(Attributes.AUTHORIZATION, "Bearer " + token)
                 .get(ClientResponse.class);
 
@@ -97,7 +97,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
 
     private void testScopeNotAuthorized (String accessToken)
             throws KustvaktException {
-        ClientResponse response = resource().path("vc").path("list")
+        ClientResponse response = resource().path(API_VERSION).path("vc").path("list")
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .get(ClientResponse.class);
 
@@ -114,7 +114,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
     private void testScopeNotAuthorize2 (String accessToken)
             throws KustvaktException {
         ClientResponse response =
-                resource().path("vc").path("access").path("list")
+                resource().path(API_VERSION).path("vc").path("access").path("list")
                         .header(Attributes.AUTHORIZATION,
                                 "Bearer " + accessToken)
                         .get(ClientResponse.class);
@@ -170,7 +170,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         form.add("client_id", confidentialClientId);
         form.add("client_secret", "secret");
 
-        ClientResponse response = resource().path("oauth2").path("revoke")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("revoke")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).post(ClientResponse.class);
@@ -211,7 +211,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         form.add("client_secret", "secret");
         form.add("refresh_token", refreshToken);
 
-        ClientResponse response = resource().path("oauth2").path("token")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
@@ -241,7 +241,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         form.add("client_id", confidentialClientId);
         form.add("client_secret", clientSecret);
 
-        ClientResponse response = resource().path("oauth2").path("authorize")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("authorize")
                 .header(Attributes.AUTHORIZATION, "Bearer " + userAuthToken)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,

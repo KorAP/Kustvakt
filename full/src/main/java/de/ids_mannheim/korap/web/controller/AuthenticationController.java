@@ -45,6 +45,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.ServiceInfo;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
+import de.ids_mannheim.korap.web.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
@@ -55,10 +56,16 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 /**
  * @author hanl
  * @date 24/01/2014
+ * 
+ * @author margaretha
+ * @last-update 28/08/2018
+ * 
+ * - added user authentication time in token context
+ * - added api version filter
  */
 @Controller
-@Path("/auth")
-@ResourceFilters({ PiwikFilter.class })
+@Path("/{version}/auth")
+@ResourceFilters({APIVersionFilter.class, PiwikFilter.class })
 @Produces(MediaType.TEXT_HTML + ";charset=utf-8")
 public class AuthenticationController {
 

@@ -31,7 +31,7 @@ public abstract class FastJerseyTest extends BeanConfigTest{
                     "de.ids_mannheim.korap.web.filter",
                     "de.ids_mannheim.korap.web.utils" };
 
-    private final static String API_VERSION = "v0.1";
+    public final static String API_VERSION = "v0.1";
 
     private static DefaultResourceConfig resourceConfig =
             new DefaultResourceConfig();

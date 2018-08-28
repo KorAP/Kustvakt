@@ -29,6 +29,7 @@ import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.UserGroupService;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
+import de.ids_mannheim.korap.web.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
@@ -47,9 +48,9 @@ import de.ids_mannheim.korap.web.input.UserGroupJson;
  *
  */
 @Controller
-@Path("group")
-@ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class,
-        PiwikFilter.class })
+@Path("{version}/group")
+@ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
+        BlockingFilter.class, PiwikFilter.class })
 public class UserGroupController {
 
     @Autowired
@@ -85,7 +86,6 @@ public class UserGroupController {
             throw kustvaktResponseHandler.throwit(e);
         }
     }
-
 
     /**
      * Lists user-groups for system-admin purposes. If username
@@ -227,7 +227,8 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            scopeService.verifyScope(context, OAuth2Scope.DELETE_USER_GROUP_MEMBER);
+            scopeService.verifyScope(context,
+                    OAuth2Scope.DELETE_USER_GROUP_MEMBER);
             service.deleteGroupMember(memberId, groupId, context.getUsername());
             return Response.ok().build();
         }
@@ -256,7 +257,8 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            scopeService.verifyScope(context, OAuth2Scope.ADD_USER_GROUP_MEMBER);
+            scopeService.verifyScope(context,
+                    OAuth2Scope.ADD_USER_GROUP_MEMBER);
             service.inviteGroupMembers(group, context.getUsername());
             return Response.ok().build();
         }
@@ -289,7 +291,8 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            scopeService.verifyScope(context, OAuth2Scope.ADD_USER_GROUP_MEMBER_ROLE);
+            scopeService.verifyScope(context,
+                    OAuth2Scope.ADD_USER_GROUP_MEMBER_ROLE);
             service.addMemberRoles(context.getUsername(), groupId,
                     memberUsername, roleIds);
             return Response.ok().build();
@@ -322,7 +325,8 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            scopeService.verifyScope(context, OAuth2Scope.DELETE_USER_GROUP_MEMBER_ROLE);
+            scopeService.verifyScope(context,
+                    OAuth2Scope.DELETE_USER_GROUP_MEMBER_ROLE);
             service.deleteMemberRoles(context.getUsername(), groupId,
                     memberUsername, roleIds);
             return Response.ok().build();
@@ -350,7 +354,8 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            scopeService.verifyScope(context, OAuth2Scope.ADD_USER_GROUP_MEMBER);
+            scopeService.verifyScope(context,
+                    OAuth2Scope.ADD_USER_GROUP_MEMBER);
             service.acceptInvitation(groupId, context.getUsername());
             return Response.ok().build();
         }
@@ -379,7 +384,8 @@ public class UserGroupController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            scopeService.verifyScope(context, OAuth2Scope.DELETE_USER_GROUP_MEMBER);
+            scopeService.verifyScope(context,
+                    OAuth2Scope.DELETE_USER_GROUP_MEMBER);
             service.deleteGroupMember(context.getUsername(), groupId,
                     context.getUsername());
             return Response.ok().build();

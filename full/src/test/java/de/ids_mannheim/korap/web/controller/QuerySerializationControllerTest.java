@@ -38,7 +38,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
     @Test
     public void testQuerySerializationFilteredPublic ()
             throws KustvaktException {
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
 
                 .path("corpus/WPD13/query").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp").queryParam("context", "base/s:s")
@@ -57,7 +57,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
     @Test
     public void testQuerySerializationUnexistingResource ()
             throws KustvaktException {
-        ClientResponse response = resource().path("corpus/ZUW19/query")
+        ClientResponse response = resource().path(API_VERSION).path("corpus/ZUW19/query")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("context", "base/s:s")
                 .method("GET", ClientResponse.class);
@@ -74,7 +74,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
     @Test
     public void testQuerySerializationWithNonPublicCorpus ()
             throws KustvaktException {
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
 
                 .path("corpus/BRZ10/query").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp").queryParam("context", "base/s:s")
@@ -92,7 +92,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
     @Test
     public void testQuerySerializationWithAuthentication ()
             throws KustvaktException {
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
 
                 .path("corpus/BRZ10/query").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp")
@@ -116,7 +116,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
     public void testQuerySerializationWithNewCollection ()
             throws KustvaktException {
         // Add Virtual Collection
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
 
                 .path("virtualcollection").queryParam("filter", "false")
                 .queryParam("query",
@@ -139,7 +139,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
         assertEquals("Weimarer Werke", node.path("name").asText());
 
         // Get virtual collections
-        response = resource()
+        response = resource().path(API_VERSION)
 
                 .path("collection")
                 .header(Attributes.AUTHORIZATION,
@@ -164,7 +164,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
         assertFalse(id.isEmpty());
 
         // query serialization service
-        response = resource()
+        response = resource().path(API_VERSION)
 
                 .path("collection").path(id).path("query")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
@@ -204,7 +204,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
     @Test
     public void testQuerySerializationOfVirtualCollection ()
             throws KustvaktException {
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
 
                 .path("collection/GOE-VC/query").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp").queryParam("context", "base/s:s")
@@ -231,7 +231,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
 
     @Test
     public void testMetaQuerySerialization () throws KustvaktException {
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
 
                 .path("query").queryParam("context", "sentence")
                 .queryParam("count", "20").queryParam("page", "5")
@@ -259,7 +259,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
     @Test
     public void testMetaQuerySerializationWithOffset ()
             throws KustvaktException {
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
 
                 .path("query").queryParam("context", "sentence")
                 .queryParam("count", "20").queryParam("page", "5")

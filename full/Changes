@@ -1,3 +1,10 @@
+# version 0.61.1
+28/08/2018
+    - Added API URL versioning (margaretha) 
+    - Deactivated IdRewrite (margaretha)
+    - Fixed kustvakt controller (margaretha)
+
+
 # version 0.61.0
 
 02/08/2018

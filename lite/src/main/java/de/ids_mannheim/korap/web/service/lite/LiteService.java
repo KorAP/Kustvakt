@@ -23,8 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-
-import com.fasterxml.jackson.databind.JsonNode;
+import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.QueryBuilderUtil;
@@ -37,24 +36,26 @@ import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.web.ClientsHandler;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
-import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.APIVersionFilter;
 
 /**
  * @author hanl
  * @date 29/01/2014
  * 
  * @author margaretha
- * @update 10/10/2017
+ * @update 28/08/2018
  * 
  * <pre>
  * Recent changes:
  * - removed version from service paths
  * - altered service with path /search and method trace to path
  * /query and method get
+ * - added API versioning
  * </pre>
  */
 @Controller
-@Path("/")
+@Path("{version}/")
+@ResourceFilters(APIVersionFilter.class)
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class LiteService {
 
@@ -104,6 +105,7 @@ public class LiteService {
     }
 
 
+    @SuppressWarnings("unchecked")
     @GET
     @Path("query")
     public Response buildQuery (@QueryParam("q") String q,
@@ -162,6 +164,7 @@ public class LiteService {
     }
 
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @GET
     @Path("search")
     public Response searchbyNameAll (@QueryParam("q") String q,
@@ -249,6 +252,7 @@ public class LiteService {
      * @param engine
      * @return
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     //fixme: search in collection /collection/collection-id/search
     @Deprecated
     @GET

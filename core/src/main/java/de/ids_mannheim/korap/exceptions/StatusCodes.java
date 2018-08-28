@@ -25,7 +25,8 @@ public class StatusCodes {
     public static final int NOT_ALLOWED = 109;
     public static final int HTTPS_REQUIRED = 110;
     public static final int INVALID_ALGORITHM = 111;
-
+    public static final int UNSUPPORTED_API_VERSION = 112;
+    
     /**
      * 200 status codes general JSON serialization error
      */

@@ -1,3 +1,7 @@
+version 0.61.0
+28/08/2018
+   - Added API URL versioning (margaretha)
+   
 version 0.60.2
 05/07/2018
     - Added support for unrestricted corpus statistics (ndiewald)

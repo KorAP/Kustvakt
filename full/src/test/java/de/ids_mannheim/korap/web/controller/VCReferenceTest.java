@@ -27,7 +27,7 @@ public class VCReferenceTest extends SpringJerseyTest {
     }
 
     private void testSearchWithoutVCRefOr () throws KustvaktException {
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq",
                         "textSigle=\"GOE/AGF/00000\" | textSigle=\"GOE/AGA/01784\"")
@@ -39,7 +39,7 @@ public class VCReferenceTest extends SpringJerseyTest {
     }
 
     private void testSearchWithoutVCRefAnd () throws KustvaktException {
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq",
                         "textSigle!=\"GOE/AGI/04846\" & textSigle!=\"GOE/AGA/01784\"")
@@ -51,7 +51,7 @@ public class VCReferenceTest extends SpringJerseyTest {
     }
 
     public void testSearchWithVCRefEqual () throws KustvaktException {
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo named-vc1")
                 .get(ClientResponse.class);
@@ -63,7 +63,7 @@ public class VCReferenceTest extends SpringJerseyTest {
     }
 
     public void testSearchWithVCRefNotEqual () throws KustvaktException {
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo named-vc2")
                 .get(ClientResponse.class);
@@ -75,7 +75,7 @@ public class VCReferenceTest extends SpringJerseyTest {
 
     public void testStatisticsWithVCReference () throws KustvaktException {
         String corpusQuery = "availability = /CC-BY.*/ & referTo named-vc1";
-        ClientResponse response = resource().path("statistics")
+        ClientResponse response = resource().path(API_VERSION).path("statistics")
                 .queryParam("corpusQuery", corpusQuery)
                 .get(ClientResponse.class);
 

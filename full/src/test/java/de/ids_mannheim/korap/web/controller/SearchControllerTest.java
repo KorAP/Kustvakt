@@ -31,7 +31,7 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     public void testSearchQueryPublicCorpora () throws KustvaktException {
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -50,7 +50,7 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     public void testSearchQueryFailure () throws KustvaktException {
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der").queryParam("ql", "poliqarp")
                 .queryParam("cq", "corpusSigle=WPD | corpusSigle=GOE")
                 .queryParam("count", "13").accept(MediaType.APPLICATION_JSON)
@@ -70,7 +70,7 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     public void testSearchQueryWithMeta () throws KustvaktException {
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cutoff", "true").queryParam("count", "5")
                 .queryParam("page", "1").queryParam("context", "40-t,30-t")
@@ -91,7 +91,7 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     public void testSearchQueryFreeExtern () throws KustvaktException {
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
@@ -112,7 +112,7 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     public void testSearchQueryFreeIntern () throws KustvaktException {
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .header(HttpHeaders.X_FORWARDED_FOR, "172.27.0.32")
                 .get(ClientResponse.class);
@@ -133,7 +133,7 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     public void testSearchQueryExternAuthorized () throws KustvaktException {
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
@@ -164,7 +164,7 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     public void testSearchQueryInternAuthorized () throws KustvaktException {
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
@@ -200,7 +200,7 @@ public class SearchControllerTest extends SpringJerseyTest {
     @Test
     public void testSearchQueryWithCollectionQueryAuthorizedWithoutIP ()
             throws KustvaktException {
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "textClass=politik & corpusSigle=BRZ10")
                 .header(Attributes.AUTHORIZATION,
@@ -231,7 +231,7 @@ public class SearchControllerTest extends SpringJerseyTest {
     @Test
     @Ignore
     public void testSearchQueryAuthorizedWithoutIP () throws KustvaktException {
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
@@ -255,7 +255,7 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     public void testSearchSentenceMeta () throws KustvaktException {
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("context", "sentence").get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -272,7 +272,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("(der) or (das)", "CQL");
 
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .post(ClientResponse.class, s.toJSON());
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -292,7 +292,7 @@ public class SearchControllerTest extends SpringJerseyTest {
 
         s.setQuery("Wasser", "poliqarp");
         // System.out.println(s.toJSON());
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .post(ClientResponse.class, s.toJSON());
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());

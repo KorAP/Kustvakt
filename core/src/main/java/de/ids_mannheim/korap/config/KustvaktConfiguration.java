@@ -1,14 +1,16 @@
 package de.ids_mannheim.korap.config;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -79,6 +81,8 @@ public class KustvaktConfiguration {
     private String baseURL;
     private Properties properties;
 
+    private Set<String> version;
+    
     // deprec?!
     private final BACKENDS DEFAULT_ENGINE = BACKENDS.LUCENE;
 
@@ -96,6 +100,13 @@ public class KustvaktConfiguration {
      * @throws Exception
      */
     protected void load (Properties properties) throws Exception {
+        String version = properties.getProperty("supported.api.version", "");
+        if (version.isEmpty()){
+            throw new IllegalArgumentException("supported.api.version must be set in the .conf file");
+        }
+        this.version = Arrays.stream(version.split(" ")).collect(Collectors.toSet());
+        
+        
         baseURL = properties.getProperty("kustvakt.base.url", "/api/*");
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));
         returnhits = new Integer(properties.getProperty("returnhits", "50000"));
@@ -152,7 +163,6 @@ public class KustvaktConfiguration {
         // passcodeSaltField =
         // properties.getProperty("security.passcode.salt",
         // "accountCreation");
-
     }
 
     /**

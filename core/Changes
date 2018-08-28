@@ -1,3 +1,7 @@
+version 0.61.1
+28/08/2018
+    - Added API URL versioning (margaretha)
+
 version 0.61.0
 13/08/2018
 	- Updated Krill and Koral versions enabling VC caching and referencing (margaretha)

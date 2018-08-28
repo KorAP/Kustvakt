@@ -25,7 +25,8 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 
 public class VCReferenceTest extends JerseyTest{
 
-    public static final String classPackage = "de.ids_mannheim.korap.web.service.light";
+    public static final String API_VERSION = "v0.1";
+    public static final String classPackage = "de.ids_mannheim.korap.web.service.lite";
     
     @Override
     protected TestContainerFactory getTestContainerFactory ()
@@ -59,7 +60,7 @@ public class VCReferenceTest extends JerseyTest{
     
     @Test
     public void testSearchWithVCRef () throws KustvaktException {
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo named-vc1")
                 .get(ClientResponse.class);
@@ -73,7 +74,7 @@ public class VCReferenceTest extends JerseyTest{
     @Test
     public void testStatisticsWithVCReference () throws KustvaktException {
         String corpusQuery = "referTo named-vc1";
-        ClientResponse response = resource().path("statistics")
+        ClientResponse response = resource().path(API_VERSION).path("statistics")
                 .queryParam("corpusQuery", corpusQuery)
                 .get(ClientResponse.class);
 

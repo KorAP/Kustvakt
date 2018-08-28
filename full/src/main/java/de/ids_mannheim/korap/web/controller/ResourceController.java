@@ -14,6 +14,7 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.dto.ResourceDto;
 import de.ids_mannheim.korap.service.ResourceService;
+import de.ids_mannheim.korap.web.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 
 /**
@@ -23,8 +24,8 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
  *
  */
 @Controller
-@Path("resource/")
-@ResourceFilters({ PiwikFilter.class })
+@Path("{version}/resource/")
+@ResourceFilters({APIVersionFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ResourceController {
 

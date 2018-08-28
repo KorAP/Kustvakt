@@ -40,7 +40,7 @@ public class TokenExpiryTest extends SpringJerseyTest {
         form.add("username", "dory");
         form.add("password", "password");
 
-        ClientResponse response = resource().path("oauth2").path("token")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).post(ClientResponse.class);
@@ -63,7 +63,7 @@ public class TokenExpiryTest extends SpringJerseyTest {
     // does not work.
     private void testSearchWithExpiredToken (String token)
             throws KustvaktException, IOException {
-        ClientResponse response = resource().path("search")
+        ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "Wasser").queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION, "Bearer " + token)
                 .get(ClientResponse.class);
@@ -91,7 +91,7 @@ public class TokenExpiryTest extends SpringJerseyTest {
         form.add("max_age", "1");
 
         ClientResponse response =
-                resource().path("oauth2").path("openid").path("authorize")
+                resource().path(API_VERSION).path("oauth2").path("openid").path("authorize")
                         .header(Attributes.AUTHORIZATION, "Bearer " + token)
                         .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                         .header(HttpHeaders.CONTENT_TYPE,

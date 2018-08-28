@@ -26,6 +26,8 @@ import com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestCon
 @ContextConfiguration("classpath:test-config.xml")
 public abstract class SpringJerseyTest extends JerseyTest {
 
+    public final static String API_VERSION = "v1.0";
+    
     @Autowired
     protected GenericApplicationContext applicationContext;
 

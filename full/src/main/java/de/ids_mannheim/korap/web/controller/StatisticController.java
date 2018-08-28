@@ -23,6 +23,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
+import de.ids_mannheim.korap.web.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 
 /**
@@ -35,8 +36,8 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
  * 
  */
 @Controller
-@Path("statistics/")
-@ResourceFilters({ PiwikFilter.class })
+@Path("{version}/statistics/")
+@ResourceFilters({APIVersionFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class StatisticController {
 

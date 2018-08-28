@@ -67,7 +67,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         json.setRedirectURI("https://example.client.com/redirect");
         json.setDescription("This is a confidential test client.");
 
-        return resource().path("oauth2").path("client").path("register")
+        return resource().path(API_VERSION).path("oauth2").path("client").path("register")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -78,7 +78,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     private JsonNode retrieveClientInfo (String clientId, String username)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        ClientResponse response = resource().path("oauth2").path("client")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("client")
                 .path("info").path(clientId)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
@@ -128,7 +128,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         json.setRedirectURI("https://test.public.client.com/redirect");
         json.setDescription("This is a public test client.");
 
-        ClientResponse response = resource().path("oauth2").path("client")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("client")
                 .path("register")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
@@ -155,7 +155,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         json.setType(OAuth2ClientType.PUBLIC);
         json.setDescription("This is a desktop test client.");
 
-        ClientResponse response = resource().path("oauth2").path("client")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("client")
                 .path("register")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
@@ -213,7 +213,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
             String clientId) throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
 
-        ClientResponse response = resource().path("oauth2").path("client")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("client")
                 .path("deregister").path(clientId).delete(ClientResponse.class);
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -228,7 +228,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
 
-        ClientResponse response = resource().path("oauth2").path("client")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("client")
                 .path("deregister")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
@@ -241,7 +241,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
 
-        ClientResponse response = resource().path("oauth2").path("client")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("client")
                 .path("deregister").path(clientId)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
@@ -257,7 +257,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("client_secret", clientSecret);
 
-        ClientResponse response = resource().path("oauth2").path("client")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("client")
                 .path("deregister").path(clientId)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
@@ -271,7 +271,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     private void testDeregisterConfidentialClientMissingSecret (String clientId)
             throws KustvaktException {
 
-        ClientResponse response = resource().path("oauth2").path("client")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("client")
                 .path("deregister").path(clientId)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
@@ -295,7 +295,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("client_secret", clientSecret);
 
-        ClientResponse response = resource().path("oauth2").path("client")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("client")
                 .path("deregister").path(clientId)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
@@ -320,7 +320,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("client_id", clientId);
 
-        ClientResponse response = resource().path("oauth2").path("client")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("client")
                 .path("reset")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
@@ -343,7 +343,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         form.add("client_id", clientId);
         form.add("client_secret", clientSecret);
 
-        ClientResponse response = resource().path("oauth2").path("client")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("client")
                 .path("reset")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
@@ -396,7 +396,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertTrue(node.at("/isSuper").asBoolean());
 
         // list vc
-        ClientResponse response = resource().path("vc").path("list")
+        ClientResponse response = resource().path(API_VERSION).path("vc").path("list")
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .get(ClientResponse.class);
 

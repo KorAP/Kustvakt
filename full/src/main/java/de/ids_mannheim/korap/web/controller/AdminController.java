@@ -23,10 +23,10 @@ import de.ids_mannheim.korap.auditing.AuditRecord;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
-import de.ids_mannheim.korap.server.KustvaktServer;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
+import de.ids_mannheim.korap.web.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 
@@ -35,12 +35,13 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
  * Created date 6/11/14. 
  * Last update: 08/11/2017
  * Last changes:
- *  removed DocumentDao (EM)
+ *  - removed DocumentDao (EM)
+ *  - added API version filter (EM)
  */
 @Deprecated
 @Controller
-@Path(KustvaktServer.API_VERSION + "/admin")
-@ResourceFilters({ AdminFilter.class, PiwikFilter.class })
+@Path("/v0.1/admin")
+@ResourceFilters({APIVersionFilter.class, AdminFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class AdminController {
 

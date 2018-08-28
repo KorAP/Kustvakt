@@ -23,7 +23,7 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
 	
     //    @Test
     public void testFieldsInSearch () {
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("search").queryParam("q", "[base=Wort]")
                 .queryParam("ql", "poliqarp").get(ClientResponse.class);
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
@@ -32,7 +32,7 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
 
     @Test
     public void testQuery () {
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("search").queryParam("q", "[base=Wort]")
                 .queryParam("ql", "poliqarp").get(ClientResponse.class);
         //        System.out.println("_______________________________________________");
@@ -46,7 +46,7 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[base=Wort]", "poliqarp");
 
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("search").post(ClientResponse.class, s.toJSON());
         //        System.out.println("_______________________________________________ RAW");
         //        System.out.println(response.getEntity(String.class));
@@ -58,13 +58,13 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
     @Test
     @Ignore
     public void testGetMatchInfoThrowsNoException () {
-        ClientResponse response = resource().path(getAPIVersion()).get(
+        ClientResponse response = resource().path(API_VERSION).get(
                 ClientResponse.class);
     }
    
     //    @Test
     public void testBuildQueryThrowsNoException () {
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("search").queryParam("q", "[base=Haus & surface=Hauses]")
                 .queryParam("ql", "poliqarp").queryParam("cutOff", "true")
                 .queryParam("page", "1").method("TRACE", ClientResponse.class);
@@ -74,7 +74,7 @@ public class KustvaktCoreRestTest extends FastJerseyTest {
 
     //    @Test
     public void testQueryByNameThrowsNoException () {
-        ClientResponse response = resource()
+        ClientResponse response = resource().path(API_VERSION)
                 .path("corpus").path("WPD").path("search")
                 .queryParam("q", "[base=Haus & surface=Hauses]")
                 .queryParam("ql", "poliqarp").queryParam("cutOff", "true")

@@ -53,6 +53,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
+import de.ids_mannheim.korap.web.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
@@ -65,9 +66,9 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
  * @lastUpdate 11/2017
  */
 @Controller
-@Path("/user")
+@Path("v0.1/user")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-@ResourceFilters({ PiwikFilter.class })
+@ResourceFilters({APIVersionFilter.class, PiwikFilter.class })
 public class UserController {
 
     @Autowired
