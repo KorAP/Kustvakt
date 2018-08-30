@@ -33,10 +33,10 @@ import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.resource.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
+import de.ids_mannheim.korap.web.APIVersionFilter;
 import de.ids_mannheim.korap.web.ClientsHandler;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
-import de.ids_mannheim.korap.web.APIVersionFilter;
 
 /**
  * @author hanl
@@ -50,7 +50,7 @@ import de.ids_mannheim.korap.web.APIVersionFilter;
  * - removed version from service paths
  * - altered service with path /search and method trace to path
  * /query and method get
- * - added API versioning
+ * - added API URL versioning
  * </pre>
  */
 @Controller
@@ -62,7 +62,7 @@ public class LiteService {
     private static Logger jlog = LogManager.getLogger(LiteService.class);
 
     @Autowired
-    CoreResponseHandler kustvaktResponseHandler;
+    private CoreResponseHandler kustvaktResponseHandler;
     @Autowired
     private SearchKrill searchKrill;
     private ClientsHandler graphDBhandler;

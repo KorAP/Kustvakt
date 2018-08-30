@@ -10,7 +10,6 @@ import de.ids_mannheim.korap.web.KustvaktBaseServer;
 
 public class KustvaktLiteServer extends KustvaktBaseServer {
 
-
     public static void main (String[] args) throws Exception {
         KustvaktLiteServer server = new KustvaktLiteServer();
         kargs = server.readAttributes(args);
@@ -20,20 +19,22 @@ public class KustvaktLiteServer extends KustvaktBaseServer {
         File f = new File("kustvakt-lite.conf");
         Properties properties = new Properties();
         InputStream in = null;
-        
-        if (!f.exists()){
-            in = KustvaktLiteServer.class.getClassLoader().getResourceAsStream("kustvakt-lite.conf");
+
+        if (!f.exists()) {
+            in = KustvaktLiteServer.class.getClassLoader()
+                    .getResourceAsStream("kustvakt-lite.conf");
         }
-        else{
+        else {
             in = new FileInputStream(f);
         }
-        
+
         properties.load(in);
         in.close();
         config = new KustvaktConfiguration(properties);
-        
+
         kargs.setSpringConfig("lite-config.xml");
-        rootPackages = "de.ids_mannheim.korap.web.service.lite";
+        rootPackages =
+                "de.ids_mannheim.korap.web";
 
         server.start();
     }

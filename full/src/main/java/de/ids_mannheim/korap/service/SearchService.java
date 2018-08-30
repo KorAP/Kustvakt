@@ -56,6 +56,7 @@ public class SearchService {
         this.graphDBhandler = new ClientsHandler(builder.build());
     }
 
+    @SuppressWarnings("unchecked")
     public String serializeQuery (String q, String ql, String v, String cq,
             Integer pageIndex, Integer startPage, Integer pageLength,
             String context, Boolean cutoff) {
@@ -91,6 +92,7 @@ public class SearchService {
         return searchKrill.search(jsonld);
     }
 
+    @SuppressWarnings("unchecked")
     public String search (String engine, String username, HttpHeaders headers,
             String q, String ql, String v, String cq, Integer pageIndex,
             Integer pageInteger, String ctx, Integer pageLength, Boolean cutoff)
@@ -123,7 +125,7 @@ public class SearchService {
         else {
             result = searchKrill.search(query);
         }
-        jlog.debug("Query result: " + result);
+//        jlog.debug("Query result: " + result);
         return result;
 
     }

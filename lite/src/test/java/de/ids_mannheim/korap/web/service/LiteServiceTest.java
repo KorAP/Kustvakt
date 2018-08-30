@@ -8,9 +8,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.URI;
 import java.util.Iterator;
 import java.util.concurrent.ThreadLocalRandom;
 
+import javax.ws.rs.core.MediaType;
+
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 import org.springframework.web.context.ContextLoaderListener;
 
@@ -41,7 +45,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  */
 public class LiteServiceTest extends JerseyTest{
 
-    public static final String API_VERSION = "v0.1";
+    public static final String API_VERSION = "v1.0";
     public static final String classPackage = "de.ids_mannheim.korap.web.service.lite";
 
     @Override
@@ -425,4 +429,25 @@ public class LiteServiceTest extends JerseyTest{
 		};
 		assertEquals(5, checkC);
 	};
+	
+    @Test
+    public void testSearchWithoutVersion () throws KustvaktException {
+        ClientResponse response = resource().path("api").path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        assertEquals(HttpStatus.PERMANENT_REDIRECT_308, response.getStatus());
+        URI location = response.getLocation();
+        assertEquals("/api/v1.0/search", location.getPath());
+    }
+
+    @Test
+    public void testSearchWrongVersion () throws KustvaktException {
+        ClientResponse response = resource().path("api").path("v0.2")
+                .path("search").queryParam("q", "[orth=der]")
+                .queryParam("ql", "poliqarp").accept(MediaType.APPLICATION_JSON)
+                .get(ClientResponse.class);
+        assertEquals(HttpStatus.PERMANENT_REDIRECT_308, response.getStatus());
+        URI location = response.getLocation();
+        assertEquals("/api/v1.0/search", location.getPath());
+    }
 }

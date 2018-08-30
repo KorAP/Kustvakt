@@ -3,7 +3,10 @@
     - Added API URL versioning (margaretha) 
     - Deactivated IdRewrite (margaretha)
     - Fixed kustvakt controller (margaretha)
-
+30/08/2018
+    - Fixed root packages & added api version properties in kustvakt.conf (margaretha)
+    - Fixed versioning in SearchController (margaretha)
+    - Added API versioning tests (margaretha)
 
 # version 0.61.0
 

@@ -1,6 +1,9 @@
 version 0.61.1
 28/08/2018
     - Added API URL versioning (margaretha)
+30/08/2018
+   - Added backwards compability for URL versioning (margaretha)
+   - Updated API version filter (margaretha)
 
 version 0.61.0
 13/08/2018

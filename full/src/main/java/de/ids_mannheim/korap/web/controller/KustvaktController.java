@@ -38,7 +38,7 @@ public class KustvaktController {
         
         Map m = new HashMap();
         m.put("version", ServiceInfo.getInfo().getVersion());
-        m.put("supported_api_version(s)", config.getVersion());
+        m.put("supported_api_version(s)", config.getSupportedVersions());
         m.put("service_name", ServiceInfo.getInfo().getName());
         try {
             return Response.ok(JsonUtils.toJSON(m)).build();

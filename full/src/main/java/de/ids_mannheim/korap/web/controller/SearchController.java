@@ -43,7 +43,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
  * 
  */
 @Controller
-@Path("/{version}/")
+@Path("/")
 @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
         DemoUserFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -83,7 +83,7 @@ public class SearchController {
      */
     // ref query parameter removed!
     @GET
-    @Path("query")
+    @Path("{version}/query")
     public Response serializeQuery (@Context Locale locale,
             @Context SecurityContext securityContext, @QueryParam("q") String q,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
@@ -108,7 +108,7 @@ public class SearchController {
     }
 
     @POST
-    @Path("search")
+    @Path("{version}/search")
     public Response searchPost (@Context SecurityContext context,
             @Context Locale locale, @QueryParam("engine") String engine,
             String jsonld) {
@@ -127,7 +127,7 @@ public class SearchController {
     }
 
     @GET
-    @Path("search")
+    @Path("{version}/search")
     public Response searchGet (@Context SecurityContext securityContext,
             @Context HttpHeaders headers, @Context Locale locale,
             @QueryParam("q") String q, @QueryParam("ql") String ql,
@@ -156,7 +156,7 @@ public class SearchController {
     }
 
     @GET
-    @Path("/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
+    @Path("{version}/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
     public Response getMatchInfo (@Context SecurityContext ctx,
             @Context HttpHeaders headers, @Context Locale locale,
             @PathParam("corpusId") String corpusId,
@@ -184,7 +184,7 @@ public class SearchController {
     // This is currently identical to LiteService#getMeta(),
     // but may need auth code to work following policies
     @GET
-    @Path("/corpus/{corpusId}/{docId}/{textId}")
+    @Path("{version}/corpus/{corpusId}/{docId}/{textId}")
     public Response getMetadata (@PathParam("corpusId") String corpusId,
             @PathParam("docId") String docId, @PathParam("textId") String textId
     // @QueryParam("fields") Set<String> fields
@@ -195,7 +195,7 @@ public class SearchController {
     }
 
     @POST
-    @Path("colloc")
+    @Path("{version}/colloc")
     public Response getCollocationBase (@QueryParam("q") String query) {
         String result;
         try {

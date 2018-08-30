@@ -42,8 +42,7 @@ public class KustvaktServer extends KustvaktBaseServer {
         if (kargs.getSpringConfig() == null){
             kargs.setSpringConfig("default-config.xml");
         }
-        rootPackages = "de.ids_mannheim.korap.web.utils;"
-                + "de.ids_mannheim.korap.web.service.full";
+        rootPackages = "de.ids_mannheim.korap.web;";
         server.start();
     }
 }

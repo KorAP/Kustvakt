@@ -1,13 +1,16 @@
 version 0.61.0
-28/08/2018
-   - Added API URL versioning (margaretha)
-   
+30/08/2018
+   - Fixed root packages & added api version properties in kustvakt-lite.conf (margaretha)
+   - Added API versioning tests (margaretha)
+
 version 0.60.2
 05/07/2018
     - Added support for unrestricted corpus statistics (ndiewald)
     - Do not pass broken queries to Krill (diewald)
 27/08/2018
     - Added vc reference test (margaretha)
+28/08/2018
+   - Added API URL versioning (margaretha)
 
 version 0.60.1
 12/06/2018
