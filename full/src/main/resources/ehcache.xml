@@ -34,8 +34,7 @@
            diskSpoolBufferSizeMB="30"
            diskExpiryThreadIntervalSeconds="120"
            memoryStoreEvictionPolicy="LRU"
-           statistics="false"/>
-           
+           />
            
     <!-- EM --> 
     <cache name='authorization'

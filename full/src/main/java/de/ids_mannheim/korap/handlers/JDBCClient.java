@@ -22,6 +22,7 @@ import lombok.Setter;
  * @author hanl
  * @date 13/01/2014
  */
+@Deprecated
 @Data
 public class JDBCClient extends PersistenceClient<NamedParameterJdbcTemplate> {
 

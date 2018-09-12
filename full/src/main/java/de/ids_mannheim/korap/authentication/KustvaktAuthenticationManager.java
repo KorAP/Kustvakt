@@ -16,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.mchange.rmi.NotAuthorizedException;
 // import com.novell.ldap.*; search() funktioniert nicht korrekt, ausgewechselt gegen unboundID's Bibliothek 20.04.17/FB
 //Using JAR from unboundID:
 import com.unboundid.ldap.sdk.LDAPException;
@@ -30,7 +31,6 @@ import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.NotAuthorizedException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.exceptions.WrappedException;
 import de.ids_mannheim.korap.interfaces.AuthenticationIface;

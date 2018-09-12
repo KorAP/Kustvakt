@@ -25,6 +25,7 @@ import java.util.HashMap;
  * @author hanl
  * @date 28/01/2016
  */
+@Deprecated
 public class UserSettingsDao implements UserDataDbIface<UserSettings> {
 
     private static final Logger jlog = LogManager

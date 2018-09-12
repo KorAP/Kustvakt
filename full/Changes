@@ -1,3 +1,7 @@
+# version 0.61.2
+12/09/2018
+    - Added various log4j2 configurations.
+
 # version 0.61.1
 28/08/2018
     - Added API URL versioning (margaretha) 

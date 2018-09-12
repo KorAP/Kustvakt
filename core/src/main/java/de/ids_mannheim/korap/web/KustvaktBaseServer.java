@@ -28,10 +28,7 @@ public abstract class KustvaktBaseServer {
     protected static String rootPackages;
     protected static KustvaktArgs kargs;
 
-    public KustvaktBaseServer () {
-        KustvaktConfiguration.loadLogger();
-    }
-
+    public KustvaktBaseServer () {}
 
     protected KustvaktArgs readAttributes (String[] args) {
         KustvaktArgs kargs = new KustvaktArgs();
@@ -49,7 +46,6 @@ public abstract class KustvaktBaseServer {
                     b.append("Parameter description: \n")
                             .append("--spring-config  <Spring XML configuration filename in classpath>\n")
                             .append("--port  <Server port number>\n")
-                            //                            .append("--props  <Path to kustvakt properties> : list of configuration properties\n")
                             .append("--help : This help menu\n");
                     System.out.println(b.toString());
                     System.out.println();
@@ -109,7 +105,6 @@ public abstract class KustvaktBaseServer {
         @Getter
         private String springConfig;
         private int port;
-
 
         public KustvaktArgs () {
             this.port = -1;

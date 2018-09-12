@@ -233,13 +233,13 @@
 			ref="kustvakt_config" />
 	</bean>
 
-	<bean id="openid_auth"
+	<!-- <bean id="openid_auth"
 		class="de.ids_mannheim.korap.authentication.OpenIDconnectAuthentication">
 		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
 			ref="kustvakt_config" />
 		<constructor-arg
 			type="de.ids_mannheim.korap.interfaces.db.PersistenceClient" ref="kustvakt_db" />
-	</bean>
+	</bean> -->
 
 	<bean id="basic_auth"
 		class="de.ids_mannheim.korap.authentication.BasicAuthentication" />
@@ -263,7 +263,7 @@
 		<ref bean="ldap_auth" />
 		<ref bean="session_auth" />
 		<!-- <ref bean="api_auth" /> -->
-		<ref bean="openid_auth" />
+		<!-- <ref bean="openid_auth" /> -->
 		<ref bean="oauth2_auth" />
 	</util:list>
 

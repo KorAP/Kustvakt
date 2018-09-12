@@ -22,6 +22,7 @@ import java.util.HashMap;
  * @author hanl
  * @date 27/01/2016
  */
+@Deprecated
 public class UserDetailsDao implements UserDataDbIface<UserDetails> {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
