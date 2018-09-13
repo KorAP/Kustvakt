@@ -48,10 +48,12 @@ public class VirtualCorpus implements Comparable<VirtualCorpus>{
     @Column(name = "required_access")
     private CorpusAccess requiredAccess;
     @Column(name = "corpus_query")
-    private String corpusQuery;
+    private String koralQuery;
     private String definition;
     @Column(name = "created_by")
     private String createdBy;
+    @Column(name = "is_cached")
+    private boolean isCached;
 
     @OneToMany(mappedBy = "virtualCorpus", fetch = FetchType.LAZY,
             cascade = CascadeType.REMOVE)
@@ -61,7 +63,7 @@ public class VirtualCorpus implements Comparable<VirtualCorpus>{
     public String toString () {
         return "id=" + id + ", name= " + name + ", type= " + type + ", status= "
                 + status + ", description=" + description + ", requiredAccess="
-                + requiredAccess + ", corpusQuery= " + corpusQuery
+                + requiredAccess + ", corpusQuery= " + koralQuery
                 + ", definition= " + definition + ", createdBy= " + createdBy;
     }
 

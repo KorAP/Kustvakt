@@ -36,7 +36,7 @@ public class SearchKrill {
     String indexDir = "/data/prep_corpus/index/";
     String i = "/Users/hanl/Projects/prep_corpus";
     String klinux10 = "/vol/work/hanl/indices";
-    private KrillIndex index;
+    public static KrillIndex index;
     
     /**
      * Constructor

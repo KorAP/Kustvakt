@@ -55,7 +55,7 @@ public class VirtualCorpusService {
     private static Logger jlog =
             LogManager.getLogger(VirtualCorpusService.class);
 
-    public static Pattern wordPattern = Pattern.compile("[\\w ]+");
+    public static Pattern wordPattern = Pattern.compile("[-\\w ]+");
 
     @Autowired
     private VirtualCorpusDao vcDao;
@@ -123,7 +123,7 @@ public class VirtualCorpusService {
         Iterator<VirtualCorpus> i = vcList.iterator();
         while (i.hasNext()) {
             vc = i.next();
-            String json = vc.getCorpusQuery();
+            String json = vc.getKoralQuery();
             String statistics = krill.getStatistics(json);
             VirtualCorpusDto vcDto =
                     converter.createVirtualCorpusDto(vc, statistics);
@@ -234,7 +234,8 @@ public class VirtualCorpusService {
         String name = vc.getName();
         if (!wordPattern.matcher(name).matches()) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
-                    "Virtual corpus name must only contains letters, numbers, underscores and spaces",
+                    "Virtual corpus name must only contains letters, numbers, "
+                            + "underscores, hypens and spaces",
                     name);
         }
 
@@ -249,7 +250,7 @@ public class VirtualCorpusService {
 
         int vcId = vcDao.createVirtualCorpus(vc.getName(), vc.getType(),
                 requiredAccess, koralQuery, vc.getDefinition(),
-                vc.getDescription(), vc.getStatus(), username);
+                vc.getDescription(), vc.getStatus(), vc.isCached(), username);
 
         if (vc.getType().equals(VirtualCorpusType.PUBLISHED)) {
             publishVC(vcId);
@@ -274,7 +275,7 @@ public class VirtualCorpusService {
         return koralQuery;
     }
 
-    private CorpusAccess determineRequiredAccess (String koralQuery)
+    public CorpusAccess determineRequiredAccess (String koralQuery)
             throws KustvaktException {
 
         if (findDocWithLicense(koralQuery, config.getAllOnlyRegex())) {
@@ -416,17 +417,32 @@ public class VirtualCorpusService {
 
     }
 
+    public VirtualCorpus searchVCByName (String username, String vcName, String createdBy)
+            throws KustvaktException {
+        VirtualCorpus vc = vcDao.retrieveVCByName(vcName, createdBy);
+        checkVCAccess(vc, username);
+        return vc;
+    }
+
     public VirtualCorpusDto searchVCById (String username, int vcId)
             throws KustvaktException {
 
         VirtualCorpus vc = vcDao.retrieveVCById(vcId);
+        checkVCAccess(vc, username);
+        String json = vc.getKoralQuery();
+        String statistics = krill.getStatistics(json);
+        return converter.createVirtualCorpusDto(vc, statistics);
+    }
+
+    private void checkVCAccess (VirtualCorpus vc, String username)
+            throws KustvaktException {
         VirtualCorpusType type = vc.getType();
 
         if (!adminDao.isAdmin(username)
                 && !username.equals(vc.getCreatedBy())) {
             if (type.equals(VirtualCorpusType.PRIVATE)
                     || (type.equals(VirtualCorpusType.PROJECT)
-                            && !hasAccess(username, vcId))) {
+                            && !hasAccess(username, vc.getId()))) {
                 throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                         "Unauthorized operation for user: " + username,
                         username);
@@ -434,8 +450,8 @@ public class VirtualCorpusService {
 
             else if (VirtualCorpusType.PUBLISHED.equals(type)) {
                 // add user in the VC's auto group
-                UserGroup userGroup =
-                        userGroupService.retrieveHiddenUserGroupByVC(vcId);
+                UserGroup userGroup = userGroupService
+                        .retrieveHiddenUserGroupByVC(vc.getId());
                 try {
                     userGroupService.addGroupMember(username, userGroup,
                             "system", GroupMemberStatus.ACTIVE);
@@ -448,10 +464,6 @@ public class VirtualCorpusService {
             }
             // else VirtualCorpusType.SYSTEM
         }
-
-        String json = vc.getCorpusQuery();
-        String statistics = krill.getStatistics(json);
-        return converter.createVirtualCorpusDto(vc, statistics);
     }
 
     private boolean hasAccess (String username, int vcId)

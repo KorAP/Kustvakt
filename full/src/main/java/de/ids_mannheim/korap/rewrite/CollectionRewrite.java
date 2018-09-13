@@ -144,7 +144,7 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
         KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
         RewriteIdentifier identifier = new KoralNode.RewriteIdentifier(
                 Attributes.AVAILABILITY, user.getCorpusAccess());
-        JsonNode rewrittesNode;
+        JsonNode rewrittenNode;
 
         if (jsonNode.has("collection")) {
             List<String> avalabilityCopy =
@@ -159,16 +159,16 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
                 builder.with(buildAvailability(avalabilityCopy));
                 jlog.debug("corpus query: " + builder.toString());
                 builder.setBaseQuery(builder.toJSON());
-                rewrittesNode = builder.mergeWith(jsonNode).at("/collection");
-                node.set("collection", rewrittesNode, identifier);
+                rewrittenNode = builder.mergeWith(jsonNode).at("/collection");
+                node.set("collection", rewrittenNode, identifier);
             }
         }
         else {
             builder.with(buildAvailability(userAvailabilities));
             jlog.debug("corpus query: " + builder.toString());
-            rewrittesNode =
+            rewrittenNode =
                     JsonUtils.readTree(builder.toJSON()).at("/collection");
-            node.set("collection", rewrittesNode, identifier);
+            node.set("collection", rewrittenNode, identifier);
         }
 
         jlog.debug("REWRITES: " + node.at("/collection").toString());

@@ -36,9 +36,10 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
-/** VirtualCorpusDao manages SQL queries regarding virtual corpora, 
- *  e.g. retrieving and storing virtual corpora.
- *  
+/**
+ * VirtualCorpusDao manages SQL queries regarding virtual corpora,
+ * e.g. retrieving and storing virtual corpora.
+ * 
  * @author margaretha
  *
  */
@@ -50,19 +51,20 @@ public class VirtualCorpusDao {
     private EntityManager entityManager;
 
     public int createVirtualCorpus (String name, VirtualCorpusType type,
-            CorpusAccess requiredAccess, String corpusQuery, String definition,
-            String description, String status, String createdBy)
-            throws KustvaktException {
+            CorpusAccess requiredAccess, String koralQuery, String definition,
+            String description, String status, boolean isCached,
+            String createdBy) throws KustvaktException {
 
         VirtualCorpus vc = new VirtualCorpus();
         vc.setName(name);
         vc.setType(type);
         vc.setRequiredAccess(requiredAccess);
-        vc.setCorpusQuery(corpusQuery);
+        vc.setKoralQuery(koralQuery);
         vc.setDefinition(definition);
         vc.setDescription(description);
         vc.setStatus(status);
         vc.setCreatedBy(createdBy);
+        vc.setCached(isCached);
 
         entityManager.persist(vc);
         return vc.getId();
@@ -70,7 +72,7 @@ public class VirtualCorpusDao {
 
     public void editVirtualCorpus (VirtualCorpus vc, String name,
             VirtualCorpusType type, CorpusAccess requiredAccess,
-            String corpusQuery, String definition, String description,
+            String koralQuery, String definition, String description,
             String status) throws KustvaktException {
 
         if (name != null && !name.isEmpty()) {
@@ -82,8 +84,8 @@ public class VirtualCorpusDao {
         if (requiredAccess != null) {
             vc.setRequiredAccess(requiredAccess);
         }
-        if (corpusQuery != null) {
-            vc.setCorpusQuery(corpusQuery);
+        if (koralQuery != null) {
+            vc.setKoralQuery(koralQuery);
         }
         if (definition != null && !definition.isEmpty()) {
             vc.setDefinition(definition);
@@ -97,22 +99,28 @@ public class VirtualCorpusDao {
         entityManager.merge(vc);
     }
 
-    public void deleteVirtualCorpus (VirtualCorpus vc) throws KustvaktException {
-        if (!entityManager.contains(vc)){
+    public void deleteVirtualCorpus (VirtualCorpus vc)
+            throws KustvaktException {
+        if (!entityManager.contains(vc)) {
             vc = entityManager.merge(vc);
         }
         entityManager.remove(vc);
-        
+
     }
 
-    /** System admin function. 
+    /**
+     * System admin function.
      * 
-     *  Retrieves virtual corpus by creator and type. If type is not specified, 
-     *  retrieves virtual corpora of all types. If createdBy is not specified,
-     *  retrieves virtual corpora of all users.
+     * Retrieves virtual corpus by creator and type. If type is not
+     * specified,
+     * retrieves virtual corpora of all types. If createdBy is not
+     * specified,
+     * retrieves virtual corpora of all users.
      * 
-     * @param type {@link VirtualCorpusType}
-     * @param createdBy username of the virtual corpus creator
+     * @param type
+     *            {@link VirtualCorpusType}
+     * @param createdBy
+     *            username of the virtual corpus creator
      * @return a list of {@link VirtualCorpus}
      * @throws KustvaktException
      */
@@ -172,6 +180,40 @@ public class VirtualCorpusDao {
         return vc;
     }
 
+    public VirtualCorpus retrieveVCByName (String vcName, String createdBy)
+            throws KustvaktException {
+        ParameterChecker.checkStringValue(createdBy, "createdBy");
+        ParameterChecker.checkStringValue(vcName, "vcName");
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<VirtualCorpus> query =
+                builder.createQuery(VirtualCorpus.class);
+
+        Root<VirtualCorpus> virtualCorpus = query.from(VirtualCorpus.class);
+
+        Predicate condition = builder.and(
+                builder.equal(virtualCorpus.get(VirtualCorpus_.createdBy),
+                        createdBy),
+                builder.equal(virtualCorpus.get(VirtualCorpus_.name), vcName));
+
+        query.select(virtualCorpus);
+        query.where(condition);
+
+        Query q = entityManager.createQuery(query);
+        VirtualCorpus vc = null;
+        try {
+            vc = (VirtualCorpus) q.getSingleResult();
+        }
+        catch (NoResultException e) {
+            String vcCode = createdBy + "/" + vcName;
+            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
+                    "No result found for query: retrieve virtual corpus by name "
+                            + vcCode,
+                    String.valueOf(vcCode), e);
+        }
+        return vc;
+    }
+
     @SuppressWarnings("unchecked")
     public List<VirtualCorpus> retrieveOwnerVC (String userId)
             throws KustvaktException {
@@ -225,11 +267,11 @@ public class VirtualCorpusDao {
         Join<VirtualCorpus, VirtualCorpusAccess> access =
                 virtualCorpus.join(VirtualCorpus_.virtualCorpusAccess);
 
-        //        Predicate corpusStatus = builder.and(
-        //                builder.notEqual(access.get(VirtualCorpusAccess_.status),
-        //                        VirtualCorpusAccessStatus.HIDDEN),
-        //                builder.notEqual(access.get(VirtualCorpusAccess_.status),
-        //                        VirtualCorpusAccessStatus.DELETED));
+        // Predicate corpusStatus = builder.and(
+        // builder.notEqual(access.get(VirtualCorpusAccess_.status),
+        // VirtualCorpusAccessStatus.HIDDEN),
+        // builder.notEqual(access.get(VirtualCorpusAccess_.status),
+        // VirtualCorpusAccessStatus.DELETED));
 
         Predicate corpusStatus =
                 builder.notEqual(access.get(VirtualCorpusAccess_.status),
@@ -269,7 +311,6 @@ public class VirtualCorpusDao {
                         userId),
                 builder.equal(virtualCorpus.get(VirtualCorpus_.type),
                         VirtualCorpusType.SYSTEM));
-
 
         query.select(virtualCorpus);
         query.where(predicate);

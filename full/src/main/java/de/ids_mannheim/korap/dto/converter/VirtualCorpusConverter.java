@@ -31,7 +31,7 @@ public class VirtualCorpusConverter {
         dto.setStatus(vc.getStatus());
         dto.setDescription(vc.getDescription());
         dto.setType(vc.getType().displayName());
-        dto.setKoralQuery(vc.getCorpusQuery());
+        dto.setKoralQuery(vc.getKoralQuery());
 
         JsonNode node = JsonUtils.readTree(statistics);
         int numberOfDoc = node.at("/documents").asInt();

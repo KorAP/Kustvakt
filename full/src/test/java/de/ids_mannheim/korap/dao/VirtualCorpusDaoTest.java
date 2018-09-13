@@ -45,7 +45,7 @@ public class VirtualCorpusDaoTest {
         // insert vc
         int id = dao.createVirtualCorpus("system VC", VirtualCorpusType.SYSTEM,
                 User.CorpusAccess.FREE, "corpusSigle=GOE", "definition",
-                "description", "experimental", "test class");
+                "description", "experimental", false, "test class");
 
         // select vc
         List<VirtualCorpus> vcList =

@@ -133,6 +133,13 @@ public abstract class KoralNode {
         }
     }
 
+    public void setAll (ObjectNode other) {
+        if (this.node.isObject()) {
+            ObjectNode n = (ObjectNode) this.node;
+            n.setAll(other);
+        }
+        this.rewrites.add("insertion",null);
+    }
 
     public String get (String name) {
         if (this.node.isObject())
@@ -204,7 +211,9 @@ public abstract class KoralNode {
         public KoralRewriteBuilder add (String op, Object scope) {
             KoralRewrite rewrite = new KoralRewrite();
             rewrite.setOperation(op);
-            rewrite.setScope(scope.toString());
+            if (scope !=null){
+                rewrite.setScope(scope.toString());
+            }
             this.rewrites.add(rewrite);
             return this;
         }
@@ -269,5 +278,16 @@ public abstract class KoralNode {
 
     public boolean isMissingNode (String string) {
         return this.node.at(string).isMissingNode();
+    }
+
+
+    public int size () {
+        return this.node.size();
+    }
+
+
+    public KoralNode get (int i) {
+//        this.node = this.node.get(i);
+        return this.wrapNode(this.node.get(i));
     }
 }

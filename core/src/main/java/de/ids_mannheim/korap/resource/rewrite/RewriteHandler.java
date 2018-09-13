@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,7 +51,7 @@ public class RewriteHandler{
     public RewriteHandler () {
         this.node_processors = new HashSet<>();
         this.token_node_processors = new HashSet<>();
-        this.query_processors = new HashSet<>();
+        this.query_processors = new LinkedHashSet<>();
         this.failed_task_registration = new HashSet<>();
         this.beans = null;
         this.add(FoundryInject.class);

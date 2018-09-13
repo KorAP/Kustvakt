@@ -13,6 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.KrillCollection;
+import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.dao.VirtualCorpusDao;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.service.VirtualCorpusService;
+import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.web.SearchKrill;
 
@@ -22,10 +28,14 @@ public class NamedVCLoader {
     private FullConfiguration config;
     @Autowired
     private SearchKrill searchKrill;
-
+    @Autowired
+    private VirtualCorpusDao vcDao;
+    @Autowired
+    private VirtualCorpusService vcService;
+    
     private static Logger jlog = LogManager.getLogger(NamedVCLoader.class);
 
-    public void loadVCToCache () throws IOException, QueryException {
+    public void loadVCToCache () throws IOException, QueryException, KustvaktException {
 
         String dir = config.getNamedVCPath();
         File d = new File(dir);
@@ -66,18 +76,39 @@ public class NamedVCLoader {
                 continue;
             }
             jlog.debug(
-                    "READ " + file.getName() + " duration: " + (end - start));
+                    "READ " + filename + " duration: " + (end - start));
 
-            KrillCollection collection = new KrillCollection(json);
-            collection.setIndex(searchKrill.getIndex());
-
-            if (collection != null) {
-                collection.storeInCache(filename);
-            }
-            end = System.currentTimeMillis();
-            jlog.debug(filename + "caching duration: " + (end - start));
-            jlog.debug("memory cache: "
-                    + KrillCollection.cache.calculateInMemorySize());
+            cacheVC(json, filename);
+            storeVC(filename, json);
         }
+    }
+    
+    private void cacheVC (String json, String filename) throws IOException, QueryException {
+        long start, end;
+        start = System.currentTimeMillis();
+        
+        KrillCollection collection = new KrillCollection(json);
+        collection.setIndex(searchKrill.getIndex());
+
+        if (collection != null) {
+            collection.storeInCache(filename);
+        }
+        end = System.currentTimeMillis();
+        jlog.info(filename + " caching duration: " + (end - start));
+        jlog.debug("memory cache: "
+                + KrillCollection.cache.calculateInMemorySize());
+    }
+
+    private void storeVC (String name, String koralQuery) throws KustvaktException {
+        if (!VirtualCorpusService.wordPattern.matcher(name).matches()) {
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
+                    "Virtual corpus name must only contains letters, numbers, "
+                            + "underscores, hypens and spaces",
+                    name);
+        }
+        CorpusAccess requiredAccess = vcService.determineRequiredAccess(koralQuery);
+        vcDao.createVirtualCorpus(name, VirtualCorpusType.SYSTEM,
+                requiredAccess, koralQuery, null,
+                null, null, true, "system");
     }
 }

@@ -1,6 +1,8 @@
 # version 0.61.2
 12/09/2018
-    - Added various log4j2 configurations.
+    - Added various log4j2 configurations (margaretha)
+13/09/2018
+    - Implemented VirtualCorpusRewrite (margaretha)
 
 # version 0.61.1
 28/08/2018

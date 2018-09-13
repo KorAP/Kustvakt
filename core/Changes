@@ -1,7 +1,9 @@
 version 0.61.2
 12/09/2018
    - Removed log4j loader and old OAuth2 implementation codes(margaretha)
-
+13/09/2018
+   - Updated KoralNode and enforced order of RewriteTask (margaretha)
+    
 version 0.61.1
 28/08/2018
     - Added API URL versioning (margaretha)

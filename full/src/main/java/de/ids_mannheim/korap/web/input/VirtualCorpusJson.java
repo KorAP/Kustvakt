@@ -31,6 +31,7 @@ public class VirtualCorpusJson {
     private String definition;
     private String description;
     private String status;
+    private boolean isCached;
 
 
     public void setCorpusQuery (String corpusQuery)

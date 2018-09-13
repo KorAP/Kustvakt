@@ -72,7 +72,8 @@ CREATE TABLE IF NOT EXISTS virtual_corpus (
   description VARCHAR(255) DEFAULT NULL,
   status VARCHAR(100) DEFAULT NULL,
   corpus_query TEXT NOT NULL,
-  definition VARCHAR(255) DEFAULT NULL
+  definition VARCHAR(255) DEFAULT NULL,
+  is_cached BOOLEAN DEFAULT 0
 );
 
 CREATE INDEX virtual_corpus_owner_index ON virtual_corpus(created_by);
