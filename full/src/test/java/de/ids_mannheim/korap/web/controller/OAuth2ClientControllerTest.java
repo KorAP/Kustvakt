@@ -382,6 +382,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         testAccessTokenAfterUpgradingClient(clientId, accessToken);
         testAccessTokenAfterDegradingSuperClient(clientId, accessToken);
+        
+        testDeregisterConfidentialClient(clientId, clientSecret);
     }
 
     // old access tokens retain their scopes

@@ -3,6 +3,8 @@ version 0.61.2
    - Removed log4j loader and old OAuth2 implementation codes(margaretha)
 13/09/2018
    - Updated KoralNode and enforced order of RewriteTask (margaretha)
+14/09/2018
+   - Added a status code for nonunique results (margaretha)
     
 version 0.61.1
 28/08/2018

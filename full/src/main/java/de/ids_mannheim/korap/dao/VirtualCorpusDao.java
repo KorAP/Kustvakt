@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -208,6 +209,13 @@ public class VirtualCorpusDao {
             String vcCode = createdBy + "/" + vcName;
             throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
                     "No result found for query: retrieve virtual corpus by name "
+                            + vcCode,
+                    String.valueOf(vcCode), e);
+        }
+        catch (NonUniqueResultException e) {
+            String vcCode = createdBy + "/" + vcName;
+            throw new KustvaktException(StatusCodes.NON_UNIQUE_RESULT_FOUND,
+                    "Non unique result found for query: retrieve virtual corpus by name "
                             + vcCode,
                     String.valueOf(vcCode), e);
         }

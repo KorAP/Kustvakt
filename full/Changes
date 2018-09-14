@@ -3,6 +3,10 @@
     - Added various log4j2 configurations (margaretha)
 13/09/2018
     - Implemented VirtualCorpusRewrite (margaretha)
+14/09/2018
+    - Fixed SpringJerseyTest ApplicationContext (margaretha)
+    - Handled VCRef with username in VirtualCorpusRewrite (margaretha)
+    - Enabled VCReferenceTest in maven test suite (margaretha)
 
 # version 0.61.1
 28/08/2018

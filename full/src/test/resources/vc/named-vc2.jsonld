@@ -1,0 +1,10 @@
+{"collection": {
+    "@type": "koral:doc",
+    "key": "textSigle",
+    "match": "match:ne",
+    "type" : "type:string",
+    "value": [
+        "GOE/AGI/04846",
+        "GOE/AGA/01784"
+    ]
+}}

@@ -14,6 +14,7 @@ import de.ids_mannheim.korap.resource.rewrite.KoralNode.RewriteIdentifier;
 import de.ids_mannheim.korap.resource.rewrite.RewriteTask;
 import de.ids_mannheim.korap.service.VirtualCorpusService;
 import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.util.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 @Component
@@ -36,24 +37,24 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
         if (koralNode.has("@type")
                 && koralNode.get("@type").equals("koral:docGroupRef")) {
             if (!koralNode.has("ref")) {
-                // throw error
+                throw new KustvaktException(StatusCodes.MISSING_VC_REFERENCE,
+                        "ref is not found");
             }
             else {
                 String vcName = koralNode.get("ref");
+                String vcOwner = "system";
+                if (vcName.contains("/")) {
+                    String[] names = vcName.split("/");
+                    if (names.length == 2) {
+                        vcOwner = names[0];
+                        vcName = names[1];
+                    }
+                }
 
                 VirtualCorpus vc =
-                        vcService.searchVCByName(username, vcName, "system");
+                        vcService.searchVCByName(username, vcName, vcOwner);
                 if (!vc.isCached()) {
-                    String koralQuery = vc.getKoralQuery();
-                    JsonNode kq =
-                            JsonUtils.readTree(koralQuery).at("/collection");
-                    JsonNode jsonNode = koralNode.rawNode();
-                    // rewrite
-                    koralNode.remove("@type", new RewriteIdentifier("@type",
-                            jsonNode.at("/@type").asText()));
-                    koralNode.remove("ref", new RewriteIdentifier("ref",
-                            jsonNode.at("/ref").asText()));
-                    koralNode.setAll((ObjectNode) kq);
+                    rewriteVC(vc, koralNode);
                 }
             }
 
@@ -68,5 +69,18 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
             }
 
         }
+    }
+
+    private void rewriteVC (VirtualCorpus vc, KoralNode koralNode)
+            throws KustvaktException {
+        String koralQuery = vc.getKoralQuery();
+        JsonNode kq = JsonUtils.readTree(koralQuery).at("/collection");
+        JsonNode jsonNode = koralNode.rawNode();
+        // rewrite
+        koralNode.remove("@type",
+                new RewriteIdentifier("@type", jsonNode.at("/@type").asText()));
+        koralNode.remove("ref",
+                new RewriteIdentifier("ref", jsonNode.at("/ref").asText()));
+        koralNode.setAll((ObjectNode) kq);
     }
 }
