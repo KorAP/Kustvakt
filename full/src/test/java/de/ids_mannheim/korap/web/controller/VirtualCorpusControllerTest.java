@@ -14,6 +14,7 @@ import java.util.Set;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.http.HttpStatus;
 import org.apache.http.entity.ContentType;
 import org.junit.Test;
 
@@ -63,7 +64,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     private JsonNode testSearchVC (String username, String vcId)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc").path(vcId)
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path(vcId)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -78,7 +80,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     private JsonNode testListVC (String username)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("list")
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("list")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -91,12 +94,11 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         return JsonUtils.readTree(entity);
     }
 
-
     private JsonNode testListOwnerVC (String username)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("list")
-                .path("user")
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("list").path("user")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -112,8 +114,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
     private void testDeleteVC (String vcId, String username)
             throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("delete")
-                .path(vcId)
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("delete").path(vcId)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -125,8 +127,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
     private JsonNode testlistAccessByVC (String username, String vcId)
             throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("access")
-                .path("list").queryParam("vcId", vcId)
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("access").path("list").queryParam("vcId", vcId)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -161,10 +163,12 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     public void testSearchPrivateVCUnauthorized ()
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("1").header(
-                Attributes.AUTHORIZATION,
-                HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
-                        "VirtualCorpusControllerTest", "pass"))
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("1")
+                .header(Attributes.AUTHORIZATION,
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue(
+                                        "VirtualCorpusControllerTest", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
@@ -194,7 +198,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
 
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("2")
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("2")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -250,8 +255,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     @Test
     public void testListVCByOtherUser () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("list")
-                .queryParam("createdBy", "dory")
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("list").queryParam("createdBy", "dory")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("pearl", "pass"))
@@ -271,8 +276,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     @Test
     public void testListVCByGuest () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("list")
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("list").header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -291,10 +296,12 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         String json = "{\"name\": \"new vc\",\"type\": \"PRIVATE\","
                 + "\"corpusQuery\": \"corpusSigle=GOE\"}";
 
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("create").header(
-                Attributes.AUTHORIZATION,
-                HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
-                        "VirtualCorpusControllerTest", "pass"))
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("create")
+                .header(Attributes.AUTHORIZATION,
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue(
+                                        "VirtualCorpusControllerTest", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .post(ClientResponse.class, json);
@@ -321,10 +328,12 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     public void testCreatePublishVC () throws KustvaktException {
         String json = "{\"name\": \"new published vc\",\"type\": \"PUBLISHED\""
                 + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("create").header(
-                Attributes.AUTHORIZATION,
-                HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
-                        "VirtualCorpusControllerTest", "pass"))
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("create")
+                .header(Attributes.AUTHORIZATION,
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue(
+                                        "VirtualCorpusControllerTest", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .post(ClientResponse.class, json);
@@ -365,7 +374,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     private JsonNode testCheckHiddenGroup (String groupId)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("group").path(groupId)
+        ClientResponse response = resource().path(API_VERSION).path("group")
+                .path(groupId)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -390,7 +400,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
             authToken = reader.readLine();
         }
 
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("create")
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("create")
                 .header(Attributes.AUTHORIZATION,
                         AuthenticationScheme.API.displayName() + " "
                                 + authToken)
@@ -421,7 +432,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                 + "UiLCJleHAiOjE1MzA2MTgyOTR9.JUMvTQZ4tvdRXFBpQKzoNxrq7"
                 + "CuYAfytr_LWqY8woJs";
 
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("create")
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("create")
                 .header(Attributes.AUTHORIZATION,
                         AuthenticationScheme.API.displayName() + " "
                                 + authToken)
@@ -445,10 +457,12 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         String json = "{\"name\": \"new vc\",\"type\": \"SYSTEM\","
                 + "\"corpusQuery\": \"creationDate since 1820\"}";
 
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("create").header(
-                Attributes.AUTHORIZATION,
-                HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
-                        "VirtualCorpusControllerTest", "pass"))
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("create")
+                .header(Attributes.AUTHORIZATION,
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue(
+                                        "VirtualCorpusControllerTest", "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
 
@@ -464,16 +478,18 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
         checkWWWAuthenticateHeader(response);
     }
-    
+
     @Test
     public void testCreateVCInvalidName () throws KustvaktException {
         String json = "{\"name\": \"new $vc\",\"type\": \"PRIVATE\","
                 + "\"corpusQuery\": \"creationDate since 1820\"}";
 
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("create").header(
-                Attributes.AUTHORIZATION,
-                HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
-                        "VirtualCorpusControllerTest", "pass"))
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("create")
+                .header(Attributes.AUTHORIZATION,
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue(
+                                        "VirtualCorpusControllerTest", "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
@@ -489,7 +505,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         String json = "{\"name\": \"new vc\",\"type\": \"PRIVATE\","
                 + "\"corpusQuery\": \"creationDate since 1820\"}";
 
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("create")
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("create")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
 
@@ -509,10 +526,12 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     public void testCreateVCWithoutcorpusQuery () throws KustvaktException {
         String json = "{\"name\": \"new vc\",\"type\": \"PRIVATE\"}";
 
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("create").header(
-                Attributes.AUTHORIZATION,
-                HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
-                        "VirtualCorpusControllerTest", "pass"))
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("create")
+                .header(Attributes.AUTHORIZATION,
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue(
+                                        "VirtualCorpusControllerTest", "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
@@ -531,10 +550,12 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         String json = "{\"name\": \"new vc\",\"corpusQuery\": "
                 + "\"creationDate since 1820\"}";
 
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("create").header(
-                Attributes.AUTHORIZATION,
-                HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
-                        "VirtualCorpusControllerTest", "pass"))
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("create")
+                .header(Attributes.AUTHORIZATION,
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue(
+                                        "VirtualCorpusControllerTest", "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
@@ -553,10 +574,12 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         String json = "{\"name\": \"new vc\",\"type\": \"PRIVAT\","
                 + "\"corpusQuery\": \"creationDate since 1820\"}";
 
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("create").header(
-                Attributes.AUTHORIZATION,
-                HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
-                        "VirtualCorpusControllerTest", "pass"))
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("create")
+                .header(Attributes.AUTHORIZATION,
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue(
+                                        "VirtualCorpusControllerTest", "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
@@ -574,7 +597,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
     @Test
     public void testDeleteVCUnauthorized () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("delete").path("1")
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("delete").path("1")
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(
@@ -602,7 +626,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         // 1st edit
         String json = "{\"id\": \"1\", \"name\": \"edited vc\"}";
 
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("edit")
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("edit")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -636,10 +661,12 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     public void testEditVCNotOwner () throws KustvaktException {
         String json = "{\"id\": \"1\", \"name\": \"edited vc\"}";
 
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("edit").header(
-                Attributes.AUTHORIZATION,
-                HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
-                        "VirtualCorpusControllerTest", "pass"))
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("edit")
+                .header(Attributes.AUTHORIZATION,
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue(
+                                        "VirtualCorpusControllerTest", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .post(ClientResponse.class, json);
@@ -656,7 +683,6 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         checkWWWAuthenticateHeader(response);
     }
 
-
     /**
      * @see VirtualCorpusServiceTest
      * @throws KustvaktException
@@ -667,7 +693,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         String vcId = "2";
         String json = "{\"id\": \"" + vcId + "\", \"type\": \"PUBLISHED\"}";
 
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("edit")
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("edit")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -715,8 +742,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
     @Test
     public void testlistAccessMissingId () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("access")
-                .path("list")
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("access").path("list")
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(
@@ -733,8 +760,9 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
     @Test
     public void testlistAccessByGroup () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("access")
-                .path("list").path("byGroup").queryParam("groupId", "2")
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("access").path("list").path("byGroup")
+                .queryParam("groupId", "2")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -749,28 +777,12 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         assertEquals("dory group", node.at("/0/userGroupName").asText());
     }
 
-
     @Test
     public void testCreateDeleteAccess () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
 
         String vcId = "5";
-
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        // marlin vc
-        form.add("vcId", vcId);
-        // marlin group
-        form.add("groupId", "1");
-
-        ClientResponse response;
-        // share VC
-        response = resource().path(API_VERSION).path("vc").path("access").path("share")
-                .type(MediaType.APPLICATION_FORM_URLENCODED)
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("marlin", "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(form)
-                .post(ClientResponse.class);
-
+        ClientResponse response = testShareVC(vcId);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         // list vc access by marlin
@@ -784,8 +796,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
         String accessId = node.at("/accessId").asText();
 
-        // delete access
-        // unauthorized
+        testCreateNonUniqueAccess(vcId);
         testDeleteAccessUnauthorized(accessId);
 
         // delete access
@@ -795,6 +806,37 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         // list vc access by dory
         node = testlistAccessByVC("dory", vcId);
         assertEquals(0, node.size());
+    }
+
+    private ClientResponse testShareVC (String vcId)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        // marlin vc
+        form.add("vcId", vcId);
+        // marlin group
+        form.add("groupId", "1");
+
+        return resource().path(API_VERSION).path("vc").path("access")
+                .path("share").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("marlin", "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(form)
+                .post(ClientResponse.class);
+    }
+
+    private void testCreateNonUniqueAccess (String vcId)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        ClientResponse response = testShareVC(vcId);
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        
+        assertEquals(HttpStatus.SC_BAD_REQUEST, response.getStatus());
+        assertEquals(StatusCodes.DB_INSERT_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertTrue(node.at("/errors/0/1").asText()
+                .startsWith("[SQLITE_CONSTRAINT_UNIQUE]"));
     }
 
     @Test
@@ -810,8 +852,9 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
         // share VC
         // dory is VCA in marlin group
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("access")
-                .path("share").type(MediaType.APPLICATION_FORM_URLENCODED)
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("access").path("share")
+                .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(form)
@@ -838,8 +881,9 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
 
         // share VC
         // nemo is not VCA in marlin group
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("access")
-                .path("share").type(MediaType.APPLICATION_FORM_URLENCODED)
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("access").path("share")
+                .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("nemo", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(form)
@@ -857,8 +901,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     private void testDeleteAccess (String username, String accessId)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("access")
-                .path("delete").path(accessId)
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("access").path("delete").path(accessId)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -870,8 +914,8 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     private void testDeleteAccessUnauthorized (String accessId)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("access")
-                .path("delete").path(accessId)
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("access").path("delete").path(accessId)
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(

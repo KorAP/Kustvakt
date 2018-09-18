@@ -20,8 +20,6 @@ CREATE TABLE IF NOT EXISTS oauth2_client (
 	   REFERENCES oauth2_client_url(url_hashcode)
 );
 
-CREATE UNIQUE INDEX client_id_index on oauth2_client(id);
-
 CREATE TABLE IF NOT EXISTS oauth2_access_scope (
 	id VARCHAR(255) PRIMARY KEY NOT NULL
 );

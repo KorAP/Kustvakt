@@ -78,6 +78,8 @@ CREATE TABLE IF NOT EXISTS virtual_corpus (
 
 CREATE INDEX virtual_corpus_owner_index ON virtual_corpus(created_by);
 CREATE INDEX virtual_corpus_type_index ON virtual_corpus(type);
+CREATE UNIQUE INDEX  virtual_corpus_unique_name 
+	ON virtual_corpus(name,created_by);
 
 CREATE TABLE IF NOT EXISTS virtual_corpus_access (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -97,6 +99,6 @@ CREATE TABLE IF NOT EXISTS virtual_corpus_access (
 
 CREATE INDEX virtual_corpus_status_index 
 	ON virtual_corpus_access(status);
-CREATE INDEX virtual_corpus_access_unique_index 
+CREATE UNIQUE INDEX virtual_corpus_access_unique_index 
 	ON virtual_corpus_access(virtual_corpus_id,user_group_id);
 

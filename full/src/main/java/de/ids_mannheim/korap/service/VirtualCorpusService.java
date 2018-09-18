@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.service;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -212,7 +213,7 @@ public class VirtualCorpusService {
         // check if hidden access exists
         if (access == null) {
             VirtualCorpus vc = vcDao.retrieveVCById(vcId);
-            // create and assign a hidden group
+            // create and assign a new hidden group
             int groupId = userGroupService.createAutoHiddenGroup(vcId);
             UserGroup autoHidden =
                     userGroupService.retrieveUserGroupById(groupId);
@@ -220,18 +221,28 @@ public class VirtualCorpusService {
                     VirtualCorpusAccessStatus.HIDDEN);
         }
         else {
+            // should not happened
             jlog.error("Cannot publish VC with id: " + vcId
-                    + ". There have been hidden accesses for the VC already.");
+                    + ". Hidden access exists! Access id: " + access.getId());
         }
     }
 
     public int storeVC (VirtualCorpusJson vc, String username)
             throws KustvaktException {
-        ParameterChecker.checkStringValue(vc.getName(), "name");
-        ParameterChecker.checkObjectValue(vc.getType(), "type");
         ParameterChecker.checkStringValue(vc.getCorpusQuery(), "corpusQuery");
+        String koralQuery = serializeCorpusQuery(vc.getCorpusQuery());
 
-        String name = vc.getName();
+        return storeVC(vc.getName(), vc.getType(), koralQuery,
+                vc.getDefinition(), vc.getDescription(), vc.getStatus(),
+                vc.isCached(), username);
+    }
+
+    public int storeVC (String name, VirtualCorpusType type, String koralQuery,
+            String definition, String description, String status,
+            boolean isCached, String username) throws KustvaktException {
+        ParameterChecker.checkStringValue(name, "name");
+        ParameterChecker.checkObjectValue(type, "type");
+
         if (!wordPattern.matcher(name).matches()) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "Virtual corpus name must only contains letters, numbers, "
@@ -239,20 +250,36 @@ public class VirtualCorpusService {
                     name);
         }
 
-        if (vc.getType().equals(VirtualCorpusType.SYSTEM)
+        if (type.equals(VirtualCorpusType.SYSTEM) 
+                && !username.equals("system")
                 && !adminDao.isAdmin(username)) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
 
-        String koralQuery = serializeCorpusQuery(vc.getCorpusQuery());
         CorpusAccess requiredAccess = determineRequiredAccess(koralQuery);
 
-        int vcId = vcDao.createVirtualCorpus(vc.getName(), vc.getType(),
-                requiredAccess, koralQuery, vc.getDefinition(),
-                vc.getDescription(), vc.getStatus(), vc.isCached(), username);
+        int vcId = 0;
+        try {
+            vcId = vcDao.createVirtualCorpus(name, type, requiredAccess,
+                    koralQuery, definition, description, status, isCached,
+                    username);
 
-        if (vc.getType().equals(VirtualCorpusType.PUBLISHED)) {
+        }
+        catch (Exception e) {
+            Throwable cause = e;
+            Throwable lastCause = null;
+            while ((cause = cause.getCause()) != null
+                    && !cause.equals(lastCause)) {
+                if (cause instanceof SQLException) {
+                    break;
+                }
+                lastCause = cause;
+            }
+            throw new KustvaktException(StatusCodes.DB_INSERT_FAILED,
+                    cause.getMessage());
+        }
+        if (type.equals(VirtualCorpusType.PUBLISHED)) {
             publishVC(vcId);
         }
         // EM: should this return anything?
@@ -326,8 +353,23 @@ public class VirtualCorpusService {
                     "Unauthorized operation for user: " + username, username);
         }
         else {
-            accessDao.createAccessToVC(vc, userGroup, username,
-                    VirtualCorpusAccessStatus.ACTIVE);
+            try {
+                accessDao.createAccessToVC(vc, userGroup, username,
+                        VirtualCorpusAccessStatus.ACTIVE);
+            }
+            catch (Exception e) {
+                Throwable cause = e;
+                Throwable lastCause = null;
+                while ((cause = cause.getCause()) != null
+                        && !cause.equals(lastCause)) {
+                    if (cause instanceof SQLException) {
+                        break;
+                    }
+                    lastCause = cause;
+                }
+                throw new KustvaktException(StatusCodes.DB_INSERT_FAILED,
+                        cause.getMessage());
+            }
             vcDao.editVirtualCorpus(vc, null, VirtualCorpusType.PUBLISHED, null,
                     null, null, null, null);
         }
@@ -417,8 +459,8 @@ public class VirtualCorpusService {
 
     }
 
-    public VirtualCorpus searchVCByName (String username, String vcName, String createdBy)
-            throws KustvaktException {
+    public VirtualCorpus searchVCByName (String username, String vcName,
+            String createdBy) throws KustvaktException {
         VirtualCorpus vc = vcDao.retrieveVCByName(vcName, createdBy);
         checkVCAccess(vc, username);
         return vc;

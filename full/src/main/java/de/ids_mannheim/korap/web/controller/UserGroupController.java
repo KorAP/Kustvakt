@@ -24,12 +24,13 @@ import com.sun.jersey.spi.container.ResourceFilters;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.dto.UserGroupDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.UserGroupService;
-import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.APIVersionFilter;
+import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
@@ -260,6 +261,35 @@ public class UserGroupController {
             scopeService.verifyScope(context,
                     OAuth2Scope.ADD_USER_GROUP_MEMBER);
             service.inviteGroupMembers(group, context.getUsername());
+            return Response.ok().build();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+    }
+
+    @POST
+    @Path("member/role/edit")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response editMemberRoles (@Context SecurityContext securityContext,
+            @FormParam("groupId") int groupId,
+            @FormParam("memberUsername") String memberUsername,
+            @FormParam("roleIds") List<Integer> roleIds,
+            @PathParam("version") String version) {
+        double v = Double.valueOf(version.substring(1, version.length()));
+        if (v < 1.1) {
+            throw kustvaktResponseHandler.throwit(new KustvaktException(
+                    StatusCodes.UNSUPPORTED_API_VERSION,
+                    "Method is not supported in version " + version, version));
+        }
+
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            scopeService.verifyScope(context,
+                    OAuth2Scope.EDIT_USER_GROUP_MEMBER_ROLE);
+            service.editMemberRoles(context.getUsername(), groupId,
+                    memberUsername, roleIds);
             return Response.ok().build();
         }
         catch (KustvaktException e) {

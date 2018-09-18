@@ -70,12 +70,15 @@ public class UserGroupDaoTest {
         assertEquals(createdBy, m.getUserId());
 
         // member roles
-        List<Role> roles = roleDao.retrieveRoleByGroupMemberId(m.getId());
+        Set<Role> roles = roleDao.retrieveRoleByGroupMemberId(m.getId());
         assertEquals(2, roles.size());
+        ArrayList<Role> roleList = new ArrayList<>(2);
+        roleList.addAll(roles);
+        Collections.sort(roleList);
         assertEquals(PredefinedRole.USER_GROUP_ADMIN.getId(),
-                roles.get(0).getId());
+                roleList.get(0).getId());
         assertEquals(PredefinedRole.VC_ACCESS_ADMIN.getId(),
-                roles.get(1).getId());
+                roleList.get(1).getId());
 
         //retrieve VC by group
         List<VirtualCorpus> vc = virtualCorpusDao.retrieveVCByGroup(groupId);

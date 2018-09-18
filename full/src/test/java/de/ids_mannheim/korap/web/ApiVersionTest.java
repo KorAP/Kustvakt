@@ -23,7 +23,7 @@ public class ApiVersionTest extends SpringJerseyTest {
                 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         assertEquals(HttpStatus.PERMANENT_REDIRECT_308, response.getStatus());
         URI location = response.getLocation();
-        assertEquals("/api/v1.0/search", location.getPath());
+        assertEquals("/api/"+API_VERSION+"/search", location.getPath());
     }
 
     @Test
@@ -34,6 +34,6 @@ public class ApiVersionTest extends SpringJerseyTest {
                 .get(ClientResponse.class);
         assertEquals(HttpStatus.PERMANENT_REDIRECT_308, response.getStatus());
         URI location = response.getLocation();
-        assertEquals("/api/v1.0/search", location.getPath());
+        assertEquals("/api/"+API_VERSION+"/search", location.getPath());
     }
 }

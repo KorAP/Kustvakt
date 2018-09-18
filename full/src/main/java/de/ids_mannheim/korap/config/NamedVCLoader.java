@@ -16,11 +16,8 @@ import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.KrillCollection;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
-import de.ids_mannheim.korap.dao.VirtualCorpusDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.service.VirtualCorpusService;
-import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.web.SearchKrill;
 
@@ -30,8 +27,6 @@ public class NamedVCLoader {
     private FullConfiguration config;
     @Autowired
     private SearchKrill searchKrill;
-    @Autowired
-    private VirtualCorpusDao vcDao;
     @Autowired
     private VirtualCorpusService vcService;
 
@@ -44,7 +39,8 @@ public class NamedVCLoader {
         String json = IOUtils.toString(is, "utf-8");
         if (json != null) {
             cacheVC(json, filename);
-            storeVC(filename, json);
+            vcService.storeVC(filename, VirtualCorpusType.SYSTEM, json, null,
+                    null, null, true, "system");
         }
     }
 
@@ -66,7 +62,8 @@ public class NamedVCLoader {
             String json = readFile(file, filename);
             if (json != null) {
                 cacheVC(json, filename);
-                storeVC(filename, json);
+                vcService.storeVC(filename, VirtualCorpusType.SYSTEM, json, null,
+                        null, null, true, "system");
             }
         }
     }
@@ -113,17 +110,4 @@ public class NamedVCLoader {
                 + KrillCollection.cache.calculateInMemorySize());
     }
 
-    private void storeVC (String name, String koralQuery)
-            throws KustvaktException {
-        if (!VirtualCorpusService.wordPattern.matcher(name).matches()) {
-            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
-                    "Virtual corpus name must only contains letters, numbers, "
-                            + "underscores, hypens and spaces",
-                    name);
-        }
-        CorpusAccess requiredAccess =
-                vcService.determineRequiredAccess(koralQuery);
-        vcDao.createVirtualCorpus(name, VirtualCorpusType.SYSTEM,
-                requiredAccess, koralQuery, null, null, null, true, "system");
-    }
 }

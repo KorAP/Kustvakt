@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -25,6 +27,23 @@ public class VirtualCorpusServiceTest {
 
     @Autowired
     private VirtualCorpusService vcService;
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    @Test
+    public void testCreateNonUniqueVC () throws KustvaktException {
+        thrown.expect(KustvaktException.class);
+        thrown.expectMessage("A UNIQUE constraint failed "
+                + "(UNIQUE constraint failed: virtual_corpus.name, "
+                + "virtual_corpus.created_by)");
+
+        VirtualCorpusJson vc = new VirtualCorpusJson();
+        vc.setCorpusQuery("corpusSigle=GOE");
+        vc.setName("dory VC");
+        vc.setType(VirtualCorpusType.PRIVATE);
+        vcService.storeVC(vc, "dory");
+    }
 
     @Test
     public void createDeletePublishVC () throws KustvaktException {
@@ -63,7 +82,8 @@ public class VirtualCorpusServiceTest {
         // check VC
         VirtualCorpusDto vcDto = vcService.searchVCById("dory", vcId);
         assertEquals("group VC published", vcDto.getName());
-        assertEquals(VirtualCorpusType.PUBLISHED.displayName(), vcDto.getType());
+        assertEquals(VirtualCorpusType.PUBLISHED.displayName(),
+                vcDto.getType());
 
         // check access
         List<VirtualCorpusAccess> accesses =
@@ -72,7 +92,7 @@ public class VirtualCorpusServiceTest {
 
         VirtualCorpusAccess access = accesses.get(1);
         assertEquals(VirtualCorpusAccessStatus.HIDDEN, access.getStatus());
-        
+
         // check auto hidden group
         UserGroup autoHiddenGroup = access.getUserGroup();
         assertEquals(UserGroupStatus.HIDDEN, autoHiddenGroup.getStatus());

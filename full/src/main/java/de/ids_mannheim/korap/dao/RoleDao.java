@@ -1,6 +1,8 @@
 package de.ids_mannheim.korap.dao;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -78,8 +80,7 @@ public class RoleDao {
         return (Role) q.getSingleResult();
     }
 
-    @SuppressWarnings("unchecked")
-    public List<Role> retrieveRoleByGroupMemberId (int userId) {
+    public Set<Role> retrieveRoleByGroupMemberId (int userId) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Role> query = criteriaBuilder.createQuery(Role.class);
 
@@ -91,7 +92,9 @@ public class RoleDao {
         query.where(criteriaBuilder.equal(memberRole.get(UserGroupMember_.id),
                 userId));
         Query q = entityManager.createQuery(query);
-        return q.getResultList();
+        @SuppressWarnings("unchecked")
+        List<Role> resultList = q.getResultList();
+        return new HashSet<Role>(resultList);
     }
 
 }

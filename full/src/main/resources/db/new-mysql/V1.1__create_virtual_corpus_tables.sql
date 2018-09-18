@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS virtual_corpus (
   corpus_query TEXT NOT NULL,
   definition varchar(255) DEFAULT NULL,
   is_cached BOOLEAN DEFAULT 0,
+  UNIQUE INDEX unique_index (name,created_by),
   INDEX owner_index (created_by),
   INDEX type_index (type)
 );

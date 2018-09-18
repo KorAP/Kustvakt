@@ -16,9 +16,10 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Describes user roles for example in managing a group or 
- *  virtual corpora of a group.
- *  
+/**
+ * Describes user roles for example in managing a group or
+ * virtual corpora of a group.
+ * 
  * @author margaretha
  * @see Privilege
  */
@@ -26,7 +27,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "role")
-public class Role implements Comparable<Role>{
+public class Role implements Comparable<Role> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -46,12 +47,29 @@ public class Role implements Comparable<Role>{
 
     @Override
     public int compareTo (Role o) {
-        if (this.getId() > o.getId()){
+        if (this.getId() > o.getId()) {
             return 1;
         }
-        else if (this.getId() < o.getId()){
+        else if (this.getId() < o.getId()) {
             return -1;
         }
         return 0;
+    }
+
+    @Override
+    public boolean equals (Object obj) {
+        Role r = (Role) obj;
+        if (this.id == r.getId() && this.name.equals(r.getName())) {
+            return true;
+        }
+        return false;
+    }
+    
+    @Override
+    public int hashCode () {
+        int hash = 7;
+        hash = 31 * hash + (int) id;
+        hash = 31 * hash + (name == null ? 0 : name.hashCode());
+        return hash;
     }
 }

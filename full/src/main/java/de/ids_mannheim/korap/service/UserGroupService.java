@@ -32,7 +32,9 @@ import de.ids_mannheim.korap.utils.ParameterChecker;
 import de.ids_mannheim.korap.web.controller.UserGroupController;
 import de.ids_mannheim.korap.web.input.UserGroupJson;
 
-/** UserGroupService defines the logic behind user group web controller.
+/**
+ * UserGroupService defines the logic behind user group web
+ * controller.
  * 
  * @see UserGroupController
  * 
@@ -42,8 +44,7 @@ import de.ids_mannheim.korap.web.input.UserGroupJson;
 @Service
 public class UserGroupService {
 
-    private static Logger jlog =
-            LogManager.getLogger(UserGroupService.class);
+    private static Logger jlog = LogManager.getLogger(UserGroupService.class);
     @Autowired
     private UserGroupDao userGroupDao;
     @Autowired
@@ -61,10 +62,12 @@ public class UserGroupService {
 
     private static Set<Role> memberRoles;
 
-    /** Only users with {@link PredefinedRole#USER_GROUP_ADMIN} 
+    /**
+     * Only users with {@link PredefinedRole#USER_GROUP_ADMIN}
      * are allowed to see the members of the group.
      * 
-     * @param username username
+     * @param username
+     *            username
      * @return a list of usergroups
      * @throws KustvaktException
      * 
@@ -166,24 +169,27 @@ public class UserGroupService {
         }
     }
 
-    /** Group owner is automatically added when creating a group. 
-     *  Do not include owners in group members. 
-     *  
-     *  {@link PredefinedRole#USER_GROUP_MEMBER} and 
-     *  {@link PredefinedRole#VC_ACCESS_MEMBER} roles are 
-     *  automatically assigned to each group member. 
-     *  
-     *  {@link PredefinedRole#USER_GROUP_MEMBER} restrict users 
-     *  to see other group members and allow users to remove 
-     *  themselves from the groups.
-     *   
-     *  {@link PredefinedRole#VC_ACCESS_MEMBER} allow user to 
-     *  read group VC.
+    /**
+     * Group owner is automatically added when creating a group.
+     * Do not include owners in group members.
+     * 
+     * {@link PredefinedRole#USER_GROUP_MEMBER} and
+     * {@link PredefinedRole#VC_ACCESS_MEMBER} roles are
+     * automatically assigned to each group member.
+     * 
+     * {@link PredefinedRole#USER_GROUP_MEMBER} restrict users
+     * to see other group members and allow users to remove
+     * themselves from the groups.
+     * 
+     * {@link PredefinedRole#VC_ACCESS_MEMBER} allow user to
+     * read group VC.
      * 
      * @see /full/src/main/resources/db/predefined/V3.2__insert_predefined_roles.sql
      * 
-     * @param groupJson UserGroupJson object from json
-     * @param createdBy the user creating the group
+     * @param groupJson
+     *            UserGroupJson object from json
+     * @param createdBy
+     *            the user creating the group
      * @throws KustvaktException
      * 
      * 
@@ -240,19 +246,26 @@ public class UserGroupService {
                 config.isSoftDeleteAutoGroup());
     }
 
-    /** Adds a user to the specified usergroup. If the username with 
-     *  {@link GroupMemberStatus} DELETED exists as a member of the group, 
-     *  the entry will be deleted first, and a new entry will be added.
-     *  
-     *  If a username with other statuses exists, a KustvaktException will 
-     *  be thrown.    
+    /**
+     * Adds a user to the specified usergroup. If the username with
+     * {@link GroupMemberStatus} DELETED exists as a member of the
+     * group,
+     * the entry will be deleted first, and a new entry will be added.
+     * 
+     * If a username with other statuses exists, a KustvaktException
+     * will
+     * be thrown.
      * 
      * @see GroupMemberStatus
      * 
-     * @param username a username
-     * @param userGroup a user group
-     * @param createdBy the user (VCA/system) adding the user the user-group 
-     * @param status the status of the membership
+     * @param username
+     *            a username
+     * @param userGroup
+     *            a user group
+     * @param createdBy
+     *            the user (VCA/system) adding the user the user-group
+     * @param status
+     *            the status of the membership
      * @throws KustvaktException
      */
     public void inviteGroupMember (String username, UserGroup userGroup,
@@ -357,11 +370,15 @@ public class UserGroupService {
         return false;
     }
 
-    /** Updates the {@link GroupMemberStatus} of a pending member 
-     * to {@link GroupMemberStatus#ACTIVE} and add default member roles.
+    /**
+     * Updates the {@link GroupMemberStatus} of a pending member
+     * to {@link GroupMemberStatus#ACTIVE} and add default member
+     * roles.
      * 
-     * @param groupId groupId
-     * @param username the username of the group member
+     * @param groupId
+     *            groupId
+     * @param username
+     *            the username of the group member
      * @throws KustvaktException
      */
     public void acceptInvitation (int groupId, String username)
@@ -452,14 +469,19 @@ public class UserGroupService {
         }
     }
 
-    /** Updates the {@link GroupMemberStatus} of a member to 
+    /**
+     * Updates the {@link GroupMemberStatus} of a member to
      * {@link GroupMemberStatus#DELETED}
      * 
-     * @param userId user to be deleted
-     * @param groupId user-group id
-     * @param deletedBy user that issue the delete 
-     * @param isSoftDelete true if database entry is to be deleted 
-     * permanently, false otherwise
+     * @param userId
+     *            user to be deleted
+     * @param groupId
+     *            user-group id
+     * @param deletedBy
+     *            user that issue the delete
+     * @param isSoftDelete
+     *            true if database entry is to be deleted
+     *            permanently, false otherwise
      * @throws KustvaktException
      */
     private void doDeleteMember (String username, int groupId, String deletedBy,
@@ -495,8 +517,9 @@ public class UserGroupService {
 
     }
 
-    public void addMemberRoles (String username, int groupId,
-            String memberUsername, List<Integer> roleIds) throws KustvaktException {
+    public void editMemberRoles (String username, int groupId,
+            String memberUsername, List<Integer> roleIds)
+            throws KustvaktException {
 
         ParameterChecker.checkIntegerValue(groupId, "groupId");
         ParameterChecker.checkStringValue(username, "username");
@@ -504,9 +527,49 @@ public class UserGroupService {
 
         UserGroup userGroup = userGroupDao.retrieveGroupById(groupId, true);
         UserGroupStatus groupStatus = userGroup.getStatus();
-        if (groupStatus == UserGroupStatus.DELETED){
+        if (groupStatus == UserGroupStatus.DELETED) {
             throw new KustvaktException(StatusCodes.GROUP_DELETED,
-                    "Usergroup has been deleted."); 
+                    "Usergroup has been deleted.");
+        }
+        else if (isUserGroupAdmin(username, userGroup)
+                || adminDao.isAdmin(username)) {
+
+            UserGroupMember member =
+                    groupMemberDao.retrieveMemberById(memberUsername, groupId);
+
+            if (!member.getStatus().equals(GroupMemberStatus.ACTIVE)) {
+                throw new KustvaktException(StatusCodes.GROUP_MEMBER_INACTIVE,
+                        memberUsername + " has status " + member.getStatus(),
+                        memberUsername, member.getStatus().name());
+            }
+
+            Set<Role> roles = new HashSet<>();
+            for (int i = 0; i < roleIds.size(); i++) {
+                roles.add(roleDao.retrieveRoleById(roleIds.get(i)));
+            }
+            member.setRoles(roles);
+            groupMemberDao.updateMember(member);
+
+        }
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
+    }
+
+    public void addMemberRoles (String username, int groupId,
+            String memberUsername, List<Integer> roleIds)
+            throws KustvaktException {
+
+        ParameterChecker.checkIntegerValue(groupId, "groupId");
+        ParameterChecker.checkStringValue(username, "username");
+        ParameterChecker.checkStringValue(memberUsername, "memberUsername");
+
+        UserGroup userGroup = userGroupDao.retrieveGroupById(groupId, true);
+        UserGroupStatus groupStatus = userGroup.getStatus();
+        if (groupStatus == UserGroupStatus.DELETED) {
+            throw new KustvaktException(StatusCodes.GROUP_DELETED,
+                    "Usergroup has been deleted.");
         }
         else if (isUserGroupAdmin(username, userGroup)
                 || adminDao.isAdmin(username)) {
@@ -535,7 +598,8 @@ public class UserGroupService {
     }
 
     public void deleteMemberRoles (String username, int groupId,
-            String memberUsername, List<Integer> roleIds) throws KustvaktException {
+            String memberUsername, List<Integer> roleIds)
+            throws KustvaktException {
 
         ParameterChecker.checkIntegerValue(groupId, "groupId");
         ParameterChecker.checkStringValue(username, "username");
@@ -551,8 +615,8 @@ public class UserGroupService {
 
             Set<Role> roles = member.getRoles();
             Iterator<Role> i = roles.iterator();
-            while (i.hasNext()){
-                if (roleIds.contains(i.next().getId())){
+            while (i.hasNext()) {
+                if (roleIds.contains(i.next().getId())) {
                     i.remove();
                 }
             }

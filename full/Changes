@@ -7,6 +7,9 @@
     - Fixed SpringJerseyTest ApplicationContext (margaretha)
     - Handled VCRef with username in VirtualCorpusRewrite (margaretha)
     - Enabled VCReferenceTest in maven test suite (margaretha)
+18/09/2018
+    - Handled unique constraints (margaretha)
+    - Added a controller for editing user group member roles (margaretha)
 
 # version 0.61.1
 28/08/2018

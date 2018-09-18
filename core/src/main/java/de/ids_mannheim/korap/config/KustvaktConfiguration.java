@@ -99,11 +99,9 @@ public class KustvaktConfiguration {
         currentVersion = properties.getProperty("current.api.version", "v1.0");
         String supportedVersions =
                 properties.getProperty("supported.api.version", "");
-        if (supportedVersions.isEmpty()){
-            supportedVersions = currentVersion;
-        }
         this.supportedVersions = Arrays.stream(supportedVersions.split(" "))
                 .collect(Collectors.toSet());
+        this.supportedVersions.add(currentVersion);
 
         baseURL = properties.getProperty("kustvakt.base.url", "/api/*");
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));
