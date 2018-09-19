@@ -43,11 +43,13 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
             else {
                 String vcName = koralNode.get("ref");
                 String vcOwner = "system";
+                boolean ownerExist = false;
                 if (vcName.contains("/")) {
                     String[] names = vcName.split("/");
                     if (names.length == 2) {
                         vcOwner = names[0];
                         vcName = names[1];
+                        ownerExist = true;
                     }
                 }
 
@@ -55,6 +57,9 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
                         vcService.searchVCByName(username, vcName, vcOwner);
                 if (!vc.isCached()) {
                     rewriteVC(vc, koralNode);
+                }
+                else if (ownerExist) {
+                    removeOwner(vc.getKoralQuery(), vcOwner, koralNode);
                 }
             }
 
@@ -69,6 +74,16 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
             }
 
         }
+    }
+
+    private void removeOwner (String koralQuery, String vcOwner,
+            KoralNode koralNode) throws KustvaktException {
+        JsonNode jsonNode = koralNode.rawNode();
+        String ref = jsonNode.at("/ref").asText();
+        koralNode.remove("ref", new RewriteIdentifier("ref", ref));
+
+        ref = ref.substring(vcOwner.length()+1, ref.length());
+        koralNode.set("ref", ref, new RewriteIdentifier("ref", ref));
     }
 
     private void rewriteVC (VirtualCorpus vc, KoralNode koralNode)

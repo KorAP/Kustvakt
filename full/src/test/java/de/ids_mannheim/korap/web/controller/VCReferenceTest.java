@@ -80,13 +80,12 @@ public class VCReferenceTest extends SpringJerseyTest {
     public void testSearchWithVCRefEqual () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("cq", "referTo named-vc1")
+                .queryParam("cq", "referTo \"system/named-vc1\"")
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertTrue(node.at("/matches").size() > 0);
-
     }
 
     public void testSearchWithVCRefNotEqual () throws KustvaktException {

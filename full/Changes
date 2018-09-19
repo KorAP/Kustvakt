@@ -10,6 +10,8 @@
 18/09/2018
     - Handled unique constraints (margaretha)
     - Added a controller for editing user group member roles (margaretha)
+19/09/2018
+    - Fixed cached-VC ref with username (margaretha)
 
 # version 0.61.1
 28/08/2018

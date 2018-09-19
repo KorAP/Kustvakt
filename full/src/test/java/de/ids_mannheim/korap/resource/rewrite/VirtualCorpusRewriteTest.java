@@ -34,32 +34,56 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
     private NamedVCLoader vcLoader;
     @Autowired
     private VirtualCorpusDao dao;
-    
+
     @Test
     public void testNoRewriteWithCachedVCRef ()
             throws KustvaktException, IOException, QueryException {
         KrillCollection.cache = CacheManager.newInstance().getCache("named_vc");
         vcLoader.loadVCToCache("named-vc1", "/vc/named-vc1.jsonld");
 
+        // ClientResponse response =
+        // resource().path(API_VERSION).path("search")
+        // .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+        // .queryParam("cq", "referTo named-vc1")
+        // .get(ClientResponse.class);
+        //
+        // String ent = response.getEntity(String.class);
+        // JsonNode node = JsonUtils.readTree(ent);
+        // node = node.at("/collection");
+        //
+        // assertEquals("koral:docGroup", node.at("/@type").asText());
+        // assertTrue(node.at("/operands/1/rewrites").isMissingNode());
+
+        testNoRewriteWithUsername();
+
+        KrillCollection.cache.removeAll();
+        VirtualCorpus vc = dao.retrieveVCByName("named-vc1", "system");
+        dao.deleteVirtualCorpus(vc);
+    }
+
+    private void testNoRewriteWithUsername ()
+            throws KustvaktException, IOException, QueryException {
+
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("cq", "referTo named-vc1")
+                .queryParam("cq", "referTo \"system/named-vc1\"")
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/collection");
-
         assertEquals("koral:docGroup", node.at("/@type").asText());
-        assertTrue(node.at("/operands/1/rewrites").isMissingNode());
-        
-        KrillCollection.cache.removeAll();
-        VirtualCorpus vc = dao.retrieveVCByName("named-vc1", "system");
-        dao.deleteVirtualCorpus(vc);
+
+        node = node.at("/operands/1/rewrites");
+        assertEquals(2, node.size());
+        assertEquals("operation:deletion", node.at("/0/operation").asText());
+        assertEquals("operation:insertion", node.at("/1/operation").asText());
+
     }
-    
+
     @Test
-    public void testRewriteFreeAndSystemVCRef () throws KustvaktException, Exception {
+    public void testRewriteFreeAndSystemVCRef ()
+            throws KustvaktException, Exception {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"system VC\"")
@@ -71,7 +95,7 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
 
         assertEquals("koral:docGroup", node.at("/@type").asText());
         assertEquals("koral:doc", node.at("/operands/0/@type").asText());
-        
+
         assertEquals("koral:doc", node.at("/operands/1/@type").asText());
         assertEquals("GOE", node.at("/operands/1/value").asText());
         assertEquals("corpusSigle", node.at("/operands/1/key").asText());
@@ -98,7 +122,7 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         node = node.at("/collection");
         assertEquals("koral:docGroup", node.at("/@type").asText());
         assertEquals("koral:docGroup", node.at("/operands/0/@type").asText());
-        
+
         node = node.at("/operands/1/rewrites");
         assertEquals(3, node.size());
         assertEquals("operation:deletion", node.at("/0/operation").asText());
@@ -120,7 +144,7 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/collection");
-//        System.out.println(node);
+        // System.out.println(node);
         assertEquals("koral:docGroup", node.at("/@type").asText());
         node = node.at("/operands/1/rewrites");
         assertEquals(3, node.size());
