@@ -1,0 +1,10 @@
+[{
+    "id": "WPD15",
+    "de_title" : "Deutsche Wikipedia Artikel 2015",
+    "en_title" : "German Wikipedia Articles 2015",
+    "en_description" : "A collection of German Wikipedia articles from May 2015.",
+    "layers": [
+        "opennlp/p",
+        "corenlp/p"
+    ]
+}]

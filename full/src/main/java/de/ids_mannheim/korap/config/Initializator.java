@@ -6,6 +6,7 @@ import java.util.EnumSet;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.annotation.AnnotationParser;
+import de.ids_mannheim.korap.annotation.FreeResourceParser;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
 import de.ids_mannheim.korap.oauth2.dao.AccessScopeDao;
@@ -26,7 +27,9 @@ public class Initializator {
     private NamedVCLoader loader;
     @Autowired
     private AnnotationParser annotationParser;
-
+    @Autowired
+    private FreeResourceParser resourceParser;
+    
     public Initializator () {}
 
     public void init () throws IOException, QueryException, KustvaktException {
@@ -39,6 +42,7 @@ public class Initializator {
         setInitialAccessScope();
         loader.loadVCToCache();
         annotationParser.run();
+        resourceParser.run();
     }
 
     public void initTest () {

@@ -3,6 +3,7 @@
     - Updated NamedVCLoader to be optional (margaretha)
     - Updated annotation tables & implemented key-value structure (margaretha)
     - Added annotation parser for annotation data from kalamar (margaretha)
+    - Implemented parsing free resource info from json (margaretha)
 
 # version 0.61.2
 12/09/2018

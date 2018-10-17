@@ -123,14 +123,21 @@ public class AnnotationParser {
             Annotation layer = retrieveOrCreateAnnotation(code, annotationType,
                     null, array.get(0));
             try {
-                annotationDao.createAnnotationLayer(foundry, layer);
+                AnnotationLayer annotationLayer =
+                        annotationDao.retrieveAnnotationLayer(foundry.getCode(),
+                                layer.getCode());
+                if (annotationLayer == null) {
+                    annotationDao.createAnnotationLayer(foundry, layer);
+                }
             }
             catch (Exception e) {
                 log.debug("Duplicate annotation layer: " + foundry.getCode()
                         + "/" + layer.getCode());
             }
         }
-        else if (annotationType.equals(AnnotationType.KEY)) {
+        else if (annotationType.equals(AnnotationType.KEY))
+
+        {
             if (layer == null) {
                 computeLayer(annotationCode);
             }
