@@ -48,6 +48,8 @@ public class NamedVCLoader {
             throws IOException, QueryException, KustvaktException {
 
         String dir = config.getNamedVCPath();
+        if (dir.isEmpty()) return;
+        
         File d = new File(dir);
         if (!d.isDirectory()) {
             throw new IOException("Directory " + dir + " is not valid");

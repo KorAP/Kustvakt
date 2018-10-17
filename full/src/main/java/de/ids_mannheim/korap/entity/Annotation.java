@@ -10,10 +10,11 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Describes annotation tags available in the system / used in 
- *  annotating corpus data. 
+/**
+ * Describes annotation tags available in the system / used in
+ * annotating corpus data.
  * 
- *  @author margaretha
+ * @author margaretha
  *
  */
 @Setter
@@ -22,15 +23,24 @@ import lombok.Setter;
 @Table(name = "annotation")
 public class Annotation {
 
+    public Annotation () {}
+
+    public Annotation (String code, String type, String text, String description) {
+        this.code = code;
+        this.type = type;
+        this.text = text;
+        this.description = description;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String code;
     private String type;
+    private String text;
     private String description;
     @Column(name = "de_description")
     private String germanDescription;
-
 
     @Override
     public String toString () {

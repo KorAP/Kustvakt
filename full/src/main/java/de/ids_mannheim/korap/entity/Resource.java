@@ -44,7 +44,7 @@ public class Resource {
                     referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "layer_id",
                     referencedColumnName = "id"))
-    private Set<AnnotationPair> layers;
+    private Set<AnnotationLayer> layers;
 
 
     @Override

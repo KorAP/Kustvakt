@@ -12,7 +12,7 @@ import de.ids_mannheim.korap.dao.AnnotationDao;
 import de.ids_mannheim.korap.dto.FoundryDto;
 import de.ids_mannheim.korap.dto.LayerDto;
 import de.ids_mannheim.korap.dto.converter.AnnotationConverter;
-import de.ids_mannheim.korap.entity.AnnotationPair;
+import de.ids_mannheim.korap.entity.AnnotationLayer;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.web.controller.AnnotationController;
@@ -35,7 +35,7 @@ public class AnnotationService {
     private AnnotationConverter annotationConverter;
 
     public List<LayerDto> getLayerDtos () {
-        List<AnnotationPair> layers = annotationDao.getAllFoundryLayerPairs();
+        List<AnnotationLayer> layers = annotationDao.getAllFoundryLayerPairs();
         jlog.debug("/layers " + layers.toString());
         List<LayerDto> layerDto = annotationConverter.convertToLayerDto(layers);
         return layerDto;
@@ -43,7 +43,7 @@ public class AnnotationService {
 
     public List<FoundryDto> getFoundryDtos (List<String> codes, String language)
             throws KustvaktException {
-        List<AnnotationPair> annotationPairs = null;
+        List<AnnotationLayer> annotationPairs = null;
         String foundry = "", layer = "";
         if (codes.contains("*")) {
             annotationPairs =
@@ -51,7 +51,7 @@ public class AnnotationService {
         }
         else {
             String[] annotationCode;
-            annotationPairs = new ArrayList<AnnotationPair>();
+            annotationPairs = new ArrayList<AnnotationLayer>();
             for (String code : codes) {
                 jlog.debug("code " + code);
                 annotationCode = code.split("/");

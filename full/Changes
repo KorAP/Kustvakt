@@ -1,3 +1,9 @@
+# version 0.61.3
+17/10/2018
+    - Updated NamedVCLoader to be optional (margaretha)
+    - Updated annotation tables & implemented key-value structure (margaretha)
+    - Added annotation parser for annotation data from kalamar (margaretha)
+
 # version 0.61.2
 12/09/2018
     - Added various log4j2 configurations (margaretha)
@@ -8,14 +14,14 @@
     - Handled VCRef with username in VirtualCorpusRewrite (margaretha)
     - Enabled VCReferenceTest in maven test suite (margaretha)
 18/09/2018
-    - Handled unique constraints (margaretha)
+    - Handled unique constraints / inserting duplicate items to DB (margaretha)
     - Added a controller for editing user group member roles (margaretha)
 19/09/2018
-    - Fixed cached-VC ref with username (margaretha)
+    - Fixed cached-VC ref with username (margaretha)   
 
 # version 0.61.1
 28/08/2018
-    - Added API URL versioning (margaretha) 
+    - Added API URL versioning (margaretha)
     - Deactivated IdRewrite (margaretha)
     - Fixed kustvakt controller (margaretha)
 30/08/2018

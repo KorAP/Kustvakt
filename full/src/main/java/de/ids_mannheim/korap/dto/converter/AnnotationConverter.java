@@ -8,10 +8,12 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.dto.FoundryDto;
+import de.ids_mannheim.korap.dto.FoundryDto.Key;
 import de.ids_mannheim.korap.dto.FoundryDto.Layer;
 import de.ids_mannheim.korap.dto.LayerDto;
 import de.ids_mannheim.korap.entity.Annotation;
-import de.ids_mannheim.korap.entity.AnnotationPair;
+import de.ids_mannheim.korap.entity.AnnotationKey;
+import de.ids_mannheim.korap.entity.AnnotationLayer;
 
 /**
  * AnnotationConverter prepares data transfer objects (DTOs) from
@@ -28,22 +30,22 @@ public class AnnotationConverter {
      * Returns layer descriptions in a list of {@link LayerDto}s.
      * 
      * @param pairs
-     *            a list of {@link AnnotationPair}s
+     *            a list of {@link AnnotationLayer}s
      * @return a list of {@link LayerDto}s
      */
-    public List<LayerDto> convertToLayerDto (List<AnnotationPair> pairs) {
+    public List<LayerDto> convertToLayerDto (List<AnnotationLayer> pairs) {
         List<LayerDto> layerDtos = new ArrayList<LayerDto>(pairs.size());
         LayerDto dto;
         String foundry, layer;
-        for (AnnotationPair p : pairs) {
+        for (AnnotationLayer p : pairs) {
             dto = new LayerDto();
             dto.setId(p.getId());
             dto.setDescription(p.getDescription());
 
-            foundry = p.getAnnotation1().getCode();
+            foundry = p.getFoundry().getCode();
             dto.setFoundry(foundry);
 
-            layer = p.getAnnotation2().getCode();
+            layer = p.getLayer().getCode();
             dto.setLayer(layer);
             dto.setCode(foundry + "/" + layer);
             layerDtos.add(dto);
@@ -52,60 +54,72 @@ public class AnnotationConverter {
         return layerDtos;
     }
 
-
     /**
      * Returns foundry description in {@link FoundryDto}s
      * 
      * @param pairs
-     *            a list of {@link AnnotationPair}s
+     *            a list of {@link AnnotationLayer}s
      * @param language
      * @return a list of {@link FoundryDto}s
      */
-    public List<FoundryDto> convertToFoundryDto (List<AnnotationPair> pairs,
+    public List<FoundryDto> convertToFoundryDto (List<AnnotationLayer> pairs,
             String language) {
         List<FoundryDto> foundryDtos = new ArrayList<FoundryDto>(pairs.size());
-        Map<String, List<AnnotationPair>> foundryMap = createFoundryMap(pairs);
+        Map<String, List<AnnotationLayer>> foundryMap = createFoundryMap(pairs);
 
-        for (String key : foundryMap.keySet()) {
-            List<AnnotationPair> foundries = foundryMap.get(key);
+        for (String foundryCode : foundryMap.keySet()) {
+            List<AnnotationLayer> foundries = foundryMap.get(foundryCode);
             List<Layer> layers = new ArrayList<Layer>(foundries.size());
             FoundryDto dto = null;
 
-            for (AnnotationPair f : foundries) {
+            for (AnnotationLayer f : foundries) {
                 if (dto == null) {
-                    Annotation foundry = f.getAnnotation1();
+                    Annotation foundry = f.getFoundry();
                     dto = new FoundryDto();
-                    if (language.equals("de")){
+                    if (language.equals("de")) {
                         dto.setDescription(foundry.getGermanDescription());
                     }
-                    else{
+                    else {
                         dto.setDescription(foundry.getDescription());
                     }
                     dto.setCode(foundry.getCode());
                 }
 
-                Annotation layer = f.getAnnotation2();
-                Map<String, String> tags = new HashMap<>();
-                for (Annotation value : f.getValues()) {
-                    if (language.equals("de")){
-                        tags.put(value.getCode(), value.getGermanDescription());
+                Annotation layer = f.getLayer();
+                List<Key> keys = new ArrayList<>();
+
+                for (AnnotationKey ak : f.getKeys()) {
+                    Annotation a = ak.getKey();
+                    Map<String, String> values = new HashMap<>();
+                    Key key = dto.new Key(a.getCode());
+                    if (language.equals("de")) {
+                        key.setDescription(a.getGermanDescription());
+                        for (Annotation v : ak.getValues()) {
+                            values.put(v.getCode(), v.getGermanDescription());
+                        }
+
                     }
-                    else{
-                        tags.put(value.getCode(), value.getDescription());
+                    else {
+                        key.setDescription(a.getDescription());
+                        for (Annotation v : ak.getValues()) {
+                            values.put(v.getCode(), v.getDescription());
+                        }
                     }
+                    key.setValues(values);
+                    keys.add(key);
                 }
 
                 Layer l = dto.new Layer();
                 l.setCode(layer.getCode());
-                
-                if (language.equals("de")){
+
+                if (language.equals("de")) {
                     l.setDescription(layer.getGermanDescription());
                 }
-                else{
+                else {
                     l.setDescription(layer.getDescription());
                 }
-                
-                l.setTags(tags);
+
+                l.setKeys(keys);
                 layers.add(l);
             }
 
@@ -116,19 +130,18 @@ public class AnnotationConverter {
         return foundryDtos;
     }
 
-
-    private Map<String, List<AnnotationPair>> createFoundryMap (
-            List<AnnotationPair> pairs) {
-        Map<String, List<AnnotationPair>> foundries =
-                new HashMap<String, List<AnnotationPair>>();
-        for (AnnotationPair p : pairs) {
-            String foundryCode = p.getAnnotation1().getCode();
+    private Map<String, List<AnnotationLayer>> createFoundryMap (
+            List<AnnotationLayer> pairs) {
+        Map<String, List<AnnotationLayer>> foundries =
+                new HashMap<String, List<AnnotationLayer>>();
+        for (AnnotationLayer p : pairs) {
+            String foundryCode = p.getFoundry().getCode();
             if (foundries.containsKey(foundryCode)) {
                 foundries.get(foundryCode).add(p);
             }
             else {
-                List<AnnotationPair> foundryList =
-                        new ArrayList<AnnotationPair>();
+                List<AnnotationLayer> foundryList =
+                        new ArrayList<AnnotationLayer>();
                 foundryList.add(p);
                 foundries.put(foundryCode, foundryList);
             }

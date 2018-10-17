@@ -8,12 +8,14 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.dto.ResourceDto;
-import de.ids_mannheim.korap.entity.AnnotationPair;
+import de.ids_mannheim.korap.entity.AnnotationLayer;
 import de.ids_mannheim.korap.entity.Resource;
 
 /**
- * ResourceConverter prepares data transfer objects (DTOs) from {@link Resource}
- * entities. DTO structure defines controllers output, namely the structure of 
+ * ResourceConverter prepares data transfer objects (DTOs) from
+ * {@link Resource}
+ * entities. DTO structure defines controllers output, namely the
+ * structure of
  * JSON objects in HTTP responses.
  * 
  * @author margaretha
@@ -41,9 +43,9 @@ public class ResourceConverter {
 
             layers = new HashMap<Integer, String>();
             String foundry, layer, code;
-            for (AnnotationPair annotationPair : r.getLayers()) {
-                foundry = annotationPair.getAnnotation1().getCode();
-                layer = annotationPair.getAnnotation2().getCode();
+            for (AnnotationLayer annotationPair : r.getLayers()) {
+                foundry = annotationPair.getFoundry().getCode();
+                layer = annotationPair.getLayer().getCode();
                 code = foundry + "/" + layer;
                 layers.put(annotationPair.getId(), code);
             }

@@ -113,7 +113,7 @@ public class FullConfiguration extends KustvaktConfiguration {
         setRSAKeys(properties);
         
         setNamedVCPath(properties
-                .getProperty("krill.namedVC", "vc"));
+                .getProperty("krill.namedVC", ""));
     }
 
     private void setSecurityConfiguration (Properties properties) {
