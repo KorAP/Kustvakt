@@ -5,6 +5,9 @@
     "en_description" : "A collection of German Wikipedia articles from May 2015.",
     "layers": [
         "opennlp/p",
-        "corenlp/p"
+        "corenlp/p",
+        "corenlp/c",
+        "marmot/m",
+        "marmot/p"
     ]
 }]

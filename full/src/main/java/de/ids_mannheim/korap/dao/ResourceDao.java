@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -37,15 +39,14 @@ public class ResourceDao {
      * 
      * @return a list of resources
      */
-    @SuppressWarnings("unchecked")
     public List<Resource> getAllResources () {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Resource> query =
                 criteriaBuilder.createQuery(Resource.class);
         Root<Resource> resource = query.from(Resource.class);
         query.select(resource);
-        
-        Query q = entityManager.createQuery(query);
+
+        TypedQuery<Resource> q = entityManager.createQuery(query);
         return q.getResultList();
     }
 
@@ -58,12 +59,17 @@ public class ResourceDao {
         query.where(criteriaBuilder.equal(resource.get(Resource_.id), id));
 
         Query q = entityManager.createQuery(query);
-        return (Resource) q.getSingleResult();
+        try {
+            return (Resource) q.getSingleResult();
+        }
+        catch (NoResultException e) {
+            return null;
+        }
     }
 
     public void createResource (String id, String germanTitle,
-            String englishTitle, String englishDescription, Set<AnnotationLayer> layers)
-            throws KustvaktException {
+            String englishTitle, String englishDescription,
+            Set<AnnotationLayer> layers) throws KustvaktException {
         ParameterChecker.checkStringValue(id, "id");
         ParameterChecker.checkStringValue(englishTitle, "en_title");
         ParameterChecker.checkStringValue(germanTitle, "de_title");

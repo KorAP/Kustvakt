@@ -6,7 +6,8 @@
     - Implemented parsing free resource info from json (margaretha)
 22/10/2018
     - Updated jetty, spring and hibernate versions (margaretha)
-    - Fixed annotation order & added tests (margaretha)
+    - Fixed the order of annotation keys and values, and added tests (margaretha)
+    - Fixed resource DAO & added tests (margaretha)
 
 # version 0.61.2
 12/09/2018
