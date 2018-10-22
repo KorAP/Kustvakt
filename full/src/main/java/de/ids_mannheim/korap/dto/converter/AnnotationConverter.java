@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.springframework.stereotype.Component;
 
@@ -86,11 +89,12 @@ public class AnnotationConverter {
                 }
 
                 Annotation layer = f.getLayer();
-                List<Key> keys = new ArrayList<>();
+                Set<Key> keys = new TreeSet<>();
 
                 for (AnnotationKey ak : f.getKeys()) {
                     Annotation a = ak.getKey();
-                    Map<String, String> values = new HashMap<>();
+                    Map<String, String> values = new TreeMap<>();
+                    
                     Key key = dto.new Key(a.getCode());
                     if (language.equals("de")) {
                         key.setDescription(a.getGermanDescription());

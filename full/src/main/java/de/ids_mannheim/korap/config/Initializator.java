@@ -45,8 +45,10 @@ public class Initializator {
         resourceParser.run();
     }
 
-    public void initTest () {
+    public void initTest () throws IOException, KustvaktException {
         setInitialAccessScope();
+        annotationParser.run();
+        resourceParser.run();
     }
 
     private void setInitialAccessScope () {

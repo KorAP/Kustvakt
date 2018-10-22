@@ -1,3 +1,7 @@
+version 0.61.3
+22/10/2018
+   - Updated jetty, spring and hibernate versions (margaretha)
+
 version 0.61.2
 12/09/2018
    - Removed log4j loader and old OAuth2 implementation codes(margaretha)

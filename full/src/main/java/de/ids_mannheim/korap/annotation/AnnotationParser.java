@@ -141,18 +141,19 @@ public class AnnotationParser {
             if (layer == null) {
                 computeLayer(annotationCode);
             }
-            String code = array.get(1);
-            if (code.endsWith("=") || code.endsWith(":")) {
-                code = code.substring(0, code.length() - 1);
-            }
+
             Annotation annotation = null;
             if (array.size() == 2) {
+                String code = array.get(1);
+                if (code.endsWith("=") || code.endsWith(":")) {
+                    code = code.substring(0, code.length() - 1);
+                }
                 annotation = retrieveOrCreateAnnotation(code, annotationType,
                         null, array.get(0));
             }
             else if (array.size() == 3) {
-                annotation = retrieveOrCreateAnnotation(code, annotationType,
-                        array.get(1), array.get(2));
+                annotation = retrieveOrCreateAnnotation(array.get(0),
+                        annotationType, array.get(1), array.get(2));
             }
             if (annotation != null) {
                 AnnotationKey annotationKey =
@@ -167,8 +168,7 @@ public class AnnotationParser {
             if (this.key == null) {
                 computeKey(annotationCode);
             }
-            String valueCode = array.get(0);
-            Annotation value = retrieveOrCreateAnnotation(valueCode,
+            Annotation value = retrieveOrCreateAnnotation(array.get(0),
                     AnnotationType.VALUE, array.get(1), array.get(2));
             if (value != null) {
                 values.add(value);

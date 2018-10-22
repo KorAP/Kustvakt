@@ -23,15 +23,6 @@ import lombok.Setter;
 @Table(name = "annotation")
 public class Annotation {
 
-    public Annotation () {}
-
-    public Annotation (String code, String type, String text, String description) {
-        this.code = code;
-        this.type = type;
-        this.text = text;
-        this.description = description;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -41,6 +32,16 @@ public class Annotation {
     private String description;
     @Column(name = "de_description")
     private String germanDescription;
+
+    public Annotation () {}
+
+    public Annotation (String code, String type, String text,
+                       String description) {
+        this.code = code;
+        this.type = type;
+        this.text = text;
+        this.description = description;
+    }
 
     @Override
     public String toString () {

@@ -3,15 +3,15 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ids_mannheim.korap</groupId>
 	<artifactId>Kustvakt-core</artifactId>
-	<version>0.61.2</version>
+	<version>0.61.3</version>
 
 	<properties>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring-framework.version>5.0.3.RELEASE</spring-framework.version>
+		<spring-framework.version>5.1.1.RELEASE</spring-framework.version>
 		<jersey.version>1.19.4</jersey.version>
-		<jetty.version>9.4.8.v20171121</jetty.version>
-		<hibernate.version>5.1.11.Final</hibernate.version>
+		<jetty.version>9.4.12.v20180830</jetty.version>
+		<hibernate.version>5.3.7.Final</hibernate.version>
 	</properties>
 	<build>
 		<resources>

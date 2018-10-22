@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.dto;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
@@ -36,14 +37,14 @@ public class FoundryDto {
     public class Layer {
         private String code;
         private String description;
-        private List<Key> keys;
+        private Set<Key> keys;
     }
 
     @Getter
     @Setter
     @JsonInclude(Include.NON_EMPTY)
     @JsonSerialize(include=Inclusion.NON_EMPTY) // old codehouse annotation used by jersey
-    public class Key {
+    public class Key implements Comparable<Key>{
 
         private String code;
         private String description;
@@ -51,6 +52,11 @@ public class FoundryDto {
 
         public Key (String code) {
             this.code = code;
+        }
+        
+        @Override
+        public int compareTo (Key k) {
+            return this.code.compareTo(k.code); 
         }
     }
 }

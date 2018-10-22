@@ -4,6 +4,9 @@
     - Updated annotation tables & implemented key-value structure (margaretha)
     - Added annotation parser for annotation data from kalamar (margaretha)
     - Implemented parsing free resource info from json (margaretha)
+22/10/2018
+    - Updated jetty, spring and hibernate versions (margaretha)
+    - Fixed annotation order & added tests (margaretha)
 
 # version 0.61.2
 12/09/2018

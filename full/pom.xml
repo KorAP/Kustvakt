@@ -7,11 +7,10 @@
 	<properties>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring-framework.version>5.0.3.RELEASE</spring-framework.version>
-		<spring-security.version>4.2.3.RELEASE</spring-security.version>
-		<jetty.version>9.4.8.v20171121</jetty.version>
+		<spring-framework.version>5.1.1.RELEASE</spring-framework.version>
+		<jetty.version>9.4.12.v20180830</jetty.version>
 		<jersey.version>1.19.4</jersey.version>
-		<hibernate.version>5.1.11.Final</hibernate.version>
+		<hibernate.version>5.3.7.Final</hibernate.version>
 	</properties>
 	<build>
 		<!-- <resources>
@@ -39,6 +38,7 @@
 				<includes>
 					<include>**/*.info</include>
 					<include>**/*.properties</include>
+					<include>**/*.json</include>
 				</includes>
 			</testResource>
 		</testResources>
@@ -151,7 +151,7 @@
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Kustvakt-core</artifactId>
-			<version>0.61.2</version>
+			<version>0.61.3</version>
 		</dependency>
 		<!-- LDAP -->
 		<dependency>
@@ -191,7 +191,7 @@
 		<dependency>
 		    <groupId>org.hibernate</groupId>
 		    <artifactId>hibernate-c3p0</artifactId>
-		    <version>5.3.5.Final</version>
+		    <version>${hibernate.version}</version>
 		</dependency>
 		
 		<dependency>
@@ -241,12 +241,12 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
-			<version>${spring-security.version}</version>
+			<version>${spring-framework.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
-			<version>${spring-security.version}</version>
+			<version>${spring-framework.version}</version>
 		</dependency>
 
 		<!-- velocity -->
