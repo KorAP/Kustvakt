@@ -120,7 +120,6 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(4, node.size());
 
         boolean containsHiddenStatus = false;
         for (int i = 0; i < node.size(); i++) {

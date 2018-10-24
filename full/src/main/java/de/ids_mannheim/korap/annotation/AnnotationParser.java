@@ -58,7 +58,7 @@ public class AnnotationParser {
 
     private void readFile (File file) throws IOException {
         BufferedReader br = new BufferedReader(
-                new InputStreamReader(new FileInputStream(file)));
+                new InputStreamReader(new FileInputStream(file)), 1024);
 
         foundry = null;
 

@@ -11,7 +11,6 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserDetails;
@@ -27,16 +26,16 @@ import de.ids_mannheim.korap.user.Userdata;
 public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
 
     @Autowired
-    private AuthenticationManagerIface authManager;
+    private AuthenticationManager authenticationManager;
     
     @After
     public void after () {
         try {
-            User user = authManager
+            User user = authenticationManager
                     .getUser(
                             (String) KustvaktConfiguration.KUSTVAKT_USER
                                     .get(Attributes.USERNAME));
-            authManager
+            authenticationManager
                     .deleteAccount(user);
         }
         catch (KustvaktException e) {}
@@ -56,11 +55,11 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
     @Test
     @Ignore
     public void testUserdetailsGet () throws KustvaktException {
-        User user = authManager
+        User user = authenticationManager
                 .getUser((String) KustvaktConfiguration.KUSTVAKT_USER
                         .get(Attributes.USERNAME));
 
-        Userdata data = authManager.getUserData(user, UserDetails.class);
+        Userdata data = authenticationManager.getUserData(user, UserDetails.class);
         assertNotNull(data);
     }
 
@@ -68,11 +67,11 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
     @Test
     @Ignore
     public void testUsersettingsGet () throws KustvaktException {
-        User user = authManager
+        User user = authenticationManager
                 .getUser((String) KustvaktConfiguration.KUSTVAKT_USER
                         .get(Attributes.USERNAME));
 
-        Userdata data = authManager.getUserData(user, UserSettings.class);
+        Userdata data = authenticationManager.getUserData(user, UserSettings.class);
         assertNotNull(data);
     }
 
@@ -80,14 +79,14 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
     @Test(expected = KustvaktException.class)
     public void testUserDetailsGetNonExistent () throws KustvaktException {
         User user = new KorAPUser(10, "random");
-        authManager.getUserData(user, UserDetails.class);
+        authenticationManager.getUserData(user, UserDetails.class);
     }
 
 
     @Test(expected = KustvaktException.class)
     public void testUserSettingsGetNonExistent () throws KustvaktException {
         User user = new KorAPUser(10, "random");
-        authManager.getUserData(user, UserSettings.class);
+        authenticationManager.getUserData(user, UserSettings.class);
     }
 
 

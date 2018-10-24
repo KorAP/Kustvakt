@@ -14,10 +14,10 @@ import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
+import de.ids_mannheim.korap.oauth2.dao.AuthorizationDao;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
-import de.ids_mannheim.korap.oauth2.interfaces.AuthorizationDaoInterface;
 
 @Service(value = "authorizationService")
 public class OAuth2AuthorizationService {
@@ -30,7 +30,7 @@ public class OAuth2AuthorizationService {
     @Autowired
     protected OAuth2ScopeService scopeService;
     @Autowired
-    private AuthorizationDaoInterface authorizationDao;
+    private AuthorizationDao authorizationDao;
 
     @Autowired
     protected FullConfiguration config;

@@ -36,12 +36,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ResourceFilters;
 
+import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.Scopes;
 import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.User;
@@ -76,7 +76,7 @@ public class UserController {
 
     private static Logger jlog = LogManager.getLogger(UserController.class);
     @Autowired
-    private AuthenticationManagerIface controller;
+    private AuthenticationManager controller;
 
     private @Context UriInfo info;
 

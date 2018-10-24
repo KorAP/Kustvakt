@@ -158,16 +158,20 @@
 	</bean>
 
 	<!-- Data access objects -->
+	<bean id="adminDao" class="de.ids_mannheim.korap.dao.AdminDaoImpl" />
 	<bean id="resourceDao" class="de.ids_mannheim.korap.dao.ResourceDao" />
 	<bean id="accessScopeDao" class="de.ids_mannheim.korap.oauth2.dao.AccessScopeDao" />
-	<bean id="authorizationDao" class="de.ids_mannheim.korap.oauth2.dao.AuthorizationCacheDao" />
+	<bean id="authorizationDao" class="de.ids_mannheim.korap.oauth2.dao.CachedAuthorizationDaoImpl" />
+	
+	<!-- Services -->
+	<bean id="scopeService" class="de.ids_mannheim.korap.oauth2.service.OAuth2ScopeServiceImpl" />
 	
 	<!-- props are injected from default-config.xml -->
 	<bean id="kustvakt_config" class="de.ids_mannheim.korap.config.FullConfiguration">
 		<constructor-arg name="properties" ref="props" />
 	</bean>
 
-	<bean id="initializator" class="de.ids_mannheim.korap.config.Initializator"
+	<bean id="initializator" class="de.ids_mannheim.de.init.InitializatorImpl"
 		init-method="initTest">
 	</bean>
 
@@ -189,7 +193,7 @@
 		<constructor-arg value="http,https" />
 	</bean>
 
-	<bean id="kustvakt_rewrite" class="de.ids_mannheim.korap.rewrite.FullRewriteHandler">
+	<bean id="rewriteHandler" class="de.ids_mannheim.korap.rewrite.FullRewriteHandler">
 		<constructor-arg ref="kustvakt_config" />
 	</bean>
 
@@ -288,7 +292,7 @@
 	</util:list>
 
 	<!-- specify type for constructor argument -->
-	<bean id="kustvakt_authenticationmanager"
+	<bean id="authenticationManager"
 		class="de.ids_mannheim.korap.authentication.KustvaktAuthenticationManager">
 		<constructor-arg type="de.ids_mannheim.korap.interfaces.EntityHandlerIface"
 			ref="kustvakt_userdb" />

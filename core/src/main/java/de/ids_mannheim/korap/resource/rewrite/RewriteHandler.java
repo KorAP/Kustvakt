@@ -54,7 +54,6 @@ public class RewriteHandler{
         this.query_processors = new LinkedHashSet<>();
         this.failed_task_registration = new HashSet<>();
         this.beans = null;
-        this.add(FoundryInject.class);
     }
 
     public Set getFailedProcessors () {
@@ -294,5 +293,9 @@ public class RewriteHandler{
         }
 
 
+    }
+
+    public void defaultRewriteConstraints () {
+        this.add(FoundryInject.class);
     }
 }

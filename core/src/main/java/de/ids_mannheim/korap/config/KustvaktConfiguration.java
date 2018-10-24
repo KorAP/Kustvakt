@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import de.ids_mannheim.korap.util.KrillProperties;
@@ -82,6 +83,11 @@ public class KustvaktConfiguration {
 
     // deprec?!
     private final BACKENDS DEFAULT_ENGINE = BACKENDS.LUCENE;
+    
+    // license patterns
+    protected Pattern publicLicensePattern;
+    protected Pattern freeLicensePattern;
+    protected Pattern allLicensePattern;
 
     public KustvaktConfiguration (Properties properties) throws Exception {
         load(properties);

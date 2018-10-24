@@ -20,6 +20,7 @@ import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
+import de.ids_mannheim.korap.oauth2.dao.AuthorizationDao;
 import de.ids_mannheim.korap.oauth2.dao.OAuth2ClientDao;
 import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientDto;
@@ -28,7 +29,6 @@ import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
-import de.ids_mannheim.korap.oauth2.interfaces.AuthorizationDaoInterface;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
 /**
@@ -58,7 +58,7 @@ public class OAuth2ClientService {
     @Autowired
     private RefreshTokenDao refreshDao;
     @Autowired
-    private AuthorizationDaoInterface authorizationDao;
+    private AuthorizationDao authorizationDao;
     @Autowired
     private AdminDao adminDao;
     @Autowired

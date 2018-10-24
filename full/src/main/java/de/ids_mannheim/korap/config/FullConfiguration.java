@@ -56,10 +56,6 @@ public class FullConfiguration extends KustvaktConfiguration {
     private List<String> publicRegexList;
     private List<String> allRegexList;
 
-    private Pattern publicLicensePattern;
-    private Pattern freeLicensePattern;
-    private Pattern allLicensePattern;
-
     private String authenticationScheme;
 
     private boolean isSoftDeleteAutoGroup;

@@ -1,7 +1,6 @@
 package de.ids_mannheim.korap.rewrite;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.resource.rewrite.CollectionCleanRewrite;
@@ -25,6 +24,7 @@ public class FullRewriteHandler extends RewriteHandler {
     }
 
     public void defaultRewriteConstraints () {
+        super.defaultRewriteConstraints();
         this.addProcessor(vcRewrite);
         this.add(CollectionRewrite.class);
         // this.add(IdWriter.class);

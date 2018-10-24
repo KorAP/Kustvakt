@@ -2,7 +2,7 @@ package de.ids_mannheim.korap.config;
 
 import java.util.List;
 
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
+import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
@@ -27,6 +27,6 @@ public interface TestBeans {
 
 	public  EncryptionIface getCrypto();
 
-	public  AuthenticationManagerIface getAuthManager();
+	public  AuthenticationManager getAuthManager();
 
 }

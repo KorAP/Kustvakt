@@ -10,12 +10,12 @@ import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 
+import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.authentication.http.AuthorizationData;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.security.context.KustvaktContext;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.utils.TimeUtils;
@@ -35,7 +35,7 @@ public class AuthenticationFilter
     private HttpAuthorizationHandler authorizationHandler;
 
     @Autowired
-    private AuthenticationManagerIface authenticationManager;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
     private KustvaktResponseHandler kustvaktResponseHandler;

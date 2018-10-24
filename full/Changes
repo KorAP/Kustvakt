@@ -8,6 +8,11 @@
     - Updated jetty, spring and hibernate versions (margaretha)
     - Fixed the order of annotation keys and values, and added tests (margaretha)
     - Fixed resource DAO & added tests (margaretha)
+24/10/2018    
+    - Fixed query serialization service (margaretha)
+    - Added "highlights" parameter to matchInfo controller (margaretha)
+    - Added "fields" parameter to search controllers (margaretha)
+    - Integrated lite controllers, services and tests in full version (margaretha)
 
 # version 0.61.2
 12/09/2018

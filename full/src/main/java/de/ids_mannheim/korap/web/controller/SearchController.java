@@ -96,15 +96,14 @@ public class SearchController {
         TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(ctx, OAuth2Scope.SERIALIZE_QUERY);
+            String result = searchService.serializeQuery(q, ql, v, cq,
+                    pageIndex, startPage, pageLength, context, cutoff);
+            jlog.debug("Query: " + result);
+            return Response.ok(result).build();
         }
         catch (KustvaktException e) {
-            kustvaktResponseHandler.throwit(e);
+            throw kustvaktResponseHandler.throwit(e);
         }
-
-        String result = searchService.serializeQuery(q, ql, v, cq, pageIndex,
-                startPage, pageLength, context, cutoff);
-        jlog.debug("Query: " + result);
-        return Response.ok(result).build();
     }
 
     @POST
@@ -136,6 +135,7 @@ public class SearchController {
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
             @QueryParam("page") Integer pageInteger,
+            @QueryParam("fields") Set<String> fields,
             @QueryParam("cq") String cq, @QueryParam("engine") String engine) {
 
         TokenContext context =
@@ -145,7 +145,7 @@ public class SearchController {
         try {
             scopeService.verifyScope(context, OAuth2Scope.SEARCH);
             result = searchService.search(engine, context.getUsername(),
-                    headers, q, ql, v, cq, pageIndex, pageInteger, ctx,
+                    headers, q, ql, v, cq, fields, pageIndex, pageInteger, ctx,
                     pageLength, cutoff);
         }
         catch (KustvaktException e) {
@@ -165,16 +165,19 @@ public class SearchController {
             @PathParam("matchId") String matchId,
             @QueryParam("foundry") Set<String> foundries,
             @QueryParam("layer") Set<String> layers,
-            @QueryParam("spans") Boolean spans) throws KustvaktException {
+            @QueryParam("spans") Boolean spans, 
+            // Highlights may also be a list of valid highlight classes
+            @QueryParam("hls") Boolean highlights) throws KustvaktException {
 
         TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
         scopeService.verifyScope(tokenContext, OAuth2Scope.MATCH_INFO);
         spans = spans != null ? spans : false;
+        highlights = highlights != null ? highlights : false;
         if (layers == null || layers.isEmpty()) layers = new HashSet<>();
 
         String results = searchService.retrieveMatchInfo(corpusId, docId,
                 textId, matchId, foundries, tokenContext.getUsername(), headers,
-                layers, spans);
+                layers, spans, highlights);
         return Response.ok(results).build();
     }
 

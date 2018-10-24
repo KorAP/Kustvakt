@@ -34,7 +34,6 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.exceptions.WrappedException;
 import de.ids_mannheim.korap.interfaces.AuthenticationIface;
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.ValidatorIface;
@@ -60,7 +59,7 @@ import de.ids_mannheim.korap.utils.TimeUtils;
  * 
  * @author hanl
  */
-public class KustvaktAuthenticationManager extends AuthenticationManagerIface {
+public class KustvaktAuthenticationManager extends AuthenticationManager {
 
 	private static Logger jlog = LogManager.getLogger(KustvaktAuthenticationManager.class);
 	private EncryptionIface crypto;

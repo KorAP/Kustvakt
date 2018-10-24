@@ -28,9 +28,9 @@ import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 
+import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserSettings;
@@ -52,7 +52,7 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
     public static boolean ENABLED = false;
     private Map<String, String> customVars;
     @Autowired
-    private AuthenticationManagerIface controller;
+    private AuthenticationManager authenticationManager;
 
 
     public PiwikFilter () {
@@ -133,12 +133,14 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
             try {
                 TokenContext context = (TokenContext) request
                         .getUserPrincipal();
-                // since this is cached, not very expensive!
-                User user = controller.getUser(context.getUsername());
-                Userdata data = controller
-                        .getUserData(user, UserSettings.class);
-                if ((Boolean) data.get(Attributes.COLLECT_AUDITING_DATA))
-                    customVars.put("username", context.getUsername());
+                if (context.getUsername() != null){
+                    // since this is cached, not very expensive!
+                    User user = authenticationManager.getUser(context.getUsername());
+                    Userdata data = authenticationManager
+                            .getUserData(user, UserSettings.class);
+                    if ((Boolean) data.get(Attributes.COLLECT_AUDITING_DATA))
+                        customVars.put("username", context.getUsername());
+                }
             }
             catch (KustvaktException | UnsupportedOperationException e) {
                 //do nothing

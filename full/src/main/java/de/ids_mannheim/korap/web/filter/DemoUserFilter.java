@@ -1,17 +1,6 @@
 package de.ids_mannheim.korap.web.filter;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ResourceFilter;
-import de.ids_mannheim.korap.config.BeansFactory;
-import de.ids_mannheim.korap.config.KustvaktConfiguration;
-import de.ids_mannheim.korap.constant.TokenType;
-import de.ids_mannheim.korap.security.context.KustvaktContext;
-import de.ids_mannheim.korap.security.context.TokenContext;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.TimeUtils;
-import de.ids_mannheim.korap.web.CoreResponseHandler;
+import java.security.Principal;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
@@ -20,11 +9,20 @@ import javax.ws.rs.ext.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.security.Principal;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerRequestFilter;
+import com.sun.jersey.spi.container.ContainerResponseFilter;
+import com.sun.jersey.spi.container.ResourceFilter;
+
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.constant.TokenType;
+import de.ids_mannheim.korap.security.context.KustvaktContext;
+import de.ids_mannheim.korap.security.context.TokenContext;
+import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.TimeUtils;
 
 /**
  * Created by hanl on 7/15/14.
- * EM: why would we need this?
  */
 @Provider
 @Component

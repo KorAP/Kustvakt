@@ -17,16 +17,15 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
 
+import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
 /**
  * Manages mail related services, such as sending group member
- * invitations
- * per email.
+ * invitations per email.
  * 
  * @author margaretha
  *
@@ -37,7 +36,7 @@ public class MailService {
     private static Logger jlog = LogManager.getLogger(MailService.class);
 
     @Autowired
-    private AuthenticationManagerIface authManager;
+    private AuthenticationManager authenticationManager;
     @Autowired
     private JavaMailSender mailSender;
     @Autowired
@@ -56,7 +55,7 @@ public class MailService {
 
             public void prepare (MimeMessage mimeMessage) throws Exception {
 
-                User invitee = authManager.getUser(inviteeName,
+                User invitee = authenticationManager.getUser(inviteeName,
                         config.getEmailAddressRetrieval());
 
                 MimeMessageHelper message = new MimeMessageHelper(mimeMessage);

@@ -7,7 +7,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.ContextLoaderListener;
 
 import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
@@ -20,7 +19,6 @@ import lombok.Setter;
  * @author hanl
  * @date 01/06/2015
  */
-@Component
 public abstract class KustvaktBaseServer {
 
     protected static KustvaktConfiguration config;

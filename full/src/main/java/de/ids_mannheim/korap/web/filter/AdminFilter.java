@@ -8,25 +8,22 @@ import javax.ws.rs.ext.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 
+import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.authentication.http.AuthorizationData;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
-import de.ids_mannheim.korap.authentication.http.TransferEncoding;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.AuthenticationMethod;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.security.context.KustvaktContext;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.StringUtils;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 
 /**
@@ -43,7 +40,7 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
     @Autowired
     private AdminDao adminDao;
     @Autowired
-    private AuthenticationManagerIface authManager;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
     private KustvaktResponseHandler kustvaktResponseHandler;
@@ -72,7 +69,7 @@ public class AdminFilter implements ContainerRequestFilter, ResourceFilter {
         attributes.put(Attributes.USER_AGENT, agent);
         try {
             // EM: fix me: AuthenticationType based on header value
-            User user = authManager.authenticate(AuthenticationMethod.LDAP,
+            User user = authenticationManager.authenticate(AuthenticationMethod.LDAP,
                     data.getUsername(), data.getPassword(), attributes);
             if (!adminDao.isAdmin(user.getUsername())) {
                 throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,

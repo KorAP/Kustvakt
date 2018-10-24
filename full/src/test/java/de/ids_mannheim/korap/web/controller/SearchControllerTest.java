@@ -178,7 +178,7 @@ public class SearchControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
-        System.out.println(node);
+//        System.out.println(node);
         assertEquals("koral:docGroup", node.at("/collection/@type").asText());
         assertEquals("CC-BY.*",
                 node.at("/collection/operands/0/value").asText());

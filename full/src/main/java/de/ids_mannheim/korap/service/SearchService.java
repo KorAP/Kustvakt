@@ -16,14 +16,13 @@ import org.springframework.stereotype.Service;
 
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
-import de.ids_mannheim.korap.config.FullConfiguration;
+import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
-import de.ids_mannheim.korap.rewrite.FullRewriteHandler;
+import de.ids_mannheim.korap.resource.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.web.ClientsHandler;
@@ -35,13 +34,13 @@ public class SearchService {
     private static Logger jlog = LogManager.getLogger(SearchService.class);
 
     @Autowired
-    private FullConfiguration config;
+    private KustvaktConfiguration config;
 
     @Autowired
-    private AuthenticationManagerIface authManager;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
-    private FullRewriteHandler rewriteHandler;
+    private RewriteHandler rewriteHandler;
 
     @Autowired
     private SearchKrill searchKrill;
@@ -59,7 +58,7 @@ public class SearchService {
     @SuppressWarnings("unchecked")
     public String serializeQuery (String q, String ql, String v, String cq,
             Integer pageIndex, Integer startPage, Integer pageLength,
-            String context, Boolean cutoff) {
+            String context, Boolean cutoff) throws KustvaktException {
         QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
         if (cq != null) ss.setCollection(cq);
 
@@ -72,15 +71,22 @@ public class SearchService {
         meta.addEntry("cutOff", cutoff);
 
         ss.setMeta(meta.raw());
-        return ss.toJSON();
+        // return ss.toJSON();
+
+        String query = ss.toJSON();
+        query = rewriteHandler.processQuery(ss.toJSON(), null);
+        return query;
     }
 
     private User createUser (String username, HttpHeaders headers)
             throws KustvaktException {
-        User user = authManager.getUser(username);
-        authManager.setAccessAndLocation(user, headers);
-        jlog.debug("Debug: /getMatchInfo/: location=" + user.locationtoString()
-                + ", access=" + user.accesstoString());
+        User user = authenticationManager.getUser(username);
+        authenticationManager.setAccessAndLocation(user, headers);
+        if (user != null) {
+            jlog.debug(
+                    "Debug: /getMatchInfo/: location=" + user.locationtoString()
+                            + ", access=" + user.accesstoString());
+        }
         return user;
     }
 
@@ -94,9 +100,9 @@ public class SearchService {
 
     @SuppressWarnings("unchecked")
     public String search (String engine, String username, HttpHeaders headers,
-            String q, String ql, String v, String cq, Integer pageIndex,
-            Integer pageInteger, String ctx, Integer pageLength, Boolean cutoff)
-            throws KustvaktException {
+            String q, String ql, String v, String cq, Set<String> fields,
+            Integer pageIndex, Integer pageInteger, String ctx,
+            Integer pageLength, Boolean cutoff) throws KustvaktException {
 
         KustvaktConfiguration.BACKENDS eng = this.config.chooseBackend(engine);
         User user = createUser(username, headers);
@@ -107,6 +113,8 @@ public class SearchService {
 
         MetaQueryBuilder meta = createMetaQuery(pageIndex, pageInteger, ctx,
                 pageLength, cutoff);
+        if (fields != null && !fields.isEmpty())
+            meta.addEntry("fields", fields);
         serializer.setMeta(meta.raw());
 
         // There is an error in query processing
@@ -115,7 +123,8 @@ public class SearchService {
             throw new KustvaktException(serializer.toJSON());
         }
 
-        String query = this.rewriteHandler.processQuery(serializer.toJSON(), user);
+        String query =
+                this.rewriteHandler.processQuery(serializer.toJSON(), user);
         jlog.info("the serialized query " + query);
 
         String result;
@@ -125,7 +134,7 @@ public class SearchService {
         else {
             result = searchKrill.search(query);
         }
-//        jlog.debug("Query result: " + result);
+        // jlog.debug("Query result: " + result);
         return result;
 
     }
@@ -167,25 +176,26 @@ public class SearchService {
     public String retrieveMatchInfo (String corpusId, String docId,
             String textId, String matchId, Set<String> foundries,
             String username, HttpHeaders headers, Set<String> layers,
-            boolean spans) throws KustvaktException {
+            boolean spans, boolean highlights) throws KustvaktException {
         String matchid =
                 searchKrill.getMatchId(corpusId, docId, textId, matchId);
 
         User user = createUser(username, headers);
-        CorpusAccess corpusAccess = user.getCorpusAccess();
-        Pattern p;
-        switch (corpusAccess) {
-            case PUB:
-                p = config.getPublicLicensePattern();
-                break;
-            case ALL:
-                p = config.getAllLicensePattern();
-                break;
-            default: // FREE
-                p = config.getFreeLicensePattern();
-                break;
+        Pattern p = null;
+        if (user != null) {
+            CorpusAccess corpusAccess = user.getCorpusAccess();
+            switch (corpusAccess) {
+                case PUB:
+                    p = config.getPublicLicensePattern();
+                    break;
+                case ALL:
+                    p = config.getAllLicensePattern();
+                    break;
+                default: // FREE
+                    p = config.getFreeLicensePattern();
+                    break;
+            }
         }
-
         boolean match_only = foundries == null || foundries.isEmpty();
         String results;
         try {
@@ -206,7 +216,7 @@ public class SearchService {
                 }
 
                 results = searchKrill.getMatch(matchid, foundryList, layerList,
-                        spans, false, true, p);
+                        spans, highlights, true, p);
             }
             else {
                 results = searchKrill.getMatch(matchid, p);
@@ -226,7 +236,7 @@ public class SearchService {
         String textSigle = searchKrill.getTextSigle(corpusId, docId, textId);
         return searchKrill.getFields(textSigle);
     }
-    
+
     public String getCollocationBase (String query) throws KustvaktException {
         return graphDBhandler.getResponse("distCollo", "q", query);
     }

@@ -10,11 +10,11 @@ import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.AuthenticationManagerIface;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 
@@ -40,7 +40,7 @@ public class OAuth2TokenService {
     @Autowired
     protected FullConfiguration config;
     @Autowired
-    private AuthenticationManagerIface authenticationManager;
+    private AuthenticationManager authenticationManager;
 
     /**
      * RFC 6749:
