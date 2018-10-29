@@ -285,7 +285,7 @@
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Krill</artifactId>
-			<version>0.58.0</version>
+			<version>0.58.1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.xerial</groupId>
@@ -364,9 +364,6 @@
 			<artifactId>spring-aspects</artifactId>
 			<version>${spring-framework.version}</version>
 		</dependency>
-
-		<!-- <dependency> <groupId>net.sf.ehcache</groupId> <artifactId>ehcache-core</artifactId> 
-			<version>2.6.5</version> </dependency> -->
 
 		<!-- end copy -->
 
@@ -454,7 +451,10 @@
 			<artifactId>hibernate-ehcache</artifactId>
 			<version>${hibernate.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>4.0.1</version>
+		</dependency>
 	</dependencies>
-
-
 </project>

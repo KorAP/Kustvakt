@@ -1,6 +1,8 @@
 version 0.61.1
 22/10/2018
    - Updated spring and kustvakt-core versions (margaretha)
+29/10/2018
+   - Added rewrite handler post construct (margaretha)
 
 version 0.61.0
 30/08/2018

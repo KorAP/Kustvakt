@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -78,7 +79,11 @@ public class LiteService {
         this.graphDBhandler = new ClientsHandler(builder.build());
     }
 
-
+    @PostConstruct
+    private void init () {
+        processor.defaultRewriteConstraints();
+    }
+    
     /** Requires Karang (Neo4j search engine)
      *  
      * @param query

@@ -86,6 +86,8 @@ public class OltuTokenService extends OAuth2TokenService {
      * Client authentication is done using the given client
      * credentials.
      * 
+     * TODO: should create a new refresh token when the old refresh token is used
+     * 
      * @param refreshTokenStr
      * @param scopes
      * @param clientId
@@ -187,6 +189,8 @@ public class OltuTokenService extends OAuth2TokenService {
      * client type. To make sure that confidential clients
      * authenticate, client_id is made required (similar to
      * authorization code grant).
+     * 
+     * TODO: FORCE client secret
      * 
      * @param clientId
      *            client_id, required

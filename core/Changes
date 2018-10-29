@@ -9,6 +9,8 @@ version 0.61.2
    - Updated KoralNode and enforced order of RewriteTask (margaretha)
 14/09/2018
    - Added a status code for nonunique results (margaretha)
+29/10/2018
+    - Added javax.servlet-api
     
 version 0.61.1
 28/08/2018

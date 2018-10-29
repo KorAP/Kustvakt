@@ -13,6 +13,8 @@
     - Added "highlights" parameter to matchInfo controller (margaretha)
     - Added "fields" parameter to search controllers (margaretha)
     - Integrated lite controllers, services and tests in full version (margaretha)
+29/10/2018
+    - Moved javax.servlet-api to core
 
 # version 0.61.2
 12/09/2018
