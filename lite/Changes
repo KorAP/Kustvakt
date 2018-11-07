@@ -3,6 +3,8 @@ version 0.61.1
    - Updated spring and kustvakt-core versions (margaretha)
 29/10/2018
    - Added rewrite handler post construct (margaretha)
+07/11/2018
+    - OpenJDK8u181-workaround (see Debian Bug report #911925; diewald)
 
 version 0.61.0
 30/08/2018
