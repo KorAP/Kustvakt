@@ -120,7 +120,6 @@ Requires ```kustvakt.conf``` or ```kustvakt-lite.conf``` in the same folder as t
 Kustvakt full version requires an LDAP configuration file containing an admin password to access an LDAP system. You can still run Kustvakt full version without an LDAP system, but user authentication functions and services cannot be used. Only services for guest/demo user would be available.
 
 <pre>
-cd target/
 java -jar target/Kustvakt-[lite/full]-[version].jar    
 </pre>
 
