@@ -55,11 +55,6 @@ mvn clean package
 </pre>
 The jar file is located in the ```target/``` folder.
 
-If there are errors regarding tests, please skip them.
-<pre>
-mvn clean package -DskipTests=true
-</pre>
-
 ## Customizing Kustvakt configuration
 
 Copy the default Kustvakt configuration file (e.g. ```full/src/main/resources/kustvakt.conf``` or ```lite/src/main/resources/kustvakt-lite.conf```), to the same  folder as the Kustvakt jar files  (```/target```). Please do not change the name of the configuration file.
