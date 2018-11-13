@@ -258,7 +258,7 @@ public class VirtualCorpusService {
         }
 
         CorpusAccess requiredAccess = determineRequiredAccess(koralQuery);
-
+        jlog.debug("Storing VC");
         int vcId = 0;
         try {
             vcId = vcDao.createVirtualCorpus(name, type, requiredAccess,

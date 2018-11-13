@@ -14,7 +14,10 @@
     - Added "fields" parameter to search controllers (margaretha)
     - Integrated lite controllers, services and tests in full version (margaretha)
 29/10/2018
-    - Moved javax.servlet-api to core
+    - Moved javax.servlet-api to core (margaretha)
+13/11/2018
+    - Added Shutdown handler to Jetty server (margaretha)
+    - Fixed storing VC order in NamedVCLoader (margaretha)  
 
 # version 0.61.2
 12/09/2018

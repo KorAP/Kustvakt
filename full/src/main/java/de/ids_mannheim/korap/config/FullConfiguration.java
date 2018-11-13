@@ -63,8 +63,6 @@ public class FullConfiguration extends KustvaktConfiguration {
     private boolean isSoftDeleteGroupMember;
 
     private EncryptionIface.Encryption secureHashAlgorithm;
-    private String secureRandomAlgorithm;
-    private String messageDigestAlgorithm;
 
     private AuthenticationMethod OAuth2passwordAuthentication;
     private String nativeClientHost;
@@ -83,7 +81,7 @@ public class FullConfiguration extends KustvaktConfiguration {
     private RSAPrivateKey rsaPrivateKey;
     private JWKSet publicKeySet;
     private String rsaKeyId;
-    
+
     private String namedVCPath;
 
     public FullConfiguration (Properties properties) throws Exception {
@@ -107,9 +105,8 @@ public class FullConfiguration extends KustvaktConfiguration {
         setOAuth2Configuration(properties);
         setOpenIdConfiguration(properties);
         setRSAKeys(properties);
-        
-        setNamedVCPath(properties
-                .getProperty("krill.namedVC", ""));
+
+        setNamedVCPath(properties.getProperty("krill.namedVC", ""));
     }
 
     private void setSecurityConfiguration (Properties properties) {
@@ -117,11 +114,6 @@ public class FullConfiguration extends KustvaktConfiguration {
                 properties.getProperty("security.secure.hash.algorithm",
                         "BCRYPT")));
 
-        setSecureRandomAlgorithm(properties
-                .getProperty("security.secure.random.algorithm", "SHA1PRNG"));
-
-        setMessageDigestAlgorithm(
-                properties.getProperty("security.md.algorithm", "MD5"));
     }
 
     private void setOpenIdConfiguration (Properties properties)
@@ -320,7 +312,6 @@ public class FullConfiguration extends KustvaktConfiguration {
         }
         return list;
     }
-
 
     private Pattern compilePattern (String patternStr) {
         if (!patternStr.isEmpty()) {
@@ -632,22 +623,6 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     public void setAuthorizationCodeExpiry (int authorizationCodeExpiry) {
         this.authorizationCodeExpiry = authorizationCodeExpiry;
-    }
-
-    public String getSecureRandomAlgorithm () {
-        return secureRandomAlgorithm;
-    }
-
-    public void setSecureRandomAlgorithm (String secureRandomAlgorithm) {
-        this.secureRandomAlgorithm = secureRandomAlgorithm;
-    }
-
-    public String getMessageDigestAlgorithm () {
-        return messageDigestAlgorithm;
-    }
-
-    public void setMessageDigestAlgorithm (String messageDigestAlgorithm) {
-        this.messageDigestAlgorithm = messageDigestAlgorithm;
     }
 
     public String getNamedVCPath () {

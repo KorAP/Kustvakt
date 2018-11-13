@@ -61,7 +61,9 @@ public class NamedVCLoader {
             }
 
             String filename = file.getName();
-            String json = readFile(file, filename);
+            String[] strArr = readFile(file, filename);
+            filename = strArr[0];
+            String json = strArr[1];
             if (json != null) {
                 cacheVC(json, filename);
                 vcService.storeVC(filename, VirtualCorpusType.SYSTEM, json, null,
@@ -70,7 +72,7 @@ public class NamedVCLoader {
         }
     }
 
-    private String readFile (File file, String filename) throws IOException {
+    private String[] readFile (File file, String filename) throws IOException, KustvaktException {
         String json = null;
         long start = System.currentTimeMillis();
         if (filename.endsWith(".jsonld")) {
@@ -92,17 +94,22 @@ public class NamedVCLoader {
         }
         long end = System.currentTimeMillis();
         jlog.debug("READ " + filename + " duration: " + (end - start));
-        return json;
+        
+        return new String[]{filename, json};
     }
 
     private void cacheVC (String json, String filename)
             throws IOException, QueryException {
+        jlog.info("Create KrillCollection: "+filename);
         long start, end;
         start = System.currentTimeMillis();
 
         KrillCollection collection = new KrillCollection(json);
+        jlog.debug("Finished creating KrillCollection");
+        jlog.debug("Set Index to collection");
         collection.setIndex(searchKrill.getIndex());
-
+                
+        jlog.debug("StoreInCache "+filename);
         if (collection != null) {
             collection.storeInCache(filename);
         }

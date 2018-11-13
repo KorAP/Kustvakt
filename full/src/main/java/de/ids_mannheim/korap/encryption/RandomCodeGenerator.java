@@ -1,7 +1,5 @@
 package de.ids_mannheim.korap.encryption;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -14,7 +12,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import de.ids_mannheim.korap.config.FullConfiguration;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 
@@ -29,7 +27,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 public class RandomCodeGenerator {
 
     @Autowired
-    private FullConfiguration config;
+    public KustvaktConfiguration config;
 
     public static SecureRandom secureRandom;
 
@@ -37,6 +35,13 @@ public class RandomCodeGenerator {
     public void init () throws NoSuchAlgorithmException {
         secureRandom =
                 SecureRandom.getInstance(config.getSecureRandomAlgorithm());
+    }
+
+    public String createRandomCode (KustvaktConfiguration c)
+            throws KustvaktException, NoSuchAlgorithmException {
+        config = c;
+        init();
+        return createRandomCode();
     }
 
     public String createRandomCode () throws KustvaktException {

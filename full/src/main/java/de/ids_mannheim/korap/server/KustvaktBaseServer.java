@@ -1,10 +1,19 @@
-package de.ids_mannheim.korap.web;
+package de.ids_mannheim.korap.server;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
 
 import javax.servlet.ServletContextListener;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ShutdownHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.springframework.web.context.ContextLoaderListener;
@@ -12,6 +21,8 @@ import org.springframework.web.context.ContextLoaderListener;
 import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -53,7 +64,8 @@ public abstract class KustvaktBaseServer {
         return kargs;
     }
 
-    protected void start () {
+    protected void start ()
+            throws KustvaktException, IOException, NoSuchAlgorithmException {
 
         if (kargs.port == -1) {
             kargs.setPort(config.getPort());
@@ -82,7 +94,22 @@ public abstract class KustvaktBaseServer {
         connector.setPort(kargs.port);
         connector.setIdleTimeout(60000);
 
-        server.setHandler(contextHandler);
+        RandomCodeGenerator random = new RandomCodeGenerator();
+        String shutdownToken = random.createRandomCode(config);
+        ShutdownHandler shutdownHandler = new ShutdownHandler(shutdownToken,true,true);
+
+        FileOutputStream fos = new FileOutputStream(new File("shutdownToken"));
+        OutputStreamWriter writer =
+                new OutputStreamWriter(fos, StandardCharsets.UTF_8.name());
+        writer.write(shutdownToken);
+        writer.flush();
+        writer.close();
+
+        HandlerList handlers = new HandlerList();
+        handlers.addHandler(shutdownHandler);
+        handlers.addHandler(contextHandler);
+
+        server.setHandler(handlers);
 
         server.setConnectors(new Connector[] { connector });
         try {

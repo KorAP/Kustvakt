@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import de.ids_mannheim.korap.util.KrillProperties;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * if configuration class is extended, loadSubTypes method should be
@@ -27,6 +28,7 @@ import lombok.Getter;
  * - cleaned up log4j loader
  */
 
+@Setter
 @Getter
 public class KustvaktConfiguration {
 
@@ -89,6 +91,10 @@ public class KustvaktConfiguration {
     protected Pattern freeLicensePattern;
     protected Pattern allLicensePattern;
 
+    // random code generator
+    private String secureRandomAlgorithm;
+    private String messageDigestAlgorithm;
+    
     public KustvaktConfiguration (Properties properties) throws Exception {
         load(properties);
         KrillProperties.setProp(properties);
@@ -165,6 +171,13 @@ public class KustvaktConfiguration {
         // passcodeSaltField =
         // properties.getProperty("security.passcode.salt",
         // "accountCreation");
+        
+        setSecureRandomAlgorithm(properties
+                .getProperty("security.secure.random.algorithm", "SHA1PRNG"));
+
+        setMessageDigestAlgorithm(
+                properties.getProperty("security.md.algorithm", "MD5"));
+
     }
 
     /**

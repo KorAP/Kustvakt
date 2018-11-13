@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
-import de.ids_mannheim.korap.web.KustvaktBaseServer;
 
 public class KustvaktLiteServer extends KustvaktBaseServer {
 
