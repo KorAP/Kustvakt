@@ -28,12 +28,7 @@ Clone the latest version of Kustvakt
 git clone git@github.com:KorAP/Kustvakt.git
 </pre>
 
-Since Kustvakt requires Krill and Koral, please install [Krill](https://github.com/KorAP/Krill) and [Koral](https://github.com/KorAP/Koral) in your maven local repository.
-Adjust the versions of Krill and Koral in ```Kustvakt/core/pom.xml``` 
-according to the versions in 
-```Koral/pom.xml```
- and 
- ```Krill/pom.xml```.
+Since Kustvakt requires Krill and Koral, please install [Krill](https://github.com/KorAP/Krill) and [Koral](https://github.com/KorAP/Koral) in your maven local repository according to the required versions specified in ```Kustvakt/core/pom.xml```. 
 
 Install Kustvakt-core in your maven local repository
 <pre>
