@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5592ddc3_1d5e72b4",
+        "filename": "full/Changes",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2018-11-13T10:49:25Z",
+      "side": 1,
+      "message": "could you remove this line?",
+      "range": {
+        "startLine": 23,
+        "startChar": 18,
+        "endLine": 23,
+        "endChar": 25
+      },
+      "revId": "f500edba29a9818b4f763a2dccaeefda2384a238",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c",
+      "unresolved": true
+    }
+  ]
+}
