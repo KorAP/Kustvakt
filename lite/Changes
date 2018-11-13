@@ -5,6 +5,8 @@ version 0.61.1
    - Added rewrite handler post construct (margaretha)
 07/11/2018
     - OpenJDK8u181-workaround (see Debian Bug report #911925; diewald)
+13/11/2018
+    - Added shutdown handler (margaretha)    
 
 version 0.61.0
 30/08/2018

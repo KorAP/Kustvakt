@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
-import de.ids_mannheim.korap.web.KustvaktBaseServer;
 
 public class KustvaktLiteServer extends KustvaktBaseServer {
 
@@ -33,8 +32,7 @@ public class KustvaktLiteServer extends KustvaktBaseServer {
         config = new KustvaktConfiguration(properties);
 
         kargs.setSpringConfig("lite-config.xml");
-        rootPackages =
-                "de.ids_mannheim.korap.web";
+        rootPackages = "de.ids_mannheim.korap.web";
 
         server.start();
     }
