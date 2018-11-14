@@ -28,7 +28,7 @@ public class OAuth2AuthorizationService {
     @Autowired
     protected OAuth2ClientService clientService;
     @Autowired
-    protected OAuth2ScopeService scopeService;
+    protected OAuth2ScopeServiceImpl scopeService;
     @Autowired
     private AuthorizationDao authorizationDao;
 

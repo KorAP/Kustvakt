@@ -9,10 +9,9 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.AuthenticationIface;
 import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken;
-import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
+import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeServiceImpl;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
 
@@ -22,7 +21,7 @@ public class OAuth2Authentication implements AuthenticationIface {
     @Autowired
     private AccessTokenDao accessDao;
     @Autowired
-    private OAuth2ScopeService scopeService;
+    private OAuth2ScopeServiceImpl scopeService;
 
     @Override
     public TokenContext getTokenContext (String authToken)

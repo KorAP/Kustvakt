@@ -21,12 +21,12 @@ import org.springframework.stereotype.Controller;
 
 import com.sun.jersey.spi.container.ResourceFilters;
 
+import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.VirtualCorpusService;

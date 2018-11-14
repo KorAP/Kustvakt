@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -111,8 +112,8 @@ public class KustvaktConfiguration {
         currentVersion = properties.getProperty("current.api.version", "v1.0");
         String supportedVersions =
                 properties.getProperty("supported.api.version", "");
-        this.supportedVersions = Arrays.stream(supportedVersions.split(" "))
-                .collect(Collectors.toSet());
+        
+        this.supportedVersions = new HashSet<>(Arrays.asList(supportedVersions.split(" ")));
         this.supportedVersions.add(currentVersion);
 
         baseURL = properties.getProperty("kustvakt.base.url", "/api/*");

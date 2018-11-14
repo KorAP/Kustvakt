@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import de.ids_mannheim.korap.annotation.AnnotationParser;
 import de.ids_mannheim.korap.annotation.FreeResourceParser;
 import de.ids_mannheim.korap.config.NamedVCLoader;
+import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
 import de.ids_mannheim.korap.oauth2.dao.AccessScopeDao;
 import de.ids_mannheim.korap.util.QueryException;
 
@@ -54,7 +54,11 @@ public class InitializatorImpl implements Initializator {
      * @see de.ids_mannheim.de.init.Initializator#initTest()
      */
     @Override
-    public void initTest () throws IOException, KustvaktException {
+    public void initTest () {
+        setInitialAccessScope();
+    }
+    
+    public void initAnnotationTest () throws IOException, KustvaktException {
         setInitialAccessScope();
         annotationParser.run();
         resourceParser.run();

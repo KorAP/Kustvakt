@@ -11,7 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
+import de.ids_mannheim.korap.constant.OAuth2Scope;
 import lombok.Getter;
 import lombok.Setter;
 

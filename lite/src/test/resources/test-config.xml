@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+	<context:component-scan
+		base-package="de.ids_mannheim.korap.web.filter, de.ids_mannheim.korap.web.utils,
+		de.ids_mannheim.korap.authentication.http" />
+	<context:annotation-config />
+
+	<bean id="placeholders"
+		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<array>
+				<value>classpath:test-jdbc.properties</value>
+				<value>file:./test-jdbc.properties</value>
+				<value>classpath:hibernate.properties</value>
+				<value>classpath:kustvakt-lite.conf</value>
+				<value>file:./kustvakt-lite.conf</value>
+			</array>
+		</property>
+	</bean>
+
+	<bean id="properties"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<array>
+				<value>classpath:kustvakt-lite.conf</value>
+				<value>file:./kustvakt-lite.conf</value>
+			</array>
+		</property>
+	</bean>
+
+	<bean id="config" class="de.ids_mannheim.korap.config.KustvaktConfiguration">
+		<constructor-arg index="0" name="properties" ref="properties" />
+	</bean>
+
+	<!-- Database -->
+
+	<bean id="sqliteDataSource"
+		class="org.springframework.jdbc.datasource.SingleConnectionDataSource"
+		lazy-init="true">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="connectionProperties">
+			<props>
+				<prop key="date_string_format">yyyy-MM-dd HH:mm:ss</prop>
+			</props>
+		</property>
+
+		<!-- relevant for single connection datasource and sqlite -->
+		<property name="suppressClose">
+			<value>true</value>
+		</property>
+		<!--<property name="initialSize" value="2"/> -->
+		<!--<property name="poolPreparedStatements" value="true"/> -->
+	</bean>
+
+	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+		<property name="baselineOnMigrate" value="true" />
+		<!-- <property name="validateOnMigrate" value="false" /> -->
+		<!-- <property name="cleanOnValidationError" value="true" /> -->
+		<property name="locations" value="${jdbc.schemaPath}" />
+		<property name="dataSource" ref="sqliteDataSource" />
+	</bean>
+
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="sqliteDataSource" />
+
+		<property name="packagesToScan">
+			<array>
+				<value>de.ids_mannheim.korap.entity</value>
+			</array>
+		</property>
+		<property name="jpaVendorAdapter">
+			<bean id="jpaVendorAdapter"
+				class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="databasePlatform" value="${hibernate.dialect}" />
+			</bean>
+		</property>
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.cache.use_query_cache">${hibernate.cache.use_query_cache}</prop>
+				<prop key="hibernate.cache.use_second_level_cache">${hibernate.cache.use_second_level_cache}
+				</prop>
+				<prop key="hibernate.cache.provider_class">${hibernate.cache.provider}</prop>
+				<prop key="hibernate.cache.region.factory_class">${hibernate.cache.region.factory}</prop>
+				<prop key="hibernate.jdbc.time_zone">${hibernate.jdbc.time_zone}</prop>
+			</props>
+		</property>
+	</bean>
+	<tx:annotation-driven proxy-target-class="true"
+		transaction-manager="transactionManager" />
+
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+
+	<bean id="transactionTemplate"
+		class="org.springframework.transaction.support.TransactionTemplate">
+		<constructor-arg ref="transactionManager" />
+	</bean>
+	<bean id="txManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="sqliteDataSource" />
+	</bean>
+
+	<!-- Initialization -->
+	<bean id="initializator" class="de.ids_mannheim.de.init.LiteInitializatorImpl"
+		init-method="init">
+	</bean>
+	<bean id="annotationParser" class="de.ids_mannheim.korap.annotation.AnnotationParser"
+		scope="singleton" />
+
+	<!-- Krill -->
+	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">
+		<constructor-arg value="${krill.indexDir}" />
+	</bean>
+
+	<!-- Filters -->
+	<bean id="APIVersionFilter" class="de.ids_mannheim.korap.web.APIVersionFilter"
+		scope="singleton" />
+
+	<!-- Authentication -->
+	<bean id="authenticationManager"
+		class="de.ids_mannheim.korap.authentication.DummyAuthenticationManager" />
+
+	<!-- Response handler -->
+	<bean id="kustvaktResponseHandler" class="de.ids_mannheim.korap.web.KustvaktResponseHandler">
+		<constructor-arg index="0" name="iface" ref="kustvakt_auditing" />
+	</bean>
+
+	<!-- Controllers -->
+	<bean id="annotationController"
+		class="de.ids_mannheim.korap.web.controller.AnnotationController" />
+	<bean id="searchController" class="de.ids_mannheim.korap.web.controller.SearchController" />
+	<bean id="statisticController"
+		class="de.ids_mannheim.korap.web.controller.StatisticController" />
+
+	<!-- Services -->
+	<bean id="annotationService" class="de.ids_mannheim.korap.service.AnnotationService"></bean>
+	<bean id="scopeService"
+		class="de.ids_mannheim.korap.oauth2.service.DummyOAuth2ScopeServiceImpl" />
+	<bean id="searchService" class="de.ids_mannheim.korap.service.SearchService"></bean>
+
+	<!-- DAO -->
+	<bean id="adminDao" class="de.ids_mannheim.korap.dao.DummyAdminDaoImpl" />
+	<bean id="annotationDao" class="de.ids_mannheim.korap.dao.AnnotationDao" />
+
+	<!-- DTO Converter -->
+	<bean id="annotationConverter" class="de.ids_mannheim.korap.dto.converter.AnnotationConverter" />
+
+	<!-- Rewrite -->
+	<bean id="rewriteHandler" class="de.ids_mannheim.korap.resource.rewrite.RewriteHandler">
+		<constructor-arg ref="config" />
+	</bean>
+
+
+
+	<bean id="kustvakt_auditing"
+		class="de.ids_mannheim.korap.interfaces.defaults.DefaultAuditing">
+	</bean>
+
+</beans>

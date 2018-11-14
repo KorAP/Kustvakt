@@ -1,0 +1,8 @@
+kustvakt.version=${project.version}
+kustvakt.name=${project.name}
+
+# use this file to define the properties and logging file names
+kustvakt.properties=./kustvakt-lite.conf
+kustvakt.logging=./log4j.properties
+kustvakt.cache=true
+kustvakt.cache_store=./store

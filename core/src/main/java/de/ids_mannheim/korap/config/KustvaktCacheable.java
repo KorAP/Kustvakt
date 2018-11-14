@@ -29,6 +29,10 @@ public abstract class KustvaktCacheable {
         this.prefix = prefix;
         this.name = cache_name;
     }
+    
+    public KustvaktCacheable () {
+        // TODO Auto-generated constructor stub
+    }
 
     private static Cache getCache(String name) {
         return CacheManager.getInstance().getCache(name);

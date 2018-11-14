@@ -31,8 +31,8 @@ import com.nimbusds.oauth2.sdk.http.HTTPRequest.Method;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.sun.jersey.spi.container.ResourceFilters;
 
+import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
 import de.ids_mannheim.korap.oauth2.openid.OpenIdConfiguration;
 import de.ids_mannheim.korap.oauth2.openid.OpenIdHttpRequestWrapper;
 import de.ids_mannheim.korap.oauth2.openid.service.JWKService;

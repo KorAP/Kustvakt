@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.web.controller;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.springframework.test.context.ContextConfiguration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
@@ -11,6 +12,7 @@ import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
+@ContextConfiguration("classpath:test-annotation-config.xml")
 public class FreeResourceControllerTest extends SpringJerseyTest {
     
     @Test

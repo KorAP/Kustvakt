@@ -33,7 +33,6 @@ import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.exceptions.WrappedException;
-import de.ids_mannheim.korap.interfaces.AuthenticationIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.ValidatorIface;
@@ -74,6 +73,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 	
 	public KustvaktAuthenticationManager(EntityHandlerIface userdb, EncryptionIface crypto,
 			FullConfiguration config, AuditingIface auditer, Collection<UserDataDbIface> userdatadaos) {
+	    super("id_tokens");
 		this.entHandler = userdb;
 		this.config = config;
 		this.crypto = crypto;

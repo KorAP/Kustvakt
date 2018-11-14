@@ -26,8 +26,8 @@ import org.springframework.stereotype.Controller;
 
 import com.sun.jersey.spi.container.ResourceFilters;
 
+import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2AuthorizationRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
 import de.ids_mannheim.korap.oauth2.oltu.service.OltuAuthorizationService;

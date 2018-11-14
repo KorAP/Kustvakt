@@ -1,3 +1,6 @@
+version 0.61.2
+   - Integrated lite and full services and controllers in core (margaretha)
+
 version 0.61.1
 22/10/2018
    - Updated spring and kustvakt-core versions (margaretha)
@@ -6,7 +9,7 @@ version 0.61.1
 07/11/2018
     - OpenJDK8u181-workaround (see Debian Bug report #911925; diewald)
 13/11/2018
-    - Added shutdown handler (margaretha)    
+    - Added shutdown handler (margaretha)
 
 version 0.61.0
 30/08/2018

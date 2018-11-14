@@ -35,7 +35,7 @@ public class OAuth2TokenService {
     private OAuth2AuthorizationService authorizationService;
 
     @Autowired
-    protected OAuth2ScopeService scopeService;
+    protected OAuth2ScopeServiceImpl scopeService;
 
     @Autowired
     protected FullConfiguration config;

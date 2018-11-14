@@ -11,13 +11,14 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
-import de.ids_mannheim.korap.oauth2.constant.OAuth2Scope;
 import de.ids_mannheim.korap.oauth2.dao.AccessScopeDao;
+import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.security.context.TokenContext;
 
@@ -29,10 +30,13 @@ public class OAuth2ScopeServiceImpl implements OAuth2ScopeService {
     @Autowired
     private AdminDao adminDao;
 
-    /* (non-Javadoc)
-     * @see de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService#convertToAccessScope(java.util.Collection)
+    /**
+     * Converts a set of scope strings to a set of {@link AccessScope}
+     * 
+     * @param scopes
+     * @return
+     * @throws KustvaktException
      */
-    @Override
     public Set<AccessScope> convertToAccessScope (Collection<String> scopes)
             throws KustvaktException {
 
@@ -64,19 +68,11 @@ public class OAuth2ScopeServiceImpl implements OAuth2ScopeService {
         return requestedScopes;
     }
 
-    /* (non-Javadoc)
-     * @see de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService#convertAccessScopesToString(java.util.Set)
-     */
-    @Override
     public String convertAccessScopesToString (Set<AccessScope> scopes) {
         Set<String> set = convertAccessScopesToStringSet(scopes);
         return String.join(" ", set);
     }
 
-    /* (non-Javadoc)
-     * @see de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService#convertAccessScopesToStringSet(java.util.Set)
-     */
-    @Override
     public Set<String> convertAccessScopesToStringSet (
             Set<AccessScope> scopes) {
         Set<String> set = scopes.stream().map(scope -> scope.toString())
@@ -84,10 +80,14 @@ public class OAuth2ScopeServiceImpl implements OAuth2ScopeService {
         return set;
     }
 
-    /* (non-Javadoc)
-     * @see de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService#filterScopes(java.util.Set, java.util.Set)
+    /**
+     * Simple reduction of requested scopes, i.e. excluding any scopes
+     * that are not default scopes for a specific authorization grant.
+     * 
+     * @param scopes
+     * @param defaultScopes
+     * @return accepted scopes
      */
-    @Override
     public Set<String> filterScopes (Set<String> scopes,
             Set<String> defaultScopes) {
         Stream<String> stream = scopes.stream();
@@ -115,10 +115,18 @@ public class OAuth2ScopeServiceImpl implements OAuth2ScopeService {
         }
     }
 
-    /* (non-Javadoc)
-     * @see de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService#verifyRefreshScope(java.util.Set, java.util.Set)
+    /**
+     * Verify scopes given in a refresh request. The scopes must not
+     * include other scopes than those authorized in the original
+     * access token issued together with the refresh token.
+     * 
+     * @param requestScopes
+     *            requested scopes
+     * @param originalScopes
+     *            authorized scopes
+     * @return a set of requested {@link AccessScope}
+     * @throws KustvaktException
      */
-    @Override
     public Set<AccessScope> verifyRefreshScope (Set<String> requestScopes,
             Set<AccessScope> originalScopes) throws KustvaktException {
         Set<AccessScope> requestedScopes = convertToAccessScope(requestScopes);

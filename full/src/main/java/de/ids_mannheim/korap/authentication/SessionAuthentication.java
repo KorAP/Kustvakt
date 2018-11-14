@@ -4,7 +4,6 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.AuthenticationIface;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.config.Attributes;

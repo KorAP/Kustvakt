@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ids_mannheim.korap</groupId>
 	<artifactId>Kustvakt-full</artifactId>
-	<version>0.61.3</version>
+	<version>0.61.4</version>
 	<properties>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -185,7 +185,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.22.1</version>
 				<configuration>
-          <useSystemClassLoader>false</useSystemClassLoader>
+                    <useSystemClassLoader>false</useSystemClassLoader>
 					<reuseForks>true</reuseForks>
 					<forkCount>1</forkCount>
 					<threadCount>10</threadCount>
@@ -208,7 +208,7 @@
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Kustvakt-core</artifactId>
-			<version>0.61.3</version>
+			<version>[0.61.4,)</version>
 		</dependency>
 		<!-- LDAP -->
 		<dependency>
@@ -251,12 +251,6 @@
 			<version>${hibernate.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.javassist</groupId>
-			<artifactId>javassist</artifactId>
-			<version>3.22.0-GA</version>
-		</dependency>
-
 		<!-- MySql -->
 		<dependency>
 			<groupId>mysql</groupId>
@@ -276,34 +270,6 @@
 			<artifactId>jersey-test-framework-grizzly</artifactId>
 			<version>${jersey.version}</version>
 			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-json</artifactId>
-			<version>${jersey.version}</version>
-		</dependency>
-
-		<!-- Spring -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>
-			<version>${spring-framework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-tx</artifactId>
-			<version>${spring-framework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-core</artifactId>
-			<version>${spring-framework.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-web</artifactId>
-			<version>${spring-framework.version}</version>
 		</dependency>
 
 		<!-- velocity -->
@@ -327,13 +293,6 @@
 			<groupId>javax.activation</groupId>
 			<artifactId>activation</artifactId>
 			<version>1.1.1</version>
-		</dependency>
-
-		<!-- Flyway -->
-		<dependency>
-			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-core</artifactId>
-			<version>4.0</version>
 		</dependency>
 
 		<!-- OAuth -->

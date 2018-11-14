@@ -56,7 +56,7 @@ public class VirtualCorpusService {
     private static Logger jlog =
             LogManager.getLogger(VirtualCorpusService.class);
 
-    public static Pattern wordPattern = Pattern.compile("[-\\w ]+");
+    public static Pattern wordPattern = Pattern.compile("[-\\w. ]+");
 
     @Autowired
     private VirtualCorpusDao vcDao;
