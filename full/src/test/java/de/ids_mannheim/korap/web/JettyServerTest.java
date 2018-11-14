@@ -20,7 +20,7 @@ public class JettyServerTest {
         Server server = new Server(8000);
         HandlerList handlers = new HandlerList();
         handlers.setHandlers(
-                new Handler[] { new ShutdownHandler("secret", true, true) });
+                new Handler[] { new ShutdownHandler("secret", false, true) });
         server.setHandler(handlers);
         server.start();
     }
