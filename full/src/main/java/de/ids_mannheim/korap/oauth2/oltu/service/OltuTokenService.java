@@ -25,7 +25,6 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
 import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
-import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
@@ -80,14 +79,16 @@ public class OltuTokenService extends OAuth2TokenService {
 
     /**
      * Revokes all access token associated with the given refresh
-     * token, and creates a new access token with the given refresh
-     * token and scopes. Thus, at one point of time, there is only one
-     * active access token associated with a refresh token.
+     * token, and creates a new access token and a new refresh
+     * token with the same scopes. Thus, at one point of time,
+     * there is only one active access token associated with
+     * a refresh token.
      * 
      * Client authentication is done using the given client
      * credentials.
      * 
-     * TODO: should create a new refresh token when the old refresh token is used
+     * TODO: should create a new refresh token when the old refresh
+     * token is used
      * 
      * @param refreshTokenStr
      * @param scopes
@@ -139,11 +140,23 @@ public class OltuTokenService extends OAuth2TokenService {
         if (scopes != null && !scopes.isEmpty()) {
             requestedScopes =
                     scopeService.verifyRefreshScope(scopes, requestedScopes);
+            scopes = scopeService
+                    .convertAccessScopesToStringSet(requestedScopes);
         }
+
+        // revoke the refresh token and all access tokens associated
+        // to it
+        revokeRefreshToken(refreshTokenStr);
 
         return createsAccessTokenResponse(scopes, requestedScopes, clientId,
                 refreshToken.getUserId(),
-                refreshToken.getUserAuthenticationTime(), refreshToken);
+                refreshToken.getUserAuthenticationTime());
+
+        // without new refresh token
+        // return createsAccessTokenResponse(scopes, requestedScopes,
+        // clientId,
+        // refreshToken.getUserId(),
+        // refreshToken.getUserAuthenticationTime(), refreshToken);
     }
 
     /**

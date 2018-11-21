@@ -222,9 +222,9 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
 
         node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
-        assertEquals(refreshToken, node.at("/refresh_token").asText());
+        assertTrue(!refreshToken.equals(node.at("/refresh_token").asText()));
 
-        testSearchWithOAuth2Token(accessToken);
+        testSearchWithRevokedAccessToken(accessToken);
     }
 
     @Test

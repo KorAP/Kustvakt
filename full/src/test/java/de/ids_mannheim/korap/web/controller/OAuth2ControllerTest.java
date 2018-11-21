@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
 
@@ -175,17 +176,16 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
 
-        testRevokeTokenPublicClient(accessToken, publicClientId,
+        testRevokeToken(accessToken, publicClientId,null,
                 "access_token");
 
         testRequestRefreshTokenInvalidScope(publicClientId, refreshToken);
-        testRequestRefreshTokenPublicClient(publicClientId, refreshToken);
         testRequestRefreshTokenInvalidClient(refreshToken);
         testRequestRefreshTokenInvalidRefreshToken(publicClientId);
+        testRequestRefreshTokenPublicClient(publicClientId, refreshToken);
 
-        testRevokeTokenPublicClient(refreshToken, publicClientId,
-                "refresh_token");
-        testRequestRefreshWithRevokedRefreshToken(publicClientId, refreshToken);
+        testRequestRefreshWithRevokedRefreshToken(publicClientId, null,
+                refreshToken);
     }
 
     @Test
@@ -218,6 +218,11 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertNotNull(node.at("/expires_in").asText());
 
         testRequestTokenWithUsedAuthorization(code);
+        
+        String refreshToken = node.at("/refresh_token").asText();
+        testRevokeToken(refreshToken, confidentialClientId,clientSecret,
+                "refresh_token");
+        testRequestRefreshWithRevokedRefreshToken(confidentialClientId, clientSecret, refreshToken);
     }
 
     private void testRequestTokenWithUsedAuthorization (String code)
@@ -585,6 +590,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(TokenType.BEARER.toString(),
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
+
+        assertTrue(!node.at("/refresh_token").asText().equals(refreshToken));
     }
 
     private void testRequestRefreshTokenInvalidClient (String refreshToken)
@@ -624,11 +631,14 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     }
 
     private void testRequestRefreshWithRevokedRefreshToken (String clientId,
-            String refreshToken) throws KustvaktException {
+            String clientSecret, String refreshToken) throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("grant_type", GrantType.REFRESH_TOKEN.toString());
         form.add("client_id", clientId);
         form.add("refresh_token", refreshToken);
+        if (clientSecret!=null){
+            form.add("client_secret", clientSecret);
+        }
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -641,13 +651,16 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
     }
 
-    private void testRevokeTokenPublicClient (String token, String clientId,
-            String tokenType) {
+    private void testRevokeToken (String token, String clientId,
+            String clientSecret, String tokenType) {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("token_type", tokenType);
         form.add("token", token);
         form.add("client_id", clientId);
-
+        if (clientSecret!=null){
+            form.add("client_secret", clientSecret);
+        }
+        
         ClientResponse response = resource().path(API_VERSION).path("oauth2").path("revoke")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
@@ -655,5 +668,5 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
-
+    
 }
