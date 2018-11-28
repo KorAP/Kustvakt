@@ -257,8 +257,18 @@ public class VirtualCorpusService {
                     "Unauthorized operation for user: " + username, username);
         }
 
-        CorpusAccess requiredAccess = determineRequiredAccess(koralQuery);
-        jlog.debug("Storing VC");
+        CorpusAccess requiredAccess;
+        if (isCached){
+            KoralCollectionQueryBuilder koral = new KoralCollectionQueryBuilder();
+            koral.with("referTo "+name);
+            String vcRef = koral.toJSON();
+            jlog.debug("Determine vc access with vc ref: " + vcRef);
+            requiredAccess = determineRequiredAccess(vcRef);
+        }
+        else{
+            requiredAccess = determineRequiredAccess(koralQuery);
+        }
+        jlog.debug("Storing VC "+name);
         int vcId = 0;
         try {
             vcId = vcDao.createVirtualCorpus(name, type, requiredAccess,

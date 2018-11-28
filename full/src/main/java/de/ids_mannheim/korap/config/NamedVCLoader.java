@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.KrillCollection;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.service.VirtualCorpusService;
 import de.ids_mannheim.korap.util.QueryException;
@@ -49,7 +50,7 @@ public class NamedVCLoader {
 
         String dir = config.getNamedVCPath();
         if (dir.isEmpty()) return;
-        
+
         File d = new File(dir);
         if (!d.isDirectory()) {
             throw new IOException("Directory " + dir + " is not valid");
@@ -66,13 +67,25 @@ public class NamedVCLoader {
             String json = strArr[1];
             if (json != null) {
                 cacheVC(json, filename);
-                vcService.storeVC(filename, VirtualCorpusType.SYSTEM, json, null,
-                        null, null, true, "system");
+                try {
+                    VirtualCorpus vc = vcService.searchVCByName("system",
+                            filename, "system");
+                    if (vc != null) {
+                        jlog.debug("Delete existing vc: " + filename);
+                        vcService.deleteVC("system", vc.getId());
+                    }
+                }
+                catch (KustvaktException e) {
+                    // ignore
+                }
+                vcService.storeVC(filename, VirtualCorpusType.SYSTEM, json,
+                        null, null, null, true, "system");
             }
         }
     }
 
-    private String[] readFile (File file, String filename) throws IOException, KustvaktException {
+    private String[] readFile (File file, String filename)
+            throws IOException, KustvaktException {
         String json = null;
         long start = System.currentTimeMillis();
         if (filename.endsWith(".jsonld")) {
@@ -94,13 +107,13 @@ public class NamedVCLoader {
         }
         long end = System.currentTimeMillis();
         jlog.debug("READ " + filename + " duration: " + (end - start));
-        
-        return new String[]{filename, json};
+
+        return new String[] { filename, json };
     }
 
     private void cacheVC (String json, String filename)
             throws IOException, QueryException {
-        jlog.info("Create KrillCollection: "+filename);
+        jlog.info("Create KrillCollection: " + filename);
         long start, end;
         start = System.currentTimeMillis();
 
@@ -108,8 +121,8 @@ public class NamedVCLoader {
         jlog.debug("Finished creating KrillCollection");
         jlog.debug("Set Index to collection");
         collection.setIndex(searchKrill.getIndex());
-                
-        jlog.debug("StoreInCache "+filename);
+
+        jlog.debug("StoreInCache " + filename);
         if (collection != null) {
             collection.storeInCache(filename);
         }
