@@ -129,6 +129,13 @@ where ```custom-spring-config.xml``` is in the ```config``` folder.
 Advanced setup including database and mailing setting are described in the [wiki](https://github.com/KorAP/Kustvakt/wiki).
 
 
+# Contributions
+
+Contributions to Krill are very welcome!
+
+Please note that unless you explicitly state otherwise any contribution intentionally submitted for inclusion into Kustvakt shall –	
+as Kustvakt itself – be under the [BSD-2 License](https://raw.githubusercontent.com/KorAP/Kustvakt/master/LICENSE).
+
 # Publication
 
 Diewald, Nils/Hanl, Michael/Margaretha, Eliza/Bingel, Joachim/Kupietz, Marc/Bański, Piotr/Witt, Andreas (2016):
