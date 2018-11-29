@@ -14,6 +14,8 @@ Kustvakt acts as a middleware in KorAP binding other components, such as [Koral]
   
   provides user and policy management and extended services, in addition to the basic services. This version requires a database (Sqlite is provided) and an LDAP system for user authentication.
   
+Recent changes on the project are described in the change logs (Changes files).
+  
 # Web-services
 
 Web-services including their usage examples are described in the [wiki](https://github.com/KorAP/Kustvakt/wiki).
@@ -125,14 +127,19 @@ java -cp Kustvakt-full-[version].jar:config de.ids_mannheim.korap.server.Kustvak
 where ```custom-spring-config.xml``` is in the ```config``` folder.
 
 
-# Futher Setup
+# Advanced Setup
 
-Advanced setup including database and mailing setting are described in the [wiki](https://github.com/KorAP/Kustvakt/wiki).
+Advanced setup such as setting database properties and configuring mail settings for email notifications, are described in the [wiki](https://github.com/KorAP/Kustvakt/wiki).
 
+# License
+
+Kustvakt is published under the [BSD-2 License](https://raw.githubusercontent.com/KorAP/Kustvakt/master/LICENSE). It is developed as part of the KorAP Corpus Analysis Platform at the Institute for German Language (IDS), funded by the Leibniz-Gemeinschaft and supported by the KobRA project, funded by the Federal Ministry of Education and Research (BMBF).
 
 # Contributions
 
 Contributions to Kustvakt are very welcome!
+
+Ideally, any contributions should be committed via [KorAP Gerrit server](https://korap.ids-mannheim.de/gerrit/) to facilitate code reviewing (see [Gerrit Code Review - A Quick Introduction](https://korap.ids-mannheim.de/gerrit/Documentation/intro-quick.html)). However, we are also happy to accept comments and pull requests via GitHub.
 
 Please note that unless you explicitly state otherwise any contribution intentionally submitted for inclusion into Kustvakt shall –	
 as Kustvakt itself – be under the [BSD-2 License](https://raw.githubusercontent.com/KorAP/Kustvakt/master/LICENSE).
