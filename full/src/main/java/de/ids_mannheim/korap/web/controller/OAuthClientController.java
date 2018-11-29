@@ -229,10 +229,12 @@ public class OAuthClientController {
     }
 
     /**
-     * Lists user clients having refresh tokens. This service is not
-     * part of the OAuth2 specification. It is intended to facilitate
-     * users revoking any suspicious and misused access or refresh
-     * tokens.
+     * Lists user clients having active refresh tokens (not revoked,
+     * not expired), except super clients.
+     * 
+     * This service is not part of the OAuth2 specification. It is
+     * intended to facilitate users revoking any suspicious and
+     * misused access or refresh tokens.
      * 
      * Only super clients are allowed to use this service. It requires
      * user and client authentications.

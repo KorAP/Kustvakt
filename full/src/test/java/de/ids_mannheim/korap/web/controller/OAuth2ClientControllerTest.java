@@ -442,6 +442,27 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 node.at("/errors/0/1").asText());
     }
 
+    private void requestUserClientList () throws KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("client_id", superClientId);
+        form.add("client_secret", clientSecret);
+
+        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+                .path("client").path("list")
+                .header(Attributes.AUTHORIZATION, userAuthHeader)
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(2, node.size());
+        assertEquals(confidentialClientId, node.at("/0/clientId").asText());
+        assertEquals(publicClientId, node.at("/1/clientId").asText());
+    }
+
     @Test
     public void testListUserClients () throws KustvaktException {
         String username = "pearl";
@@ -468,24 +489,21 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 confidentialClientId, clientSecret, code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("client_id", superClientId);
-        form.add("client_secret", clientSecret);
+        requestUserClientList();
+        testListClientWithMultipleRefreshTokens();
+    }
 
-        response = resource().path(API_VERSION).path("oauth2").path("client")
-                .path("list").header(Attributes.AUTHORIZATION, userAuthHeader)
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+    private void testListClientWithMultipleRefreshTokens ()
+            throws KustvaktException {
+        // client 1
+        String code = requestAuthorizationCode(publicClientId, clientSecret,
+                null, userAuthHeader);
+        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
+                publicClientId, "", code);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        
-        String entity = response.getEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        
-        assertEquals(2, node.size());
-        assertEquals(confidentialClientId, node.at("/0/clientId").asText());
-        assertEquals(publicClientId, node.at("/1/clientId").asText());
+
+        requestUserClientList();
     }
 
 }

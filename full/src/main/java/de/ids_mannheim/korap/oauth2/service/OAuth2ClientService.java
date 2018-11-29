@@ -346,11 +346,6 @@ public class OAuth2ClientService {
         return clientDao.retrieveClientById(clientId);
     }
 
-    public List<OAuth2Client> retrieveUserClients (String username)
-            throws KustvaktException {
-        return clientDao.retrieveUserClients(username);
-    }
-
     public List<OAuth2UserClientDto> listUserClients (String username,
             String clientId, String clientSecret) throws KustvaktException {
         OAuth2Client client = authenticateClient(clientId, clientSecret);
@@ -359,9 +354,10 @@ public class OAuth2ClientService {
                     "Only super client is allowed to list user clients.",
                     OAuth2Error.UNAUTHORIZED_CLIENT);
         }
-        List<OAuth2Client> userClients = retrieveUserClients(username);
+        List<OAuth2Client> userClients =
+                clientDao.retrieveUserClients(username);
         Collections.sort(userClients);
-        
+
         List<OAuth2UserClientDto> dtoList = new ArrayList<>(userClients.size());
         for (OAuth2Client uc : userClients) {
             if (uc.isSuper()) continue;

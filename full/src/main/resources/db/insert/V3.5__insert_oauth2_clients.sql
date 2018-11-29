@@ -34,20 +34,25 @@ INSERT INTO oauth2_client(id,name,secret,type,super,url_id,
 VALUES ("8bIDtZnH6NvRkW2Fq","third party client",null,
   "PUBLIC", 0, -2137275617,
   "https://third.party.client.com/redirect","system",
-  "This is a test nonsuper public client.");
+  "This is a test public client.");
 
   
 INSERT INTO oauth2_client_url(url,url_hashcode)
 VALUES("http://korap.ids-mannheim.de/public", 1360724310); 
   
---INSERT INTO oauth2_client(id,name,secret,type,super,url_id,
---  redirect_uri, registered_by, description) 
---VALUES ("iBr3LsTCxOj7D2o0A5m","test public client",null,
---  "PUBLIC", 1, 1360724310,
---  "https://korap.ids-mannheim.de/public/redirect","system", 
---  "This is a test super public client."); 
+INSERT INTO oauth2_client(id,name,secret,type,super,url_id,
+  redirect_uri, registered_by, description) 
+VALUES ("nW5qM63Rb2a7KdT9L","test public client",null,
+  "PUBLIC", 0, 1360724310,
+  "https://korap.ids-mannheim.de/public/redirect","system", 
+  "This is a test super public client."); 
 
 INSERT INTO oauth2_access_token(token,user_id,created_date, 
 expiry_date, user_auth_time)
 VALUES("fia0123ikBWn931470H8s5gRqx7Moc4p","marlin","2018-05-30 16:25:50", 
 "2018-05-31 16:25:50", "2018-05-30 16:23:10");
+
+INSERT INTO oauth2_refresh_token(token,user_id,user_auth_time, 
+created_date, expiry_date, client)
+VALUES("js9iQ4lw1Ri7fz06l0dXl8fCVp3Yn7vmq8","pearl","2017-05-30 16:25:50", 
+"2017-05-31 16:26:35", "1527784020000", "nW5qM63Rb2a7KdT9L");

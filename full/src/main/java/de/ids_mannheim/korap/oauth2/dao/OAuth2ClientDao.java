@@ -11,7 +11,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.ListJoin;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -116,7 +116,7 @@ public class OAuth2ClientDao {
                 builder.createQuery(OAuth2Client.class);
 
         Root<OAuth2Client> client = query.from(OAuth2Client.class);
-        ListJoin<OAuth2Client, RefreshToken> refreshToken =
+        Join<OAuth2Client, RefreshToken> refreshToken =
                 client.join(OAuth2Client_.refreshTokens);
         Predicate condition = builder.and(
                 builder.equal(refreshToken.get(RefreshToken_.userId), username),
@@ -128,6 +128,7 @@ public class OAuth2ClientDao {
                                 .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE))));
         query.select(client);
         query.where(condition);
+        query.distinct(true);
         TypedQuery<OAuth2Client> q = entityManager.createQuery(query);
         return q.getResultList();
     }
