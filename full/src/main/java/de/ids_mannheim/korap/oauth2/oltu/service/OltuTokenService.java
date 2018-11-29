@@ -120,7 +120,7 @@ public class OltuTokenService extends OAuth2TokenService {
                     "Refresh token is not found", OAuth2Error.INVALID_GRANT);
         }
 
-        if (!clientId.equals(refreshToken.getClientId())) {
+        if (!clientId.equals(refreshToken.getClient().getId())) {
             throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
                     "Client " + clientId + "is not authorized",
                     OAuth2Error.INVALID_CLIENT);

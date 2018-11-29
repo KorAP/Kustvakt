@@ -24,8 +24,9 @@ import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
-/** Provides common methods and variables for OAuth2 tests,
- *  and does not run any test. 
+/**
+ * Provides common methods and variables for OAuth2 tests,
+ * and does not run any test.
  * 
  * @author margaretha
  *
@@ -105,8 +106,8 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         form.add("client_id", clientId);
         form.add("code", code);
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
-                .header(Attributes.AUTHORIZATION, authHeader)
+        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+                .path("token").header(Attributes.AUTHORIZATION, authHeader)
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).post(ClientResponse.class);
@@ -115,14 +116,21 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         return JsonUtils.readTree(entity);
     }
 
-    public ClientResponse requestTokenWithPassword (String clientId,
+    public ClientResponse requestTokenWithDoryPassword (String clientId,
             String clientSecret) throws KustvaktException {
+        return requestTokenWithPassword(clientId, clientSecret, "dory",
+                "password");
+    }
+
+    public ClientResponse requestTokenWithPassword (String clientId,
+            String clientSecret, String username, String password)
+            throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("grant_type", "password");
         form.add("client_id", clientId);
         form.add("client_secret", clientSecret);
-        form.add("username", "dory");
-        form.add("password", "password");
+        form.add("username", username);
+        form.add("password", password);
 
         return requestToken(form);
     }
@@ -130,8 +138,8 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     public void updateClientPrivilege (MultivaluedMap<String, String> form)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("client")
-                .path("privilege")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+                .path("client").path("privilege")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
@@ -140,10 +148,10 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
-    
+
     public ClientResponse searchWithAccessToken (String accessToken) {
-        return resource().path(API_VERSION).path("search").queryParam("q", "Wasser")
-                .queryParam("ql", "poliqarp")
+        return resource().path(API_VERSION).path("search")
+                .queryParam("q", "Wasser").queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);

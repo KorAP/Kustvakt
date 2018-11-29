@@ -1,22 +1,32 @@
 package de.ids_mannheim.korap.oauth2.dao;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.ListJoin;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2ClientUrl;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client_;
+import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
+import de.ids_mannheim.korap.oauth2.entity.RefreshToken_;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
 @Transactional
@@ -95,6 +105,31 @@ public class OAuth2ClientDao {
     public void updateClient (OAuth2Client client) throws KustvaktException {
         ParameterChecker.checkObjectValue(client, "client");
         client = entityManager.merge(client);
+    }
+
+    public List<OAuth2Client> retrieveUserClients (String username)
+            throws KustvaktException {
+        ParameterChecker.checkStringValue(username, "username");
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<OAuth2Client> query =
+                builder.createQuery(OAuth2Client.class);
+
+        Root<OAuth2Client> client = query.from(OAuth2Client.class);
+        ListJoin<OAuth2Client, RefreshToken> refreshToken =
+                client.join(OAuth2Client_.refreshTokens);
+        Predicate condition = builder.and(
+                builder.equal(refreshToken.get(RefreshToken_.userId), username),
+                builder.equal(refreshToken.get(RefreshToken_.isRevoked), false),
+                builder.greaterThan(
+                        refreshToken
+                                .<ZonedDateTime> get(RefreshToken_.expiryDate),
+                        ZonedDateTime
+                                .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE))));
+        query.select(client);
+        query.where(condition);
+        TypedQuery<OAuth2Client> q = entityManager.createQuery(query);
+        return q.getResultList();
     }
 
 }

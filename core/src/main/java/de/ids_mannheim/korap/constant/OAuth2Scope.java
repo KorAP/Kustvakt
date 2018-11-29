@@ -8,6 +8,8 @@ public enum OAuth2Scope {
     OPENID, 
     AUTHORIZE,
     
+    LIST_USER_CLIENT,
+    
     CLIENT_INFO,
     REGISTER_CLIENT,
     DEREGISTER_CLIENT,

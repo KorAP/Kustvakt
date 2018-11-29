@@ -5,6 +5,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.validator.routines.UrlValidator;
@@ -25,6 +27,7 @@ import de.ids_mannheim.korap.oauth2.dao.OAuth2ClientDao;
 import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientInfoDto;
+import de.ids_mannheim.korap.oauth2.dto.OAuth2UserClientDto;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
@@ -336,5 +339,37 @@ public class OAuth2ClientService {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
+    }
+
+    public OAuth2Client retrieveClient (String clientId)
+            throws KustvaktException {
+        return clientDao.retrieveClientById(clientId);
+    }
+
+    public List<OAuth2Client> retrieveUserClients (String username)
+            throws KustvaktException {
+        return clientDao.retrieveUserClients(username);
+    }
+
+    public List<OAuth2UserClientDto> listUserClients (String username,
+            String clientId, String clientSecret) throws KustvaktException {
+        OAuth2Client client = authenticateClient(clientId, clientSecret);
+        if (!client.isSuper()) {
+            throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
+                    "Only super client is allowed to list user clients.",
+                    OAuth2Error.UNAUTHORIZED_CLIENT);
+        }
+        List<OAuth2Client> userClients = retrieveUserClients(username);
+        Collections.sort(userClients);
+        
+        List<OAuth2UserClientDto> dtoList = new ArrayList<>(userClients.size());
+        for (OAuth2Client uc : userClients) {
+            if (uc.isSuper()) continue;
+            OAuth2UserClientDto dto = new OAuth2UserClientDto();
+            dto.setClientId(uc.getId());
+            dto.setClientName(uc.getName());
+            dtoList.add(dto);
+        }
+        return dtoList;
     }
 }

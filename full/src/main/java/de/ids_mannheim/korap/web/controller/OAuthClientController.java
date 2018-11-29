@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.web.controller;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -22,6 +24,7 @@ import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientInfoDto;
+import de.ids_mannheim.korap.oauth2.dto.OAuth2UserClientDto;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ClientService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
@@ -55,7 +58,8 @@ import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
  */
 @Controller
 @Path("{version}/oauth2/client")
-@ResourceFilters({APIVersionFilter.class, AuthenticationFilter.class, BlockingFilter.class })
+@ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
+        BlockingFilter.class })
 public class OAuthClientController {
 
     @Autowired
@@ -180,7 +184,8 @@ public class OAuthClientController {
      * authorization codes are invalidated.
      * 
      * @param securityContext
-     * @param clientId OAuth2 client id
+     * @param clientId
+     *            OAuth2 client id
      * @param super
      *            true indicating super client, false otherwise
      * @return Response status OK, if successful
@@ -222,4 +227,43 @@ public class OAuthClientController {
             throw responseHandler.throwit(e);
         }
     }
+
+    /**
+     * Lists user clients having refresh tokens. This service is not
+     * part of the OAuth2 specification. It is intended to facilitate
+     * users revoking any suspicious and misused access or refresh
+     * tokens.
+     * 
+     * Only super clients are allowed to use this service. It requires
+     * user and client authentications.
+     * 
+     * @param context
+     * @return a list of clients having refresh tokens of the
+     *         given user
+     */
+    @POST
+    @Path("list")
+    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public List<OAuth2UserClientDto> listUserApp (
+            @Context SecurityContext context,
+            @FormParam("client_id") String clientId,
+            @FormParam("client_secret") String clientSecret) {
+
+        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+        String username = tokenContext.getUsername();
+
+        try {
+            scopeService.verifyScope(tokenContext,
+                    OAuth2Scope.LIST_USER_CLIENT);
+
+            return clientService.listUserClients(username, clientId,
+                    clientSecret);
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
+
 }

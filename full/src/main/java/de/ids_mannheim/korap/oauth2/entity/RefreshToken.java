@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -30,8 +31,8 @@ public class RefreshToken {
     private ZonedDateTime expiryDate;
     @Column(name = "user_id")
     private String userId;
-    @Column(name = "client_id")
-    private String clientId;
+//    @Column(name = "client_id")
+//    private String clientId;
     @Column(name = "user_auth_time", updatable = false)
     private ZonedDateTime userAuthenticationTime;
     @Column(name = "is_revoked")
@@ -39,6 +40,10 @@ public class RefreshToken {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "refreshToken")
     private Set<AccessToken> accessTokens;
+    
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="client")
+    private OAuth2Client client;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "oauth2_refresh_token_scope",
@@ -82,14 +87,6 @@ public class RefreshToken {
         this.userId = userId;
     }
 
-    public String getClientId () {
-        return clientId;
-    }
-
-    public void setClientId (String clientId) {
-        this.clientId = clientId;
-    }
-
     public ZonedDateTime getUserAuthenticationTime () {
         return userAuthenticationTime;
     }
@@ -121,6 +118,14 @@ public class RefreshToken {
 
     public void setScopes (Set<AccessScope> scopes) {
         this.scopes = scopes;
+    }
+
+    public OAuth2Client getClient () {
+        return client;
+    }
+
+    public void setClient (OAuth2Client client) {
+        this.client = client;
     }
 
 }

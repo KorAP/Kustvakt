@@ -42,7 +42,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
     @Test
     public void testScopeWithSuperClient () throws KustvaktException {
         ClientResponse response =
-                requestTokenWithPassword(superClientId, clientSecret);
+                requestTokenWithDoryPassword(superClientId, clientSecret);
 
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         assertEquals("all", node.at("/scope").asText());
@@ -261,7 +261,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
     public void testRequestAuthorizationWithBearerToken ()
             throws KustvaktException {
         ClientResponse response =
-                requestTokenWithPassword(superClientId, clientSecret);
+                requestTokenWithDoryPassword(superClientId, clientSecret);
         String entity = response.getEntity(String.class);
         
         JsonNode node = JsonUtils.readTree(entity);

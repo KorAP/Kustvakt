@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.oauth2.entity;
 
+import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,6 +10,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -19,7 +22,7 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
  */
 @Entity
 @Table(name = "oauth2_client")
-public class OAuth2Client {
+public class OAuth2Client implements Comparable<OAuth2Client>{
 
     @Id
     private String id;
@@ -40,6 +43,9 @@ public class OAuth2Client {
     @JoinColumn(name = "url_id")
     private OAuth2ClientUrl clientUrl;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "client")
+    private List<RefreshToken> refreshTokens;
+    
     @Override
     public String toString () {
         return "id=" + id + ", name=" + name + ", secret=" + secret + ", type="
@@ -118,5 +124,10 @@ public class OAuth2Client {
 
     public void setClientUrl (OAuth2ClientUrl clientUrl) {
         this.clientUrl = clientUrl;
+    }
+
+    @Override
+    public int compareTo (OAuth2Client o) {
+        return this.getName().compareTo(o.getName());
     }
 }

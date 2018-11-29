@@ -322,7 +322,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     public void testRequestTokenPasswordGrantConfidentialSuper ()
             throws KustvaktException {
         ClientResponse response =
-                requestTokenWithPassword(superClientId, clientSecret);
+                requestTokenWithDoryPassword(superClientId, clientSecret);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
@@ -338,7 +338,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     public void testRequestTokenPasswordGrantConfidentialNonSuper ()
             throws KustvaktException {
         ClientResponse response =
-                requestTokenWithPassword(confidentialClientId, clientSecret);
+                requestTokenWithDoryPassword(confidentialClientId, clientSecret);
         String entity = response.getEntity(String.class);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
@@ -352,7 +352,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     @Test
     public void testRequestTokenPasswordGrantPublic ()
             throws KustvaktException {
-        ClientResponse response = requestTokenWithPassword(publicClientId, "");
+        ClientResponse response = requestTokenWithDoryPassword(publicClientId, "");
         String entity = response.getEntity(String.class);
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -422,7 +422,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     public void testRequestTokenPasswordGrantMissingClientSecret ()
             throws KustvaktException {
         ClientResponse response =
-                requestTokenWithPassword(confidentialClientId, "");
+                requestTokenWithDoryPassword(confidentialClientId, "");
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         String entity = response.getEntity(String.class);
@@ -436,7 +436,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     @Test
     public void testRequestTokenPasswordGrantMissingClientId ()
             throws KustvaktException {
-        ClientResponse response = requestTokenWithPassword(null, clientSecret);
+        ClientResponse response = requestTokenWithDoryPassword(null, clientSecret);
         String entity = response.getEntity(String.class);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
