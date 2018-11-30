@@ -9,6 +9,7 @@ dependency-reduced-pom.xml
 admin_token
 /bin/
 /db.sqlite
+/lite/liteDB.sqlite
 
 
 # FB specific Kustvakt.conf
