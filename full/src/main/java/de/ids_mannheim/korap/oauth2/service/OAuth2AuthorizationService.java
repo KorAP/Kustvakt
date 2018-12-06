@@ -22,9 +22,11 @@ import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 @Service(value = "authorizationService")
 public class OAuth2AuthorizationService {
 
-    private static Logger jlog =
+    public static Logger jlog =
             LogManager.getLogger(OAuth2AuthorizationService.class);
 
+    public static boolean DEBUG = false;
+    
     @Autowired
     protected OAuth2ClientService clientService;
     @Autowired
@@ -179,9 +181,10 @@ public class OAuth2AuthorizationService {
     private boolean isExpired (ZonedDateTime expiryDate) {
         ZonedDateTime now =
                 ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
-        jlog.debug("createdDate: " + expiryDate);
-        jlog.debug("expiration: " + expiryDate + ", now: " + now);
-
+        if (DEBUG) {
+            jlog.debug("createdDate: " + expiryDate);
+            jlog.debug("expiration: " + expiryDate + ", now: " + now);
+        }
         if (expiryDate.isAfter(now)) {
             return false;
         }

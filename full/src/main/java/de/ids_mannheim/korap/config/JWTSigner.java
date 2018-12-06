@@ -39,6 +39,7 @@ import de.ids_mannheim.korap.utils.TimeUtils;
 public class JWTSigner {
 
     private static Logger jlog = LogManager.getLogger(JWTSigner.class);
+    public static boolean DEBUG = false;
     
     private URL issuer;
     private JWSSigner signer;
@@ -92,7 +93,7 @@ public class JWTSigner {
                 attr.get(Attributes.AUTHENTICATION_TIME));
         
         JWTClaimsSet jwtClaimsSet = csBuilder.build();
-        jlog.debug(jwtClaimsSet.getClaim(Attributes.AUTHENTICATION_TIME));
+        if (DEBUG) jlog.debug(jwtClaimsSet.getClaim(Attributes.AUTHENTICATION_TIME));
         SignedJWT signedJWT =
                 new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), jwtClaimsSet);
         try {

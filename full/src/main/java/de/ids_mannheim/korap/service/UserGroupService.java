@@ -44,7 +44,9 @@ import de.ids_mannheim.korap.web.input.UserGroupJson;
 @Service
 public class UserGroupService {
 
-    private static Logger jlog = LogManager.getLogger(UserGroupService.class);
+    public static Logger jlog = LogManager.getLogger(UserGroupService.class);
+    public static boolean DEBUG = false;
+    
     @Autowired
     private UserGroupDao userGroupDao;
     @Autowired
@@ -412,10 +414,14 @@ public class UserGroupService {
         }
         // status pending
         else {
-            jlog.debug("status: " + member.getStatusDate());
+            if (DEBUG) {
+                jlog.debug("status: " + member.getStatusDate());
+            }
             ZonedDateTime expiration = member.getStatusDate().plusMinutes(30);
             ZonedDateTime now = ZonedDateTime.now();
-            jlog.debug("expiration: " + expiration + ", now: " + now);
+            if (DEBUG) {
+                jlog.debug("expiration: " + expiration + ", now: " + now);
+            }
 
             if (expiration.isAfter(now)) {
                 member.setStatus(GroupMemberStatus.ACTIVE);

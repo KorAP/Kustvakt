@@ -37,7 +37,7 @@ public class FreeResourceParser {
         JsonNode node = mapper.readTree(is);
         for (JsonNode resource : node) {
             String resourceId = resource.at("/id").asText();
-            log.debug(resourceId);
+//            log.debug(resourceId);
             Set<AnnotationLayer> layers = parseLayers(resource.at("/layers"));
             try {
                 Resource r = resourceDao.retrieveResource(resourceId);

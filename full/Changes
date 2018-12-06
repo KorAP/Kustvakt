@@ -9,7 +9,9 @@
    - Handled storing cached VC with VC reference (margaretha)
 29/11/2018
    - Added a controller for listing user clients having active refresh tokens 
-     (margaretha)  
+     (margaretha)
+6/12/2018
+   - Added debug flags to mitigate log4j debugging performance (margaretha)
    
 # version 0.61.3
 17/10/2018

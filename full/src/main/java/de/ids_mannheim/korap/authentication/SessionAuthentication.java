@@ -29,6 +29,8 @@ public class SessionAuthentication implements AuthenticationIface {
 
     private static final Logger jlog = LogManager
             .getLogger(SessionAuthentication.class);
+    public static boolean DEBUG = false;
+    
     public static SessionFactory sessions;
     private ScheduledThreadPoolExecutor scheduled;
     private EncryptionIface crypto;
@@ -52,7 +54,10 @@ public class SessionAuthentication implements AuthenticationIface {
     @Override
     public TokenContext getTokenContext(String authenticationToken)
             throws KustvaktException {
-        jlog.debug("retrieving user session for user "+ authenticationToken);
+        if (DEBUG) {
+            jlog.debug(
+                    "retrieving user session for user " + authenticationToken);
+        }
         return this.sessions.getSession(authenticationToken);
     }
 
@@ -72,10 +77,12 @@ public class SessionAuthentication implements AuthenticationIface {
         ctx.setExpirationTime(ex.getMillis()+(1000));
         ctx.setHostAddress(attr.get(Attributes.HOST).toString());
         ctx.setUserAgent(attr.get(Attributes.USER_AGENT).toString());
-        jlog.debug(ctx.toJson());
         this.sessions.putSession(token, ctx);
-        jlog.debug("session " +sessions.getSession(token).toString());
-        jlog.info("create session for user: " + user.getUsername());
+        if (DEBUG) {
+            jlog.debug(ctx.toJson());
+            jlog.debug("session " +sessions.getSession(token).toString());
+            jlog.info("create session for user: " + user.getUsername());
+        }
         return ctx;
     }
 

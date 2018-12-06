@@ -53,9 +53,11 @@ import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
 @Service
 public class VirtualCorpusService {
 
-    private static Logger jlog =
+    public static Logger jlog =
             LogManager.getLogger(VirtualCorpusService.class);
 
+    public static boolean DEBUG = false;
+    
     public static Pattern wordPattern = Pattern.compile("[-\\w. ]+");
 
     @Autowired
@@ -262,13 +264,16 @@ public class VirtualCorpusService {
             KoralCollectionQueryBuilder koral = new KoralCollectionQueryBuilder();
             koral.with("referTo "+name);
             String vcRef = koral.toJSON();
-            jlog.debug("Determine vc access with vc ref: " + vcRef);
+            if (DEBUG) {
+                jlog.debug("Determine vc access with vc ref: " + vcRef);
+            }
             requiredAccess = determineRequiredAccess(vcRef);
         }
         else{
             requiredAccess = determineRequiredAccess(koralQuery);
         }
-        jlog.debug("Storing VC "+name);
+        
+        if (DEBUG) jlog.debug("Storing VC "+name+"in the database ");
         int vcId = 0;
         try {
             vcId = vcDao.createVirtualCorpus(name, type, requiredAccess,
@@ -308,7 +313,9 @@ public class VirtualCorpusService {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "Invalid argument: " + corpusQuery, corpusQuery);
         }
-        jlog.debug(koralQuery);
+        if (DEBUG) {
+            jlog.debug(koralQuery);
+        }
         return koralQuery;
     }
 
@@ -336,7 +343,10 @@ public class VirtualCorpusService {
         String statistics = krill.getStatistics(json);
         JsonNode node = JsonUtils.readTree(statistics);
         int numberOfDoc = node.at("/documents").asInt();
-        jlog.debug("License: " + license + ", number of docs: " + numberOfDoc);
+        if (DEBUG) {
+            jlog.debug(
+                    "License: " + license + ", number of docs: " + numberOfDoc);
+        }
         return (numberOfDoc > 0) ? true : false;
     }
 

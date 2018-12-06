@@ -20,9 +20,12 @@ public class LoginCounter {
     private final Map<String, Long[]> failedLogins;
     private KustvaktConfiguration config;
 
+    public static boolean DEBUG = false;
 
     public LoginCounter (KustvaktConfiguration config) {
-        jlog.debug("init login counter for authentication management");
+        if (DEBUG) {
+            jlog.debug("init login counter for authentication management");
+        }
         this.config = config;
         this.failedLogins = new HashMap<>();
     }

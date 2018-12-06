@@ -33,13 +33,13 @@ import net.sf.ehcache.Element;
 public class APIAuthentication implements AuthenticationIface {
 
     private static Logger jlog = LogManager.getLogger(APIAuthentication.class);
-
+    public static boolean DEBUG = false;
+    
     private JWTSigner signedToken;
     private Cache invalided =
             CacheManager.getInstance().getCache("id_tokens_inv");
     // private Cache id_tokens =
     // CacheManager.getInstance().getCache("id_tokens");
-
 
     public APIAuthentication (FullConfiguration config) throws JOSEException {
         this.signedToken = new JWTSigner(config.getSharedSecret(),
@@ -82,7 +82,10 @@ public class APIAuthentication implements AuthenticationIface {
         try {
             c.setExpirationTime(
                     jwt.getJWTClaimsSet().getExpirationTime().getTime());
-            jlog.debug(jwt.getJWTClaimsSet().getClaim(Attributes.AUTHENTICATION_TIME));
+            if (DEBUG ) {
+                jlog.debug(jwt.getJWTClaimsSet()
+                        .getClaim(Attributes.AUTHENTICATION_TIME));
+            }
             Date authTime = jwt.getJWTClaimsSet()
                     .getDateClaim(Attributes.AUTHENTICATION_TIME);
             ZonedDateTime time = ZonedDateTime.ofInstant(authTime.toInstant(),

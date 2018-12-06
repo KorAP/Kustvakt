@@ -33,8 +33,9 @@ import de.ids_mannheim.korap.utils.ParameterChecker;
 @Service
 public class MailService {
 
-    private static Logger jlog = LogManager.getLogger(MailService.class);
-
+    public static Logger jlog = LogManager.getLogger(MailService.class);
+    public static boolean DEBUG = false;
+    
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
@@ -84,7 +85,7 @@ public class MailService {
                 StandardCharsets.UTF_8.name(), context, stringWriter);
 
         String message = stringWriter.toString();
-        jlog.debug(message);
+        if (DEBUG) jlog.debug(message);
         return message;
     }
 }

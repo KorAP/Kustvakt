@@ -61,6 +61,8 @@ import de.ids_mannheim.korap.utils.TimeUtils;
 public class KustvaktAuthenticationManager extends AuthenticationManager {
 
 	private static Logger jlog = LogManager.getLogger(KustvaktAuthenticationManager.class);
+	public static boolean DEBUG = false;
+	
 	private EncryptionIface crypto;
 	private EntityHandlerIface entHandler;
 	@Autowired
@@ -232,7 +234,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 	    {
 	    	// to be absolutely sure:
 	    	user.setCorpusAccess(User.CorpusAccess.FREE);
-	    	jlog.debug("setAccessAndLocation: DemoUser: location="+user.locationtoString()+" access="+ user.accesstoString());
+            if (DEBUG) {
+                jlog.debug("setAccessAndLocation: DemoUser: location="
+                        + user.locationtoString() + " access="
+                        + user.accesstoString());
+            }
 	     	return;
 	    }
 		
@@ -251,11 +257,17 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 					corpusAccess = CorpusAccess.PUB;
 				}
 				
-			    jlog.debug(String.format("X-Forwarded-For : '%s' (%d values) -> %s\n", 
-						Arrays.toString(vals), vals.length, vals[0]));
-			    jlog.debug(String.format("X-Forwarded-For : location = %s corpusAccess = %s\n",
-						location == Location.INTERN ? "INTERN" : "EXTERN", corpusAccess == CorpusAccess.ALL ? "ALL"
-								: corpusAccess == CorpusAccess.PUB ? "PUB" : "FREE"));
+				if (DEBUG){
+                    jlog.debug(String.format(
+                            "X-Forwarded-For : '%s' (%d values) -> %s\n",
+                            Arrays.toString(vals), vals.length, vals[0]));
+                    jlog.debug(String.format(
+                            "X-Forwarded-For : location = %s corpusAccess = %s\n",
+                            location == Location.INTERN ? "INTERN" : "EXTERN",
+                            corpusAccess == CorpusAccess.ALL ? "ALL"
+                                    : corpusAccess == CorpusAccess.PUB ? "PUB"
+                                            : "FREE"));
+                }
 
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
@@ -265,7 +277,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 			user.setLocation(location);
 			user.setCorpusAccess(corpusAccess);
 	    	
-	    	jlog.debug("setAccessAndLocation: KorAPUser: location="+user.locationtoString()+", access="+ user.accesstoString());
+            if (DEBUG) {
+                jlog.debug("setAccessAndLocation: KorAPUser: location="
+                        + user.locationtoString() + ", access="
+                        + user.accesstoString());
+            }
 
 		}
 	} // getAccess
@@ -345,8 +361,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		}
 
 		boolean isAdmin = adminDao.isAdmin(unknown.getUsername());
-		jlog.debug("Authentication: found username " + unknown.getUsername());
-
+        if (DEBUG) {
+            jlog.debug(
+                    "Authentication: found username " + unknown.getUsername());
+        }
 		if (unknown instanceof KorAPUser) {
 			if (password == null || password.isEmpty())
 				throw new WrappedException(new KustvaktException(unknown.getId(), StatusCodes.BAD_CREDENTIALS),
@@ -370,7 +388,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 				URIParam param = (URIParam) user.getField(URIParam.class);
 
 				if (param.hasValues()) {
-					jlog.debug("Account is not yet activated for user '"+user.getUsername()+"'" );
+                    if (DEBUG) {
+                        jlog.debug("Account is not yet activated for user '"
+                                + user.getUsername() + "'");
+                    }
 					if (TimeUtils.getNow().isAfter(param.getUriExpiration())) {
 						jlog.error("URI token is expired. Deleting account for user "+ user.getUsername());
 						deleteAccount(user);
@@ -391,7 +412,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		} else if (unknown instanceof ShibbolethUser) {
 			// todo
 		}
-		jlog.debug("Authentication done: "+unknown);
+        if (DEBUG) {
+            jlog.debug("Authentication done: " + unknown);
+        }
 		return unknown;
 	}
 
@@ -431,7 +454,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		try {
 			// todo: unknown = ...
 			int ret = LdapAuth3.login(username, password, config.getLdapConfig());
-			System.out.printf("Debug: autenticationIdM: Ldap.login(%s) returns: %d.\n", username, ret);
+			if (DEBUG){
+			    jlog.debug("Debug: autenticationIdM: Ldap.login(%s) returns: %d.\n", username, ret);
+			}
 			if (ret != LdapAuth3.LDAP_AUTH_ROK) {
 				jlog.error("LdapAuth3.login(username='"+username+"') returns '"+ret+"'='"+LdapAuth3.getErrMessage(ret)+"'!");
 
@@ -474,8 +499,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		 */
 		unknown = user;
 
-		jlog.trace("Authentication: found username " + unknown.getUsername());
-
+        if (DEBUG) {
+            jlog.trace(
+                    "Authentication: found username " + unknown.getUsername());
+        }
 		if (unknown instanceof KorAPUser) {
 			/*
 			 * password already checked using LDAP: if (password == null ||
@@ -523,7 +550,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 			// todo
 		}
 
-		jlog.debug("Authentication done: " + username);
+        if (DEBUG) {
+            jlog.debug("Authentication done: " + username);
+        }
 		return unknown;
 
 	} // authenticateIdM
@@ -752,7 +781,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 
 	// todo:
 	private ShibbolethUser createShibbUserAccount(Map<String, Object> attributes) throws KustvaktException {
-		jlog.debug("creating shibboleth user account for user attr: "+ attributes);
+        if (DEBUG) {
+            jlog.debug("creating shibboleth user account for user attr: "
+                    + attributes);
+        }
 		Map<String, Object> safeMap = validator.validateMap(attributes);
 
 		// todo eppn non-unique.join with idp or use persistent_id as username

@@ -33,6 +33,7 @@ import java.util.concurrent.ConcurrentMap;
 public class SessionFactory implements Runnable {
 
     private static Logger jlog = LogManager.getLogger(SessionFactory.class);
+    public static boolean DEBUG = false;
 
     public static ConcurrentMap<String, TokenContext> sessionsObject;
     public static ConcurrentMap<String, DateTime> timeCheck;
@@ -43,7 +44,9 @@ public class SessionFactory implements Runnable {
 
 
     public SessionFactory (boolean multipleEnabled, int inactive) {
-        jlog.debug("allow multiple sessions per user: "+ multipleEnabled);
+        if (DEBUG) {
+            jlog.debug("allow multiple sessions per user: " + multipleEnabled);
+        }
         this.multipleEnabled = multipleEnabled;
         this.inactive = inactive;
         this.sessionsObject = new ConcurrentHashMap<>();
@@ -63,7 +66,9 @@ public class SessionFactory implements Runnable {
     // todo: remove this!
     @Cacheable("session")
     public TokenContext getSession (String token) throws KustvaktException {
-        jlog.debug("logged in users: "+ loggedInRecord);
+        if (DEBUG) {
+            jlog.debug("logged in users: " + loggedInRecord);
+        }
         TokenContext context = sessionsObject.get(token);
         if (context != null) {
             // fixme: set context to respecitve expiratin interval and return context. handler checks expiration later!
@@ -134,11 +139,12 @@ public class SessionFactory implements Runnable {
         if (timeCheck.containsKey(token)) {
             if (TimeUtils.plusSeconds(timeCheck.get(token).getMillis(),
                     inactive).isAfterNow()) {
-                jlog.debug("user has session");
+                if (DEBUG){ jlog.debug("user has session");}
                 return true;
             }
-            else
+            else if (DEBUG){
                 jlog.debug("user with token "+token+" has an invalid session");
+            }
         }
         return false;
     }
@@ -161,9 +167,12 @@ public class SessionFactory implements Runnable {
             }
         }
         // fixme: not doing anything!
-        if (inactive.size() > 0)
+        if (inactive.size() > 0){
+            if (DEBUG){
             jlog.trace("removing inactive user session for users "+
                     inactive);
+            }
+        }
     }
 
 

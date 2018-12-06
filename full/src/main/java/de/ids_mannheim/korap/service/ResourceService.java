@@ -21,7 +21,8 @@ import de.ids_mannheim.korap.web.controller.ResourceController;
 @Service
 public class ResourceService {
 
-    private static Logger jlog = LogManager.getLogger(ResourceService.class);
+    public static Logger jlog = LogManager.getLogger(ResourceService.class);
+    public static boolean DEBUG = false;
 
     @Autowired
     private ResourceDao resourceDao;
@@ -32,7 +33,9 @@ public class ResourceService {
         List<Resource> resources = resourceDao.getAllResources();
         List<ResourceDto> resourceDtos =
                 resourceConverter.convertToResourcesDto(resources);
-        jlog.debug("/info " + resourceDtos.toString());
+        if (DEBUG) {
+            jlog.debug("/info " + resourceDtos.toString());
+        }
         return resourceDtos;
     }
 

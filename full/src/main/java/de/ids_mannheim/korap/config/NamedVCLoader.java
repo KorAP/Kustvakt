@@ -31,7 +31,8 @@ public class NamedVCLoader {
     @Autowired
     private VirtualCorpusService vcService;
 
-    private static Logger jlog = LogManager.getLogger(NamedVCLoader.class);
+    public static Logger jlog = LogManager.getLogger(NamedVCLoader.class);
+    public static boolean DEBUG = false;
 
     public void loadVCToCache (String filename, String filePath)
             throws IOException, QueryException, KustvaktException {
@@ -71,7 +72,9 @@ public class NamedVCLoader {
                     VirtualCorpus vc = vcService.searchVCByName("system",
                             filename, "system");
                     if (vc != null) {
-                        jlog.debug("Delete existing vc: " + filename);
+                        if (DEBUG) {
+                            jlog.debug("Delete existing vc: " + filename);
+                        }
                         vcService.deleteVC("system", vc.getId());
                     }
                 }
@@ -106,7 +109,9 @@ public class NamedVCLoader {
                     + " is not allowed. Filename must ends with .jsonld or .jsonld.gz");
         }
         long end = System.currentTimeMillis();
-        jlog.debug("READ " + filename + " duration: " + (end - start));
+        if (DEBUG) {
+            jlog.debug("READ " + filename + " duration: " + (end - start));
+        }
 
         return new String[] { filename, json };
     }
@@ -118,18 +123,18 @@ public class NamedVCLoader {
         start = System.currentTimeMillis();
 
         KrillCollection collection = new KrillCollection(json);
-        jlog.debug("Finished creating KrillCollection");
-        jlog.debug("Set Index to collection");
         collection.setIndex(searchKrill.getIndex());
 
-        jlog.debug("StoreInCache " + filename);
+        jlog.info("Store vc in cache " + filename);
         if (collection != null) {
             collection.storeInCache(filename);
         }
         end = System.currentTimeMillis();
         jlog.info(filename + " caching duration: " + (end - start));
-        jlog.debug("memory cache: "
-                + KrillCollection.cache.calculateInMemorySize());
+        if (DEBUG) {
+            jlog.debug("memory cache: "
+                    + KrillCollection.cache.calculateInMemorySize());
+        }
     }
 
 }
