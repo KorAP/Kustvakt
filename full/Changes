@@ -12,6 +12,7 @@
      (margaretha)
 6/12/2018
    - Added debug flags to mitigate log4j debugging performance (margaretha)
+   - Fixed KoralNode at() method (margaretha)
    
 # version 0.61.3
 17/10/2018

@@ -27,7 +27,8 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
     public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) throws KustvaktException {
         if (node.has("collection")) {
-            findVCRef(user.getUsername(), node.at("/collection"));
+            node = node.at("/collection");
+            findVCRef(user.getUsername(), node);
         }
         return node.rawNode();
     }

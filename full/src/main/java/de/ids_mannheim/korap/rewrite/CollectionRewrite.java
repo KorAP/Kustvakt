@@ -48,9 +48,11 @@ import edu.emory.mathcs.backport.java.util.Arrays;
  */
 public class CollectionRewrite implements RewriteTask.RewriteQuery {
 
-    private static Logger jlog =
+    public static Logger jlog =
             LogManager.getLogger(CollectionRewrite.class);
 
+    public static boolean DEBUG = false;
+    
     public CollectionRewrite () {
         super();
     }
@@ -59,11 +61,13 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
     private List<String> checkAvailability (JsonNode node,
             List<String> originalAvailabilities,
             List<String> updatedAvailabilities, boolean isOperationOr) {
-        try {
-            jlog.debug(JsonUtils.toJSON(node));
-        }
-        catch (KustvaktException e) {
-            e.printStackTrace();
+        if (DEBUG) {
+            try {
+                jlog.debug(JsonUtils.toJSON(node));
+            }
+            catch (KustvaktException e) {
+                e.printStackTrace();
+            }
         }
 
         if (node.has("operands")) {
@@ -105,11 +109,15 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
 
             if (originalAvailabilities.contains(queryAvailability)
                     && matchOp.equals(KoralMatchOperator.EQUALS.toString())) {
-                jlog.debug("REMOVE " + queryAvailability);
+                if (DEBUG) {
+                    jlog.debug("REMOVE " + queryAvailability);
+                }
                 updatedAvailabilities.remove(queryAvailability);
             }
             else if (isOperationOr) {
-                jlog.debug("RESET availabilities 2");
+                if (DEBUG) { 
+                    jlog.debug("RESET availabilities 2");
+                }
                 updatedAvailabilities.clear();
                 updatedAvailabilities.addAll(originalAvailabilities);
                 return updatedAvailabilities;
@@ -150,14 +158,18 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
             List<String> avalabilityCopy =
                     new ArrayList<String>(userAvailabilities.size());
             avalabilityCopy.addAll(userAvailabilities);
-            jlog.debug("Availabilities: "
-                    + Arrays.toString(userAvailabilities.toArray()));
+            if (DEBUG) {
+                jlog.debug("Availabilities: "
+                        + Arrays.toString(userAvailabilities.toArray()));
+            }
 
             userAvailabilities = checkAvailability(jsonNode.at("/collection"),
                     avalabilityCopy, userAvailabilities, false);
             if (!userAvailabilities.isEmpty()) {
                 builder.with(buildAvailability(avalabilityCopy));
-                jlog.debug("corpus query: " + builder.toString());
+                if (DEBUG) {
+                    jlog.debug("corpus query: " + builder.toString());
+                }
                 builder.setBaseQuery(builder.toJSON());
                 rewrittenNode = builder.mergeWith(jsonNode).at("/collection");
                 node.set("collection", rewrittenNode, identifier);
@@ -165,13 +177,17 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
         }
         else {
             builder.with(buildAvailability(userAvailabilities));
-            jlog.debug("corpus query: " + builder.toString());
+            if (DEBUG) {
+                jlog.debug("corpus query: " + builder.toString());
+            }
             rewrittenNode =
                     JsonUtils.readTree(builder.toJSON()).at("/collection");
             node.set("collection", rewrittenNode, identifier);
         }
 
-        jlog.debug("REWRITES: " + node.at("/collection").toString());
+        node = node.at("/collection");
+        jlog.debug("REWRITES: " + node.toString());
+        
         return node.rawNode();
     }
 

@@ -149,8 +149,9 @@ public abstract class KoralNode {
 
 
     public KoralNode at (String name) {
-        this.node = this.node.at(name);
-        return this;
+//        this.node = this.node.at(name);
+//        return this;
+        return wrapNode( this.node.at(name) );
     }
 
 
