@@ -21,14 +21,14 @@ public class IdWriter implements RewriteTask.RewriteKoralToken {
 
 
     @Override
-    public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
+    public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) {
         if (node.get("@type").equals("koral:token")) {
             String s = extractToken(node.rawNode());
             if (s != null && !s.isEmpty())
                 node.put("idn", s + "_" + counter++);
         }
-        return node.rawNode();
+        return node;
     }
 
 

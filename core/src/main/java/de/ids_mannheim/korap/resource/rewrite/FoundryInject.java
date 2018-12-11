@@ -29,7 +29,7 @@ public class FoundryInject implements RewriteTask.IterableRewritePath,
 
 
     @Override
-    public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
+    public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) throws KustvaktException {
         LayerMapper mapper;
         // EM: do not use DB
@@ -44,7 +44,7 @@ public class FoundryInject implements RewriteTask.IterableRewritePath,
         if (node.get("@type").equals("koral:span")) {
             if (!node.isMissingNode("/wrap")){
                 node = node.at("/wrap");
-                JsonNode term = rewriteQuery(node, config, user);
+                JsonNode term = rewriteQuery(node, config, user).rawNode();
                 node.replaceAt("/wrap", term, new RewriteIdentifier("koral:term", "replace"));
             }
         }
@@ -58,7 +58,7 @@ public class FoundryInject implements RewriteTask.IterableRewritePath,
             if (foundry != null)
                 node.put("foundry", foundry);
         }
-        return node.rawNode();
+        return node;
     }
 
 

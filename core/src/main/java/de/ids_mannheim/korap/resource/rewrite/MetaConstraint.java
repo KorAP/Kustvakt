@@ -13,7 +13,7 @@ public class MetaConstraint implements RewriteTask.RewriteNodeAt {
 
 
     @Override
-    public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
+    public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) {
         // redundant
         if (node.rawNode().has("meta")) {
@@ -21,7 +21,7 @@ public class MetaConstraint implements RewriteTask.RewriteNodeAt {
             //todo: check meta parameter
             System.out.println("HAVE TO CHECK THE META ENTRIES");
         }
-        return node.rawNode();
+        return node;
     }
 
 

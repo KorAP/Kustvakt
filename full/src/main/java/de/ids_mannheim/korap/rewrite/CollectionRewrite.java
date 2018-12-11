@@ -11,8 +11,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.FullConfiguration;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.object.KoralMatchOperator;
 import de.ids_mannheim.korap.query.object.KoralOperation;
@@ -127,7 +127,7 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
     }
 
     @Override
-    public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
+    public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) throws KustvaktException {
         JsonNode jsonNode = node.rawNode();
 
@@ -188,7 +188,7 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
         node = node.at("/collection");
         jlog.debug("REWRITES: " + node.toString());
         
-        return node.rawNode();
+        return node;
     }
 
 

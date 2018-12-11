@@ -60,11 +60,11 @@ public class TreeConstraint implements RewriteTask.RewriteNodeAt {
 
 
     @Override
-    public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
+    public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) {
         System.out.println("FIND PATH " + node.rawNode().findParent(pointer));
 
-        return node.rawNode();
+        return node;
     }
 
 

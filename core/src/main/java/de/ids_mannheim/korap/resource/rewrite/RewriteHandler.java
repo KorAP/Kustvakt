@@ -283,7 +283,7 @@ public class RewriteHandler{
                 }
 
                 if (!post & task instanceof RewriteTask.RewriteQuery)
-                    ((RewriteTask.RewriteQuery) task).rewriteQuery(next,
+                    next = ((RewriteTask.RewriteQuery) task).rewriteQuery(next,
                             RewriteHandler.this.config, user);
                 else if (task instanceof RewriteTask.RewriteResult)
                     ((RewriteTask.RewriteResult) task).rewriteResult(next);

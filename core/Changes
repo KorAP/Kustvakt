@@ -9,6 +9,7 @@ version 0.61.4
    - Fixed KoralNode at method (margaretha)
 11/12/2018
    - Removed document controllers and KustvaktResource (margaretha) 
+   - Fixed rewrite bugs (updated rewriteQuery & KoralNode) (margaretha)   
 
 version 0.61.3
 22/10/2018

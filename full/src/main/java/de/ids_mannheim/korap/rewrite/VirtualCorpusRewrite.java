@@ -24,13 +24,13 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
     private VirtualCorpusService vcService;
 
     @Override
-    public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
+    public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) throws KustvaktException {
         if (node.has("collection")) {
             node = node.at("/collection");
             findVCRef(user.getUsername(), node);
         }
-        return node.rawNode();
+        return node;
     }
 
     private void findVCRef (String username, KoralNode koralNode)

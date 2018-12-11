@@ -241,6 +241,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
                 node.at("/collection/operands/1/operands/0/key").asText());
         assertEquals("textClass",
                 node.at("/collection/operands/1/operands/1/key").asText());
+        System.out.println(node);
         assertEquals("koral:rewrite", node.at("/collection/rewrites/0/@type")
                 .asText());
         assertEquals("availability(FREE)", node.at("/collection/rewrites/0/scope")

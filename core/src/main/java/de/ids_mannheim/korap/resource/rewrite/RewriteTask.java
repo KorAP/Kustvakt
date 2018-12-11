@@ -29,7 +29,7 @@ public interface RewriteTask {
          *            checked properly
          * @return
          */
-        JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
+        KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
                 User user) throws KustvaktException;
 
     }

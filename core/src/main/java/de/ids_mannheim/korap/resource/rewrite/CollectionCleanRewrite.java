@@ -18,9 +18,10 @@ import java.util.Iterator;
 public class CollectionCleanRewrite implements RewriteTask.RewriteNodeAt {
 
     @Override
-    public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
+    public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) {
-        return process(node.rawNode());
+        JsonNode jsonNode = process(node.rawNode());
+        return node.wrapNode(jsonNode);
     }
 
 

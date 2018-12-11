@@ -17,6 +17,7 @@
    - Implemented revoking all tokens of a user client via a super client
    (margaretha)   
    - Removed document controllers and KustvaktResource (margaretha)
+   - Fixed rewrite bugs (updated rewriteQuery & KoralNode) (margaretha)
 
    
 # version 0.61.3

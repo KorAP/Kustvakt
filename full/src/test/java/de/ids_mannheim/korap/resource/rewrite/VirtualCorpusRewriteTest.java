@@ -36,32 +36,31 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
     private VirtualCorpusDao dao;
 
     @Test
-    public void testNoRewriteWithCachedVCRef ()
+    public void testCachedVCRef ()
             throws KustvaktException, IOException, QueryException {
         KrillCollection.cache = CacheManager.newInstance().getCache("named_vc");
         vcLoader.loadVCToCache("named-vc1", "/vc/named-vc1.jsonld");
 
-        // ClientResponse response =
-        // resource().path(API_VERSION).path("search")
-        // .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-        // .queryParam("cq", "referTo named-vc1")
-        // .get(ClientResponse.class);
-        //
-        // String ent = response.getEntity(String.class);
-        // JsonNode node = JsonUtils.readTree(ent);
-        // node = node.at("/collection");
-        //
-        // assertEquals("koral:docGroup", node.at("/@type").asText());
-        // assertTrue(node.at("/operands/1/rewrites").isMissingNode());
+        ClientResponse response = resource().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("cq", "referTo named-vc1")
+                .get(ClientResponse.class);
 
-        testNoRewriteWithUsername();
+        String ent = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        node = node.at("/collection");
+
+        assertEquals("koral:docGroup", node.at("/@type").asText());
+        assertTrue(node.at("/operands/1/rewrites").isMissingNode());
+
+        testCachedVCRefWithUsername();
 
         KrillCollection.cache.removeAll();
         VirtualCorpus vc = dao.retrieveVCByName("named-vc1", "system");
         dao.deleteVirtualCorpus(vc);
     }
 
-    private void testNoRewriteWithUsername ()
+    private void testCachedVCRefWithUsername ()
             throws KustvaktException, IOException, QueryException {
 
         ClientResponse response = resource().path(API_VERSION).path("search")
@@ -144,7 +143,6 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/collection");
-        // System.out.println(node);
         assertEquals("koral:docGroup", node.at("/@type").asText());
         node = node.at("/operands/1/rewrites");
         assertEquals(3, node.size());

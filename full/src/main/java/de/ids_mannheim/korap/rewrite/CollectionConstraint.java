@@ -15,7 +15,7 @@ import de.ids_mannheim.korap.user.User;
 public class CollectionConstraint implements RewriteTask.IterableRewritePath {
 
     @Override
-    public JsonNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
+    public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) {
         if (node.get("@type").equals("koral:doc")) {
             if (node.get("key").equals(Attributes.CORPUS_SIGLE)) {
@@ -27,7 +27,7 @@ public class CollectionConstraint implements RewriteTask.IterableRewritePath {
                             Attributes.CORPUS_SIGLE, id));
             }
         }
-        return node.rawNode();
+        return node;
     }
 
 

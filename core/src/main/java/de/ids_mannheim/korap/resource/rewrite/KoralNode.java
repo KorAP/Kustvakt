@@ -11,24 +11,29 @@ import java.util.*;
  * @author hanl
  * @date 04/07/2015
  */
-public abstract class KoralNode {
+public class KoralNode {
     private JsonNode node;
     private KoralRewriteBuilder rewrites;
     private boolean remove;
 
 
-    private KoralNode (JsonNode node) {
+    public KoralNode (JsonNode node) {
         this.node = node;
         this.rewrites = new KoralRewriteBuilder();
+        this.remove = false;
+    }
+    
+    public KoralNode (JsonNode node, KoralRewriteBuilder rewrites) {
+        this.node = node;
+        this.rewrites = rewrites;
         this.remove = false;
     }
 
 
     public static KoralNode wrapNode (JsonNode node) {
-        return new KoralNode(node) {};
+        return new KoralNode(node);
     }
-
-
+    
     public void buildRewrites (JsonNode node) {
         this.rewrites.build(node);
     }
@@ -151,7 +156,7 @@ public abstract class KoralNode {
     public KoralNode at (String name) {
 //        this.node = this.node.at(name);
 //        return this;
-        return wrapNode( this.node.at(name) );
+        return new KoralNode(this.node.at(name), this.rewrites);
     }
 
 
@@ -291,4 +296,6 @@ public abstract class KoralNode {
 //        this.node = this.node.get(i);
         return this.wrapNode(this.node.get(i));
     }
+    
+    
 }
