@@ -8,6 +8,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
+import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -22,6 +23,7 @@ import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
@@ -38,7 +40,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     protected String superClientId = "fCBbQkAyYzI4NzUxMg";
     protected String clientSecret = "secret";
 
-    public ClientResponse requestAuthorizationCode (
+    protected ClientResponse requestAuthorizationCode (
             MultivaluedMap<String, String> form, String authHeader)
             throws KustvaktException {
 
@@ -50,7 +52,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
                 .entity(form).post(ClientResponse.class);
     }
 
-    public String requestAuthorizationCode (String clientId,
+    protected String requestAuthorizationCode (String clientId,
             String clientSecret, String scope, String authHeader)
             throws KustvaktException {
 
@@ -72,7 +74,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         return params.getFirst("code");
     }
 
-    public ClientResponse requestToken (MultivaluedMap<String, String> form)
+    protected ClientResponse requestToken (MultivaluedMap<String, String> form)
             throws KustvaktException {
         return resource().path(API_VERSION).path("oauth2").path("token")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -82,7 +84,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     }
 
     // client credentials as form params
-    public ClientResponse requestTokenWithAuthorizationCodeAndForm (
+    protected ClientResponse requestTokenWithAuthorizationCodeAndForm (
             String clientId, String clientSecret, String code)
             throws KustvaktException {
 
@@ -99,7 +101,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     }
 
     // client credentials in authorization header
-    public JsonNode requestTokenWithAuthorizationCodeAndHeader (String clientId,
+    protected JsonNode requestTokenWithAuthorizationCodeAndHeader (String clientId,
             String code, String authHeader) throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("grant_type", "authorization_code");
@@ -116,13 +118,13 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         return JsonUtils.readTree(entity);
     }
 
-    public ClientResponse requestTokenWithDoryPassword (String clientId,
+    protected ClientResponse requestTokenWithDoryPassword (String clientId,
             String clientSecret) throws KustvaktException {
         return requestTokenWithPassword(clientId, clientSecret, "dory",
                 "password");
     }
 
-    public ClientResponse requestTokenWithPassword (String clientId,
+    protected ClientResponse requestTokenWithPassword (String clientId,
             String clientSecret, String username, String password)
             throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
@@ -134,8 +136,32 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
         return requestToken(form);
     }
+    
+    protected void testRequestTokenWithRevokedRefreshToken (String clientId,
+            String clientSecret, String refreshToken) throws KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("grant_type", GrantType.REFRESH_TOKEN.toString());
+        form.add("client_id", clientId);
+        form.add("refresh_token", refreshToken);
+        if (clientSecret != null) {
+            form.add("client_secret", clientSecret);
+        }
 
-    public void updateClientPrivilege (MultivaluedMap<String, String> form)
+        ClientResponse response =
+                resource().path(API_VERSION).path("oauth2").path("token")
+                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                        .header(HttpHeaders.CONTENT_TYPE,
+                                ContentType.APPLICATION_FORM_URLENCODED)
+                        .entity(form).post(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
+        assertEquals("Refresh token has been revoked",
+                node.at("/error_description").asText());
+    }
+
+    protected void updateClientPrivilege (MultivaluedMap<String, String> form)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
@@ -149,7 +175,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
-    public ClientResponse searchWithAccessToken (String accessToken) {
+    protected ClientResponse searchWithAccessToken (String accessToken) {
         return resource().path(API_VERSION).path("search")
                 .queryParam("q", "Wasser").queryParam("ql", "poliqarp")
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)

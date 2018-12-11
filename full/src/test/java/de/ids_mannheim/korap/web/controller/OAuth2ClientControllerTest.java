@@ -482,6 +482,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        String refreshToken = node.at("/refresh_token").asText();
+
         // client 2
         code = requestAuthorizationCode(confidentialClientId, clientSecret,
                 null, userAuthHeader);
@@ -490,10 +493,20 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         requestUserClientList();
-        testListClientWithMultipleRefreshTokens();
+        testListClientWithMultipleRefreshTokens(userAuthHeader);
+
+        testRequestTokenWithRevokedRefreshToken(publicClientId, clientSecret,
+                refreshToken);
+
+        node = JsonUtils.readTree(response.getEntity(String.class));
+        String accessToken = node.at("/access_token").asText();
+        refreshToken = node.at("/refresh_token").asText();
+
+        testRevokeTokenViaSuperClient(confidentialClientId, userAuthHeader,
+                accessToken, refreshToken);
     }
 
-    private void testListClientWithMultipleRefreshTokens ()
+    private void testListClientWithMultipleRefreshTokens (String userAuthHeader)
             throws KustvaktException {
         // client 1
         String code = requestAuthorizationCode(publicClientId, clientSecret,
@@ -504,6 +517,44 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         requestUserClientList();
+
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        String accessToken = node.at("/access_token").asText();
+        String refreshToken = node.at("/refresh_token").asText();
+
+        testRevokeTokenViaSuperClient(publicClientId, userAuthHeader,
+                accessToken, refreshToken);
     }
 
+    private void testRevokeTokenViaSuperClient (String clientId,
+            String userAuthHeader, String accessToken, String refreshToken)
+            throws KustvaktException {
+        // check token before revoking
+        ClientResponse response = searchWithAccessToken(accessToken);
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        assertTrue(node.at("/matches").size() > 0);
+
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("client_id", clientId);
+        form.add("super_client_id", superClientId);
+        form.add("super_client_secret", clientSecret);
+
+        response = resource().path(API_VERSION).path("oauth2").path("revoke")
+                .path("super").header(Attributes.AUTHORIZATION, userAuthHeader)
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        response = searchWithAccessToken(accessToken);
+        node = JsonUtils.readTree(response.getEntity(String.class));
+        assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Access token has been revoked",
+                node.at("/errors/0/1").asText());
+
+        testRequestTokenWithRevokedRefreshToken(clientId, clientSecret,
+                refreshToken);
+    }
 }

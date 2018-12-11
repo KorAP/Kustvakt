@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.oauth2.oltu.service;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.NoResultException;
@@ -30,6 +31,7 @@ import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
+import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenSuperRequest;
 import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
 
 @Service
@@ -127,13 +129,13 @@ public class OltuTokenService extends OAuth2TokenService {
         }
         else if (refreshToken.isRevoked()) {
             throw new KustvaktException(StatusCodes.INVALID_REFRESH_TOKEN,
-                    "Refresh token has been revoked.",
+                    "Refresh token has been revoked",
                     OAuth2Error.INVALID_GRANT);
         }
         else if (ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE))
                 .isAfter(refreshToken.getExpiryDate())) {
             throw new KustvaktException(StatusCodes.INVALID_REFRESH_TOKEN,
-                    "Refresh token is expired.", OAuth2Error.INVALID_GRANT);
+                    "Refresh token is expired", OAuth2Error.INVALID_GRANT);
         }
 
         Set<AccessScope> requestedScopes = refreshToken.getScopes();
@@ -394,6 +396,12 @@ public class OltuTokenService extends OAuth2TokenService {
             return false;
         }
 
+        revokeRefreshToken(refreshToken);
+        return true;
+    }
+
+    private void revokeRefreshToken (RefreshToken refreshToken)
+            throws KustvaktException {
         refreshToken.setRevoked(true);
         refreshDao.updateRefreshToken(refreshToken);
 
@@ -402,7 +410,27 @@ public class OltuTokenService extends OAuth2TokenService {
             accessToken.setRevoked(true);
             tokenDao.updateAccessToken(accessToken);
         }
+    }
 
-        return true;
+    public void revokeTokenViaSuperClient (
+            OAuth2RevokeTokenSuperRequest revokeTokenRequest)
+            throws KustvaktException {
+        String superClientId = revokeTokenRequest.getSuperClientId();
+        String superClientSecret = revokeTokenRequest.getSuperClientSecret();
+
+        OAuth2Client superClient = clientService
+                .authenticateClient(superClientId, superClientSecret);
+        if (!superClient.isSuper()) {
+            throw new KustvaktException(
+                    StatusCodes.CLIENT_AUTHENTICATION_FAILED);
+        }
+
+        String clientId = revokeTokenRequest.getClientId();
+        List<RefreshToken> refreshTokens =
+                tokenDao.retrieveRefreshTokenByClientId(clientId);
+
+        for (RefreshToken r : refreshTokens) {
+            revokeRefreshToken(r);
+        }
     }
 }

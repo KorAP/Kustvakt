@@ -13,6 +13,9 @@
 6/12/2018
    - Added debug flags to mitigate log4j debugging performance (margaretha)
    - Fixed KoralNode at() method (margaretha)
+11/12/2018
+   - Implemented revoking all tokens of a user client via a super client
+   (margaretha)   
    
 # version 0.61.3
 17/10/2018

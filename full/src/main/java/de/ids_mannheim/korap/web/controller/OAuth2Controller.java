@@ -30,6 +30,7 @@ import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2AuthorizationRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
+import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenSuperRequest;
 import de.ids_mannheim.korap.oauth2.oltu.service.OltuAuthorizationService;
 import de.ids_mannheim.korap.oauth2.oltu.service.OltuTokenService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
@@ -42,7 +43,7 @@ import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 
 @Controller
 @Path("{version}/oauth2")
-@ResourceFilters({APIVersionFilter.class})
+@ResourceFilters({ APIVersionFilter.class })
 public class OAuth2Controller {
 
     @Autowired
@@ -60,7 +61,7 @@ public class OAuth2Controller {
      * Kustvakt supports authorization only with Kalamar as the
      * authorization web-frontend or user interface. Thus
      * authorization code request requires user authentication
-     * using authentication header.
+     * using authorization header.
      * 
      * <br /><br />
      * RFC 6749:
@@ -237,6 +238,42 @@ public class OAuth2Controller {
             throw responseHandler.throwit(e);
         }
         catch (OAuthSystemException e) {
+            throw responseHandler.throwit(e);
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
+
+    /**
+     * Revokes all tokens of a client from a super client. This
+     * service is not part of the OAUTH2 specification. It requires
+     * user authentication via authorization header, and super client
+     * via URL-encoded form parameters.
+     * 
+     * @param request
+     * @param form
+     * @return
+     */
+    @POST
+    @Path("revoke/super")
+    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response revokeTokenViaSuperClient (
+            @Context HttpServletRequest request,
+            MultivaluedMap<String, String> form) {
+
+        try {
+            OAuth2RevokeTokenSuperRequest revokeTokenRequest =
+                    new OAuth2RevokeTokenSuperRequest(
+                            new FormRequestWrapper(request, form));
+            tokenService.revokeTokenViaSuperClient(revokeTokenRequest);
+            return Response.ok().build();
+        }
+        catch (OAuthSystemException e) {
+            throw responseHandler.throwit(e);
+        }
+        catch (OAuthProblemException e) {
             throw responseHandler.throwit(e);
         }
         catch (KustvaktException e) {

@@ -184,7 +184,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         testRequestRefreshTokenInvalidRefreshToken(publicClientId);
         testRequestRefreshTokenPublicClient(publicClientId, refreshToken);
 
-        testRequestRefreshWithRevokedRefreshToken(publicClientId, null,
+        testRequestTokenWithRevokedRefreshToken(publicClientId, null,
                 refreshToken);
     }
 
@@ -222,7 +222,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String refreshToken = node.at("/refresh_token").asText();
         testRevokeToken(refreshToken, confidentialClientId,clientSecret,
                 "refresh_token");
-        testRequestRefreshWithRevokedRefreshToken(confidentialClientId, clientSecret, refreshToken);
+        testRequestTokenWithRevokedRefreshToken(confidentialClientId, clientSecret, refreshToken);
     }
 
     private void testRequestTokenWithUsedAuthorization (String code)
@@ -618,27 +618,6 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.add("grant_type", GrantType.REFRESH_TOKEN.toString());
         form.add("client_id", clientId);
         form.add("refresh_token", "Lia8s8w8tJeZSBlaQDrYV8ion3l");
-
-        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
-
-        String entity = response.getEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
-    }
-
-    private void testRequestRefreshWithRevokedRefreshToken (String clientId,
-            String clientSecret, String refreshToken) throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("grant_type", GrantType.REFRESH_TOKEN.toString());
-        form.add("client_id", clientId);
-        form.add("refresh_token", refreshToken);
-        if (clientSecret!=null){
-            form.add("client_secret", clientSecret);
-        }
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")

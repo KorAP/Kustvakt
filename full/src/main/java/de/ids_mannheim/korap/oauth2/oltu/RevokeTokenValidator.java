@@ -38,8 +38,4 @@ public class RevokeTokenValidator
         }
     }
 
-    @Override
-    public void validateContentType (HttpServletRequest request)
-            throws OAuthProblemException {}
-
 }
