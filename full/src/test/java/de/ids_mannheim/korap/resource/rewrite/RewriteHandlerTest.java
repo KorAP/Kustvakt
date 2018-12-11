@@ -25,7 +25,6 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * @author hanl
  * @date 21/10/2015
  */
-@Ignore
 public class RewriteHandlerTest extends BeanConfigTest {
 
     @Test
@@ -33,7 +32,6 @@ public class RewriteHandlerTest extends BeanConfigTest {
         RewriteHandler handler = new RewriteHandler();
         handler.insertBeans(helper().getContext());
         assertTrue(handler.add(FoundryInject.class));
-        assertTrue(handler.add(DocMatchRewrite.class));
         assertTrue(handler.add(CollectionCleanRewrite.class));
         assertTrue(handler.add(IdWriter.class));
     }
@@ -95,18 +93,18 @@ public class RewriteHandlerTest extends BeanConfigTest {
                 node.at("/query/wrap/operands/1/foundry").asText());
     }
 
-
+ // EM: Fix me usersetting
     @Override
     public void initMethod () throws KustvaktException {
-        helper().setupAccount();
-        UserDataDbIface settingsdao = BeansFactory.getTypeFactory()
-                .getTypeInterfaceBean(
-                        helper().getContext().getUserDataProviders(),
-                        UserSettings.class);
-        assertNotNull(settingsdao);
-        UserSettings s = (UserSettings) settingsdao.get(helper().getUser());
-        s.setField(Attributes.DEFAULT_LEMMA_FOUNDRY, "tt_test");
-        settingsdao.update(s);
+//        helper().setupAccount();
+//        UserDataDbIface settingsdao = BeansFactory.getTypeFactory()
+//                .getTypeInterfaceBean(
+//                        helper().getContext().getUserDataProviders(),
+//                        UserSettings.class);
+//        assertNotNull(settingsdao);
+//        UserSettings s = (UserSettings) settingsdao.get(helper().getUser());
+//        s.setField(Attributes.DEFAULT_LEMMA_FOUNDRY, "tt_test");
+//        settingsdao.update(s);
     }
 
 

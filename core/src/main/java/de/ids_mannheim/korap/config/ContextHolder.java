@@ -10,7 +10,6 @@ import org.springframework.context.ApplicationContext;
 import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
-import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.interfaces.defaults.ApacheValidator;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
@@ -93,31 +92,6 @@ public abstract class ContextHolder {
     public Collection<UserDataDbIface> getUserDataProviders () {
         return getBean(KUSTVAKT_USERDATA);
     }
-
-
-//    public EncryptionIface getEncryption () {
-//        return getBean(KUSTVAKT_ENCRYPTION);
-//    }
-
-
-//    public AuthenticationManagerIface getAuthenticationManager () {
-//        return getBean(KUSTVAKT_AUTHENTICATION_MANAGER);
-//    }
-
-
-//    public EntityHandlerIface getUserDBHandler () {
-//        return getBean(KUSTVAKT_USERDB);
-//    }
-    
-//    public Collection<AuthenticationIface> getAuthProviders () {
-//        return getBean(KUSTVAKT_AUTHPROVIDERS);
-//    }
-
-
-    public Collection<ResourceOperationIface> getResourceProviders () {
-        return getBean(KUSTVAKT_RESOURCES);
-    }
-
 
     public ValidatorIface getValidator()  {
         try {

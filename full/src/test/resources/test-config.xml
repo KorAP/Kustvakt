@@ -220,10 +220,6 @@
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
 
-	<bean id="document_provider" class="de.ids_mannheim.korap.handlers.DocumentDao">
-		<constructor-arg ref="kustvakt_db" />
-	</bean>
-
 	<bean name="kustvakt_encryption" class="de.ids_mannheim.korap.encryption.KustvaktEncryption">
 		<constructor-arg ref="kustvakt_config" />
 	</bean>
@@ -288,7 +284,6 @@
 
 	<util:list id="kustvakt_resources"
 		value-type="de.ids_mannheim.korap.interfaces.db.ResourceOperationIface">
-		<ref bean="document_provider" />
 	</util:list>
 
 	<!-- specify type for constructor argument -->

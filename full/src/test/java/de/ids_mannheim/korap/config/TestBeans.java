@@ -6,7 +6,6 @@ import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.EntityHandlerIface;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
-import de.ids_mannheim.korap.interfaces.db.ResourceOperationIface;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 
 /**
@@ -20,8 +19,6 @@ public interface TestBeans {
 	public  EntityHandlerIface getUserDao();
 	
 	public  AuditingIface getAuditingDao();
-
-	public  List<ResourceOperationIface> getResourceDaos();
 
 	public  List<UserDataDbIface> getUserdataDaos();
 
