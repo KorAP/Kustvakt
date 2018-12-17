@@ -1,3 +1,7 @@
+# version 0.61.5
+17/11/2018
+   - Added a search timeout test (margaretha)
+
 # version 0.61.4
 14/11/2018
    - Integrated lite and full services and controllers in core (margaretha)

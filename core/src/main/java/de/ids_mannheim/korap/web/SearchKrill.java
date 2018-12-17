@@ -32,6 +32,8 @@ public class SearchKrill {
     private final static Logger jlog = LogManager
             .getLogger(SearchKrill.class);
 
+    private static final boolean DEBUG = false;
+
     // Temporary - shouldn't be here.
     String indexDir = "/data/prep_corpus/index/";
     String i = "/Users/hanl/Projects/prep_corpus";
@@ -46,7 +48,7 @@ public class SearchKrill {
     	
         try {
             if (path.equals(":temp:")) {
-                this.index = new KrillIndex();
+                index = new KrillIndex();
             }
             else {
                 File f = new File(path);
@@ -55,7 +57,7 @@ public class SearchKrill {
                     jlog.error("Index not found: " + path + "!");
                     System.exit(-1);
                 }
-                this.index = new KrillIndex(new MMapDirectory(Paths.get(path)));
+                index = new KrillIndex(new MMapDirectory(Paths.get(path)));
             };
         }
         catch (IOException e) {
@@ -64,7 +66,7 @@ public class SearchKrill {
     };
 
     public KrillIndex getIndex () {
-        return this.index;
+        return index;
     };
 
 
@@ -76,9 +78,16 @@ public class SearchKrill {
      *            filters.
      */
     public String search (String json) {
-        jlog.trace(json);
-        if (this.index != null)
-            return new Krill(json).apply(this.index).toJsonString();
+        if (DEBUG){
+            jlog.debug(json);
+        }
+        if (index != null){
+            String result = new Krill(json).apply(index).toJsonString();
+//            if (DEBUG){
+                jlog.debug(result);
+//            }
+            return result;
+        }
         Result kr = new Result();
         kr.addError(601, "Unable to find index");
         return kr.toJsonString();
@@ -94,9 +103,11 @@ public class SearchKrill {
      */
     @Deprecated
     public String searchTokenList (String json) {
-        jlog.trace(json);
-        if (this.index != null)
-            return new Krill(json).apply(this.index).toTokenListJsonString();
+        if (DEBUG){
+            jlog.debug(json);
+        }
+        if (index != null)
+            return new Krill(json).apply(index).toTokenListJsonString();
         Result kr = new Result();
         kr.addError(601, "Unable to find index");
         return kr.toJsonString();
@@ -114,9 +125,9 @@ public class SearchKrill {
      */
     public String getMatch (String id, Pattern licensePattern) {
     	Match km;
-        if (this.index != null) {
+        if (index != null) {
             try {
-            	km = this.index.getMatch(id);
+            	km = index.getMatch(id);
             	String availability = km.getAvailability();
             	if (licensePattern!=null && availability != null){
             		Matcher m = licensePattern.matcher(availability);
@@ -152,7 +163,7 @@ public class SearchKrill {
 		MetaFields meta;
 
 		// No index found
-		if (this.index == null) {
+		if (index == null) {
         	meta = new MetaFields(id);
         	meta.addError(601, "Unable to find index");
 		}
@@ -161,7 +172,7 @@ public class SearchKrill {
 		else {
 
 			//Get fields
-			meta = this.index.getFields(id);
+			meta = index.getFields(id);
 		};
 		return meta.toJsonString();
 	};
@@ -173,9 +184,9 @@ public class SearchKrill {
             boolean includeHighlights, boolean sentenceExpansion, 
             Pattern licensePattern) {
     	 Match km;
-        if (this.index != null) {
+        if (index != null) {
             try {
-            	km = this.index.getMatchInfo(id, "tokens", true, foundries,
+            	km = index.getMatchInfo(id, "tokens", true, foundries,
                         layers, includeSpans, includeHighlights,
                         sentenceExpansion);
             	String availability = km.getAvailability();
@@ -227,7 +238,7 @@ public class SearchKrill {
             boolean includeSpans, boolean includeHighlights,
             boolean sentenceExpansion) {
 
-        if (this.index != null) {
+        if (index != null) {
             try {
                 /*
                   For multiple foundries/layers use
@@ -240,7 +251,7 @@ public class SearchKrill {
                   boolean includeHighlights,
                   boolean extendToSentence
                 */
-                return this.index.getMatchInfo(id, "tokens", foundry, layer,
+                return index.getMatchInfo(id, "tokens", foundry, layer,
                         includeSpans, includeHighlights, sentenceExpansion)
                         .toJsonString();
             }
@@ -265,14 +276,16 @@ public class SearchKrill {
      *            JSON-LD string with potential meta filters.
      */
     public String getStatistics (String json) {
-        if (this.index == null) {
+        if (index == null) {
             return "{\"documents\" : -1, error\" : \"No index given\" }";
         };
 
 		// Define a virtual corpus
 		KrillCollection kc;
 		if (json != null && !json.equals("")) {
-			jlog.trace(json);
+			if (DEBUG){
+			    jlog.debug(json);
+			}
 
 			// Create Virtual collection from json search
 			kc = new KrillCollection(json);
@@ -286,7 +299,7 @@ public class SearchKrill {
 		};
 
         // Set index
-        kc.setIndex(this.index);
+        kc.setIndex(index);
         long docs = 0, tokens = 0, sentences = 0, paragraphs = 0;
         // Get numbers from index (currently slow)
         try {

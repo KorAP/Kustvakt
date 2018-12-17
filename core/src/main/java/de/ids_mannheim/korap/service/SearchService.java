@@ -31,6 +31,8 @@ import de.ids_mannheim.korap.web.SearchKrill;
 @Service
 public class SearchService {
 
+    private static final boolean DEBUG = false;
+
     private static Logger jlog = LogManager.getLogger(SearchService.class);
 
     @Autowired
@@ -106,13 +108,14 @@ public class SearchService {
 
         KustvaktConfiguration.BACKENDS eng = this.config.chooseBackend(engine);
         User user = createUser(username, headers);
-
+        CorpusAccess corpusAccess = user.getCorpusAccess();
+        
         QuerySerializer serializer = new QuerySerializer();
         serializer.setQuery(q, ql, v);
         if (cq != null) serializer.setCollection(cq);
 
         MetaQueryBuilder meta = createMetaQuery(pageIndex, pageInteger, ctx,
-                pageLength, cutoff);
+                pageLength, cutoff, corpusAccess);
         if (fields != null && !fields.isEmpty())
             meta.addEntry("fields", fields);
         serializer.setMeta(meta.raw());
@@ -125,7 +128,9 @@ public class SearchService {
 
         String query =
                 this.rewriteHandler.processQuery(serializer.toJSON(), user);
-        jlog.info("the serialized query " + query);
+        if (DEBUG){
+            jlog.debug("the serialized query " + query);
+        }
 
         String result;
         if (eng.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
@@ -141,7 +146,7 @@ public class SearchService {
 
     private MetaQueryBuilder createMetaQuery (Integer pageIndex,
             Integer pageInteger, String ctx, Integer pageLength,
-            Boolean cutoff) {
+            Boolean cutoff, CorpusAccess corpusAccess) {
         MetaQueryBuilder meta = new MetaQueryBuilder();
         meta.addEntry("startIndex", pageIndex);
         meta.addEntry("startPage", pageInteger);
@@ -153,6 +158,13 @@ public class SearchService {
         // cutoff);
         // fixme: should only apply to CQL queries per default!
         // meta.addEntry("itemsPerResource", 1);
+        
+        if (corpusAccess.equals(CorpusAccess.FREE)){
+            meta.addEntry("timeout", 10000);
+        }
+        else{
+            meta.addEntry("timeout", 90000);
+        }
         return meta;
     }
 
