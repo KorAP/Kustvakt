@@ -83,9 +83,9 @@ public class SearchKrill {
         }
         if (index != null){
             String result = new Krill(json).apply(index).toJsonString();
-//            if (DEBUG){
+            if (DEBUG){
                 jlog.debug(result);
-//            }
+            }
             return result;
         }
         Result kr = new Result();

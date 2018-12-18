@@ -1,6 +1,8 @@
 # version 0.61.5
-17/11/2018
+17/12/2018
    - Added a search timeout test (margaretha)
+18/12/2018
+   - Updated tests using BeanConfigTest to use SpringJerseyTest (margaretha)
 
 # version 0.61.4
 14/11/2018

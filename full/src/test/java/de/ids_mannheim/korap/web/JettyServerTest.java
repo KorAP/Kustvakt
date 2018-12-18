@@ -13,6 +13,10 @@ import org.eclipse.jetty.server.handler.ShutdownHandler;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+/**
+ * @author margaretha
+ *
+ */
 public class JettyServerTest {
 
     @BeforeClass

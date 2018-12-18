@@ -5,31 +5,36 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import de.ids_mannheim.korap.config.BeanConfigTest;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
+import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
  * @author hanl
  * @date 21/10/2015
  */
-public class IdRewriteTest extends BeanConfigTest {
+public class IdRewriteTest extends SpringJerseyTest {
 
+    @Autowired
+    private KustvaktConfiguration config;
+    
     @Test
     public void insertTokenId () throws KustvaktException {
-        RewriteHandler handler = new RewriteHandler();
-        handler.insertBeans(helper().getContext());
+        RewriteHandler handler = new RewriteHandler(config);
         assertTrue(handler.add(IdWriter.class));
 
         String query = "[surface=Wort]";
         QuerySerializer s = new QuerySerializer();
         s.setQuery(query, "poliqarp");
 
-        String value = handler.processQuery(s.toJSON(), null);
+        String value = handler.processQuery(s.toJSON(), new KorAPUser());
         JsonNode result = JsonUtils.readTree(value);
 
         assertNotNull(result);
@@ -39,13 +44,12 @@ public class IdRewriteTest extends BeanConfigTest {
 
     @Test
     public void testIdWriterTest () throws KustvaktException {
-        RewriteHandler handler = new RewriteHandler();
-        handler.insertBeans(helper().getContext());
+        RewriteHandler handler = new RewriteHandler(config);
         assertTrue(handler.add(IdWriter.class));
 
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[base=Haus]", "poliqarp");
-        String result = handler.processQuery(s.toJSON(), null);
+        String result = handler.processQuery(s.toJSON(), new KorAPUser());
         JsonNode node = JsonUtils.readTree(result);
         assertNotNull(node);
         assertFalse(node.at("/query/wrap").isMissingNode());
@@ -53,8 +57,4 @@ public class IdRewriteTest extends BeanConfigTest {
     }
 
 
-    @Override
-    public void initMethod () throws KustvaktException {
-
-    }
 }

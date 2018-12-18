@@ -14,6 +14,10 @@ import com.sun.jersey.api.client.ClientResponse;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 
+/**
+ * @author margaretha
+ *
+ */
 public class ApiVersionTest extends SpringJerseyTest {
 
     @Test

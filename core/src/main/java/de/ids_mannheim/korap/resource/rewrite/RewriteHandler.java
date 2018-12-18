@@ -150,10 +150,10 @@ public class RewriteHandler{
     }
 
 
-    public <T extends ContextHolder> void insertBeans (T beans) {
-        this.beans = beans;
-        this.config = beans.getConfiguration();
-    }
+//    public <T extends ContextHolder> void insertBeans (T beans) {
+//        this.beans = beans;
+//        this.config = beans.getConfiguration();
+//    }
 
 
 

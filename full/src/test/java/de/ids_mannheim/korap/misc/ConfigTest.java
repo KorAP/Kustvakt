@@ -6,27 +6,25 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.util.Map;
 import java.util.Properties;
 
-import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import de.ids_mannheim.korap.config.BeanConfigTest;
 import de.ids_mannheim.korap.config.ConfigLoader;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.utils.ServiceInfo;
 import de.ids_mannheim.korap.utils.TimeUtils;
 
-/** EM: To do: fix tests
+/** 
  * @author hanl
  * @date 02/09/2015
  */
-@Ignore
-public class ConfigTest extends BeanConfigTest {
+public class ConfigTest extends SpringJerseyTest {
 
+    @Autowired
+    KustvaktConfiguration config;
 
     @Test
     public void testConfigLoader () {
@@ -52,32 +50,11 @@ public class ConfigTest extends BeanConfigTest {
 
     @Test
     public void testProperties () {
-        assertEquals("token layer does not match", "opennlp", helper()
-                .getContext().getConfiguration().getDefault_token());
+        assertEquals("token layer does not match", "opennlp", config.getDefault_token());
         assertEquals("token expiration does not match",
-                TimeUtils.convertTimeToSeconds("1D"), helper().getContext()
-                        .getConfiguration().getLongTokenTTL());
+                TimeUtils.convertTimeToSeconds("1D"), config.getLongTokenTTL());
     }
 
 
-    @Test(expected = KustvaktException.class)
-    @Ignore
-    public void testBeanOverrideInjection () throws Exception {
-        helper().getContext()
-                .getConfiguration()
-                .setPropertiesAsStream(
-                        ConfigTest.class.getClassLoader().getResourceAsStream(
-                                "kustvakt.conf"));
-    }
-
-    @Test
-    public void testBootConfigDependencyOrder () {
-        // todo:
-
-    }
-
-    @Override
-    public void initMethod () throws KustvaktException {
-
-    }
+   
 }

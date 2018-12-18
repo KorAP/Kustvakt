@@ -4,10 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import de.ids_mannheim.korap.config.BeanConfigTest;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.config.TestVariables;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
@@ -20,19 +22,15 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * @author hanl
  * @date 03/09/2015
  */
-public class CollectionRewriteTest extends BeanConfigTest {
+public class CollectionRewriteTest extends SpringJerseyTest {
 
-    @Override
-    public void initMethod () throws KustvaktException {
-//        helper().runBootInterfaces();
-    }
-
-
+    @Autowired
+    public KustvaktConfiguration config;
+    
     @Test
     public void testCollectionNodeRemoveCorpusIdNoErrors ()
             throws KustvaktException {
-        RewriteHandler handler = new RewriteHandler();
-        handler.insertBeans(helper().getContext());
+        RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionConstraint.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
@@ -54,8 +52,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
     @Test
     public void testCollectionNodeRemoveAllCorpusIdNoErrors ()
             throws KustvaktException {
-        RewriteHandler handler = new RewriteHandler();
-        handler.insertBeans(helper().getContext());
+        RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionConstraint.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
@@ -75,8 +72,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
     @Test
     public void testCollectionNodeRemoveGroupedCorpusIdNoErrors ()
             throws KustvaktException {
-        RewriteHandler handler = new RewriteHandler();
-        handler.insertBeans(helper().getContext());
+        RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionConstraint.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
@@ -99,8 +95,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
     @Test
     public void testCollectionCleanEmptyDocGroupNoErrors ()
             throws KustvaktException {
-        RewriteHandler handler = new RewriteHandler();
-        handler.insertBeans(helper().getContext());
+        RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionConstraint.class);
         handler.add(CollectionCleanRewrite.class);
         QuerySerializer s = new QuerySerializer();
@@ -128,8 +123,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
     @Test
     public void testCollectionCleanMoveOneDocFromGroupUpNoErrors ()
             throws KustvaktException {
-        RewriteHandler handler = new RewriteHandler();
-        handler.insertBeans(helper().getContext());
+        RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionConstraint.class);
         handler.add(CollectionCleanRewrite.class);
         QuerySerializer s = new QuerySerializer();
@@ -150,8 +144,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
     @Test
     public void testCollectionCleanEmptyGroupAndMoveOneFromGroupUpNoErrors ()
             throws KustvaktException {
-        RewriteHandler handler = new RewriteHandler();
-        handler.insertBeans(helper().getContext());
+        RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionConstraint.class);
         handler.add(CollectionCleanRewrite.class);
         QuerySerializer s = new QuerySerializer();
@@ -172,8 +165,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
     @Test
     public void testCollectionRemoveAndMoveOneFromGroupUpNoErrors ()
             throws KustvaktException {
-        RewriteHandler handler = new RewriteHandler();
-        handler.insertBeans(helper().getContext());
+        RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionConstraint.class);
         handler.add(CollectionCleanRewrite.class);
         QuerySerializer s = new QuerySerializer();
@@ -196,8 +188,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
 
     @Test
     public void testPublicCollectionRewriteEmptyAdd () throws KustvaktException {
-        RewriteHandler handler = new RewriteHandler();
-        handler.insertBeans(helper().getContext());
+        RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionRewrite.class);
 
         QuerySerializer s = new QuerySerializer();
@@ -221,8 +212,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
     @Test
     public void testPublicCollectionRewriteNonEmptyAdd ()
             throws KustvaktException {
-        RewriteHandler handler = new RewriteHandler();
-        handler.insertBeans(helper().getContext());
+        RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionRewrite.class);
 
         QuerySerializer s = new QuerySerializer();
@@ -251,8 +241,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
 
     @Test
     public void testRemoveCorpusFromDifferentGroups () throws KustvaktException {
-        RewriteHandler handler = new RewriteHandler();
-        handler.insertBeans(helper().getContext());
+        RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionConstraint.class);
         QuerySerializer s = new QuerySerializer();
         s.setQuery(TestVariables.SIMPLE_ADD_QUERY, "poliqarp");
@@ -277,8 +266,7 @@ public class CollectionRewriteTest extends BeanConfigTest {
     @Test
     public void testRemoveOneCorpusAndMoveDocFromTwoGroups ()
             throws KustvaktException {
-        RewriteHandler handler = new RewriteHandler();
-        handler.insertBeans(helper().getContext());
+        RewriteHandler handler = new RewriteHandler(config);
         handler.add(CollectionConstraint.class);
         // todo: use this collection query also to test clean up filter! after reduction of corpusSigle (wiss | freizeit)!
         handler.add(CollectionCleanRewrite.class);

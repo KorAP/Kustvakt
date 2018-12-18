@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.config;
+package de.ids_mannheim.korap.cache;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.KrillCollection;
 import de.ids_mannheim.korap.collection.CachedVCData;
+import de.ids_mannheim.korap.config.NamedVCLoader;
+import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.dao.VirtualCorpusDao;
 import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;

@@ -3,8 +3,9 @@ package de.ids_mannheim.korap.resource.rewrite;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import de.ids_mannheim.korap.config.BeanConfigTest;
+import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.config.TestVariables;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.rewrite.CollectionRewrite;
@@ -14,17 +15,13 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * @author hanl
  * @date 12/11/2015
  */
-public class ResultRewriteTest extends BeanConfigTest {
+public class ResultRewriteTest extends SpringJerseyTest {
 
-    @Override
-    public void initMethod () throws KustvaktException {
-
-    }
-
+    @Autowired
+    public RewriteHandler ha;
+    
     @Test
     public void testPostRewriteNothingToDo () throws KustvaktException {
-        RewriteHandler ha = new RewriteHandler();
-        ha.insertBeans(helper().getContext());
         assertEquals("Handler could not be added to rewrite handler instance!",
                 true, ha.add(CollectionRewrite.class));
 

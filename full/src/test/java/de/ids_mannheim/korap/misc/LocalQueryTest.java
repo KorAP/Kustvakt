@@ -3,12 +3,14 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import javax.annotation.PostConstruct;
+
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.KrillCollection;
-import de.ids_mannheim.korap.config.BeanConfigTest;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -19,27 +21,26 @@ import de.ids_mannheim.korap.web.SearchKrill;
  * @author hanl
  * @date 14/01/2016
  */
-public class LocalQueryTest extends BeanConfigTest {
+public class LocalQueryTest extends SpringJerseyTest {
 
     private static String index;
-    private static String qstring;
 
+    @Autowired
+    KustvaktConfiguration config;
 
-    @BeforeClass
-    public static void setup () throws Exception {
-        qstring = "creationDate since 1786 & creationDate until 1788";
-        //        qstring = "creationDate since 1765 & creationDate until 1768";
-        //        qstring = "textType = Aphorismus";
-        //        qstring = "title ~ \"Werther\"";
+    @PostConstruct
+    public void setup () throws Exception {
+        index = config.getIndexDir();
     }
-
-
-    @AfterClass
-    public static void drop () {}
 
 
     @Test
     public void testQuery () throws KustvaktException {
+        String qstring = "creationDate since 1786 & creationDate until 1788";
+        //        qstring = "creationDate since 1765 & creationDate until 1768";
+        //        qstring = "textType = Aphorismus";
+        //        qstring = "title ~ \"Werther\"";
+        
         SearchKrill krill = new SearchKrill(index);
         KoralCollectionQueryBuilder coll = new KoralCollectionQueryBuilder();
         coll.with(qstring);
@@ -73,14 +74,4 @@ public class LocalQueryTest extends BeanConfigTest {
         assertNotNull(docs);
     }
 
-
-    @Test
-    public void testQueryHash () {}
-
-
-    @Override
-    public void initMethod () throws KustvaktException {
-//        helper().runBootInterfaces();
-        index = helper().getContext().getConfiguration().getIndexDir();
-    }
 }
