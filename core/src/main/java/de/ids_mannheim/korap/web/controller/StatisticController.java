@@ -42,6 +42,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 public class StatisticController {
 
 
+    private static final boolean DEBUG = false;
     private static Logger jlog =
             LogManager.getLogger(StatisticController.class);
     @Autowired
@@ -86,9 +87,12 @@ public class StatisticController {
 			stats = searchKrill.getStatistics(null);
 		};
 
-        if (stats.contains("-1"))
+        if (stats.contains("-1")){
             throw kustvaktResponseHandler.throwit(StatusCodes.NO_RESULT_FOUND);
-        jlog.debug("Stats: " + stats);
+        }
+        if (DEBUG){
+            jlog.debug("Stats: " + stats);
+        }
         return Response.ok(stats).build();
     }
 }

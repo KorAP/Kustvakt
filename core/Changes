@@ -3,6 +3,9 @@
    - Added search timeout in meta query (margaretha)
 18/12/2018
    - Updated RewriteHandler (margaretha)
+19/12/2018
+   - Added debug flags (margaretha)
+   - Added order on the fields parameter of search get request (margaretha)   
 
 version 0.61.4
 14/11/2018

@@ -25,6 +25,8 @@ import de.ids_mannheim.korap.web.controller.AnnotationController;
 @Service
 public class AnnotationService {
 
+    private static final boolean DEBUG = false;
+
     private static Logger jlog =
             LogManager.getLogger(AnnotationService.class);
 
@@ -36,7 +38,9 @@ public class AnnotationService {
 
     public List<LayerDto> getLayerDtos () {
         List<AnnotationLayer> layers = annotationDao.getAllFoundryLayerPairs();
-        jlog.debug("/layers " + layers.toString());
+        if (DEBUG){
+            jlog.debug("/layers " + layers.toString());
+        }
         List<LayerDto> layerDto = annotationConverter.convertToLayerDto(layers);
         return layerDto;
     }
@@ -53,7 +57,9 @@ public class AnnotationService {
             String[] annotationCode;
             annotationPairs = new ArrayList<AnnotationLayer>();
             for (String code : codes) {
-                jlog.debug("code " + code);
+                if (DEBUG){
+                    jlog.debug("code " + code);
+                }
                 annotationCode = code.split("/");
                 if (annotationCode.length == 1) {
                     foundry = annotationCode[0];
@@ -76,7 +82,9 @@ public class AnnotationService {
         if (annotationPairs != null && !annotationPairs.isEmpty()) {
             List<FoundryDto> foundryDtos = annotationConverter
                     .convertToFoundryDto(annotationPairs, language);
-            jlog.debug("/description " + annotationPairs.toString());
+            if (DEBUG){
+                jlog.debug("/description " + annotationPairs.toString());
+            }
             return foundryDtos;
         }
         else {

@@ -49,6 +49,8 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class SearchController {
 
+    private static final boolean DEBUG = false;
+
     private static Logger jlog = LogManager.getLogger(SearchController.class);
 
     @Autowired
@@ -98,7 +100,9 @@ public class SearchController {
             scopeService.verifyScope(ctx, OAuth2Scope.SERIALIZE_QUERY);
             String result = searchService.serializeQuery(q, ql, v, cq,
                     pageIndex, startPage, pageLength, context, cutoff);
-            jlog.debug("Query: " + result);
+            if (DEBUG){
+                jlog.debug("Query: " + result);
+            }
             return Response.ok(result).build();
         }
         catch (KustvaktException e) {
@@ -119,9 +123,13 @@ public class SearchController {
             throw kustvaktResponseHandler.throwit(e);
         }
 
-        jlog.debug("Serialized search: " + jsonld);
+        if (DEBUG){
+            jlog.debug("Serialized search: " + jsonld);
+        }
         String result = searchService.search(jsonld);
-        jlog.debug("The result set: " + result);
+        if (DEBUG){
+            jlog.debug("The result set: " + result);
+        }
         return Response.ok(result).build();
     }
 
@@ -135,7 +143,7 @@ public class SearchController {
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
             @QueryParam("page") Integer pageInteger,
-            @QueryParam("fields") Set<String> fields,
+            @QueryParam("fields") String fields,
             @QueryParam("cq") String cq, @QueryParam("engine") String engine) {
 
         TokenContext context =

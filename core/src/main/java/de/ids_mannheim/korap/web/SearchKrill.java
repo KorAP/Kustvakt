@@ -132,7 +132,9 @@ public class SearchKrill {
             	if (licensePattern!=null && availability != null){
             		Matcher m = licensePattern.matcher(availability);
             		if (!m.matches()){
-            		    jlog.debug("availability: "+availability);
+            		    if (DEBUG){
+            		        jlog.debug("availability: "+availability);
+            		    }
                         if (availability.isEmpty()){
                             km.addError(StatusCodes.MISSING_ATTRIBUTE, 
                                     "Availability for "+ id +"is empty.", id);
@@ -198,7 +200,9 @@ public class SearchKrill {
             	    }
             		Matcher m = licensePattern.matcher(availability);
             		if (!m.matches()){
-            		    jlog.debug("pattern: "+ licensePattern.toString() + ", availability: "+availability);
+            		    if (DEBUG){
+            		        jlog.debug("pattern: "+ licensePattern.toString() + ", availability: "+availability);
+            		    }
             			km = new Match();
             			km.addError(StatusCodes.ACCESS_DENIED, 
             					"Retrieving match info with ID "+id+" is not allowed.", id);

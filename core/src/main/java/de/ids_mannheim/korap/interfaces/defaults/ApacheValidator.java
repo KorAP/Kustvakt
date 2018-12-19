@@ -23,6 +23,8 @@ public class ApacheValidator implements ValidatorIface {
 
     private static final String STRING_PATTERN = "^[\\.;:,&\\|@\\[\\]\\=\\*\\/\\/_()\\-0-9\\p{L}\\p{Space}]{0,1024}$";
 
+    private static final boolean DEBUG = false;
+
     private Map<String, RegexValidator> validators;
 
 
@@ -117,8 +119,11 @@ public class ApacheValidator implements ValidatorIface {
             else
                 return this.isValid(input, "string");
         }
-        jlog.debug("validating entry "+input+" of type "+type+": "+ (
-                valid ? "Is valid!" : "Is not valid!"));
+        if (DEBUG){
+            jlog.debug("validating entry "+input+" of type "+type+": "+ (
+                    valid ? "Is valid!" : "Is not valid!"));
+        }
+            
         return valid;
     }
 }

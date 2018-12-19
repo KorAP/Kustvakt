@@ -32,6 +32,7 @@ public class TimeUtils {
     private static DateTimeFormatter dtf = DateTimeFormat
             .forPattern("dd/MM/yyyy");
     private static final DateTimeZone dtz = DateTimeZone.forID(Attributes.DEFAULT_TIME_ZONE);
+    private static final boolean DEBUG = false;
     private static Logger jlog = LogManager.getLogger(TimeUtils.class);
 
 
@@ -40,8 +41,10 @@ public class TimeUtils {
         int finIndex = expirationVal.length() - 1;
         char entity = expirationVal.charAt(finIndex);
         int returnSec = Integer.valueOf(expirationVal.substring(0, finIndex));
-        jlog.debug("setting time value to "+returnSec+" with time in "+
-                entity);
+        if (DEBUG) {
+            jlog.debug("setting time value to " + returnSec + " with time in "
+                    + entity);
+        }
         switch (entity) {
             case 'D':
                 return returnSec * 60 * 60 * 24;
@@ -52,7 +55,9 @@ public class TimeUtils {
             case 'S':
                 return returnSec;
             default:
-                jlog.debug("no time unit specified. Trying to read from default (minutes)");
+                if (DEBUG){
+                    jlog.debug("no time unit specified. Trying to read from default (minutes)");
+                }
                 return Integer.valueOf(expirationVal) * 60;
         }
 

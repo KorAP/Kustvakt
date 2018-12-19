@@ -159,6 +159,7 @@ public class RewriteHandler{
 
     public class RewriteProcess {
 
+        private static final boolean DEBUG = false;
         private JsonNode root;
         private User user;
 
@@ -208,7 +209,9 @@ public class RewriteHandler{
 
 
         private JsonNode start (boolean result) throws KustvaktException {
-            jlog.debug("Running rewrite process on query "+ root);
+            if (DEBUG){
+                jlog.debug("Running rewrite process on query "+ root);
+            }
             if (root != null) {
                 Iterator<Map.Entry<String, JsonNode>> it = root.fields();
                 while (it.hasNext()) {
@@ -236,8 +239,10 @@ public class RewriteHandler{
                 throw new RuntimeException("KustvaktConfiguration must be set!");
 
             for (RewriteTask task : tasks) {
-                jlog.debug("running processor on node: " + node);
-                jlog.debug("on processor: " + task.getClass().toString());
+                if (DEBUG) {
+                    jlog.debug("running processor on node: " + node);
+                    jlog.debug("on processor: " + task.getClass().toString());
+                }
 
                 if (RewriteHandler.this.beans != null
                         && task instanceof BeanInjectable)
@@ -247,7 +252,9 @@ public class RewriteHandler{
                 if (task instanceof RewriteTask.IterableRewritePath) {
                     RewriteTask.IterableRewritePath rw = (RewriteTask.IterableRewritePath) task;
                     if (rw.path() != null && !rw.path().equals(rootNode)) {
-                        jlog.debug("skipping node: " + node);
+                        if (DEBUG){
+                            jlog.debug("skipping node: " + node);
+                        }
                         continue;
                     }
                 }

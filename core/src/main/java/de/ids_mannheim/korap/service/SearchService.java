@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -84,10 +85,12 @@ public class SearchService {
             throws KustvaktException {
         User user = authenticationManager.getUser(username);
         authenticationManager.setAccessAndLocation(user, headers);
-        if (user != null) {
-            jlog.debug(
-                    "Debug: /getMatchInfo/: location=" + user.locationtoString()
-                            + ", access=" + user.accesstoString());
+        if (DEBUG) {
+            if (user != null) {
+                jlog.debug("Debug: /getMatchInfo/: location="
+                        + user.locationtoString() + ", access="
+                        + user.accesstoString());
+            }
         }
         return user;
     }
@@ -102,7 +105,7 @@ public class SearchService {
 
     @SuppressWarnings("unchecked")
     public String search (String engine, String username, HttpHeaders headers,
-            String q, String ql, String v, String cq, Set<String> fields,
+            String q, String ql, String v, String cq, String fields,
             Integer pageIndex, Integer pageInteger, String ctx,
             Integer pageLength, Boolean cutoff) throws KustvaktException {
 
@@ -115,9 +118,7 @@ public class SearchService {
         if (cq != null) serializer.setCollection(cq);
 
         MetaQueryBuilder meta = createMetaQuery(pageIndex, pageInteger, ctx,
-                pageLength, cutoff, corpusAccess);
-        if (fields != null && !fields.isEmpty())
-            meta.addEntry("fields", fields);
+                pageLength, cutoff, corpusAccess, fields);
         serializer.setMeta(meta.raw());
 
         // There is an error in query processing
@@ -146,7 +147,7 @@ public class SearchService {
 
     private MetaQueryBuilder createMetaQuery (Integer pageIndex,
             Integer pageInteger, String ctx, Integer pageLength,
-            Boolean cutoff, CorpusAccess corpusAccess) {
+            Boolean cutoff, CorpusAccess corpusAccess, String fields) {
         MetaQueryBuilder meta = new MetaQueryBuilder();
         meta.addEntry("startIndex", pageIndex);
         meta.addEntry("startPage", pageInteger);
@@ -164,6 +165,15 @@ public class SearchService {
         }
         else{
             meta.addEntry("timeout", 90000);
+        }
+        
+        if (fields != null && !fields.isEmpty()){
+            String[] fieldArray = fields.split(",");
+            List<String> fieldList = new ArrayList<>(fieldArray.length);
+            for (String field :  fieldArray){
+                fieldList.add(field.trim());
+            }
+            meta.addEntry("fields", fieldList);
         }
         return meta;
     }
@@ -239,7 +249,9 @@ public class SearchService {
             throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
                     e.getMessage());
         }
-        jlog.debug("MatchInfo results: " + results);
+        if (DEBUG){
+            jlog.debug("MatchInfo results: " + results);
+        }
         return results;
     }
 

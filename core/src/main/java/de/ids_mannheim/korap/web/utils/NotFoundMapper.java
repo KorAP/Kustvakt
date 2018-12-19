@@ -27,6 +27,7 @@ public class NotFoundMapper implements ExceptionMapper<NotFoundException> {
             LogManager.getLogger(NotFoundMapper.class);
     public static final Pattern VERSION_PATTERN =
             Pattern.compile("/(v[0-9][^/]*)(/.*)");
+    private static final boolean DEBUG = false;
 
     @Autowired
     private KustvaktConfiguration config;
@@ -46,7 +47,9 @@ public class NotFoundMapper implements ExceptionMapper<NotFoundException> {
                 path = baseUrl + "/" + config.getCurrentVersion() + path;
                 URI redirectUri = UriBuilder.fromUri(notFoundUri)
                         .replacePath(path).build();
-                jlog.debug("REDIRECT: "+redirectUri.toString());
+                if (DEBUG){
+                    jlog.debug("REDIRECT: "+redirectUri.toString());
+                }
                 return Response.status(HttpStatus.PERMANENT_REDIRECT_308)
                         .location(redirectUri).build();
             }
@@ -55,7 +58,9 @@ public class NotFoundMapper implements ExceptionMapper<NotFoundException> {
                         + matcher.group(2);
                 URI redirectUri = UriBuilder.fromUri(notFoundUri)
                         .replacePath(path).build();
-                jlog.debug("REDIRECT replace: "+ redirectUri.toString());
+                if (DEBUG){
+                    jlog.debug("REDIRECT replace: "+ redirectUri.toString());
+                }
                 return Response.status(HttpStatus.PERMANENT_REDIRECT_308)
                         .location(redirectUri).build();
             }
