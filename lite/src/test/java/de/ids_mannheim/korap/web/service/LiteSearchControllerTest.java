@@ -137,7 +137,8 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     public void testParameterField () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
-                .queryParam("fields", "author, docSigle")
+                .queryParam("fields", "author")
+                .queryParam("fields", "docSigle")
                 .queryParam("context", "sentence").queryParam("count", "13")
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -147,7 +148,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         assertNotNull(node);
         assertEquals("orth", node.at("/query/wrap/layer").asText());
         assertNotEquals(0, node.at("/matches").size());
-        assertEquals("[\"author, docSigle\"]",
+        assertEquals("[\"author\",\"docSigle\"]",
                 node.at("/meta/fields").toString());
     }
 

@@ -11,6 +11,7 @@ import de.ids_mannheim.korap.constant.AuthenticationMethod;
 import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.security.context.TokenContext;
+import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.Userdata;
 import de.ids_mannheim.korap.utils.TimeUtils;
@@ -38,8 +39,9 @@ public class DummyAuthenticationManager extends AuthenticationManager {
 
     @Override
     public User getUser (String username) throws KustvaktException {
-        // TODO Auto-generated method stub
-        return null;
+        KorAPUser user = new KorAPUser();
+        user.setUsername(username);
+        return user;
     }
 
     @Override
