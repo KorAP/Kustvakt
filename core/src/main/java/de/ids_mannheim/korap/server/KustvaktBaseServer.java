@@ -96,7 +96,7 @@ public abstract class KustvaktBaseServer {
 
         RandomCodeGenerator random = new RandomCodeGenerator();
         String shutdownToken = random.createRandomCode(config);
-        ShutdownHandler shutdownHandler = new ShutdownHandler(shutdownToken,true,true);
+        ShutdownHandler shutdownHandler = new ShutdownHandler(shutdownToken,true,false);
 
         FileOutputStream fos = new FileOutputStream(new File("shutdownToken"));
         OutputStreamWriter writer =

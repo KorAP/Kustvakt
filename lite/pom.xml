@@ -70,14 +70,12 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.22.1</version>
 				<configuration>
-          <useSystemClassLoader>false</useSystemClassLoader>
-					<reuseForks>false</reuseForks>
-					<forkCount>2</forkCount>
-					<threadCount>4</threadCount>
-					<argLine>-Xmx512m -XX:MaxPermSize=256m</argLine>
-					<excludes>
-						<exclude>**/VCReferenceTest.java</exclude>>
-					</excludes>
+                    <useSystemClassLoader>false</useSystemClassLoader>
+					<reuseForks>true</reuseForks>
+					<forkCount>1</forkCount>
+					<threadCount>5</threadCount>
+					<argLine>-Xmx512m -XX:MaxPermSize=256m
+						-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager</argLine>
 				</configuration>
 			</plugin>
 			<plugin>

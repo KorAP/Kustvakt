@@ -65,8 +65,6 @@
 		<property name="suppressClose">
 			<value>true</value>
 		</property>
-		<!--<property name="initialSize" value="2"/> -->
-		<!--<property name="poolPreparedStatements" value="true"/> -->
 	</bean>
 
 	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
