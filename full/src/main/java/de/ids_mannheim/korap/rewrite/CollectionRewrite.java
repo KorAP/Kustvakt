@@ -186,7 +186,9 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
         }
 
         node = node.at("/collection");
-        jlog.debug("REWRITES: " + node.toString());
+        if (DEBUG) { 
+            jlog.debug("REWRITES: " + node.toString());
+        }
         
         return node;
     }

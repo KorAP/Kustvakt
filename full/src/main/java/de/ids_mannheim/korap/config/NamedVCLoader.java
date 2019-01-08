@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 
+import javax.management.RuntimeErrorException;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -23,7 +25,7 @@ import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.web.SearchKrill;
 
 @Component
-public class NamedVCLoader {
+public class NamedVCLoader implements Runnable{
     @Autowired
     private FullConfiguration config;
     @Autowired
@@ -34,6 +36,17 @@ public class NamedVCLoader {
     public static Logger jlog = LogManager.getLogger(NamedVCLoader.class);
     public static boolean DEBUG = false;
 
+    @Override
+    public void run () {
+        try {
+            loadVCToCache();
+        }
+        catch (IOException | QueryException | KustvaktException e) {
+//            e.printStackTrace();
+            throw new RuntimeErrorException(new Error(e.getMessage(), e.getCause()));
+        }
+    }
+    
     public void loadVCToCache (String filename, String filePath)
             throws IOException, QueryException, KustvaktException {
 
@@ -118,23 +131,21 @@ public class NamedVCLoader {
 
     private void cacheVC (String json, String filename)
             throws IOException, QueryException {
-        jlog.info("Create KrillCollection: " + filename);
         long start, end;
         start = System.currentTimeMillis();
 
         KrillCollection collection = new KrillCollection(json);
         collection.setIndex(searchKrill.getIndex());
 
-        jlog.info("Store vc in cache " + filename);
+        jlog.info("Store {} in cache ", filename);
         if (collection != null) {
             collection.storeInCache(filename);
         }
         end = System.currentTimeMillis();
-        jlog.info(filename + " caching duration: " + (end - start));
+        jlog.info("{} caching duration: {}", filename, (end - start));
         if (DEBUG) {
             jlog.debug("memory cache: "
                     + KrillCollection.cache.calculateInMemorySize());
         }
     }
-
 }

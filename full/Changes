@@ -3,6 +3,8 @@
    - Added a search timeout test (margaretha)
 18/12/2018
    - Updated tests using BeanConfigTest to use SpringJerseyTest (margaretha)
+08/01/2019
+   - Improved predefined vc caching (issue #28, margaretha)
 
 # version 0.61.4
 14/11/2018

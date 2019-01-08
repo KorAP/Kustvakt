@@ -25,7 +25,7 @@ public class InitializatorImpl implements Initializator {
     @Autowired
     private AccessScopeDao accessScopeDao;
     @Autowired
-    private NamedVCLoader loader;
+    private NamedVCLoader vcLoader;
     @Autowired
     private AnnotationParser annotationParser;
     @Autowired
@@ -39,15 +39,17 @@ public class InitializatorImpl implements Initializator {
     @Override
     public void init () throws IOException, QueryException, KustvaktException {
         setInitialAccessScope();
-        loader.loadVCToCache();
+        Thread t = new Thread(vcLoader);
+        t.start();
     }
 
     public void initAnnotation ()
             throws IOException, QueryException, KustvaktException {
         setInitialAccessScope();
-        loader.loadVCToCache();
         annotationParser.run();
         resourceParser.run();
+        Thread t = new Thread(vcLoader);
+        t.start();
     }
 
     /* (non-Javadoc)

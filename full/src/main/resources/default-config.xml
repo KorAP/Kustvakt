@@ -172,8 +172,6 @@
 
 	<!-- Data access objects -->
 	<bean id="adminDao" class="de.ids_mannheim.korap.dao.AdminDaoImpl" />
-	<bean id="resourceDao" class="de.ids_mannheim.korap.dao.ResourceDao" />
-	<bean id="accessScopeDao" class="de.ids_mannheim.korap.oauth2.dao.AccessScopeDao" />
 	<bean id="authorizationDao" class="de.ids_mannheim.korap.oauth2.dao.CachedAuthorizationDaoImpl" />
 
 	<!-- Filters -->
