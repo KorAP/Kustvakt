@@ -25,7 +25,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
 /**
- * AnnotationDao manages SQL queries regarding annotations including
+ * AnnotationDao manages queries to database regarding annotations including
  * foundry and layer pairs.
  * 
  * @author margaretha

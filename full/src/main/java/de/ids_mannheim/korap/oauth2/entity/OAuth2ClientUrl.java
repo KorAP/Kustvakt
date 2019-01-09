@@ -8,7 +8,8 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
+/** Describes oauth2_client_url database table mapping
+ * 
  * @author margaretha
  *
  */

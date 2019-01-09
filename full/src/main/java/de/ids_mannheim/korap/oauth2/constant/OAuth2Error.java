@@ -1,11 +1,16 @@
 package de.ids_mannheim.korap.oauth2.constant;
 
+/**
+ * Lists possible OAuth2 errors as described in RFC 6749 and 6750.
+ * 
+ * @author margaretha
+ *
+ */
 public class OAuth2Error {
 
     public static final String ERROR = "error";
     public static final String DESCRIPTION = "error_description";
     public static final String URI = "error_uri";
-
 
     /**
      * The request is missing a required parameter, includes an
@@ -92,12 +97,22 @@ public class OAuth2Error {
     public static final String TEMPORARILY_UNAVAILABLE =
             "temporarily_unavailable";
 
-
-    // extensions
-    
+    /**
+     * The request requires higher privileges than provided by the
+     * access token.
+     */
     public static final String INSUFFICIENT_SCOPE = "insufficient_scope";
 
+    /**
+     * The access token provided is revoked, malformed, or
+     * invalid for other reasons.
+     */
     public static final String INVALID_TOKEN = "invalid_token";
 
+    /**
+     * The access token provided is expired. This error is a
+     * specialization of invalid_token error and not part of
+     * the RFCs.
+     */
     public static final String EXPIRED_TOKEN = "expired_token";
 }

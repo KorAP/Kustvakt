@@ -24,6 +24,11 @@ import de.ids_mannheim.korap.service.VirtualCorpusService;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.web.SearchKrill;
 
+/** Loads predefined virtual corpora at server start up and cache them.
+ * 
+ * @author margaretha
+ *
+ */
 @Component
 public class NamedVCLoader implements Runnable{
     @Autowired

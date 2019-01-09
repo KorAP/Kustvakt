@@ -19,9 +19,13 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.AccessScopeDao;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
-import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.security.context.TokenContext;
 
+/** Defines business logic related to OAuth2 scopes.
+ * 
+ * @author margaretha
+ *
+ */
 public class OAuth2ScopeServiceImpl implements OAuth2ScopeService {
 
     @Autowired
@@ -46,15 +50,16 @@ public class OAuth2ScopeServiceImpl implements OAuth2ScopeService {
         int index;
         OAuth2Scope oauth2Scope = null;
         for (String scope : scopes) {
-            try{
-                oauth2Scope = Enum.valueOf(OAuth2Scope.class, scope.toUpperCase());
+            try {
+                oauth2Scope =
+                        Enum.valueOf(OAuth2Scope.class, scope.toUpperCase());
             }
             catch (IllegalArgumentException e) {
                 throw new KustvaktException(StatusCodes.INVALID_SCOPE,
                         scope + " is an invalid scope",
                         OAuth2Error.INVALID_SCOPE);
             }
-            
+
             index = definedScopes.indexOf(new AccessScope(oauth2Scope));
             if (index == -1) {
                 throw new KustvaktException(StatusCodes.INVALID_SCOPE,

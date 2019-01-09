@@ -29,6 +29,11 @@ import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken_;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
+/** Manages database queries and transactions regarding OAuth2 clients. 
+ * 
+ * @author margaretha
+ *
+ */
 @Transactional
 @Repository
 public class OAuth2ClientDao {

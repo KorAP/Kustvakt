@@ -14,9 +14,11 @@ import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import edu.emory.mathcs.backport.java.util.Collections;
 
-/** Manages conversion of  {@link UserGroup} objects to their data access objects (DTO), 
- * e.g. UserGroupDto. DTO structure defines controllers output, namely the structure of 
- * JSON objects in HTTP responses.
+/**
+ * UserGroupConverter manages conversion of {@link UserGroup} objects
+ * to their data access objects (DTO), e.g. UserGroupDto. DTO
+ * structure defines controllers output, namely the structure of JSON
+ * objects in HTTP responses.
  * 
  * @author margaretha
  *

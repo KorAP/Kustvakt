@@ -6,7 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Data transfer object for resource description (e.g. for KorapSRU).
+ * Data transfer object for resource / corpus description (e.g. for
+ * KorapSRU).
  * 
  * @author margaretha
  *
@@ -20,7 +21,6 @@ public class ResourceDto {
     private String description;
     private String[] languages;
     private Map<Integer, String> layers;
-
 
     @Override
     public String toString () {

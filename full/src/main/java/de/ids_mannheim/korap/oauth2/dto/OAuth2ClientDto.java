@@ -3,6 +3,13 @@ package de.ids_mannheim.korap.oauth2.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+/**
+ * Describes the client_id and the client_secret of a client after
+ * client registration or reset secret.
+ * 
+ * @author margaretha
+ *
+ */
 @JsonInclude(Include.NON_EMPTY)
 public class OAuth2ClientDto {
 

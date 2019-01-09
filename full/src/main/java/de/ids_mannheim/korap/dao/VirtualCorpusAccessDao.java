@@ -25,8 +25,10 @@ import de.ids_mannheim.korap.entity.VirtualCorpus_;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
-/** Manages database transactions regarding {@link VirtualCorpusAccess} entity 
- *  and its corresponding database table.
+/**
+ * Manages database queries and transactions regarding
+ * {@link VirtualCorpusAccess} entity and its corresponding database
+ * table.
  * 
  * @author margaretha
  *
@@ -148,11 +150,13 @@ public class VirtualCorpusAccessDao {
         return q.getResultList();
     }
 
-    /** Hidden accesses are only created for published or system VC. 
+    /**
+     * Hidden accesses are only created for published or system VC.
      * 
      * Warn: The actual hidden accesses are not checked.
      * 
-     * @param vcId vcId 
+     * @param vcId
+     *            vcId
      * @return true if there is a hidden access, false otherwise
      * @throws KustvaktException
      */
@@ -173,10 +177,10 @@ public class VirtualCorpusAccessDao {
                 builder.equal(accessVC.get(VirtualCorpus_.id), vcId),
                 builder.equal(access.get(VirtualCorpusAccess_.status),
                         VirtualCorpusAccessStatus.HIDDEN)
-//                ,
-//                builder.notEqual(access.get(VirtualCorpusAccess_.deletedBy),
-//                        "NULL")
-                );
+        // ,
+        // builder.notEqual(access.get(VirtualCorpusAccess_.deletedBy),
+        // "NULL")
+        );
 
         query.select(access);
         query.where(p);
@@ -203,9 +207,9 @@ public class VirtualCorpusAccessDao {
 
     public void deleteAccess (VirtualCorpusAccess access, String deletedBy) {
         // soft delete
-        
+
         // hard delete
-        if (!entityManager.contains(access)){
+        if (!entityManager.contains(access)) {
             access = entityManager.merge(access);
         }
         entityManager.remove(access);

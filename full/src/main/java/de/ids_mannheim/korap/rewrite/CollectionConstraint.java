@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
-import de.ids_mannheim.korap.resource.rewrite.KoralNode;
-import de.ids_mannheim.korap.resource.rewrite.RewriteTask;
 import de.ids_mannheim.korap.user.User;
 
 /**

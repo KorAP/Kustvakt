@@ -12,6 +12,13 @@ import org.apache.oltu.oauth2.common.validators.AbstractValidator;
 
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 
+/**
+ * Defines required request parameters for
+ * OAuth2RevokeTokenSuperRequest and validates the request method.
+ * 
+ * @author margaretha
+ *
+ */
 public class RevokeTokenSuperValidator
         extends AbstractValidator<HttpServletRequest> {
 
@@ -42,12 +49,10 @@ public class RevokeTokenSuperValidator
         if (enforceClientAuthentication) {
             Set<String> missingParameters = new HashSet<String>();
 
-            if (OAuthUtils
-                    .isEmpty(request.getParameter(SUPER_CLIENT_ID))) {
+            if (OAuthUtils.isEmpty(request.getParameter(SUPER_CLIENT_ID))) {
                 missingParameters.add(SUPER_CLIENT_ID);
             }
-            if (OAuthUtils
-                    .isEmpty(request.getParameter(SUPER_CLIENT_SECRET))) {
+            if (OAuthUtils.isEmpty(request.getParameter(SUPER_CLIENT_SECRET))) {
                 missingParameters.add(SUPER_CLIENT_SECRET);
             }
 

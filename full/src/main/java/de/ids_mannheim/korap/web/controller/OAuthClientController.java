@@ -29,7 +29,7 @@ import de.ids_mannheim.korap.oauth2.service.OAuth2ClientService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
-import de.ids_mannheim.korap.web.APIVersionFilter;
+import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;

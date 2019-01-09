@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.resource.rewrite;
+package de.ids_mannheim.korap.rewrite;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -13,6 +13,10 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
+import de.ids_mannheim.korap.rewrite.CollectionCleanRewrite;
+import de.ids_mannheim.korap.rewrite.FoundryInject;
+import de.ids_mannheim.korap.rewrite.IdWriter;
+import de.ids_mannheim.korap.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /** EM: to do: Fix tests

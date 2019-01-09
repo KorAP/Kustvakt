@@ -22,7 +22,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Describes annotations as a pair, e.g. foundry and layer where
+ * Describes annotation layers as a pair of foundry and layer where
  * foundry denotes where the annotation comes from e.g. Tree tagger
  * parser, and layer denotes the annotation layer e.g. part of speech.
  * 

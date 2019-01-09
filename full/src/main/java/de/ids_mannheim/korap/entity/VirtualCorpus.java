@@ -19,12 +19,14 @@ import de.ids_mannheim.korap.user.User.CorpusAccess;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Describes virtual corpora.
+/**
+ * Describes the virtual corpora table and its relation to
+ * VirtualCorpusAccess.
  * 
- *  Any user may create a virtual corpus and share it to a user group.
- *  However, if the user is not a user-group admin, the virtual corpus 
- *  will not be shared until a user-group admin accept his/her request.
- *   
+ * Any user may create a virtual corpus and share it to a user group.
+ * However, if the user is not a user-group admin, the virtual corpus
+ * will not be shared until a user-group admin accept his/her request.
+ * 
  * @author margaretha
  *
  * @see VirtualCorpusAccess
@@ -34,7 +36,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "virtual_corpus")
-public class VirtualCorpus implements Comparable<VirtualCorpus>{
+public class VirtualCorpus implements Comparable<VirtualCorpus> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -2,7 +2,7 @@ package de.ids_mannheim.korap.constant;
 
 import de.ids_mannheim.korap.entity.VirtualCorpusAccess;
 
-/** Defines possible statusess of {@link VirtualCorpusAccess}
+/** Defines possible statuses of {@link VirtualCorpusAccess}
  * 
  * @author margaretha
  * @see VirtualCorpusAccess

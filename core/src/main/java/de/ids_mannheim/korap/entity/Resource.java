@@ -16,8 +16,8 @@ import lombok.Setter;
 
 /**
  * Describes resources having free licenses. Primarily for
- * accommodating
- * clients in providing data without login such as KorapSRU.
+ * accommodating clients in providing data without login such as
+ * KorapSRU.
  * 
  * @author margaretha
  *

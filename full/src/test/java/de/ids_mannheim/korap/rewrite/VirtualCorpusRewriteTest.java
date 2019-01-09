@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.resource.rewrite;
+package de.ids_mannheim.korap.rewrite;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

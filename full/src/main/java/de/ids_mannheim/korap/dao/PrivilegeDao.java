@@ -18,8 +18,9 @@ import de.ids_mannheim.korap.entity.Privilege_;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.Role_;
 
-/** Manages database transactions regarding {@link Privilege} entity or 
- *  database table.
+/**
+ * Manages database queries and transactions regarding
+ * {@link Privilege} entity or database table.
  * 
  * @see Privilege
  * @see PrivilegeType
@@ -34,7 +35,7 @@ public class PrivilegeDao {
 
     @PersistenceContext
     private EntityManager entityManager;
-    
+
     public void addPrivilegesToRole (Role role,
             List<PrivilegeType> privilegeTypes) {
         for (PrivilegeType type : privilegeTypes) {
@@ -46,8 +47,8 @@ public class PrivilegeDao {
     public void deletePrivilegeFromRole (int roleId,
             PrivilegeType privilegeType) {
         List<Privilege> privilegeList = retrievePrivilegeByRoleId(roleId);
-        for (Privilege p: privilegeList){
-            if (p.getName().equals(privilegeType)){
+        for (Privilege p : privilegeList) {
+            if (p.getName().equals(privilegeType)) {
                 entityManager.remove(p);
                 break;
             }
@@ -66,6 +67,6 @@ public class PrivilegeDao {
         query.where(criteriaBuilder
                 .equal(root.get(Privilege_.role).get(Role_.id), roleId));
         Query q = entityManager.createQuery(query);
-       return q.getResultList();
+        return q.getResultList();
     }
 }

@@ -122,7 +122,7 @@
 
 	<!-- Initialization -->
 	<bean id="initializator" class="de.ids_mannheim.de.init.LiteInitializatorImpl"
-		init-method="init">
+		init-method="initTest">
 	</bean>
 	<bean id="annotationParser" class="de.ids_mannheim.korap.annotation.AnnotationParser"
 		scope="singleton" />
@@ -133,9 +133,9 @@
 	</bean>
 
 	<!-- Filters -->
-	<bean id="APIVersionFilter" class="de.ids_mannheim.korap.web.APIVersionFilter"
+<!-- 	<bean id="APIVersionFilter" class="de.ids_mannheim.korap.web.APIVersionFilter"
 		scope="singleton" />
-
+ -->
 	<!-- Authentication -->
 	<bean id="authenticationManager"
 		class="de.ids_mannheim.korap.authentication.DummyAuthenticationManager" />
@@ -166,7 +166,7 @@
 	<bean id="annotationConverter" class="de.ids_mannheim.korap.dto.converter.AnnotationConverter" />
 
 	<!-- Rewrite -->
-	<bean id="rewriteHandler" class="de.ids_mannheim.korap.resource.rewrite.RewriteHandler">
+	<bean id="rewriteHandler" class="de.ids_mannheim.korap.rewrite.RewriteHandler">
 		<constructor-arg ref="config" />
 	</bean>
 

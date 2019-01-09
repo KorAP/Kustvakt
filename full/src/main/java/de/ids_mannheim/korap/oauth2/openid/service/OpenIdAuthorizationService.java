@@ -31,6 +31,11 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.service.OAuth2AuthorizationService;
 
+/** Authorization service implementation using open id. 
+ * 
+ * @author margaretha
+ *
+ */
 @Service
 public class OpenIdAuthorizationService extends OAuth2AuthorizationService {
 

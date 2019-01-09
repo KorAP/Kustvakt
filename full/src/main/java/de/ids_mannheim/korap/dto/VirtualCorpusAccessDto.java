@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
+ * Defines the structure of virtual corpus accesses, e.g. as JSON
+ * objects in HTTP Responses.
+ * 
  * @author margaretha
  *
  */

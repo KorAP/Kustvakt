@@ -20,6 +20,13 @@ import javax.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Defines oauth2_access_token database table mapping and access token
+ * relations to AccessScope and RefreshToken.
+ * 
+ * @author margaretha
+ *
+ */
 @Getter
 @Setter
 @Entity
@@ -59,7 +66,7 @@ public class AccessToken implements Serializable {
                     columnNames = { "token_id", "scope_id" }))
     private Set<AccessScope> scopes;
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="refresh_token")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "refresh_token")
     private RefreshToken refreshToken;
 }

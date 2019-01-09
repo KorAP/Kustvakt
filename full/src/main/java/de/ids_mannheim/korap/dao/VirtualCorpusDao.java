@@ -38,8 +38,9 @@ import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
 /**
- * VirtualCorpusDao manages SQL queries regarding virtual corpora,
- * e.g. retrieving and storing virtual corpora.
+ * VirtualCorpusDao manages database queries and transactions
+ * regarding virtual corpora, e.g. retrieving and storing virtual
+ * corpora.
  * 
  * @author margaretha
  *

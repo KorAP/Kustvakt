@@ -1,6 +1,6 @@
 package de.ids_mannheim.korap.constant;
 
-/** Defines the status of a user-group member
+/** Defines possible statuses of a user-group member
  * 
  * @author margaretha
  *

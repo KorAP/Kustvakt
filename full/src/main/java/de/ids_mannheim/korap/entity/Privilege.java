@@ -15,7 +15,8 @@ import de.ids_mannheim.korap.constant.PrivilegeType;
 import lombok.Getter;
 import lombok.Setter;
 
-/**  
+/**
+ * Describes privilege table listing users and their roles.
  * 
  * @author margaretha
  *
@@ -23,7 +24,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name="privilege")
+@Table(name = "privilege")
 public class Privilege {
 
     @Id
@@ -31,11 +32,12 @@ public class Privilege {
     private int id;
     @Enumerated(EnumType.STRING)
     private PrivilegeType name;
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
 
     public Privilege () {}
+
     public Privilege (PrivilegeType name, Role role) {
         this.name = name;
         this.role = role;

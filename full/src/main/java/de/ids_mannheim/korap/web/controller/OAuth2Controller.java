@@ -28,6 +28,7 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2AuthorizationRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenSuperRequest;
@@ -36,11 +37,22 @@ import de.ids_mannheim.korap.oauth2.oltu.service.OltuTokenService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
-import de.ids_mannheim.korap.web.APIVersionFilter;
+import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 
+/**
+ * OAuth2Controller describes OAuth2 web API for authorization
+ * for both internal (e.g Kalamar) and external (third party) clients.
+ * 
+ * Possible authorization scopes are listed in {@link OAuth2Scope} For
+ * more information about OAuth2 authorization mechanisms, see RFC
+ * 6749.
+ * 
+ * @author margaretha
+ *
+ */
 @Controller
 @Path("{version}/oauth2")
 @ResourceFilters({ APIVersionFilter.class })

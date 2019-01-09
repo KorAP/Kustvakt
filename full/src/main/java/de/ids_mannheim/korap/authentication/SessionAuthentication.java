@@ -1,22 +1,21 @@
 package de.ids_mannheim.korap.authentication;
 
-import de.ids_mannheim.korap.config.KustvaktConfiguration;
-import de.ids_mannheim.korap.constant.TokenType;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.security.context.TokenContext;
-import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.TimeUtils;
+import java.util.Map;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 
-import java.util.Map;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.constant.TokenType;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.interfaces.EncryptionIface;
+import de.ids_mannheim.korap.security.context.TokenContext;
+import de.ids_mannheim.korap.user.User;
+import de.ids_mannheim.korap.utils.TimeUtils;
 
 /**
  * implementation of the AuthenticationIface to handle korap

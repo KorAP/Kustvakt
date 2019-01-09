@@ -5,6 +5,9 @@
    - Updated tests using BeanConfigTest to use SpringJerseyTest (margaretha)
 08/01/2019
    - Improved predefined vc caching (issue #28, margaretha)
+09/01/2019
+   - Added comments (margaretha)
+   - Updated code structure (margaretha)
 
 # version 0.61.4
 14/11/2018

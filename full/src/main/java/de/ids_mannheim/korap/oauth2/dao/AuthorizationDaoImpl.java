@@ -27,6 +27,13 @@ import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.Authorization_;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
+/**
+ * Implementations of {@link AuthorizationDao} managing database
+ * queries and transactions regarding OAuth2 authorizations.
+ * 
+ * @author margaretha
+ *
+ */
 @Transactional
 @Repository
 public class AuthorizationDaoImpl implements AuthorizationDao {
@@ -35,7 +42,7 @@ public class AuthorizationDaoImpl implements AuthorizationDao {
     private EntityManager entityManager;
     @Autowired
     private FullConfiguration config;
-    
+
     public Authorization storeAuthorizationCode (String clientId, String userId,
             String code, Set<AccessScope> scopes, String redirectURI,
             ZonedDateTime authenticationTime, String nonce)
@@ -55,7 +62,7 @@ public class AuthorizationDaoImpl implements AuthorizationDao {
         authorization.setRedirectURI(redirectURI);
         authorization.setUserAuthenticationTime(authenticationTime);
         authorization.setNonce(nonce);
-        
+
         ZonedDateTime now =
                 ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
         authorization.setCreatedDate(now);
@@ -101,7 +108,8 @@ public class AuthorizationDaoImpl implements AuthorizationDao {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Authorization> retrieveAuthorizationsByClientId (String clientId) {
+    public List<Authorization> retrieveAuthorizationsByClientId (
+            String clientId) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Authorization> query =
                 builder.createQuery(Authorization.class);

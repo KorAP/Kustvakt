@@ -5,7 +5,13 @@
    - Updated RewriteHandler (margaretha)
 19/12/2018
    - Added debug flags (margaretha)
-   - Added order on the fields parameter of search get request (margaretha)   
+   - Added order on the fields parameter of search get request (margaretha)
+07/01/2019
+   - Disabled send shutdown to existing jetty web server at start (margaretha)
+09/01/2019
+   - Added comments (margaretha)
+   - Updated code structure (margaretha)
+   - Removed spring security libraries and ManagerInterface (margaretha)
 
 version 0.61.4
 14/11/2018

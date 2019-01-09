@@ -15,11 +15,18 @@ import de.ids_mannheim.korap.constant.OAuth2Scope;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Defines the oauth2_access_scope database table mapping and access
+ * scope relations to Authorization, AccessToken and RefreshToken.
+ * 
+ * @author margaretha
+ *
+ */
 @Getter
 @Setter
 @Entity
 @Table(name = "oauth2_access_scope")
-public class AccessScope implements Serializable{
+public class AccessScope implements Serializable {
 
     private static final long serialVersionUID = -7356877266702636705L;
 
@@ -35,10 +42,10 @@ public class AccessScope implements Serializable{
 
     @ManyToMany(mappedBy = "scopes", fetch = FetchType.LAZY)
     private List<Authorization> authorizations;
-    
+
     @ManyToMany(mappedBy = "scopes", fetch = FetchType.LAZY)
     private List<AccessToken> accessTokens;
-    
+
     @ManyToMany(mappedBy = "scopes", fetch = FetchType.LAZY)
     private List<RefreshToken> refreshTokens;
 

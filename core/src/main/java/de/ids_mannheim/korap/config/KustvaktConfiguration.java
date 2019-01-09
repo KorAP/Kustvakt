@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import de.ids_mannheim.korap.util.KrillProperties;
 import de.ids_mannheim.korap.utils.TimeUtils;
@@ -19,14 +18,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * if configuration class is extended, loadSubTypes method should be
+ * Describes configuration for Kustvakt by importing properties 
+ * from kustvakt.conf file and setting default values if they are 
+ * not configured.  
+ * 
+ * MH: if configuration class is extended, loadSubTypes method should be
  * overriden
  * 
  * @author hanl
- * @date 05/02/2014
- * 
  * @author margaretha
- * - cleaned up log4j loader
  */
 
 @Setter

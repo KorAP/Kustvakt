@@ -9,14 +9,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.resource.rewrite.KoralNode;
-import de.ids_mannheim.korap.resource.rewrite.KoralNode.RewriteIdentifier;
-import de.ids_mannheim.korap.resource.rewrite.RewriteTask;
+import de.ids_mannheim.korap.rewrite.KoralNode.RewriteIdentifier;
 import de.ids_mannheim.korap.service.VirtualCorpusService;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.util.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
+/**
+ * Rewrites virtual corpus reference with the corresponding koral
+ * query describing the actual virtual corpus query.
+ * 
+ * @author margaretha
+ *
+ */
 @Component
 public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
 
@@ -83,7 +88,7 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
         String ref = jsonNode.at("/ref").asText();
         koralNode.remove("ref", new RewriteIdentifier("ref", ref));
 
-        ref = ref.substring(vcOwner.length()+1, ref.length());
+        ref = ref.substring(vcOwner.length() + 1, ref.length());
         koralNode.set("ref", ref, new RewriteIdentifier("ref", ref));
     }
 

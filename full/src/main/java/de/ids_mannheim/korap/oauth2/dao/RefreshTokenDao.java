@@ -28,6 +28,12 @@ import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken_;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
+/**
+ * Manages database queries and transactions regarding refresh tokens.
+ * 
+ * @author margaretha
+ *
+ */
 @Repository
 @Transactional
 public class RefreshTokenDao {
@@ -71,7 +77,7 @@ public class RefreshTokenDao {
                 builder.createQuery(RefreshToken.class);
         Root<RefreshToken> root = query.from(RefreshToken.class);
         root.fetch(RefreshToken_.client);
-        
+
         query.select(root);
         query.where(builder.equal(root.get(RefreshToken_.token), token));
         Query q = entityManager.createQuery(query);

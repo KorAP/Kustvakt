@@ -18,14 +18,17 @@ import de.ids_mannheim.korap.constant.UserGroupStatus;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Describes user groups.
+/**
+ * Describes user group table and its relations to UserGroupMember and
+ * VirtualCorpusAccess.
  * 
- * Any user may create a user group and send invitations to group 
+ * Any user may create a user group and send invitations to group
  * member by username. Any group member may reject the invitation
  * or unsubscribe from the group.
  * 
  * @author margaretha
  * @see UserGroupMember
+ * @see VirtualCorpusAccess
  */
 @Setter
 @Getter
@@ -54,12 +57,10 @@ public class UserGroup implements Comparable<UserGroup> {
             cascade = CascadeType.REMOVE)
     private List<VirtualCorpusAccess> virtualCorpusAccess;
 
-
     @Override
     public String toString () {
         return "id=" + id + ", name= " + name + ", createdBy= " + createdBy;
     }
-
 
     @Override
     public int compareTo (UserGroup o) {

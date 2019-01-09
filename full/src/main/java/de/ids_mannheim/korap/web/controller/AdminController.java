@@ -26,7 +26,7 @@ import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
-import de.ids_mannheim.korap.web.APIVersionFilter;
+import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 

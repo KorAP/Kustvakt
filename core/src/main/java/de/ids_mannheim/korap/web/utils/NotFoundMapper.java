@@ -19,12 +19,18 @@ import com.sun.jersey.api.NotFoundException;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 
+/**
+ * Handles not found API version by redirecting the request URI to a
+ * similar URI with current API version.
+ * 
+ * @author margaretha
+ *
+ */
 @Component
 @Provider
 public class NotFoundMapper implements ExceptionMapper<NotFoundException> {
 
-    private static Logger jlog =
-            LogManager.getLogger(NotFoundMapper.class);
+    private static Logger jlog = LogManager.getLogger(NotFoundMapper.class);
     public static final Pattern VERSION_PATTERN =
             Pattern.compile("/(v[0-9][^/]*)(/.*)");
     private static final boolean DEBUG = false;
@@ -47,19 +53,19 @@ public class NotFoundMapper implements ExceptionMapper<NotFoundException> {
                 path = baseUrl + "/" + config.getCurrentVersion() + path;
                 URI redirectUri = UriBuilder.fromUri(notFoundUri)
                         .replacePath(path).build();
-                if (DEBUG){
-                    jlog.debug("REDIRECT: "+redirectUri.toString());
+                if (DEBUG) {
+                    jlog.debug("REDIRECT: " + redirectUri.toString());
                 }
                 return Response.status(HttpStatus.PERMANENT_REDIRECT_308)
                         .location(redirectUri).build();
             }
-            else if (!matcher.group(1).equals(config.getCurrentVersion())){
+            else if (!matcher.group(1).equals(config.getCurrentVersion())) {
                 path = baseUrl + "/" + config.getCurrentVersion()
                         + matcher.group(2);
                 URI redirectUri = UriBuilder.fromUri(notFoundUri)
                         .replacePath(path).build();
-                if (DEBUG){
-                    jlog.debug("REDIRECT replace: "+ redirectUri.toString());
+                if (DEBUG) {
+                    jlog.debug("REDIRECT replace: " + redirectUri.toString());
                 }
                 return Response.status(HttpStatus.PERMANENT_REDIRECT_308)
                         .location(redirectUri).build();

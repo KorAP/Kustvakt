@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.resource.rewrite;
+package de.ids_mannheim.korap.rewrite;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

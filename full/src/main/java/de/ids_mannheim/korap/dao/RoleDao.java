@@ -22,7 +22,9 @@ import de.ids_mannheim.korap.entity.Role_;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.entity.UserGroupMember_;
 
-/** Manages database transactions regarding {@link Role} entity or database table. 
+/**
+ * Manages database queries and transactions regarding {@link Role}
+ * entity or database table.
  * 
  * @author margaretha
  * @see Role

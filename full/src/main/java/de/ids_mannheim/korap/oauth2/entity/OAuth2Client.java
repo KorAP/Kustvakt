@@ -16,7 +16,8 @@ import javax.persistence.Table;
 
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 
-/**
+/** Describe oauth2_client database table mapping.
+ * 
  * @author margaretha
  *
  */

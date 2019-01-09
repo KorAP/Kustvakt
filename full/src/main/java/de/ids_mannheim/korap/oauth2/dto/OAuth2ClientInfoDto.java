@@ -6,6 +6,11 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 
+/** Describes information about an OAuth2 client.
+ * 
+ * @author margaretha
+ *
+ */
 @JsonInclude(Include.NON_EMPTY)
 public class OAuth2ClientInfoDto {
 

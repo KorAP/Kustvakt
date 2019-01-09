@@ -13,10 +13,8 @@ import de.ids_mannheim.korap.entity.Resource;
 
 /**
  * ResourceConverter prepares data transfer objects (DTOs) from
- * {@link Resource}
- * entities. DTO structure defines controllers output, namely the
- * structure of
- * JSON objects in HTTP responses.
+ * {@link Resource} entities. DTO structure defines controllers
+ * output, namely the structure of JSON objects in HTTP responses.
  * 
  * @author margaretha
  *

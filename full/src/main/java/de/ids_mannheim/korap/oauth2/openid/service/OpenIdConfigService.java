@@ -6,6 +6,10 @@ import org.springframework.stereotype.Service;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.oauth2.openid.OpenIdConfiguration;
 
+/**
+ * @author margaretha
+ *
+ */
 @Service
 public class OpenIdConfigService {
 

@@ -36,8 +36,9 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
-/** Manages database transactions regarding {@link UserGroup} entity and 
- *  database table.
+/**
+ * Manages database queries and transactions regarding
+ * {@link UserGroup} entity and database table.
  * 
  * @author margaretha
  * 
@@ -117,14 +118,18 @@ public class UserGroupDao {
         entityManager.merge(group);
     }
 
-    /** Retrieves the UserGroup by the given group id. This methods does not 
-     *  fetch group members because only group admin is allowed to see them. 
-     *  Group members have to be retrieved separately.
+    /**
+     * Retrieves the UserGroup by the given group id. This methods
+     * does not
+     * fetch group members because only group admin is allowed to see
+     * them.
+     * Group members have to be retrieved separately.
      * 
      * @see UserGroupMember
-     * @param groupId group id
+     * @param groupId
+     *            group id
      * @return UserGroup
-     * @throws KustvaktException 
+     * @throws KustvaktException
      */
     public UserGroup retrieveGroupById (int groupId) throws KustvaktException {
         return retrieveGroupById(groupId, false);
@@ -156,10 +161,12 @@ public class UserGroupDao {
         }
     }
 
-
-    /** Retrieves only user-groups that are active (not hidden or deleted).
+    /**
+     * Retrieves only user-groups that are active (not hidden or
+     * deleted).
      * 
-     * @param userId user id
+     * @param userId
+     *            user id
      * @return a list of UserGroup
      * @throws KustvaktException
      */
@@ -183,9 +190,8 @@ public class UserGroupDao {
                         userId),
                 criteriaBuilder.notEqual(members.get(UserGroupMember_.status),
                         GroupMemberStatus.DELETED));
-        //                criteriaBuilder.equal(members.get(UserGroupMember_.status),
-        //                        GroupMemberStatus.ACTIVE));
-
+        // criteriaBuilder.equal(members.get(UserGroupMember_.status),
+        // GroupMemberStatus.ACTIVE));
 
         query.select(root);
         query.where(restrictions);
@@ -261,7 +267,9 @@ public class UserGroupDao {
 
     }
 
-    /** This is an admin function. It retrieves all groups given the userId 
+    /**
+     * This is an admin function. It retrieves all groups given the
+     * userId
      * and status.
      * 
      * @param userId

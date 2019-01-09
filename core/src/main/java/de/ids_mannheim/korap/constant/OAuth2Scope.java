@@ -1,5 +1,10 @@
 package de.ids_mannheim.korap.constant;
 
+/** Defines all possible authorization scopes
+ * 
+ * @author margaretha
+ *
+ */
 public enum OAuth2Scope {
     
     ALL, 

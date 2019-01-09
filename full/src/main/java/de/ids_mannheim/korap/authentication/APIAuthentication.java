@@ -25,8 +25,7 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 
 /**
- * EM: there is no authentication here, just implementation for
- * creating token context etc.
+ * Authentication provider using JWT tokens
  * 
  * Created by hanl on 5/23/14.
  */

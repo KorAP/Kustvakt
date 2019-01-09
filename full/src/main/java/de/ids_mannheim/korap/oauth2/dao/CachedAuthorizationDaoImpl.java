@@ -20,6 +20,13 @@ import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 import net.sf.ehcache.Element;
 
+/**
+ * Implementations of {@link AuthorizationDao} using a cache instead
+ * of a database.
+ * 
+ * @author margaretha
+ *
+ */
 public class CachedAuthorizationDaoImpl extends KustvaktCacheable
         implements AuthorizationDao {
 

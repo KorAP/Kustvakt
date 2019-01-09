@@ -27,6 +27,11 @@ import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import net.minidev.json.JSONObject;
 
+/** Generates OpenId specific responses.
+ * 
+ * @author margaretha
+ *
+ */
 @Service
 public class OpenIdResponseHandler extends KustvaktResponseHandler {
 

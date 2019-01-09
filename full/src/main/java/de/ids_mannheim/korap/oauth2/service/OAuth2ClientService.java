@@ -35,6 +35,9 @@ import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
 /**
+ * Defines business logic related to OAuth2 client including
+ * client registration and client authentication.
+ * 
  * According to RFC 6749, an authorization server MUST:
  * <ul>
  * <li>

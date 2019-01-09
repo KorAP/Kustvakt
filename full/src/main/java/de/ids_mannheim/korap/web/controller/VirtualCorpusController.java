@@ -31,7 +31,7 @@ import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.VirtualCorpusService;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
-import de.ids_mannheim.korap.web.APIVersionFilter;
+import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;

@@ -42,14 +42,22 @@ import de.ids_mannheim.korap.oauth2.openid.service.OpenIdTokenService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OpenIdResponseHandler;
-import de.ids_mannheim.korap.web.APIVersionFilter;
+import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.utils.MapUtils;
 
+/**
+ * Describes OAuth2 webAPI with OpenId Connect implementation, an
+ * additional authentication protocol allowing clients to verify
+ * user authentication data represented by ID tokens.
+ * 
+ * @author margaretha
+ *
+ */
 @Controller
 @Path("{version}/oauth2/openid")
-@ResourceFilters({APIVersionFilter.class})
+@ResourceFilters({ APIVersionFilter.class })
 public class OAuth2WithOpenIdController {
 
     @Autowired
@@ -62,7 +70,7 @@ public class OAuth2WithOpenIdController {
     private OpenIdConfigService configService;
     @Autowired
     private OAuth2ScopeService scopeService;
-    
+
     @Autowired
     private OpenIdResponseHandler openIdResponseHandler;
 
@@ -142,7 +150,7 @@ public class OAuth2WithOpenIdController {
         URI uri = null;
         try {
             scopeService.verifyScope(tokenContext, OAuth2Scope.AUTHORIZE);
-            
+
             if (isAuthentication) {
                 authzService.checkRedirectUriParam(map);
             }
@@ -160,7 +168,6 @@ public class OAuth2WithOpenIdController {
         ResponseBuilder builder = Response.temporaryRedirect(uri);
         return builder.build();
     }
-
 
     @POST
     @Path("token")

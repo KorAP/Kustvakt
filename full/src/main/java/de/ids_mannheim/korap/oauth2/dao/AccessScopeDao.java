@@ -16,6 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 
+/**
+ * AccessScopeDao manages database queries and transactions regarding
+ * access scopes.
+ * 
+ * @author margaretha
+ *
+ */
 @Repository
 @Transactional
 public class AccessScopeDao {

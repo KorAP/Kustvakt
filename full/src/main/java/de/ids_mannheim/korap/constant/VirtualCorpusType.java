@@ -8,13 +8,22 @@ import de.ids_mannheim.korap.entity.VirtualCorpus;
  *
  */
 public enum VirtualCorpusType {
-    // available for all
+    /**
+     * available for all
+     */
     SYSTEM, 
-    // available to project group members
+    // 
+    /** available to project group members
+     * 
+     */
     PROJECT, 
-    // available only for the creator
+    /**
+     * available only for the creator
+     */
     PRIVATE, 
-    // available for all, but not listed for all
+    /**
+     * available for all, but not listed for all 
+     */
     PUBLISHED;
     
     public String displayName () {

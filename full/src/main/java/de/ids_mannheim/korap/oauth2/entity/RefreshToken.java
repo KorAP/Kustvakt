@@ -17,6 +17,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+/**
+ * Describes oauth2_refresh_token database table mapping and refresh
+ * token relations to access scopes, access tokens, and oauth2 clients.
+ * 
+ * @author margaretha
+ *
+ */
 @Entity
 @Table(name = "oauth2_refresh_token")
 public class RefreshToken {
@@ -31,8 +38,8 @@ public class RefreshToken {
     private ZonedDateTime expiryDate;
     @Column(name = "user_id")
     private String userId;
-//    @Column(name = "client_id")
-//    private String clientId;
+    // @Column(name = "client_id")
+    // private String clientId;
     @Column(name = "user_auth_time", updatable = false)
     private ZonedDateTime userAuthenticationTime;
     @Column(name = "is_revoked")
@@ -40,9 +47,9 @@ public class RefreshToken {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "refreshToken")
     private Set<AccessToken> accessTokens;
-    
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="client")
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client")
     private OAuth2Client client;
 
     @ManyToMany(fetch = FetchType.EAGER)

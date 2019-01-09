@@ -20,6 +20,11 @@ import com.nimbusds.jose.jwk.RSAKey;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
 
+/** JWK services for generating key pair and key set.
+ * 
+ * @author margaretha
+ *
+ */
 @Service
 public class JWKService {
 

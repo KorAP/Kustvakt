@@ -8,12 +8,18 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-/**
+/** Utility methods for maps
+ * 
  * @author margaretha
  *
  */
 public class MapUtils {
 
+    /** Converts {@link MultivaluedMap} to {@link Map}
+     * 
+     * @param multivaluedMap
+     * @return
+     */
     public static Map<String, String> toMap (
             MultivaluedMap<String, String> multivaluedMap) {
         

@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.resource.rewrite;
+package de.ids_mannheim.korap.rewrite;
 
 import static org.junit.Assert.assertEquals;
 
@@ -9,6 +9,7 @@ import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.config.TestVariables;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.rewrite.CollectionRewrite;
+import de.ids_mannheim.korap.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**

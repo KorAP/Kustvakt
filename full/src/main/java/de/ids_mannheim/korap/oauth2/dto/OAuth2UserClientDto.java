@@ -1,5 +1,10 @@
 package de.ids_mannheim.korap.oauth2.dto;
 
+/** Lists authorized OAuth2 clients of a user
+ * 
+ * @author margaretha
+ *
+ */
 public class OAuth2UserClientDto {
     
     private String clientId;

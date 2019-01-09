@@ -23,6 +23,11 @@ import de.ids_mannheim.korap.entity.Annotation;
 import de.ids_mannheim.korap.entity.AnnotationKey;
 import de.ids_mannheim.korap.entity.AnnotationLayer;
 
+/** Parser for extracting annotation descriptions from Kalamar javascripts 
+ * 
+ * @author margaretha
+ *
+ */
 @Component
 public class AnnotationParser {
 

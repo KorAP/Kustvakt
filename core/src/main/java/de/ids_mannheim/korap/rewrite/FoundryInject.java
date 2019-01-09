@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.resource.rewrite;
+package de.ids_mannheim.korap.rewrite;
 
 import java.util.Collection;
 
@@ -8,8 +8,7 @@ import de.ids_mannheim.korap.config.BeanInjectable;
 import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.resource.LayerMapper;
-import de.ids_mannheim.korap.resource.rewrite.KoralNode.RewriteIdentifier;
+import de.ids_mannheim.korap.rewrite.KoralNode.RewriteIdentifier;
 import de.ids_mannheim.korap.user.User;
 import edu.emory.mathcs.backport.java.util.Collections;
 

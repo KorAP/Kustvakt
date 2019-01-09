@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.resource.rewrite;
+package de.ids_mannheim.korap.rewrite;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;

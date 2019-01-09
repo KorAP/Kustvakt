@@ -18,6 +18,14 @@ import javax.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Describes the annotation key mapping to annotation_key table in the
+ * database and annotation key relations to {@link AnnotationLayer}
+ * and {@link Annotation}.
+ * 
+ * @author margaretha
+ *
+ */
 @Setter
 @Getter
 @Entity

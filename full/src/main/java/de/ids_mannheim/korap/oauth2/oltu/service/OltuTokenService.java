@@ -34,6 +34,11 @@ import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenSuperRequest;
 import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
 
+/** Implementation of token service using Apache Oltu.
+ * 
+ * @author margaretha
+ *
+ */
 @Service
 public class OltuTokenService extends OAuth2TokenService {
 

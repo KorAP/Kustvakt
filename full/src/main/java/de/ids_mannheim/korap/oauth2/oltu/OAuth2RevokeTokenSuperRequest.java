@@ -5,12 +5,20 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.oltu.oauth2.as.request.OAuthRequest;
 import org.apache.oltu.oauth2.common.OAuth;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.utils.OAuthUtils;
 import org.apache.oltu.oauth2.common.validators.OAuthValidator;
 
+/**
+ * A custom request based on {@link OAuthRequest}. It defines token
+ * revocation request that should have been sent from a super client.
+ * 
+ * @author margaretha
+ *
+ */
 public class OAuth2RevokeTokenSuperRequest {
     protected HttpServletRequest request;
     protected OAuthValidator<HttpServletRequest> validator;
@@ -49,13 +57,13 @@ public class OAuth2RevokeTokenSuperRequest {
     public String getClientId () {
         return request.getParameter(OAuth.OAUTH_CLIENT_ID);
     }
-    
+
     public String getSuperClientId () {
         return request.getParameter(RevokeTokenSuperValidator.SUPER_CLIENT_ID);
     }
-    
+
     public String getSuperClientSecret () {
-        return request.getParameter(RevokeTokenSuperValidator.
-                SUPER_CLIENT_SECRET);
+        return request
+                .getParameter(RevokeTokenSuperValidator.SUPER_CLIENT_SECRET);
     }
 }

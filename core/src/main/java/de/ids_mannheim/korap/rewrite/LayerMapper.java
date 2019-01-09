@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.resource;
+package de.ids_mannheim.korap.rewrite;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.Attributes;

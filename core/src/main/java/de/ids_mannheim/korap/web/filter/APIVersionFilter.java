@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web;
+package de.ids_mannheim.korap.web.filter;
 
 import java.util.List;
 

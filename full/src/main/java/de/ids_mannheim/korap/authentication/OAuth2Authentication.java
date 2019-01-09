@@ -15,6 +15,11 @@ import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeServiceImpl;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
 
+/** Authentication provider for Bearer tokens
+ * 
+ * @author margaretha
+ *
+ */
 @Component
 public class OAuth2Authentication implements AuthenticationIface {
 

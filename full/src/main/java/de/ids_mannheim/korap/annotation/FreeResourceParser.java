@@ -19,6 +19,12 @@ import de.ids_mannheim.korap.entity.AnnotationLayer;
 import de.ids_mannheim.korap.entity.Resource;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 
+/** Parser for extracting data from free-resources.json containing
+ * listing free (non-licensed) corpora.
+ * 
+ * @author margaretha
+ *
+ */
 @Component
 public class FreeResourceParser {
     private Logger log = LogManager.getLogger(FreeResourceParser.class);

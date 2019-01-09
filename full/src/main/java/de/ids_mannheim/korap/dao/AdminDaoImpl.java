@@ -17,6 +17,8 @@ import de.ids_mannheim.korap.entity.Admin_;
 import de.ids_mannheim.korap.user.User;
 
 /**
+ * Describes database queries and transactions regarding admin users.
+ * 
  * @author margaretha
  *
  */

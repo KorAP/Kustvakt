@@ -18,6 +18,13 @@ import javax.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Describes oauth2_authorization database table mapping and
+ * authorization relations to AccessScope.
+ * 
+ * @author margaretha
+ *
+ */
 @Getter
 @Setter
 @Entity

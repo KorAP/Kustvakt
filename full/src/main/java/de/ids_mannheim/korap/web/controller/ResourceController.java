@@ -14,7 +14,7 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.dto.ResourceDto;
 import de.ids_mannheim.korap.service.ResourceService;
-import de.ids_mannheim.korap.web.APIVersionFilter;
+import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 
 /**

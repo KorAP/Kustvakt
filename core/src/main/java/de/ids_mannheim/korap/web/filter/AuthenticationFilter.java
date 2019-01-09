@@ -21,7 +21,11 @@ import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 
-/**
+/** Authentication filter extracts an authentication token from 
+ * authorization header and uses an authentication provider 
+ * with respect to the token type to create a token context as
+ * a security context.
+ * 
  * @author hanl, margaretha
  * @date 28/01/2014
  * @last update 12/2017

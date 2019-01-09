@@ -34,6 +34,12 @@ import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken_;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
+/**
+ * Manages database queries and transactions regarding access tokens.
+ * 
+ * @author margaretha
+ *
+ */
 @Repository
 @Transactional
 public class AccessTokenDao extends KustvaktCacheable {
@@ -129,7 +135,8 @@ public class AccessTokenDao extends KustvaktCacheable {
         CriteriaQuery<RefreshToken> query =
                 builder.createQuery(RefreshToken.class);
         Root<RefreshToken> root = query.from(RefreshToken.class);
-        Join<RefreshToken, OAuth2Client> client = root.join(RefreshToken_.client);
+        Join<RefreshToken, OAuth2Client> client =
+                root.join(RefreshToken_.client);
         query.select(root);
         query.where(builder.equal(client.get(OAuth2Client_.id), clientId));
         TypedQuery<RefreshToken> q = entityManager.createQuery(query);

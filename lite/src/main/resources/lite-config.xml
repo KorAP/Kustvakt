@@ -135,8 +135,8 @@
 	</bean>
 
 	<!-- Filters -->
-	<bean id="APIVersionFilter" class="de.ids_mannheim.korap.web.APIVersionFilter"
-		scope="singleton" />
+	<!-- <bean id="APIVersionFilter" class="de.ids_mannheim.korap.web.APIVersionFilter"
+		scope="singleton" /> -->
 
 	<!-- Authentication -->
 	<bean id="authenticationManager"
@@ -168,7 +168,7 @@
 	<bean id="annotationConverter" class="de.ids_mannheim.korap.dto.converter.AnnotationConverter" />
 
 	<!-- Rewrite -->
-	<bean id="rewriteHandler" class="de.ids_mannheim.korap.resource.rewrite.RewriteHandler">
+	<bean id="rewriteHandler" class="de.ids_mannheim.korap.rewrite.RewriteHandler">
 		<constructor-arg ref="config" />
 	</bean>
 

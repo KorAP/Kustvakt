@@ -19,6 +19,11 @@ import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 
+/** Describes business logic behind OAuth2 authorization requests.
+ * 
+ * @author margaretha
+ *
+ */
 @Service(value = "authorizationService")
 public class OAuth2AuthorizationService {
 

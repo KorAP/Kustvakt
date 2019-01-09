@@ -55,6 +55,8 @@ import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
 import de.ids_mannheim.korap.utils.TimeUtils;
 
 /**
+ * Token service implementation using OpenId.
+ * 
  * ID Tokens MUST be signed using JWS and optionally both signed and
  * then encrypted using JWS [JWS] and JWE [JWE] respectively.
  * 
