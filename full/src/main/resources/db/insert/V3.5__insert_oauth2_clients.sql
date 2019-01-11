@@ -6,7 +6,7 @@ VALUES("http://korap.ids-mannheim.de/confidential", 2087150261);
 -- plain secret value is "secret"
 INSERT INTO oauth2_client(id,name,secret,type,super,url_id,
   redirect_uri,registered_by, description) 
-VALUES ("fCBbQkAyYzI4NzUxMg","test confidential client",
+VALUES ("fCBbQkAyYzI4NzUxMg","super confidential client",
   "$2a$08$vi1FbuN3p6GcI1tSxMAoeuIYL8Yw3j6A8wJthaN8ZboVnrQaTwLPq",
   "CONFIDENTIAL", 1, 2087150261,
   "https://korap.ids-mannheim.de/confidential/redirect", "system",
@@ -19,7 +19,7 @@ VALUES("http://third.party.com/confidential", 1712550103);
 -- plain secret value is "secret"
 INSERT INTO oauth2_client(id,name,secret,type,super,url_id,
   redirect_uri,registered_by, description) 
-VALUES ("9aHsGW6QflV13ixNpez","test non super confidential client",
+VALUES ("9aHsGW6QflV13ixNpez","non super confidential client",
   "$2a$08$vi1FbuN3p6GcI1tSxMAoeuIYL8Yw3j6A8wJthaN8ZboVnrQaTwLPq",
   "CONFIDENTIAL", 0, 1712550103,
   "https://third.party.com/confidential/redirect", "system",

@@ -276,13 +276,6 @@ public class UserGroupController {
             @FormParam("memberUsername") String memberUsername,
             @FormParam("roleIds") List<Integer> roleIds,
             @PathParam("version") String version) {
-        double v = Double.valueOf(version.substring(1, version.length()));
-        if (v < 1.1) {
-            throw kustvaktResponseHandler.throwit(new KustvaktException(
-                    StatusCodes.UNSUPPORTED_API_VERSION,
-                    "Method is not supported in version " + version, version));
-        }
-
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {

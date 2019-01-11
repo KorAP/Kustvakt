@@ -8,6 +8,9 @@
 09/01/2019
    - Added comments (margaretha)
    - Updated code structure (margaretha)
+11/01/2019
+   - Degraded API version to 1.0 (margaretha)
+   - Added OAuth2 client info tests (margaretha)
 
 # version 0.61.4
 14/11/2018

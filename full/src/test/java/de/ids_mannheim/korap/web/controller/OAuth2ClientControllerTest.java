@@ -92,6 +92,33 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     }
 
     @Test
+    public void testRetrieveClientInfo () throws KustvaktException {
+        // public client
+        JsonNode clientInfo = retrieveClientInfo(publicClientId, "system");
+        assertEquals(publicClientId, clientInfo.at("/id").asText());
+        assertEquals("third party client", clientInfo.at("/name").asText());
+        assertNotNull(clientInfo.at("/description"));
+        assertNotNull(clientInfo.at("/redirectURI"));
+        assertEquals("PUBLIC", clientInfo.at("/type").asText());
+
+        // confidential client
+        clientInfo = retrieveClientInfo(confidentialClientId, "system");
+        assertEquals(confidentialClientId, clientInfo.at("/id").asText());
+        assertEquals("non super confidential client", clientInfo.at("/name").asText());
+        assertNotNull(clientInfo.at("/redirectURI"));
+        assertEquals(false,clientInfo.at("/isSuper").asBoolean());
+        assertEquals("CONFIDENTIAL", clientInfo.at("/type").asText());
+        
+        // super client
+        clientInfo = retrieveClientInfo(superClientId, "system");
+        assertEquals(superClientId, clientInfo.at("/id").asText());
+        assertEquals("super confidential client", clientInfo.at("/name").asText());
+        assertNotNull(clientInfo.at("/redirectURI"));
+        assertEquals("CONFIDENTIAL", clientInfo.at("/type").asText());
+        assertTrue(clientInfo.at("/isSuper").asBoolean());
+    }
+    
+    @Test
     public void testRegisterConfidentialClient () throws KustvaktException {
         ClientResponse response = registerConfidentialClient();
         String entity = response.getEntity(String.class);
