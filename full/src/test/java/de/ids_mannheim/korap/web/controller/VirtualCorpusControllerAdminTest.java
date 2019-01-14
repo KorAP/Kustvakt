@@ -73,7 +73,7 @@ public class VirtualCorpusControllerAdminTest extends SpringJerseyTest {
     public void testListDoryVC () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc").path("list")
-                .queryParam("createdBy", "dory")
+                .queryParam("username", "dory")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(admin, "pass"))

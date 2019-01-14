@@ -136,6 +136,7 @@ public class VirtualCorpusController {
     @GET
     @Path("{vcId}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @Deprecated
     public VirtualCorpusDto retrieveVC (
             @Context SecurityContext securityContext,
             @PathParam("vcId") int vcId) {
@@ -151,16 +152,50 @@ public class VirtualCorpusController {
     }
 
     /**
-     * Lists not only private virtual corpora but all virtual corpora
-     * available to a user.
-     * 
-     * Users, except system admins, cannot list virtual corpora of
-     * other users. Thus, createdBy parameter is only relevant for
-     * requests from system admins.
+     * Returns the virtual corpus with the given name and creator.
      * 
      * @param securityContext
      * @param createdBy
-     *            username of virtual corpus creator (optional)
+     *            vc creator
+     * @param vcName
+     *            vc name
+     * @return the virtual corpus with the given name and creator.
+     */
+    @GET
+    @Path("{createdBy}/{vcName}")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public VirtualCorpusDto retrieveVCByName (
+            @Context SecurityContext securityContext,
+            @PathParam("createdBy") String createdBy,
+            @PathParam("vcName") String vcName) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
+            return service.retrieveVCByName(context.getUsername(), vcName,
+                    createdBy);
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+    }
+
+    /**
+     * Lists not only owned virtual corpora but all virtual corpora
+     * available to the authenticated user.
+     *
+     * System-admins can list available vc for a specific user by
+     * specifiying the username parameter.
+     * 
+     * Normal users cannot list virtual corpora
+     * available for other users. Thus, username parameter is optional
+     * and must be identical to the authenticated username.
+     * 
+     * 
+     * 
+     * @param securityContext
+     * @param username
+     *            a username (optional)
      * @return a list of virtual corpora
      */
     @GET
@@ -168,12 +203,13 @@ public class VirtualCorpusController {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<VirtualCorpusDto> listVCByUser (
             @Context SecurityContext securityContext,
-            @QueryParam("createdBy") String createdBy) {
+            @QueryParam("username") String username) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
-            return service.listVCByUser(context.getUsername(), createdBy);
+            return service.listAvailableVCForUser(context.getUsername(),
+                    username);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -248,6 +284,7 @@ public class VirtualCorpusController {
      */
     @DELETE
     @Path("delete/{vcId}")
+    @Deprecated
     public Response deleteVC (@Context SecurityContext securityContext,
             @PathParam("vcId") int vcId) {
         TokenContext context =
@@ -255,6 +292,35 @@ public class VirtualCorpusController {
         try {
             scopeService.verifyScope(context, OAuth2Scope.DELETE_VC);
             service.deleteVC(context.getUsername(), vcId);
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+        return Response.ok().build();
+    }
+
+    /**
+     * Only the VC owner and system admins can delete VC. VCA admins
+     * can delete VC-accesses e.g. of project VC, but not the VC
+     * themselves.
+     * 
+     * @param securityContext
+     * @param createdBy
+     *            vc creator
+     * @param vcName
+     *            vc name
+     * @return HTTP status 200, if successful
+     */
+    @DELETE
+    @Path("{createdBy}/{vcName}")
+    public Response deleteVCByName (@Context SecurityContext securityContext,
+            @PathParam("createdBy") String createdBy,
+            @PathParam("vcName") String vcName) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            scopeService.verifyScope(context, OAuth2Scope.DELETE_VC);
+            service.deleteVCByName(context.getUsername(), vcName, createdBy);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
