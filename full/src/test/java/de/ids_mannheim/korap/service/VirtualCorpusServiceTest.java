@@ -42,7 +42,7 @@ public class VirtualCorpusServiceTest {
         vc.setCorpusQuery("corpusSigle=GOE");
         vc.setName("dory VC");
         vc.setType(VirtualCorpusType.PRIVATE);
-        vcService.storeVC(vc, "dory");
+        vcService.storeVC(vc, vc.getName(), "dory");
     }
 
     @Test
@@ -53,7 +53,7 @@ public class VirtualCorpusServiceTest {
         vc.setCorpusQuery("corpusSigle=GOE");
         vc.setName("new published vc");
         vc.setType(VirtualCorpusType.PUBLISHED);
-        int vcId = vcService.storeVC(vc, "VirtualCorpusServiceTest");
+        int vcId = vcService.storeVC(vc,vc.getName(), "VirtualCorpusServiceTest");
 
         List<VirtualCorpusAccess> accesses =
                 vcService.retrieveAllVCAccess(vcId);

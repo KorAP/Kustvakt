@@ -7,6 +7,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -78,6 +79,7 @@ public class VirtualCorpusController {
     @POST
     @Path("create")
     @Consumes("application/json")
+    @Deprecated
     public Response createVC (@Context SecurityContext securityContext,
             VirtualCorpusJson vc) {
         try {
@@ -86,7 +88,7 @@ public class VirtualCorpusController {
                     (TokenContext) securityContext.getUserPrincipal();
 
             scopeService.verifyScope(context, OAuth2Scope.CREATE_VC);
-            service.storeVC(vc, context.getUsername());
+            service.storeVC(vc, vc.getName(), context.getUsername());
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -110,6 +112,7 @@ public class VirtualCorpusController {
     @POST
     @Path("edit")
     @Consumes("application/json")
+    @Deprecated
     public Response editVC (@Context SecurityContext securityContext,
             VirtualCorpusJson vc) throws KustvaktException {
         TokenContext context =
@@ -118,6 +121,27 @@ public class VirtualCorpusController {
         try {
             scopeService.verifyScope(context, OAuth2Scope.EDIT_VC);
             service.editVC(vc, context.getUsername());
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+        return Response.ok().build();
+    }
+
+    // EM: changing vc name is disabled
+    @PUT
+    @Path("/{vcCreator}/{vcName}")
+    @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public Response editVC (@Context SecurityContext securityContext,
+            @PathParam("vcCreator") String vcCreator,
+            @PathParam("vcName") String vcName,
+            VirtualCorpusJson vc) throws KustvaktException {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+
+        try {
+            scopeService.verifyScope(context, OAuth2Scope.EDIT_VC);
+            service.handlePutRequest(context.getUsername(),vcCreator, vcName, vc);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -181,8 +205,7 @@ public class VirtualCorpusController {
     }
 
     /**
-     * Lists not only owned virtual corpora but all virtual corpora
-     * available to the authenticated user.
+     * Lists all virtual corpora available to the authenticated user.
      *
      * System-admins can list available vc for a specific user by
      * specifiying the username parameter.
@@ -201,7 +224,16 @@ public class VirtualCorpusController {
     @GET
     @Path("list")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @Deprecated
     public List<VirtualCorpusDto> listVCByUser (
+            @Context SecurityContext securityContext,
+            @QueryParam("username") String username) {
+        return listAvailableVC(securityContext, username);
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public List<VirtualCorpusDto> listAvailableVC (
             @Context SecurityContext securityContext,
             @QueryParam("username") String username) {
         TokenContext context =
@@ -216,6 +248,8 @@ public class VirtualCorpusController {
         }
     }
 
+    // EM: TODO: change path to @Path("{createdBy}"), currently
+    // conflicted with /{vcId}
     /**
      * Lists all virtual corpora created by a user
      * 
@@ -328,6 +362,7 @@ public class VirtualCorpusController {
         return Response.ok().build();
     }
 
+    // EM: TODO: replace vcId with vcCreator and vcUsername
     /**
      * VC can only be shared with a group, not individuals.
      * Only VCA admins are allowed to share VC and the VC must have
@@ -373,7 +408,16 @@ public class VirtualCorpusController {
      */
     @DELETE
     @Path("access/delete/{accessId}")
+    @Deprecated
     public Response deleteVCAccess (@Context SecurityContext securityContext,
+            @PathParam("accessId") int accessId) {
+        return deleteVCAccessById(securityContext, accessId);
+    }
+
+    @DELETE
+    @Path("access/{accessId}")
+    public Response deleteVCAccessById (
+            @Context SecurityContext securityContext,
             @PathParam("accessId") int accessId) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
@@ -405,6 +449,7 @@ public class VirtualCorpusController {
     @GET
     @Path("access/list")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @Deprecated
     public List<VirtualCorpusAccessDto> listVCAccess (
             @Context SecurityContext securityContext,
             @QueryParam("vcId") int vcId) {
@@ -413,6 +458,45 @@ public class VirtualCorpusController {
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_ACCESS_INFO);
             return service.listVCAccessByVC(context.getUsername(), vcId);
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+    }
+
+    /**
+     * Lists active VC-accesses available to a given VC or user-group.
+     * 
+     * Only available to VCA and system admins.
+     * For system admins, list all VCA for the group.
+     * 
+     * @param securityContext
+     * @param vcCreator
+     *            the username of a VC creator
+     * @param vcName
+     *            the name of a VC
+     * @param groupId
+     *            a group id number
+     * @return
+     */
+    @GET
+    @Path("access")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public List<VirtualCorpusAccessDto> listVCAccesses (
+            @Context SecurityContext securityContext,
+            @QueryParam("vcCreator") String vcCreator,
+            @QueryParam("vcName") String vcName,
+            @QueryParam("groupId") int groupId) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            scopeService.verifyScope(context, OAuth2Scope.VC_ACCESS_INFO);
+            if (groupId > 0) {
+                return service.listVCAccessByGroup(context.getUsername(),
+                        groupId);
+            }
+            return service.listVCAccessByVC(context.getUsername(), vcCreator,
+                    vcName);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -435,6 +519,7 @@ public class VirtualCorpusController {
     @GET
     @Path("access/list/byGroup")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @Deprecated
     public List<VirtualCorpusAccessDto> listVCAccessByGroup (
             @Context SecurityContext securityContext,
             @QueryParam("groupId") int groupId) {

@@ -75,7 +75,7 @@ public class VirtualCorpusDao {
     public void editVirtualCorpus (VirtualCorpus vc, String name,
             VirtualCorpusType type, CorpusAccess requiredAccess,
             String koralQuery, String definition, String description,
-            String status) throws KustvaktException {
+            String status, boolean isCached) throws KustvaktException {
 
         if (name != null && !name.isEmpty()) {
             vc.setName(name);
@@ -98,6 +98,7 @@ public class VirtualCorpusDao {
         if (status != null && !status.isEmpty()) {
             vc.setStatus(status);
         }
+        vc.setCached(isCached);
         entityManager.merge(vc);
     }
 
@@ -207,11 +208,14 @@ public class VirtualCorpusDao {
             vc = (VirtualCorpus) q.getSingleResult();
         }
         catch (NoResultException e) {
-            String vcCode = createdBy + "/" + vcName;
-            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                    "No result found for query: retrieve virtual corpus by name "
-                            + vcCode,
-                    String.valueOf(vcCode), e);
+            return null;
+            // String vcCode = createdBy + "/" + vcName;
+            // throw new
+            // KustvaktException(StatusCodes.NO_RESULT_FOUND,
+            // "No result found for query: retrieve virtual corpus by
+            // name "
+            // + vcCode,
+            // String.valueOf(vcCode), e);
         }
         catch (NonUniqueResultException e) {
             String vcCode = createdBy + "/" + vcName;

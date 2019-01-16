@@ -256,7 +256,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     public void testListVCByOtherUser () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
-                .path("list").queryParam("createdBy", "dory")
+                .path("list").queryParam("username", "dory")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("pearl", "pass"))

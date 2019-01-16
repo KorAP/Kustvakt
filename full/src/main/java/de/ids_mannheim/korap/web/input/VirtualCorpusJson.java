@@ -2,7 +2,6 @@ package de.ids_mannheim.korap.web.input;
 
 
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.service.VirtualCorpusService;
 import de.ids_mannheim.korap.web.controller.VirtualCorpusController;
 import lombok.Getter;
@@ -18,25 +17,21 @@ import lombok.Setter;
 @Getter
 @Setter
 public class VirtualCorpusJson {
-
+    // required
+    private boolean isCached;
+    
     // required in creating VCs
+    @Deprecated
     private String name;
     private VirtualCorpusType type;
     private String corpusQuery;
     
     // required in editing VCs
+    @Deprecated
     private int id;
     
     // optional
     private String definition;
     private String description;
     private String status;
-    private boolean isCached;
-
-
-    public void setCorpusQuery (String corpusQuery)
-            throws KustvaktException {
-        
-        this.corpusQuery = corpusQuery;
-    }
 }

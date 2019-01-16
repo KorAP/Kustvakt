@@ -13,6 +13,10 @@
    - Added OAuth2 client info tests (margaretha)
 14/01/2019
    - Added retrieveVCByName and deleteVCByName controllers (margaretha)
+16/01/2019
+   - Added a PUT request for both creating and editing vc (margaretha)
+   - Added aliases to some VC controllers (margaretha)
+   - Merged VC access list controllers (margaretha)  
 
 # version 0.61.4
 14/11/2018
