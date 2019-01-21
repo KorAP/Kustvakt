@@ -76,9 +76,6 @@ public abstract class AuthenticationManager extends KustvaktCacheable {
 
     public abstract void lockAccount (User user) throws KustvaktException;
 
-    public abstract User createUserAccount (Map<String, Object> attributes,
-            boolean confirmation_required) throws KustvaktException;
-
     public abstract boolean deleteAccount (User user) throws KustvaktException;
 
     public abstract <T extends Userdata> T getUserData (User user,
@@ -86,15 +83,6 @@ public abstract class AuthenticationManager extends KustvaktCacheable {
 
     public abstract void updateUserData (Userdata data)
             throws KustvaktException;
-
-    public abstract Object[] validateResetPasswordRequest (String username,
-            String email) throws KustvaktException;
-
-    public abstract void resetPassword (String uriFragment, String username,
-            String newPassphrase) throws KustvaktException;
-
-    public abstract void confirmRegistration (String uriFragment,
-            String username) throws KustvaktException;
 
     public String providerList () {
         return "provider list: " + this.providers.toString();

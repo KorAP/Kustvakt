@@ -99,15 +99,15 @@ public class TestHelper {
         Map m = getUserCredentials();
         assertNotNull("userdatabase handler must not be null", dao);
 
-        try {
-            manager.createUserAccount(m, false);
-        }
-        catch (KustvaktException e) {
-            throw new RuntimeException(e);
-            /*// do nothing
-            jlog.error("Error: {}", e.string());
-            assertNotNull("Test user could not be set up", null);*/
-        }
+//        try {
+//            manager.createUserAccount(m, false);
+//        }
+//        catch (KustvaktException e) {
+//            throw new RuntimeException(e);
+//            /*// do nothing
+//            jlog.error("Error: {}", e.string());
+//            assertNotNull("Test user could not be set up", null);*/
+//        }
         assertNotEquals(0, dao.size());
         return this;
     }

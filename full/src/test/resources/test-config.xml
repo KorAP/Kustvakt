@@ -282,10 +282,6 @@
 		<ref bean="userdata_settings" />
 	</util:list>
 
-	<util:list id="kustvakt_resources"
-		value-type="de.ids_mannheim.korap.interfaces.db.ResourceOperationIface">
-	</util:list>
-
 	<!-- specify type for constructor argument -->
 	<bean id="authenticationManager"
 		class="de.ids_mannheim.korap.authentication.KustvaktAuthenticationManager">

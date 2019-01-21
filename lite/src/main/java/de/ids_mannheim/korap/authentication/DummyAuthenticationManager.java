@@ -84,13 +84,6 @@ public class DummyAuthenticationManager extends AuthenticationManager {
     }
 
     @Override
-    public User createUserAccount (Map<String, Object> attributes,
-            boolean confirmation_required) throws KustvaktException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public boolean deleteAccount (User user) throws KustvaktException {
         // TODO Auto-generated method stub
         return false;
@@ -105,27 +98,6 @@ public class DummyAuthenticationManager extends AuthenticationManager {
 
     @Override
     public void updateUserData (Userdata data) throws KustvaktException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public Object[] validateResetPasswordRequest (String username, String email)
-            throws KustvaktException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void resetPassword (String uriFragment, String username,
-            String newPassphrase) throws KustvaktException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void confirmRegistration (String uriFragment, String username)
-            throws KustvaktException {
         // TODO Auto-generated method stub
 
     }

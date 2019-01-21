@@ -1,24 +1,26 @@
 package de.ids_mannheim.korap.user;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.ValidatorIface;
-import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
-import de.ids_mannheim.korap.utils.JsonUtils;
 
-import java.io.IOException;
-import java.util.*;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.interfaces.ValidatorIface;
+import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
  * @author hanl
  * @date 27/01/2016
  */
 public abstract class DataFactory {
-
-    private static final Map<Class<? extends Userdata>, UserDataDbIface> instances = new HashMap<>();
 
     private static DataFactory factory;
 

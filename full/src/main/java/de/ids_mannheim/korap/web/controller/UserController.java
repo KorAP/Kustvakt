@@ -2,7 +2,6 @@ package de.ids_mannheim.korap.web.controller;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -13,17 +12,14 @@ import java.util.Set;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.logging.log4j.LogManager;
@@ -32,16 +28,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.Scopes;
-import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.User;
@@ -51,7 +43,6 @@ import de.ids_mannheim.korap.user.UserSettings;
 import de.ids_mannheim.korap.user.Userdata;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
-import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
@@ -59,14 +50,12 @@ import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 
-/** Some of the APIs are not applicable due to changes in DB, 
- * i.e. users are not saved in the DB.
+/** 
  * 
  * @author hanl, margaretha
- * @lastUpdate 11/2017
  */
 @Controller
-@Path("v0.1/user")
+@Path("{version}/user")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 @ResourceFilters({APIVersionFilter.class, PiwikFilter.class })
 public class UserController {
@@ -80,64 +69,7 @@ public class UserController {
 
     private @Context UriInfo info;
 
-
-    // fixme: json contains password in clear text. Encrypt request?
-    // EM: no encryption is needed for communications over https. 
-    // It should not be necessary in IDS internal network. 
-
-    @Deprecated
-    // fixme: should also collect service exception, not just db exception!
-    @POST
-    @Path("register")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response signUp (
-            @HeaderParam(ContainerRequest.USER_AGENT) String agent,
-            @HeaderParam(ContainerRequest.HOST) String host,
-            @Context Locale locale, Map values) {
-
-        values.put(Attributes.HOST, host);
-        values.put(Attributes.USER_AGENT, agent);
-        UriBuilder uriBuilder;
-        User user;
-        try {
-            uriBuilder = info.getBaseUriBuilder();
-            uriBuilder.path("user").path("confirm");
-            user = controller.createUserAccount(values, true);
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
-        URIParam uri = user.getField(URIParam.class);
-        if (uri.hasValues()) {
-            uriBuilder
-                    .queryParam(Attributes.QUERY_PARAM_URI,
-                            uri.getUriFragment())
-                    .queryParam(Attributes.QUERY_PARAM_USER,
-                            user.getUsername());
-            jlog.info("registration was successful for user "+
-                    user.getUsername());
-            Map<String, Object> object = new HashMap<String, Object>();
-            object.put("confirm_uri", uriBuilder.build());
-            object.put("uri_expiration",
-                    TimeUtils.format(uri.getUriExpiration()));
-            try {
-                return Response.ok(JsonUtils.toJSON(object)).build();
-            }
-            catch (KustvaktException e) {
-                throw kustvaktResponseHandler.throwit(e);
-            }
-        }
-        else {
-            jlog.error("Failed creating confirmation and expiry tokens.");
-            // EM: why illegal argument when uri fragment/param is self-generated 
-            throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
-                    "failed to validate uri parameter",
-                    "confirmation fragment");
-        }
-
-    }
-
-    @Deprecated
+    // EM: may be used for managing shib users
     //todo: password update in special function? --> password reset only!
     @POST
     @Path("update")
@@ -162,107 +94,7 @@ public class UserController {
         }
         return Response.ok().build();
     }
-
-    @Deprecated
-    @GET
-    @Path("confirm")
-    @Produces(MediaType.TEXT_HTML)
-    public Response confirmRegistration (@QueryParam("uri") String uritoken,
-            @Context Locale locale, @QueryParam("user") String username) {
-        if (uritoken == null || uritoken.isEmpty())
-            throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
-                    "parameter missing", "uri parameter");
-        if (username == null || username.isEmpty())
-            throw kustvaktResponseHandler.throwit(StatusCodes.ILLEGAL_ARGUMENT,
-                    "parameter missing", "Username");
-
-        try {
-            controller.confirmRegistration(uritoken, username);
-        }
-        catch (KustvaktException e) {
-            e.printStackTrace();
-            throw kustvaktResponseHandler.throwit(e);
-        }
-        return Response.ok().build();
-    }
-
-    @Deprecated
-    // todo: auditing!
-    @POST
-    @Path("requestReset")
-    @Produces(MediaType.TEXT_HTML)
-    @Consumes({ MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_FORM_URLENCODED })
-    public Response requestPasswordReset (@Context Locale locale, String json) {
-        JsonNode node;
-        try {
-            node = JsonUtils.readTree(json);
-        }
-        catch (KustvaktException e1) {
-            throw kustvaktResponseHandler.throwit(e1);
-        }
-        StringBuilder builder = new StringBuilder();
-        String username, email;
-        username = node.path(Attributes.USERNAME).asText();
-        email = node.path(Attributes.EMAIL).asText();
-
-        // deprecated --> depends on the client!
-        //        String url = config.getMailProperties()
-        //                .getProperty("korap.frontend.url", "");
-        //        if (url.isEmpty())
-        //            return Response.ok("URLException: Missing source URL").build();
-
-        //        URIUtils utils = new URIUtils(info);
-        // may inject the actual REST url in a redirect request?!
-        //        UriBuilder uriBuilder = UriBuilder.fromUri(url).fragment("reset");
-        Object[] objects;
-        try {
-            builder.append("?");
-            // just append the endpint fragment plus the query parameter.
-            // the address by which the data is handled depends on the frontend
-            objects = controller.validateResetPasswordRequest(username, email);
-            builder.append(Attributes.QUERY_PARAM_URI).append("=")
-                    .append(objects[0]);
-            builder.append(Attributes.QUERY_PARAM_USER).append("=")
-                    .append(username);
-        }
-        catch (KustvaktException e) {
-            jlog.error("Eoxception encountered! "+ e.string());
-            throw kustvaktResponseHandler.throwit(e);
-        }
-
-        ObjectNode obj = JsonUtils.createObjectNode();
-        obj.put(Attributes.URI, builder.toString());
-        obj.put(Attributes.URI_EXPIRATION, objects[1].toString());
-        try {
-            return Response.ok(JsonUtils.toJSON(obj)).build();
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
-    }
-
-    @Deprecated
-    @POST
-    @Path("reset")
-    @Produces(MediaType.TEXT_HTML)
-    @Consumes({ MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_FORM_URLENCODED })
-    public Response resetPassword (
-            @QueryParam(Attributes.QUERY_PARAM_URI) String uri,
-            @QueryParam(Attributes.QUERY_PARAM_USER) String username,
-            @Context HttpHeaders headers, String passphrase) {
-        try {
-            controller.resetPassword(uri, username, passphrase);
-        }
-        catch (KustvaktException e) {
-            jlog.error("Exception encountered!", e);
-            return Response.notModified().build();
-        }
-        return Response.ok().build();
-    }
-
-
+    
     // todo: refactor and make something out of if --> needs to give some sort of feedback!
     @GET
     @Path("info")
@@ -346,7 +178,6 @@ public class UserController {
         return Response.ok().build();
     }
 
-
     @GET
     @Path("details")
     @ResourceFilters({ AuthenticationFilter.class, DemoUserFilter.class,
@@ -372,6 +203,7 @@ public class UserController {
     }
 
 
+    // EM: may be used for managing shib users
     @POST
     @Path("details")
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -463,7 +295,7 @@ public class UserController {
         }
     }
 
-    @Deprecated
+    // EM: may be used for managing shib users
     @DELETE
     @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
             BlockingFilter.class })
