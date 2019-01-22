@@ -3,7 +3,7 @@ package de.ids_mannheim.korap.user;
 import de.ids_mannheim.korap.config.Attributes;
 
 /**
- * @author hanl
+ * @author hanl, margaretha
  * @date 28/01/2016
  */
 public class UserSettings extends Userdata {
@@ -12,10 +12,15 @@ public class UserSettings extends Userdata {
 
     }
 
+    @Deprecated
     public UserSettings(Integer userid) {
         super(userid);
     }
 
+    // EM: added
+    public UserSettings(String username) {
+        super(username);
+    }
 
     @Override
     public String[] requiredFields () {

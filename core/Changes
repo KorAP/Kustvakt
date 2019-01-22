@@ -12,6 +12,11 @@
    - Added comments (margaretha)
    - Updated code structure (margaretha)
    - Removed spring security libraries and ManagerInterface (margaretha)
+21/01/2019
+   - Removed codes related to user registration & password management (margaretha)  
+22/01/2019
+   - Added create, edit, retrieve user default setting controllers (margaretha)
+
 
 version 0.61.4
 14/11/2018

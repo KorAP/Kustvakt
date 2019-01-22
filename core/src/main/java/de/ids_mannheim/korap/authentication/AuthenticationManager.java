@@ -78,9 +78,11 @@ public abstract class AuthenticationManager extends KustvaktCacheable {
 
     public abstract boolean deleteAccount (User user) throws KustvaktException;
 
+    @Deprecated
     public abstract <T extends Userdata> T getUserData (User user,
             Class<T> clazz) throws KustvaktException;
 
+    @Deprecated
     public abstract void updateUserData (Userdata data)
             throws KustvaktException;
 

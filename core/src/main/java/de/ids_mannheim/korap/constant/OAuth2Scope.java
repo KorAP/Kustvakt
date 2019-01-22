@@ -42,7 +42,10 @@ public enum OAuth2Scope {
     
     SHARE_VC, 
     DELETE_VC_ACCESS, 
-    VC_ACCESS_INFO;
+    VC_ACCESS_INFO, 
+    
+    CREATE_DEFAULT_SETTING, 
+    SETTING_INFO;
 
     @Override
     public String toString () {

@@ -17,16 +17,14 @@ import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
- * @author hanl
+ * @author hanl, margaretha
  * @date 27/01/2016
  */
 public abstract class DataFactory {
 
     private static DataFactory factory;
 
-
     private DataFactory () {}
-
 
     public static DataFactory getFactory () {
         if (factory == null)
@@ -116,7 +114,7 @@ public abstract class DataFactory {
         public Set<String> keys (Object data) {
             Set<String> keys = new HashSet<>();
             if (checkDataType(data) && ((JsonNode) data).isObject()) {
-                Iterator it = ((JsonNode) data).fieldNames();
+                Iterator<String> it = ((JsonNode) data).fieldNames();
                 while (it.hasNext())
                     keys.add((String) it.next());
             }
@@ -133,7 +131,8 @@ public abstract class DataFactory {
         public Object validate(Object data, ValidatorIface validator) throws KustvaktException {
             if (checkDataType(data) && ((JsonNode) data).isObject()) {
                 try {
-                    Map mdata = JsonUtils.read(toStringValue(data), HashMap.class);
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> mdata = JsonUtils.read(toStringValue(data), HashMap.class);
                     return validator.validateMap(mdata);
                 } catch (IOException e) {
                     // do nothing
@@ -182,7 +181,16 @@ public abstract class DataFactory {
                     if (value instanceof Integer)
                         node.put(field, (Integer) value);
                     if (value instanceof JsonNode)
-                        node.put(field, (JsonNode) value);
+                        node.set(field, (JsonNode) value);
+                    // EM: added
+                    if (value instanceof Collection<?>){
+                        Collection<?> list = (Collection<?>) value;
+                        ArrayNode arrayNode = JsonUtils.createArrayNode();
+                        for (Object o : list){
+                            addValue(arrayNode, null, o);
+                        }
+                        node.set(field,arrayNode);
+                    }
                     return true;
                 }
                 else if (((JsonNode) data).isArray()) {
@@ -241,7 +249,7 @@ public abstract class DataFactory {
             if (checkDataType(data1) && checkDataType(data2)) {
                 if (((JsonNode) data1).isObject()
                         && ((JsonNode) data2).isObject()) {
-                    ((ObjectNode) data1).putAll((ObjectNode) data2);
+                    ((ObjectNode) data1).setAll((ObjectNode) data2);
                 }
                 else if (((JsonNode) data1).isArray()
                         && ((JsonNode) data2).isArray()) {

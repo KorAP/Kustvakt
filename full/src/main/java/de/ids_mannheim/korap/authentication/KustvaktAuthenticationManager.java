@@ -621,7 +621,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		entHandler.updateAccount(u);
 	}
 
-		// todo:
+	@Deprecated	// todo:
 	private ShibbolethUser createShibbUserAccount(Map<String, Object> attributes) throws KustvaktException {
         if (DEBUG) {
             jlog.debug("creating shibboleth user account for user attr: "
@@ -746,6 +746,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 	}
 
 	// EM: not in the new DB
+	@Deprecated
 	@Override
 	public <T extends Userdata> T getUserData(User user, Class<T> clazz) throws WrappedException {
 		try {
@@ -765,6 +766,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		}
 	}
 
+	@Deprecated
 	// todo: cache userdata outside of the user object!
 	@Override
 	public void updateUserData(Userdata data) throws WrappedException {

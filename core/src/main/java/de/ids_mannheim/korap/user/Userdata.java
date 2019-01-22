@@ -10,44 +10,58 @@ import lombok.Setter;
 import java.util.*;
 
 /**
- * @author hanl
+ * @author hanl, margaretha
  * @date 22/01/2016
+ * 
  */
 public abstract class Userdata {
 
+    public static DataFactory dataFactory = DataFactory.getFactory();
+    
     @Getter
     @Setter
     private Integer id;
     @Getter(AccessLevel.PRIVATE)
-    @Setter(AccessLevel.PRIVATE)
     private Object data;
     @Getter
     @Setter
     private Integer userId;
-
-
+    
+    // EM: new
+    @Getter
+    @Setter
+    private String username;
+    
     public Userdata () {
         this(-1);
     }
 
+    // EM: replace with username
+    @Deprecated
     public Userdata(Integer userid) {
         this.userId = userid;
         this.id = -1;
-        this.data = DataFactory.getFactory().convertData(null);
+        this.data = dataFactory.convertData(null);
     }
 
+    // EM: new
+    public Userdata (String username) {
+        this.username = username;
+        this.id = -1;
+        this.data = dataFactory.convertData(null);
+    }
 
     public int size () {
-        return DataFactory.getFactory().size(this.data);
+        return dataFactory.size(this.data);
     }
 
 
     public Object get (String key) {
-        return DataFactory.getFactory().getValue(this.data, key);
+        return dataFactory.getValue(this.data, key);
     }
 
     public Object filter(String ... keys) {
-        return DataFactory.getFactory().filter(this.data, keys);
+        return dataFactory.filter(this.data, keys);
     }
 
 
@@ -56,13 +70,13 @@ public abstract class Userdata {
      * @return
      */
     public boolean isValid () {
-        return missing().length == 0;
+        return findMissingFields().length == 0;
     }
 
 
-    public String[] missing () {
+    public String[] findMissingFields () {
         Set<String> missing = new HashSet<>();
-        Set<String> keys = DataFactory.getFactory().keys(this.data);
+        Set<String> keys = dataFactory.keys(this.data);
         for (String key : requiredFields()) {
             if (!keys.contains(key))
                 missing.add(key);
@@ -72,8 +86,8 @@ public abstract class Userdata {
 
 
     public void checkRequired () throws KustvaktException {
-        String[] fields = missing();
-        if (missing().length != 0) {
+        String[] fields = findMissingFields();
+        if (findMissingFields().length != 0) {
             throw new KustvaktException(userId, StatusCodes.MISSING_PARAMETER,
                     "User data object not valid. Object has missing fields!",
                     Arrays.asList(fields).toString());
@@ -83,40 +97,41 @@ public abstract class Userdata {
 
     //fixme: if data array, return empty?!
     public Set<String> keys () {
-        return DataFactory.getFactory().keys(this.data);
+        return dataFactory.keys(this.data);
     }
 
 
     public Collection<Object> values () {
-        return DataFactory.getFactory().values(this.data);
+        return dataFactory.values(this.data);
     }
 
 
     public void setData (String data) {
-        this.data = DataFactory.getFactory().convertData(data);
+        this.data = dataFactory.convertData(data);
     }
 
 
     public void update (Userdata other) {
         if (other != null && this.getClass().equals(other.getClass()))
-            this.data = DataFactory.getFactory().merge(this.data, other.data);
+            this.data = dataFactory.merge(this.data, other.data);
     }
 
 
     public String serialize () throws KustvaktException {
         // to have consistency with required fields --> updates/deletion may cause required fields to be missing.
         this.checkRequired();
-        return DataFactory.getFactory().toStringValue(this.data);
+        return dataFactory.toStringValue(this.data);
     }
 
 
     public void setField (String key, Object value) {
-        DataFactory.getFactory().addValue(this.data, key, value);
+        dataFactory.addValue(this.data, key, value);
     }
 
+    // EM: not reliable
     // todo: test
     public void validate (ValidatorIface validator) throws KustvaktException {
-        DataFactory.getFactory().validate(this.data, validator);
+        dataFactory.validate(this.data, validator);
     }
 
 
@@ -128,17 +143,19 @@ public abstract class Userdata {
 
 
     public void readQuietly (Map<String, Object> map, boolean defaults_only) {
-        if (defaults_only) {
-            for (String k : defaultFields()) {
-                Object o = map.get(k);
-                if (o != null) {
-                    DataFactory.getFactory().addValue(this.data, k, o);
+        if (map != null){
+            if (defaults_only) {
+                for (String k : defaultFields()) {
+                    Object o = map.get(k);
+                    if (o != null) {
+                        dataFactory.addValue(this.data, k, o);
+                    }
                 }
             }
-        }
-        else {
-            for (String key : map.keySet())
-                DataFactory.getFactory().addValue(this.data, key, map.get(key));
+            else {
+                for (String key : map.keySet())
+                    dataFactory.addValue(this.data, key, map.get(key));
+            }
         }
     }
 
