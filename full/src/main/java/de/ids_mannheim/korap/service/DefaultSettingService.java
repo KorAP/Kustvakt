@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.service;
 
 import java.util.Map;
 
+import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,29 +19,37 @@ public class DefaultSettingService {
     @Autowired
     private DefaultSettingDao settingDao;
 
-    public void handlePutRequest (String username,
-            Map<String, Object> form, String authenticatedUser)
+    private void verifiyUsername (String username, String authenticatedUser)
             throws KustvaktException {
         if (!username.equals(authenticatedUser)) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "Username verification failed. Path parameter username "
-                            + "must be the same as the authenticated username.");
+                            + "must be the same as the authenticated username.",
+                    username);
         }
-        else if (form == null || form.isEmpty()) {
+    }
+
+    public int handlePutRequest (String username, Map<String, Object> map,
+            String authenticatedUser) throws KustvaktException {
+        verifiyUsername(username, authenticatedUser);
+
+        if (map == null || map.isEmpty()) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "Entity body is empty. No settings are given.");
         }
 
         Userdata userdata = new UserSettings(username);
-        userdata.readQuietly(form, false);
+        userdata.readQuietly(map, false);
 
         DefaultSetting defaultSetting =
                 settingDao.retrieveDefautlSetting(username);
         if (defaultSetting == null) {
             createDefaultSetting(username, userdata);
+            return HttpStatus.SC_CREATED;
         }
         else {
             updateDefaultSetting(defaultSetting, userdata);
+            return HttpStatus.SC_OK;
         }
     }
 
@@ -61,8 +70,11 @@ public class DefaultSettingService {
         settingDao.updateDefaultSetting(setting);
     }
 
-    public String retrieveDefaultSettings (String username)
-            throws KustvaktException {
+    public String retrieveDefaultSettings (String username,
+            String authenticatedUser) throws KustvaktException {
+
+        verifiyUsername(username, authenticatedUser);
+
         DefaultSetting defaultSetting =
                 settingDao.retrieveDefautlSetting(username);
         return defaultSetting.getSettings();

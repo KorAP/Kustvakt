@@ -34,7 +34,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
  *
  */
 @Controller
-@Path("{version}/user")
+@Path("{version}/{username: ~[a-zA-Z0-9_]+}")
 @ResourceFilters({ AuthenticationFilter.class, APIVersionFilter.class,
         PiwikFilter.class })
 public class UserController {
@@ -47,40 +47,41 @@ public class UserController {
     private OAuth2ScopeService scopeService;
 
     @PUT
-    @Path("settings/{username}")
+    @Path("setting")
     @Consumes(MediaType.APPLICATION_JSON)
     @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
             BlockingFilter.class })
     public Response createDefaultSetting (@Context SecurityContext context,
-            @PathParam("username") String username,
-            Map<String, Object> form) {
+            @PathParam("username") String username, Map<String, Object> map) {
 
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
         try {
             scopeService.verifyScope(tokenContext,
                     OAuth2Scope.CREATE_DEFAULT_SETTING);
-            settingService.handlePutRequest(username, form,
+            int statusCode = settingService.handlePutRequest(username, map,
                     tokenContext.getUsername());
+            return Response.status(statusCode).build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
-        return Response.ok().build();
+
     }
 
     @GET
-    @Path("settings")
+    @Path("setting")
     @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
             BlockingFilter.class })
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response createDefaultSetting (@Context SecurityContext context) {
+    public Response retrieveDefaultSetting (@Context SecurityContext context,
+            @PathParam("username") String username) {
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
 
         try {
             scopeService.verifyScope(tokenContext,
                     OAuth2Scope.CREATE_DEFAULT_SETTING);
-            String settings = settingService
-                    .retrieveDefaultSettings(tokenContext.getUsername());
+            String settings = settingService.retrieveDefaultSettings(username,
+                    tokenContext.getUsername());
             return Response.ok(settings).build();
         }
         catch (KustvaktException e) {

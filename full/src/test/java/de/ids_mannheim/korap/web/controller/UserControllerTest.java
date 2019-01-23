@@ -18,6 +18,7 @@ import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
@@ -26,15 +27,16 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  */
 public class UserControllerTest extends SpringJerseyTest {
 
-    private String username = "UserControllerTest";
+    private String username = "~UserControllerTest";
+    private String username2 = "~UserControllerTest2";
 
-    private ClientResponse sendPutRequest (Map<String, Object> form)
-            throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("user")
-                .path("settings").path(username)
+    private ClientResponse sendPutRequest (String username,
+            Map<String, Object> map) throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION)
+                .path(username).path("setting")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
-                .type(MediaType.APPLICATION_JSON).entity(form)
+                .type(MediaType.APPLICATION_JSON).entity(map)
                 .put(ClientResponse.class);
 
         return response;
@@ -45,52 +47,85 @@ public class UserControllerTest extends SpringJerseyTest {
         String json = "{\"foundry\":\"opennlp\",\"metadata\":\"author title "
                 + "textSigle availability\",\"resultPerPage\":25}";
 
-        ClientResponse response = resource().path(API_VERSION).path("user")
-                .path("settings").path(username)
+        ClientResponse response = resource().path(API_VERSION)
+                .path(username).path("setting")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .type(MediaType.APPLICATION_JSON).entity(json)
                 .put(ClientResponse.class);
 
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
-        testRetrieveSettings("opennlp", 25,
+        testRetrieveSettings(username, "opennlp", 25,
                 "author title textSigle availability");
     }
 
     @Test
-    public void testCreateSettingWithForm () throws KustvaktException {
-        Map<String, Object> form = new HashMap<>();
-        form.put("foundry", "opennlp");
-        form.put("resultPerPage", 25);
-        form.put("metadata", "author title textSigle availability");
+    public void testCreateSettingWithMap () throws KustvaktException {
+        Map<String, Object> map = new HashMap<>();
+        map.put("foundry", "opennlp");
+        map.put("resultPerPage", 25);
+        map.put("metadata", "author title textSigle availability");
 
-        ClientResponse response = sendPutRequest(form);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        ClientResponse response = sendPutRequest(username2, map);
+        assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
-        testRetrieveSettings("opennlp", 25,
+        testRetrieveSettings(username2, "opennlp", 25,
                 "author title textSigle availability");
 
-        testUpdateSetting();
+        testUpdateSetting(username2);
     }
 
-    private void testUpdateSetting () throws KustvaktException {
-        Map<String, Object> form = new HashMap<>();
-        form.put("foundry", "malt");
-        form.put("resultPerPage", 15);
-        form.put("metadata", "author title");
+    @Test
+    public void testPutDifferentUsername () throws KustvaktException {
+        String json = "{\"foundry\":\"opennlp\",\"metadata\":\"author title "
+                + "textSigle availability\",\"resultPerPage\":25}";
 
-        ClientResponse response = sendPutRequest(form);
+        ClientResponse response = resource().path(API_VERSION)
+                .path(username).path("setting")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username2, "pass"))
+                .type(MediaType.APPLICATION_JSON).entity(json)
+                .put(ClientResponse.class);
+
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.INVALID_ARGUMENT,
+                node.at("/errors/0/0").asInt());
+    }
+
+    @Test
+    public void testGetDifferentUsername () throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION)
+                .path(username).path("setting")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username2, "pass"))
+                .get(ClientResponse.class);
+
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.INVALID_ARGUMENT,
+                node.at("/errors/0/0").asInt());
+    }
+
+    private void testUpdateSetting (String username) throws KustvaktException {
+        Map<String, Object> map = new HashMap<>();
+        map.put("foundry", "malt");
+        map.put("resultPerPage", 15);
+        map.put("metadata", "author title");
+
+        ClientResponse response = sendPutRequest(username, map);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        testRetrieveSettings("malt", 15, "author title");
-
+        testRetrieveSettings(username, "malt", 15, "author title");
     }
 
-    private void testRetrieveSettings (String foundry, int numOfResult,
+    private void testRetrieveSettings (String username, String foundry, int numOfResult,
             String metadata) throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("user")
-                .path("settings")
+        ClientResponse response = resource().path(API_VERSION)
+                .path(username).path("setting")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
