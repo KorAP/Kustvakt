@@ -17,6 +17,8 @@ import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
+ * EM: util class
+ * 
  * @author hanl, margaretha
  * @date 27/01/2016
  */

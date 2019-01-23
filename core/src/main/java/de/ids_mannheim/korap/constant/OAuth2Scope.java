@@ -45,7 +45,8 @@ public enum OAuth2Scope {
     VC_ACCESS_INFO, 
     
     CREATE_DEFAULT_SETTING, 
-    SETTING_INFO;
+    READ_DEFAULT_SETTING, 
+    DELETE_DEFAULT_SETTING;
 
     @Override
     public String toString () {

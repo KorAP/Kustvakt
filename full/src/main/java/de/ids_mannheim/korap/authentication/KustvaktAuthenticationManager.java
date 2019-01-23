@@ -47,7 +47,7 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.user.User.Location;
 import de.ids_mannheim.korap.user.UserDetails;
-import de.ids_mannheim.korap.user.UserSettings;
+import de.ids_mannheim.korap.user.UserSettingProcessor;
 import de.ids_mannheim.korap.user.Userdata;
 import de.ids_mannheim.korap.utils.TimeUtils;
 
@@ -642,7 +642,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		UserDetails d = new UserDetails();
 		d.read(attributes, true);
 
-		UserSettings s = new UserSettings();
+		UserSettingProcessor s = new UserSettingProcessor();
 		s.read(attributes, true);
 
 		entHandler.createAccount(user);
@@ -654,7 +654,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		assert dao != null;
 		dao.store(d);
 
-		dao = BeansFactory.getTypeFactory().getTypeInterfaceBean(userdatadaos, UserSettings.class);
+		dao = BeansFactory.getTypeFactory().getTypeInterfaceBean(userdatadaos, UserSettingProcessor.class);
 		assert dao != null;
 		dao.store(d);
 

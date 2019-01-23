@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.web.controller;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -79,7 +80,7 @@ public class UserController {
 
         try {
             scopeService.verifyScope(tokenContext,
-                    OAuth2Scope.CREATE_DEFAULT_SETTING);
+                    OAuth2Scope.READ_DEFAULT_SETTING);
             String settings = settingService.retrieveDefaultSettings(username,
                     tokenContext.getUsername());
             return Response.ok(settings).build();
@@ -89,4 +90,24 @@ public class UserController {
         }
     }
 
+    @DELETE
+    @Path("setting/{key}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
+            BlockingFilter.class })
+    public Response createDefaultSetting (@Context SecurityContext context,
+            @PathParam("username") String username,
+            @PathParam("key") String key) {
+
+        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+        try {
+            scopeService.verifyScope(tokenContext,
+                    OAuth2Scope.DELETE_DEFAULT_SETTING);
+            settingService.deleteKey(username, tokenContext.getUsername(), key);
+            return Response.ok().build();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+    }
 }

@@ -39,7 +39,7 @@ import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserDetails;
 import de.ids_mannheim.korap.user.UserQuery;
-import de.ids_mannheim.korap.user.UserSettings;
+import de.ids_mannheim.korap.user.UserSettingProcessor;
 import de.ids_mannheim.korap.user.Userdata;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.StringUtils;
@@ -130,7 +130,7 @@ public class ShibbolethUserController {
         String result;
         try {
             User user = controller.getUser(ctx.getUsername());
-            Userdata data = controller.getUserData(user, UserSettings.class);
+            Userdata data = controller.getUserData(user, UserSettingProcessor.class);
             data.setField(Attributes.USERNAME, ctx.getUsername());
             result = data.serialize();
         }
@@ -159,14 +159,14 @@ public class ShibbolethUserController {
             if (User.UserFactory.isDemo(ctx.getUsername()))
                 return Response.notModified().build();
 
-            Userdata data = controller.getUserData(user, UserSettings.class);
+            Userdata data = controller.getUserData(user, UserSettingProcessor.class);
             // todo: check setting only within the scope of user settings permissions; not foundry range. Latter is part of
             // frontend which only displays available foundries and
             //            SecurityManager.findbyId(us.getDefaultConstfoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultLemmafoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultPOSfoundry(), user, Foundry.class);
             //            SecurityManager.findbyId(us.getDefaultRelfoundry(), user, Foundry.class);
-            Userdata new_data = new UserSettings(user.getId());
+            Userdata new_data = new UserSettingProcessor(user.getId());
             new_data.readQuietly((Map<String, Object>) settings, false);
             data.update(new_data);
             controller.updateUserData(data);

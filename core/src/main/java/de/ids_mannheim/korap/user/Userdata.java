@@ -16,21 +16,18 @@ import java.util.*;
  */
 public abstract class Userdata {
 
-    public static DataFactory dataFactory = DataFactory.getFactory();
+    public DataFactory dataFactory = DataFactory.getFactory();
     
+    @Deprecated
     @Getter
     @Setter
     private Integer id;
     @Getter(AccessLevel.PRIVATE)
     private Object data;
+    @Deprecated
     @Getter
     @Setter
     private Integer userId;
-    
-    // EM: new
-    @Getter
-    @Setter
-    private String username;
     
     public Userdata () {
         this(-1);
@@ -44,11 +41,8 @@ public abstract class Userdata {
         this.data = dataFactory.convertData(null);
     }
 
-    // EM: new
-    public Userdata (String username) {
-        this.username = username;
-        this.id = -1;
-        this.data = dataFactory.convertData(null);
+    public Userdata (String data) {
+        this.data = dataFactory.convertData(data);
     }
 
     public int size () {
@@ -159,7 +153,11 @@ public abstract class Userdata {
         }
     }
 
-
+    // EM: added
+    public boolean removeField (String field) {
+        return dataFactory.removeValue(this.data, field);
+    }
+    
     public abstract String[] requiredFields ();
 
 

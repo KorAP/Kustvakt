@@ -25,7 +25,7 @@ public class UserdataTest2 {
 
     @Test
     public void testReadEmptyMap () throws KustvaktException {
-        Userdata userData = new UserSettings();
+        Userdata userData = new UserSettingProcessor();
         userData.read(new HashMap<>(), false);
         String jsonSettings = userData.serialize();
         assertEquals("{}", jsonSettings);
@@ -33,7 +33,7 @@ public class UserdataTest2 {
 
     @Test
     public void testReadNullMap () throws KustvaktException {
-        Userdata userData = new UserSettings();
+        Userdata userData = new UserSettingProcessor();
         userData.read(null, false);
         String jsonSettings = userData.serialize();
         assertEquals("{}", jsonSettings);
@@ -56,7 +56,7 @@ public class UserdataTest2 {
         map.put("k1", Arrays.asList(new String[] { "a", "b", "c" }));
         map.put("k2", Arrays.asList(new Integer[] { 1, 2, 3 }));
 
-        Userdata data = new UserSettings();
+        Userdata data = new UserSettingProcessor();
         data.read(map, false);
         data.validate(new ApacheValidator());
     }
@@ -80,7 +80,7 @@ public class UserdataTest2 {
 
     @Test
     public void testUserdataDefaultFields () throws KustvaktException {
-        UserSettings settings = new UserSettings(-1);
+        UserSettingProcessor settings = new UserSettingProcessor(-1);
         Map<String, Object> m = new HashMap<>();
         m.put(Attributes.DEFAULT_REL_FOUNDRY, "rel_1");
         m.put(Attributes.DEFAULT_CONST_FOUNDRY, "const_1");

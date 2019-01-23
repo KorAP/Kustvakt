@@ -96,7 +96,7 @@ public class UserdataTest extends BeanConfigTest {
 
     @Test
     public void testSettingsValidation () {
-        Userdata data = new UserSettings(1);
+        Userdata data = new UserSettingProcessor(1);
         data.setField(Attributes.FILE_FORMAT_FOR_EXPORT, "export");
 
         String[] req = data.requiredFields();
@@ -118,7 +118,7 @@ public class UserdataTest extends BeanConfigTest {
 
         dao = BeansFactory.getTypeFactory().getTypeInterfaceBean(
                 helper().getContext().getUserDataProviders(),
-                UserSettings.class);
+                UserSettingProcessor.class);
         assertNotNull(dao);
         assertTrue(dao instanceof UserSettingsDao);
     }

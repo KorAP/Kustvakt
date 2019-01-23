@@ -10,8 +10,8 @@ import de.ids_mannheim.korap.dao.DefaultSettingDao;
 import de.ids_mannheim.korap.entity.DefaultSetting;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.user.UserSettings;
-import de.ids_mannheim.korap.user.Userdata;
+import de.ids_mannheim.korap.user.DataFactory;
+import de.ids_mannheim.korap.user.UserSettingProcessor;
 
 @Service
 public class DefaultSettingService {
@@ -19,65 +19,84 @@ public class DefaultSettingService {
     @Autowired
     private DefaultSettingDao settingDao;
 
-    private void verifiyUsername (String username, String authenticatedUser)
+    public DataFactory dataFactory = DataFactory.getFactory();
+
+    private String verifiyUsername (String username, String contextUsername)
             throws KustvaktException {
-        if (!username.equals(authenticatedUser)) {
+        username = username.substring(0);
+        if (!username.equals(contextUsername)) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "Username verification failed. Path parameter username "
-                            + "must be the same as the authenticated username.",
+                            + "without prefix must be the same as the "
+                            + "authenticated username.",
                     username);
         }
+        return username;
     }
 
     public int handlePutRequest (String username, Map<String, Object> map,
-            String authenticatedUser) throws KustvaktException {
-        verifiyUsername(username, authenticatedUser);
+            String contextUsername) throws KustvaktException {
+        username = verifiyUsername(username, contextUsername);
 
         if (map == null || map.isEmpty()) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "Entity body is empty. No settings are given.");
         }
 
-        Userdata userdata = new UserSettings(username);
-        userdata.readQuietly(map, false);
+        UserSettingProcessor processor = new UserSettingProcessor();
+        processor.readQuietly(map, false);
 
         DefaultSetting defaultSetting =
                 settingDao.retrieveDefautlSetting(username);
         if (defaultSetting == null) {
-            createDefaultSetting(username, userdata);
+            createDefaultSetting(username, processor);
             return HttpStatus.SC_CREATED;
         }
         else {
-            updateDefaultSetting(defaultSetting, userdata);
+            updateDefaultSetting(defaultSetting, processor);
             return HttpStatus.SC_OK;
         }
     }
 
-    public void createDefaultSetting (String username, Userdata userdata)
-            throws KustvaktException {
-        String jsonSettings = userdata.serialize();
+    public void createDefaultSetting (String username,
+            UserSettingProcessor processor) throws KustvaktException {
+        String jsonSettings = processor.serialize();
         settingDao.createDefaultSetting(username, jsonSettings);
     }
 
-    public void updateDefaultSetting (DefaultSetting setting, Userdata newData)
-            throws KustvaktException {
-        Userdata existingData = new UserSettings(setting.getUsername());
-        existingData.setData(setting.getSettings());
-        existingData.update(newData);
+    public void updateDefaultSetting (DefaultSetting setting,
+            UserSettingProcessor newProcessor) throws KustvaktException {
+        UserSettingProcessor processor =
+                new UserSettingProcessor(setting.getSettings());
+        processor.update(newProcessor);
 
-        String newSettings = existingData.serialize();
-        setting.setSettings(newSettings);
+        String jsonSettings = processor.serialize();
+        setting.setSettings(jsonSettings);
         settingDao.updateDefaultSetting(setting);
     }
 
     public String retrieveDefaultSettings (String username,
-            String authenticatedUser) throws KustvaktException {
+            String contextUsername) throws KustvaktException {
 
-        verifiyUsername(username, authenticatedUser);
-
+        username = verifiyUsername(username, contextUsername);
         DefaultSetting defaultSetting =
                 settingDao.retrieveDefautlSetting(username);
         return defaultSetting.getSettings();
+    }
+
+    public void deleteKey (String username, String contextUsername, String key)
+            throws KustvaktException {
+        username = verifiyUsername(username, contextUsername);
+        DefaultSetting defaultSetting =
+                settingDao.retrieveDefautlSetting(username);
+
+        String jsonSettings = defaultSetting.getSettings();
+        UserSettingProcessor processor = new UserSettingProcessor(jsonSettings);
+        processor.removeField(key);
+        String json = processor.serialize();
+
+        defaultSetting.setSettings(json);
+        settingDao.updateDefaultSetting(defaultSetting);
     }
 
 }

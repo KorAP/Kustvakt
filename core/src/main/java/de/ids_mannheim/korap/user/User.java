@@ -37,7 +37,7 @@ public abstract class User implements Serializable {
     private ParamFields fields;
     @Getter(AccessLevel.PRIVATE)
     @Setter(AccessLevel.PRIVATE)
-    private UserSettings settings;
+    private UserSettingProcessor settings;
     //todo: remove!
     @Getter(AccessLevel.PRIVATE)
     @Setter(AccessLevel.PRIVATE)

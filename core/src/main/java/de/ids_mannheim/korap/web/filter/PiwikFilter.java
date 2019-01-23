@@ -33,7 +33,7 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.UserSettings;
+import de.ids_mannheim.korap.user.UserSettingProcessor;
 import de.ids_mannheim.korap.user.Userdata;
 import net.minidev.json.JSONArray;
 
@@ -137,7 +137,7 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
                     // since this is cached, not very expensive!
                     User user = authenticationManager.getUser(context.getUsername());
                     Userdata data = authenticationManager
-                            .getUserData(user, UserSettings.class);
+                            .getUserData(user, UserSettingProcessor.class);
                     if ((Boolean) data.get(Attributes.COLLECT_AUDITING_DATA))
                         customVars.put("username", context.getUsername());
                 }

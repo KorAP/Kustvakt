@@ -6,20 +6,20 @@ import de.ids_mannheim.korap.config.Attributes;
  * @author hanl, margaretha
  * @date 28/01/2016
  */
-public class UserSettings extends Userdata {
+public class UserSettingProcessor extends Userdata {
 
-    public UserSettings() {
+    public UserSettingProcessor() {
 
     }
 
     @Deprecated
-    public UserSettings(Integer userid) {
+    public UserSettingProcessor(Integer userid) {
         super(userid);
     }
 
     // EM: added
-    public UserSettings(String username) {
-        super(username);
+    public UserSettingProcessor(String data) {
+        super(data);
     }
 
     @Override

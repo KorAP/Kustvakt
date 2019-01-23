@@ -14,7 +14,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.UserDetails;
-import de.ids_mannheim.korap.user.UserSettings;
+import de.ids_mannheim.korap.user.UserSettingProcessor;
 import de.ids_mannheim.korap.user.Userdata;
 
 /**
@@ -71,7 +71,7 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
                 .getUser((String) KustvaktConfiguration.KUSTVAKT_USER
                         .get(Attributes.USERNAME));
 
-        Userdata data = authenticationManager.getUserData(user, UserSettings.class);
+        Userdata data = authenticationManager.getUserData(user, UserSettingProcessor.class);
         assertNotNull(data);
     }
 
@@ -86,7 +86,7 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
     @Test(expected = KustvaktException.class)
     public void testUserSettingsGetNonExistent () throws KustvaktException {
         User user = new KorAPUser(10, "random");
-        authenticationManager.getUserData(user, UserSettings.class);
+        authenticationManager.getUserData(user, UserSettingProcessor.class);
     }
 
 

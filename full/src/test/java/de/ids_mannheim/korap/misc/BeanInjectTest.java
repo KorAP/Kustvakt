@@ -12,7 +12,7 @@ import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.handlers.UserDetailsDao;
 import de.ids_mannheim.korap.handlers.UserSettingsDao;
 import de.ids_mannheim.korap.user.UserDetails;
-import de.ids_mannheim.korap.user.UserSettings;
+import de.ids_mannheim.korap.user.UserSettingProcessor;
 
 /**
  * Created by hanl on 03.06.16.
@@ -26,7 +26,7 @@ public class BeanInjectTest {
                 .getUserDataProviders();
         assertFalse(coll.isEmpty());
         Object o = BeansFactory.getTypeFactory().getTypeInterfaceBean(coll,
-                UserSettings.class);
+                UserSettingProcessor.class);
         assertEquals(UserSettingsDao.class, AopUtils.getTargetClass(o));
 
         o = BeansFactory.getTypeFactory().getTypeInterfaceBean(coll,
