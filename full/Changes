@@ -24,6 +24,9 @@
 22/01/2019
    - Updated default setting controllers & added tests (margaretha)
    - Added delete key in setting controllers (margaretha)
+23/01/2019
+   - Added default setting key validation (margaretha)
+   - Fixed UserdataTest (margaretha) 
 
 # version 0.61.4
 14/11/2018

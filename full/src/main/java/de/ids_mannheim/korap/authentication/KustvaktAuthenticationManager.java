@@ -1,10 +1,7 @@
 package de.ids_mannheim.korap.authentication;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -35,10 +32,8 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.exceptions.WrappedException;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.EntityHandlerIface;
-import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
-import de.ids_mannheim.korap.interfaces.defaults.ApacheValidator;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.DemoUser;
 import de.ids_mannheim.korap.user.KorAPUser;
@@ -50,6 +45,7 @@ import de.ids_mannheim.korap.user.UserDetails;
 import de.ids_mannheim.korap.user.UserSettingProcessor;
 import de.ids_mannheim.korap.user.Userdata;
 import de.ids_mannheim.korap.utils.TimeUtils;
+import de.ids_mannheim.korap.validator.Validator;
 
 /**
  * contains the logic to authentication and registration processes. Uses
@@ -69,9 +65,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 	private AdminDao adminDao;
 	private AuditingIface auditing;
 	private FullConfiguration config;
+	@Deprecated
 	private Collection userdatadaos;
 	private LoginCounter counter;
-	private ValidatorIface validator;
+	@Autowired
+	private Validator validator;
 	
 	public KustvaktAuthenticationManager(EntityHandlerIface userdb, EncryptionIface crypto,
 			FullConfiguration config, AuditingIface auditer, Collection<UserDataDbIface> userdatadaos) {
@@ -83,11 +81,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		this.counter = new LoginCounter(config);
 		this.userdatadaos = userdatadaos;
 		// todo: load via beancontext
-		try {
-			this.validator = new ApacheValidator();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			this.validator = new ApacheValidator();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	/**

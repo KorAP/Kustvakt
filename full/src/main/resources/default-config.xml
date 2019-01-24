@@ -198,6 +198,9 @@
 	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">
 		<constructor-arg value="${krill.indexDir}" />
 	</bean>
+	
+	<!-- Validator -->
+	<bean id="validator" class="de.ids_mannheim.korap.validator.ApacheValidator"/>
 
 	<!-- URLValidator -->
 	<bean id="redirectURIValidator" class="org.apache.commons.validator.routines.UrlValidator">

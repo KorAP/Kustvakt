@@ -2,7 +2,7 @@ package de.ids_mannheim.korap.user;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.ValidatorIface;
+import de.ids_mannheim.korap.validator.Validator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -122,9 +122,10 @@ public abstract class Userdata {
         dataFactory.addValue(this.data, key, value);
     }
 
-    // EM: not reliable
+    // EM: de.ids_mannheim.korap.interfaces.defaults.ApacheValidator.validateMap(Map<String, Object>)
+    // is not reliable
     // todo: test
-    public void validate (ValidatorIface validator) throws KustvaktException {
+    public void validate (Validator validator) throws KustvaktException {
         dataFactory.validate(this.data, validator);
     }
 

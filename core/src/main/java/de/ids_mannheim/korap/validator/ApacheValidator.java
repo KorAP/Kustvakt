@@ -1,23 +1,28 @@
-package de.ids_mannheim.korap.interfaces.defaults;
+package de.ids_mannheim.korap.validator;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import org.apache.commons.validator.routines.DateValidator;
+import org.apache.commons.validator.routines.EmailValidator;
+import org.apache.commons.validator.routines.RegexValidator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.ConfigLoader;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.web.utils.KustvaktMap;
-import org.apache.commons.validator.routines.*;
-import org.apache.commons.validator.routines.RegexValidator;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.io.IOException;
-import java.util.*;
 
 /**
  * Created by hanl on 09.06.16.
+ *  
  */
-public class ApacheValidator implements ValidatorIface {
+public class ApacheValidator implements Validator {
 
     private static Logger jlog = LogManager.getLogger(ApacheValidator.class);
 
@@ -91,7 +96,7 @@ public class ApacheValidator implements ValidatorIface {
     public String validateEntry (String input, String type)
             throws KustvaktException {
         if (!isValid(input, type))
-            throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "Entry did not validate for type '" + type + "'", input);
         return input;
     }

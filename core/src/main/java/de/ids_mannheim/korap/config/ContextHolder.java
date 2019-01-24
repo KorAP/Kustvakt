@@ -1,17 +1,13 @@
 package de.ids_mannheim.korap.config;
 
-import java.io.IOException;
 import java.util.Collection;
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 
-//import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
-import de.ids_mannheim.korap.interfaces.defaults.ApacheValidator;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
 
 /**
@@ -79,26 +75,20 @@ public abstract class ContextHolder {
     }
 
 
+    @Deprecated
     public <T extends KustvaktConfiguration> T getConfiguration () {
         return (T) getBean(KUSTVAKT_CONFIG);
     }
 
 
+    @Deprecated
     public PersistenceClient getPersistenceClient () {
         return getBean(KUSTVAKT_DB);
     }
 
-
+    @Deprecated
     public Collection<UserDataDbIface> getUserDataProviders () {
         return getBean(KUSTVAKT_USERDATA);
-    }
-
-    public ValidatorIface getValidator()  {
-        try {
-            return new ApacheValidator();
-        } catch (IOException e) {
-            throw new RuntimeException("validator could not be loaded!");
-        }
     }
 
     private void close () {

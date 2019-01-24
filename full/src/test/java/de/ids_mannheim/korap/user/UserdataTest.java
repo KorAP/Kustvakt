@@ -3,84 +3,68 @@ package de.ids_mannheim.korap.user;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Before;
-import org.junit.Ignore;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.BeanConfigTest;
-import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.handlers.UserDetailsDao;
-import de.ids_mannheim.korap.handlers.UserSettingsDao;
-import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
+import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.validator.ApacheValidator;
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
- * @author hanl
+ * @author hanl, margaretha
  * @date 27/01/2016
  */
-@Deprecated
-@Ignore
-public class UserdataTest extends BeanConfigTest {
+public class UserdataTest {
 
-    @Before
-    public void clear () {
-        UserDetailsDao dao = new UserDetailsDao(helper().getContext()
-                .getPersistenceClient());
-        UserSettingsDao sdao = new UserSettingsDao(helper().getContext()
-                .getPersistenceClient());
-        assertNotEquals(-1, dao.deleteAll());
-        assertNotEquals(-1, sdao.deleteAll());
+    // EM: added
+    @Test
+    public void testReadEmptyMap () throws KustvaktException {
+        Userdata userData = new UserSettingProcessor();
+        userData.read(new HashMap<>(), false);
+        String jsonSettings = userData.serialize();
+        assertEquals("{}", jsonSettings);
     }
-
 
     @Test
-    public void testDataStore () throws KustvaktException {
-        String val = "value1;value_data";
-        User user = new KorAPUser();
-        user.setId(1);
-        UserDetailsDao dao = new UserDetailsDao(helper().getContext()
-                .getPersistenceClient());
-        UserDetails d = new UserDetails(1);
-        d.setField(Attributes.FIRSTNAME, "first");
-        d.setField(Attributes.LASTNAME, "last");
-        d.setField(Attributes.ADDRESS, "address");
-        d.setField(Attributes.EMAIL, "email");
-        d.setField("key_1", val);
-        assertNotEquals(-1, dao.store(d));
+    public void testReadNullMap () throws KustvaktException {
+        Userdata userData = new UserSettingProcessor();
+        userData.read(null, false);
+        String jsonSettings = userData.serialize();
+        assertEquals("{}", jsonSettings);
     }
 
-
+    // EM: based on MH code, supposedly to validate entries like email
+    // and date. See ApacheValidator
+    //
+    // It has inconsistent behaviors:
+    // throws exceptions when there are invalid entries in a list,
+    // otherwise skips invalid entries and returns a valid map
+    // Moreover, Userdata.validate(ValidatorIface) does not return a
+    // valid map.
+    //
+    // At the moment, validation is not needed for default settings.
     @Test
-    public void testDataGet () throws KustvaktException {
-        String val = "value1;value_data";
-        User user = new KorAPUser();
-        user.setId(1);
-        
-        UserDetailsDao dao = new UserDetailsDao(helper().getContext()
-                .getPersistenceClient());
-        UserDetails d = new UserDetails(1);
-        d.setField(Attributes.FIRSTNAME, "first");
-        d.setField(Attributes.LASTNAME, "last");
-        d.setField(Attributes.ADDRESS, "address");
-        d.setField(Attributes.EMAIL, "email");
-        d.setField("key_1", val);
+    public void testValidateMap () throws IOException, KustvaktException {
 
-        assertNotEquals(-1, dao.store(d));
+        Map<String, Object> map = new HashMap<>();
+        map.put("k1", Arrays.asList(new String[] { "a", "b", "c" }));
+        map.put("k2", Arrays.asList(new Integer[] { 1, 2, 3 }));
 
-        d = dao.get(d.getId());
-        assertNotNull(d);
-        assertEquals(val, d.get("key_1"));
-
-        d = dao.get(user);
-        assertNotNull(d);
-        assertEquals(val, d.get("key_1"));
+        Userdata data = new UserSettingProcessor();
+        data.read(map, false);
+        data.validate(new ApacheValidator());
     }
 
-
+    // EM: below are tests from MH
     @Test
     public void testDataValidation () {
         Userdata data = new UserDetails(1);
@@ -96,7 +80,7 @@ public class UserdataTest extends BeanConfigTest {
 
     @Test
     public void testSettingsValidation () {
-        Userdata data = new UserSettingProcessor(1);
+        Userdata data = new UserSettingProcessor();
         data.setField(Attributes.FILE_FORMAT_FOR_EXPORT, "export");
 
         String[] req = data.requiredFields();
@@ -105,43 +89,95 @@ public class UserdataTest extends BeanConfigTest {
         assertEquals(req.length, r.length);
         assertTrue(data.isValid());
     }
+    
+    @Test
+    public void testUserdataRequiredFields () throws KustvaktException {
+        UserDetails details = new UserDetails(-1);
+        Map<String, Object> m = new HashMap<>();
+        m.put(Attributes.FIRSTNAME, "first");
+        m.put(Attributes.LASTNAME, "last");
+        m.put(Attributes.ADDRESS, "address");
+        m.put(Attributes.EMAIL, "email");
+        details.setData(JsonUtils.toJSON(m));
 
+        details.setData(JsonUtils.toJSON(m));
+        String[] missing = details.findMissingFields();
+        assertEquals(0, missing.length);
+    }
 
     @Test
-    public void testUserdataDaoTypefactory () throws KustvaktException {
-        UserDataDbIface dao = BeansFactory.getTypeFactory()
-                .getTypeInterfaceBean(
-                        helper().getContext().getUserDataProviders(),
-                        UserDetails.class);
-        assertNotNull(dao);
-        assertTrue(dao instanceof UserDetailsDao);
+    public void testUserdataDefaultFields () throws KustvaktException {
+        UserSettingProcessor settings = new UserSettingProcessor();
+        Map<String, Object> m = new HashMap<>();
+        m.put(Attributes.DEFAULT_REL_FOUNDRY, "rel_1");
+        m.put(Attributes.DEFAULT_CONST_FOUNDRY, "const_1");
+        m.put(Attributes.DEFAULT_POS_FOUNDRY, "pos_1");
+        m.put(Attributes.DEFAULT_LEMMA_FOUNDRY, "lemma_1");
+        m.put(Attributes.PAGE_LENGTH, 10);
+        m.put(Attributes.QUERY_LANGUAGE, "poliqarp");
+        m.put(Attributes.METADATA_QUERY_EXPERT_MODUS, false);
 
-        dao = BeansFactory.getTypeFactory().getTypeInterfaceBean(
-                helper().getContext().getUserDataProviders(),
-                UserSettingProcessor.class);
-        assertNotNull(dao);
-        assertTrue(dao instanceof UserSettingsDao);
+        settings.read(m, true);
+
+        assertNotEquals(m.size(), settings.size());
+        assertEquals(settings.defaultFields().length, settings.size());
+        assertEquals("rel_1", settings.get(Attributes.DEFAULT_REL_FOUNDRY));
+        assertEquals("pos_1", settings.get(Attributes.DEFAULT_POS_FOUNDRY));
+        assertEquals("lemma_1", settings.get(Attributes.DEFAULT_LEMMA_FOUNDRY));
+        assertEquals("const_1", settings.get(Attributes.DEFAULT_CONST_FOUNDRY));
+        assertEquals(10, settings.get(Attributes.PAGE_LENGTH));
+
     }
 
-    @Deprecated
-    @Test(expected = RuntimeException.class)
-    public void testUserdatafactoryError () throws KustvaktException {
-        BeansFactory.getTypeFactory().getTypeInterfaceBean(
-                helper().getContext().getUserDataProviders(), new Userdata(1) {
-                    @Override
-                    public String[] requiredFields () {
-                        return new String[0];
-                    }
+    @Test(expected = KustvaktException.class)
+    public void testUserDataRequiredFieldsException ()
+            throws KustvaktException {
+        UserDetails details = new UserDetails(-1);
+        Map<String, Object> m = new HashMap<>();
+        m.put(Attributes.FIRSTNAME, "first");
+        m.put(Attributes.LASTNAME, "last");
+        m.put(Attributes.ADDRESS, "address");
 
+        details.setData(JsonUtils.toJSON(m));
+        String[] missing = details.findMissingFields();
 
-                    @Override
-                    public String[] defaultFields () {
-                        return new String[0];
-                    }
-                }.getClass());
+        assertEquals(1, missing.length);
+        assertEquals("email", missing[0]);
+        details.checkRequired();
     }
 
+    @Test
+    public void testUserDataPointerFunction () throws KustvaktException {
+        UserDetails details = new UserDetails(-1);
+        Map<String, Object> m = new HashMap<>();
+        m.put(Attributes.FIRSTNAME, "first");
+        m.put(Attributes.LASTNAME, "last");
+        m.put(Attributes.ADDRESS, "address");
+        m.put(Attributes.EMAIL, "email");
+        details.setData(JsonUtils.toJSON(m));
 
-    @Override
-    public void initMethod () throws KustvaktException {}
+        ArrayNode array = JsonUtils.createArrayNode();
+        array.add(100);
+        array.add("message");
+        details.setField("errors", array);
+
+        assertEquals(100, details.get("/errors/0"));
+        assertEquals("message", details.get("/errors/1"));
+    }
+
+    @Test
+    public void testUserDataUpdate () {
+        UserDetails details = new UserDetails(-1);
+        details.setField(Attributes.FIRSTNAME, "first");
+        details.setField(Attributes.LASTNAME, "last");
+        details.setField(Attributes.ADDRESS, "address");
+        details.setField(Attributes.EMAIL, "email");
+
+        UserDetails details2 = new UserDetails(-1);
+        details2.setField(Attributes.COUNTRY, "Germany");
+        details.update(details2);
+
+        assertEquals("first", details.get(Attributes.FIRSTNAME));
+        assertEquals("Germany", details.get(Attributes.COUNTRY));
+    }
 }

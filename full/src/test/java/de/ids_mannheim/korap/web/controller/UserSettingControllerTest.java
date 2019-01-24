@@ -26,10 +26,10 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * @author margaretha
  *
  */
-public class UserControllerTest extends SpringJerseyTest {
+public class UserSettingControllerTest extends SpringJerseyTest {
 
-    private String username = "~UserControllerTest";
-    private String username2 = "~UserControllerTest2";
+    private String username = "~UserSettingTest";
+    private String username2 = "~UserSettingTest2";
 
     private ClientResponse sendPutRequest (String username,
             Map<String, Object> map) throws KustvaktException {
@@ -80,8 +80,22 @@ public class UserControllerTest extends SpringJerseyTest {
                 "author title textSigle availability");
 
         testUpdateSetting(username2);
+        testputRequestInvalidKey();
     }
+    
+    @Test
+    public void testputRequestInvalidKey () throws KustvaktException {
+        Map<String, Object> map = new HashMap<>();
+        map.put("key/", "invalidKey");
 
+        ClientResponse response = sendPutRequest(username2, map);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        assertEquals(StatusCodes.INVALID_ARGUMENT, node.at("/errors/0/0").asInt());
+        assertEquals("key/", node.at("/errors/0/2").asText());
+    }
+    
     @Test
     public void testPutDifferentUsername () throws KustvaktException {
         String json = "{\"foundry\":\"opennlp\",\"metadata\":\"author title "
@@ -155,7 +169,7 @@ public class UserControllerTest extends SpringJerseyTest {
 
         testRetrieveSettings(username, "malt", 15, "author title");
     }
-
+    
     private void testRetrieveSettings (String username, String foundry,
             int numOfResult, String metadata) throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path(username)

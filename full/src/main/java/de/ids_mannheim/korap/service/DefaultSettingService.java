@@ -10,16 +10,23 @@ import de.ids_mannheim.korap.dao.DefaultSettingDao;
 import de.ids_mannheim.korap.entity.DefaultSetting;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.user.DataFactory;
 import de.ids_mannheim.korap.user.UserSettingProcessor;
+import de.ids_mannheim.korap.validator.ApacheValidator;
 
+/**
+ * DefaultSettingService handles all business logic related to user
+ * default setting.
+ * 
+ * @author margaretha
+ *
+ */
 @Service
 public class DefaultSettingService {
 
     @Autowired
     private DefaultSettingDao settingDao;
-
-    public DataFactory dataFactory = DataFactory.getFactory();
+    @Autowired
+    private ApacheValidator validator;
 
     private String verifiyUsername (String username, String contextUsername)
             throws KustvaktException {
@@ -34,14 +41,21 @@ public class DefaultSettingService {
         return username;
     }
 
-    public int handlePutRequest (String username, Map<String, Object> map,
-            String contextUsername) throws KustvaktException {
-        username = verifiyUsername(username, contextUsername);
-
+    private void validateSettingMap (Map<String, Object> map)
+            throws KustvaktException {
         if (map == null || map.isEmpty()) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "Entity body is empty. No settings are given.");
         }
+        for (String k : map.keySet()) {
+            validator.validateEntry(k, "setting");
+        }
+    }
+
+    public int handlePutRequest (String username, Map<String, Object> map,
+            String contextUsername) throws KustvaktException {
+        username = verifiyUsername(username, contextUsername);
+        validateSettingMap(map);
 
         UserSettingProcessor processor = new UserSettingProcessor();
         processor.readQuietly(map, false);

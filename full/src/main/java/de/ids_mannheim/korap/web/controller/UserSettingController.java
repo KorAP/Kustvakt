@@ -31,14 +31,19 @@ import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 
 /**
+ * UserSettingController defines web APIs related to user default
+ * setting.
+ * 
+ * All the APIs in this class are only available to logged-in users.
+ * 
  * @author margaretha
  *
  */
 @Controller
-@Path("{version}/{username: ~[a-zA-Z0-9_]+}")
+@Path("{version}/{username: ~[a-zA-Z0-9_]+}/setting")
 @ResourceFilters({ AuthenticationFilter.class, APIVersionFilter.class,
         PiwikFilter.class })
-public class UserController {
+public class UserSettingController {
 
     @Autowired
     private DefaultSettingService settingService;
@@ -47,8 +52,23 @@ public class UserController {
     @Autowired
     private OAuth2ScopeService scopeService;
 
+    /**
+     * Creates a default setting of the given username.
+     * The setting inputs should be represented as a pair of keys and
+     * values (a map). The keys must only contains alphabets, numbers,
+     * hypens or underscores.
+     * 
+     * 
+     * @param context
+     *            security context
+     * @param username
+     *            username
+     * @param map
+     *            the default setting
+     * @return status code 201 if a new resource is created, or 200 if
+     *         an existing resource is edited.
+     */
     @PUT
-    @Path("setting")
     @Consumes(MediaType.APPLICATION_JSON)
     @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
             BlockingFilter.class })
@@ -69,8 +89,16 @@ public class UserController {
 
     }
 
+    /**
+     * Retrieves the default setting of the given username.
+     * 
+     * @param context
+     *            a security context
+     * @param username
+     *            a username
+     * @return the default setting of the given username
+     */
     @GET
-    @Path("setting")
     @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
             BlockingFilter.class })
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
@@ -90,12 +118,20 @@ public class UserController {
         }
     }
 
+    /**
+     * Deletes an entry of a default setting of a user by the given key.
+     * 
+     * @param context a security context
+     * @param username a username
+     * @param key the key of the default setting entry to be deleted
+     * @return
+     */
     @DELETE
-    @Path("setting/{key}")
+    @Path("{key}")
     @Consumes(MediaType.APPLICATION_JSON)
     @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
             BlockingFilter.class })
-    public Response createDefaultSetting (@Context SecurityContext context,
+    public Response deleteDefaultSettingEntry (@Context SecurityContext context,
             @PathParam("username") String username,
             @PathParam("key") String key) {
 

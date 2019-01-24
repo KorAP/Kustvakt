@@ -13,8 +13,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.interfaces.ValidatorIface;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.validator.Validator;
 
 /**
  * EM: util class
@@ -52,7 +52,7 @@ public abstract class DataFactory {
 
     public abstract Collection<Object> values (Object data);
 
-    public abstract Object validate(Object data, ValidatorIface validator) throws KustvaktException;
+    public abstract Object validate(Object data, Validator validator) throws KustvaktException;
 
     @Deprecated
     public abstract Map<String, Object> fields (Object data);
@@ -130,7 +130,7 @@ public abstract class DataFactory {
         }
 
         @Override
-        public Object validate(Object data, ValidatorIface validator) throws KustvaktException {
+        public Object validate(Object data, Validator validator) throws KustvaktException {
             if (checkDataType(data) && ((JsonNode) data).isObject()) {
                 try {
                     @SuppressWarnings("unchecked")

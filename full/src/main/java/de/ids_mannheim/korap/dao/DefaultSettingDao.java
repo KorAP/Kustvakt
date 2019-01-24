@@ -16,6 +16,13 @@ import de.ids_mannheim.korap.entity.DefaultSetting_;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
+/**
+ * DefaultSettingDao manages database queries and transactions
+ * regarding user default setting.
+ * 
+ * @author margaretha
+ *
+ */
 @Transactional
 @Repository
 public class DefaultSettingDao {
