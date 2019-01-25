@@ -17,6 +17,7 @@ import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.dao.VirtualCorpusDao;
 import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import net.sf.ehcache.CacheManager;
@@ -29,7 +30,7 @@ public class VCReferenceTest extends SpringJerseyTest {
     private VirtualCorpusDao dao;
 
     @Test
-    public void testVCRef ()
+    public void testRefPredefinedVC ()
             throws KustvaktException, IOException, QueryException {
         testSearchWithoutVCRefOr();
         testSearchWithoutVCRefAnd();
@@ -108,5 +109,33 @@ public class VCReferenceTest extends SpringJerseyTest {
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(2, node.at("/documents").asInt());
+    }
+
+    @Test
+    public void testRefVCNotExist () throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("cq", "referTo \"username/vc1\"")
+                .get(ClientResponse.class);
+
+        String ent = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertEquals(StatusCodes.NO_RESULT_FOUND,
+                node.at("/errors/0/0").asInt());
+        assertEquals("username/vc1", node.at("/errors/0/2").asText());
+    }
+
+    @Test
+    public void testRefNotAuthorized() throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("cq", "referTo \"dory/dory VC\"")
+                .get(ClientResponse.class);
+
+        String ent = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals("guest", node.at("/errors/0/2").asText());
     }
 }

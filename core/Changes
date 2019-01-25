@@ -16,6 +16,8 @@
    - Removed codes related to user registration & password management (margaretha)  
 22/01/2019
    - Added create, edit, retrieve user default setting controllers (margaretha)
+24/01/2019
+   - Added default setting key validation & fixed UserdataTest (margaretha)   
 
 
 version 0.61.4

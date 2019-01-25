@@ -27,6 +27,10 @@
 23/01/2019
    - Added default setting key validation (margaretha)
    - Fixed UserdataTest (margaretha) 
+24/01/2019
+   - Added default setting key validation & fixed UserdataTest (margaretha)
+25/01/2019   
+   - Added VC reference and MapUtil tests (margaretha)  
 
 # version 0.61.4
 14/11/2018

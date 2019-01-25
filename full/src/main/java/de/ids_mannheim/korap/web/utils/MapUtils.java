@@ -8,25 +8,31 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-/** Utility methods for maps
+/**
+ * Utility methods for maps
  * 
  * @author margaretha
  *
  */
 public class MapUtils {
 
-    /** Converts {@link MultivaluedMap} to {@link Map}
+    /**
+     * Converts {@link MultivaluedMap} to {@link Map}
      * 
      * @param multivaluedMap
      * @return
      */
     public static Map<String, String> toMap (
             MultivaluedMap<String, String> multivaluedMap) {
+
+        if (multivaluedMap == null) {
+            return new HashMap<String, String>();
+        }
         
         Set<String> keySet = multivaluedMap.keySet();
         Map<String, String> map = new HashMap<String, String>(keySet.size());
-        
-        for (String key :  keySet){
+
+        for (String key : keySet) {
             List<String> values = multivaluedMap.get(key);
             String value = values.stream().collect(Collectors.joining(" "));
             map.put(key, value);
