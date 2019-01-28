@@ -30,10 +30,10 @@ public class UserSettingProcessor extends Userdata {
 
     @Override
     public String[] defaultFields () {
-        return new String[] { Attributes.DEFAULT_REL_FOUNDRY,
-                Attributes.DEFAULT_POS_FOUNDRY,
-                Attributes.DEFAULT_CONST_FOUNDRY,
-                Attributes.DEFAULT_LEMMA_FOUNDRY, Attributes.QUERY_LANGUAGE,
+        return new String[] { Attributes.DEFAULT_FOUNDRY_RELATION,
+                Attributes.DEFAULT_FOUNDRY_POS,
+                Attributes.DEFAULT_FOUNDRY_CONSTITUENT,
+                Attributes.DEFAULT_FOUNDRY_LEMMA, Attributes.QUERY_LANGUAGE,
                 Attributes.PAGE_LENGTH };
     }
 }

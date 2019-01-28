@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import de.ids_mannheim.korap.config.BeanInjectable;
-import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User;
@@ -39,21 +38,25 @@ public class RewriteHandler{
     private Set<Class> failed_task_registration;
     @Autowired
     private KustvaktConfiguration config;
-    private ContextHolder beans;
 
-
+    public RewriteHandler (List<RewriteTask> rewriteTasks) {
+        this();
+        for (RewriteTask t : rewriteTasks){
+            addProcessor(t);
+        }
+    }
+    
+    // EM: for testing
     public RewriteHandler (KustvaktConfiguration config) {
         this();
-        this.config = config;
+        this.config=config;
     }
-
 
     public RewriteHandler () {
         this.node_processors = new HashSet<>();
         this.token_node_processors = new HashSet<>();
         this.query_processors = new LinkedHashSet<>();
         this.failed_task_registration = new HashSet<>();
-        this.beans = null;
     }
 
     public Set getFailedProcessors () {
@@ -99,6 +102,7 @@ public class RewriteHandler{
      * @return boolean if rewriter class was successfully added to
      *         rewrite handler!
      */
+    @Deprecated
     public boolean add (Class<? extends RewriteTask> rewriter) {
         RewriteTask task;
         try {
@@ -244,10 +248,10 @@ public class RewriteHandler{
                     jlog.debug("on processor: " + task.getClass().toString());
                 }
 
-                if (RewriteHandler.this.beans != null
-                        && task instanceof BeanInjectable)
-                    ((BeanInjectable) task)
-                            .insertBeans(RewriteHandler.this.beans);
+//                if (RewriteHandler.this.beans != null
+//                        && task instanceof BeanInjectable)
+//                    ((BeanInjectable) task)
+//                            .insertBeans(RewriteHandler.this.beans);
 
                 if (task instanceof RewriteTask.IterableRewritePath) {
                     RewriteTask.IterableRewritePath rw = (RewriteTask.IterableRewritePath) task;
@@ -302,7 +306,4 @@ public class RewriteHandler{
 
     }
 
-    public void defaultRewriteConstraints () {
-        this.add(FoundryInject.class);
-    }
 }

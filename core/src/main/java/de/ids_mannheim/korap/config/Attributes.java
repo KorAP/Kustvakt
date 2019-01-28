@@ -144,10 +144,11 @@ public class Attributes {
     /**
      * default layers
      */
-    public static final String DEFAULT_POS_FOUNDRY = "POSFoundry";
-    public static final String DEFAULT_LEMMA_FOUNDRY = "lemmaFoundry";
-    public static final String DEFAULT_CONST_FOUNDRY = "constFoundry";
-    public static final String DEFAULT_REL_FOUNDRY = "relFoundry";
+    public static final String DEFAULT_FOUNDRY_POS = "pos-foundry";
+    public static final String DEFAULT_FOUNDRY_LEMMA = "lemma-foundry";
+    public static final String DEFAULT_FOUNDRY_CONSTITUENT = "constituent-foundry";
+    public static final String DEFAULT_FOUNDRY_RELATION = "relation-foundry";
+    public static final String DEFAULT_FOUNDRY_MORPHOLOGY = "morphology-foundry";
 
     /**
      * db column keys

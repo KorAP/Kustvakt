@@ -52,8 +52,6 @@ public class SearchService {
 
     @PostConstruct
     private void doPostConstruct () {
-        this.rewriteHandler.defaultRewriteConstraints();
-
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
         this.graphDBhandler = new ClientsHandler(builder.build());
     }

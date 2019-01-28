@@ -1,17 +1,16 @@
 package de.ids_mannheim.korap.rewrite;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import de.ids_mannheim.korap.config.BeanInjectable;
-import de.ids_mannheim.korap.config.ContextHolder;
-import de.ids_mannheim.korap.config.KustvaktConfiguration;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.utils.JsonUtils;
-import edu.emory.mathcs.backport.java.util.Arrays;
-
 import java.util.Iterator;
 
-/**
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.user.User;
+import edu.emory.mathcs.backport.java.util.Arrays;
+
+/** EM: not used anymore. This rewrite was to remove an empty koral:doc group in operands.
+ * 
  * @author hanl
  * @date 28/07/2015
  */

@@ -30,7 +30,7 @@ public class DefaultSettingService {
 
     private String verifiyUsername (String username, String contextUsername)
             throws KustvaktException {
-        username = username.substring(0);
+        username = username.substring(1);
         if (!username.equals(contextUsername)) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "Username verification failed. Path parameter username "
@@ -93,10 +93,17 @@ public class DefaultSettingService {
             String contextUsername) throws KustvaktException {
 
         username = verifiyUsername(username, contextUsername);
+        return retrieveDefaultSettings(username);
+    }
+    
+    public String retrieveDefaultSettings (String username) throws KustvaktException {
         DefaultSetting defaultSetting =
                 settingDao.retrieveDefautlSetting(username);
+        if (defaultSetting == null) {
+            return null;
+        }
         return defaultSetting.getSettings();
-    }
+    }    
 
     public void deleteKey (String username, String contextUsername, String key)
             throws KustvaktException {

@@ -30,7 +30,11 @@
 24/01/2019
    - Added default setting key validation & fixed UserdataTest (margaretha)
 25/01/2019   
-   - Added VC reference and MapUtil tests (margaretha)  
+   - Added VC reference and MapUtil tests (margaretha)
+28/01/2019
+   - Fixed username verification in DefaultSettingService (margaretha)
+   - Added foundry rewrite with user default setting (margaretha)
+   - Added default foundry for morphology layer (margaretha)
 
 # version 0.61.4
 14/11/2018

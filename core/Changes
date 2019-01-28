@@ -18,7 +18,8 @@
    - Added create, edit, retrieve user default setting controllers (margaretha)
 24/01/2019
    - Added default setting key validation & fixed UserdataTest (margaretha)   
-
+28/01/2019
+   - Updated Rewrite handler (margaretha)
 
 version 0.61.4
 14/11/2018

@@ -13,7 +13,9 @@
 
 
 	<context:component-scan
-		base-package="de.ids_mannheim.korap.web.filter, de.ids_mannheim.korap.web.utils,
+		base-package="de.ids_mannheim.korap.rewrite, 
+	    de.ids_mannheim.korap.web.filter, 
+		de.ids_mannheim.korap.web.utils,
 		de.ids_mannheim.korap.authentication.http" />
 	<context:annotation-config />
 
@@ -168,8 +170,14 @@
 	<bean id="annotationConverter" class="de.ids_mannheim.korap.dto.converter.AnnotationConverter" />
 
 	<!-- Rewrite -->
+	<bean id="foundryInject" class="de.ids_mannheim.korap.rewrite.FoundryInject" />
+	
+	<util:list id="rewriteTasks" value-type="de.ids_mannheim.korap.rewrite.RewriteTask">
+		<ref bean="foundryInject"/>
+	</util:list>
+	
 	<bean id="rewriteHandler" class="de.ids_mannheim.korap.rewrite.RewriteHandler">
-		<constructor-arg ref="config" />
+		<constructor-arg ref="rewriteTasks" />
 	</bean>
 
 

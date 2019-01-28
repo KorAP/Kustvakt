@@ -71,6 +71,7 @@ public class KustvaktConfiguration {
     private String passcodeSaltField;
 
     private String default_pos;
+    private String default_morphology;
     private String default_lemma;
     private String default_token;
     private String default_dep;
@@ -95,6 +96,7 @@ public class KustvaktConfiguration {
     // random code generator
     private String secureRandomAlgorithm;
     private String messageDigestAlgorithm;
+
     
     public KustvaktConfiguration (Properties properties) throws Exception {
         load(properties);
@@ -131,14 +133,15 @@ public class KustvaktConfiguration {
             queryLanguages.add(querylang.trim().toUpperCase());
 
         default_const =
-                properties.getProperty("default.layer.constituent", "mate");
+                properties.getProperty("default.foundry.constituent", "corenlp");
         default_dep =
-                properties.getProperty("default.layer.dependency", "mate");
-        default_lemma = properties.getProperty("default.layer.lemma", "tt");
+                properties.getProperty("default.foundry.dependency", "malt");
+        default_lemma = properties.getProperty("default.foundry.lemma", "tt");
+        default_morphology = properties.getProperty("default.foundry.morphology", "marmot");
         default_pos =
-                properties.getProperty("default.layer.partOfSpeech", "tt");
+                properties.getProperty("default.foundry.partOfSpeech", "tt");
         default_token =
-                properties.getProperty("default.layer.orthography", "opennlp");
+                properties.getProperty("default.foundry.orthography", "opennlp");
 
         // security configuration
         inactiveTime = TimeUtils.convertTimeToSeconds(

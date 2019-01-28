@@ -215,8 +215,19 @@
 	</bean>
 	
 	<!-- Rewrite -->
-	<bean id="rewriteHandler" class="de.ids_mannheim.korap.rewrite.FullRewriteHandler">
-		<constructor-arg ref="kustvakt_config" />
+	<bean id="foundryRewrite" class="de.ids_mannheim.korap.rewrite.FoundryRewrite"/>
+	<bean id="collectionRewrite" class="de.ids_mannheim.korap.rewrite.CollectionRewrite"/>
+	<bean id="virtualCorpusRewrite" class="de.ids_mannheim.korap.rewrite.VirtualCorpusRewrite"/>
+	
+	<util:list id="rewriteTasks"
+		value-type="de.ids_mannheim.korap.rewrite.RewriteTask">
+		<ref bean="foundryRewrite" />
+		<ref bean="collectionRewrite" />
+		<ref bean="virtualCorpusRewrite" />
+	</util:list>
+	
+	<bean id="rewriteHandler" class="de.ids_mannheim.korap.rewrite.RewriteHandler">
+		<constructor-arg ref="rewriteTasks"/>
 	</bean>
 
 	<bean id="kustvakt_auditing" class="de.ids_mannheim.korap.handlers.JDBCAuditing">

@@ -1,7 +1,6 @@
 package de.ids_mannheim.korap.user;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +45,7 @@ public abstract class User implements Serializable {
     @Setter(AccessLevel.PRIVATE)
     private List<UserQuery> queries;
 
-    private List<Userdata> userdata;
+    private UserSettingProcessor userSettingProcessor;
 
 //    private boolean isSystemAdmin;
 
@@ -78,7 +77,6 @@ public abstract class User implements Serializable {
         this.isAccountLocked = false;
         this.username = "";
         this.id = -1;
-        this.userdata = new ArrayList<>();
         this.location 		= Location.EXTERN;
         this.corpusAccess 	= CorpusAccess.FREE;
     }
@@ -104,19 +102,6 @@ public abstract class User implements Serializable {
     public <T extends ParamFields.Param> T getField (Class<T> cl) {
         return this.fields.get(cl);
     }
-
-
-    public void addUserData (Userdata data) {
-        if (data != null) {
-            for (Userdata d : this.userdata) {
-                // already has an object of that type!
-                if (d.getClass().equals(data.getClass()))
-                    return;
-            }
-            userdata.add(data);
-        }
-    }
-
 
     public void setId (Integer id) {
         this.id = id;

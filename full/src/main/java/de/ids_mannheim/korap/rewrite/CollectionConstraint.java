@@ -6,7 +6,9 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.user.User;
 
-/**
+/** EM: not used anymore. This rewrite was meant to remove doc from 
+ * a collection by checking user access to the doc.  
+ * 
  * @author hanl
  * @date 03/07/2015
  */

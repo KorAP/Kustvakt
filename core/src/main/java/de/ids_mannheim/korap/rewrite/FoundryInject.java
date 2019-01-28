@@ -1,45 +1,28 @@
 package de.ids_mannheim.korap.rewrite;
 
-import java.util.Collection;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import de.ids_mannheim.korap.config.BeanInjectable;
-import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.rewrite.KoralNode.RewriteIdentifier;
 import de.ids_mannheim.korap.user.User;
-import edu.emory.mathcs.backport.java.util.Collections;
+import de.ids_mannheim.korap.user.UserSettingProcessor;
 
 /**
- * @author hanl
+ * @author hanl, margaretha
  * @date 30/06/2015
  */
-public class FoundryInject implements RewriteTask.IterableRewritePath,
-        BeanInjectable {
+public class FoundryInject implements RewriteTask.IterableRewritePath {
 
-    private Collection userdaos;
-
-
-    public FoundryInject () {
-        this.userdaos = Collections.emptyList();
-    }
-
-
+    @Autowired
+    protected LayerMapper mapper;
+    
     @Override
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) throws KustvaktException {
-        LayerMapper mapper;
-        // EM: do not use DB
-//        if (user != null && !userdaos.isEmpty()) {
-//            UserDataDbIface dao = BeansFactory.getTypeFactory()
-//                    .getTypeInterfaceBean(userdaos, UserSettings.class);
-//            mapper = new LayerMapper(config, dao.get(user));
-//        }
-//        else
-            mapper = new LayerMapper(config);
-            
+        
         if (node.get("@type").equals("koral:span")) {
             if (!node.isMissingNode("/wrap")){
                 node = node.at("/wrap");
@@ -49,17 +32,22 @@ public class FoundryInject implements RewriteTask.IterableRewritePath,
         }
         else if (node.get("@type").equals("koral:term") && !node.has("foundry")) {
             String layer;
-            if (node.has("layer"))
+            if (node.has("layer")){
                 layer = node.get("layer");
-            else
+            }
+            else{
                 layer = node.get("key");
-            String foundry = mapper.findFoundry(layer);
+            }
+            UserSettingProcessor settingProcessor = null;
+            if (user!=null){
+                settingProcessor = user.getUserSettingProcessor();
+            }
+            String foundry = mapper.findFoundry(layer, settingProcessor);
             if (foundry != null)
                 node.put("foundry", foundry);
         }
         return node;
     }
-
 
     @Override
     public String path () {
@@ -70,11 +58,5 @@ public class FoundryInject implements RewriteTask.IterableRewritePath,
     @Override
     public JsonNode rewriteResult (KoralNode node) {
         return null;
-    }
-
-
-    @Override
-    public <T extends ContextHolder> void insertBeans (T beans) {
-        this.userdaos = beans.getUserDataProviders();
     }
 }

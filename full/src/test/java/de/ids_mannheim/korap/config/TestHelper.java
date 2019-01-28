@@ -50,9 +50,9 @@ public class TestHelper {
         data.put(Attributes.LASTNAME, "user");
         data.put(Attributes.EMAIL, "test@ids-mannheim.de");
         data.put(Attributes.ADDRESS, "Mannheim");
-        data.put(Attributes.DEFAULT_LEMMA_FOUNDRY, "test_l");
-        data.put(Attributes.DEFAULT_POS_FOUNDRY, "test_p");
-        data.put(Attributes.DEFAULT_CONST_FOUNDRY, "test_const");
+        data.put(Attributes.DEFAULT_FOUNDRY_LEMMA, "test_l");
+        data.put(Attributes.DEFAULT_FOUNDRY_POS, "test_p");
+        data.put(Attributes.DEFAULT_FOUNDRY_CONSTITUENT, "test_const");
     }
 
     private ContextHolder beansHolder;

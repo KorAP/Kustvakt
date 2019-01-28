@@ -109,10 +109,10 @@ public class UserdataTest {
     public void testUserdataDefaultFields () throws KustvaktException {
         UserSettingProcessor settings = new UserSettingProcessor();
         Map<String, Object> m = new HashMap<>();
-        m.put(Attributes.DEFAULT_REL_FOUNDRY, "rel_1");
-        m.put(Attributes.DEFAULT_CONST_FOUNDRY, "const_1");
-        m.put(Attributes.DEFAULT_POS_FOUNDRY, "pos_1");
-        m.put(Attributes.DEFAULT_LEMMA_FOUNDRY, "lemma_1");
+        m.put(Attributes.DEFAULT_FOUNDRY_RELATION, "rel_1");
+        m.put(Attributes.DEFAULT_FOUNDRY_CONSTITUENT, "const_1");
+        m.put(Attributes.DEFAULT_FOUNDRY_POS, "pos_1");
+        m.put(Attributes.DEFAULT_FOUNDRY_LEMMA, "lemma_1");
         m.put(Attributes.PAGE_LENGTH, 10);
         m.put(Attributes.QUERY_LANGUAGE, "poliqarp");
         m.put(Attributes.METADATA_QUERY_EXPERT_MODUS, false);
@@ -121,10 +121,10 @@ public class UserdataTest {
 
         assertNotEquals(m.size(), settings.size());
         assertEquals(settings.defaultFields().length, settings.size());
-        assertEquals("rel_1", settings.get(Attributes.DEFAULT_REL_FOUNDRY));
-        assertEquals("pos_1", settings.get(Attributes.DEFAULT_POS_FOUNDRY));
-        assertEquals("lemma_1", settings.get(Attributes.DEFAULT_LEMMA_FOUNDRY));
-        assertEquals("const_1", settings.get(Attributes.DEFAULT_CONST_FOUNDRY));
+        assertEquals("rel_1", settings.get(Attributes.DEFAULT_FOUNDRY_RELATION));
+        assertEquals("pos_1", settings.get(Attributes.DEFAULT_FOUNDRY_POS));
+        assertEquals("lemma_1", settings.get(Attributes.DEFAULT_FOUNDRY_LEMMA));
+        assertEquals("const_1", settings.get(Attributes.DEFAULT_FOUNDRY_CONSTITUENT));
         assertEquals(10, settings.get(Attributes.PAGE_LENGTH));
 
     }

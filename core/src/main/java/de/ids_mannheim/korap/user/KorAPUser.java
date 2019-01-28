@@ -20,7 +20,7 @@ public class KorAPUser extends User {
     private Long URIExpiration;
 
 
-    protected KorAPUser (String username) {
+    public KorAPUser (String username) {
         super(username, 0);
         this.URIFragment = "";
         this.URIExpiration = 0L;
