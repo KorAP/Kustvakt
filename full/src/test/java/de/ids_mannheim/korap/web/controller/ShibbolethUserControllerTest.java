@@ -201,7 +201,7 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 		String entity = response.getEntity(String.class);
 		JsonNode node = JsonUtils.readTree(entity);
 		assertNotNull(node);
-		assertEquals(StatusCodes.NO_RESULT_FOUND, node.at("/errors/0/0").asInt());
+		assertEquals(StatusCodes.NO_RESOURCE_FOUND, node.at("/errors/0/0").asInt());
 		assertEquals("UserDetails", node.at("/errors/0/2").asText());
 		helper().dropUser("userservicetest");
 	}

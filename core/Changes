@@ -20,6 +20,8 @@
    - Added default setting key validation & fixed UserdataTest (margaretha)   
 28/01/2019
    - Updated Rewrite handler (margaretha)
+29/01/2019
+   - Handled "no resource found" cases (margaretha, issue #37)   
 
 version 0.61.4
 14/11/2018

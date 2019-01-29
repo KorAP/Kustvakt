@@ -55,14 +55,13 @@ public class DefaultSettingDao {
         entityManager.merge(defaultSetting);
     }
 
-    public void deleteDefaultSetting (DefaultSetting defaultSetting)
+    public void deleteDefaultSetting (String username)
             throws KustvaktException {
-        ParameterChecker.checkObjectValue(defaultSetting, "defaultSetting");
-        if (!entityManager.contains(defaultSetting)) {
-            defaultSetting = entityManager.merge(defaultSetting);
+        ParameterChecker.checkObjectValue(username, "defaultSetting");
+        DefaultSetting defaultSetting = retrieveDefautlSetting(username);
+        if (defaultSetting != null){
+            entityManager.remove(defaultSetting);
         }
-        entityManager.remove(defaultSetting);
-
     }
 
     public DefaultSetting retrieveDefautlSetting (String username)

@@ -94,6 +94,10 @@ public class CoreResponseHandler {
             case StatusCodes.STATUS_OK:
                 status = Response.Status.OK;
                 break;
+            // EM: Added 
+            case StatusCodes.NO_RESOURCE_FOUND:
+                status = Response.Status.NOT_FOUND;
+                break;
         }
         return status;
     }

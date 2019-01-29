@@ -27,7 +27,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * @author margaretha
  *
  */
-public class VirtualCorpusControllerAdminTest extends SpringJerseyTest {
+public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
 
     private String admin = "admin";
     private String username = "VirtualCorpusControllerAdminTest";
@@ -260,8 +260,10 @@ public class VirtualCorpusControllerAdminTest extends SpringJerseyTest {
 
         String accessId = testlistAccessByVC(vcId);
         testDeleteVCAccess(accessId);
+        
+        testEditVCType(admin, vcId, VirtualCorpusType.PRIVATE);
     }
-
+    
     private void testCreateVCAccess (String vcId, String groupId)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {

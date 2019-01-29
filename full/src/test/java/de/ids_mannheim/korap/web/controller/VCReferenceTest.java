@@ -120,7 +120,7 @@ public class VCReferenceTest extends SpringJerseyTest {
 
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(StatusCodes.NO_RESULT_FOUND,
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
                 node.at("/errors/0/0").asInt());
         assertEquals("username/vc1", node.at("/errors/0/2").asText());
     }

@@ -94,7 +94,8 @@ public class UserGroupDao {
             group = retrieveGroupById(groupId);
         }
         catch (NoResultException e) {
-            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
+            throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
+                    "Group " + groupId + " is not found.",
                     "groupId: " + groupId);
         }
 
@@ -202,9 +203,8 @@ public class UserGroupDao {
         }
         catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                    "No result found for query: retrieve group by used id "
-                            + userId,
-                    userId, e);
+                    "No group for username: " + userId + " is found", userId,
+                    e);
         }
     }
 
@@ -226,10 +226,8 @@ public class UserGroupDao {
             return (UserGroup) q.getSingleResult();
         }
         catch (NoResultException e) {
-            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                    "No result found for query: retrieve group by name "
-                            + groupName,
-                    groupName, e);
+            throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
+                    "Group " + groupName + " is not found", groupName, e);
         }
     }
 
@@ -261,7 +259,8 @@ public class UserGroupDao {
         }
         catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                    "No hidden group found for virtual corpus with id " + vcId,
+                    "No hidden group for virtual corpus with id " + vcId
+                            + " is found",
                     String.valueOf(vcId), e);
         }
 
@@ -318,7 +317,8 @@ public class UserGroupDao {
         }
         catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                    "No group found for status " + status, status.toString());
+                    "No group with status " + status + " is found",
+                    status.toString());
         }
 
     }

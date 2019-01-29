@@ -89,7 +89,7 @@ public class AnnotationService {
         }
         else {
             throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                    "No result found.", "");
+                    "No result found", "");
         }
 
     }

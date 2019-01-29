@@ -33,8 +33,8 @@ public class UserSettingControllerTest extends SpringJerseyTest {
 
     public ClientResponse sendPutRequest (String username,
             Map<String, Object> map) throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("~"+username)
-                .path("setting")
+        ClientResponse response = resource().path(API_VERSION)
+                .path("~" + username).path("setting")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .type(MediaType.APPLICATION_JSON).entity(map)
@@ -45,11 +45,12 @@ public class UserSettingControllerTest extends SpringJerseyTest {
 
     @Test
     public void testCreateSettingWithJson () throws KustvaktException {
-        String json = "{\"pos-foundry\":\"opennlp\",\"metadata\":\"author title "
-                + "textSigle availability\",\"resultPerPage\":25}";
+        String json =
+                "{\"pos-foundry\":\"opennlp\",\"metadata\":\"author title "
+                        + "textSigle availability\",\"resultPerPage\":25}";
 
-        ClientResponse response = resource().path(API_VERSION).path("~"+username)
-                .path("setting")
+        ClientResponse response = resource().path(API_VERSION)
+                .path("~" + username).path("setting")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .type(MediaType.APPLICATION_JSON).entity(json)
@@ -62,7 +63,9 @@ public class UserSettingControllerTest extends SpringJerseyTest {
 
         testRetrieveSettings(username, "opennlp", numOfResult, metadata);
 
+        testDeleteKeyNotExist(username);
         testDeleteKey(username, numOfResult, metadata);
+        testDeleteSetting(username);
     }
 
     @Test
@@ -99,11 +102,12 @@ public class UserSettingControllerTest extends SpringJerseyTest {
 
     @Test
     public void testPutDifferentUsername () throws KustvaktException {
-        String json = "{\"pos-foundry\":\"opennlp\",\"metadata\":\"author title "
-                + "textSigle availability\",\"resultPerPage\":25}";
+        String json =
+                "{\"pos-foundry\":\"opennlp\",\"metadata\":\"author title "
+                        + "textSigle availability\",\"resultPerPage\":25}";
 
-        ClientResponse response = resource().path(API_VERSION).path("~"+username)
-                .path("setting")
+        ClientResponse response = resource().path(API_VERSION)
+                .path("~" + username).path("setting")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username2, "pass"))
                 .type(MediaType.APPLICATION_JSON).entity(json)
@@ -118,8 +122,8 @@ public class UserSettingControllerTest extends SpringJerseyTest {
 
     @Test
     public void testGetDifferentUsername () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("~"+username)
-                .path("setting")
+        ClientResponse response = resource().path(API_VERSION)
+                .path("~" + username).path("setting")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username2, "pass"))
                 .get(ClientResponse.class);
@@ -132,9 +136,42 @@ public class UserSettingControllerTest extends SpringJerseyTest {
     }
 
     @Test
+    public void testGetSettingNotExist () throws KustvaktException {
+        String username = "tralala";
+        ClientResponse response = resource().path(API_VERSION)
+                .path("~" + username).path("setting")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .get(ClientResponse.class);
+
+        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                node.at("/errors/0/0").asInt());
+        assertEquals("No default setting for username: " + username +" is found",
+                node.at("/errors/0/1").asText());
+        assertEquals(username, node.at("/errors/0/2").asText());
+    }
+    
+    @Test
+    public void testDeleteSettingNotExist () throws KustvaktException {
+        String username = "tralala";
+        ClientResponse response = resource().path(API_VERSION)
+                .path("~" + username).path("setting")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .delete(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+
+    @Test
     public void testDeleteKeyDifferentUsername () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("~"+username)
-                .path("setting").path("pos-foundry")
+        ClientResponse response = resource().path(API_VERSION)
+                .path("~" + username).path("setting").path("pos-foundry")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username2, "pass"))
                 .delete(ClientResponse.class);
@@ -146,11 +183,47 @@ public class UserSettingControllerTest extends SpringJerseyTest {
                 node.at("/errors/0/0").asInt());
     }
 
+    private void testDeleteSetting (String username) throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION)
+                .path("~" + username).path("setting")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .delete(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        response = resource().path(API_VERSION).path("~" + username)
+                .path("setting")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get(ClientResponse.class);
+
+        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                node.at("/errors/0/0").asInt());
+        assertEquals(username, node.at("/errors/0/2").asText());
+    }
+    
+    // EM: deleting a non-existing key does not throw an error, because 
+    // the purpose of the request has been achieved.
+    private void testDeleteKeyNotExist (String username) throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION)
+                .path("~" + username).path("setting").path("lemma-foundry")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .delete(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+
     private void testDeleteKey (String username, int numOfResult,
             String metadata) throws KustvaktException {
 
-        ClientResponse response = resource().path(API_VERSION).path("~"+username)
-                .path("setting").path("pos-foundry")
+        ClientResponse response = resource().path(API_VERSION)
+                .path("~" + username).path("setting").path("pos-foundry")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .delete(ClientResponse.class);
@@ -173,8 +246,8 @@ public class UserSettingControllerTest extends SpringJerseyTest {
 
     private void testRetrieveSettings (String username, String posFoundry,
             int numOfResult, String metadata) throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("~"+username)
-                .path("setting")
+        ClientResponse response = resource().path(API_VERSION)
+                .path("~" + username).path("setting")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")

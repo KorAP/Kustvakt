@@ -37,10 +37,9 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
  */
 @Controller
 @Path("{version}/statistics/")
-@ResourceFilters({APIVersionFilter.class, PiwikFilter.class })
+@ResourceFilters({ APIVersionFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class StatisticController {
-
 
     private static final boolean DEBUG = false;
     private static Logger jlog =
@@ -49,7 +48,6 @@ public class StatisticController {
     private CoreResponseHandler kustvaktResponseHandler;
     @Autowired
     private SearchKrill searchKrill;
-
 
     /**
      * Returns statistics of the virtual corpus defined by the given
@@ -71,26 +69,26 @@ public class StatisticController {
 
         KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
 
-		String stats;
-		if (corpusQuery != null && !corpusQuery.isEmpty()) {
-			builder.with(corpusQuery);
-			String json = null;
-			try {
-				json = builder.toJSON();
-			}
-			catch (KustvaktException e) {
-				throw kustvaktResponseHandler.throwit(e);
-			}
-			stats = searchKrill.getStatistics(json);
-		}
-		else {
-			stats = searchKrill.getStatistics(null);
-		};
+        String stats;
+        if (corpusQuery != null && !corpusQuery.isEmpty()) {
+            builder.with(corpusQuery);
+            String json = null;
+            try {
+                json = builder.toJSON();
+            }
+            catch (KustvaktException e) {
+                throw kustvaktResponseHandler.throwit(e);
+            }
+            stats = searchKrill.getStatistics(json);
+        }
+        else {
+            stats = searchKrill.getStatistics(null);
+        };
 
-        if (stats.contains("-1")){
+        if (stats.contains("-1")) {
             throw kustvaktResponseHandler.throwit(StatusCodes.NO_RESULT_FOUND);
         }
-        if (DEBUG){
+        if (DEBUG) {
             jlog.debug("Stats: " + stats);
         }
         return Response.ok(stats).build();

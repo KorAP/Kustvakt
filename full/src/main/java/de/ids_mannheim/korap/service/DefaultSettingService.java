@@ -95,15 +95,16 @@ public class DefaultSettingService {
         username = verifiyUsername(username, contextUsername);
         return retrieveDefaultSettings(username);
     }
-    
-    public String retrieveDefaultSettings (String username) throws KustvaktException {
+
+    public String retrieveDefaultSettings (String username)
+            throws KustvaktException {
         DefaultSetting defaultSetting =
                 settingDao.retrieveDefautlSetting(username);
         if (defaultSetting == null) {
             return null;
         }
         return defaultSetting.getSettings();
-    }    
+    }
 
     public void deleteKey (String username, String contextUsername, String key)
             throws KustvaktException {
@@ -118,6 +119,12 @@ public class DefaultSettingService {
 
         defaultSetting.setSettings(json);
         settingDao.updateDefaultSetting(defaultSetting);
+    }
+
+    public void deleteSetting (String username, String contextUsername)
+            throws KustvaktException {
+        username = verifiyUsername(username, contextUsername);
+        settingDao.deleteDefaultSetting(username);
     }
 
 }

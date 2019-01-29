@@ -188,9 +188,8 @@ public class VirtualCorpusService {
 
         if (vc == null) {
             String vcCode = createdBy + "/" + vcName;
-            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                    "No result found for query: retrieve virtual corpus by name "
-                            + vcCode,
+            throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
+                    "Virtual corpus "+ vcCode+" is not found.",
                     String.valueOf(vcCode));
         }
         else if (vc.getCreatedBy().equals(username)
@@ -575,9 +574,8 @@ public class VirtualCorpusService {
         VirtualCorpus vc = vcDao.retrieveVCByName(vcName, createdBy);
         if (vc == null) {
             String vcCode = createdBy + "/" + vcName;
-            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                    "No result found for query: retrieve virtual corpus by name "
-                            + vcCode,
+            throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
+                    "Virtual corpus "+ vcCode+" is not found.",
                     String.valueOf(vcCode));
         }
         checkVCAccess(vc, username);

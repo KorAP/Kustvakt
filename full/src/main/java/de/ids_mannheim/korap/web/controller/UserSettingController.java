@@ -112,10 +112,11 @@ public class UserSettingController {
                     OAuth2Scope.READ_DEFAULT_SETTING);
             String settings = settingService.retrieveDefaultSettings(username,
                     tokenContext.getUsername());
-            if (settings == null){
+            if (settings == null) {
                 username = tokenContext.getUsername();
-                throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                        "No setting is found for " + username, username);
+                throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
+                        "No default setting for username: " + username+" is found",
+                        username);
             }
             return Response.ok(settings).build();
         }
@@ -125,11 +126,15 @@ public class UserSettingController {
     }
 
     /**
-     * Deletes an entry of a default setting of a user by the given key.
+     * Deletes an entry of a default setting of a user by the given
+     * key.
      * 
-     * @param context a security context
-     * @param username a username
-     * @param key the key of the default setting entry to be deleted
+     * @param context
+     *            a security context
+     * @param username
+     *            a username
+     * @param key
+     *            the key of the default setting entry to be deleted
      * @return
      */
     @DELETE
@@ -146,6 +151,35 @@ public class UserSettingController {
             scopeService.verifyScope(tokenContext,
                     OAuth2Scope.DELETE_DEFAULT_SETTING);
             settingService.deleteKey(username, tokenContext.getUsername(), key);
+            return Response.ok().build();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+    }
+
+    /**
+     * Deletes the default setting of the given username. If such a
+     * setting does not exists, no error will be thrown and response
+     * status 200 will be returned since the purpose of the request
+     * has been achieved.
+     * 
+     * @param context
+     * @param username
+     *            a username
+     * @return 200 if the request is successful
+     */
+    @DELETE
+    @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
+            BlockingFilter.class })
+    public Response deleteDefaultSetting (@Context SecurityContext context,
+            @PathParam("username") String username) {
+
+        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+        try {
+            scopeService.verifyScope(tokenContext,
+                    OAuth2Scope.DELETE_DEFAULT_SETTING);
+            settingService.deleteSetting(username, tokenContext.getUsername());
             return Response.ok().build();
         }
         catch (KustvaktException e) {

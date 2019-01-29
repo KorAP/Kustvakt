@@ -109,15 +109,10 @@ public class AnnotationController {
             throw kustvaktResponseHandler.throwit(new KustvaktException(
                     StatusCodes.INVALID_ARGUMENT, "Bad argument:", json));
         }
-        if (codes == null) {
+        if (codes == null || codes.isEmpty()) {
             throw kustvaktResponseHandler.throwit(
                     new KustvaktException(StatusCodes.MISSING_ATTRIBUTE,
-                            "Missing attribute:", "codes"));
-        }
-        else if (codes.isEmpty()) {
-            throw kustvaktResponseHandler
-                    .throwit(new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                            "No result found.", "codes:[]"));
+                            "codes is null or empty", "codes"));
         }
 
         try {

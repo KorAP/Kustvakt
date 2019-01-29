@@ -169,7 +169,7 @@ public class UserGroupMemberDao {
         }
         catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                    "No member is found in group " + groupId,
+                    "No member in group " + groupId+" is found",
                     String.valueOf(groupId));
         }
     }

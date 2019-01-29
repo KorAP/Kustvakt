@@ -175,9 +175,8 @@ public class VirtualCorpusDao {
             vc = (VirtualCorpus) q.getSingleResult();
         }
         catch (NoResultException e) {
-            throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                    "No result found for query: retrieve virtual corpus by id "
-                            + id,
+            throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
+                    "Virtual corpus with id: "+ id+" is not found",
                     String.valueOf(id), e);
         }
         return vc;

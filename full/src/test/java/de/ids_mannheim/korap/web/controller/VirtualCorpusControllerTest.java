@@ -29,7 +29,6 @@ import com.sun.jersey.spi.container.ContainerRequest;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.constant.AuthenticationScheme;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -41,7 +40,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * @author margaretha
  *
  */
-public class VirtualCorpusControllerTest extends SpringJerseyTest {
+public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
     private void checkWWWAuthenticateHeader (ClientResponse response) {
         Set<Entry<String, List<String>>> headers =
@@ -59,22 +58,6 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                         header.getValue().get(2));
             }
         }
-    }
-
-    private JsonNode testSearchVC (String username, String vcId)
-            throws UniformInterfaceException, ClientHandlerException,
-            KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc")
-                .path(vcId)
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
-        String entity = response.getEntity(String.class);
-        // System.out.println(entity);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
-        return JsonUtils.readTree(entity);
     }
 
     private JsonNode testListVC (String username)
@@ -821,7 +804,10 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         // list vc access by dory
         node = testlistAccessByVC("dory", vcId);
         assertEquals(0, node.size());
+        
+        testEditVCType("marlin", vcId, VirtualCorpusType.PRIVATE);
     }
+
 
     private ClientResponse testShareVC (String vcId)
             throws UniformInterfaceException, ClientHandlerException,

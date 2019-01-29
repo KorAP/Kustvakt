@@ -37,6 +37,9 @@
    - Added default foundry for morphology layer (margaretha)
 29/01/2019
    - Fixed share VC type (margaretha)
+   - Added delete setting controller (margaretha)
+   - Handled "no resource found" cases (margaretha, issue #37)
+   
 
 # version 0.61.4
 14/11/2018
