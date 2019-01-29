@@ -35,6 +35,8 @@
    - Fixed username verification in DefaultSettingService (margaretha)
    - Added foundry rewrite with user default setting (margaretha)
    - Added default foundry for morphology layer (margaretha)
+29/01/2019
+   - Fixed share VC type (margaretha)
 
 # version 0.61.4
 14/11/2018

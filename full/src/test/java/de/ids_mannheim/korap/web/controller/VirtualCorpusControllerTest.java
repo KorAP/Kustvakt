@@ -325,7 +325,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testCreatePublishVC () throws KustvaktException {
+    public void testCreatePublishedVC () throws KustvaktException {
         String json = "{\"name\": \"new published vc\",\"type\": \"PUBLISHED\""
                 + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
         ClientResponse response = resource().path(API_VERSION).path("vc")
@@ -688,11 +688,17 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
      * @throws KustvaktException
      */
     @Test
-    public void testEditPublishVC () throws KustvaktException {
+    public void testPublishProjectVC () throws KustvaktException {
 
         String vcId = "2";
+        
+        // check the vc type
+        JsonNode node = testSearchVC("dory", vcId);
+        assertEquals(VirtualCorpusType.PROJECT.displayName(),
+                node.get("type").asText());
+        
+        // edit vc
         String json = "{\"id\": \"" + vcId + "\", \"type\": \"PUBLISHED\"}";
-
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("edit")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -700,11 +706,10 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .post(ClientResponse.class, json);
-
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         // check VC
-        JsonNode node = testListOwnerVC("dory");
+        node = testListOwnerVC("dory");
         JsonNode n = node.get(1);
         assertEquals(VirtualCorpusType.PUBLISHED.displayName(),
                 n.get("type").asText());
@@ -782,11 +787,21 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
             ClientHandlerException, KustvaktException {
 
         String vcId = "5";
+        
+        // check the vc type
+        JsonNode node = testSearchVC("marlin", vcId);
+        assertEquals("marlin VC", node.at("/name").asText());
+        assertEquals("private", node.at("/type").asText());
+        
         ClientResponse response = testShareVC(vcId);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
+        // check the vc type
+        node = testSearchVC("marlin", vcId);
+        assertEquals("project", node.at("/type").asText());
+        
         // list vc access by marlin
-        JsonNode node = testlistAccessByVC("marlin", vcId);
+        node = testlistAccessByVC("marlin", vcId);
         assertEquals(1, node.size());
         node = node.get(0);
         assertEquals(5, node.at("/vcId").asInt());
@@ -799,7 +814,7 @@ public class VirtualCorpusControllerTest extends SpringJerseyTest {
         testCreateNonUniqueAccess(vcId);
         testDeleteAccessUnauthorized(accessId);
 
-        // delete access
+        // delete access by vc-admin
         // dory is a vc-admin in marlin group
         testDeleteAccess("dory", accessId);
 

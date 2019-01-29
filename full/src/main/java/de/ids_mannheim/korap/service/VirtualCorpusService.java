@@ -459,7 +459,7 @@ public class VirtualCorpusService {
                         cause.getMessage());
             }
             
-            vcDao.editVirtualCorpus(vc, null, VirtualCorpusType.PUBLISHED, null,
+            vcDao.editVirtualCorpus(vc, null, VirtualCorpusType.PROJECT, null,
                     null, null, null, null, vc.isCached());
         }
     }
