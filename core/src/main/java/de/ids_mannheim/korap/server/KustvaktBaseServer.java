@@ -101,7 +101,8 @@ public abstract class KustvaktBaseServer {
         FileOutputStream fos = new FileOutputStream(new File("shutdownToken"));
         OutputStreamWriter writer =
                 new OutputStreamWriter(fos, StandardCharsets.UTF_8.name());
-        writer.write(shutdownToken);
+        writer.append("token=");
+        writer.append(shutdownToken);
         writer.flush();
         writer.close();
 

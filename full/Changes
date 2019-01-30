@@ -39,7 +39,8 @@
    - Fixed share VC type (margaretha)
    - Added delete setting controller (margaretha)
    - Handled "no resource found" cases (margaretha, issue #37)
-   
+30/01/2019
+   - Added server shutdown description in readme (margaretha) 
 
 # version 0.61.4
 14/11/2018

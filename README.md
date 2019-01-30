@@ -96,15 +96,18 @@ The default base URL is
 
 	kustvakt.base.url=/kustvakt/api/*
 
-### Setting Default Layers
+### Setting Default Foundries
 
-The values of the following properties are foundries. 
+These properties define the default foundries used for specific layers, 
+for instance in a rewrite, a default foundry may be added to a Koral query
+missing a foundry.   
+   
 
-	default.layer.partOfSpeech = tt
-	default.layer.lemma = tt
-	default.layer.orthography = opennlp
-	default.layer.dependency = mate
-	default.layer.constituent = corenlp
+	default.foundry.partOfSpeech = tt
+	default.foundry.lemma = tt
+	default.foundry.orthography = opennlp
+	default.foundry.dependency = malt
+	default.foundry.constituent = corenlp
 
 
 # Running Kustvakt Server
@@ -116,7 +119,9 @@ Kustvakt full version requires an LDAP configuration file containing an admin pa
 java -jar target/Kustvakt-[lite/full]-[version].jar    
 </pre>
 
-To run Kustvakt with a custom spring XML config, the config must be included in the classpath. For instance:
+To run Kustvakt with a custom spring XML configuration file, it must be included in the classpath. For instance:
+```custom-spring-config.xml``` is located in ```config``` folder. 
+The ```config``` folder must be included in the classpath with ```-cp``` command.
 
 <pre>
 cd target/
@@ -124,8 +129,21 @@ java -cp Kustvakt-full-[version].jar:config de.ids_mannheim.korap.server.Kustvak
 --spring-config custom-spring-config.xml
 </pre>
 
-where ```custom-spring-config.xml``` is in the ```config``` folder.
 
+# Shutting down Kustvakt Server
+
+Kustvakt server can be shut down by sending a POST request with a shutdown token. When Kustvakt server is started, a shutdown token is automatically generated and written to a ```shutdownToken``` file with the following format:
+
+<pre>
+token=[shutdown-token]
+</pre>
+
+A shutdown request can be sent as follows.
+
+<pre>
+curl -H "Content-Type: application/x-www-form-urlencoded" 
+"http://localhost:8089/shutdown" -d @shutdownToken  
+</pre>
 
 # Advanced Setup
 
