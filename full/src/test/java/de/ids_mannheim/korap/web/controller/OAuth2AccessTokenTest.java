@@ -152,7 +152,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Access token is not found",
+        assertEquals("Access token is invalid",
                 node.at("/errors/0/1").asText());
     }
 
@@ -190,7 +190,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Access token has been revoked",
+        assertEquals("Access token is invalid",
                 node.at("/errors/0/1").asText());
     }
 

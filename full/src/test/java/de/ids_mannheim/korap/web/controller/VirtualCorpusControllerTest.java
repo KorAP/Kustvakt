@@ -832,12 +832,14 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
             KustvaktException {
         ClientResponse response = testShareVC(vcId);
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
-        
         assertEquals(HttpStatus.SC_BAD_REQUEST, response.getStatus());
         assertEquals(StatusCodes.DB_INSERT_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertTrue(node.at("/errors/0/1").asText()
-                .startsWith("[SQLITE_CONSTRAINT_UNIQUE]"));
+        
+        // EM: message differs depending on the database used
+        // for testing. The message below is from sqlite.
+//        assertTrue(node.at("/errors/0/1").asText()
+//                .startsWith("[SQLITE_CONSTRAINT_UNIQUE]"));
     }
 
     @Test

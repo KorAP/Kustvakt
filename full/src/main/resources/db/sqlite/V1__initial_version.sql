@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS annotation_value(
 	FOREIGN KEY (key_id)
 		REFERENCES annotation_key (id)
 		ON DELETE CASCADE,
-	FOREIGN KEY (key_id)
+	FOREIGN KEY (value_id)
 		REFERENCES annotation (id)
 		ON DELETE CASCADE
 );

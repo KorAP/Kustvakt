@@ -84,7 +84,7 @@ public class OAuth2ClientService {
         int urlHashCode = 0;
         if (url != null && !url.isEmpty()) {
             urlHashCode = clientJson.getUrl().hashCode();
-            if (!redirectURIValidator.isValid(url)) {
+            if (!urlValidator.isValid(url)) {
                 throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                         url + " is invalid.", OAuth2Error.INVALID_REQUEST);
             }
@@ -92,7 +92,7 @@ public class OAuth2ClientService {
 
         String redirectURI = clientJson.getRedirectURI();
         if (redirectURI != null && !redirectURI.isEmpty()
-                && !urlValidator.isValid(redirectURI)) {
+                && !redirectURIValidator.isValid(redirectURI)) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     redirectURI + " is invalid.", OAuth2Error.INVALID_REQUEST);
         }
@@ -192,8 +192,8 @@ public class OAuth2ClientService {
         if (adminDao.isAdmin(username)
                 || client.getRegisteredBy().equals(username)) {
 
-            clientDao.deregisterClient(client);
             revokeAllAuthorizationsByClientId(clientId);
+            clientDao.deregisterClient(client);
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,

@@ -35,7 +35,7 @@ public class OAuth2Authentication implements AuthenticationIface {
         AccessToken accessToken = accessDao.retrieveAccessToken(authToken);
         if (accessToken.isRevoked()) {
             throw new KustvaktException(StatusCodes.INVALID_ACCESS_TOKEN,
-                    "Access token has been revoked");
+                    "Access token is invalid");
         }
 
         String scopes = scopeService

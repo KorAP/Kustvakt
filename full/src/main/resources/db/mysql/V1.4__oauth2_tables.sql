@@ -1,10 +1,5 @@
 -- EM: modified from Michael Hanl version
 
-CREATE TABLE IF NOT EXISTS oauth2_client_url (
-	url_hashcode INTEGER PRIMARY KEY NOT NULL,	
-	url TEXT DEFAULT NULL	
-);
-
 -- oauth2 db tables
 CREATE TABLE IF NOT EXISTS oauth2_client (
 	id VARCHAR(100) PRIMARY KEY NOT NULL,
@@ -15,9 +10,9 @@ CREATE TABLE IF NOT EXISTS oauth2_client (
 	redirect_uri TEXT DEFAULT NULL,
 	description VARCHAR(250) NOT NULL,
 	registered_by VARCHAR(100) NOT NULL,
-	url_id INTEGER,
-	FOREIGN KEY (url_id)
-	   REFERENCES oauth2_client_url(url_hashcode)
+	url_hashcode INTEGER NOT NULL,	
+	url TEXT DEFAULT NULL,
+	UNIQUE INDEX unique_url(url_hashcode)
 );
 
 CREATE TABLE IF NOT EXISTS oauth2_access_scope (
@@ -58,12 +53,15 @@ CREATE TABLE IF NOT EXISTS oauth2_refresh_token (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT,
 	token VARCHAR(255) NOT NULL,
 	user_id VARCHAR(100) DEFAULT NULL,
-	client_id VARCHAR(100) DEFAULT NULL,
+	user_auth_time TIMESTAMP NOT NULL,
 	created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	expiry_date TIMESTAMP NULL,
 	is_revoked BOOLEAN DEFAULT 0,
-	FOREIGN KEY (client_id)
+	client VARCHAR(100) NOT NULL,
+	FOREIGN KEY (client)
 	   REFERENCES oauth2_client(id)
+	   -- these will delete all refresh tokens related to the client
+	   ON DELETE CASCADE
 );
 
 CREATE TABLE oauth2_refresh_token_scope (
@@ -83,7 +81,9 @@ CREATE TABLE IF NOT EXISTS oauth2_access_token (
 	user_auth_time TIMESTAMP NULL,
     refresh_token INTEGER DEFAULT NULL,
 	FOREIGN KEY (client_id)
-	   REFERENCES oauth2_client(id),
+	   REFERENCES oauth2_client(id)
+	   -- these will delete all access tokens related to the client
+	   ON DELETE CASCADE,
 	FOREIGN KEY (refresh_token)
 	   REFERENCES oauth2_refresh_token(id)
 );

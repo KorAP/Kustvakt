@@ -34,9 +34,11 @@ public class VirtualCorpusServiceTest {
     @Test
     public void testCreateNonUniqueVC () throws KustvaktException {
         thrown.expect(KustvaktException.class);
-        thrown.expectMessage("A UNIQUE constraint failed "
-                + "(UNIQUE constraint failed: virtual_corpus.name, "
-                + "virtual_corpus.created_by)");
+        // EM: message differs depending on the database used
+        // for testing. The message below is from sqlite.
+//        thrown.expectMessage("A UNIQUE constraint failed "
+//                + "(UNIQUE constraint failed: virtual_corpus.name, "
+//                + "virtual_corpus.created_by)");
 
         VirtualCorpusJson vc = new VirtualCorpusJson();
         vc.setCorpusQuery("corpusSigle=GOE");

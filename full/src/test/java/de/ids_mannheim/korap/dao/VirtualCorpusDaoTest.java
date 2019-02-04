@@ -10,19 +10,15 @@ import javax.persistence.PersistenceException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
 import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:test-config.xml")
-public class VirtualCorpusDaoTest {
+public class VirtualCorpusDaoTest extends SpringJerseyTest{
 
     @Autowired
     private VirtualCorpusDao dao;

@@ -115,7 +115,7 @@ public class AccessTokenDao extends KustvaktCacheable {
         }
         catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.INVALID_ACCESS_TOKEN,
-                    "Access token is not found", OAuth2Error.INVALID_TOKEN);
+                    "Access token is invalid", OAuth2Error.INVALID_TOKEN);
         }
     }
 

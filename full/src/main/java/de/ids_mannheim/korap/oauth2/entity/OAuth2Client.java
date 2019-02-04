@@ -2,16 +2,13 @@ package de.ids_mannheim.korap.oauth2.entity;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
@@ -40,9 +37,9 @@ public class OAuth2Client implements Comparable<OAuth2Client>{
     private String registeredBy;
     private String description;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "url_id")
-    private OAuth2ClientUrl clientUrl;
+    private String url;
+    @Column(name = "url_hashcode")
+    private int urlHashCode;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "client")
     private List<RefreshToken> refreshTokens;
@@ -55,6 +52,11 @@ public class OAuth2Client implements Comparable<OAuth2Client>{
                 + ", description=" + description;
     }
 
+    @Override
+    public int compareTo (OAuth2Client o) {
+        return this.getName().compareTo(o.getName());
+    }
+    
     public boolean isSuper () {
         return isSuper;
     }
@@ -119,16 +121,19 @@ public class OAuth2Client implements Comparable<OAuth2Client>{
         this.description = description;
     }
 
-    public OAuth2ClientUrl getClientUrl () {
-        return clientUrl;
+    public String getUrl () {
+        return url;
     }
 
-    public void setClientUrl (OAuth2ClientUrl clientUrl) {
-        this.clientUrl = clientUrl;
+    public void setUrl (String url) {
+        this.url = url;
     }
 
-    @Override
-    public int compareTo (OAuth2Client o) {
-        return this.getName().compareTo(o.getName());
+    public int getUrlHashCode () {
+        return urlHashCode;
+    }
+
+    public void setUrlHashCode (int urlHashCode) {
+        this.urlHashCode = urlHashCode;
     }
 }

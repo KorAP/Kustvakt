@@ -233,7 +233,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         node = JsonUtils.readTree(response.getEntity(String.class));
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Access token has been revoked",
+        assertEquals("Access token is invalid",
                 node.at("/errors/0/1").asText());
     }
 
@@ -465,11 +465,11 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Access token has been revoked",
+        assertEquals("Access token is invalid",
                 node.at("/errors/0/1").asText());
     }
 
-    private void requestUserClientList () throws KustvaktException {
+    private void requestUserClientList (String userAuthHeader) throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("client_id", superClientId);
         form.add("client_secret", clientSecret);
@@ -519,7 +519,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 confidentialClientId, clientSecret, code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        requestUserClientList();
+        requestUserClientList(userAuthHeader);
         testListClientWithMultipleRefreshTokens(userAuthHeader);
 
         testRequestTokenWithRevokedRefreshToken(publicClientId, clientSecret,
@@ -543,7 +543,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        requestUserClientList();
+        requestUserClientList(userAuthHeader);
 
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         String accessToken = node.at("/access_token").asText();
@@ -578,7 +578,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         node = JsonUtils.readTree(response.getEntity(String.class));
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Access token has been revoked",
+        assertEquals("Access token is invalid",
                 node.at("/errors/0/1").asText());
 
         testRequestTokenWithRevokedRefreshToken(clientId, clientSecret,
