@@ -2,7 +2,9 @@
 04/02/2019
    - Fixed SQL data and merged oauth2_client_url and oauth2_client (margaretha)
    - Updated client deregistration behavior (margaretha)
- 
+05/02/2019
+   - Added delete-group-by-name controller (margaretha)
+   - Added unique index to group name (margaretha)
 
 # version 0.61.5
 17/12/2018

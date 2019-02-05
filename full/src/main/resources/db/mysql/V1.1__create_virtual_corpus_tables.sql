@@ -22,7 +22,8 @@ CREATE TABLE IF NOT EXISTS user_group (
   status varchar(100) NOT NULL,
   created_by varchar(100) NOT NULL,
   deleted_by varchar(100) DEFAULT NULL,
-  INDEX status_index(status)
+  INDEX status_index(status),
+  UNIQUE INDEX unique_name(name);
 );
 
 CREATE TABLE IF NOT EXISTS user_group_member (

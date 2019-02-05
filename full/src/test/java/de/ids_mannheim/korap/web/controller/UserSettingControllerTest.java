@@ -28,8 +28,8 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  */
 public class UserSettingControllerTest extends SpringJerseyTest {
 
-    private String username = "UserSettingTest";
-    private String username2 = "UserSettingTest2";
+    private String username = "UserSetting_Test";
+    private String username2 = "UserSetting.Test2";
 
     public ClientResponse sendPutRequest (String username,
             Map<String, Object> map) throws KustvaktException {

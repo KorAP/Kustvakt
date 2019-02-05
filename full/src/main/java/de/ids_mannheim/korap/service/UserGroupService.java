@@ -203,13 +203,15 @@ public class UserGroupService {
                 UserGroupStatus.ACTIVE);
         UserGroup userGroup = userGroupDao.retrieveGroupById(groupId);
 
-        for (String memberId : groupJson.getMembers()) {
-            if (memberId.equals(createdBy)) {
-                // skip owner, already added while creating group.
-                continue;
+        if (groupJson.getMembers() != null){
+            for (String memberId : groupJson.getMembers()) {
+                if (memberId.equals(createdBy)) {
+                    // skip owner, already added while creating group.
+                    continue;
+                }
+                inviteGroupMember(memberId, userGroup, createdBy,
+                        GroupMemberStatus.PENDING);
             }
-            inviteGroupMember(memberId, userGroup, createdBy,
-                    GroupMemberStatus.PENDING);
         }
     }
 
@@ -225,6 +227,27 @@ public class UserGroupService {
                 || adminDao.isAdmin(username)) {
             // soft delete
             userGroupDao.deleteGroup(groupId, username,
+                    config.isSoftDeleteGroup());
+        }
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
+    }
+    
+    public void deleteGroup (String groupName, String username)
+            throws KustvaktException {
+        UserGroup userGroup = userGroupDao.retrieveGroupByName(groupName);
+        if (userGroup.getStatus() == UserGroupStatus.DELETED) {
+            // EM: should this be "not found" instead?
+            throw new KustvaktException(StatusCodes.GROUP_DELETED,
+                    "Group " + userGroup.getName() + " has been deleted.",
+                    userGroup.getName());
+        }
+        else if (userGroup.getCreatedBy().equals(username)
+                || adminDao.isAdmin(username)) {
+            // soft delete
+            userGroupDao.deleteGroup(userGroup.getId(), username,
                     config.isSoftDeleteGroup());
         }
         else {

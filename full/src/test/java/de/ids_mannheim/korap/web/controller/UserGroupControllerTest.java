@@ -58,6 +58,17 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         return JsonUtils.readTree(entity);
     }
+    
+    private void deleteGroupByName (String groupName) throws KustvaktException{
+        ClientResponse response = resource().path(API_VERSION).path("group")
+                .path(groupName)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .delete(ClientResponse.class);
+        
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
 
     // dory is a group admin in dory group
     @Test
@@ -122,7 +133,6 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 .path("list").header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
-        // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -132,8 +142,49 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 node.at("/errors/0/1").asText());
     }
 
+    
     @Test
-    public void testCreateUserGroup () throws UniformInterfaceException,
+    public void testCreateGroupEmptyMembers () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        String groupName = "empty_group";
+        UserGroupJson json = new UserGroupJson();
+        json.setName(groupName);
+        json.setMembers(new String[] {});
+
+        ClientResponse response = resource().path(API_VERSION).path("group")
+                .path("create").type(MediaType.APPLICATION_JSON)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(json)
+                .post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+     
+        deleteGroupByName(groupName);
+    }
+
+    
+    @Test
+    public void testCreateGroupMissingMembers () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        String groupName = "missing-member-group";
+        UserGroupJson json = new UserGroupJson();
+        json.setName(groupName);
+
+        ClientResponse response = resource().path(API_VERSION).path("group")
+                .path("create").type(MediaType.APPLICATION_JSON)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(json)
+                .post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
+        deleteGroupByName(groupName);
+    }
+    
+    @Test
+    public void testUserGroup () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
 
         UserGroupJson json = new UserGroupJson();
@@ -287,6 +338,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
+        // EM: this is so complicated because the group retrieval are not allowed 
+        // for delete groups
         // check group
         response = resource().path(API_VERSION).path("group").path("list")
                 .path("system-admin").queryParam("username", username)
@@ -295,16 +348,17 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                         .createBasicAuthorizationHeaderValue(admin, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
+        
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.getEntity(String.class);
-
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(1, node.size());
-        assertEquals(groupId, node.at("/0/id").asText());
-
-        // check group members
-        for (int i = 0; i < node.at("/0/members").size(); i++) {
-            assertEquals(GroupMemberStatus.DELETED.name(),
-                    node.at("/0/members/" + i + "/status").asText());
+        for (int j = 0; j < node.size(); j++){
+            JsonNode group = node.get(j);
+            // check group members
+            for (int i = 0; i < group.at("/0/members").size(); i++) {
+                assertEquals(GroupMemberStatus.DELETED.name(),
+                        group.at("/0/members/" + i + "/status").asText());
+            }
         }
     }
 

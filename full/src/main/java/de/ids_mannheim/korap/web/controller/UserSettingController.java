@@ -41,7 +41,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
  *
  */
 @Controller
-@Path("{version}/{username: ~[a-zA-Z0-9_]+}/setting")
+@Path("{version}/{username: ~[a-zA-Z0-9_.]+}/setting")
 @ResourceFilters({ AuthenticationFilter.class, APIVersionFilter.class,
         PiwikFilter.class })
 public class UserSettingController {
@@ -55,7 +55,7 @@ public class UserSettingController {
 
     /**
      * Creates a default setting of the given username.
-     * The setting inputs should be represented as a pair of keys and
+     * The setting inputs should be represented as pairs of keys and
      * values (a map). The keys must only contains alphabets, numbers,
      * hypens or underscores.
      * 

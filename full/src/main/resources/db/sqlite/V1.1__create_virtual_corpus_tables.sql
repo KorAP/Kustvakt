@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS user_group (
 );
 
 CREATE INDEX user_group_index ON user_group(status);
+CREATE UNIQUE INDEX user_group_name on user_group(name);
 
 
 CREATE TABLE IF NOT EXISTS user_group_member (

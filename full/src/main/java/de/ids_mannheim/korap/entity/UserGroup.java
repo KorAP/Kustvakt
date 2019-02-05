@@ -39,6 +39,7 @@ public class UserGroup implements Comparable<UserGroup> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    // unique
     @Column(name = "name")
     private String name;
     @Column(name = "created_by")

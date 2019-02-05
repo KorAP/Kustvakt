@@ -1,3 +1,7 @@
+version 0.61.4
+05/02/2019
+  - Updated kustvakt-lite.conf
+
 version 0.61.3
 19/12/2018
   - Fixed getUser in DummyAuthenticationManager (margaretha)

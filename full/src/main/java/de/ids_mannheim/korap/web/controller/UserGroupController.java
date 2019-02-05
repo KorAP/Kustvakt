@@ -207,6 +207,22 @@ public class UserGroupController {
             throw kustvaktResponseHandler.throwit(e);
         }
     }
+    
+    @DELETE
+    @Path("{groupName}")
+    public Response deleteUserGroupByName (@Context SecurityContext securityContext,
+            @PathParam("groupName") String groupName) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            scopeService.verifyScope(context, OAuth2Scope.DELETE_USER_GROUP);
+            service.deleteGroup(groupName, context.getUsername());
+            return Response.ok().build();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+    }
 
     /**
      * Deletes a user-group member. Group owner cannot be deleted.
