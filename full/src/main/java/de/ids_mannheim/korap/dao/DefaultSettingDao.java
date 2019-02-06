@@ -58,13 +58,13 @@ public class DefaultSettingDao {
     public void deleteDefaultSetting (String username)
             throws KustvaktException {
         ParameterChecker.checkObjectValue(username, "defaultSetting");
-        DefaultSetting defaultSetting = retrieveDefautlSetting(username);
+        DefaultSetting defaultSetting = retrieveDefaultSetting(username);
         if (defaultSetting != null){
             entityManager.remove(defaultSetting);
         }
     }
 
-    public DefaultSetting retrieveDefautlSetting (String username)
+    public DefaultSetting retrieveDefaultSetting (String username)
             throws KustvaktException {
         ParameterChecker.checkStringValue(username, "username");
 

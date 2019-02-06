@@ -61,7 +61,7 @@ public class DefaultSettingService {
         processor.readQuietly(map, false);
 
         DefaultSetting defaultSetting =
-                settingDao.retrieveDefautlSetting(username);
+                settingDao.retrieveDefaultSetting(username);
         if (defaultSetting == null) {
             createDefaultSetting(username, processor);
             return HttpStatus.SC_CREATED;
@@ -99,7 +99,7 @@ public class DefaultSettingService {
     public String retrieveDefaultSettings (String username)
             throws KustvaktException {
         DefaultSetting defaultSetting =
-                settingDao.retrieveDefautlSetting(username);
+                settingDao.retrieveDefaultSetting(username);
         if (defaultSetting == null) {
             return null;
         }
@@ -110,7 +110,7 @@ public class DefaultSettingService {
             throws KustvaktException {
         username = verifiyUsername(username, contextUsername);
         DefaultSetting defaultSetting =
-                settingDao.retrieveDefautlSetting(username);
+                settingDao.retrieveDefaultSetting(username);
 
         String jsonSettings = defaultSetting.getSettings();
         UserSettingProcessor processor = new UserSettingProcessor(jsonSettings);

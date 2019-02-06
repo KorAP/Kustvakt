@@ -73,9 +73,10 @@ public class KustvaktConfiguration {
     private String default_pos;
     private String default_morphology;
     private String default_lemma;
-    private String default_token;
+    private String default_orthography;
     private String default_dep;
     private String default_const;
+    private String defaultStructureFoundry;
     private ArrayList<String> foundries;
     private ArrayList<String> layers;
 
@@ -140,8 +141,10 @@ public class KustvaktConfiguration {
         default_morphology = properties.getProperty("default.foundry.morphology", "marmot");
         default_pos =
                 properties.getProperty("default.foundry.partOfSpeech", "tt");
-        default_token =
+        default_orthography =
                 properties.getProperty("default.foundry.orthography", "opennlp");
+        defaultStructureFoundry =
+                properties.getProperty("default.foundry.structure", "base");
 
         // security configuration
         inactiveTime = TimeUtils.convertTimeToSeconds(

@@ -1,16 +1,14 @@
-version 0.61.4
+version 0.61.3
 05/02/2019
   - Updated kustvakt-lite.conf
-
-version 0.61.3
-19/12/2018
-  - Fixed getUser in DummyAuthenticationManager (margaretha)
-  - Fixed search test with fields parameter (margaretha)
 
 version 0.61.2
 14/11/2018
    - Integrated lite and full services and controllers in core (margaretha)
    - Added annotation services (margaretha)
+19/12/2018
+  - Fixed getUser in DummyAuthenticationManager (margaretha)
+  - Fixed search test with fields parameter (margaretha)
 
 version 0.61.1
 22/10/2018

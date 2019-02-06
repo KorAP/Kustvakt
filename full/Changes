@@ -5,6 +5,8 @@
 05/02/2019
    - Added delete-group-by-name controller (margaretha)
    - Added unique index to group name (margaretha)
+06/02/2019
+   - Updated a user setting test using array for multiple values (margaretha)
 
 # version 0.61.5
 17/12/2018

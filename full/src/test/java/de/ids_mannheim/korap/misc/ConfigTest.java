@@ -50,7 +50,7 @@ public class ConfigTest extends SpringJerseyTest {
 
     @Test
     public void testProperties () {
-        assertEquals("token layer does not match", "opennlp", config.getDefault_token());
+        assertEquals("token layer does not match", "opennlp", config.getDefault_orthography());
         assertEquals("token expiration does not match",
                 TimeUtils.convertTimeToSeconds("1D"), config.getLongTokenTTL());
     }

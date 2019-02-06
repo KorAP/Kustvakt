@@ -46,8 +46,8 @@ public class UserSettingControllerTest extends SpringJerseyTest {
     @Test
     public void testCreateSettingWithJson () throws KustvaktException {
         String json =
-                "{\"pos-foundry\":\"opennlp\",\"metadata\":\"author title "
-                        + "textSigle availability\",\"resultPerPage\":25}";
+                "{\"pos-foundry\":\"opennlp\",\"metadata\":[\"author\", \"title\","
+                        + "\"textSigle\", \"availability\"],\"resultPerPage\":25}";
 
         ClientResponse response = resource().path(API_VERSION)
                 .path("~" + username).path("setting")
@@ -59,7 +59,8 @@ public class UserSettingControllerTest extends SpringJerseyTest {
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
         int numOfResult = 25;
-        String metadata = "author title textSigle availability";
+        String metadata = "[\"author\",\"title\",\"textSigle\","
+                + "\"availability\"]";
 
         testRetrieveSettings(username, "opennlp", numOfResult, metadata);
 
@@ -254,6 +255,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
                 .get(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
+        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         if (posFoundry == null) {
             assertTrue(node.at("/pos-foundry").isMissingNode());
@@ -262,7 +264,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
             assertEquals(posFoundry, node.at("/pos-foundry").asText());
         }
         assertEquals(numOfResult, node.at("/resultPerPage").asInt());
-        assertEquals(metadata, node.at("/metadata").asText());
+        assertEquals(metadata, node.at("/metadata").toString());
     }
 
 }

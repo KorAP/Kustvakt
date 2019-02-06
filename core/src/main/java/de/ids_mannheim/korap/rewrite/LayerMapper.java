@@ -53,6 +53,9 @@ public class LayerMapper {
                 case "surface":
                     return "opennlp";
                 // EM: added
+                case "s":
+                    return (String) settings
+                            .get(Attributes.DEFAULT_FOUNDRY_STRUCTURE);    
                 case "morphology":
                     return (String) settings
                             .get(Attributes.DEFAULT_FOUNDRY_MORPHOLOGY);    
@@ -72,13 +75,14 @@ public class LayerMapper {
                     return config.getDefault_pos();
                 case "lemma":
                     return config.getDefault_lemma();
-                case "morphology":
-                    return config.getDefault_morphology();
                 case "surface":
-                    return config.getDefault_token();
+                    return config.getDefault_orthography();
                     // refers to "structure" and is used for paragraphs or sentence boundaries
                 case "s":
-                    return "base";
+                    return config.getDefaultStructureFoundry();
+                //EM: added
+                case "morphology":
+                    return config.getDefault_morphology();
                 default:
                     // if the layer is not in this specific listing, assume a default layer
                     // like orth or other tokenization layers
@@ -101,8 +105,10 @@ public class LayerMapper {
                 //todo the orth layer does not need a foundry entry
             case "orth":
                 return "surface";
-            case "t":
-                return "surface";
+            // EM: layer t does not exist at all   
+//            case "t":
+//                return "surface";
+            // EM: this islegacy support    
             case "const":
                 return "c";
             case "p":

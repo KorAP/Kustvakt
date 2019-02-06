@@ -149,7 +149,8 @@ public class Attributes {
     public static final String DEFAULT_FOUNDRY_CONSTITUENT = "constituent-foundry";
     public static final String DEFAULT_FOUNDRY_RELATION = "relation-foundry";
     public static final String DEFAULT_FOUNDRY_MORPHOLOGY = "morphology-foundry";
-
+    public static final String DEFAULT_FOUNDRY_STRUCTURE = "structure-foundry";
+    
     /**
      * db column keys
      */

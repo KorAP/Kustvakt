@@ -114,7 +114,7 @@ public class FoundryRewriteTest extends SpringJerseyTest {
     public void testDefaultLayerMapperThrowsNoException () {
         assertEquals(config.getDefault_lemma(), m.findFoundry("lemma"));
         assertEquals(config.getDefault_pos(), m.findFoundry("pos"));
-        assertEquals(config.getDefault_token(), m.findFoundry("surface"));
+        assertEquals(config.getDefault_orthography(), m.findFoundry("surface"));
         assertEquals(config.getDefault_dep(), m.findFoundry("d"));
         assertEquals(config.getDefault_const(), m.findFoundry("c"));
     }
