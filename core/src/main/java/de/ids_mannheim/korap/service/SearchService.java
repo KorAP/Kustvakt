@@ -193,14 +193,7 @@ public class SearchService {
 
     }
 
-    public String retrieveMatchInfo (String corpusId, String docId,
-            String textId, String matchId, Set<String> foundries,
-            String username, HttpHeaders headers, Set<String> layers,
-            boolean spans, boolean highlights) throws KustvaktException {
-        String matchid =
-                searchKrill.getMatchId(corpusId, docId, textId, matchId);
-
-        User user = createUser(username, headers);
+    private Pattern determineAvailabilityPattern (User user) {
         Pattern p = null;
         if (user != null) {
             CorpusAccess corpusAccess = user.getCorpusAccess();
@@ -216,9 +209,22 @@ public class SearchService {
                     break;
             }
         }
+        return p;
+    }
+    
+    public String retrieveMatchInfo (String corpusId, String docId,
+            String textId, String matchId, Set<String> foundries,
+            String username, HttpHeaders headers, Set<String> layers,
+            boolean spans, boolean highlights) throws KustvaktException {
+        String matchid =
+                searchKrill.getMatchId(corpusId, docId, textId, matchId);
+
+        User user = createUser(username, headers);
+        Pattern p = determineAvailabilityPattern(user);
+        
         boolean match_only = foundries == null || foundries.isEmpty();
         String results;
-        try {
+//        try {
             if (!match_only) {
 
                 ArrayList<String> foundryList = new ArrayList<String>();
@@ -241,12 +247,12 @@ public class SearchService {
             else {
                 results = searchKrill.getMatch(matchid, p);
             }
-        }
-        catch (Exception e) {
-            jlog.error("Exception in the MatchInfo service encountered!", e);
-            throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
-                    e.getMessage());
-        }
+//        }
+//        catch (Exception e) {
+//            jlog.error("Exception in the MatchInfo service encountered!", e);
+//            throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT,
+//                    e.getMessage());
+//        }
         if (DEBUG){
             jlog.debug("MatchInfo results: " + results);
         }
@@ -254,9 +260,12 @@ public class SearchService {
     }
 
     public String retrieveDocMetadata (String corpusId, String docId,
-            String textId) {
+            String textId, String username, HttpHeaders headers)
+            throws KustvaktException {
+        User user = createUser(username, headers);
+        Pattern p = determineAvailabilityPattern(user);
         String textSigle = searchKrill.getTextSigle(corpusId, docId, textId);
-        return searchKrill.getFields(textSigle);
+        return searchKrill.getFields(textSigle, p);
     }
 
     public String getCollocationBase (String query) throws KustvaktException {

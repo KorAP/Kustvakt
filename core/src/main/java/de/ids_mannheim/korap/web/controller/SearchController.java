@@ -163,9 +163,29 @@ public class SearchController {
         return Response.ok(result).build();
     }
 
+    // EM: legacy support
+    @Deprecated
     @GET
     @Path("{version}/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
     public Response getMatchInfo (@Context SecurityContext ctx,
+            @Context HttpHeaders headers, @Context Locale locale,
+            @PathParam("corpusId") String corpusId,
+            @PathParam("docId") String docId,
+            @PathParam("textId") String textId,
+            @PathParam("matchId") String matchId,
+            @QueryParam("foundry") Set<String> foundries,
+            @QueryParam("layer") Set<String> layers,
+            @QueryParam("spans") Boolean spans, 
+            // Highlights may also be a list of valid highlight classes
+            @QueryParam("hls") Boolean highlights) throws KustvaktException {
+
+        return retrieveMatchInfo(ctx, headers, locale, corpusId, docId, textId,
+                matchId, foundries, layers, spans, highlights);
+    }
+    
+    @GET
+    @Path("{version}/corpus/{corpusId}/{docId}/{textId}/{matchId}")
+    public Response retrieveMatchInfo (@Context SecurityContext ctx,
             @Context HttpHeaders headers, @Context Locale locale,
             @PathParam("corpusId") String corpusId,
             @PathParam("docId") String docId,
@@ -183,10 +203,16 @@ public class SearchController {
         highlights = highlights != null ? highlights : false;
         if (layers == null || layers.isEmpty()) layers = new HashSet<>();
 
-        String results = searchService.retrieveMatchInfo(corpusId, docId,
-                textId, matchId, foundries, tokenContext.getUsername(), headers,
-                layers, spans, highlights);
-        return Response.ok(results).build();
+        try{
+            String results = searchService.retrieveMatchInfo(corpusId, docId,
+                    textId, matchId, foundries, tokenContext.getUsername(),
+                    headers, layers, spans, highlights);
+            return Response.ok(results).build();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+        
     }
 
     /*
@@ -197,12 +223,21 @@ public class SearchController {
     @GET
     @Path("{version}/corpus/{corpusId}/{docId}/{textId}")
     public Response getMetadata (@PathParam("corpusId") String corpusId,
-            @PathParam("docId") String docId, @PathParam("textId") String textId
-    // @QueryParam("fields") Set<String> fields
+            @PathParam("docId") String docId,
+            @PathParam("textId") String textId, 
+            @Context SecurityContext ctx,
+            @Context HttpHeaders headers
+            // @QueryParam("fields") Set<String> fields
     ) throws KustvaktException {
-        String results =
-                searchService.retrieveDocMetadata(corpusId, docId, textId);
-        return Response.ok(results).build();
+        TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
+        try {
+            String results = searchService.retrieveDocMetadata(corpusId, docId,
+                    textId, tokenContext.getUsername(), headers);
+            return Response.ok(results).build();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
     }
 
     @POST

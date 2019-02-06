@@ -111,7 +111,8 @@ public class StatusCodes {
     public static final int STATUS_OK = 1000;
     public static final int NOTHING_CHANGED = 1001;
     public static final int REQUEST_INVALID = 1002;
-    public static final int ACCESS_DENIED = 1003;
+    
+//    public static final int ACCESS_DENIED = 1003;
 
     
     // User group and member 
