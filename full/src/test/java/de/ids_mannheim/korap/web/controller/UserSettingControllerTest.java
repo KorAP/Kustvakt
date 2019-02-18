@@ -59,13 +59,13 @@ public class UserSettingControllerTest extends SpringJerseyTest {
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
         int numOfResult = 25;
-        String metadata = "[\"author\",\"title\",\"textSigle\","
-                + "\"availability\"]";
+        String metadata =
+                "[\"author\",\"title\",\"textSigle\"," + "\"availability\"]";
 
-        testRetrieveSettings(username, "opennlp", numOfResult, metadata);
+        testRetrieveSettings(username, "opennlp", numOfResult, metadata, true);
 
         testDeleteKeyNotExist(username);
-        testDeleteKey(username, numOfResult, metadata);
+        testDeleteKey(username, numOfResult, metadata, true);
         testDeleteSetting(username);
     }
 
@@ -81,7 +81,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
         testRetrieveSettings(username2, "opennlp", 25,
-                "author title textSigle availability");
+                "author title textSigle availability", false);
 
         testUpdateSetting(username2);
         testputRequestInvalidKey();
@@ -146,17 +146,18 @@ public class UserSettingControllerTest extends SpringJerseyTest {
                 .get(ClientResponse.class);
 
         assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
-        
+
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(StatusCodes.NO_RESOURCE_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals("No default setting for username: " + username +" is found",
+        assertEquals(
+                "No default setting for username: " + username + " is found",
                 node.at("/errors/0/1").asText());
         assertEquals(username, node.at("/errors/0/2").asText());
     }
-    
+
     @Test
     public void testDeleteSettingNotExist () throws KustvaktException {
         String username = "tralala";
@@ -207,10 +208,12 @@ public class UserSettingControllerTest extends SpringJerseyTest {
                 node.at("/errors/0/0").asInt());
         assertEquals(username, node.at("/errors/0/2").asText());
     }
-    
-    // EM: deleting a non-existing key does not throw an error, because 
+
+    // EM: deleting a non-existing key does not throw an error,
+    // because
     // the purpose of the request has been achieved.
-    private void testDeleteKeyNotExist (String username) throws KustvaktException {
+    private void testDeleteKeyNotExist (String username)
+            throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
                 .path("~" + username).path("setting").path("lemma-foundry")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -221,7 +224,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
     }
 
     private void testDeleteKey (String username, int numOfResult,
-            String metadata) throws KustvaktException {
+            String metadata, boolean isMetadataArray) throws KustvaktException {
 
         ClientResponse response = resource().path(API_VERSION)
                 .path("~" + username).path("setting").path("pos-foundry")
@@ -230,7 +233,8 @@ public class UserSettingControllerTest extends SpringJerseyTest {
                 .delete(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        testRetrieveSettings(username, null, numOfResult, metadata);
+        testRetrieveSettings(username, null, numOfResult, metadata,
+                isMetadataArray);
     }
 
     private void testUpdateSetting (String username) throws KustvaktException {
@@ -242,11 +246,12 @@ public class UserSettingControllerTest extends SpringJerseyTest {
         ClientResponse response = sendPutRequest(username, map);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        testRetrieveSettings(username, "malt", 15, "author title");
+        testRetrieveSettings(username, "malt", 15, "author title", false);
     }
 
     private void testRetrieveSettings (String username, String posFoundry,
-            int numOfResult, String metadata) throws KustvaktException {
+            int numOfResult, String metadata, boolean isMetadataArray)
+            throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
                 .path("~" + username).path("setting")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -255,7 +260,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
                 .get(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
-        System.out.println(entity);
+
         JsonNode node = JsonUtils.readTree(entity);
         if (posFoundry == null) {
             assertTrue(node.at("/pos-foundry").isMissingNode());
@@ -264,7 +269,13 @@ public class UserSettingControllerTest extends SpringJerseyTest {
             assertEquals(posFoundry, node.at("/pos-foundry").asText());
         }
         assertEquals(numOfResult, node.at("/resultPerPage").asInt());
-        assertEquals(metadata, node.at("/metadata").toString());
+
+        if (isMetadataArray) {
+            assertEquals(metadata, node.at("/metadata").toString());
+        }
+        else {
+            assertEquals(metadata, node.at("/metadata").asText());
+        }
     }
 
 }

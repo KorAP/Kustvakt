@@ -104,9 +104,10 @@ public class StatisticsControllerTest extends SpringJerseyTest {
                 .queryParam("corpusQuery", "creationDate >= 1810")
                 .get(ClientResponse.class);
 
+        String ent = response.getEntity(String.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        
         JsonNode node = mapper.readTree(ent);
         assertEquals(node.at("/errors/0/0").asInt(), 305);
         assertEquals(node.at("/errors/0/1").asText(),

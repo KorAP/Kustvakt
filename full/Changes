@@ -8,6 +8,9 @@
 06/02/2019
    - Updated a user setting test using array for multiple values (margaretha)
    - Added metadata controller tests (margaretha)
+18/02/2019
+   - Fixed tests (margaretha)
+   - Updated handling errors from Koral (margaretha)  
 
 # version 0.61.5
 17/12/2018

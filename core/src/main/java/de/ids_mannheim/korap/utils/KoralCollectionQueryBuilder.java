@@ -1,8 +1,8 @@
 package de.ids_mannheim.korap.utils;
 
+import java.util.HashMap;
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -12,7 +12,6 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.CollectionQueryProcessor;
 import de.ids_mannheim.korap.response.Notifications;
-import de.ids_mannheim.korap.web.CoreResponseHandler;
 import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
@@ -31,9 +30,6 @@ public class KoralCollectionQueryBuilder {
     private JsonNode base;
     private StringBuilder builder;
     private String mergeOperator;
-    @Autowired
-    private CoreResponseHandler responseHandler;
-
 
     public KoralCollectionQueryBuilder () {
         this(false);
@@ -113,21 +109,27 @@ public class KoralCollectionQueryBuilder {
                     new CollectionQueryProcessor(this.verbose);
             tree.process(this.builder.toString());
             if (tree.getErrors().size() > 0) {
-                Notifications notif = new Notifications();
-                int code;
+                // legacy support
                 for (List<Object> e : tree.getErrors()) {
-                    code = (int) e.get(0);
-                    if (e.get(1) instanceof String) {
-                        notif.addError(code, (String) e.get(1));
-                    }
-                    else {
+                    if (e.get(1) instanceof String[]) {
+                        Notifications notif = new Notifications();
+                        int code = (int) e.get(0);
                         notif.addError(code, (String[]) e.get(1));
+                        String notificationStr = notif.toJsonString();
+                        throw new KustvaktException(StatusCodes.SERIALIZATION_FAILED,
+                                notificationStr, true);
+                    }
+                    else{
+                        break;
                     }
                 }
-
-                String notificationStr = notif.toJsonString();
+                // -- end of legacy support
+                
+                Map<String, Object> map = new HashMap<>();
+                map.put("errors", tree.getErrors());
+                String errors = JsonUtils.toJSON(map);
                 throw new KustvaktException(StatusCodes.SERIALIZATION_FAILED,
-                        notificationStr, true);
+                        errors, true);
             }
             request = JsonUtils.valueToTree(tree.getRequestMap());
         }

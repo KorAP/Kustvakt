@@ -1,8 +1,10 @@
 # version 0.61.6
-06/02/2018
+06/02/2019
    - Added default foundry for structure layer (margaretha)
    - Added authentication to metadata controller (margaretha, issue #38)
    - Updated search krill error handling (margaretha)
+18/02/2019
+   - Updated handling errors from Koral (margaretha)
 
 # version 0.61.5
 17/12/2018

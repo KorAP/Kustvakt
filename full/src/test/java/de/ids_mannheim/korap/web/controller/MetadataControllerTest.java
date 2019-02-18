@@ -88,20 +88,20 @@ public class MetadataControllerTest extends SpringJerseyTest {
     public void testMetadataAvailabilityAllUnauthorized ()
             throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("corpus")
-                .path("GOE").path("AGI").path("00000")
+                .path("GOE").path("AGD").path("00000")
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "170.27.0.32")
                 .get(ClientResponse.class);
-
+        
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
         assertEquals(
                 "Retrieving resource with ID "
-                        + "GOE/AGI/00000 is not allowed.",
+                        + "GOE/AGD/00000 is not allowed.",
                 node.at("/errors/0/1").asText());
     }
 }
