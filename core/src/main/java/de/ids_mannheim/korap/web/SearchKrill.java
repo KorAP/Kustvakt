@@ -164,7 +164,7 @@ public class SearchKrill {
     /*
      * Retrieve the meta fields for a certain document
      */
-    public String getFields (String id, Pattern licensePattern)
+    public String getFields (String id, List<String> fields, Pattern licensePattern)
             throws KustvaktException {
         MetaFields meta;
 
@@ -175,16 +175,24 @@ public class SearchKrill {
         }
 
         // Index available
+        else if (fields !=null){
+            // Get fields
+            meta = index.getFields(id, fields);
+        }
         else {
             // Get fields
             meta = index.getFields(id);
-        };
-
-        String availability = meta.getFieldValue("availability");
-        checkAvailability(licensePattern, availability, id);
+        }
+        
+        // EM: this approach forbids the whole metadata
+        // this should be refined by filtering out only the restricted
+        // metadata fields
+        // String availability = meta.getFieldValue("availability");
+        // checkAvailability(licensePattern, availability, id);
 
         return meta.toJsonString();
     };
+    
 
     public String getMatch (String id, List<String> foundries,
             List<String> layers, boolean includeSpans,

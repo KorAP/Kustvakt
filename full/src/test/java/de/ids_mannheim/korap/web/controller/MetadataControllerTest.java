@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.web.controller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,11 +20,41 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class MetadataControllerTest extends SpringJerseyTest {
 
     @Test
+    public void testRetrieveMetadataWithField () throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("corpus")
+                .path("GOE").path("AGA").path("01784")
+                .queryParam("fields", "author").get(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+
+        assertEquals("author", node.at("/document/fields/0/key").asText());
+    }
+    
+
+    @Test
+    public void testRetrieveMetadataWithMultipleFields () throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("corpus")
+                .path("GOE").path("AGA").path("01784")
+                .queryParam("fields", "author,title").get(ClientResponse.class);
+
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+
+        assertEquals("author", node.at("/document/fields/0/key").asText());
+        assertEquals("title", node.at("/document/fields/1/key").asText());
+    }    
+    
+    @Test
     public void testFreeMetadata () throws KustvaktException {
 
         ClientResponse response = resource().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGA").path("01784")
-                .queryParam("foundry", "*").get(ClientResponse.class);
+                .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -34,12 +65,14 @@ public class MetadataControllerTest extends SpringJerseyTest {
 
     }
 
+    // EM: currently all metadata are allowed
     @Test
+    @Ignore
     public void testMetadataUnauthorized () throws KustvaktException {
 
         ClientResponse response = resource().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGI").path("04846")
-                .queryParam("foundry", "*").get(ClientResponse.class);
+                .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
                 response.getStatus());
@@ -84,7 +117,9 @@ public class MetadataControllerTest extends SpringJerseyTest {
                 response.getStatus());
     }
 
+    // EM: currently all metadata are allowed
     @Test
+    @Ignore
     public void testMetadataAvailabilityAllUnauthorized ()
             throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("corpus")

@@ -23,12 +23,42 @@ import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
- * @author margaretha, hanl
- * @lastUpdate 22/03/2018
+ * @author hanl, margaretha
+ * @lastUpdate 18/02/2019
  *
  */
 public class SearchControllerTest extends SpringJerseyTest {
 
+    
+    private JsonNode requestSearchWithFields(String fields) throws KustvaktException{
+        ClientResponse response = resource().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
+                .queryParam("fields", fields)
+                .queryParam("context", "sentence").queryParam("count", "13")
+                .get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String query = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(query);
+        return node;
+    }
+    
+    @Test
+    public void testSearchWithField () throws KustvaktException {
+        JsonNode node = requestSearchWithFields("author");
+        assertNotEquals(0, node.at("/matches").size());
+        assertEquals("[\"author\"]",
+                node.at("/meta/fields").toString());
+    }
+    
+    @Test
+    public void testSearchWithMultipleFields () throws KustvaktException {
+        JsonNode node = requestSearchWithFields("author, title");
+        assertNotEquals(0, node.at("/matches").size());
+        assertEquals("[\"author\",\"title\"]",
+                node.at("/meta/fields").toString());
+    }
+    
     @Test
     public void testSearchQueryPublicCorpora () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")

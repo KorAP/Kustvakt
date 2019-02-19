@@ -224,7 +224,8 @@ public class SearchController {
     @Path("{version}/corpus/{corpusId}/{docId}/{textId}")
     public Response getMetadata (@PathParam("corpusId") String corpusId,
             @PathParam("docId") String docId,
-            @PathParam("textId") String textId, 
+            @PathParam("textId") String textId,
+            @QueryParam("fields") String fields,
             @Context SecurityContext ctx,
             @Context HttpHeaders headers
             // @QueryParam("fields") Set<String> fields
@@ -232,7 +233,7 @@ public class SearchController {
         TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
         try {
             String results = searchService.retrieveDocMetadata(corpusId, docId,
-                    textId, tokenContext.getUsername(), headers);
+                    textId, fields, tokenContext.getUsername(), headers);
             return Response.ok(results).build();
         }
         catch (KustvaktException e) {

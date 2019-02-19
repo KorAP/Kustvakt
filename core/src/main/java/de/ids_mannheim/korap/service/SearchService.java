@@ -166,16 +166,21 @@ public class SearchService {
         }
         
         if (fields != null && !fields.isEmpty()){
-            String[] fieldArray = fields.split(",");
-            List<String> fieldList = new ArrayList<>(fieldArray.length);
-            for (String field :  fieldArray){
-                fieldList.add(field.trim());
-            }
+            List<String> fieldList = convertFieldsToList(fields);
             meta.addEntry("fields", fieldList);
         }
         return meta;
     }
 
+    private List<String> convertFieldsToList (String fields) {
+        String[] fieldArray = fields.split(",");
+        List<String> fieldList = new ArrayList<>(fieldArray.length);
+        for (String field :  fieldArray){
+            fieldList.add(field.trim());
+        }
+        return fieldList;
+    }
+    
     private String searchNeo4J (String query, int pageLength,
             MetaQueryBuilder meta, boolean raw) throws KustvaktException {
 
@@ -260,14 +265,21 @@ public class SearchService {
     }
 
     public String retrieveDocMetadata (String corpusId, String docId,
-            String textId, String username, HttpHeaders headers)
+            String textId, String fields, String username, HttpHeaders headers)
             throws KustvaktException {
-        User user = createUser(username, headers);
-        Pattern p = determineAvailabilityPattern(user);
+        List<String> fieldList = null;
+        if (fields != null && !fields.isEmpty()){
+            fieldList = convertFieldsToList(fields);
+        }
+        Pattern p = null;
+        if (config.isMetadataRestricted()){
+            User user = createUser(username, headers);
+            p = determineAvailabilityPattern(user);
+        }
         String textSigle = searchKrill.getTextSigle(corpusId, docId, textId);
-        return searchKrill.getFields(textSigle, p);
+        return searchKrill.getFields(textSigle, fieldList, p);
     }
-
+    
     public String getCollocationBase (String query) throws KustvaktException {
         return graphDBhandler.getResponse("distCollo", "q", query);
     }

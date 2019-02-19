@@ -98,6 +98,9 @@ public class KustvaktConfiguration {
     private String secureRandomAlgorithm;
     private String messageDigestAlgorithm;
 
+    // EM: metadata restriction
+    // another variable might be needed to define which metadata fields are restricted 
+    private boolean isMetadataRestricted = false;
     
     public KustvaktConfiguration (Properties properties) throws Exception {
         load(properties);
