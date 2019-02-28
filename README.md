@@ -151,7 +151,8 @@ Advanced setup such as setting database properties and configuring mail settings
 
 # License
 
-Kustvakt is published under the [BSD-2 License](https://raw.githubusercontent.com/KorAP/Kustvakt/master/LICENSE). It is developed as part of the KorAP Corpus Analysis Platform at the Institute for German Language (IDS), funded by the Leibniz-Gemeinschaft and supported by the KobRA project, funded by the Federal Ministry of Education and Research (BMBF).
+Kustvakt is published under the [BSD-2 License](https://raw.githubusercontent.com/KorAP/Kustvakt/master/LICENSE). It is developed as part of [KorAP](http://korap.ids-mannheim.de/), the Corpus Analysis Platform at the [Leibniz Institute for the German Language (IDS)](http://ids-mannheim.de/),
+member of the [Leibniz Association](https://www.leibniz-gemeinschaft.de/en/home/).
 
 # Contributions
 
