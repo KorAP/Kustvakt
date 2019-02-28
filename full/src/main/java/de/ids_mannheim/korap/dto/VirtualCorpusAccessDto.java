@@ -19,4 +19,11 @@ public class VirtualCorpusAccessDto {
     private String vcName;
     private int userGroupId;
     private String userGroupName;
+
+    @Override
+    public String toString () {
+        return "accessId=" + accessId + ", createdBy=" + createdBy + " , vcId="
+                + vcId + ", vcName=" + vcName + ", userGroupId=" + userGroupId
+                + ", userGroupName=" + userGroupName;
+    }
 }

@@ -108,24 +108,16 @@ public class VirtualCorpusAccessDao {
         TypedQuery<VirtualCorpusAccess> q = entityManager.createQuery(query);
         return q.getResultList();
     }
-
-    // for system admins
-    @Deprecated
-    public List<VirtualCorpusAccess> retrieveAllAccessByVC (int vcId)
+    
+    public List<VirtualCorpusAccess> retrieveAllAccess ()
             throws KustvaktException {
-        ParameterChecker.checkIntegerValue(vcId, "vcId");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<VirtualCorpusAccess> query =
                 builder.createQuery(VirtualCorpusAccess.class);
-
         Root<VirtualCorpusAccess> access =
                 query.from(VirtualCorpusAccess.class);
-        Join<VirtualCorpusAccess, VirtualCorpus> accessVC =
-                access.join(VirtualCorpusAccess_.virtualCorpus);
-
         query.select(access);
-        query.where(builder.equal(accessVC.get(VirtualCorpus_.id), vcId));
         TypedQuery<VirtualCorpusAccess> q = entityManager.createQuery(query);
         return q.getResultList();
     }

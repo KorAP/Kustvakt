@@ -1,3 +1,8 @@
+# version 0.62
+28/02/2019
+   - Removed old VC controllers and updated tests (margaretha, issue #34)
+   - Updated VC access controllers (margaretha)
+
 # version 0.61.6
 04/02/2019
    - Fixed SQL data and merged oauth2_client_url and oauth2_client (margaretha)

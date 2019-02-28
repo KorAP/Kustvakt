@@ -23,6 +23,7 @@ import de.ids_mannheim.korap.dao.UserGroupDao;
 import de.ids_mannheim.korap.dao.UserGroupMemberDao;
 import de.ids_mannheim.korap.dto.UserGroupDto;
 import de.ids_mannheim.korap.dto.converter.UserGroupConverter;
+import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
@@ -61,7 +62,9 @@ public class UserGroupService {
     private FullConfiguration config;
     @Autowired
     private MailService mailService;
-
+    @Autowired
+    private RandomCodeGenerator random;
+    
     private static Set<Role> memberRoles;
 
     /**
@@ -75,14 +78,20 @@ public class UserGroupService {
      * 
      * @see {@link PredefinedRole}
      */
-    public List<UserGroupDto> retrieveUserGroup (String username)
+    public List<UserGroup> retrieveUserGroup (String username)
             throws KustvaktException {
 
         List<UserGroup> userGroups =
                 userGroupDao.retrieveGroupByUserId(username);
         Collections.sort(userGroups);
+        return userGroups;
+    }
+    
+    public List<UserGroupDto> retrieveUserGroupDto (String username)
+            throws KustvaktException {
+        List<UserGroup> userGroups = retrieveUserGroup(username);
+        
         ArrayList<UserGroupDto> dtos = new ArrayList<>(userGroups.size());
-
         UserGroupMember userAsMember;
         List<UserGroupMember> members;
         UserGroupDto groupDto;
@@ -96,6 +105,7 @@ public class UserGroupService {
         }
 
         return dtos;
+
     }
 
     private List<UserGroupMember> retrieveMembers (int groupId, String username)
@@ -117,6 +127,11 @@ public class UserGroupService {
     public UserGroup retrieveUserGroupById (int groupId)
             throws KustvaktException {
         return userGroupDao.retrieveGroupById(groupId);
+    }
+    
+    public UserGroup retrieveUserGroupByName (String groupName)
+            throws KustvaktException {
+        return userGroupDao.retrieveGroupByName(groupName);
     }
 
     public UserGroup retrieveHiddenUserGroupByVC (int vcId)
@@ -257,7 +272,8 @@ public class UserGroupService {
     }
 
     public int createAutoHiddenGroup (int vcId) throws KustvaktException {
-        String groupName = "auto-hidden-group";
+        String code = random.createRandomCode();
+        String groupName = "auto-"+code;
         int groupId = userGroupDao.createGroup(groupName, "system",
                 UserGroupStatus.HIDDEN);
 

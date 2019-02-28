@@ -80,7 +80,7 @@ public class UserGroupController {
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.USER_GROUP_INFO);
-            return service.retrieveUserGroup(context.getUsername());
+            return service.retrieveUserGroupDto(context.getUsername());
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);

@@ -17,18 +17,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class VirtualCorpusJson {
-    // required
+    // default false
     private boolean isCached;
     
     // required in creating VCs
-    @Deprecated
-    private String name;
     private VirtualCorpusType type;
     private String corpusQuery;
-    
-    // required in editing VCs
-    @Deprecated
-    private int id;
     
     // optional
     private String definition;

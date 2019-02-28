@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -13,11 +14,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import de.ids_mannheim.korap.constant.UserGroupStatus;
-import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.entity.UserGroup;
-import de.ids_mannheim.korap.entity.VirtualCorpusAccess;
+import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
 
@@ -27,6 +28,8 @@ public class VirtualCorpusServiceTest {
 
     @Autowired
     private VirtualCorpusService vcService;
+    @Autowired
+    private UserGroupService groupService;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -36,37 +39,51 @@ public class VirtualCorpusServiceTest {
         thrown.expect(KustvaktException.class);
         // EM: message differs depending on the database used
         // for testing. The message below is from sqlite.
-//        thrown.expectMessage("A UNIQUE constraint failed "
-//                + "(UNIQUE constraint failed: virtual_corpus.name, "
-//                + "virtual_corpus.created_by)");
+        // thrown.expectMessage("A UNIQUE constraint failed "
+        // + "(UNIQUE constraint failed: virtual_corpus.name, "
+        // + "virtual_corpus.created_by)");
 
         VirtualCorpusJson vc = new VirtualCorpusJson();
         vc.setCorpusQuery("corpusSigle=GOE");
-        vc.setName("dory VC");
         vc.setType(VirtualCorpusType.PRIVATE);
-        vcService.storeVC(vc, vc.getName(), "dory");
+        vcService.storeVC(vc, "dory VC", "dory");
     }
 
     @Test
     public void createDeletePublishVC () throws KustvaktException {
-        String username = "VirtualCorpusServiceTest";
+        String vcName = "new published vc";
 
         VirtualCorpusJson vc = new VirtualCorpusJson();
         vc.setCorpusQuery("corpusSigle=GOE");
-        vc.setName("new published vc");
         vc.setType(VirtualCorpusType.PUBLISHED);
-        int vcId = vcService.storeVC(vc,vc.getName(), "VirtualCorpusServiceTest");
+        String username = "VirtualCorpusServiceTest";
+        vcService.storeVC(vc, vcName, username );
 
-        List<VirtualCorpusAccess> accesses =
-                vcService.retrieveAllVCAccess(vcId);
-        assertEquals(1, accesses.size());
+        List<VirtualCorpusAccessDto> accesses =
+                vcService.listVCAccessByUsername("admin");
+        int size = accesses.size();
 
-        VirtualCorpusAccess access = accesses.get(0);
-        assertEquals(VirtualCorpusAccessStatus.HIDDEN, access.getStatus());
+        VirtualCorpusAccessDto dto = accesses.get(accesses.size() - 1);
+        assertEquals(vcName, dto.getVcName());
+        assertEquals("system", dto.getCreatedBy());
+        assertTrue(dto.getUserGroupName().startsWith("auto"));
 
-        vcService.deleteVC(username, vcId);
-        accesses = vcService.retrieveAllVCAccess(vcId);
-        assertEquals(0, accesses.size());
+        // check hidden group
+        int groupId = dto.getUserGroupId();
+        UserGroup group = groupService.retrieveUserGroupById(groupId);
+        assertEquals(UserGroupStatus.HIDDEN, group.getStatus());
+
+        //delete vc
+        vcService.deleteVCByName(username, vcName, username);
+        
+        // check hidden access
+        accesses = vcService.listVCAccessByUsername("admin");
+        assertEquals(size-1, accesses.size());
+        
+        // check hidden group
+        thrown.expect(KustvaktException.class);
+        group = groupService.retrieveUserGroupById(groupId);
+        thrown.expectMessage("Group with id "+groupId+" is not found");
     }
 
     @Test
@@ -74,38 +91,40 @@ public class VirtualCorpusServiceTest {
         String username = "dory";
         int vcId = 2;
 
+        String vcName = "group VC";
+        VirtualCorpus existingVC =
+                vcService.searchVCByName(username, vcName, username);
         VirtualCorpusJson vcJson = new VirtualCorpusJson();
-        vcJson.setId(vcId);
-        vcJson.setName("group VC published");
         vcJson.setType(VirtualCorpusType.PUBLISHED);
 
-        vcService.editVC(vcJson, username);
+        vcService.editVC(existingVC, vcJson, vcName, username);
 
         // check VC
         VirtualCorpusDto vcDto = vcService.searchVCById("dory", vcId);
-        assertEquals("group VC published", vcDto.getName());
+        assertEquals(vcName, vcDto.getName());
         assertEquals(VirtualCorpusType.PUBLISHED.displayName(),
                 vcDto.getType());
 
         // check access
-        List<VirtualCorpusAccess> accesses =
-                vcService.retrieveAllVCAccess(vcId);
-        assertEquals(2, accesses.size());
-
-        VirtualCorpusAccess access = accesses.get(1);
-        assertEquals(VirtualCorpusAccessStatus.HIDDEN, access.getStatus());
+        List<VirtualCorpusAccessDto> accesses =
+                vcService.listVCAccessByUsername("admin");
+        int size = accesses.size();
+        VirtualCorpusAccessDto dto = accesses.get(accesses.size() - 1);
+        assertEquals(vcName, dto.getVcName());
+        assertEquals("system", dto.getCreatedBy());
+        assertTrue(dto.getUserGroupName().startsWith("auto"));
 
         // check auto hidden group
-        UserGroup autoHiddenGroup = access.getUserGroup();
-        assertEquals(UserGroupStatus.HIDDEN, autoHiddenGroup.getStatus());
+        int groupId = dto.getUserGroupId();
+        UserGroup group = groupService.retrieveUserGroupById(groupId);
+        assertEquals(UserGroupStatus.HIDDEN, group.getStatus());
 
         // 2nd edit (withdraw from publication)
+
         vcJson = new VirtualCorpusJson();
-        vcJson.setId(vcId);
-        vcJson.setName("group VC");
         vcJson.setType(VirtualCorpusType.PROJECT);
 
-        vcService.editVC(vcJson, username);
+        vcService.editVC(existingVC, vcJson, vcName, username);
 
         // check VC
         vcDto = vcService.searchVCById("dory", vcId);
@@ -113,8 +132,12 @@ public class VirtualCorpusServiceTest {
         assertEquals(VirtualCorpusType.PROJECT.displayName(), vcDto.getType());
 
         // check access
-        accesses = vcService.retrieveAllVCAccess(vcId);
-        assertEquals(1, accesses.size());
+        accesses = vcService.listVCAccessByUsername("admin");
+        assertEquals(size - 1, accesses.size());
+
+        thrown.expect(KustvaktException.class);
+        group = groupService.retrieveUserGroupById(groupId);
+        thrown.expectMessage("Group with id 5 is not found");
     }
 
 }

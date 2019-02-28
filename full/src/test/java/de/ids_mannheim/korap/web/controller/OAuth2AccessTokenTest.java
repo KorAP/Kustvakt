@@ -71,7 +71,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
                 .contains(OAuth2Scope.VC_INFO.toString()));
 
         // test list vc using the token
-        response = resource().path(API_VERSION).path("vc").path("list")
+        response = resource().path(API_VERSION).path("vc")
                 .header(Attributes.AUTHORIZATION, "Bearer " + token)
                 .get(ClientResponse.class);
 
@@ -114,7 +114,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
     private void testScopeNotAuthorize2 (String accessToken)
             throws KustvaktException {
         ClientResponse response =
-                resource().path(API_VERSION).path("vc").path("access").path("list")
+                resource().path(API_VERSION).path("vc").path("access")
                         .header(Attributes.AUTHORIZATION,
                                 "Bearer " + accessToken)
                         .get(ClientResponse.class);

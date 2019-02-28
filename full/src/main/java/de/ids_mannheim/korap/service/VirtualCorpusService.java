@@ -77,8 +77,19 @@ public class VirtualCorpusService {
     @Autowired
     private VirtualCorpusAccessConverter accessConverter;
 
-    public List<VirtualCorpusDto> listOwnerVC (String username)
+    private void verifyUsername (String contextUsername, String pathUsername)
             throws KustvaktException {
+        if (!contextUsername.equals(pathUsername)
+                && !adminDao.isAdmin(contextUsername)) {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + contextUsername,
+                    contextUsername);
+        }
+    }
+
+    public List<VirtualCorpusDto> listOwnerVC (String username, String vcCreator)
+            throws KustvaktException {
+        verifyUsername(username, vcCreator);
         List<VirtualCorpus> vcList = vcDao.retrieveOwnerVC(username);
         return createVCDtos(vcList);
     }
@@ -210,22 +221,18 @@ public class VirtualCorpusService {
         }
     }
 
-    @Deprecated
-    public void editVC (VirtualCorpusJson vcJson, String username)
-            throws KustvaktException {
-        ParameterChecker.checkIntegerValue(vcJson.getId(), "id");
-        VirtualCorpus vc = vcDao.retrieveVCById(vcJson.getId());
-        editVC(vc, vcJson, vcJson.getName(), username);
-    }
+//    @Deprecated
+//    public void editVC (VirtualCorpusJson vcJson, String username)
+//            throws KustvaktException {
+//        ParameterChecker.checkIntegerValue(vcJson.getId(), "id");
+//        VirtualCorpus vc = vcDao.retrieveVCById(vcJson.getId());
+//        editVC(vc, vcJson, vcJson.getName(), username);
+//    }
 
     public void handlePutRequest (String username, String vcCreator,
             String vcName, VirtualCorpusJson vcJson) throws KustvaktException {
-        if (!username.equals(vcCreator)) {
-            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
-                    "VC creator verification failed. Path parameter vcCreator "
-                            + "must be the same as the authenticated username.");
-        }
         
+        verifyUsername(username, vcCreator);
         VirtualCorpus vc = vcDao.retrieveVCByName(vcName, vcCreator);
         if (vc == null) {
             storeVC(vcJson, vcName, username);
@@ -416,23 +423,18 @@ public class VirtualCorpusService {
         return (numberOfDoc > 0) ? true : false;
     }
 
-    @Deprecated
-    public List<VirtualCorpusAccess> retrieveAllVCAccess (int vcId)
-            throws KustvaktException {
-        return accessDao.retrieveAllAccessByVC(vcId);
-    }
 
-    public void shareVC (String username, int vcId, int groupId)
-            throws KustvaktException {
+    public void shareVC (String username, String createdBy, String vcName,
+            String groupName) throws KustvaktException {
 
-        VirtualCorpus vc = vcDao.retrieveVCById(vcId);
+        VirtualCorpus vc = vcDao.retrieveVCByName(vcName, createdBy);
         if (!username.equals(vc.getCreatedBy())
                 && !adminDao.isAdmin(username)) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
 
-        UserGroup userGroup = userGroupService.retrieveUserGroupById(groupId);
+        UserGroup userGroup = userGroupService.retrieveUserGroupByName(groupName);
 
         if (!isVCAccessAdmin(userGroup, username)
                 && !adminDao.isAdmin(username)) {
@@ -491,28 +493,25 @@ public class VirtualCorpusService {
     // }
     // }
 
-    @Deprecated
-    public List<VirtualCorpusAccessDto> listVCAccessByVC (String username,
-            int vcId) throws KustvaktException {
-
-        List<VirtualCorpusAccess> accessList;
+    
+    public List<VirtualCorpusAccessDto> listVCAccessByUsername (String username)
+            throws KustvaktException {
+        List<VirtualCorpusAccess> accessList = new ArrayList<>();
         if (adminDao.isAdmin(username)) {
-            accessList = accessDao.retrieveAllAccessByVC(vcId);
+            accessList = accessDao.retrieveAllAccess();
         }
         else {
-            accessList = accessDao.retrieveActiveAccessByVC(vcId);
-            List<VirtualCorpusAccess> filteredAccessList = new ArrayList<>();
-            for (VirtualCorpusAccess access : accessList) {
-                UserGroup userGroup = access.getUserGroup();
-                if (isVCAccessAdmin(userGroup, username)) {
-                    filteredAccessList.add(access);
-                }
+            List<UserGroup> groups = userGroupService.retrieveUserGroup(username);
+            for (UserGroup g: groups){
+                if (isVCAccessAdmin(g, username)){
+                    accessList.addAll(accessDao.retrieveActiveAccessByGroup(g.getId()));
+                }   
             }
-            accessList = filteredAccessList;
         }
         return accessConverter.createVCADto(accessList);
     }
-
+    
+    
     public List<VirtualCorpusAccessDto> listVCAccessByVC (String username,
             String vcCreator, String vcName) throws KustvaktException {
 
@@ -534,6 +533,7 @@ public class VirtualCorpusService {
         return accessConverter.createVCADto(accessList);
     }
 
+    @Deprecated
     public List<VirtualCorpusAccessDto> listVCAccessByGroup (String username,
             int groupId) throws KustvaktException {
         UserGroup userGroup = userGroupService.retrieveUserGroupById(groupId);
@@ -550,6 +550,24 @@ public class VirtualCorpusService {
                     "Unauthorized operation for user: " + username, username);
         }
 
+        return accessConverter.createVCADto(accessList);
+    }
+    
+    public List<VirtualCorpusAccessDto> listVCAccessByGroup (String username,
+            String groupName) throws KustvaktException {
+        UserGroup userGroup = userGroupService.retrieveUserGroupByName(groupName);
+
+        List<VirtualCorpusAccess> accessList;
+        if (adminDao.isAdmin(username)) {
+            accessList = accessDao.retrieveAllAccessByGroup(userGroup.getId());
+        }
+        else if (isVCAccessAdmin(userGroup, username)) {
+            accessList = accessDao.retrieveActiveAccessByGroup(userGroup.getId());
+        }
+        else {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
         return accessConverter.createVCADto(accessList);
     }
 
