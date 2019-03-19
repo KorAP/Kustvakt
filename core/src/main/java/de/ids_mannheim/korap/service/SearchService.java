@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.ServletContext;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
@@ -283,4 +284,18 @@ public class SearchService {
     public String getCollocationBase (String query) throws KustvaktException {
         return graphDBhandler.getResponse("distCollo", "q", query);
     }
+    
+    public void closeIndexReader (String token, ServletContext context)
+            throws KustvaktException {
+
+        if (token != null && !token.isEmpty()
+                && token.equals(context.getInitParameter("adminToken"))) {
+            searchKrill.closeIndexReader();
+        }
+        else {
+            throw new KustvaktException(StatusCodes.INCORRECT_ADMIN_TOKEN,
+                    "Admin token is incorrect");
+        }
+    }
+    
 }

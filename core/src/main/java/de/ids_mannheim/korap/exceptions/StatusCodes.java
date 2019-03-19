@@ -165,22 +165,23 @@ public class StatusCodes {
      * 2000 status and error codes concerning authentication
      * 
      * Response with WWW-Authenticate header will be created 
-     * for all KustvaktExceptions with status codes 2000 or greater  
+     * for all KustvaktExceptions with status codes 2001 or greater  
      *  
      * MH: service level messages and callbacks
      */
 
-    public static final int AUTHENTICATION_FAILED = 2000;
-    public static final int LOGIN_FAILED = 2001;
-    public static final int EXPIRED = 2002;
-    public static final int BAD_CREDENTIALS = 2003;
-    public static final int ACCOUNT_NOT_CONFIRMED = 2004;
-    public static final int ACCOUNT_DEACTIVATED = 2005;
-
-    public static final int INVALID_ACCESS_TOKEN = 2006;
+    public static final int INCORRECT_ADMIN_TOKEN = 2000;
     
+    public static final int AUTHENTICATION_FAILED = 2001;
+    public static final int LOGIN_FAILED = 2002;
+    public static final int EXPIRED = 2003;
+    public static final int BAD_CREDENTIALS = 2004;
+    public static final int ACCOUNT_NOT_CONFIRMED = 2005;
+    public static final int ACCOUNT_DEACTIVATED = 2006;
+
     //    public static final int CLIENT_AUTHORIZATION_FAILED = 2013;
     public static final int AUTHORIZATION_FAILED = 2010;
+    public static final int INVALID_ACCESS_TOKEN = 2011;
 
     // 2020 - 2029 reserviert für LDAP-Fehlercodes - 21.04.17/FB
     public static final int LDAP_BASE_ERRCODE = 2020;

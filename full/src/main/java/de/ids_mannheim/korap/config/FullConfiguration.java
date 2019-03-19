@@ -87,6 +87,10 @@ public class FullConfiguration extends KustvaktConfiguration {
     public FullConfiguration (Properties properties) throws Exception {
         super(properties);
     }
+    
+    public FullConfiguration () {
+        super();
+    }
 
     @Override
     public void load (Properties properties) throws Exception {

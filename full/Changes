@@ -2,6 +2,9 @@
 28/02/2019
    - Removed old VC controllers and updated tests (margaretha, issue #34)
    - Updated VC access controllers (margaretha)
+19/03/2019
+  - Added close index controller (margaretha)
+
 
 # version 0.61.6
 04/02/2019

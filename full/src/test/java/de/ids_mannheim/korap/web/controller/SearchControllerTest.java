@@ -6,14 +6,20 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.apache.http.HttpStatus;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -21,14 +27,17 @@ import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.SearchKrill;
 
 /**
  * @author hanl, margaretha
- * @lastUpdate 18/02/2019
+ * @lastUpdate 18/03/2019
  *
  */
 public class SearchControllerTest extends SpringJerseyTest {
 
+    @Autowired
+    private SearchKrill searchKrill;
     
     private JsonNode requestSearchWithFields(String fields) throws KustvaktException{
         ClientResponse response = resource().path(API_VERSION).path("search")
@@ -332,6 +341,22 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
         // assertEquals(10993, node.at("/meta/totalResults").asInt());
+    }
+    
+    @Test
+    public void testCloseIndex () throws IOException {
+        searchKrill.getStatistics(null);
+        assertEquals(true, searchKrill.getIndex().isReaderOpen());
+
+        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
+        m.add("token", "secret");
+
+        ClientResponse response = resource().path(API_VERSION).path("index")
+                .path("close").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .post(ClientResponse.class, m);
+
+        assertEquals(HttpStatus.SC_OK, response.getStatus());
+        assertEquals(false, searchKrill.getIndex().isReaderOpen());
     }
 
 }

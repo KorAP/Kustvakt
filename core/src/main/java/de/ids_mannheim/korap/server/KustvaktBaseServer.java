@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 
@@ -18,6 +19,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.springframework.web.context.ContextLoaderListener;
 
+import com.google.common.io.Files;
 import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
@@ -71,6 +73,24 @@ public abstract class KustvaktBaseServer {
             kargs.setPort(config.getPort());
         }
 
+        String adminToken="";
+        File f = new File("adminToken");
+        if (!f.exists()) {
+            RandomCodeGenerator random = new RandomCodeGenerator();
+            adminToken = random.createRandomCode(config);
+            FileOutputStream fos = new FileOutputStream(new File("adminToken"));
+            OutputStreamWriter writer =
+                    new OutputStreamWriter(fos, StandardCharsets.UTF_8.name());
+            writer.append("token=");
+            writer.append(adminToken);
+            writer.flush();
+            writer.close();
+        }
+        else {
+            adminToken = Files.readFirstLine(f, Charset.forName("utf-8"))
+                    .substring(6);
+        }
+
         Server server = new Server();
 
         ServletContextHandler contextHandler =
@@ -81,6 +101,7 @@ public abstract class KustvaktBaseServer {
 
         ServletContextListener listener = new ContextLoaderListener();
         contextHandler.addEventListener(listener);
+        contextHandler.setInitParameter("adminToken", adminToken);
 
         ServletHolder servletHolder = new ServletHolder(new SpringServlet());
         servletHolder.setInitParameter(
@@ -94,17 +115,7 @@ public abstract class KustvaktBaseServer {
         connector.setPort(kargs.port);
         connector.setIdleTimeout(60000);
 
-        RandomCodeGenerator random = new RandomCodeGenerator();
-        String shutdownToken = random.createRandomCode(config);
-        ShutdownHandler shutdownHandler = new ShutdownHandler(shutdownToken,true,false);
-
-        FileOutputStream fos = new FileOutputStream(new File("shutdownToken"));
-        OutputStreamWriter writer =
-                new OutputStreamWriter(fos, StandardCharsets.UTF_8.name());
-        writer.append("token=");
-        writer.append(shutdownToken);
-        writer.flush();
-        writer.close();
+        ShutdownHandler shutdownHandler = new ShutdownHandler(adminToken,true,true);
 
         HandlerList handlers = new HandlerList();
         handlers.addHandler(shutdownHandler);

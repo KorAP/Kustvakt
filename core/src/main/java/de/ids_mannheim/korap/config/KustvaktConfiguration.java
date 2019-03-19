@@ -62,8 +62,6 @@ public class KustvaktConfiguration {
     private int validationEmaillength;
 
     private byte[] sharedSecret;
-    @Deprecated
-    private String adminToken;
     private int longTokenTTL;
     private int tokenTTL;
     private int shortTokenTTL;
@@ -107,6 +105,17 @@ public class KustvaktConfiguration {
         KrillProperties.setProp(properties);
     }
 
+    public KustvaktConfiguration () {}
+    
+    public void loadBasicProperties (Properties properties) {
+        port = new Integer(properties.getProperty("server.port", "8095"));
+        baseURL = properties.getProperty("kustvakt.base.url", "/api/*");
+        setSecureRandomAlgorithm(properties
+                .getProperty("security.secure.random.algorithm", "SHA1PRNG"));
+        setMessageDigestAlgorithm(
+                properties.getProperty("security.md.algorithm", "MD5"));
+    }
+    
     /**
      * loading of the properties and mapping to parameter variables
      * 
@@ -115,6 +124,8 @@ public class KustvaktConfiguration {
      * @throws Exception
      */
     protected void load (Properties properties) throws Exception {
+        loadBasicProperties(properties);
+        
         currentVersion = properties.getProperty("current.api.version", "v1.0");
         String supportedVersions =
                 properties.getProperty("supported.api.version", "");
@@ -122,11 +133,10 @@ public class KustvaktConfiguration {
         this.supportedVersions = new HashSet<>(Arrays.asList(supportedVersions.split(" ")));
         this.supportedVersions.add(currentVersion);
 
-        baseURL = properties.getProperty("kustvakt.base.url", "/api/*");
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));
         returnhits = new Integer(properties.getProperty("returnhits", "50000"));
         indexDir = properties.getProperty("krill.indexDir", "");
-        port = new Integer(properties.getProperty("server.port", "8095"));
+        
         // server options
         serverHost = String
                 .valueOf(properties.getProperty("server.host", "localhost"));
@@ -169,7 +179,6 @@ public class KustvaktConfiguration {
 
         sharedSecret =
                 properties.getProperty("security.sharedSecret", "").getBytes();
-        adminToken = properties.getProperty("security.adminToken");
 
         longTokenTTL = TimeUtils.convertTimeToSeconds(
                 properties.getProperty("security.longTokenTTL", "100D"));
@@ -181,13 +190,6 @@ public class KustvaktConfiguration {
         // passcodeSaltField =
         // properties.getProperty("security.passcode.salt",
         // "accountCreation");
-        
-        setSecureRandomAlgorithm(properties
-                .getProperty("security.secure.random.algorithm", "SHA1PRNG"));
-
-        setMessageDigestAlgorithm(
-                properties.getProperty("security.md.algorithm", "MD5"));
-
     }
 
     /**

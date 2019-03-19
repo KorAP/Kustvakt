@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.servlet.ServletContext;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -52,7 +54,8 @@ public class SearchController {
     private static final boolean DEBUG = false;
 
     private static Logger jlog = LogManager.getLogger(SearchController.class);
-
+    private @Context ServletContext context;
+    
     @Autowired
     private KustvaktResponseHandler kustvaktResponseHandler;
 
@@ -60,7 +63,20 @@ public class SearchController {
     private SearchService searchService;
     @Autowired
     private OAuth2ScopeService scopeService;
-
+    
+    @POST
+    @Path("{version}/index/close")
+    public Response closeIndexReader (@FormParam("token") String token){
+        try {
+            searchService.closeIndexReader(token, context);
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+        return Response.ok().build();
+    }
+    
+    
     /**
      * Builds a json query serialization from the given parameters.
      * 

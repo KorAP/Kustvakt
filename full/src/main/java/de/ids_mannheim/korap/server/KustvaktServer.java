@@ -33,7 +33,8 @@ public class KustvaktServer extends KustvaktBaseServer {
         properties.load(in);
         in.close();
         
-        config = new FullConfiguration(properties);
+        config = new FullConfiguration();
+        config.loadBasicProperties(properties);
 
 		if (kargs == null)
 			System.exit(0);

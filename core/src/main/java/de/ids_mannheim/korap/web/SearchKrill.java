@@ -67,6 +67,15 @@ public class SearchKrill {
     public KrillIndex getIndex () {
         return index;
     };
+    
+    public void closeIndexReader() throws KustvaktException{
+        try {
+            index.closeReader();
+        }
+        catch (IOException e) {
+            throw new KustvaktException(500, "Failed closing index reader");
+        }
+    }
 
     /**
      * Search in the Lucene index.
