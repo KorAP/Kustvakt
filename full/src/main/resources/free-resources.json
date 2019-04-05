@@ -1,13 +1,43 @@
 [{
-    "id": "WPD15",
-    "de_title" : "Deutsche Wikipedia Artikel 2015",
-    "en_title" : "German Wikipedia Articles 2015",
-    "en_description" : "A collection of German Wikipedia articles from May 2015.",
+    "id": "WPD17",
+    "de_title" : "Deutsche Wikipedia Artikel 2017",
+    "en_title" : "German Wikipedia Articles 2017",
+    "en_description" : "A collection of articles of German Wikipedia from July 1st, 2017.",
     "layers": [
-        "opennlp/p",
         "corenlp/p",
-        "corenlp/c",
         "marmot/m",
-        "marmot/p"
+        "marmot/p",
+        "opennlp/p",
+        "tt/l",
+        "tt/p"
     ]
-}]
+},
+{
+    "id": "WDD17",
+    "de_title" : "Deutsche Wikipedia-Diskussionskorpus 2017",
+    "en_title" : "German Wikipedia talk corpus 2017",
+    "en_description" : "A collection of talk pages of German Wikipedia from July 1st, 2017.",
+    "layers": [
+        "corenlp/p",
+        "marmot/m",
+        "marmot/p",
+        "opennlp/p",
+        "tt/l",
+        "tt/p"
+    ]
+},
+{
+    "id": "WUD17",
+    "de_title" : "Deutsche Wikipedia-Benutzerdiskussionskorpus 2017",
+    "en_title" : "German Wikipedia talk corpus 2017",
+    "en_description" : "A collection of user talk pages of German Wikipedia from July 1st, 2017.",
+    "layers": [
+        "corenlp/p",
+        "marmot/m",
+        "marmot/p",
+        "opennlp/p",
+        "tt/l",
+        "tt/p"
+    ]
+}
+]

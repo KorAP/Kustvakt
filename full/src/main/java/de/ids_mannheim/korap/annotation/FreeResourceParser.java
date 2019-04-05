@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.annotation;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
@@ -38,8 +40,16 @@ public class FreeResourceParser {
     public static ObjectMapper mapper = new ObjectMapper();
 
     public void run () throws IOException, KustvaktException {
-        InputStream is = FreeResourceParser.class.getClassLoader()
-                .getResourceAsStream(FREE_RESOURCE_FILE);
+        InputStream is=null;
+        File f = new File(FREE_RESOURCE_FILE);
+        if (f.exists()){
+            is = new FileInputStream(f);
+        }
+        else{
+            is = FreeResourceParser.class.getClassLoader()
+                    .getResourceAsStream(FREE_RESOURCE_FILE);
+        }
+
         JsonNode node = mapper.readTree(is);
         for (JsonNode resource : node) {
             String resourceId = resource.at("/id").asText();
