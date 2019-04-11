@@ -1,6 +1,8 @@
 # version 0.62
 18/03/2019
    - Added close index controller (margaretha)
+11/04/2019
+   - Fixed multiple Jackson implementations (margaretha)   
 
 # version 0.61.6
 06/02/2019

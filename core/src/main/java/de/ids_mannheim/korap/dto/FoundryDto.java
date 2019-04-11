@@ -4,9 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -23,7 +20,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonInclude(Include.NON_EMPTY) // new fasterxml annotation, not used by current jersey version
-@JsonSerialize(include=Inclusion.NON_EMPTY) // old codehouse annotation, used by jersey
+//@JsonSerialize(include=Inclusion.NON_EMPTY) // old codehouse annotation, used by jersey
 public class FoundryDto {
 
     private String code;
@@ -33,7 +30,7 @@ public class FoundryDto {
     @Getter
     @Setter
     @JsonInclude(Include.NON_EMPTY)
-    @JsonSerialize(include=Inclusion.NON_EMPTY) // old codehouse annotation used by jersey
+//    @JsonSerialize(include=Inclusion.NON_EMPTY) // old codehouse annotation used by jersey
     public class Layer {
         private String code;
         private String description;
@@ -43,7 +40,7 @@ public class FoundryDto {
     @Getter
     @Setter
     @JsonInclude(Include.NON_EMPTY)
-    @JsonSerialize(include=Inclusion.NON_EMPTY) // old codehouse annotation used by jersey
+//    @JsonSerialize(include=Inclusion.NON_EMPTY) // old codehouse annotation used by jersey
     public class Key implements Comparable<Key>{
 
         private String code;
