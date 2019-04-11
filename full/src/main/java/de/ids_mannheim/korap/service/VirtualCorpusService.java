@@ -255,7 +255,7 @@ public class VirtualCorpusService {
         String koralQuery = null;
         CorpusAccess requiredAccess = null;
         String corpusQuery = newVC.getCorpusQuery();
-        if (corpusQuery != null && corpusQuery.isEmpty()) {
+        if (corpusQuery != null && !corpusQuery.isEmpty()) {
             koralQuery = serializeCorpusQuery(corpusQuery);
             requiredAccess = determineRequiredAccess(newVC.isCached(), vcName,
                     koralQuery);
@@ -428,6 +428,12 @@ public class VirtualCorpusService {
             String groupName) throws KustvaktException {
 
         VirtualCorpus vc = vcDao.retrieveVCByName(vcName, createdBy);
+        if (vc == null){
+            String vcCode = createdBy + "/" + vcName;
+            throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
+                    "Virtual corpus "+ vcCode+" is not found.",
+                    String.valueOf(vcCode));
+        }
         if (!username.equals(vc.getCreatedBy())
                 && !adminDao.isAdmin(username)) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,

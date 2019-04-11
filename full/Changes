@@ -7,6 +7,9 @@
 11/04/2019
    - Fixed unknown authentication scheme, missing VC entity, and parameter 
      checker (margaretha)
+   - Fixed sharing unknown VC, updating corpusQuery, and handling non-
+     unique group name and unknown VC access (margaretha)
+     
 
 # version 0.61.6
 04/02/2019

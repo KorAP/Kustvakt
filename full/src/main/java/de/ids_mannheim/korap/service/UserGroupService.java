@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.service;
 
+import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -214,8 +215,26 @@ public class UserGroupService {
     public void createUserGroup (UserGroupJson groupJson, String createdBy)
             throws KustvaktException {
 
-        int groupId = userGroupDao.createGroup(groupJson.getName(), createdBy,
-                UserGroupStatus.ACTIVE);
+        int groupId=0;
+        try {
+            groupId = userGroupDao.createGroup(groupJson.getName(), createdBy,
+                    UserGroupStatus.ACTIVE);
+        }
+        // handle DB exceptions, e.g. unique constraint
+        catch (Exception e) {
+            Throwable cause = e;
+            Throwable lastCause = null;
+            while ((cause = cause.getCause()) != null
+                    && !cause.equals(lastCause)) {
+                if (cause instanceof SQLException) {
+                    break;
+                }
+                lastCause = cause;
+            }
+            throw new KustvaktException(StatusCodes.DB_INSERT_FAILED,
+                    cause.getMessage());
+        }
+        
         UserGroup userGroup = userGroupDao.retrieveGroupById(groupId);
 
         if (groupJson.getMembers() != null){

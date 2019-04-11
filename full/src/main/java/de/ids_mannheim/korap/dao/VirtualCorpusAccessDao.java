@@ -24,6 +24,8 @@ import de.ids_mannheim.korap.entity.VirtualCorpusAccess;
 import de.ids_mannheim.korap.entity.VirtualCorpusAccess_;
 import de.ids_mannheim.korap.entity.VirtualCorpus_;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
 /**
@@ -57,7 +59,14 @@ public class VirtualCorpusAccessDao {
         query.where(
                 builder.equal(access.get(VirtualCorpusAccess_.id), accessId));
         Query q = entityManager.createQuery(query);
-        return (VirtualCorpusAccess) q.getSingleResult();
+        try{
+            return (VirtualCorpusAccess) q.getSingleResult();
+        }
+        catch (NoResultException e) {
+            throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
+                    "Virtual corpus access is not found",
+                    String.valueOf(accessId));
+        }
     }
 
     // for vca admins
