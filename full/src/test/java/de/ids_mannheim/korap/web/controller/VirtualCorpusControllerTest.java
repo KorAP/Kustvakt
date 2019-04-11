@@ -528,8 +528,28 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
-        assertEquals("corpusQuery", node.at("/errors/0/1").asText());
-        assertEquals("null", node.at("/errors/0/2").asText());
+        assertEquals("corpusQuery is null", node.at("/errors/0/1").asText());
+        assertEquals("corpusQuery", node.at("/errors/0/2").asText());
+    }
+    
+    @Test
+    public void testCreateVCWithoutEntity() throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("VirtualCorpusControllerTest").path("new vc")
+                .header(Attributes.AUTHORIZATION,
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue(
+                                        "VirtualCorpusControllerTest", "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .put(ClientResponse.class);
+        String entity = response.getEntity(String.class);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.INVALID_ARGUMENT,
+                node.at("/errors/0/0").asInt());
+        assertEquals("request entity is null", node.at("/errors/0/1").asText());
+        assertEquals("request entity", node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -552,8 +572,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
-        assertEquals("type", node.at("/errors/0/1").asText());
-        assertEquals("null", node.at("/errors/0/2").asText());
+        assertEquals("type is null", node.at("/errors/0/1").asText());
+        assertEquals("type", node.at("/errors/0/2").asText());
     }
 
     @Test

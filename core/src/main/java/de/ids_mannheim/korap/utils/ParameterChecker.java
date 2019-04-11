@@ -10,40 +10,40 @@ public class ParameterChecker {
     public static void checkObjectValue (Object obj, String name)
             throws KustvaktException {
         if (obj == null) {
-            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, name,
-                    "null");
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
+                    name + " is null", name);
         }
     }
-    
+
     public static void checkCollection (Collection<?> collection, String name)
             throws KustvaktException {
         if (collection == null) {
-            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, name,
-                    "null");
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
+                    name + " is null", name);
         }
-        else if (collection.isEmpty()){
-            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, name,
-                    "empty");
+        else if (collection.isEmpty()) {
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, 
+                    name + " is empty", name);
         }
     }
 
     public static void checkStringValue (String string, String name)
             throws KustvaktException {
         if (string == null) {
-            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, name,
-                    "null");
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, 
+                    name + " is null", name);
         }
         else if (string.isEmpty()) {
-            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, name,
-                    "empty");
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, 
+                    name + " is empty", name);
         }
     }
 
     public static void checkIntegerValue (int integer, String name)
             throws KustvaktException {
         if (integer == 0) {
-            throw new KustvaktException(StatusCodes.MISSING_PARAMETER, name,
-                    "0");
+            throw new KustvaktException(StatusCodes.MISSING_PARAMETER, 
+                    name + " is missing", name);
         }
     }
 }

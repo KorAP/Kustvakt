@@ -234,6 +234,7 @@ public class VirtualCorpusService {
         
         verifyUsername(username, vcCreator);
         VirtualCorpus vc = vcDao.retrieveVCByName(vcName, vcCreator);
+        ParameterChecker.checkObjectValue(vcJson, "request entity");
         if (vc == null) {
             storeVC(vcJson, vcName, username);
         }
@@ -305,7 +306,6 @@ public class VirtualCorpusService {
 
     public int storeVC (VirtualCorpusJson vc, String name, String createdBy)
             throws KustvaktException {
-
         ParameterChecker.checkStringValue(vc.getCorpusQuery(), "corpusQuery");
         String koralQuery = serializeCorpusQuery(vc.getCorpusQuery());
 

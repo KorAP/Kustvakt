@@ -7,9 +7,10 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
-/** Implementation of Basic HTTP authentication scheme (see RFC 7253 
- *  and 7617) for client asking for authorization and sending user 
- *  data.  
+/**
+ * Implementation of Basic HTTP authentication scheme (see RFC 7253
+ * and 7617) for client asking for authorization and sending user
+ * data.
  * 
  * @author margaretha
  * 
@@ -17,13 +18,13 @@ import de.ids_mannheim.korap.utils.ParameterChecker;
 @Component
 public class HttpAuthorizationHandler {
 
-    public static String createBasicAuthorizationHeaderValue (String username, 
+    public static String createBasicAuthorizationHeaderValue (String username,
             String password) throws KustvaktException {
         ParameterChecker.checkStringValue(username, "username");
         ParameterChecker.checkStringValue(password, "password");
 
         String credentials = TransferEncoding.encodeBase64(username, password);
-        return AuthenticationScheme.BASIC.displayName()+" " + credentials;
+        return AuthenticationScheme.BASIC.displayName() + " " + credentials;
     }
 
     public AuthorizationData parseAuthorizationHeaderValue (
@@ -42,8 +43,15 @@ public class HttpAuthorizationHandler {
         }
 
         AuthorizationData data = new AuthorizationData();
-        data.setAuthenticationScheme(
-                AuthenticationScheme.valueOf(values[0].toUpperCase()));
+        String scheme = values[0];
+        try {
+            data.setAuthenticationScheme(
+                    AuthenticationScheme.valueOf(scheme.toUpperCase()));
+        }
+        catch (IllegalArgumentException e) {
+            throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
+                    "Authentication scheme is not supported.", scheme);
+        }
         data.setToken(values[1]);
         return data;
     }

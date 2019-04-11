@@ -687,8 +687,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.MISSING_PARAMETER,
                 node.at("/errors/0/0").asInt());
-        assertEquals("groupId", node.at("/errors/0/1").asText());
-        assertEquals("0", node.at("/errors/0/2").asText());
+        assertEquals("groupId is missing", node.at("/errors/0/1").asText());
+        assertEquals("groupId", node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -871,8 +871,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         assertEquals(StatusCodes.MISSING_PARAMETER,
                 node.at("/errors/0/0").asInt());
-        assertEquals("groupId", node.at("/errors/0/1").asText());
-        assertEquals("0", node.at("/errors/0/2").asText());
+        assertEquals("groupId is missing", node.at("/errors/0/1").asText());
+        assertEquals("groupId", node.at("/errors/0/2").asText());
     }
 
     @Test

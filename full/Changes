@@ -4,7 +4,9 @@
    - Updated VC access controllers (margaretha)
 19/03/2019
   - Added close index controller (margaretha)
-
+11/04/2019
+   - Fixed unknown authentication scheme, missing VC entity, and parameter 
+     checker (margaretha)
 
 # version 0.61.6
 04/02/2019
