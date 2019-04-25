@@ -3,7 +3,6 @@ package de.ids_mannheim.korap.web.controller;
 import static org.junit.Assert.assertEquals;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.junit.Test;
@@ -205,7 +204,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     private void testAddMemberRoles (String groupId, String memberUsername)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        MultivaluedMap<String, String> map = new MultivaluedHashMap<>();
+        MultivaluedMap<String, String> map = new MultivaluedMapImpl();
         map.add("groupId", groupId.toString());
         map.add("memberUsername", memberUsername);
         map.add("roleIds", "1"); // USER_GROUP_ADMIN
@@ -239,7 +238,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     private void testDeleteMemberRoles (String groupId, String memberUsername)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        MultivaluedMap<String, String> map = new MultivaluedHashMap<>();
+        MultivaluedMap<String, String> map = new MultivaluedMapImpl();
         map.add("groupId", groupId.toString());
         map.add("memberUsername", memberUsername);
         map.add("roleIds", "1"); // USER_GROUP_ADMIN

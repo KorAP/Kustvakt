@@ -33,7 +33,6 @@ public class KustvaktLiteServer extends KustvaktBaseServer {
         config.loadBasicProperties(properties);
 
         kargs.setSpringConfig("lite-config.xml");
-        rootPackages = "de.ids_mannheim.korap.web";
 
         server.start();
     }

@@ -39,7 +39,10 @@ public abstract class KustvaktBaseServer {
     protected static String rootPackages;
     protected static KustvaktArgs kargs;
 
-    public KustvaktBaseServer () {}
+    public KustvaktBaseServer () {
+        rootPackages = "de.ids_mannheim.korap.web; "
+                + "com.fasterxml.jackson.jaxrs.json;";
+    }
 
     protected KustvaktArgs readAttributes (String[] args) {
         KustvaktArgs kargs = new KustvaktArgs();
@@ -106,8 +109,6 @@ public abstract class KustvaktBaseServer {
         ServletHolder servletHolder = new ServletHolder(new SpringServlet());
         servletHolder.setInitParameter(
                 "com.sun.jersey.config.property.packages", rootPackages);
-        servletHolder.setInitParameter(
-                "com.sun.jersey.api.json.POJOMappingFeature", "true");
         servletHolder.setInitOrder(1);
         contextHandler.addServlet(servletHolder, config.getBaseURL());
 

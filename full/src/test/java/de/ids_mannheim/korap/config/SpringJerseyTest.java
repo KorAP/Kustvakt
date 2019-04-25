@@ -11,6 +11,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.context.support.GenericWebApplicationContext;
 
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
@@ -28,10 +30,9 @@ public abstract class SpringJerseyTest extends JerseyTest {
     @Autowired
     protected GenericApplicationContext applicationContext;
 
-    private static String[] classPackages =
-            new String[] { "de.ids_mannheim.korap.web.controller",
-                    "de.ids_mannheim.korap.web.filter",
-                    "de.ids_mannheim.korap.web.utils" };
+    public static String[] classPackages =
+            new String[] { "de.ids_mannheim.korap.web",
+                    "com.fasterxml.jackson.jaxrs.json"};
 
     @Override
     protected TestContainerFactory getTestContainerFactory ()
@@ -54,6 +55,11 @@ public abstract class SpringJerseyTest extends JerseyTest {
 
     @Override
     protected AppDescriptor configure () {
+        // Simulation of the production server 
+        // Indicate to use codehaus jackson
+        ClientConfig config = new DefaultClientConfig();
+        config.getFeatures().put("com.sun.jersey.api.json.POJOMappingFeature", true);
+        
         return new WebAppDescriptor.Builder(classPackages)
                 .servletClass(SpringServlet.class)
                 .contextListenerClass(StaticContextLoaderListener.class)

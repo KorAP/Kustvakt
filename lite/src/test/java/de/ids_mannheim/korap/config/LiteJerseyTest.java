@@ -28,10 +28,9 @@ public abstract class LiteJerseyTest extends JerseyTest{
     @Autowired
     protected GenericApplicationContext applicationContext;
     
-    private static String[] classPackages =
-            new String[] { "de.ids_mannheim.korap.web.controller",
-                    "de.ids_mannheim.korap.web.filter",
-                    "de.ids_mannheim.korap.web.utils" };
+    public static String[] classPackages =
+            new String[] { "de.ids_mannheim.korap.web",
+                    "com.fasterxml.jackson.jaxrs.json"};
     
     @Override
     protected TestContainerFactory getTestContainerFactory ()
