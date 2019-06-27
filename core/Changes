@@ -5,6 +5,8 @@
    - Fixed multiple Jackson implementations (margaretha)
 25/04/2019
    - Updated Jetty version due to vulnerabilities (margaretha)
+27/06/2019
+   - Updated Jetty version, fixed server hanging problem (margaretha)  
 
 # version 0.61.6
 06/02/2019
