@@ -11,6 +11,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.jetty.http.HttpHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.mchange.rmi.NotAuthorizedException;
@@ -240,9 +241,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 	     	return;
 	    }
 		
-		if (headerMap != null && headerMap.containsKey(com.google.common.net.HttpHeaders.X_FORWARDED_FOR)) {
+		if (headerMap != null && headerMap.containsKey(HttpHeader.X_FORWARDED_FOR.toString())) {
 
-			String[] vals = headerMap.getFirst(com.google.common.net.HttpHeaders.X_FORWARDED_FOR).split(",");
+			String[] vals = headerMap.getFirst(HttpHeader.X_FORWARDED_FOR.toString()).split(",");
 			String clientAddress = vals[0];
 
 			try {

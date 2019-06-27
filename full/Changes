@@ -9,6 +9,8 @@
      checker (margaretha)
    - Fixed sharing unknown VC, updating corpusQuery, and handling non-
      unique group name and unknown VC access (margaretha)
+27/06/2019
+   - Handled LDAP errors, fixed #45 (margaretha)
      
 
 # version 0.61.6

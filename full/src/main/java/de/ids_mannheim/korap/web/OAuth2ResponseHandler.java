@@ -87,7 +87,10 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
         OAuthResponse oAuthResponse = null;
         String errorCode = e.getEntity();
         try {
-            if (errorCode.equals(OAuth2Error.INVALID_CLIENT)
+            if (errorCode == null){
+                return super.throwit(e);
+            }
+            else if (errorCode.equals(OAuth2Error.INVALID_CLIENT)
                     || errorCode.equals(OAuth2Error.UNAUTHORIZED_CLIENT)
                     || errorCode.equals(OAuth2Error.INVALID_TOKEN)) {
                 oAuthResponse = createOAuthResponse(e,
