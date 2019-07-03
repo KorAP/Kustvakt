@@ -3,7 +3,7 @@
    - Removed old VC controllers and updated tests (margaretha, issue #34)
    - Updated VC access controllers (margaretha)
 19/03/2019
-  - Added close index controller (margaretha)
+   - Added close index controller (margaretha)
 11/04/2019
    - Fixed unknown authentication scheme, missing VC entity, and parameter 
      checker (margaretha)
@@ -11,7 +11,11 @@
      unique group name and unknown VC access (margaretha)
 27/06/2019
    - Handled LDAP errors, fixed #45 (margaretha)
-     
+03/07/2019
+   - Added re-caching VC at closing-index service, resolved #44 (margaretha)
+   - Changed the response media-type of authentication controllers (margaretha)
+   - Fixed bugs: allow guest to retrieve system VC, 
+     remove VC from cache when it is deleted (margaretha)
 
 # version 0.61.6
 04/02/2019

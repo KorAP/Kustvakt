@@ -125,6 +125,18 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals(VirtualCorpusType.SYSTEM.displayName(),
                 node.at("/type").asText());
     }
+    
+    @Test
+    public void testRetrieveSystemVCGuest () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("system").path("system VC").get(ClientResponse.class);
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        assertEquals("system VC", node.at("/name").asText());
+        assertEquals(VirtualCorpusType.SYSTEM.displayName(),
+                node.at("/type").asText());
+    }
 
     @Test
     public void testRetrieveOwnerPrivateVCInfo ()

@@ -175,6 +175,7 @@
 		init-method="initTest">
 	</bean>
 
+	<bean id="vcLoader" class="de.ids_mannheim.de.init.VCLoaderImpl"/>	
 
 	<!-- Krill -->
 	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">

@@ -193,7 +193,9 @@
 	<bean id="initializator" class="de.ids_mannheim.de.init.InitializatorImpl"
 		init-method="initAnnotation">
 	</bean>
-
+	
+	<bean id="vcLoader" class="de.ids_mannheim.de.init.VCLoaderImpl"/>
+	
 	<!-- Krill -->
 	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">
 		<constructor-arg value="${krill.indexDir}" />

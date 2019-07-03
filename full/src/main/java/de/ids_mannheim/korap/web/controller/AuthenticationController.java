@@ -58,15 +58,16 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
  * @date 24/01/2014
  * 
  * @author margaretha
- * @last-update 28/08/2018
+ * @last-update 01/07/2019
  * 
  * - added user authentication time in token context
  * - added api version filter
+ * - changed the response media-type 
  */
 @Controller
 @Path("/{version}/auth")
 @ResourceFilters({APIVersionFilter.class, PiwikFilter.class })
-@Produces(MediaType.TEXT_HTML + ";charset=utf-8")
+@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class AuthenticationController {
 
     @Autowired

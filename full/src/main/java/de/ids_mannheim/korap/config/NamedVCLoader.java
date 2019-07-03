@@ -98,6 +98,7 @@ public class NamedVCLoader implements Runnable{
                 }
                 catch (KustvaktException e) {
                     // ignore
+                    if (DEBUG) jlog.debug(e);
                 }
                 vcService.storeVC(filename, VirtualCorpusType.SYSTEM, json,
                         null, null, null, true, "system");

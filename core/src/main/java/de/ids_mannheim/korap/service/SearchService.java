@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
+import de.ids_mannheim.de.init.VCLoader;
 import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -39,7 +40,8 @@ public class SearchService {
 
     @Autowired
     private KustvaktConfiguration config;
-
+    @Autowired
+    private VCLoader vcLoader;
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -291,6 +293,7 @@ public class SearchService {
         if (token != null && !token.isEmpty()
                 && token.equals(context.getInitParameter("adminToken"))) {
             searchKrill.closeIndexReader();
+            vcLoader.recachePredefinedVC();
         }
         else {
             throw new KustvaktException(StatusCodes.INCORRECT_ADMIN_TOKEN,

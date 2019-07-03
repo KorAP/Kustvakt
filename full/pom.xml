@@ -192,7 +192,6 @@
 					<excludes>
 						<exclude>de/ids_mannheim/korap/authentication/*.java</exclude>
 						<exclude>de/ids_mannheim/korap/web/controller/TokenExpiryTest.java</exclude>
-						<exclude>**/VCReferenceTest.java</exclude>
 					</excludes>
 					<includes>
 						<include>de/ids_mannheim/korap/**/*.java</include>

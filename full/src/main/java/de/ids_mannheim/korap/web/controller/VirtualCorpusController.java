@@ -33,6 +33,7 @@ import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
+import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
 
@@ -115,6 +116,8 @@ public class VirtualCorpusController {
     @GET
     @Path("{createdBy}/{vcName}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
+        DemoUserFilter.class, PiwikFilter.class })
     public VirtualCorpusDto retrieveVCByName (
             @Context SecurityContext securityContext,
             @PathParam("createdBy") String createdBy,

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import de.ids_mannheim.korap.KrillCollection;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
@@ -212,6 +213,9 @@ public class VirtualCorpusService {
                 accessDao.deleteAccess(access, "system");
                 userGroupService.deleteAutoHiddenGroup(
                         access.getUserGroup().getId(), "system");
+            }
+            if (KrillCollection.cache.get(vc.getName())!=null){
+                KrillCollection.cache.remove(vc.getName());
             }
             vcDao.deleteVirtualCorpus(vc);
         }
