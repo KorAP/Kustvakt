@@ -40,6 +40,8 @@ import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
 /**
  * VirtualCorpusController defines web APIs related to virtual corpus
  * (VC) such as creating, deleting and listing user virtual corpora.
+ * All the APIs in this class are available to logged-in users, except
+ * retrieving info of system VC.
  * 
  * This class also includes APIs related to virtual corpus access
  * (VCA) such as sharing and publishing VC. When a VC is published,
@@ -47,7 +49,8 @@ import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
  * VC. It is listed for a user, once when he/she have searched for the
  * VC. A VC can be published by creating or editing the VC.
  * 
- * All the APIs in this class are available to logged-in users.
+ * VC name must follow the following regex [a-zA-Z_0-9-.], other
+ * characters are not allowed.
  * 
  * @author margaretha
  *

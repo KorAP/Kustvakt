@@ -46,12 +46,12 @@ public class VirtualCorpusServiceTest {
         VirtualCorpusJson vc = new VirtualCorpusJson();
         vc.setCorpusQuery("corpusSigle=GOE");
         vc.setType(VirtualCorpusType.PRIVATE);
-        vcService.storeVC(vc, "dory VC", "dory");
+        vcService.storeVC(vc, "dory-vc", "dory");
     }
 
     @Test
     public void createDeletePublishVC () throws KustvaktException {
-        String vcName = "new published vc";
+        String vcName = "new-published-vc";
 
         VirtualCorpusJson vc = new VirtualCorpusJson();
         vc.setCorpusQuery("corpusSigle=GOE");
@@ -91,7 +91,7 @@ public class VirtualCorpusServiceTest {
         String username = "dory";
         int vcId = 2;
 
-        String vcName = "group VC";
+        String vcName = "group-vc";
         VirtualCorpus existingVC =
                 vcService.searchVCByName(username, vcName, username);
         VirtualCorpusJson vcJson = new VirtualCorpusJson();
@@ -128,7 +128,7 @@ public class VirtualCorpusServiceTest {
 
         // check VC
         vcDto = vcService.searchVCById("dory", vcId);
-        assertEquals("group VC", vcDto.getName());
+        assertEquals("group-vc", vcDto.getName());
         assertEquals(VirtualCorpusType.PROJECT.displayName(), vcDto.getType());
 
         // check access

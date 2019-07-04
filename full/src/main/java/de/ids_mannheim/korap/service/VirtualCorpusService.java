@@ -59,7 +59,7 @@ public class VirtualCorpusService {
 
     public static boolean DEBUG = false;
 
-    public static Pattern wordPattern = Pattern.compile("[-\\w. ]+");
+    public static Pattern vcNamePattern = Pattern.compile("[-\\w.]+");
 
     @Autowired
     private VirtualCorpusDao vcDao;
@@ -323,7 +323,7 @@ public class VirtualCorpusService {
         ParameterChecker.checkStringValue(name, "name");
         ParameterChecker.checkObjectValue(type, "type");
 
-        if (!wordPattern.matcher(name).matches()) {
+        if (!vcNamePattern.matcher(name).matches()) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "Virtual corpus name must only contains letters, numbers, "
                             + "underscores, hypens and spaces",

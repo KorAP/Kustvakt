@@ -34,14 +34,14 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest{
 
         VirtualCorpus vc = vcList.get(0);
         assertEquals(4, vc.getId());
-        assertEquals("published VC", vc.getName());
+        assertEquals("published-vc", vc.getName());
         assertEquals("marlin", vc.getCreatedBy());
     }
 
     @Test
     public void testSystemVC () throws KustvaktException {
         // insert vc
-        int id = dao.createVirtualCorpus("system VC", VirtualCorpusType.SYSTEM,
+        int id = dao.createVirtualCorpus("system-vc", VirtualCorpusType.SYSTEM,
                 User.CorpusAccess.FREE, "corpusSigle=GOE", "definition",
                 "description", "experimental", false, "test class");
 
@@ -64,7 +64,7 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest{
         thrown.expect(PersistenceException.class);
         thrown.expectMessage("could not execute statement");
         
-        dao.createVirtualCorpus("system VC", VirtualCorpusType.SYSTEM,
+        dao.createVirtualCorpus("system-vc", VirtualCorpusType.SYSTEM,
                 User.CorpusAccess.FREE, "corpusSigle=GOE", "definition",
                 "description", "experimental", false, "system");
     }
@@ -88,10 +88,10 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest{
         assertEquals(4, virtualCorpora.size());
         // ordered by id
         Iterator<VirtualCorpus> i = virtualCorpora.iterator();
-        assertEquals("dory VC", i.next().getName());
-        assertEquals("group VC", i.next().getName());
-        assertEquals("system VC", i.next().getName());
-        assertEquals("published VC", i.next().getName());
+        assertEquals("dory-vc", i.next().getName());
+        assertEquals("group-vc", i.next().getName());
+        assertEquals("system-vc", i.next().getName());
+        assertEquals("published-vc", i.next().getName());
     }
 
     /**
@@ -105,9 +105,9 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest{
         List<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("nemo");
         assertEquals(3, virtualCorpora.size());
         Iterator<VirtualCorpus> i = virtualCorpora.iterator();
-        assertEquals("group VC", i.next().getName());
-        assertEquals("system VC", i.next().getName());
-        assertEquals("nemo VC", i.next().getName());
+        assertEquals("group-vc", i.next().getName());
+        assertEquals("system-vc", i.next().getName());
+        assertEquals("nemo-vc", i.next().getName());
     }
 
     /**
@@ -121,9 +121,9 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest{
         List<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("marlin");
         assertEquals(3, virtualCorpora.size());
         Iterator<VirtualCorpus> i = virtualCorpora.iterator();
-        assertEquals("system VC", i.next().getName());
-        assertEquals("published VC", i.next().getName());
-        assertEquals("marlin VC", i.next().getName());
+        assertEquals("system-vc", i.next().getName());
+        assertEquals("published-vc", i.next().getName());
+        assertEquals("marlin-vc", i.next().getName());
     }
 
     /**
@@ -137,8 +137,8 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest{
         List<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("pearl");
         assertEquals(2, virtualCorpora.size());
         Iterator<VirtualCorpus> i = virtualCorpora.iterator();
-        assertEquals("system VC", i.next().getName());
-        assertEquals("published VC", i.next().getName());
+        assertEquals("system-vc", i.next().getName());
+        assertEquals("published-vc", i.next().getName());
     }
 
 }

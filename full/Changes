@@ -16,6 +16,8 @@
    - Changed the response media-type of authentication controllers (margaretha)
    - Fixed bugs: allow guest to retrieve system VC, 
      remove VC from cache when it is deleted (margaretha)
+04/07/2019
+   - Updated VC name pattern and tests (margaretha)
 
 # version 0.61.6
 04/02/2019

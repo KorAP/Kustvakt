@@ -129,7 +129,7 @@ public class VCReferenceTest extends SpringJerseyTest {
     public void testRefNotAuthorized() throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("cq", "referTo \"dory/dory VC\"")
+                .queryParam("cq", "referTo \"dory/dory-vc\"")
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);

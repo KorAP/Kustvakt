@@ -85,7 +85,7 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
             throws KustvaktException, Exception {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("cq", "referTo \"system VC\"")
+                .queryParam("cq", "referTo \"system-vc\"")
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
@@ -110,7 +110,7 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
     public void testRewritePubAndSystemVCRef () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("cq", "referTo \"system/system VC\"")
+                .queryParam("cq", "referTo \"system/system-vc\"")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("user", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -135,7 +135,7 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "Fisch").queryParam("ql", "poliqarp")
-                .queryParam("cq", "referTo \"dory/dory VC\"")
+                .queryParam("cq", "referTo \"dory/dory-vc\"")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .get(ClientResponse.class);
