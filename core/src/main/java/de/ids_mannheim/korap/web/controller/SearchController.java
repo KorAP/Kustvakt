@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -41,7 +42,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
  * 
  * @author hanl, margaretha, diewald
  * @date 29/01/2014
- * @lastUpdate 09/07/2018
+ * @lastUpdate 05/07/2019
  * 
  */
 @Controller
@@ -77,31 +78,13 @@ public class SearchController {
     }
     
     
-    /**
-     * Builds a json query serialization from the given parameters.
-     * 
-     * @param locale
-     * @param securityContext
-     * @param q
-     *            query string
-     * @param ql
-     *            query language
-     * @param v
-     *            version
-     * @param context
-     * @param cutoff
-     *            true if the number of results should be limited
-     * @param pageLength
-     *            number of results per page
-     * @param pageIndex
-     * @param startPage
-     * @param cq
-     *            corpus query
-     * @return
-     */
-    // ref query parameter removed!
-    @GET
-    @Path("{version}/query")
+//     EM: This web service is DISABLED until there is a need for it.
+//     ND: In case rewrite is supported, it could be used to check the authorization 
+//         scope without searching etc. In case not, it helps to compare queries in 
+//         different query languages.
+//     MH: ref query parameter removed!
+//    @GET
+//    @Path("{version}/query")
     public Response serializeQuery (@Context Locale locale,
             @Context SecurityContext securityContext, @QueryParam("q") String q,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
@@ -110,12 +93,14 @@ public class SearchController {
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
             @QueryParam("page") Integer startPage,
+            @QueryParam("access-rewrite-disabled") boolean accessRewriteDisabled,
             @QueryParam("cq") String cq) {
         TokenContext ctx = (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(ctx, OAuth2Scope.SERIALIZE_QUERY);
             String result = searchService.serializeQuery(q, ql, v, cq,
-                    pageIndex, startPage, pageLength, context, cutoff);
+                    pageIndex, startPage, pageLength, context, cutoff,
+                    accessRewriteDisabled);
             if (DEBUG){
                 jlog.debug("Query: " + result);
             }
@@ -126,32 +111,35 @@ public class SearchController {
         }
     }
 
-    @POST
-    @Path("{version}/search")
+    
+//    This web service is DISABLED until there is a need for it. 
+//    @POST
+//    @Path("{version}/search")
     public Response searchPost (@Context SecurityContext context,
-            @Context Locale locale, @QueryParam("engine") String engine,
+            @Context Locale locale, 
+            @Context HttpHeaders headers,
             String jsonld) {
+        
+        if (DEBUG){
+            jlog.debug("Serialized search: " + jsonld);
+        }
+        
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         try {
             scopeService.verifyScope(ctx, OAuth2Scope.SEARCH);
+            String result = searchService.search(jsonld, ctx.getUsername(),
+                    headers);
+            return Response.ok(result).build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
-
-        if (DEBUG){
-            jlog.debug("Serialized search: " + jsonld);
-        }
-        String result = searchService.search(jsonld);
-        if (DEBUG){
-            jlog.debug("The result set: " + result);
-        }
-        return Response.ok(result).build();
     }
 
     @GET
     @Path("{version}/search")
     public Response searchGet (@Context SecurityContext securityContext,
+            @Context HttpServletRequest request,
             @Context HttpHeaders headers, @Context Locale locale,
             @QueryParam("q") String q, @QueryParam("ql") String ql,
             @QueryParam("v") String v, @QueryParam("context") String ctx,
@@ -160,7 +148,9 @@ public class SearchController {
             @QueryParam("offset") Integer pageIndex,
             @QueryParam("page") Integer pageInteger,
             @QueryParam("fields") String fields,
-            @QueryParam("cq") String cq, @QueryParam("engine") String engine) {
+            @QueryParam("access-rewrite-disabled") boolean accessRewriteDisabled,
+            @QueryParam("cq") String cq, 
+            @QueryParam("engine") String engine) {
 
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
@@ -170,7 +160,7 @@ public class SearchController {
             scopeService.verifyScope(context, OAuth2Scope.SEARCH);
             result = searchService.search(engine, context.getUsername(),
                     headers, q, ql, v, cq, fields, pageIndex, pageInteger, ctx,
-                    pageLength, cutoff);
+                    pageLength, cutoff, accessRewriteDisabled);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -257,8 +247,9 @@ public class SearchController {
         }
     }
 
-    @POST
-    @Path("{version}/colloc")
+//  EM: This web service requires Karang and is DISABLED.
+//    @POST
+//    @Path("{version}/colloc")
     public Response getCollocationBase (@QueryParam("q") String query) {
         String result;
         try {

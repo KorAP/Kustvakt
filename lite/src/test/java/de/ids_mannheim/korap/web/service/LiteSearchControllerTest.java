@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.eclipse.jetty.http.HttpStatus;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -35,6 +36,8 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     @Autowired
     private SearchKrill searchKrill;
     
+//  EM: The API is disabled
+    @Ignore   
     @Test
     public void testGetJSONQuery () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("query")
@@ -51,7 +54,9 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         assertEquals("sentence", node.at("/meta/context").asText());
         assertEquals("13", node.at("/meta/count").asText());
     }
-
+    
+//  EM: The API is disabled
+    @Ignore
     @Test
     public void testbuildAndPostQuery () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("query")
@@ -126,7 +131,9 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         assertEquals("opennlp", node.at("/query/wrap/foundry").asText());
     }
 
+//  EM: The API is disabled
     @Test
+    @Ignore
     public void testQueryPost () throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[orth=das]", "poliqarp");
@@ -238,7 +245,9 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
         assertEquals("Belagerung von Mainz", node.at("/title").asText());
     };
-
+    
+//  EM: The API is disabled
+    @Ignore
     @Test
     public void testCollectionQueryParameter () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("query")
@@ -382,6 +391,20 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertTrue(node.at("/collection").isMissingNode());
+    }
+    
+    @Test
+    public void testSearchPublicMetadata () throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
+                .queryParam("access-rewrite-disabled", "true")
+                .get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String query = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(query);
+
+        assertTrue(node.at("/matches/0/snippet").isMissingNode());
     }
     
     @Test

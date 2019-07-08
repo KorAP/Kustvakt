@@ -1,3 +1,8 @@
+# version 0.62.1
+08/07/2019
+   - Added tests for public metadata response in search api (margaretha, issue #43)
+   - Disabled some tests of unused/disabled web-services (margaretha)
+
 # version 0.62
 28/02/2019
    - Removed old VC controllers and updated tests (margaretha, issue #34)

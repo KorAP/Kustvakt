@@ -1,6 +1,7 @@
 <ehcache xsi:noNamespaceSchemaLocation="http://www.ehcache.org/ehcache.xsd"
 	updateCheck="true" monitoring="autodetect" dynamicConfig="true">
 	
+	<sizeOfPolicy maxDepth="100" maxDepthExceededBehavior="abort" />
     <defaultCache eternal='true' overflowToDisk='false'/>
     <!--maxBytesLocalHeap="200M"-->
     <diskStore path="./cache_store"/>

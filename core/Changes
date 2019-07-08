@@ -1,3 +1,10 @@
+# version 0.62.1
+08/07/2019
+   - Added support for public metadata response in search api (margaretha, 
+     issue #43)
+   - Disabled some unused web-services: search post, query serialization, 
+     collocation base (margaretha)
+
 # version 0.62
 18/03/2019
    - Added close index controller (margaretha)

@@ -24,8 +24,8 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.FastJerseyTest;
 
-/* EM: potentially an unused service! */
 
+// EM: The API is disabled
 @Ignore
 public class QuerySerializationControllerTest extends FastJerseyTest {
 

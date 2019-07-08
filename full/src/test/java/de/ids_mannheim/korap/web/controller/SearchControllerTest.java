@@ -42,6 +42,14 @@ public class SearchControllerTest extends SpringJerseyTest {
         return node;
     }
     
+    private String createJsonQuery(){
+        QuerySerializer s = new QuerySerializer();
+        s.setQuery("[orth=der]", "poliqarp");
+        s.setCollection("corpusSigle=GOE");
+        s.setQuery("Wasser", "poliqarp");
+        return s.toJSON();
+    }
+    
     @Test
     public void testSearchWithField () throws KustvaktException {
         JsonNode node = requestSearchWithFields("author");
@@ -296,6 +304,8 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertNotEquals("${project.version}", "/meta/version");
     }
 
+//  EM: The API is disabled
+    @Ignore
     @Test
     public void testSearchSimpleCQL () throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
@@ -313,16 +323,12 @@ public class SearchControllerTest extends SpringJerseyTest {
         // assertEquals(17027, node.at("/meta/totalResults").asInt());
     }
 
+//  EM: The API is disabled
     @Test
+    @Ignore
     public void testSearchRawQuery () throws KustvaktException {
-        QuerySerializer s = new QuerySerializer();
-        s.setQuery("[orth=der]", "poliqarp");
-        s.setCollection("corpusSigle=GOE");
-
-        s.setQuery("Wasser", "poliqarp");
-        // System.out.println(s.toJSON());
         ClientResponse response = resource().path(API_VERSION).path("search")
-                .post(ClientResponse.class, s.toJSON());
+                .post(ClientResponse.class, createJsonQuery());
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
@@ -330,6 +336,54 @@ public class SearchControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
-        // assertEquals(10993, node.at("/meta/totalResults").asInt());
+        
+        assertEquals("availability(FREE)",
+                node.at("/collection/rewrites/0/scope").asText());
+    }
+    
+//  EM: The API is disabled    
+    @Test
+    @Ignore
+    public void testSearchPostAll () throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("search")
+                .header(HttpHeaders.X_FORWARDED_FOR, "10.27.0.32")
+                .header(Attributes.AUTHORIZATION,
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue("kustvakt",
+                                        "kustvakt2015"))
+                .post(ClientResponse.class, createJsonQuery());
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String ent = response.getEntity(String.class);
+
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertNotEquals(0, node.path("matches").size());
+        
+        assertEquals("availability(ALL)",
+                node.at("/collection/rewrites/0/scope").asText());
+    }
+    
+//  EM: The API is disabled
+    @Test
+    @Ignore
+    public void testSearchPostPublic () throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("search")
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(Attributes.AUTHORIZATION,
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue("kustvakt",
+                                        "kustvakt2015"))
+                .post(ClientResponse.class, createJsonQuery());
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String ent = response.getEntity(String.class);
+
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertNotEquals(0, node.path("matches").size());
+        
+        assertEquals("availability(PUB)",
+                node.at("/collection/rewrites/0/scope").asText());
     }
 }

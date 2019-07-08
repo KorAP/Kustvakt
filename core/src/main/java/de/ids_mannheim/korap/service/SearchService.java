@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import de.ids_mannheim.de.init.VCLoader;
@@ -28,6 +29,7 @@ import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
+import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.ClientsHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
 
@@ -62,7 +64,8 @@ public class SearchService {
     @SuppressWarnings("unchecked")
     public String serializeQuery (String q, String ql, String v, String cq,
             Integer pageIndex, Integer startPage, Integer pageLength,
-            String context, Boolean cutoff) throws KustvaktException {
+            String context, Boolean cutoff, boolean accessRewriteDisabled)
+            throws KustvaktException {
         QuerySerializer ss = new QuerySerializer().setQuery(q, ql, v);
         if (cq != null) ss.setCollection(cq);
 
@@ -88,38 +91,56 @@ public class SearchService {
         authenticationManager.setAccessAndLocation(user, headers);
         if (DEBUG) {
             if (user != null) {
-                jlog.debug("Debug: /getMatchInfo/: location="
-                        + user.locationtoString() + ", access="
-                        + user.accesstoString());
+                jlog.debug("Debug: user location=" + user.locationtoString()
+                        + ", access=" + user.accesstoString());
             }
         }
         return user;
     }
 
-    public String search (String jsonld) {
+    public String search (String jsonld, String username, HttpHeaders headers)
+            throws KustvaktException {
+
+        User user = createUser(username, headers);
+
+        JsonNode node  = JsonUtils.readTree(jsonld);
+        node = node.at("/meta/snippets");
+        if (node !=null && node.asBoolean()){
+            user.setCorpusAccess(CorpusAccess.ALL);
+        }
+        
+        String query = this.rewriteHandler.processQuery(jsonld, user);
         // MH: todo: should be possible to add the meta part to
         // the query serialization
         // User user = controller.getUser(ctx.getUsername());
         // jsonld = this.processor.processQuery(jsonld, user);
-        return searchKrill.search(jsonld);
+        return searchKrill.search(query);
     }
 
     @SuppressWarnings("unchecked")
     public String search (String engine, String username, HttpHeaders headers,
             String q, String ql, String v, String cq, String fields,
             Integer pageIndex, Integer pageInteger, String ctx,
-            Integer pageLength, Boolean cutoff) throws KustvaktException {
+            Integer pageLength, Boolean cutoff, boolean accessRewriteDisabled)
+            throws KustvaktException {
 
         KustvaktConfiguration.BACKENDS eng = this.config.chooseBackend(engine);
         User user = createUser(username, headers);
         CorpusAccess corpusAccess = user.getCorpusAccess();
         
+        // EM: TODO: check if requested fields are public metadata. Currently 
+        // it is not needed because all metadata are public.        
+        if (accessRewriteDisabled){
+            corpusAccess = CorpusAccess.ALL;
+            user.setCorpusAccess(CorpusAccess.ALL);
+        }
+            
         QuerySerializer serializer = new QuerySerializer();
         serializer.setQuery(q, ql, v);
         if (cq != null) serializer.setCollection(cq);
 
         MetaQueryBuilder meta = createMetaQuery(pageIndex, pageInteger, ctx,
-                pageLength, cutoff, corpusAccess, fields);
+                pageLength, cutoff, corpusAccess, fields, accessRewriteDisabled);
         serializer.setMeta(meta.raw());
 
         // There is an error in query processing
@@ -148,7 +169,8 @@ public class SearchService {
 
     private MetaQueryBuilder createMetaQuery (Integer pageIndex,
             Integer pageInteger, String ctx, Integer pageLength,
-            Boolean cutoff, CorpusAccess corpusAccess, String fields) {
+            Boolean cutoff, CorpusAccess corpusAccess, String fields,
+            boolean accessRewriteDisabled) {
         MetaQueryBuilder meta = new MetaQueryBuilder();
         meta.addEntry("startIndex", pageIndex);
         meta.addEntry("startPage", pageInteger);
@@ -156,6 +178,7 @@ public class SearchService {
         meta.addEntry("count", pageLength);
         // todo: what happened to cutoff?
         meta.addEntry("cutOff", cutoff);
+        meta.addEntry("snippets", !accessRewriteDisabled);
         // meta.addMeta(pageIndex, pageInteger, pageLength, ctx,
         // cutoff);
         // fixme: should only apply to CQL queries per default!
