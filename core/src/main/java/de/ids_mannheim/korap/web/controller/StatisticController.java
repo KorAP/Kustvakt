@@ -16,10 +16,14 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.response.Notifications;
+import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
@@ -57,34 +61,54 @@ public class StatisticController {
      *            SecurityContext
      * @param locale
      *            Locale
-     * @param corpusQuery
+     * @param cq
      *            a collection query specifying a virtual corpus
+     * @param corpusQuery
+     *            (DEPRECATED) a collection query specifying a virtual corpus 
      * @return statistics of the virtual corpus defined by the given
      *         corpusQuery parameter.
      */
     @GET
     public Response getStatistics (@Context SecurityContext context,
             @Context Locale locale,
+            @QueryParam("cq") String cq,
             @QueryParam("corpusQuery") String corpusQuery) {
 
         KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
 
         String stats;
-        if (corpusQuery != null && !corpusQuery.isEmpty()) {
-            builder.with(corpusQuery);
-            String json = null;
-            try {
+        String json = null;
+        boolean isDeprecated = false;
+        boolean hasCq = false;
+        try {
+            if (cq != null && !cq.isEmpty()) {
+                builder.with(cq);
                 json = builder.toJSON();
+                hasCq = true;
             }
-            catch (KustvaktException e) {
-                throw kustvaktResponseHandler.throwit(e);
+            if (corpusQuery != null && !corpusQuery.isEmpty()) {
+                isDeprecated = true;
+                if (!hasCq) {
+                    builder.with(corpusQuery);
+                    json = builder.toJSON();
+                }
             }
             stats = searchKrill.getStatistics(json);
+            
+            if (isDeprecated){
+                Notifications n = new Notifications();
+                n.addWarning(StatusCodes.DEPRECATED_PARAMETER,
+                        "Parameter corpusQuery is deprecated in favor of cq.");
+                ObjectNode warning = (ObjectNode) n.toJsonNode();
+                ObjectNode node = (ObjectNode) JsonUtils.readTree(stats);
+                node.setAll(warning);
+                stats = node.toString();
+            }
         }
-        else {
-            stats = searchKrill.getStatistics(null);
-        };
-
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+        
         if (stats.contains("-1")) {
             throw kustvaktResponseHandler.throwit(StatusCodes.NO_RESULT_FOUND);
         }

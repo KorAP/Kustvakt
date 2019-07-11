@@ -4,6 +4,8 @@
      issue #43)
    - Disabled some unused web-services: search post, query serialization, 
      collocation base (margaretha)
+11/07/2019
+   - Added cq parameter to VC statistics API and deprecate corpusQuery (margaretha) 
 
 # version 0.62
 18/03/2019

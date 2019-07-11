@@ -12,10 +12,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.config.SpringJerseyTest;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.utils.JsonUtils;
 
 /** 
  * @author margaretha, diewald
- * @date 27/09/2017
  *
  */
 public class StatisticsControllerTest extends SpringJerseyTest {
@@ -40,6 +42,38 @@ public class StatisticsControllerTest extends SpringJerseyTest {
         assertEquals(node.get("tokens").asInt(),0);
     }
 
+    @Test
+    public void testStatisticsWithCq () throws KustvaktException{
+        ClientResponse response = resource().path(API_VERSION)
+                .path("statistics")
+                .queryParam("cq", "textType=Abhandlung & corpusSigle=GOE")
+                .method("GET", ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String query = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(query);
+        assertEquals(2, node.at("/documents").asInt());
+        assertEquals(138180, node.at("/tokens").asInt());
+        assertEquals(5687, node.at("/sentences").asInt());
+        assertEquals(258, node.at("/paragraphs").asInt());
+    }
+    
+    @Test
+    public void testStatisticsWithCqAndCorpusQuery () throws KustvaktException{
+        ClientResponse response = resource().path(API_VERSION)
+                .path("statistics")
+                .queryParam("cq", "textType=Abhandlung & corpusSigle=GOE")
+                .queryParam("corpusQuery", "textType=Autobiographie & corpusSigle=GOE")
+                .method("GET", ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String query = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(query);
+        assertEquals(2, node.at("/documents").asInt());
+        assertEquals(138180, node.at("/tokens").asInt());
+        assertEquals(5687, node.at("/sentences").asInt());
+        assertEquals(258, node.at("/paragraphs").asInt());
+    }
 
     @Test
     public void testGetStatisticsWithcorpusQuery1 ()
@@ -56,6 +90,11 @@ public class StatisticsControllerTest extends SpringJerseyTest {
         JsonNode node = mapper.readTree(ent);
         assertEquals(node.get("documents").asInt(),11);
         assertEquals(node.get("tokens").asInt(),665842);
+        
+        assertEquals(StatusCodes.DEPRECATED_PARAMETER,
+                node.at("/warnings/0/0").asInt());
+        assertEquals("Parameter corpusQuery is deprecated in favor of cq.",
+                node.at("/warnings/0/1").asText());
     }
 
 
