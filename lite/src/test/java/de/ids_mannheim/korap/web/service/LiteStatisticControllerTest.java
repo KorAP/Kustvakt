@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.web.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -28,6 +29,8 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
         assertEquals(138180, node.at("/tokens").asInt());
         assertEquals(5687, node.at("/sentences").asInt());
         assertEquals(258, node.at("/paragraphs").asInt());
+        
+        assertTrue(node.at("/warnings").isMissingNode());
     }
     
     @Test
@@ -46,14 +49,11 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
         assertEquals(5687, node.at("/sentences").asInt());
         assertEquals(258, node.at("/paragraphs").asInt());
         
-        assertEquals(StatusCodes.DEPRECATED_PARAMETER,
-                node.at("/warnings/0/0").asInt());
-        assertEquals("Parameter corpusQuery is deprecated in favor of cq.",
-                node.at("/warnings/0/1").asText());
+        assertTrue(node.at("/warnings").isMissingNode());
     }
     
     @Test
-    public void testStatistics () throws KustvaktException{
+    public void testStatisticsWithCorpusQuery () throws KustvaktException{
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", "textType=Autobiographie & corpusSigle=GOE")
@@ -66,6 +66,11 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
         assertEquals(527662, node.at("/tokens").asInt());
         assertEquals(19387, node.at("/sentences").asInt());
         assertEquals(514, node.at("/paragraphs").asInt());
+        
+        assertEquals(StatusCodes.DEPRECATED_PARAMETER,
+                node.at("/warnings/0/0").asInt());
+        assertEquals("Parameter corpusQuery is deprecated in favor of cq.",
+                node.at("/warnings/0/1").asText());
     }
 
     @Test

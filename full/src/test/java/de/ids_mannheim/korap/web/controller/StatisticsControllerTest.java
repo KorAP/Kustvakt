@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
@@ -56,6 +57,8 @@ public class StatisticsControllerTest extends SpringJerseyTest {
         assertEquals(138180, node.at("/tokens").asInt());
         assertEquals(5687, node.at("/sentences").asInt());
         assertEquals(258, node.at("/paragraphs").asInt());
+        
+        assertTrue(node.at("/warnings").isMissingNode());
     }
     
     @Test
@@ -73,6 +76,8 @@ public class StatisticsControllerTest extends SpringJerseyTest {
         assertEquals(138180, node.at("/tokens").asInt());
         assertEquals(5687, node.at("/sentences").asInt());
         assertEquals(258, node.at("/paragraphs").asInt());
+        
+        assertTrue(node.at("/warnings").isMissingNode());
     }
 
     @Test

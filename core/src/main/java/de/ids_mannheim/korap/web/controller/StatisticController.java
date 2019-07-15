@@ -79,20 +79,17 @@ public class StatisticController {
         String stats;
         String json = null;
         boolean isDeprecated = false;
-        boolean hasCq = false;
         try {
             if (cq != null && !cq.isEmpty()) {
                 builder.with(cq);
                 json = builder.toJSON();
-                hasCq = true;
             }
-            if (corpusQuery != null && !corpusQuery.isEmpty()) {
+            else if (corpusQuery != null && !corpusQuery.isEmpty()) {
+                builder.with(corpusQuery);
+                json = builder.toJSON();
                 isDeprecated = true;
-                if (!hasCq) {
-                    builder.with(corpusQuery);
-                    json = builder.toJSON();
-                }
             }
+            
             stats = searchKrill.getStatistics(json);
             
             if (isDeprecated){
