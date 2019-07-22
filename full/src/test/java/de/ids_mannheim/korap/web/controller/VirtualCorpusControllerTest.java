@@ -608,8 +608,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 node.at("/errors/0/0").asInt());
         assertTrue(node.at("/errors/0/1").asText().startsWith(
                 "Cannot deserialize value of type `de.ids_mannheim.korap.constant."
-                        + "VirtualCorpusType` from String \"PRIVAT\": value not one of "
-                        + "declared Enum instance names"));
+                        + "VirtualCorpusType` from String \"PRIVAT\""));
     }
     
     @Test
