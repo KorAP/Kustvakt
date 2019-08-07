@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
+import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
@@ -26,6 +27,9 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
+import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
+import de.ids_mannheim.korap.oauth2.entity.AccessScope;
+import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
@@ -332,6 +336,12 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(TokenType.BEARER.toString(),
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
+        
+        RefreshToken refreshToken = refreshTokenDao
+                .retrieveRefreshToken(node.at("/refresh_token").asText());
+        Set<AccessScope> scopes = refreshToken.getScopes();
+        assertEquals(1, scopes.size());
+        assertEquals("[all]", scopes.toString());
     }
 
     @Test
@@ -592,6 +602,11 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertNotNull(node.at("/expires_in").asText());
 
         assertTrue(!node.at("/refresh_token").asText().equals(refreshToken));
+        
+        RefreshToken rt = refreshTokenDao.retrieveRefreshToken(refreshToken);
+        assertEquals(true, rt.isRevoked());
+        Set<AccessScope> scopes = rt.getScopes();
+        assertEquals(3, scopes.size());
     }
 
     private void testRequestRefreshTokenInvalidClient (String refreshToken)

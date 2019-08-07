@@ -23,7 +23,8 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
  * Before running this test:
- * set oauth2.access.token.expiry = 3S
+ * set oauth2.access.token.expiry = 2S
+ * oauth2.authorization.code.expiry = 1S
  * 
  * @author margaretha
  *

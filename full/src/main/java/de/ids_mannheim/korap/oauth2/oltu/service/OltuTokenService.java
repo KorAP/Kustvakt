@@ -143,7 +143,8 @@ public class OltuTokenService extends OAuth2TokenService {
                     "Refresh token is expired", OAuth2Error.INVALID_GRANT);
         }
 
-        Set<AccessScope> requestedScopes = refreshToken.getScopes();
+        Set<AccessScope> requestedScopes =
+                new HashSet<>(refreshToken.getScopes());
         if (scopes != null && !scopes.isEmpty()) {
             requestedScopes =
                     scopeService.verifyRefreshScope(scopes, requestedScopes);
@@ -151,8 +152,7 @@ public class OltuTokenService extends OAuth2TokenService {
                     .convertAccessScopesToStringSet(requestedScopes);
         }
 
-        // revoke the refresh token and all access tokens associated
-        // to it
+        // revoke the refresh token and all access tokens associated to it
         revokeRefreshToken(refreshTokenStr);
 
         return createsAccessTokenResponse(scopes, requestedScopes, clientId,

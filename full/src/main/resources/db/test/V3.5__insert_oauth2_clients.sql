@@ -36,7 +36,7 @@ INSERT INTO oauth2_client(id,name,secret,type,super,
 VALUES ("nW5qM63Rb2a7KdT9L","test public client",null,
   "PUBLIC", 0, 
   "https://korap.ids-mannheim.de/public/redirect","system", 
-  "This is a test super public client.",
+  "This is a test public client.",
   "http://korap.ids-mannheim.de/public", 1360724310);
   
 

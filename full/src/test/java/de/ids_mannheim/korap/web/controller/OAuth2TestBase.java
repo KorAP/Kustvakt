@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -24,6 +25,7 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
+import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
@@ -35,6 +37,9 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  */
 public abstract class OAuth2TestBase extends SpringJerseyTest {
 
+    @Autowired
+    protected RefreshTokenDao refreshTokenDao;
+    
     protected String publicClientId = "8bIDtZnH6NvRkW2Fq";
     protected String confidentialClientId = "9aHsGW6QflV13ixNpez";
     protected String superClientId = "fCBbQkAyYzI4NzUxMg";
