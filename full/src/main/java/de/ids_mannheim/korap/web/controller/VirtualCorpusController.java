@@ -293,7 +293,7 @@ public class VirtualCorpusController {
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
-        return Response.ok().build();
+        return Response.ok("SUCCESS").build();
     }
 
     /**

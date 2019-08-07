@@ -177,7 +177,7 @@ public class UserGroupController {
         try {
             scopeService.verifyScope(context, OAuth2Scope.CREATE_USER_GROUP);
             service.createUserGroup(group, context.getUsername());
-            return Response.ok().build();
+            return Response.ok("SUCCESS").build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -276,7 +276,7 @@ public class UserGroupController {
             scopeService.verifyScope(context,
                     OAuth2Scope.ADD_USER_GROUP_MEMBER);
             service.inviteGroupMembers(group, context.getUsername());
-            return Response.ok().build();
+            return Response.ok("SUCCESS").build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -298,7 +298,7 @@ public class UserGroupController {
                     OAuth2Scope.EDIT_USER_GROUP_MEMBER_ROLE);
             service.editMemberRoles(context.getUsername(), groupId,
                     memberUsername, roleIds);
-            return Response.ok().build();
+            return Response.ok("SUCCESS").build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -333,7 +333,7 @@ public class UserGroupController {
                     OAuth2Scope.ADD_USER_GROUP_MEMBER_ROLE);
             service.addMemberRoles(context.getUsername(), groupId,
                     memberUsername, roleIds);
-            return Response.ok().build();
+            return Response.ok("SUCCESS").build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -367,7 +367,7 @@ public class UserGroupController {
                     OAuth2Scope.DELETE_USER_GROUP_MEMBER_ROLE);
             service.deleteMemberRoles(context.getUsername(), groupId,
                     memberUsername, roleIds);
-            return Response.ok().build();
+            return Response.ok("SUCCESS").build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -395,7 +395,7 @@ public class UserGroupController {
             scopeService.verifyScope(context,
                     OAuth2Scope.ADD_USER_GROUP_MEMBER);
             service.acceptInvitation(groupId, context.getUsername());
-            return Response.ok().build();
+            return Response.ok("SUCCESS").build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -426,7 +426,7 @@ public class UserGroupController {
                     OAuth2Scope.DELETE_USER_GROUP_MEMBER);
             service.deleteGroupMember(context.getUsername(), groupId,
                     context.getUsername());
-            return Response.ok().build();
+            return Response.ok("SUCCESS").build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);

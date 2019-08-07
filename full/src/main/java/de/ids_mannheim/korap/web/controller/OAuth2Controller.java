@@ -243,7 +243,7 @@ public class OAuth2Controller {
                     new OAuth2RevokeTokenRequest(
                             new FormRequestWrapper(request, form));
             tokenService.revokeToken(revokeTokenRequest);
-            return Response.ok().build();
+            return Response.ok("SUCCESS").build();
         }
         catch (OAuthProblemException e) {
             throw responseHandler.throwit(e);
@@ -279,7 +279,7 @@ public class OAuth2Controller {
                     new OAuth2RevokeTokenSuperRequest(
                             new FormRequestWrapper(request, form));
             tokenService.revokeTokenViaSuperClient(revokeTokenRequest);
-            return Response.ok().build();
+            return Response.ok("SUCCESS").build();
         }
         catch (OAuthSystemException e) {
             throw responseHandler.throwit(e);

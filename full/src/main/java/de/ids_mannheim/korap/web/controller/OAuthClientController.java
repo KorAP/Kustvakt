@@ -203,7 +203,7 @@ public class OAuthClientController {
             scopeService.verifyScope(context, OAuth2Scope.ADMIN);
             clientService.updatePrivilege(context.getUsername(), clientId,
                     Boolean.valueOf(isSuper));
-            return Response.ok().build();
+            return Response.ok("SUCCESS").build();
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
