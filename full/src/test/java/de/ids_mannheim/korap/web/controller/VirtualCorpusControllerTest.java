@@ -225,7 +225,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         String entity = response.getEntity(String.class);
         node = JsonUtils.readTree(entity);
         assertEquals(3, node.at("/0/id").asInt());
-        assertEquals("gill", node.at("/0/members/1/userId").asText());
+        String members = node.at("/0/members").toString();
+        assertTrue(members.contains("\"userId\":\"gill\""));
     }
 
     @Test

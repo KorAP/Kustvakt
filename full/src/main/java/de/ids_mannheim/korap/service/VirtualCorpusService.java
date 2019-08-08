@@ -275,6 +275,8 @@ public class VirtualCorpusService {
                     deleteVCAccess(hiddenAccess.getId(), "system");
                     int groupId = hiddenAccess.getUserGroup().getId();
                     userGroupService.deleteAutoHiddenGroup(groupId, "system");
+                    // EM: should the users within the hidden group receive 
+                    // notifications? 
                 }
                 // else remains the same
             }
@@ -642,14 +644,15 @@ public class VirtualCorpusService {
                         username);
             }
 
-            else if (VirtualCorpusType.PUBLISHED.equals(type)) {
+            else if (VirtualCorpusType.PUBLISHED.equals(type)
+                    && !username.equals("guest")) {
                 // add user in the VC's auto group
                 UserGroup userGroup = userGroupService
                         .retrieveHiddenUserGroupByVC(vc.getId());
                 try {
                     userGroupService.addGroupMember(username, userGroup,
                             "system", GroupMemberStatus.ACTIVE);
-                    // member roles has not been set (not necessary)
+                    // member roles are not set (not necessary)
                 }
                 catch (KustvaktException e) {
                     // member exists

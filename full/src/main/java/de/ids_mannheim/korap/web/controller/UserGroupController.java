@@ -283,14 +283,22 @@ public class UserGroupController {
         }
     }
 
+    /** Very similar to addMemberRoles web-service, but allows deletion 
+     * as well.
+     * 
+     * @param securityContext
+     * @param groupId
+     * @param memberUsername
+     * @param roleIds
+     * @return
+     */
     @POST
     @Path("member/role/edit")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response editMemberRoles (@Context SecurityContext securityContext,
             @FormParam("groupId") int groupId,
             @FormParam("memberUsername") String memberUsername,
-            @FormParam("roleIds") List<Integer> roleIds,
-            @PathParam("version") String version) {
+            @FormParam("roleIds") List<Integer> roleIds) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
@@ -307,8 +315,7 @@ public class UserGroupController {
 
     /**
      * Adds roles of an active member of a user-group. Only user-group
-     * admins
-     * and system admins are allowed.
+     * admins and system admins are allowed.
      * 
      * @param securityContext
      * @param groupId
