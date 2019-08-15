@@ -14,6 +14,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,12 +99,14 @@ public class VirtualCorpusController {
 
         try {
             scopeService.verifyScope(context, OAuth2Scope.EDIT_VC);
-            service.handlePutRequest(context.getUsername(),vcCreator, vcName, vc);
+            Status status = service.handlePutRequest(context.getUsername(),
+                    vcCreator, vcName, vc);
+            return Response.status(status).build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
-        return Response.ok().build();
+        
     }
 
     /**

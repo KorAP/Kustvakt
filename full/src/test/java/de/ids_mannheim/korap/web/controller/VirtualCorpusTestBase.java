@@ -49,7 +49,7 @@ public abstract class VirtualCorpusTestBase extends SpringJerseyTest{
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .put(ClientResponse.class, json);
 
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
         JsonNode node = testSearchVC(username, vcCreator, vcName);
         assertEquals(type.displayName(), node.at("/type").asText());

@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -233,7 +235,7 @@ public class VirtualCorpusService {
 //        editVC(vc, vcJson, vcJson.getName(), username);
 //    }
 
-    public void handlePutRequest (String username, String vcCreator,
+    public Status handlePutRequest (String username, String vcCreator,
             String vcName, VirtualCorpusJson vcJson) throws KustvaktException {
         
         verifyUsername(username, vcCreator);
@@ -241,9 +243,11 @@ public class VirtualCorpusService {
         ParameterChecker.checkObjectValue(vcJson, "request entity");
         if (vc == null) {
             storeVC(vcJson, vcName, username);
+            return Status.CREATED;
         }
         else {
             editVC(vc, vcJson, vcName, username);
+            return Status.NO_CONTENT;
         }
     }
 

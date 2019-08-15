@@ -306,7 +306,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .put(ClientResponse.class, json);
 
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
         // list user VC
         JsonNode node = testListVC("VirtualCorpusControllerTest");
@@ -338,7 +338,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .put(ClientResponse.class, json);
 
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
         // test list owner vc
         JsonNode node = testListOwnerVC("VirtualCorpusControllerTest");
@@ -651,7 +651,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .put(ClientResponse.class, json);
 
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
         // check VC
         JsonNode node = testListVC("dory");
@@ -668,7 +668,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .put(ClientResponse.class, json);
 
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
         // check VC
         node = testListVC("dory");
@@ -688,7 +688,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .put(ClientResponse.class, json);
 
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
         // check VC
         JsonNode node = testListVC("dory");
@@ -743,7 +743,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .put(ClientResponse.class, json);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
         // check VC
         node = testListOwnerVC("dory");
@@ -770,7 +770,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .put(ClientResponse.class, json);
 
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
         node = testListOwnerVC("dory");
         assertEquals(VirtualCorpusType.PROJECT.displayName(),

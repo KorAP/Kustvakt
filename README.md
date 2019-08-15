@@ -87,19 +87,13 @@ For testing, you can use/activate BasicAuthentication, see Spring XML configurat
 
 ### Changing Kustvakt Server Port and Host
 
-	Server.port = 8089
-	Server.host = localhost
-
-### Changing Kustvakt Service Base URL
-
-The default base URL is
-
-	kustvakt.base.url=/kustvakt/api/*
+	server.port = 8089
+	server.host = localhost
 
 ### Setting Default Foundries
 
-These properties define the default foundries used for specific layers, 
-for instance in a rewrite, a default foundry may be added to a Koral query
+The following properties define the default foundries used for specific layers. 
+For instance in a rewrite, a default foundry may be added to a Koral query
 missing a foundry.   
    
 
@@ -108,6 +102,8 @@ missing a foundry.
 	default.foundry.orthography = opennlp
 	default.foundry.dependency = malt
 	default.foundry.constituent = corenlp
+	default.foundry.morphology = marmot
+	default.foundry.surface = base
 
 
 # Running Kustvakt Server

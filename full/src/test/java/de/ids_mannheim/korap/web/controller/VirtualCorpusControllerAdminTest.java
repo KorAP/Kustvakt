@@ -113,7 +113,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).put(ClientResponse.class);
 
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
         JsonNode node = testListSystemVC();
         assertEquals(1, node.size());
@@ -152,7 +152,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .put(ClientResponse.class, json);
 
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
         JsonNode node = testListUserVC(username);
         assertEquals(1, node.size());
@@ -192,7 +192,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .put(ClientResponse.class, json);
 
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
         JsonNode node = testListUserVC(username);
         assertEquals("edited vc", node.at("/0/description").asText());
