@@ -26,6 +26,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
+import de.ids_mannheim.korap.rewrite.KoralNode;
 import de.ids_mannheim.korap.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
@@ -124,6 +125,11 @@ public class SearchService {
             Integer pageLength, Boolean cutoff, boolean accessRewriteDisabled)
             throws KustvaktException {
 
+        if (pageInteger != null && pageInteger < 1) {
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
+                    "page must start from 1", "page");
+        }
+        
         KustvaktConfiguration.BACKENDS eng = this.config.chooseBackend(engine);
         User user = createUser(username, headers);
         CorpusAccess corpusAccess = user.getCorpusAccess();
@@ -142,7 +148,7 @@ public class SearchService {
         MetaQueryBuilder meta = createMetaQuery(pageIndex, pageInteger, ctx,
                 pageLength, cutoff, corpusAccess, fields, accessRewriteDisabled);
         serializer.setMeta(meta.raw());
-
+        
         // There is an error in query processing
         // - either query, corpus or meta
         if (serializer.hasErrors()) {

@@ -27,6 +27,7 @@ import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.LiteJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.SearchKrill;
@@ -405,6 +406,20 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         JsonNode node = JsonUtils.readTree(query);
 
         assertTrue(node.at("/matches/0/snippet").isMissingNode());
+    }
+    
+    @Test
+    public void testSearchWithInvalidPage () throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
+                .queryParam("page", "0")
+                .get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+                response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.INVALID_ARGUMENT, node.at("/errors/0/0").asInt());
+        assertEquals("page must start from 1",node.at("/errors/0/1").asText());
     }
     
     @Test
