@@ -281,8 +281,9 @@ public class SearchKrill {
      * 
      * @param json
      *            JSON-LD string with potential meta filters.
+     * @throws KustvaktException 
      */
-    public String getStatistics (String json) {
+    public String getStatistics (String json) throws KustvaktException {
         if (index == null) {
             return "{\"documents\" : -1, error\" : \"No index given\" }";
         };
@@ -320,6 +321,11 @@ public class SearchKrill {
         catch (IOException e) {
             e.printStackTrace();
         };
+        
+        if (kc.hasErrors()) {
+            throw new KustvaktException(
+                    "{\"errors\":" + kc.getErrors().toJsonString() + "}");
+        }
         // Build json response
         StringBuilder sb = new StringBuilder("{");
         sb.append("\"documents\":").append(docs).append(",\"tokens\":")

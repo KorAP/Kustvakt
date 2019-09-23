@@ -2,7 +2,9 @@ package de.ids_mannheim.korap.web.controller;
 
 import java.util.Locale;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -16,7 +18,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sun.jersey.spi.container.ResourceFilters;
 
@@ -113,5 +114,28 @@ public class StatisticController {
             jlog.debug("Stats: " + stats);
         }
         return Response.ok(stats).build();
+    }
+    
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public Response getStatisticsFromKoralQuery (@Context SecurityContext context,
+            @Context Locale locale, String koralQuery) {
+        if (koralQuery != null && !koralQuery.isEmpty()) {
+            String stats;
+            try {
+                stats = searchKrill.getStatistics(koralQuery);
+                if (stats.contains("-1")){
+                    throw kustvaktResponseHandler.throwit(StatusCodes.NO_RESULT_FOUND);
+                }
+                return Response.ok(stats).build();
+            }
+            catch (KustvaktException e) {
+                throw kustvaktResponseHandler.throwit(e);
+            }
+        }
+        else {
+            throw kustvaktResponseHandler.throwit(StatusCodes.NO_QUERY, 
+                    "Koral query is missing", "koralQuery");
+        }
     }
 }
