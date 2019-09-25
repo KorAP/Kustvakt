@@ -423,7 +423,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     }
     
     @Test
-    public void testCloseIndex () throws IOException {
+    public void testCloseIndex () throws IOException, KustvaktException {
         searchKrill.getStatistics(null);
         assertEquals(true, searchKrill.getIndex().isReaderOpen());
 
