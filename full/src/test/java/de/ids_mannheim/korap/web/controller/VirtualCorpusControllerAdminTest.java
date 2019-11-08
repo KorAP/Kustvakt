@@ -258,7 +258,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
             ClientHandlerException, KustvaktException {
         String vcCreator = "marlin";
         String vcName = "marlin-vc";
-        String groupName = "marlin group";
+        String groupName = "marlin-group";
 
         testCreateVCAccess(vcCreator, vcName, groupName);
         JsonNode node = testlistAccessByGroup(groupName);

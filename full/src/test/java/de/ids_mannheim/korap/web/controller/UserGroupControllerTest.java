@@ -70,7 +70,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
-    // dory is a group admin in dory group
+    // dory is a group admin in dory-group
     @Test
     public void testListDoryGroups () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
@@ -86,12 +86,12 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
         JsonNode group = node.get(1);
         assertEquals(2, group.at("/id").asInt());
-        assertEquals("dory group", group.at("/name").asText());
+        assertEquals("dory-group", group.at("/name").asText());
         assertEquals("dory", group.at("/owner").asText());
         assertEquals(3, group.at("/members").size());
     }
 
-    // nemo is a group member in dory group
+    // nemo is a group member in dory-group
     @Test
     public void testListNemoGroups () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
@@ -106,7 +106,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(2, node.at("/0/id").asInt());
-        assertEquals("dory group", node.at("/0/name").asText());
+        assertEquals("dory-group", node.at("/0/name").asText());
         assertEquals("dory", node.at("/0/owner").asText());
         // group members are not allowed to see other members
         assertEquals(0, node.at("/0/members").size());
@@ -151,15 +151,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         json.setName(groupName);
         json.setMembers(new String[] {});
 
-        ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("create").type(MediaType.APPLICATION_JSON)
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(json)
-                .post(ClientResponse.class);
-
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-     
+        testCreateUserGroup(json);
         deleteGroupByName(groupName);
     }
 
@@ -171,6 +163,12 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         UserGroupJson json = new UserGroupJson();
         json.setName(groupName);
 
+        testCreateUserGroup(json);
+        deleteGroupByName(groupName);
+    }
+    
+    private void testCreateUserGroup (UserGroupJson json) throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("create").type(MediaType.APPLICATION_JSON)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -179,16 +177,30 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 .post(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+    
+    private void testCreateSameGroupName (UserGroupJson json)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("group")
+                .path("create").type(MediaType.APPLICATION_JSON)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(json)
+                .post(ClientResponse.class);
+
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         
-        deleteGroupByName(groupName);
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        assertEquals(StatusCodes.GROUP_EXISTS, node.at("/errors/0/0").asInt());
     }
     
     @Test
-    public void testUserGroup () throws UniformInterfaceException,
+    public void testCreateGroupInvalidName () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-
         UserGroupJson json = new UserGroupJson();
-        json.setName("new user group");
+        String groupName = "invalid-group-name$"; 
+        json.setName(groupName);
         json.setMembers(new String[] { "marlin", "nemo" });
 
         ClientResponse response = resource().path(API_VERSION).path("group")
@@ -197,22 +209,33 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(json)
                 .post(ClientResponse.class);
+        
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        assertEquals(StatusCodes.INVALID_ARGUMENT, node.at("/errors/0/0").asInt());
+        assertEquals("User-group name must only contains letters, numbers, "
+                + "underscores, hypens and spaces", node.at("/errors/0/1").asText());
+        assertEquals("invalid-group-name$", node.at("/errors/0/2").asText());
+    }
+    
+    @Test
+    public void testUserGroup () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
 
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        UserGroupJson json = new UserGroupJson();
+        String groupName = "new-user-group"; 
+        json.setName(groupName);
+        json.setMembers(new String[] { "marlin", "nemo" });
+
+        testCreateUserGroup(json);
+        testCreateSameGroupName(json);
 
         // list user group
-        response = resource().path(API_VERSION).path("group").path("list")
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
-
-        String entity = response.getEntity(String.class);
-        // System.out.println(entity);
-        JsonNode node = JsonUtils.readTree(entity);
+        JsonNode node = retrieveUserGroups(username);;
         assertEquals(1, node.size());
         node = node.get(0);
-        assertEquals("new user group", node.get("name").asText());
+        assertEquals("new-user-group", node.get("name").asText());
         String groupId = node.get("id").asText();
 
         assertEquals(username, node.get("owner").asText());
@@ -290,7 +313,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         // dory delete pearl
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("member")
-                // dory group
+                // dory-group
                 .path("delete").path("2").path("pearl")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
@@ -320,9 +343,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.GROUP_MEMBER_DELETED,
                 node.at("/errors/0/0").asInt());
-        assertEquals("pearl has already been deleted from the group dory group",
+        assertEquals("pearl has already been deleted from the group dory-group",
                 node.at("/errors/0/1").asText());
-        assertEquals("[pearl, dory group]", node.at("/errors/0/2").asText());
+        assertEquals("[pearl, dory-group]", node.at("/errors/0/2").asText());
     }
 
     private void testDeleteGroup (String groupId)
@@ -398,9 +421,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.GROUP_DELETED, node.at("/errors/0/0").asInt());
-        assertEquals("Group deleted group has been deleted.",
+        assertEquals("Group deleted-group has been deleted.",
                 node.at("/errors/0/1").asText());
-        assertEquals("deleted group", node.at("/errors/0/2").asText());
+        assertEquals("deleted-group", node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -491,7 +514,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     @Test
     public void testInviteDeletedMember2 () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        // pearl has status deleted in dory group
+        // pearl has status deleted in dory-group
         String[] members = new String[] { "pearl" };
 
         UserGroupJson userGroup = new UserGroupJson();
@@ -521,7 +544,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     @Test
     public void testInvitePendingMember () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        // marlin has status PENDING in dory group
+        // marlin has status PENDING in dory-group
         String[] members = new String[] { "marlin" };
 
         UserGroupJson userGroup = new UserGroupJson();
@@ -543,16 +566,16 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 node.at("/errors/0/0").asInt());
         assertEquals(
                 "Username marlin with status PENDING exists in the user-group "
-                        + "dory group",
+                        + "dory-group",
                 node.at("/errors/0/1").asText());
-        assertEquals("[marlin, PENDING, dory group]",
+        assertEquals("[marlin, PENDING, dory-group]",
                 node.at("/errors/0/2").asText());
     }
 
     @Test
     public void testInviteActiveMember () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        // nemo has status active in dory group
+        // nemo has status active in dory-group
         String[] members = new String[] { "nemo" };
 
         UserGroupJson userGroup = new UserGroupJson();
@@ -575,9 +598,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 node.at("/errors/0/0").asInt());
         assertEquals(
                 "Username nemo with status ACTIVE exists in the user-group "
-                        + "dory group",
+                        + "dory-group",
                 node.at("/errors/0/1").asText());
-        assertEquals("[nemo, ACTIVE, dory group]",
+        assertEquals("[nemo, ACTIVE, dory-group]",
                 node.at("/errors/0/2").asText());
     }
 
@@ -604,12 +627,12 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.GROUP_DELETED, node.at("/errors/0/0").asInt());
-        assertEquals("Group deleted group has been deleted.",
+        assertEquals("Group deleted-group has been deleted.",
                 node.at("/errors/0/1").asText());
-        assertEquals("deleted group", node.at("/errors/0/2").asText());
+        assertEquals("deleted-group", node.at("/errors/0/2").asText());
     }
 
-    // marlin has GroupMemberStatus.PENDING in dory group
+    // marlin has GroupMemberStatus.PENDING in dory-group
     @Test
     public void testSubscribePendingMember () throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
@@ -631,7 +654,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         JsonNode group = node.get(1);
         assertEquals(2, group.at("/id").asInt());
-        assertEquals("dory group", group.at("/name").asText());
+        assertEquals("dory-group", group.at("/name").asText());
         assertEquals("dory", group.at("/owner").asText());
         // group members are not allowed to see other members
         assertEquals(0, group.at("/members").size());
@@ -642,16 +665,16 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(PredefinedRole.VC_ACCESS_MEMBER.name(),
                 group.at("/userRoles/1").asText());
 
-        // unsubscribe marlin from dory group
+        // unsubscribe marlin from dory-group
         testUnsubscribeActiveMember(form);
         checkGroupMemberRole("2", "marlin");
 
-        // invite marlin to dory group to set back the
+        // invite marlin to dory-group to set back the
         // GroupMemberStatus.PENDING
         testInviteDeletedMember();
     }
 
-    // pearl has GroupMemberStatus.DELETED in dory group
+    // pearl has GroupMemberStatus.DELETED in dory-group
     @Test
     public void testSubscribeDeletedMember () throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
@@ -669,7 +692,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.GROUP_MEMBER_DELETED,
                 node.at("/errors/0/0").asInt());
-        assertEquals("pearl has already been deleted from the group dory group",
+        assertEquals("pearl has already been deleted from the group dory-group",
                 node.at("/errors/0/1").asText());
     }
 
@@ -753,7 +776,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.GROUP_DELETED, node.at("/errors/0/0").asInt());
-        assertEquals("Group new user group has been deleted.",
+        assertEquals("Group new-user-group has been deleted.",
                 node.at("/errors/0/1").asText());
     }
 
@@ -801,9 +824,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testUnsubscribeDeletedMember ()
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        // pearl unsubscribes from dory group
+        // pearl unsubscribes from dory-group
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        // dory group
+        // dory-group
         form.add("groupId", "2");
 
         ClientResponse response = resource().path(API_VERSION).path("group")
@@ -819,9 +842,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.GROUP_MEMBER_DELETED,
                 node.at("/errors/0/0").asInt());
-        assertEquals("pearl has already been deleted from the group dory group",
+        assertEquals("pearl has already been deleted from the group dory-group",
                 node.at("/errors/0/1").asText());
-        assertEquals("[pearl, dory group]", node.at("/errors/0/2").asText());
+        assertEquals("[pearl, dory-group]", node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -833,7 +856,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(2, node.size());
 
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        // dory group
+        // dory-group
         form.add("groupId", "2");
 
         ClientResponse response = resource().path(API_VERSION).path("group")
@@ -848,7 +871,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         node = retrieveUserGroups("marlin");
         assertEquals(1, node.size());
 
-        // invite marlin to dory group to set back the
+        // invite marlin to dory-group to set back the
         // GroupMemberStatus.PENDING
         testInviteDeletedMember();
     }
@@ -939,7 +962,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.GROUP_DELETED, node.at("/errors/0/0").asInt());
-        assertEquals("Group new user group has been deleted.",
+        assertEquals("Group new-user-group has been deleted.",
                 node.at("/errors/0/1").asText());
     }
 

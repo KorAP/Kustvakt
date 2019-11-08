@@ -89,10 +89,8 @@ public class UserGroupController {
 
     /**
      * Lists user-groups for system-admin purposes. If username
-     * parameter
-     * is not specified, list user-groups of all users. If status is
-     * not
-     * specified, list user-groups of all statuses.
+     * parameter is not specified, list user-groups of all users. If
+     * status is not specified, list user-groups of all statuses.
      * 
      * @param securityContext
      * @param username
@@ -207,10 +205,11 @@ public class UserGroupController {
             throw kustvaktResponseHandler.throwit(e);
         }
     }
-    
+
     @DELETE
     @Path("{groupName}")
-    public Response deleteUserGroupByName (@Context SecurityContext securityContext,
+    public Response deleteUserGroupByName (
+            @Context SecurityContext securityContext,
             @PathParam("groupName") String groupName) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
@@ -283,7 +282,8 @@ public class UserGroupController {
         }
     }
 
-    /** Very similar to addMemberRoles web-service, but allows deletion 
+    /**
+     * Very similar to addMemberRoles web-service, but allows deletion
      * as well.
      * 
      * @param securityContext
@@ -383,8 +383,7 @@ public class UserGroupController {
 
     /**
      * Handles requests to accept membership invitation. Only invited
-     * users
-     * can subscribe to the corresponding user-group.
+     * users can subscribe to the corresponding user-group.
      * 
      * @param securityContext
      * @param groupId
@@ -411,8 +410,7 @@ public class UserGroupController {
 
     /**
      * Handles requests to reject membership invitation. A member can
-     * only
-     * unsubscribe him/herself from a group.
+     * only unsubscribe him/herself from a group.
      * 
      * Implemented identical to delete group member.
      * 

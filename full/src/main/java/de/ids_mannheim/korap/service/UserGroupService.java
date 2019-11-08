@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,6 +49,8 @@ public class UserGroupService {
 
     public static Logger jlog = LogManager.getLogger(UserGroupService.class);
     public static boolean DEBUG = false;
+    
+    public static Pattern groupNamePattern = Pattern.compile("[-\\w.]+");
     
     @Autowired
     private UserGroupDao userGroupDao;
@@ -215,9 +218,28 @@ public class UserGroupService {
     public void createUserGroup (UserGroupJson groupJson, String createdBy)
             throws KustvaktException {
 
+        String name = groupJson.getName();
+        if (!groupNamePattern.matcher(name).matches()) {
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
+                    "User-group name must only contains letters, numbers, "
+                            + "underscores, hypens and spaces",
+                    name);
+        }
+        
+        try{
+            userGroupDao.retrieveGroupByName(groupJson.getName());
+            throw new KustvaktException(StatusCodes.GROUP_EXISTS,
+                    "User-group name must be unique.");
+        }
+        catch (KustvaktException e) {
+            if (e.getStatusCode() != StatusCodes.NO_RESOURCE_FOUND){
+                throw e;
+            }
+        }
+        
         int groupId=0;
         try {
-            groupId = userGroupDao.createGroup(groupJson.getName(), createdBy,
+            groupId = userGroupDao.createGroup(name, createdBy,
                     UserGroupStatus.ACTIVE);
         }
         // handle DB exceptions, e.g. unique constraint

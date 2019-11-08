@@ -153,7 +153,8 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
             ClientHandlerException, KustvaktException {
 
         UserGroupJson json = new UserGroupJson();
-        json.setName("admin test group");
+        String groupName = "admin-test-group";
+        json.setName(groupName);
         json.setMembers(new String[] { "marlin", "nemo" });
 
         ClientResponse response = resource().path(API_VERSION).path("group").path("create")
@@ -171,7 +172,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         JsonNode node = listGroup(testUsername);
         assertEquals(1, node.size());
         node = node.get(0);
-        assertEquals("admin test group", node.get("name").asText());
+        assertEquals(groupName, node.get("name").asText());
 
         String groupId = node.get("id").asText();
         testMemberRole("marlin", groupId);

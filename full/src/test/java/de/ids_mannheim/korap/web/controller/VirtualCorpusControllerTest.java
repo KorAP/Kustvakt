@@ -783,7 +783,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
     @Test
     public void testlistAccessByNonVCAAdmin () throws KustvaktException {
-        JsonNode node = testlistAccessByGroup("nemo", "dory group");
+        JsonNode node = testlistAccessByGroup("nemo", "dory-group");
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
         assertEquals("Unauthorized operation for user: nemo",
@@ -814,7 +814,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     @Test
     public void testlistAccessByGroup () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
-                .path("access").queryParam("groupName", "dory group")
+                .path("access").queryParam("groupName", "dory-group")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -827,7 +827,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals("group-vc", node.at("/0/vcName").asText());
         assertEquals(2, node.at("/0/userGroupId").asInt());
 
-        assertEquals("dory group", node.at("/0/userGroupName").asText());
+        assertEquals("dory-group", node.at("/0/userGroupName").asText());
     }
 
     @Test
@@ -835,7 +835,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
             ClientHandlerException, KustvaktException {
 
         String vcName = "marlin-vc";
-        String groupName = "marlin group";
+        String groupName = "marlin-group";
 
         // check the vc type
         JsonNode node = testSearchVC("marlin", "marlin", vcName);
@@ -954,7 +954,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         // nemo is not VCA in marlin group
         ClientResponse response = resource().path(API_VERSION).path("vc")
-                .path("nemo").path("nemo-vc").path("share").path("marlin group")
+                .path("nemo").path("nemo-vc").path("share").path("marlin-group")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("nemo", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
