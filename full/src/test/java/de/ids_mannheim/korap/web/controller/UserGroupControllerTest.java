@@ -253,22 +253,22 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 node.at("/members/1/status").asText());
         assertEquals(0, node.at("/members/1/roles").size());
 
-        testInviteMember(groupId);
+        testInviteMember(groupName);
 
-        testDeleteMemberUnauthorized(groupId);
-        testDeleteMember(groupId);
-        testDeleteGroup(groupId);
+        testDeleteMemberUnauthorized(groupName);
+        testDeleteMember(groupName);
+        testDeleteGroup(groupName);
 
-        testSubscribeToDeletedGroup(groupId);
-        testUnsubscribeToDeletedGroup(groupId);
+        testSubscribeToDeletedGroup(groupName);
+        testUnsubscribeToDeletedGroup(groupName);
     }
 
-    private void testDeleteMember (String groupId)
+    private void testDeleteMember (String groupName)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         // delete marlin from group
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("member").path("delete").path(groupId).path("marlin")
+                .path(groupName).path("marlin")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -286,12 +286,12 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(3, node.get("members").size());
     }
 
-    private void testDeleteMemberUnauthorized (String groupId)
+    private void testDeleteMemberUnauthorized (String groupName)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         // nemo is a group member
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("member").path("delete").path(groupId).path("marlin")
+                .path(groupName).path("marlin")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("nemo", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -312,9 +312,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
             ClientHandlerException, KustvaktException {
         // dory delete pearl
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("member")
-                // dory-group
-                .path("delete").path("2").path("pearl")
+                .path("dory-group").path("pearl")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -331,7 +329,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testDeleteDeletedMember () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("member").path("delete").path("2").path("pearl")
+                .path("dory-group").path("pearl")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -348,12 +346,12 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals("[pearl, dory-group]", node.at("/errors/0/2").asText());
     }
 
-    private void testDeleteGroup (String groupId)
+    private void testDeleteGroup (String groupName)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         // delete group
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("delete").path(groupId)
+                .path(groupName)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -388,9 +386,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     @Test
     public void testDeleteGroupUnauthorized () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        // dory is a group admin in marlin group
+        // dory is a group admin in marlin-group
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("delete").path("1")
+                .path("marlin-group")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -410,7 +408,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testDeleteDeletedGroup () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("delete").path("4")
+                .path("deleted-group")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -429,10 +427,10 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     @Test
     public void testDeleteGroupOwner () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        // delete marlin from marlin group
-        // dory is a group admin in marlin group
+        // delete marlin from marlin-group
+        // dory is a group admin in marlin-group
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("member").path("delete").path("1").path("marlin")
+                .path("marlin-group").path("marlin")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -447,17 +445,16 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 node.at("/errors/0/1").asText());
     }
 
-    private void testInviteMember (String groupId)
+    private void testInviteMember (String groupName)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         String[] members = new String[] { "darla" };
 
         UserGroupJson userGroup = new UserGroupJson();
         userGroup.setMembers(members);
-        userGroup.setId(Integer.parseInt(groupId));
 
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("member").path("invite").type(MediaType.APPLICATION_JSON)
+                .path(groupName).path("invite").type(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
@@ -490,11 +487,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         UserGroupJson userGroup = new UserGroupJson();
         userGroup.setMembers(members);
-        // dory group
-        userGroup.setId(2);
 
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("member").path("invite").type(MediaType.APPLICATION_JSON)
+                .path("dory-group").path("invite").type(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
@@ -519,11 +514,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         UserGroupJson userGroup = new UserGroupJson();
         userGroup.setMembers(members);
-        // dory group
-        userGroup.setId(2);
 
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("member").path("invite").type(MediaType.APPLICATION_JSON)
+                .path("dory-group").path("invite").type(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
@@ -549,11 +542,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         UserGroupJson userGroup = new UserGroupJson();
         userGroup.setMembers(members);
-        // dory group
-        userGroup.setId(2);
 
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("member").path("invite").type(MediaType.APPLICATION_JSON)
+                .path("dory-group").path("invite").type(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
@@ -580,11 +571,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         UserGroupJson userGroup = new UserGroupJson();
         userGroup.setMembers(members);
-        // dory group
-        userGroup.setId(2);
 
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("member").path("invite").type(MediaType.APPLICATION_JSON)
+                .path("dory-group").path("invite").type(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
@@ -612,11 +601,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         UserGroupJson userGroup = new UserGroupJson();
         userGroup.setMembers(members);
-        // dory's deleted group
-        userGroup.setId(4);
 
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("member").path("invite").type(MediaType.APPLICATION_JSON)
+                .path("deleted-group").path("invite").type(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
@@ -635,15 +622,12 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     // marlin has GroupMemberStatus.PENDING in dory-group
     @Test
     public void testSubscribePendingMember () throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("groupId", "2");
-
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("subscribe").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .path("dory-group").path("subscribe")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
-                .entity(form).post(ClientResponse.class);
+                .post(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
@@ -666,8 +650,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 group.at("/userRoles/1").asText());
 
         // unsubscribe marlin from dory-group
-        testUnsubscribeActiveMember(form);
-        checkGroupMemberRole("2", "marlin");
+        testUnsubscribeActiveMember("dory-group");
+        checkGroupMemberRole("dory-group", "marlin");
 
         // invite marlin to dory-group to set back the
         // GroupMemberStatus.PENDING
@@ -677,15 +661,12 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     // pearl has GroupMemberStatus.DELETED in dory-group
     @Test
     public void testSubscribeDeletedMember () throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("groupId", "2");
-
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("subscribe").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .path("dory-group").path("subscribe")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("pearl", "pass"))
-                .entity(form).post(ClientResponse.class);
+                .post(ClientResponse.class);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
@@ -697,34 +678,25 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testSubscribeMissingGroupId () throws KustvaktException {
+    public void testSubscribeMissingGroupName() throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("subscribe")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("bruce", "pass"))
                 .post(ClientResponse.class);
-        String entity = response.getEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-
-        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        assertEquals(StatusCodes.MISSING_PARAMETER,
-                node.at("/errors/0/0").asInt());
-        assertEquals("groupId is missing", node.at("/errors/0/1").asText());
-        assertEquals("groupId", node.at("/errors/0/2").asText());
+        assertEquals(Status.METHOD_NOT_ALLOWED.getStatusCode(),
+                response.getStatus());
     }
 
     @Test
     public void testSubscribeNonExistentMember () throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("groupId", "2");
-
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("subscribe").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .path("dory-group").path("subscribe")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("bruce", "pass"))
-                .entity(form).post(ClientResponse.class);
+                .post(ClientResponse.class);
         String entity = response.getEntity(String.class);
         // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
@@ -738,38 +710,31 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
     @Test
     public void testSubscribeToNonExistentGroup () throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("groupId", "100");
-
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("subscribe").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .path("non-existent").path("subscribe")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("pearl", "pass"))
-                .entity(form).post(ClientResponse.class);
+                .post(ClientResponse.class);
         String entity = response.getEntity(String.class);
-        // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
 
-        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        assertEquals(StatusCodes.GROUP_NOT_FOUND,
+        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Group with id 100 is not found",
+        assertEquals("Group non-existent is not found",
                 node.at("/errors/0/1").asText());
     }
 
-    private void testSubscribeToDeletedGroup (String groupId)
+    private void testSubscribeToDeletedGroup (String groupName)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("groupId", groupId);
-
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("subscribe").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .path(groupName).path("subscribe")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("nemo", "pass"))
-                .entity(form).post(ClientResponse.class);
+                .post(ClientResponse.class);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
@@ -780,16 +745,15 @@ public class UserGroupControllerTest extends SpringJerseyTest {
                 node.at("/errors/0/1").asText());
     }
 
-    private void testUnsubscribeActiveMember (
-            MultivaluedMap<String, String> form)
+    private void testUnsubscribeActiveMember (String groupName)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("unsubscribe").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .path(groupName).path("unsubscribe")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
-                .entity(form).post(ClientResponse.class);
+                .delete(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
@@ -797,10 +761,10 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(1, node.size());
     }
 
-    private void checkGroupMemberRole (String groupId, String deletedMemberName)
+    private void checkGroupMemberRole (String groupName, String deletedMemberName)
             throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path(groupId)
+                .path(groupName)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(admin, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -825,16 +789,12 @@ public class UserGroupControllerTest extends SpringJerseyTest {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         // pearl unsubscribes from dory-group
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        // dory-group
-        form.add("groupId", "2");
-
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("unsubscribe").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .path("dory-group").path("unsubscribe")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("pearl", "pass"))
-                .entity(form).post(ClientResponse.class);
+                .delete(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
         // System.out.println(entity);
@@ -855,16 +815,12 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         JsonNode node = retrieveUserGroups("marlin");
         assertEquals(2, node.size());
 
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        // dory-group
-        form.add("groupId", "2");
-
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("unsubscribe").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .path("dory-group").path("unsubscribe")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
-                .entity(form).post(ClientResponse.class);
+                .delete(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
@@ -877,38 +833,25 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testUnsubscribeMissingGroupId () throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-
+    public void testUnsubscribeMissingGroupName () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("unsubscribe").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .path("unsubscribe")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
-                .entity(form).post(ClientResponse.class);
+                .delete(ClientResponse.class);
 
-        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-
-        String entity = response.getEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-
-        assertEquals(StatusCodes.MISSING_PARAMETER,
-                node.at("/errors/0/0").asInt());
-        assertEquals("groupId is missing", node.at("/errors/0/1").asText());
-        assertEquals("groupId", node.at("/errors/0/2").asText());
+        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
     }
 
     @Test
     public void testUnsubscribeNonExistentMember () throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("groupId", "2");
-
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("unsubscribe").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .path("dory-group").path("unsubscribe")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("bruce", "pass"))
-                .entity(form).post(ClientResponse.class);
+                .delete(ClientResponse.class);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
@@ -923,39 +866,34 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
     @Test
     public void testUnsubscribeToNonExistentGroup () throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("groupId", "100");
-
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("unsubscribe").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .path("tralala-group").path("unsubscribe")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("pearl", "pass"))
-                .entity(form).post(ClientResponse.class);
+                .delete(ClientResponse.class);
 
-        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
-        assertEquals(StatusCodes.GROUP_NOT_FOUND,
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Group with id 100 is not found",
+        assertEquals("Group tralala-group is not found",
                 node.at("/errors/0/1").asText());
     }
 
-    private void testUnsubscribeToDeletedGroup (String groupId)
+    private void testUnsubscribeToDeletedGroup (String groupName)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("groupId", groupId);
 
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("unsubscribe").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .path(groupName).path("unsubscribe")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("nemo", "pass"))
-                .entity(form).post(ClientResponse.class);
+                .delete(ClientResponse.class);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
@@ -970,12 +908,11 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testAddSameMemberRole () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("groupId", "1");
         form.add("memberUsername", "dory");
         form.add("roleIds", "1");
 
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("member").path("role").path("add")
+                .path("marlin-group").path("role").path("add")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
@@ -992,12 +929,11 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testDeleteAddMemberRole () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("groupId", "1");
         form.add("memberUsername", "dory");
         form.add("roleIds", "1");
 
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("member").path("role").path("delete")
+                .path("marlin-group").path("role").path("delete")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
@@ -1016,15 +952,14 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testEditMemberRoleEmpty () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("groupId", "1");
         form.add("memberUsername", "dory");
-
+        
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("member").path("role").path("edit")
+                .path("marlin-group").path("role").path("edit")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
-                .entity(form).post(ClientResponse.class);
+                .post(ClientResponse.class, form);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
@@ -1032,17 +967,19 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         Set<Role> roles = member.getRoles();
         assertEquals(0, roles.size());
 
-        testEditMemberRole(form);
+        testEditMemberRole();
     }
 
-    private void testEditMemberRole (MultivaluedMap<String, String> form)
+    private void testEditMemberRole ()
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("memberUsername", "dory");
         form.add("roleIds", "1");
         form.add("roleIds", "3");
 
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("member").path("role").path("edit")
+                .path("marlin-group").path("role").path("edit")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))

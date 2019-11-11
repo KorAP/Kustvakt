@@ -3,6 +3,9 @@
    - Handled vulnerability CVE-2019-17195. (margaretha)
 8/11/2019
    - Added user-group name pattern (margaretha, issue #33)
+11/11/2019
+   - Updated user group service paths and replaced groupId with groupName 
+     (margaretha, resolved #33)
 
 # version 0.62.1
 08/07/2019

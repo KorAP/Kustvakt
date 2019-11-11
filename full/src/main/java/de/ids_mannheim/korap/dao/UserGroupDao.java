@@ -208,7 +208,7 @@ public class UserGroupDao {
         }
     }
 
-    public UserGroup retrieveGroupByName (String groupName)
+    public UserGroup retrieveGroupByName (String groupName, boolean fetchMembers)
             throws KustvaktException {
         ParameterChecker.checkStringValue(groupName, "groupName");
 
@@ -217,6 +217,9 @@ public class UserGroupDao {
                 criteriaBuilder.createQuery(UserGroup.class);
 
         Root<UserGroup> root = query.from(UserGroup.class);
+        if (fetchMembers) {
+            root.fetch(UserGroup_.members);
+        }
         query.select(root);
         query.where(
                 criteriaBuilder.equal(root.get(UserGroup_.name), groupName));

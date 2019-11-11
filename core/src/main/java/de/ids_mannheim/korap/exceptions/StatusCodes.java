@@ -122,6 +122,7 @@ public class StatusCodes {
     public static final int GROUP_MEMBER_DELETED = 1603;
     public static final int GROUP_MEMBER_NOT_FOUND = 1604;
     public static final int INVITATION_EXPIRED = 1605;
+    @Deprecated
     public static final int GROUP_NOT_FOUND = 1606;
     public static final int GROUP_DELETED = 1607;
     public static final int GROUP_EXISTS = 1608;

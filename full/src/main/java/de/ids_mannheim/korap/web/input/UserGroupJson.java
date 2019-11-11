@@ -14,6 +14,7 @@ import lombok.Setter;
 @Setter
 public class UserGroupJson {
 
+    @Deprecated
     private int id;
     private String name;
     private String[] members;

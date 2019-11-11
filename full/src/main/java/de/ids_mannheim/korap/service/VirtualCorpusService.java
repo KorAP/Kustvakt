@@ -301,7 +301,7 @@ public class VirtualCorpusService {
         if (access == null) {
             VirtualCorpus vc = vcDao.retrieveVCById(vcId);
             // create and assign a new hidden group
-            int groupId = userGroupService.createAutoHiddenGroup(vcId);
+            int groupId = userGroupService.createAutoHiddenGroup();
             UserGroup autoHidden =
                     userGroupService.retrieveUserGroupById(groupId);
             accessDao.createAccessToVC(vc, autoHidden, "system",

@@ -353,28 +353,28 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertTrue(node.at("/userGroupName").asText().startsWith("auto"));
         assertEquals(vcName, node.at("/vcName").asText());
 
-        String groupId = node.at("/userGroupId").asText();
+        String groupName = node.at("/userGroupName").asText();
 
         // EM: check if hidden group has been created
-        node = testCheckHiddenGroup(groupId);
+        node = testCheckHiddenGroup(groupName);
         assertEquals("HIDDEN", node.at("/status").asText());
 
         // EM: delete vc
         testDeleteVC(vcName, "VirtualCorpusControllerTest");
 
         // EM: check if the hidden groups are deleted as well
-        node = testCheckHiddenGroup(groupId);
-        assertEquals(StatusCodes.GROUP_NOT_FOUND,
+        node = testCheckHiddenGroup(groupName);
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Group with id " + groupId + " is not found",
+        assertEquals("Group "+ groupName + " is not found",
                 node.at("/errors/0/1").asText());
     }
 
-    private JsonNode testCheckHiddenGroup (String groupId)
+    private JsonNode testCheckHiddenGroup (String groupName)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path(groupId)
+                .path(groupName)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")

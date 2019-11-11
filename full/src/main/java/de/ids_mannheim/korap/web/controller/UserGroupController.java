@@ -63,8 +63,8 @@ public class UserGroupController {
     /**
      * Returns all user-groups in which a user is an active or a
      * pending member.
-     * Not suitable for system-admin, instead use
-     * {@link UserGroupController#
+     * 
+     * Not suitable for system-admin, instead use {@link UserGroupController#
      * getUserGroupBySystemAdmin(SecurityContext, String, UserGroupStatus)}
      * 
      * @param securityContext
@@ -119,24 +119,25 @@ public class UserGroupController {
     }
 
     /**
-     * Retrieves a specific user-group for system admins.
+     * Retrieves a specific user-group. Only system admins are
+     * allowed.
      * 
      * @param securityContext
-     * @param groupId
-     *            group id
+     * @param groupName
+     *            group name
      * @return a user-group
      */
     @GET
-    @Path("{groupId}")
+    @Path("{groupName}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public UserGroupDto searchUserGroup (
+    public UserGroupDto retrieveUserGroup (
             @Context SecurityContext securityContext,
-            @PathParam("groupId") int groupId) {
+            @PathParam("groupName") String groupName) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.ADMIN);
-            return service.searchById(context.getUsername(), groupId);
+            return service.searchByName(context.getUsername(), groupName);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -187,29 +188,12 @@ public class UserGroupController {
      * owner and system admins can delete groups.
      * 
      * @param securityContext
-     * @param groupId
+     * @param groupName the name of the group to delete
      * @return HTTP 200, if successful.
      */
     @DELETE
-    @Path("delete/{groupId}")
-    public Response deleteUserGroup (@Context SecurityContext securityContext,
-            @PathParam("groupId") int groupId) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
-        try {
-            scopeService.verifyScope(context, OAuth2Scope.DELETE_USER_GROUP);
-            service.deleteGroup(groupId, context.getUsername());
-            return Response.ok().build();
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
-    }
-
-    @DELETE
     @Path("{groupName}")
-    public Response deleteUserGroupByName (
-            @Context SecurityContext securityContext,
+    public Response deleteUserGroup (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
@@ -223,28 +207,32 @@ public class UserGroupController {
         }
     }
 
+
     /**
-     * Deletes a user-group member. Group owner cannot be deleted.
+     * Removes a user-group member. Group owner cannot be deleted.
+     * Only group admins, system admins and the member himself can
+     * remove a member. 
      * 
      * @param securityContext
-     * @param memberId
+     * @param memberUsername
      *            a username of a group member
-     * @param groupId
-     *            a group id
+     * @param groupName
+     *            a group name
      * @return if successful, HTTP response status OK
      */
     @DELETE
-    @Path("member/delete/{groupId}/{memberId}")
-    public Response deleteUserFromGroup (
+    @Path("{groupName}/{memberUsername}")
+    public Response removeUserFromGroup (
             @Context SecurityContext securityContext,
-            @PathParam("memberId") String memberId,
-            @PathParam("groupId") int groupId) {
+            @PathParam("memberUsername") String memberUsername,
+            @PathParam("groupName") String groupName) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.DELETE_USER_GROUP_MEMBER);
-            service.deleteGroupMember(memberId, groupId, context.getUsername());
+            service.deleteGroupMember(memberUsername, groupName,
+                    context.getUsername());
             return Response.ok().build();
         }
         catch (KustvaktException e) {
@@ -259,22 +247,23 @@ public class UserGroupController {
      * 
      * @param securityContext
      * @param group
-     *            UserGroupJson containing groupId and usernames to be
-     *            invited
-     *            as members
+     *            UserGroupJson containing groupName and usernames to be
+     *            invited as members
      * @return if successful, HTTP response status OK
      */
     @POST
-    @Path("member/invite")
+    @Path("{groupName}/invite")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response inviteGroupMembers (
-            @Context SecurityContext securityContext, UserGroupJson group) {
+            @Context SecurityContext securityContext,
+            @PathParam("groupName") String groupName,
+            UserGroupJson group) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.ADD_USER_GROUP_MEMBER);
-            service.inviteGroupMembers(group, context.getUsername());
+            service.inviteGroupMembers(group, groupName, context.getUsername());
             return Response.ok("SUCCESS").build();
         }
         catch (KustvaktException e) {
@@ -287,16 +276,16 @@ public class UserGroupController {
      * as well.
      * 
      * @param securityContext
-     * @param groupId
+     * @param groupName
      * @param memberUsername
      * @param roleIds
      * @return
      */
     @POST
-    @Path("member/role/edit")
+    @Path("{groupName}/role/edit")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response editMemberRoles (@Context SecurityContext securityContext,
-            @FormParam("groupId") int groupId,
+            @PathParam("groupName") String groupName,
             @FormParam("memberUsername") String memberUsername,
             @FormParam("roleIds") List<Integer> roleIds) {
         TokenContext context =
@@ -304,7 +293,7 @@ public class UserGroupController {
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.EDIT_USER_GROUP_MEMBER_ROLE);
-            service.editMemberRoles(context.getUsername(), groupId,
+            service.editMemberRoles(context.getUsername(), groupName,
                     memberUsername, roleIds);
             return Response.ok("SUCCESS").build();
         }
@@ -318,19 +307,19 @@ public class UserGroupController {
      * admins and system admins are allowed.
      * 
      * @param securityContext
-     * @param groupId
-     *            a group id
+     * @param groupName
+     *            a group name
      * @param memberUsername
-     *            the username of a group member
+     *            a username of a group member
      * @param roleIds
      *            list of role ids
      * @return if successful, HTTP response status OK
      */
     @POST
-    @Path("member/role/add")
+    @Path("{groupName}/role/add")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addMemberRoles (@Context SecurityContext securityContext,
-            @FormParam("groupId") int groupId,
+            @PathParam("groupName") String groupName,
             @FormParam("memberUsername") String memberUsername,
             @FormParam("roleIds") List<Integer> roleIds) {
         TokenContext context =
@@ -338,7 +327,7 @@ public class UserGroupController {
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.ADD_USER_GROUP_MEMBER_ROLE);
-            service.addMemberRoles(context.getUsername(), groupId,
+            service.addMemberRoles(context.getUsername(), groupName,
                     memberUsername, roleIds);
             return Response.ok("SUCCESS").build();
         }
@@ -348,23 +337,23 @@ public class UserGroupController {
     }
 
     /**
-     * Deletes roles of a member of a user-group. Only user-group
-     * admins and system admins are allowed.
+     * Updates the roles of a member of a user-group by removing the
+     * given roles. Only user-group admins and system admins are allowed.
      * 
      * @param securityContext
-     * @param groupId
-     *            a group id
+     * @param groupName
+     *            a group name
      * @param memberUsername
-     *            the username of a group member
+     *            a username of a group member
      * @param roleIds
      *            list of role ids
      * @return if successful, HTTP response status OK
      */
     @POST
-    @Path("member/role/delete")
+    @Path("{groupName}/role/delete")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deleteMemberRoles (@Context SecurityContext securityContext,
-            @FormParam("groupId") int groupId,
+            @PathParam("groupName") String groupName,
             @FormParam("memberUsername") String memberUsername,
             @FormParam("roleIds") List<Integer> roleIds) {
         TokenContext context =
@@ -372,7 +361,7 @@ public class UserGroupController {
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.DELETE_USER_GROUP_MEMBER_ROLE);
-            service.deleteMemberRoles(context.getUsername(), groupId,
+            service.deleteMemberRoles(context.getUsername(), groupName,
                     memberUsername, roleIds);
             return Response.ok("SUCCESS").build();
         }
@@ -386,21 +375,20 @@ public class UserGroupController {
      * users can subscribe to the corresponding user-group.
      * 
      * @param securityContext
-     * @param groupId
-     *            a group id
+     * @param groupName
+     *            a group name
      * @return if successful, HTTP response status OK
      */
     @POST
-    @Path("subscribe")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("{groupName}/subscribe")
     public Response subscribeToGroup (@Context SecurityContext securityContext,
-            @FormParam("groupId") int groupId) {
+            @PathParam("groupName") String groupName) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.ADD_USER_GROUP_MEMBER);
-            service.acceptInvitation(groupId, context.getUsername());
+            service.acceptInvitation(groupName, context.getUsername());
             return Response.ok("SUCCESS").build();
         }
         catch (KustvaktException e) {
@@ -412,24 +400,23 @@ public class UserGroupController {
      * Handles requests to reject membership invitation. A member can
      * only unsubscribe him/herself from a group.
      * 
-     * Implemented identical to delete group member.
+     * Implemented identical to {@link #removeUserFromGroup(SecurityContext, String, String)}.
      * 
      * @param securityContext
-     * @param groupId
+     * @param groupName
      * @return if successful, HTTP response status OK
      */
-    @POST
-    @Path("unsubscribe")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @DELETE
+    @Path("{groupName}/unsubscribe")
     public Response unsubscribeFromGroup (
             @Context SecurityContext securityContext,
-            @FormParam("groupId") int groupId) {
+            @PathParam("groupName") String groupName) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.DELETE_USER_GROUP_MEMBER);
-            service.deleteGroupMember(context.getUsername(), groupId,
+            service.deleteGroupMember(context.getUsername(), groupName,
                     context.getUsername());
             return Response.ok("SUCCESS").build();
         }
