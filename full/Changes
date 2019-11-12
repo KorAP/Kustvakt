@@ -9,6 +9,8 @@
 12/11/2019
    - Removed UserGroupJson & updated listUserGroups and createUserGroup 
      services (margaretha)
+   - Added prefixes to username and groupname parameters in service paths 
+     (margaretha, resolved #35)  
      
 
 # version 0.62.1

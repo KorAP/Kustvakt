@@ -97,7 +97,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
 
     private void testScopeNotAuthorized (String accessToken)
             throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc").path("list")
+        ClientResponse response = resource().path(API_VERSION).path("vc")
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .get(ClientResponse.class);
 

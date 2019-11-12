@@ -71,13 +71,13 @@ public class IndexControllerTest extends SpringJerseyTest {
         
         Thread.sleep(200);
 
-        response = resource().path(API_VERSION).path("vc").path("system")
+        response = resource().path(API_VERSION).path("vc").path("~system")
                 .path("named-vc1")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
                 .delete(ClientResponse.class);
 
-        response = resource().path(API_VERSION).path("vc").path("system")
+        response = resource().path(API_VERSION).path("vc").path("~system")
                 .path("named-vc1")
                 .get(ClientResponse.class);
         

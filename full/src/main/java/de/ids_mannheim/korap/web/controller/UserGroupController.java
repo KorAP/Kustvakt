@@ -131,7 +131,7 @@ public class UserGroupController {
      * @return a user-group
      */
     @GET
-    @Path("{groupName}")
+    @Path("@{groupName}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public UserGroupDto retrieveUserGroup (
             @Context SecurityContext securityContext,
@@ -173,7 +173,7 @@ public class UserGroupController {
      *         Created, otherwise 204 No Content.
      */
     @PUT
-    @Path("{groupName}")
+    @Path("@{groupName}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response createUserGroup (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
@@ -207,7 +207,7 @@ public class UserGroupController {
      * @return HTTP 200, if successful.
      */
     @DELETE
-    @Path("{groupName}")
+    @Path("@{groupName}")
     public Response deleteUserGroup (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName) {
         TokenContext context =
@@ -235,7 +235,7 @@ public class UserGroupController {
      * @return if successful, HTTP response status OK
      */
     @DELETE
-    @Path("{groupName}/{memberUsername}")
+    @Path("@{groupName}/~{memberUsername}")
     public Response removeUserFromGroup (
             @Context SecurityContext securityContext,
             @PathParam("memberUsername") String memberUsername,
@@ -264,7 +264,7 @@ public class UserGroupController {
      * @return if successful, HTTP response status OK
      */
     @POST
-    @Path("{groupName}/invite")
+    @Path("@{groupName}/invite")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response inviteGroupMembers (
             @Context SecurityContext securityContext,
@@ -295,7 +295,7 @@ public class UserGroupController {
      * @return
      */
     @POST
-    @Path("{groupName}/role/edit")
+    @Path("@{groupName}/role/edit")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response editMemberRoles (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
@@ -329,7 +329,7 @@ public class UserGroupController {
      * @return if successful, HTTP response status OK
      */
     @POST
-    @Path("{groupName}/role/add")
+    @Path("@{groupName}/role/add")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response addMemberRoles (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
@@ -364,7 +364,7 @@ public class UserGroupController {
      * @return if successful, HTTP response status OK
      */
     @POST
-    @Path("{groupName}/role/delete")
+    @Path("@{groupName}/role/delete")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deleteMemberRoles (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
@@ -394,7 +394,7 @@ public class UserGroupController {
      * @return if successful, HTTP response status OK
      */
     @POST
-    @Path("{groupName}/subscribe")
+    @Path("@{groupName}/subscribe")
     public Response subscribeToGroup (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName) {
         TokenContext context =
@@ -422,7 +422,7 @@ public class UserGroupController {
      * @return if successful, HTTP response status OK
      */
     @DELETE
-    @Path("{groupName}/unsubscribe")
+    @Path("@{groupName}/unsubscribe")
     public Response unsubscribeFromGroup (
             @Context SecurityContext securityContext,
             @PathParam("groupName") String groupName) {

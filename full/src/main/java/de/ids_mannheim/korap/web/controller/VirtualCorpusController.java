@@ -88,7 +88,7 @@ public class VirtualCorpusController {
      * @throws KustvaktException
      */
     @PUT
-    @Path("/{vcCreator}/{vcName}")
+    @Path("/~{vcCreator}/{vcName}")
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response createUpdateVC (@Context SecurityContext securityContext,
             @PathParam("vcCreator") String vcCreator,
@@ -120,7 +120,7 @@ public class VirtualCorpusController {
      * @return the virtual corpus with the given name and creator.
      */
     @GET
-    @Path("{createdBy}/{vcName}")
+    @Path("~{createdBy}/{vcName}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
         DemoUserFilter.class, PiwikFilter.class })
@@ -185,7 +185,7 @@ public class VirtualCorpusController {
      *         in the security context.
      */
     @GET
-    @Path("{createdBy}")
+    @Path("~{createdBy}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<VirtualCorpusDto> listUserVC (
             @PathParam("createdBy") String createdBy, 
@@ -248,7 +248,7 @@ public class VirtualCorpusController {
      * @return HTTP status 200, if successful
      */
     @DELETE
-    @Path("{createdBy}/{vcName}")
+    @Path("~{createdBy}/{vcName}")
     public Response deleteVCByName (@Context SecurityContext securityContext,
             @PathParam("createdBy") String createdBy,
             @PathParam("vcName") String vcName) {
@@ -282,7 +282,7 @@ public class VirtualCorpusController {
      * @return HTTP status 200, if successful
      */
     @POST
-    @Path("{vcCreator}/{vcName}/share/{groupName}")
+    @Path("~{vcCreator}/{vcName}/share/@{groupName}")
     public Response shareVC (@Context SecurityContext securityContext,
             @PathParam("vcCreator") String vcCreator,
             @PathParam("vcName") String vcName, 

@@ -427,11 +427,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertTrue(node.at("/isSuper").asBoolean());
 
         // list vc
-        ClientResponse response =
-                resource().path(API_VERSION).path("vc").path("list")
-                        .header(Attributes.AUTHORIZATION,
-                                "Bearer " + accessToken)
-                        .get(ClientResponse.class);
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
+                .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
                 response.getStatus());

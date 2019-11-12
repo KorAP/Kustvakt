@@ -24,7 +24,7 @@ public abstract class VirtualCorpusTestBase extends SpringJerseyTest{
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
-                .path(vcCreator).path(vcName)
+                .path("~"+vcCreator).path(vcName)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -42,7 +42,7 @@ public abstract class VirtualCorpusTestBase extends SpringJerseyTest{
         String json = "{\"type\": \"" + type + "\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
-                .path(vcCreator).path(vcName)
+                .path("~"+vcCreator).path(vcName)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
