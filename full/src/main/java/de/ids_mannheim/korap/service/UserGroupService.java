@@ -33,7 +33,6 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 import de.ids_mannheim.korap.web.controller.UserGroupController;
-import de.ids_mannheim.korap.web.input.UserGroupJson;
 
 /**
  * UserGroupService defines the logic behind user group web
@@ -207,29 +206,30 @@ public class UserGroupService {
      * 
      * @see /full/src/main/resources/db/predefined/V3.2__insert_predefined_roles.sql
      * 
-     * @param groupJson
-     *            UserGroupJson object from json
      * @param createdBy
      *            the user creating the group
      * @throws KustvaktException
      * 
      * 
      */
-    public void createUserGroup (UserGroupJson groupJson, String createdBy)
+    public boolean createUserGroup (String groupName, String members, String createdBy)
             throws KustvaktException {
-
-        String name = groupJson.getName();
-        if (!groupNamePattern.matcher(name).matches()) {
+        ParameterChecker.checkStringValue(groupName, "groupName");
+        ParameterChecker.checkStringValue(createdBy, "createdBy");
+        
+        if (!groupNamePattern.matcher(groupName).matches()) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "User-group name must only contains letters, numbers, "
                             + "underscores, hypens and spaces",
-                    name);
+                    groupName);
         }
         
+        UserGroup userGroup = null;
+        boolean groupExists = false;
         try{
-            userGroupDao.retrieveGroupByName(groupJson.getName(),false);
-            throw new KustvaktException(StatusCodes.GROUP_EXISTS,
-                    "User-group name must be unique.");
+            userGroup = userGroupDao.retrieveGroupByName(groupName,false);
+            groupExists = true;
+            
         }
         catch (KustvaktException e) {
             if (e.getStatusCode() != StatusCodes.NO_RESOURCE_FOUND){
@@ -237,38 +237,40 @@ public class UserGroupService {
             }
         }
         
-        int groupId=0;
-        try {
-            groupId = userGroupDao.createGroup(name, createdBy,
-                    UserGroupStatus.ACTIVE);
-        }
-        // handle DB exceptions, e.g. unique constraint
-        catch (Exception e) {
-            Throwable cause = e;
-            Throwable lastCause = null;
-            while ((cause = cause.getCause()) != null
-                    && !cause.equals(lastCause)) {
-                if (cause instanceof SQLException) {
-                    break;
-                }
-                lastCause = cause;
+        if (!groupExists){
+            try {
+                userGroupDao.createGroup(groupName, createdBy,
+                        UserGroupStatus.ACTIVE);
+                userGroup = userGroupDao.retrieveGroupByName(groupName,false);
             }
-            throw new KustvaktException(StatusCodes.DB_INSERT_FAILED,
-                    cause.getMessage());
-        }
-        
-        UserGroup userGroup = userGroupDao.retrieveGroupById(groupId);
-
-        if (groupJson.getMembers() != null){
-            for (String memberId : groupJson.getMembers()) {
-                if (memberId.equals(createdBy)) {
-                    // skip owner, already added while creating group.
-                    continue;
+            // handle DB exceptions, e.g. unique constraint
+            catch (Exception e) {
+                Throwable cause = e;
+                Throwable lastCause = null;
+                while ((cause = cause.getCause()) != null
+                        && !cause.equals(lastCause)) {
+                    if (cause instanceof SQLException) {
+                        break;
+                    }
+                    lastCause = cause;
                 }
-                inviteGroupMember(memberId, userGroup, createdBy,
-                        GroupMemberStatus.PENDING);
+                throw new KustvaktException(StatusCodes.DB_INSERT_FAILED,
+                        cause.getMessage());
+            }
+            
+            if (members != null && !members.isEmpty()){
+                String[] groupMembers = members.split(",");
+                for (String memberUsername : groupMembers) {
+                    if (memberUsername.equals(createdBy)) {
+                        // skip owner, already added while creating group.
+                        continue;
+                    }
+                    inviteGroupMember(memberUsername, userGroup, createdBy,
+                            GroupMemberStatus.PENDING);
+                }
             }
         }
+        return groupExists;
     }
 
     public void deleteGroup (String groupName, String username)
@@ -391,11 +393,11 @@ public class UserGroupService {
         return null;
     }
 
-    public void inviteGroupMembers (UserGroupJson group, String groupName,
+    public void inviteGroupMembers (String groupName, String groupMembers,
             String inviter) throws KustvaktException {
-        String[] members = group.getMembers();
+        String[] members = groupMembers.split(",");
         ParameterChecker.checkStringValue(groupName, "group name");
-        ParameterChecker.checkObjectValue(members, "members");
+        ParameterChecker.checkStringValue(groupMembers, "members");
 
         UserGroup userGroup = retrieveUserGroupByName(groupName);
         if (userGroup.getStatus() == UserGroupStatus.DELETED) {

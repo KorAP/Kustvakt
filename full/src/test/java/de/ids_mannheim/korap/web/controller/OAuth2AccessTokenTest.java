@@ -49,7 +49,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         String accessToken = node.at("/access_token").asText();
 
         // test list user group
-        response = resource().path(API_VERSION).path("group").path("list")
+        response = resource().path(API_VERSION).path("group")
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .get(ClientResponse.class);
 

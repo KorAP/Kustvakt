@@ -10,11 +10,11 @@ import lombok.Setter;
  * @author margaretha
  * @see UserGroupController
  */
+@Deprecated
 @Getter
 @Setter
 public class UserGroupJson {
 
-    @Deprecated
     private int id;
     private String name;
     private String[] members;

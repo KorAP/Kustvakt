@@ -7,6 +7,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -16,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
+import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -33,7 +35,6 @@ import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
-import de.ids_mannheim.korap.web.input.UserGroupJson;
 
 /**
  * UserGroupController defines web APIs related to user groups,
@@ -64,7 +65,8 @@ public class UserGroupController {
      * Returns all user-groups in which a user is an active or a
      * pending member.
      * 
-     * Not suitable for system-admin, instead use {@link UserGroupController#
+     * Not suitable for system-admin, instead use
+     * {@link UserGroupController#
      * getUserGroupBySystemAdmin(SecurityContext, String, UserGroupStatus)}
      * 
      * @param securityContext
@@ -72,9 +74,8 @@ public class UserGroupController {
      * 
      */
     @GET
-    @Path("list")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public List<UserGroupDto> getUserGroup (
+    public List<UserGroupDto> listUserGroups (
             @Context SecurityContext securityContext) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
@@ -88,13 +89,15 @@ public class UserGroupController {
     }
 
     /**
-     * Lists user-groups for system-admin purposes. If username
-     * parameter is not specified, list user-groups of all users. If
-     * status is not specified, list user-groups of all statuses.
+     * Lists user-groups for system-admin purposes. If username is
+     * specified, lists user-groups of the given user, otherwise list
+     * user-groups of all users. If status specified, list only
+     * user-groups with the given status, otherwise list user-groups
+     * regardless of their status.
      * 
      * @param securityContext
      * @param username
-     *            username
+     *            a username
      * @param status
      *            {@link UserGroupStatus}
      * @return a list of user-groups
@@ -146,37 +149,48 @@ public class UserGroupController {
     }
 
     /**
-     * Creates a user group where the user in token context is the
-     * group owner, and assigns the listed group members with status
+     * Creates a user group where the user in the token context is the
+     * group owner, and invites all users specified as members, see
+     * {@link #inviteGroupMembers(SecurityContext, String, UserGroupJson)}.
+     * The invited users are added as group members with status
      * GroupMemberStatus.PENDING.
      * 
-     * Invitations must be sent to these proposed members. If a member
-     * accepts the invitation, update his GroupMemberStatus to
-     * GroupMemberStatus.ACTIVE by using
-     * {@link UserGroupController#subscribeToGroup(SecurityContext, String)}.
+     * If a user accepts the invitation by using the service:
+     * {@link UserGroupController#subscribeToGroup(SecurityContext, String)},
+     * his GroupMemberStatus will be updated to
+     * GroupMemberStatus.ACTIVE.
      * 
-     * If he rejects the invitation, update his GroupMemberStatus
-     * to GroupMemberStatus.DELETED using
-     * {@link UserGroupController#unsubscribeFromGroup(SecurityContext, String)}.
-     * 
-     * 
+     * If a user rejects the invitation by using the service:
+     * {@link UserGroupController#unsubscribeFromGroup(SecurityContext, String)},
+     * his GroupMemberStatus will be updated to
+     * GroupMemberStatus.DELETED.
      * 
      * @param securityContext
-     * @param group
-     *            UserGroupJson
-     * @return if successful, HTTP response status OK
+     * @param members
+     *            usernames of users to be invited as group members
+     *            (separated by comma)
+     * @return if a new group created, HTTP response status 201
+     *         Created, otherwise 204 No Content.
      */
-    @POST
-    @Path("create")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @PUT
+    @Path("{groupName}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response createUserGroup (@Context SecurityContext securityContext,
-            UserGroupJson group) {
+            @PathParam("groupName") String groupName,
+            @FormParam("members") String members) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.CREATE_USER_GROUP);
-            service.createUserGroup(group, context.getUsername());
-            return Response.ok("SUCCESS").build();
+            boolean groupExists = service.createUserGroup(groupName, members,
+                    context.getUsername());
+            if (groupExists) {
+                return Response.noContent().build();
+            }
+            else {
+                return Response.status(HttpStatus.SC_CREATED).build();
+            }
+
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -184,11 +198,12 @@ public class UserGroupController {
     }
 
     /**
-     * Deletes a user-group specified by the group id. Only group
+     * Deletes a user-group specified by the group name. Only group
      * owner and system admins can delete groups.
      * 
      * @param securityContext
-     * @param groupName the name of the group to delete
+     * @param groupName
+     *            the name of the group to delete
      * @return HTTP 200, if successful.
      */
     @DELETE
@@ -207,11 +222,10 @@ public class UserGroupController {
         }
     }
 
-
     /**
-     * Removes a user-group member. Group owner cannot be deleted.
+     * Removes a user-group member. Group owner cannot be removed.
      * Only group admins, system admins and the member himself can
-     * remove a member. 
+     * remove a member.
      * 
      * @param securityContext
      * @param memberUsername
@@ -241,29 +255,28 @@ public class UserGroupController {
     }
 
     /**
-     * Invites group members to join a user-group specified in the
-     * JSON object.
-     * Only user-group admins and system admins are allowed.
+     * Invites users to join a user-group specified by the
+     * groupName.Only user-group admins and system admins are allowed.
      * 
      * @param securityContext
-     * @param group
-     *            UserGroupJson containing groupName and usernames to be
-     *            invited as members
+     * @param members
+     *            usernames separated by comma
      * @return if successful, HTTP response status OK
      */
     @POST
     @Path("{groupName}/invite")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response inviteGroupMembers (
             @Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
-            UserGroupJson group) {
+            @FormParam("members") String members) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.ADD_USER_GROUP_MEMBER);
-            service.inviteGroupMembers(group, groupName, context.getUsername());
+            service.inviteGroupMembers(groupName, members,
+                    context.getUsername());
             return Response.ok("SUCCESS").build();
         }
         catch (KustvaktException e) {
@@ -276,9 +289,9 @@ public class UserGroupController {
      * as well.
      * 
      * @param securityContext
-     * @param groupName
-     * @param memberUsername
-     * @param roleIds
+     * @param groupName the group name
+     * @param memberUsername the username of a group-member 
+     * @param roleIds the role ids for the member
      * @return
      */
     @POST
@@ -338,7 +351,8 @@ public class UserGroupController {
 
     /**
      * Updates the roles of a member of a user-group by removing the
-     * given roles. Only user-group admins and system admins are allowed.
+     * given roles. Only user-group admins and system admins are
+     * allowed.
      * 
      * @param securityContext
      * @param groupName
@@ -400,7 +414,8 @@ public class UserGroupController {
      * Handles requests to reject membership invitation. A member can
      * only unsubscribe him/herself from a group.
      * 
-     * Implemented identical to {@link #removeUserFromGroup(SecurityContext, String, String)}.
+     * Implemented identical to
+     * {@link #removeUserFromGroup(SecurityContext, String, String)}.
      * 
      * @param securityContext
      * @param groupName

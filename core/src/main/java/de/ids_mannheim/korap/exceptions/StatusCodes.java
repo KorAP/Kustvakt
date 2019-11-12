@@ -125,7 +125,6 @@ public class StatusCodes {
     @Deprecated
     public static final int GROUP_NOT_FOUND = 1606;
     public static final int GROUP_DELETED = 1607;
-    public static final int GROUP_EXISTS = 1608;
     
     /**
      * 1800 Oauth2 and OpenID
