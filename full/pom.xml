@@ -205,7 +205,7 @@
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Kustvakt-core</artifactId>
-			<version>[0.62.1,)</version>
+			<version>[0.62.2,)</version>
 		</dependency>
 		<!-- LDAP -->
 		<dependency>

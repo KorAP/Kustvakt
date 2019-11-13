@@ -26,7 +26,6 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
-import de.ids_mannheim.korap.rewrite.KoralNode;
 import de.ids_mannheim.korap.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
@@ -140,13 +139,16 @@ public class SearchService {
             corpusAccess = CorpusAccess.ALL;
             user.setCorpusAccess(CorpusAccess.ALL);
         }
-            
+        
         QuerySerializer serializer = new QuerySerializer();
         serializer.setQuery(q, ql, v);
         if (cq != null) serializer.setCollection(cq);
 
+        List<String> fieldList = convertFieldsToList(fields);
+        handleNonPublicFields(fieldList, accessRewriteDisabled, serializer);
+        
         MetaQueryBuilder meta = createMetaQuery(pageIndex, pageInteger, ctx,
-                pageLength, cutoff, corpusAccess, fields, accessRewriteDisabled);
+                pageLength, cutoff, corpusAccess, fieldList, accessRewriteDisabled);
         serializer.setMeta(meta.raw());
         
         // There is an error in query processing
@@ -173,9 +175,29 @@ public class SearchService {
 
     }
 
+    private void handleNonPublicFields (List<String> fieldList,
+            boolean accessRewriteDisabled, QuerySerializer serializer) {
+        List<String> nonPublicFields = new ArrayList<>(); 
+        nonPublicFields.add("snippet");
+        
+        List<String> ignoredFields = new ArrayList<>();
+        if (accessRewriteDisabled && !fieldList.isEmpty()) {
+            for (String field : fieldList) {
+                if (nonPublicFields.contains(field)) {
+                    ignoredFields.add(field);
+                }
+            }
+            if (!ignoredFields.isEmpty()) {
+                serializer.addWarning(StatusCodes.NON_PUBLIC_FIELD_IGNORED,
+                        "The requested non public fields are ignored",
+                        ignoredFields);
+            }
+        }
+    }
+    
     private MetaQueryBuilder createMetaQuery (Integer pageIndex,
             Integer pageInteger, String ctx, Integer pageLength,
-            Boolean cutoff, CorpusAccess corpusAccess, String fields,
+            Boolean cutoff, CorpusAccess corpusAccess, List<String> fieldList,
             boolean accessRewriteDisabled) {
         MetaQueryBuilder meta = new MetaQueryBuilder();
         meta.addEntry("startIndex", pageIndex);
@@ -197,20 +219,24 @@ public class SearchService {
             meta.addEntry("timeout", 90000);
         }
         
-        if (fields != null && !fields.isEmpty()){
-            List<String> fieldList = convertFieldsToList(fields);
+        if (fieldList != null && !fieldList.isEmpty()){
             meta.addEntry("fields", fieldList);
         }
         return meta;
     }
 
     private List<String> convertFieldsToList (String fields) {
-        String[] fieldArray = fields.split(",");
-        List<String> fieldList = new ArrayList<>(fieldArray.length);
-        for (String field :  fieldArray){
-            fieldList.add(field.trim());
+        if (fields != null && !fields.isEmpty()) {
+            String[] fieldArray = fields.split(",");
+            List<String> fieldList = new ArrayList<>(fieldArray.length);
+            for (String field : fieldArray) {
+                fieldList.add(field.trim());
+            }
+            return fieldList;
         }
-        return fieldList;
+        else {
+            return new ArrayList<>();
+        }
     }
     
     private String searchNeo4J (String query, int pageLength,

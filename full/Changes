@@ -11,6 +11,8 @@
      services (margaretha)
    - Added prefixes to username and groupname parameters in service paths 
      (margaretha, resolved #35)  
+13/11/2019
+   - Added tests for issue #43 (margaretha)
      
 
 # version 0.62.1

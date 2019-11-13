@@ -54,7 +54,7 @@ public class StatusCodes {
 
     // fixme: use unsupported resource and include type in return message
     public static final int POLICY_ERROR_DEFAULT = 400;
-
+    public static final int NON_PUBLIC_FIELD_IGNORED = 401;
     public static final int UNSUPPORTED_RESOURCE = 402;
     //    public static final int REWRITE_FAILED = 403;
     //public static final int UNSUPPORTED_FOUNDRY = 403;

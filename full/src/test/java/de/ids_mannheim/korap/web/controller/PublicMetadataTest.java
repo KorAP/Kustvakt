@@ -53,6 +53,48 @@ public class PublicMetadataTest extends SpringJerseyTest {
 
         assertTrue(node.at("/matches/0/snippet").isMissingNode());
     }
+    
+    @Test
+    public void testSearchPublicMetadataWithCustomFields () throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("search")
+                .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
+                .queryParam("fields", "author,title")
+                .queryParam("access-rewrite-disabled", "true")
+                .get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals("availability(ALL)",
+                node.at("/collection/rewrites/0/scope").asText());
+
+        assertTrue(node.at("/matches/0/snippet").isMissingNode());
+        assertEquals("Goethe, Johann Wolfgang von",
+                node.at("/matches/0/author").asText());
+        assertEquals("Italienische Reise",
+                node.at("/matches/0/title").asText());
+        assertEquals(3, node.at("/matches/0").size());
+    }
+    
+    @Test
+    public void testSearchPublicMetadataWithNonPublicField () throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("search")
+                .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
+                .queryParam("fields", "author,title,snippet")
+                .queryParam("access-rewrite-disabled", "true")
+                .get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+
+        assertEquals(StatusCodes.NON_PUBLIC_FIELD_IGNORED,
+                node.at("/warnings/0/0").asInt());
+        assertEquals("The requested non public fields are ignored",
+                node.at("/warnings/0/1").asText());
+        assertEquals("snippet",
+                node.at("/warnings/0/2").asText());
+    }
 
 //  EM: The API is disabled
     @Ignore
