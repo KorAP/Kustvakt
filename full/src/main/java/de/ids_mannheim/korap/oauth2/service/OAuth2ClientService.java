@@ -349,18 +349,35 @@ public class OAuth2ClientService {
         return clientDao.retrieveClientById(clientId);
     }
 
-    public List<OAuth2UserClientDto> listUserClients (String username,
+    public List<OAuth2UserClientDto> listUserAuthorizedClients (String username,
             String clientId, String clientSecret) throws KustvaktException {
         OAuth2Client client = authenticateClient(clientId, clientSecret);
         if (!client.isSuper()) {
             throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
-                    "Only super client is allowed to list user clients.",
+                    "Only super client is allowed to list user authorized clients.",
                     OAuth2Error.UNAUTHORIZED_CLIENT);
         }
         List<OAuth2Client> userClients =
-                clientDao.retrieveUserClients(username);
+                clientDao.retrieveUserAuthorizedClients(username);
         Collections.sort(userClients);
-
+        return createClientDtos(userClients);
+    }
+    
+    public List<OAuth2UserClientDto> listUserRegisteredClients (String username,
+            String clientId, String clientSecret) throws KustvaktException {
+        OAuth2Client client = authenticateClient(clientId, clientSecret);
+        if (!client.isSuper()) {
+            throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
+                    "Only super client is allowed to list user registered clients.",
+                    OAuth2Error.UNAUTHORIZED_CLIENT);
+        }
+        List<OAuth2Client> userClients =
+                clientDao.retrieveUserRegisteredClients(username);
+        Collections.sort(userClients);
+        return createClientDtos(userClients);
+    }
+    
+    private List<OAuth2UserClientDto> createClientDtos (List<OAuth2Client> userClients) {
         List<OAuth2UserClientDto> dtoList = new ArrayList<>(userClients.size());
         for (OAuth2Client uc : userClients) {
             if (uc.isSuper()) continue;

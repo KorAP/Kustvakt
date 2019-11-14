@@ -125,7 +125,7 @@ public class OAuthClientController {
     @DELETE
     @Path("deregister/{client_id}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response deregisterPublicClient (
+    public Response deregisterClient (
             @Context SecurityContext securityContext,
             @PathParam("client_id") String clientId,
             @FormParam("client_secret") String clientSecret) {
@@ -264,7 +264,7 @@ public class OAuthClientController {
             scopeService.verifyScope(tokenContext,
                     OAuth2Scope.LIST_USER_CLIENT);
 
-            return clientService.listUserClients(username, clientId,
+            return clientService.listUserAuthorizedClients(username, clientId,
                     clientSecret);
         }
         catch (KustvaktException e) {
@@ -272,4 +272,42 @@ public class OAuthClientController {
         }
     }
 
+    /**
+     * Lists clients registered by the authenticated user, e.g. an R
+     * client. This service is intended for client management. It is
+     * not part of the OAuth2 specification. Only super clients are
+     * allowed to use this service. It requires user and client
+     * authentications.
+     * 
+     * @param context
+     * @param clientId
+     *            the client id of the super client
+     * @param clientSecret
+     *            the client secret of the super client
+     * @return a list of clients registered by a user
+     */
+    @POST
+    @Path("registered")
+    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public List<OAuth2UserClientDto> listUserRegisteredClients (
+            @Context SecurityContext context,
+            @FormParam("client_id") String clientId,
+            @FormParam("client_secret") String clientSecret) {
+
+        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+        String username = tokenContext.getUsername();
+
+        try {
+            scopeService.verifyScope(tokenContext,
+                    OAuth2Scope.LIST_USER_CLIENT);
+
+            return clientService.listUserRegisteredClients(username, clientId,
+                    clientSecret);
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
 }

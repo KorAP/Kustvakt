@@ -107,7 +107,7 @@ public class OAuth2ClientDao {
         client = entityManager.merge(client);
     }
 
-    public List<OAuth2Client> retrieveUserClients (String username)
+    public List<OAuth2Client> retrieveUserAuthorizedClients (String username)
             throws KustvaktException {
         ParameterChecker.checkStringValue(username, "username");
 
@@ -128,6 +128,23 @@ public class OAuth2ClientDao {
                                 .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE))));
         query.select(client);
         query.where(condition);
+        query.distinct(true);
+        TypedQuery<OAuth2Client> q = entityManager.createQuery(query);
+        return q.getResultList();
+    }
+
+    public List<OAuth2Client> retrieveUserRegisteredClients (String username)
+            throws KustvaktException {
+        ParameterChecker.checkStringValue(username, "username");
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<OAuth2Client> query =
+                builder.createQuery(OAuth2Client.class);
+
+        Root<OAuth2Client> client = query.from(OAuth2Client.class);
+        query.select(client);
+        query.where(builder.equal(client.get(OAuth2Client_.registeredBy),
+                username));
         query.distinct(true);
         TypedQuery<OAuth2Client> q = entityManager.createQuery(query);
         return q.getResultList();

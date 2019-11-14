@@ -16,6 +16,8 @@
 14/11/2019
    - Added client description and URL to list-authorized-clients service 
      (margaretha, close #53)     
+   - Implemented a service to list clients registered by a user (margaretha, 
+     close #52)   
 
 # version 0.62.1
 08/07/2019
