@@ -214,7 +214,7 @@ public class UserGroupService {
      */
     public boolean createUserGroup (String groupName, String members, String createdBy)
             throws KustvaktException {
-        ParameterChecker.checkStringValue(groupName, "groupName");
+        ParameterChecker.checkNameValue(groupName, "groupName");
         ParameterChecker.checkStringValue(createdBy, "createdBy");
         
         if (!groupNamePattern.matcher(groupName).matches()) {

@@ -485,6 +485,28 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 node.at("/errors/0/0").asInt());
     }
 
+    
+    @Test
+    public void testCreateVCNameTooShort () throws KustvaktException {
+        String json = "{\"type\": \"PRIVATE\","
+                + "\"corpusQuery\": \"creationDate since 1820\"}";
+
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("~"+testUser).path("ne")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(testUser, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .entity(json).put(ClientResponse.class);
+        String entity = response.getEntity(String.class);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.INVALID_ARGUMENT,
+                node.at("/errors/0/0").asInt());
+        assertEquals("vcName must contain at least 3 characters",
+                node.at("/errors/0/1").asText());
+    }
+
     @Test
     public void testCreateVCUnauthorized () throws KustvaktException {
         String json = "{\"type\": \"PRIVATE\","

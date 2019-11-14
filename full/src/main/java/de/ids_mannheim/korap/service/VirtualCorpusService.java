@@ -314,26 +314,26 @@ public class VirtualCorpusService {
         }
     }
 
-    public int storeVC (VirtualCorpusJson vc, String name, String createdBy)
+    public void storeVC (VirtualCorpusJson vc, String vcName, String createdBy)
             throws KustvaktException {
         ParameterChecker.checkStringValue(vc.getCorpusQuery(), "corpusQuery");
         String koralQuery = serializeCorpusQuery(vc.getCorpusQuery());
 
-        return storeVC(name, vc.getType(), koralQuery, vc.getDefinition(),
+        storeVC(vcName, vc.getType(), koralQuery, vc.getDefinition(),
                 vc.getDescription(), vc.getStatus(), vc.isCached(), createdBy);
     }
 
-    public int storeVC (String name, VirtualCorpusType type, String koralQuery,
+    public void storeVC (String vcName, VirtualCorpusType type, String koralQuery,
             String definition, String description, String status,
             boolean isCached, String username) throws KustvaktException {
-        ParameterChecker.checkStringValue(name, "name");
+        ParameterChecker.checkNameValue(vcName, "vcName");
         ParameterChecker.checkObjectValue(type, "type");
 
-        if (!vcNamePattern.matcher(name).matches()) {
+        if (!vcNamePattern.matcher(vcName).matches()) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "Virtual corpus name must only contains letters, numbers, "
                             + "underscores, hypens and spaces",
-                    name);
+                    vcName);
         }
 
         if (type.equals(VirtualCorpusType.SYSTEM) && !username.equals("system")
@@ -343,12 +343,12 @@ public class VirtualCorpusService {
         }
 
         CorpusAccess requiredAccess =
-                determineRequiredAccess(isCached, name, koralQuery);
+                determineRequiredAccess(isCached, vcName, koralQuery);
 
-        if (DEBUG) jlog.debug("Storing VC " + name + "in the database ");
+        if (DEBUG) jlog.debug("Storing VC " + vcName + "in the database ");
         int vcId = 0;
         try {
-            vcId = vcDao.createVirtualCorpus(name, type, requiredAccess,
+            vcId = vcDao.createVirtualCorpus(vcName, type, requiredAccess,
                     koralQuery, definition, description, status, isCached,
                     username);
 
@@ -369,8 +369,6 @@ public class VirtualCorpusService {
         if (type.equals(VirtualCorpusType.PUBLISHED)) {
             publishVC(vcId);
         }
-        // EM: should this return anything?
-        return vcId;
     }
 
     private String serializeCorpusQuery (String corpusQuery)

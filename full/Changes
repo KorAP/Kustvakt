@@ -10,14 +10,15 @@
    - Removed UserGroupJson & updated listUserGroups and createUserGroup 
      services (margaretha)
    - Added prefixes to username and groupname parameters in service paths 
-     (margaretha, resolved #35)  
+     (margaretha, resolved #35)
 13/11/2019
    - Added tests for issue #43 (margaretha)
 14/11/2019
    - Added client description and URL to list-authorized-clients service 
-     (margaretha, close #53)     
+     (margaretha, close #53)
    - Implemented a service to list clients registered by a user (margaretha, 
-     close #52)   
+     close #52)
+   - Added a check for OAuth2 client, VC, and group name length (margaretha)
 
 # version 0.62.1
 08/07/2019

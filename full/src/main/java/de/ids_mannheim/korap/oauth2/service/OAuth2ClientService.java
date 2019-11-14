@@ -32,6 +32,7 @@ import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
+import de.ids_mannheim.korap.utils.ParameterChecker;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
 /**
@@ -80,6 +81,9 @@ public class OAuth2ClientService {
 
     public OAuth2ClientDto registerClient (OAuth2ClientJson clientJson,
             String registeredBy) throws KustvaktException {
+        
+        ParameterChecker.checkNameValue(clientJson.getName(), "clientName");
+        
         String url = clientJson.getUrl();
         int urlHashCode = 0;
         if (url != null && !url.isEmpty()) {

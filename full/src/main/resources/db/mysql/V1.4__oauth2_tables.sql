@@ -3,12 +3,12 @@
 -- oauth2 db tables
 CREATE TABLE IF NOT EXISTS oauth2_client (
 	id VARCHAR(100) PRIMARY KEY NOT NULL,
-	name VARCHAR(200) NOT NULL,
-	secret VARCHAR(200) DEFAULT NULL,
-	type VARCHAR(200) NOT NULL,
+	name VARCHAR(100) NOT NULL,
+	secret VARCHAR(255) DEFAULT NULL,
+	type VARCHAR(50) NOT NULL,
 	super BOOLEAN DEFAULT FALSE,
 	redirect_uri TEXT DEFAULT NULL,
-	description VARCHAR(250) NOT NULL,
+	description VARCHAR(255) NOT NULL,
 	registered_by VARCHAR(100) NOT NULL,
 	url_hashcode INTEGER NOT NULL,	
 	url TEXT DEFAULT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS oauth2_client (
 );
 
 CREATE TABLE IF NOT EXISTS oauth2_access_scope (
-	id VARCHAR(255) PRIMARY KEY NOT NULL
+	id VARCHAR(100) PRIMARY KEY NOT NULL
 );
 
 -- authorization tables are not needed if using cache 

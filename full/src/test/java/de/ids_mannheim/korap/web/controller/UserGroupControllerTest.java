@@ -205,6 +205,22 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
     
     @Test
+    public void testCreateGroupNameTooShort () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        String groupName = "a"; 
+        String members = "marlin,nemo";
+
+        ClientResponse response = testCreateUserGroup(groupName, members);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        assertEquals(StatusCodes.INVALID_ARGUMENT, node.at("/errors/0/0").asInt());
+        assertEquals("groupName must contain at least 3 characters",
+                node.at("/errors/0/1").asText());
+        assertEquals("groupName", node.at("/errors/0/2").asText());
+    }
+    
+    @Test
     public void testUserGroup () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
 

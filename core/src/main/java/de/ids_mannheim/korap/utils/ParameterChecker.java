@@ -46,4 +46,16 @@ public class ParameterChecker {
                     name + " is missing", name);
         }
     }
+    
+    public static void checkNameValue (String value, String name)
+            throws KustvaktException {
+        if (value == null) {
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
+                    name + " is null", name);
+        }
+        else if (value.length() < 3) {
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
+                    name+" must contain at least 3 characters", name);
+        }
+    }
 }

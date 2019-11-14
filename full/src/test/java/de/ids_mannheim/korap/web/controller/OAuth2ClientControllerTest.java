@@ -153,6 +153,24 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     }
 
     @Test
+    public void testRegisterClientNameTooShort ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        OAuth2ClientJson json = new OAuth2ClientJson();
+        json.setName("R");
+        json.setType(OAuth2ClientType.PUBLIC);
+
+        ClientResponse response = registerClient(username, json);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.INVALID_ARGUMENT,
+                node.at("/errors/0/0").asInt());
+        assertEquals("clientName must contain at least 3 characters",
+                node.at("/errors/0/1").asText());
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+    
+    @Test
     public void testRegisterPublicClient () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         OAuth2ClientJson json = new OAuth2ClientJson();
@@ -196,7 +214,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         testDeregisterPublicClientMissingId();
         testDeregisterPublicClient(clientId,username);
     }
-
+    
     private void testAccessTokenAfterDeregistration (String clientId,
             String clientSecret) throws KustvaktException {
         String userAuthHeader = HttpAuthorizationHandler

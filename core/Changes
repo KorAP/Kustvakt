@@ -2,6 +2,8 @@
 13/11/2019
    - Added warnings when requesting non-public fields via the search API with 
      accessRewriteDisabled (margaretha, resolved #43).
+14/11/2019
+   - Added a check for OAuth2 client, VC, and group name length (margaretha)
 
 # version 0.62.1
 08/07/2019
