@@ -80,7 +80,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
-                .path("client").path("info").path(clientId)
+                .path("client").path(clientId)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .get(ClientResponse.class);
@@ -98,14 +98,14 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertEquals(publicClientId, clientInfo.at("/id").asText());
         assertEquals("third party client", clientInfo.at("/name").asText());
         assertNotNull(clientInfo.at("/description"));
-        assertNotNull(clientInfo.at("/redirectURI"));
+        assertNotNull(clientInfo.at("/url"));
         assertEquals("PUBLIC", clientInfo.at("/type").asText());
 
         // confidential client
         clientInfo = retrieveClientInfo(confidentialClientId, "system");
         assertEquals(confidentialClientId, clientInfo.at("/id").asText());
         assertEquals("non super confidential client", clientInfo.at("/name").asText());
-        assertNotNull(clientInfo.at("/redirectURI"));
+        assertNotNull(clientInfo.at("/url"));
         assertEquals(false,clientInfo.at("/isSuper").asBoolean());
         assertEquals("CONFIDENTIAL", clientInfo.at("/type").asText());
         
@@ -113,7 +113,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         clientInfo = retrieveClientInfo(superClientId, "system");
         assertEquals(superClientId, clientInfo.at("/id").asText());
         assertEquals("super confidential client", clientInfo.at("/name").asText());
-        assertNotNull(clientInfo.at("/redirectURI"));
+        assertNotNull(clientInfo.at("/url"));
         assertEquals("CONFIDENTIAL", clientInfo.at("/type").asText());
         assertTrue(clientInfo.at("/isSuper").asBoolean());
     }
@@ -263,7 +263,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .delete(ClientResponse.class);
 
-        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        assertEquals(Status.METHOD_NOT_ALLOWED.getStatusCode(), response.getStatus());
     }
 
     private void testDeregisterPublicClient (String clientId)

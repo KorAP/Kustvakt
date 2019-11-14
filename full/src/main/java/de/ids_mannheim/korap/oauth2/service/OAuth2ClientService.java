@@ -367,6 +367,8 @@ public class OAuth2ClientService {
             OAuth2UserClientDto dto = new OAuth2UserClientDto();
             dto.setClientId(uc.getId());
             dto.setClientName(uc.getName());
+            dto.setDescription(uc.getDescription());
+            dto.setUrl(uc.getUrl());
             dtoList.add(dto);
         }
         return dtoList;

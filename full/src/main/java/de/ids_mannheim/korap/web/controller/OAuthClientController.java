@@ -211,7 +211,7 @@ public class OAuthClientController {
     }
 
     @GET
-    @Path("info/{client_id}")
+    @Path("{client_id}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public OAuth2ClientInfoDto retrieveClientInfo (
             @Context SecurityContext securityContext,
@@ -240,6 +240,10 @@ public class OAuthClientController {
      * user and client authentications.
      * 
      * @param context
+     * @param clientId
+     *            the client id of the super client
+     * @param clientSecret
+     *            the client secret of the super client
      * @return a list of clients having refresh tokens of the
      *         given user
      */
@@ -248,7 +252,7 @@ public class OAuthClientController {
     @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public List<OAuth2UserClientDto> listUserApp (
+    public List<OAuth2UserClientDto> listUserAuthorizedClients (
             @Context SecurityContext context,
             @FormParam("client_id") String clientId,
             @FormParam("client_secret") String clientSecret) {

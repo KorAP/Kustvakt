@@ -18,7 +18,7 @@ public class OAuth2ClientInfoDto {
     private String name;
     private String description;
     private String isSuper;
-    private String redirectURI;
+    private String url;
     private String registeredBy;
     private OAuth2ClientType type;
 
@@ -27,7 +27,7 @@ public class OAuth2ClientInfoDto {
         this.name = client.getName();
         this.description = client.getDescription();
         this.setType(client.getType());
-        this.redirectURI = client.getRedirectURI();
+        this.url = client.getUrl();
         this.registeredBy = client.getRegisteredBy();
 
         if (client.isSuper()) {
@@ -67,12 +67,12 @@ public class OAuth2ClientInfoDto {
         this.isSuper = isSuper;
     }
 
-    public String getRedirectURI () {
-        return redirectURI;
+    public String getUrl () {
+        return url;
     }
 
-    public void setRedirectURI (String redirectURI) {
-        this.redirectURI = redirectURI;
+    public void setUrl (String url) {
+        this.url = url;
     }
 
     public String getRegisteredBy () {

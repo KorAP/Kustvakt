@@ -13,7 +13,9 @@
      (margaretha, resolved #35)  
 13/11/2019
    - Added tests for issue #43 (margaretha)
-     
+14/11/2019
+   - Added client description and URL to list-authorized-clients service 
+     (margaretha, close #53)     
 
 # version 0.62.1
 08/07/2019
