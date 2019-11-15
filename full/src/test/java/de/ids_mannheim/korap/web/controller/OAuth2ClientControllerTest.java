@@ -484,6 +484,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("client_id", superClientId);
         form.add("client_secret", clientSecret);
+        form.add("authorized-only", "true");
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("client").path("list")
@@ -614,7 +615,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         form.add("client_secret", clientSecret);
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
-                .path("client").path("registered")
+                .path("client").path("list")
                 .header(Attributes.AUTHORIZATION, userAuthHeader)
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
