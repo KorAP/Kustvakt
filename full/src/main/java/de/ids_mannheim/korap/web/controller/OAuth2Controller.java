@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.web.controller;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -28,6 +29,7 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.oauth2.dto.OAuth2RefreshTokenDto;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2AuthorizationRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenSuperRequest;
@@ -290,5 +292,29 @@ public class OAuth2Controller {
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
+    }
+    
+    @POST
+    @Path("token/list")
+    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public List<OAuth2RefreshTokenDto> listUserRefreshToken (
+            @Context SecurityContext context,
+            @FormParam("client_id") String clientId,
+            @FormParam("client_secret") String clientSecret) {
+        
+        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+        String username = tokenContext.getUsername();
+        
+        try {
+            return tokenService.listUserRefreshToken(username, clientId,
+                    clientSecret);            
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+        
+        
     }
 }

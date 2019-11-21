@@ -12,6 +12,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,27 +109,26 @@ public class RefreshTokenDao {
         return token;
     }
 
-    // public List<RefreshToken> retrieveRefreshTokenByUser (String
-    // username)
-    // throws KustvaktException {
-    // ParameterChecker.checkStringValue(username, "username");
-    //
-    // CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    // CriteriaQuery<RefreshToken> query =
-    // builder.createQuery(RefreshToken.class);
-    //
-    // Root<RefreshToken> root = query.from(RefreshToken.class);
-    // Predicate condition = builder.and(
-    // builder.equal(root.get(RefreshToken_.userId), username),
-    // builder.equal(root.get(RefreshToken_.isRevoked), false),
-    // builder.greaterThan(
-    // root.<ZonedDateTime> get(RefreshToken_.expiryDate),
-    // ZonedDateTime
-    // .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE)))
-    // );
-    // query.select(root);
-    // query.where(condition);
-    // TypedQuery<RefreshToken> q = entityManager.createQuery(query);
-    // return q.getResultList();
-    // }
+    public List<RefreshToken> retrieveRefreshTokenByUser (String username)
+            throws KustvaktException {
+        ParameterChecker.checkStringValue(username, "username");
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<RefreshToken> query =
+                builder.createQuery(RefreshToken.class);
+
+        Root<RefreshToken> root = query.from(RefreshToken.class);
+        root.fetch(RefreshToken_.client);
+        Predicate condition = builder.and(
+                builder.equal(root.get(RefreshToken_.userId), username),
+                builder.equal(root.get(RefreshToken_.isRevoked), false),
+                builder.greaterThan(
+                        root.<ZonedDateTime> get(RefreshToken_.expiryDate),
+                        ZonedDateTime
+                                .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE))));
+        query.select(root);
+        query.where(condition);
+        TypedQuery<RefreshToken> q = entityManager.createQuery(query);
+        return q.getResultList();
+    }
 }

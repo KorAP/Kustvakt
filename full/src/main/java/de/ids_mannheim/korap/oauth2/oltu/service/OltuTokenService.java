@@ -2,6 +2,8 @@ package de.ids_mannheim.korap.oauth2.oltu.service;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,6 +27,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
 import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
+import de.ids_mannheim.korap.oauth2.dto.OAuth2RefreshTokenDto;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
@@ -32,6 +35,7 @@ import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenSuperRequest;
+import de.ids_mannheim.korap.oauth2.service.OAuth2ClientService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
 
 /** Implementation of token service using Apache Oltu.
@@ -49,6 +53,9 @@ public class OltuTokenService extends OAuth2TokenService {
     private AccessTokenDao tokenDao;
     @Autowired
     private RefreshTokenDao refreshDao;
+    
+    @Autowired
+    private OAuth2ClientService clientService;
 
     public OAuthResponse requestAccessToken (
             AbstractOAuthTokenRequest oAuthRequest)
@@ -437,5 +444,46 @@ public class OltuTokenService extends OAuth2TokenService {
         for (RefreshToken r : refreshTokens) {
             revokeRefreshToken(r);
         }
+    }
+    
+    public List<OAuth2RefreshTokenDto> listUserRefreshToken (String username, String clientId,
+            String clientSecret) throws KustvaktException {
+        
+        OAuth2Client client = clientService.authenticateClient(clientId, clientSecret);
+        if (!client.isSuper()) {
+            throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
+                    "Only super client is allowed.",
+                    OAuth2Error.UNAUTHORIZED_CLIENT);
+        }
+
+        List<RefreshToken> tokens = refreshDao.retrieveRefreshTokenByUser(username);
+        List<OAuth2RefreshTokenDto> dtoList = new ArrayList<>(tokens.size());
+        for (RefreshToken t : tokens){
+            OAuth2Client tokenClient = t.getClient();
+            if (tokenClient.getId().equals(client.getId())){
+                continue;
+            }
+            OAuth2RefreshTokenDto dto = new OAuth2RefreshTokenDto();
+            dto.setClientId(tokenClient.getId());
+            dto.setClientName(tokenClient.getName());
+            dto.setClientUrl(tokenClient.getUrl());
+            dto.setClientDescription(tokenClient.getDescription());
+            
+            DateTimeFormatter f = DateTimeFormatter.ISO_DATE_TIME;
+            dto.setCreatedDate(t.getCreatedDate().format(f));
+            dto.setExpiryDate(t.getExpiryDate().format(f));
+            dto.setUserAuthenticationTime(
+                    t.getUserAuthenticationTime().format(f));
+            dto.setToken(t.getToken());
+            
+            Set<AccessScope> accessScopes = t.getScopes();
+            Set<String> scopes = new HashSet<>(accessScopes.size());
+            for (AccessScope s : accessScopes){
+                scopes.add(s.getId().toString());
+            }
+            dto.setScopes(scopes);
+            dtoList.add(dto);
+        }
+        return dtoList;
     }
 }

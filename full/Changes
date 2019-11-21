@@ -22,6 +22,8 @@
 15/11/2019
    - Merged list authorized client and list registered client services
      (margaretha)
+21/11/2019
+   - Added a service to list active refresh tokens of a user (margaretha)    
 
 # version 0.62.1
 08/07/2019

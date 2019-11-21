@@ -100,7 +100,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 	 */
 	@Override
 	public TokenContext getTokenContext(TokenType type, String token, 
-	        String host, String useragent) throws KustvaktException {
+	        String host, String userAgent) throws KustvaktException {
 
 		AuthenticationIface provider = getProvider(type , null);
 
@@ -111,6 +111,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		}
 		
 		TokenContext context = provider.getTokenContext(token);
+		context.setHostAddress(host);
+		context.setUserAgent(userAgent);
 		// if (!matchStatus(host, useragent, context))
 		// provider.removeUserSession(token);
 		return context;
