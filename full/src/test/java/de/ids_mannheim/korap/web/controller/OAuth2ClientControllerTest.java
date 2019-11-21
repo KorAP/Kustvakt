@@ -523,6 +523,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         String refreshToken = node.at("/refresh_token").asText();
+        String accessToken = node.at("/access_token").asText();
 
         // client 2
         code = requestAuthorizationCode(confidentialClientId, clientSecret,
@@ -533,15 +534,18 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         requestAuthorizedClientList(userAuthHeader);
         testListAuthorizedClientWithMultipleRefreshTokens(userAuthHeader);
+        testListAuthorizedClientWithRefreshTokenFromAnotherUser(userAuthHeader);
         
-        
+        // revoke client 1
+        testRevokeTokenViaSuperClient(publicClientId, userAuthHeader,
+                accessToken, refreshToken);
         testRequestTokenWithRevokedRefreshToken(publicClientId, clientSecret,
                 refreshToken);
-
+        
+        // revoke client 2
         node = JsonUtils.readTree(response.getEntity(String.class));
-        String accessToken = node.at("/access_token").asText();
+        accessToken = node.at("/access_token").asText();
         refreshToken = node.at("/refresh_token").asText();
-
         testRevokeTokenViaSuperClient(confidentialClientId, userAuthHeader,
                 accessToken, refreshToken);
     }
@@ -555,6 +559,20 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 publicClientId, "", code);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
+        requestAuthorizedClientList(userAuthHeader);
+    }
+    
+    private void testListAuthorizedClientWithRefreshTokenFromAnotherUser (
+            String userAuthHeader) throws KustvaktException {
+
+        String aaaAuthHeader = HttpAuthorizationHandler
+                .createBasicAuthorizationHeaderValue("aaa", "pwd");
+        // client 1
+        String code = requestAuthorizationCode(publicClientId, clientSecret,
+                null, aaaAuthHeader);
+        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
+                publicClientId, "", code);
 
         requestAuthorizedClientList(userAuthHeader);
 
@@ -562,7 +580,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         String accessToken = node.at("/access_token").asText();
         String refreshToken = node.at("/refresh_token").asText();
 
-        testRevokeTokenViaSuperClient(publicClientId, userAuthHeader,
+        testRevokeTokenViaSuperClient(publicClientId, aaaAuthHeader,
                 accessToken, refreshToken);
     }
 

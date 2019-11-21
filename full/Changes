@@ -23,7 +23,9 @@
    - Merged list authorized client and list registered client services
      (margaretha)
 21/11/2019
-   - Added a service to list active refresh tokens of a user (margaretha)    
+   - Added a service to list active refresh tokens of a user (margaretha)
+   - Added username filtering to token revocation service via super client 
+     (margaretha)
 
 # version 0.62.1
 08/07/2019

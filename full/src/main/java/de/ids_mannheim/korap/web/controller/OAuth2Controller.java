@@ -273,14 +273,18 @@ public class OAuth2Controller {
     @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response revokeTokenViaSuperClient (
+            @Context SecurityContext context,
             @Context HttpServletRequest request,
             MultivaluedMap<String, String> form) {
 
+        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+        String username = tokenContext.getUsername();
+        
         try {
             OAuth2RevokeTokenSuperRequest revokeTokenRequest =
                     new OAuth2RevokeTokenSuperRequest(
                             new FormRequestWrapper(request, form));
-            tokenService.revokeTokenViaSuperClient(revokeTokenRequest);
+            tokenService.revokeTokenViaSuperClient(username, revokeTokenRequest);
             return Response.ok("SUCCESS").build();
         }
         catch (OAuthSystemException e) {

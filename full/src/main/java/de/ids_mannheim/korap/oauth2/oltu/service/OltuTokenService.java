@@ -424,7 +424,7 @@ public class OltuTokenService extends OAuth2TokenService {
         }
     }
 
-    public void revokeTokenViaSuperClient (
+    public void revokeTokenViaSuperClient (String username,
             OAuth2RevokeTokenSuperRequest revokeTokenRequest)
             throws KustvaktException {
         String superClientId = revokeTokenRequest.getSuperClientId();
@@ -442,7 +442,9 @@ public class OltuTokenService extends OAuth2TokenService {
                 tokenDao.retrieveRefreshTokenByClientId(clientId);
 
         for (RefreshToken r : refreshTokens) {
-            revokeRefreshToken(r);
+            if (r.getUserId().equals(username)){
+                revokeRefreshToken(r);
+            }
         }
     }
     
