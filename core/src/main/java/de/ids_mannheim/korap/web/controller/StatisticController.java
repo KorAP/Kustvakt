@@ -118,24 +118,26 @@ public class StatisticController {
     
     @POST
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response getStatisticsFromKoralQuery (@Context SecurityContext context,
-            @Context Locale locale, String koralQuery) {
-        if (koralQuery != null && !koralQuery.isEmpty()) {
-            String stats;
-            try {
+    public Response getStatisticsFromKoralQuery (
+            @Context SecurityContext context, @Context Locale locale,
+            String koralQuery) {
+        String stats;
+        try {
+            if (koralQuery != null && !koralQuery.isEmpty()) {
                 stats = searchKrill.getStatistics(koralQuery);
-                if (stats.contains("-1")){
-                    throw kustvaktResponseHandler.throwit(StatusCodes.NO_RESULT_FOUND);
-                }
-                return Response.ok(stats).build();
             }
-            catch (KustvaktException e) {
-                throw kustvaktResponseHandler.throwit(e);
+            else {
+                stats = searchKrill.getStatistics(null);
             }
+
+            if (stats.contains("-1")) {
+                throw kustvaktResponseHandler
+                        .throwit(StatusCodes.NO_RESULT_FOUND);
+            }
+            return Response.ok(stats).build();
         }
-        else {
-            throw kustvaktResponseHandler.throwit(StatusCodes.NO_QUERY, 
-                    "Koral query is missing", "koralQuery");
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
         }
     }
 }

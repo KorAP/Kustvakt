@@ -239,16 +239,16 @@ public class StatisticsControllerTest extends SpringJerseyTest {
             throws IOException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics").post(ClientResponse.class);
-
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
-                response.getStatus());
+        
         String ent = response.getEntity(String.class);
-
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        
         JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(StatusCodes.NO_QUERY, node.at("/errors/0/0").asInt());
-        assertEquals("Koral query is missing",
-                node.at("/errors/0/1").asText());
-        assertEquals("koralQuery", node.at("/errors/0/2").asText());
+        assertEquals(11, node.at("/documents").asInt());
+        assertEquals(665842, node.at("/tokens").asInt());
+        assertEquals(25074, node.at("/sentences").asInt());
+        assertEquals(772, node.at("/paragraphs").asInt());
     }
     
 }

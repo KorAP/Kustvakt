@@ -3,6 +3,11 @@ package de.ids_mannheim.korap.web.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -101,4 +106,78 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
         assertEquals(772, node.at("/paragraphs").asInt());
     }
     
+    @Test
+    public void testGetStatisticsWithKoralQuery ()
+            throws IOException, KustvaktException {
+        ClientResponse response = resource().path(API_VERSION)
+                .path("statistics")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .post(ClientResponse.class,"{ \"collection\" : {\"@type\": "
+                        + "\"koral:doc\", \"key\": \"availability\", \"match\": "
+                        + "\"match:eq\", \"type\": \"type:regex\", \"value\": "
+                        + "\"CC-BY.*\"} }");
+
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                     response.getStatus());
+        String ent = response.getEntity(String.class);
+        
+        JsonNode node = JsonUtils.readTree(ent);
+        assertEquals(2, node.at("/documents").asInt());
+        assertEquals(72770, node.at("/tokens").asInt());
+        assertEquals(2985, node.at("/sentences").asInt());
+        assertEquals(128, node.at("/paragraphs").asInt());
+    }
+    
+    @Test
+    public void testGetStatisticsWithEmptyCollection ()
+            throws IOException, KustvaktException {
+        ClientResponse response = resource().path(API_VERSION)
+                .path("statistics")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .post(ClientResponse.class,"{}");
+
+        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+                     response.getStatus());
+        String ent = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertEquals(node.at("/errors/0/0").asInt(),
+                de.ids_mannheim.korap.util.StatusCodes.MISSING_COLLECTION);
+        assertEquals(node.at("/errors/0/1").asText(),
+                "Collection is not found");
+    }
+    
+    @Test
+    public void testGetStatisticsWithIncorrectJson ()
+            throws IOException, KustvaktException {
+        ClientResponse response = resource().path(API_VERSION)
+                .path("statistics")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+                .post(ClientResponse.class,"{ \"collection\" : }");
+
+        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+                     response.getStatus());
+        String ent = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertEquals(node.at("/errors/0/0").asInt(),
+                de.ids_mannheim.korap.util.StatusCodes.UNABLE_TO_PARSE_JSON);
+        assertEquals(node.at("/errors/0/1").asText(),
+                "Unable to parse JSON");
+    }
+    
+    @Test
+    public void testGetStatisticsWithoutKoralQuery ()
+            throws IOException, KustvaktException {
+        ClientResponse response = resource().path(API_VERSION)
+                .path("statistics").post(ClientResponse.class);
+        
+        String ent = response.getEntity(String.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        
+        JsonNode node = JsonUtils.readTree(ent);
+        assertEquals(11, node.at("/documents").asInt());
+        assertEquals(665842, node.at("/tokens").asInt());
+        assertEquals(25074, node.at("/sentences").asInt());
+        assertEquals(772, node.at("/paragraphs").asInt());
+    }
 }

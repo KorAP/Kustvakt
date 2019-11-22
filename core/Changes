@@ -4,6 +4,8 @@
      accessRewriteDisabled (margaretha, resolved #43).
 14/11/2019
    - Added a check for OAuth2 client, VC, and group name length (margaretha)
+22/11/2019
+   - Updated the statistic API with KoralQuery (margaretha)  
 
 # version 0.62.1
 08/07/2019
@@ -18,7 +20,8 @@
 28/08/2019
    - Resolved #49. Added page param check in the search api (margaretha)
 23/09/2019   
-   - Resolved #50. Added statistics API with KoralQuery input (margaretha) 
+   - Resolved #50. Added statistics API with KoralQuery input (margaretha)
+   
 
 # version 0.62
 18/03/2019
