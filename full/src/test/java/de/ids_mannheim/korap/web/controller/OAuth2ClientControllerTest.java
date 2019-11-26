@@ -537,7 +537,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         testListAuthorizedClientWithRefreshTokenFromAnotherUser(userAuthHeader);
         
         // revoke client 1
-        testRevokeTokenViaSuperClient(publicClientId, userAuthHeader,
+        testRevokeAllTokenViaSuperClient(publicClientId, userAuthHeader,
                 accessToken, refreshToken);
         testRequestTokenWithRevokedRefreshToken(publicClientId, clientSecret,
                 refreshToken);
@@ -546,7 +546,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         node = JsonUtils.readTree(response.getEntity(String.class));
         accessToken = node.at("/access_token").asText();
         refreshToken = node.at("/refresh_token").asText();
-        testRevokeTokenViaSuperClient(confidentialClientId, userAuthHeader,
+        testRevokeAllTokenViaSuperClient(confidentialClientId, userAuthHeader,
                 accessToken, refreshToken);
     }
 
@@ -580,11 +580,11 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         String accessToken = node.at("/access_token").asText();
         String refreshToken = node.at("/refresh_token").asText();
 
-        testRevokeTokenViaSuperClient(publicClientId, aaaAuthHeader,
+        testRevokeAllTokenViaSuperClient(publicClientId, aaaAuthHeader,
                 accessToken, refreshToken);
     }
 
-    private void testRevokeTokenViaSuperClient (String clientId,
+    private void testRevokeAllTokenViaSuperClient (String clientId,
             String userAuthHeader, String accessToken, String refreshToken)
             throws KustvaktException {
         // check token before revoking
@@ -598,12 +598,14 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         form.add("super_client_secret", clientSecret);
 
         response = resource().path(API_VERSION).path("oauth2").path("revoke")
-                .path("super").header(Attributes.AUTHORIZATION, userAuthHeader)
+                .path("super").path("all")
+                .header(Attributes.AUTHORIZATION, userAuthHeader)
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).post(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals("SUCCESS", response.getEntity(String.class));
 
         response = searchWithAccessToken(accessToken);
         node = JsonUtils.readTree(response.getEntity(String.class));

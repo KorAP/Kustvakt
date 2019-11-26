@@ -33,6 +33,7 @@ import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
+import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeAllTokenSuperRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenSuperRequest;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ClientService;
@@ -414,18 +415,20 @@ public class OltuTokenService extends OAuth2TokenService {
 
     private void revokeRefreshToken (RefreshToken refreshToken)
             throws KustvaktException {
-        refreshToken.setRevoked(true);
-        refreshDao.updateRefreshToken(refreshToken);
-
-        Set<AccessToken> accessTokenList = refreshToken.getAccessTokens();
-        for (AccessToken accessToken : accessTokenList) {
-            accessToken.setRevoked(true);
-            tokenDao.updateAccessToken(accessToken);
+        if (refreshToken != null){
+            refreshToken.setRevoked(true);
+            refreshDao.updateRefreshToken(refreshToken);
+    
+            Set<AccessToken> accessTokenList = refreshToken.getAccessTokens();
+            for (AccessToken accessToken : accessTokenList) {
+                accessToken.setRevoked(true);
+                tokenDao.updateAccessToken(accessToken);
+            }
         }
     }
 
-    public void revokeTokenViaSuperClient (String username,
-            OAuth2RevokeTokenSuperRequest revokeTokenRequest)
+    public void revokeAllClientTokensViaSuperClient (String username,
+            OAuth2RevokeAllTokenSuperRequest revokeTokenRequest)
             throws KustvaktException {
         String superClientId = revokeTokenRequest.getSuperClientId();
         String superClientSecret = revokeTokenRequest.getSuperClientSecret();
@@ -439,13 +442,30 @@ public class OltuTokenService extends OAuth2TokenService {
 
         String clientId = revokeTokenRequest.getClientId();
         List<RefreshToken> refreshTokens =
-                tokenDao.retrieveRefreshTokenByClientId(clientId);
+                refreshDao.retrieveRefreshTokenByClientId(clientId);
 
         for (RefreshToken r : refreshTokens) {
             if (r.getUserId().equals(username)){
                 revokeRefreshToken(r);
             }
         }
+    }
+    
+    public void revokeTokensViaSuperClient (String username,
+            OAuth2RevokeTokenSuperRequest revokeTokenRequest) throws KustvaktException {
+        String superClientId = revokeTokenRequest.getSuperClientId();
+        String superClientSecret = revokeTokenRequest.getSuperClientSecret();
+
+        OAuth2Client superClient = clientService
+                .authenticateClient(superClientId, superClientSecret);
+        if (!superClient.isSuper()) {
+            throw new KustvaktException(
+                    StatusCodes.CLIENT_AUTHENTICATION_FAILED);
+        }
+        
+        String token = revokeTokenRequest.getToken();
+        RefreshToken refreshToken = refreshDao.retrieveRefreshToken(token, username);
+        revokeRefreshToken(refreshToken);
     }
     
     public List<OAuth2RefreshTokenDto> listUserRefreshToken (String username, String clientId,
@@ -488,4 +508,6 @@ public class OltuTokenService extends OAuth2TokenService {
         }
         return dtoList;
     }
+
+   
 }

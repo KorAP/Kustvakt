@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
@@ -70,9 +71,19 @@ public class RefreshTokenDao {
         entityManager.persist(token);
         return token;
     }
+    
+    public RefreshToken updateRefreshToken (RefreshToken token)
+            throws KustvaktException {
+        ParameterChecker.checkObjectValue(token, "refresh_token");
+
+        token = entityManager.merge(token);
+        return token;
+    }
 
     public RefreshToken retrieveRefreshToken (String token)
             throws KustvaktException {
+        ParameterChecker.checkStringValue(token, "refresh token");
+        
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<RefreshToken> query =
                 builder.createQuery(RefreshToken.class);
@@ -83,6 +94,32 @@ public class RefreshTokenDao {
         query.where(builder.equal(root.get(RefreshToken_.token), token));
         Query q = entityManager.createQuery(query);
         return (RefreshToken) q.getSingleResult();
+    }
+    
+    public RefreshToken retrieveRefreshToken (String token, String username)
+            throws KustvaktException {
+        
+        ParameterChecker.checkStringValue(token, "refresh token");
+        ParameterChecker.checkStringValue(username, "username");
+        
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<RefreshToken> query =
+                builder.createQuery(RefreshToken.class);
+        
+        Root<RefreshToken> root = query.from(RefreshToken.class);
+        Predicate condition = builder.and(
+                builder.equal(root.get(RefreshToken_.userId), username),
+                builder.equal(root.get(RefreshToken_.token), token));
+        
+        query.select(root);
+        query.where(condition);
+        TypedQuery<RefreshToken> q = entityManager.createQuery(query);
+        try {
+            return q.getSingleResult();
+        }
+        catch (NoResultException e) {
+            return null;
+        }
     }
 
     public List<RefreshToken> retrieveRefreshTokenByClientId (String clientId)
@@ -99,14 +136,6 @@ public class RefreshTokenDao {
         query.where(builder.equal(client.get(OAuth2Client_.id), clientId));
         TypedQuery<RefreshToken> q = entityManager.createQuery(query);
         return q.getResultList();
-    }
-
-    public RefreshToken updateRefreshToken (RefreshToken token)
-            throws KustvaktException {
-        ParameterChecker.checkObjectValue(token, "refresh_token");
-
-        token = entityManager.merge(token);
-        return token;
     }
 
     public List<RefreshToken> retrieveRefreshTokenByUser (String username)
@@ -131,4 +160,5 @@ public class RefreshTokenDao {
         TypedQuery<RefreshToken> q = entityManager.createQuery(query);
         return q.getResultList();
     }
+    
 }

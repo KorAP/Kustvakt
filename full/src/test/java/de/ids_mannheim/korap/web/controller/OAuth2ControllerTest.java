@@ -664,6 +664,24 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
                 .entity(form).post(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals("SUCCESS", response.getEntity(String.class));
+    }
+    
+    private void testRevokeTokenViaSuperClient (String token, String userAuthHeader) {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("token", token);
+        form.add("super_client_id", superClientId);
+        form.add("super_client_secret", clientSecret);
+
+        ClientResponse response = resource().path(API_VERSION)
+                .path("oauth2").path("revoke").path("super")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .header(Attributes.AUTHORIZATION, userAuthHeader)
+                .entity(form).post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals("SUCCESS", response.getEntity(String.class));
     }
     
     @Test
@@ -707,10 +725,12 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
                 publicClientId, "", code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
+        // another user
+        String darlaAuthHeader = HttpAuthorizationHandler
+                .createBasicAuthorizationHeaderValue("darla", "pwd");
         // client 1
         code = requestAuthorizationCode(publicClientId, clientSecret,
-                null, HttpAuthorizationHandler
-                .createBasicAuthorizationHeaderValue("darla", "pwd"));
+                null, darlaAuthHeader);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         response = requestTokenWithAuthorizationCodeAndForm(
                 publicClientId, "", code);
@@ -718,6 +738,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         node = JsonUtils.readTree(response.getEntity(String.class));
         String refreshToken5 = node.at("/refresh_token").asText();
         
+        // list
         node = requestRefreshTokenList(userAuthHeader);
         assertEquals(3, node.size());
         
@@ -731,10 +752,19 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         node = requestRefreshTokenList(userAuthHeader);
         assertEquals(1, node.size());
         
-        testRevokeToken(node.at("/0/token").asText(), publicClientId, null,
-                REFRESH_TOKEN_TYPE);
-        testRevokeToken(refreshToken5, publicClientId, null,
-                REFRESH_TOKEN_TYPE);
+        testRevokeTokenViaSuperClient(node.at("/0/token").asText(), userAuthHeader);
+        node = requestRefreshTokenList(userAuthHeader);
+        assertEquals(0, node.size());
+        
+        // try revoking a token belonging to another user
+        // should not return any errors
+        testRevokeTokenViaSuperClient(refreshToken5, userAuthHeader);
+        node = requestRefreshTokenList(darlaAuthHeader);
+        assertEquals(1, node.size());
+        
+        testRevokeTokenViaSuperClient(refreshToken5, darlaAuthHeader);
+        node = requestRefreshTokenList(darlaAuthHeader);
+        assertEquals(0, node.size());
     }
     
     private JsonNode requestRefreshTokenList (String userAuthHeader)

@@ -31,6 +31,7 @@ import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2RefreshTokenDto;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2AuthorizationRequest;
+import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeAllTokenSuperRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenSuperRequest;
 import de.ids_mannheim.korap.oauth2.oltu.service.OltuAuthorizationService;
@@ -258,33 +259,24 @@ public class OAuth2Controller {
         }
     }
 
-    /**
-     * Revokes all tokens of a client from a super client. This
-     * service is not part of the OAUTH2 specification. It requires
-     * user authentication via authorization header, and super client
-     * via URL-encoded form parameters.
-     * 
-     * @param request
-     * @param form
-     * @return
-     */
+    
     @POST
     @Path("revoke/super")
     @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response revokeTokenViaSuperClient (
-            @Context SecurityContext context,
+    public Response revokeTokenViaSuperClient (@Context SecurityContext context,
             @Context HttpServletRequest request,
             MultivaluedMap<String, String> form) {
 
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
         String username = tokenContext.getUsername();
-        
+
         try {
             OAuth2RevokeTokenSuperRequest revokeTokenRequest =
                     new OAuth2RevokeTokenSuperRequest(
                             new FormRequestWrapper(request, form));
-            tokenService.revokeTokenViaSuperClient(username, revokeTokenRequest);
+            tokenService.revokeTokensViaSuperClient(username,
+                    revokeTokenRequest);
             return Response.ok("SUCCESS").build();
         }
         catch (OAuthSystemException e) {
@@ -298,6 +290,51 @@ public class OAuth2Controller {
         }
     }
     
+    /**
+     * Revokes all tokens of a client for the authenticated user from
+     * a super client. This service is not part of the OAUTH2
+     * specification. It requires user authentication via
+     * authorization header, and super client
+     * via URL-encoded form parameters.
+     * 
+     * @param request
+     * @param form
+     *            containing client_id, super_client_id,
+     *            super_client_secret
+     * @return 200 if token invalidation is successful or the given
+     *         token is invalid
+     */
+    @POST
+    @Path("revoke/super/all")
+    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response revokeAllClientTokensViaSuperClient (
+            @Context SecurityContext context,
+            @Context HttpServletRequest request,
+            MultivaluedMap<String, String> form) {
+
+        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+        String username = tokenContext.getUsername();
+
+        try {
+            OAuth2RevokeAllTokenSuperRequest revokeTokenRequest =
+                    new OAuth2RevokeAllTokenSuperRequest(
+                            new FormRequestWrapper(request, form));
+            tokenService.revokeAllClientTokensViaSuperClient(username,
+                    revokeTokenRequest);
+            return Response.ok("SUCCESS").build();
+        }
+        catch (OAuthSystemException e) {
+            throw responseHandler.throwit(e);
+        }
+        catch (OAuthProblemException e) {
+            throw responseHandler.throwit(e);
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
+
     @POST
     @Path("token/list")
     @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
@@ -307,18 +344,17 @@ public class OAuth2Controller {
             @Context SecurityContext context,
             @FormParam("client_id") String clientId,
             @FormParam("client_secret") String clientSecret) {
-        
+
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
         String username = tokenContext.getUsername();
-        
+
         try {
             return tokenService.listUserRefreshToken(username, clientId,
-                    clientSecret);            
+                    clientSecret);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
-        
-        
+
     }
 }

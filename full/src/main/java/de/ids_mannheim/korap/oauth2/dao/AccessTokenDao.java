@@ -12,7 +12,6 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +27,7 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken_;
-import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
-import de.ids_mannheim.korap.oauth2.entity.OAuth2Client_;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
-import de.ids_mannheim.korap.oauth2.entity.RefreshToken_;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
 /**
@@ -130,16 +126,4 @@ public class AccessTokenDao extends KustvaktCacheable {
         return q.getResultList();
     }
 
-    public List<RefreshToken> retrieveRefreshTokenByClientId (String clientId) {
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<RefreshToken> query =
-                builder.createQuery(RefreshToken.class);
-        Root<RefreshToken> root = query.from(RefreshToken.class);
-        Join<RefreshToken, OAuth2Client> client =
-                root.join(RefreshToken_.client);
-        query.select(root);
-        query.where(builder.equal(client.get(OAuth2Client_.id), clientId));
-        TypedQuery<RefreshToken> q = entityManager.createQuery(query);
-        return q.getResultList();
-    }
 }
