@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 
@@ -17,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import de.ids_mannheim.de.init.VCLoader;
@@ -120,13 +124,18 @@ public class SearchService {
     @SuppressWarnings("unchecked")
     public String search (String engine, String username, HttpHeaders headers,
             String q, String ql, String v, String cq, String fields,
-            Integer pageIndex, Integer pageInteger, String ctx,
+            String pipes, Integer pageIndex, Integer pageInteger, String ctx,
             Integer pageLength, Boolean cutoff, boolean accessRewriteDisabled)
             throws KustvaktException {
 
         if (pageInteger != null && pageInteger < 1) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "page must start from 1", "page");
+        }
+        
+        String[] pipeArray = null;
+        if (pipes!=null && !pipes.isEmpty()){
+            pipeArray = pipes.split(",");
         }
         
         KustvaktConfiguration.BACKENDS eng = this.config.chooseBackend(engine);
@@ -157,8 +166,10 @@ public class SearchService {
             throw new KustvaktException(serializer.toJSON());
         }
 
-        String query =
-                this.rewriteHandler.processQuery(serializer.toJSON(), user);
+        String query = serializer.toJSON();
+        query = runPipes(query,pipeArray);
+        
+        query = this.rewriteHandler.processQuery(query, user);
         if (DEBUG){
             jlog.debug("the serialized query " + query);
         }
@@ -173,6 +184,23 @@ public class SearchService {
         // jlog.debug("Query result: " + result);
         return result;
 
+    }
+
+    private String runPipes (String query, String[] pipeArray) {
+        if (pipeArray !=null){
+            for (int i=0; i<pipeArray.length; i++){
+                String url = KustvaktConfiguration.pipes.get(pipeArray[i]);
+                // update query by sending it to a pipe URL
+                // NOTE: request formulation may vary depending on the service
+                Client client = Client.create();
+                WebResource resource = client.resource(url);
+                ClientResponse response =
+                        resource.type(MediaType.APPLICATION_JSON)
+                                .post(ClientResponse.class, query);
+                query = response.getEntity(String.class);
+            }
+        }
+        return query;
     }
 
     private void handleNonPublicFields (List<String> fieldList,

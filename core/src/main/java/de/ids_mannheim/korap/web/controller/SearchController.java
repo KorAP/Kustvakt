@@ -136,6 +136,40 @@ public class SearchController {
         }
     }
 
+    /** Performs for the given query 
+     * 
+     * @param securityContext
+     * @param request
+     * @param headers
+     * @param locale
+     * @param q
+     *            query
+     * @param ql
+     *            query language
+     * @param v
+     *            query language version
+     * @param ctx
+     *            result context
+     * @param cutoff
+     *            determines to limit search results to one page only
+     *            or not (default false)
+     * @param pageLength
+     *            the number of results should be included in a page
+     * @param pageIndex 
+     * @param pageInteger page number
+     * @param fields
+     *            metadata fields to be included, separated by comma
+     * @param pipes
+     *            external plugins for additional processing,
+     *            separated by comma
+     * @param accessRewriteDisabled
+     *            determine if access rewrite should be disabled
+     *            (default false)
+     * @param cq
+     *            corpus query defining a virtual corpus
+     * @param engine
+     * @return search results in JSON
+     */
     @GET
     @Path("{version}/search")
     public Response searchGet (@Context SecurityContext securityContext,
@@ -148,6 +182,7 @@ public class SearchController {
             @QueryParam("offset") Integer pageIndex,
             @QueryParam("page") Integer pageInteger,
             @QueryParam("fields") String fields,
+            @QueryParam("pipes") String pipes,
             @QueryParam("access-rewrite-disabled") boolean accessRewriteDisabled,
             @QueryParam("cq") String cq, 
             @QueryParam("engine") String engine) {
@@ -159,8 +194,9 @@ public class SearchController {
         try {
             scopeService.verifyScope(context, OAuth2Scope.SEARCH);
             result = searchService.search(engine, context.getUsername(),
-                    headers, q, ql, v, cq, fields, pageIndex, pageInteger, ctx,
-                    pageLength, cutoff, accessRewriteDisabled);
+                    headers, q, ql, v, cq, fields, pipes, pageIndex,
+                    pageInteger, ctx, pageLength, cutoff,
+                    accessRewriteDisabled);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ids_mannheim.korap</groupId>
 	<artifactId>Kustvakt-full</artifactId>
-	<version>0.62.2</version>
+	<version>0.62.3</version>
 	<properties>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -205,7 +205,7 @@
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Kustvakt-core</artifactId>
-			<version>[0.62.2,)</version>
+			<version>[0.62.3,)</version>
 		</dependency>
 		<!-- LDAP -->
 		<dependency>

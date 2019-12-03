@@ -32,6 +32,7 @@ public abstract class SpringJerseyTest extends JerseyTest {
 
     public static String[] classPackages =
             new String[] { "de.ids_mannheim.korap.web",
+                    "de.ids_mannheim.korap.test",
                     "com.fasterxml.jackson.jaxrs.json"};
 
     @Override

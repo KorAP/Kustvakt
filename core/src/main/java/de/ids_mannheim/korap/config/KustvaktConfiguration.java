@@ -1,7 +1,11 @@
 package de.ids_mannheim.korap.config;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,6 +15,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import org.apache.commons.io.FileUtils;
 
 import de.ids_mannheim.korap.util.KrillProperties;
 import de.ids_mannheim.korap.utils.TimeUtils;
@@ -100,8 +106,11 @@ public class KustvaktConfiguration {
     // another variable might be needed to define which metadata fields are restricted 
     private boolean isMetadataRestricted = false;
     
+    public static Map<String, String> pipes = new HashMap<>();
+    
     public KustvaktConfiguration (Properties properties) throws Exception {
         load(properties);
+        readPipesFile("pipes");
         KrillProperties.setProp(properties);
     }
 
@@ -191,6 +200,27 @@ public class KustvaktConfiguration {
         // properties.getProperty("security.passcode.salt",
         // "accountCreation");
     }
+    
+    public void readPipesFile (String filename) throws IOException {
+        File file = new File(filename);
+        if (file.exists()) {
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader(new FileInputStream(file)));
+
+            String line = null;
+            while( (line=br.readLine())!=null ){
+                String[] parts = line.split("\t");
+                if (parts.length !=2){
+                    continue;
+                }
+                else{
+                    pipes.put(parts[0], parts[1]);
+                }
+            }
+            br.close();
+        }
+    }
+    
 
     /**
      * set properties
