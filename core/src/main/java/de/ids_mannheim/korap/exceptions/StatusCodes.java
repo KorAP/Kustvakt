@@ -29,6 +29,7 @@ public class StatusCodes {
     public static final int NON_UNIQUE_RESULT_FOUND = 113;
     public static final int NO_RESOURCE_FOUND = 114;
     public static final int DEPRECATED_PARAMETER = 115;
+    public static final int CACHING_VC = 116;
     
     /**
      * 200 status codes general JSON serialization error

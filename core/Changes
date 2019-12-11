@@ -1,6 +1,9 @@
 # version 0.62.3
 03/12/2019
    - Implemented pipe extension in the search API (margaretha)
+11/12/2019
+   - Added errors when requesting VC in caching process (margaretha, 
+     resolved #47) 
 
 # version 0.62.2
 13/11/2019

@@ -18,9 +18,11 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sun.jersey.spi.container.ResourceFilters;
 
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.response.Notifications;
@@ -53,7 +55,9 @@ public class StatisticController {
     private CoreResponseHandler kustvaktResponseHandler;
     @Autowired
     private SearchKrill searchKrill;
-
+    @Autowired
+    private KustvaktConfiguration config;
+    
     /**
      * Returns statistics of the virtual corpus defined by the given
      * corpusQuery parameter.
@@ -91,6 +95,7 @@ public class StatisticController {
                 isDeprecated = true;
             }
             
+            checkVC(json);
             stats = searchKrill.getStatistics(json);
             
             if (isDeprecated){
@@ -116,6 +121,29 @@ public class StatisticController {
         return Response.ok(stats).build();
     }
     
+    private void checkVC (String json) throws KustvaktException {
+        JsonNode node = JsonUtils.readTree(json);
+        node = node.at("/collection");
+        if (node.has("ref")){
+            String vcName = node.path("ref").asText();
+            if (vcName.contains("/")) {
+                String[] names = vcName.split("/");
+                if (names.length == 2) {
+                    vcName = names[1];
+                }
+            }
+            
+            String vcInCaching = config.getVcInCaching();
+            if (vcName.equals(vcInCaching)) {
+                throw new KustvaktException(
+                        de.ids_mannheim.korap.exceptions.StatusCodes.CACHING_VC,
+                        "VC is currently busy and unaccessible due to "
+                                + "caching process",
+                        node.get("ref").asText());
+            }
+        }
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response getStatisticsFromKoralQuery (
@@ -124,6 +152,7 @@ public class StatisticController {
         String stats;
         try {
             if (koralQuery != null && !koralQuery.isEmpty()) {
+                checkVC(koralQuery);
                 stats = searchKrill.getStatistics(koralQuery);
             }
             else {

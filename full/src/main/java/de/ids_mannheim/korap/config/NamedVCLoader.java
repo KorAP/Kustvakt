@@ -137,13 +137,14 @@ public class NamedVCLoader implements Runnable{
 
     private void cacheVC (String json, String filename)
             throws IOException, QueryException {
+        config.setVcInCaching(filename);
         long start, end;
         start = System.currentTimeMillis();
 
         KrillCollection collection = new KrillCollection(json);
         collection.setIndex(searchKrill.getIndex());
 
-        jlog.info("Store {} in cache ", filename);
+        jlog.info("Storing {} in cache ", filename);
         if (collection != null) {
             collection.storeInCache(filename);
         }
@@ -153,5 +154,6 @@ public class NamedVCLoader implements Runnable{
             jlog.debug("memory cache: "
                     + KrillCollection.cache.calculateInMemorySize());
         }
+        config.setVcInCaching("");
     }
 }

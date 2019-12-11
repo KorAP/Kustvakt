@@ -16,8 +16,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.FileUtils;
-
 import de.ids_mannheim.korap.util.KrillProperties;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.Getter;
@@ -41,6 +39,8 @@ public class KustvaktConfiguration {
 
     public static final Map<String, Object> KUSTVAKT_USER = new HashMap<>();
 
+    private String vcInCaching;
+    
     private String indexDir;
     private int port;
     // todo: make exclusive so that the containg languages can really

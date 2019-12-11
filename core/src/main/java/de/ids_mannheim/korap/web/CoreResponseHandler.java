@@ -98,6 +98,9 @@ public class CoreResponseHandler {
             case StatusCodes.NO_RESOURCE_FOUND:
                 status = Response.Status.NOT_FOUND;
                 break;
+            case StatusCodes.CACHING_VC:
+                status = Response.Status.SERVICE_UNAVAILABLE;
+                break;    
         }
         return status;
     }

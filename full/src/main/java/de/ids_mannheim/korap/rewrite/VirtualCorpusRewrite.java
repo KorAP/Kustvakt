@@ -26,6 +26,8 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
 
     @Autowired
+    private KustvaktConfiguration config;
+    @Autowired
     private VirtualCorpusService vcService;
 
     @Override
@@ -59,6 +61,15 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
                     }
                 }
 
+                String vcInCaching = config.getVcInCaching();
+                if (vcName.equals(vcInCaching)) {
+                    throw new KustvaktException(
+                            de.ids_mannheim.korap.exceptions.StatusCodes.CACHING_VC,
+                            "VC is currently busy and unaccessible due to "
+                                    + "caching process",
+                            koralNode.get("ref"));
+                }
+                
                 VirtualCorpus vc =
                         vcService.searchVCByName(username, vcName, vcOwner);
                 if (!vc.isCached()) {
