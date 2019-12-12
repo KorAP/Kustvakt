@@ -228,10 +228,10 @@ public class StatisticsControllerTest extends SpringJerseyTest {
                      response.getStatus());
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(node.at("/errors/0/0").asInt(),
-                de.ids_mannheim.korap.util.StatusCodes.UNABLE_TO_PARSE_JSON);
-        assertEquals(node.at("/errors/0/1").asText(),
-                "Unable to parse JSON");
+        assertEquals(StatusCodes.DESERIALIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Failed deserializing json object: { \"collection\" : }",
+                node.at("/errors/0/1").asText());
     }
     
     @Test

@@ -13,7 +13,8 @@
 
 
 	<context:component-scan
-		base-package="de.ids_mannheim.korap.rewrite, 
+		base-package="de.ids_mannheim.korap.rewrite,
+		de.ids_mannheim.korap.service, 
 	    de.ids_mannheim.korap.web.filter, 
 		de.ids_mannheim.korap.web.utils,
 		de.ids_mannheim.korap.authentication.http" />
@@ -159,10 +160,8 @@
 		class="de.ids_mannheim.korap.web.controller.StatisticController" />
 
 	<!-- Services -->
-	<bean id="annotationService" class="de.ids_mannheim.korap.service.AnnotationService"></bean>
 	<bean id="scopeService"
 		class="de.ids_mannheim.korap.oauth2.service.DummyOAuth2ScopeServiceImpl" />
-	<bean id="searchService" class="de.ids_mannheim.korap.service.SearchService"></bean>
 
 	<!-- DAO -->
 	<bean id="adminDao" class="de.ids_mannheim.korap.dao.DummyAdminDaoImpl" />

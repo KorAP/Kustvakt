@@ -3,7 +3,10 @@
    - Implemented pipe extension in the search API (margaretha)
 11/12/2019
    - Added errors when requesting VC in caching process (margaretha, 
-     resolved #47) 
+     resolved #47)
+12/12/2019
+   - Added support for multiple cq parameters (margaretha, resolved #46)
+      
 
 # version 0.62.2
 17/10/2019

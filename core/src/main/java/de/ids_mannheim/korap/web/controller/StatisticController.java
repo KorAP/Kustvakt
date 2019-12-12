@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.web.controller;
 
+import java.util.List;
 import java.util.Locale;
 
 import javax.ws.rs.Consumes;
@@ -18,18 +19,11 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sun.jersey.spi.container.ResourceFilters;
 
-import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.response.Notifications;
-import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
+import de.ids_mannheim.korap.service.StatisticService;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
-import de.ids_mannheim.korap.web.SearchKrill;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 
@@ -54,10 +48,8 @@ public class StatisticController {
     @Autowired
     private CoreResponseHandler kustvaktResponseHandler;
     @Autowired
-    private SearchKrill searchKrill;
-    @Autowired
-    private KustvaktConfiguration config;
-    
+    private StatisticService service;
+
     /**
      * Returns statistics of the virtual corpus defined by the given
      * corpusQuery parameter.
@@ -69,78 +61,31 @@ public class StatisticController {
      * @param cq
      *            a collection query specifying a virtual corpus
      * @param corpusQuery
-     *            (DEPRECATED) a collection query specifying a virtual corpus 
+     *            (DEPRECATED) a collection query specifying a virtual
+     *            corpus
      * @return statistics of the virtual corpus defined by the given
      *         corpusQuery parameter.
      */
     @GET
     public Response getStatistics (@Context SecurityContext context,
-            @Context Locale locale,
-            @QueryParam("cq") String cq,
-            @QueryParam("corpusQuery") String corpusQuery) {
-
-        KoralCollectionQueryBuilder builder = new KoralCollectionQueryBuilder();
+            @Context Locale locale, @QueryParam("cq") List<String> cq,
+            @QueryParam("corpusQuery") List<String> corpusQuery) {
 
         String stats;
-        String json = null;
         boolean isDeprecated = false;
         try {
-            if (cq != null && !cq.isEmpty()) {
-                builder.with(cq);
-                json = builder.toJSON();
-            }
-            else if (corpusQuery != null && !corpusQuery.isEmpty()) {
-                builder.with(corpusQuery);
-                json = builder.toJSON();
+            if (cq.isEmpty() && corpusQuery != null && !corpusQuery.isEmpty()) {
                 isDeprecated = true;
+                cq = corpusQuery;
             }
-            
-            checkVC(json);
-            stats = searchKrill.getStatistics(json);
-            
-            if (isDeprecated){
-                Notifications n = new Notifications();
-                n.addWarning(StatusCodes.DEPRECATED_PARAMETER,
-                        "Parameter corpusQuery is deprecated in favor of cq.");
-                ObjectNode warning = (ObjectNode) n.toJsonNode();
-                ObjectNode node = (ObjectNode) JsonUtils.readTree(stats);
-                node.setAll(warning);
-                stats = node.toString();
+            stats = service.retrieveStatisticsForCorpusQuery(cq, isDeprecated);
+            if (DEBUG) {
+                jlog.debug("Stats: " + stats);
             }
+            return Response.ok(stats).build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
-        }
-        
-        if (stats.contains("-1")) {
-            throw kustvaktResponseHandler.throwit(StatusCodes.NO_RESULT_FOUND);
-        }
-        if (DEBUG) {
-            jlog.debug("Stats: " + stats);
-        }
-        return Response.ok(stats).build();
-    }
-    
-    private void checkVC (String json) throws KustvaktException {
-        JsonNode node = JsonUtils.readTree(json);
-        node = node.at("/collection");
-        if (node.has("ref")){
-            String vcName = node.path("ref").asText();
-            if (vcName.contains("/")) {
-                String[] names = vcName.split("/");
-                if (names.length == 2) {
-                    vcName = names[1];
-                }
-            }
-            
-            String vcInCaching = config.getVcInCaching();
-            if (vcName.equals(vcInCaching)) {
-                throw new KustvaktException(
-                        de.ids_mannheim.korap.exceptions.StatusCodes.CACHING_VC,
-                        "VC is currently busy and unaccessible due to "
-                                + "caching process",
-                        node.get("ref").asText());
-            }
         }
     }
 
@@ -149,20 +94,8 @@ public class StatisticController {
     public Response getStatisticsFromKoralQuery (
             @Context SecurityContext context, @Context Locale locale,
             String koralQuery) {
-        String stats;
         try {
-            if (koralQuery != null && !koralQuery.isEmpty()) {
-                checkVC(koralQuery);
-                stats = searchKrill.getStatistics(koralQuery);
-            }
-            else {
-                stats = searchKrill.getStatistics(null);
-            }
-
-            if (stats.contains("-1")) {
-                throw kustvaktResponseHandler
-                        .throwit(StatusCodes.NO_RESULT_FOUND);
-            }
+            String stats = service.retrieveStatisticsForKoralQuery(koralQuery);
             return Response.ok(stats).build();
         }
         catch (KustvaktException e) {

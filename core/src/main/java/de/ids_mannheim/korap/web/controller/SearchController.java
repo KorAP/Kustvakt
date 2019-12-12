@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.web.controller;// package
                                              // de.ids_mannheim.korap.ext.web;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -184,7 +185,7 @@ public class SearchController {
             @QueryParam("fields") String fields,
             @QueryParam("pipes") String pipes,
             @QueryParam("access-rewrite-disabled") boolean accessRewriteDisabled,
-            @QueryParam("cq") String cq, 
+            @QueryParam("cq") List<String> cq, 
             @QueryParam("engine") String engine) {
 
         TokenContext context =
@@ -270,7 +271,6 @@ public class SearchController {
             @QueryParam("fields") String fields,
             @Context SecurityContext ctx,
             @Context HttpHeaders headers
-            // @QueryParam("fields") Set<String> fields
     ) throws KustvaktException {
         TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
         try {

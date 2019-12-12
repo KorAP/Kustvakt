@@ -38,7 +38,7 @@ import de.ids_mannheim.korap.web.ClientsHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
 
 @Service
-public class SearchService {
+public class SearchService extends BasicService{
 
     private static final boolean DEBUG = false;
 
@@ -123,7 +123,7 @@ public class SearchService {
 
     @SuppressWarnings("unchecked")
     public String search (String engine, String username, HttpHeaders headers,
-            String q, String ql, String v, String cq, String fields,
+            String q, String ql, String v, List<String> cqList, String fields,
             String pipes, Integer pageIndex, Integer pageInteger, String ctx,
             Integer pageLength, Boolean cutoff, boolean accessRewriteDisabled)
             throws KustvaktException {
@@ -151,6 +151,7 @@ public class SearchService {
         
         QuerySerializer serializer = new QuerySerializer();
         serializer.setQuery(q, ql, v);
+        String cq = combineMultipleCorpusQuery(cqList);
         if (cq != null) serializer.setCollection(cq);
 
         List<String> fieldList = convertFieldsToList(fields);
