@@ -12,12 +12,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -30,6 +33,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
+import de.ids_mannheim.korap.response.Notifications;
 import de.ids_mannheim.korap.rewrite.RewriteHandler;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
@@ -187,21 +191,70 @@ public class SearchService extends BasicService{
 
     }
 
-    private String runPipes (String query, String[] pipeArray) {
+    /**
+     * Pipes are service URLs for modifying KoralQuery. A POST request
+     * with Content-Type application/json will be sent for each pipe.
+     * Kustvakt expects a KoralQuery in JSON format as the pipe response. 
+     * 
+     * @param query the original koral query
+     * @param pipeArray the pipe service URLs
+     * @param serializer the query serializer
+     * @return a modified koral query
+     * @throws KustvaktException 
+     */
+    private String runPipes (String query, String[] pipeArray) throws KustvaktException {
         if (pipeArray !=null){
             for (int i=0; i<pipeArray.length; i++){
-                String url = KustvaktConfiguration.pipes.get(pipeArray[i]);
-                // update query by sending it to a pipe URL
-                // NOTE: request formulation may vary depending on the service
-                Client client = Client.create();
-                WebResource resource = client.resource(url);
-                ClientResponse response =
-                        resource.type(MediaType.APPLICATION_JSON)
-                                .post(ClientResponse.class, query);
-                query = response.getEntity(String.class);
+                String pipeURL = pipeArray[i];
+                try {
+                    Client client = Client.create();
+                    WebResource resource = client.resource(pipeURL);
+                    ClientResponse response =
+                            resource.type(MediaType.APPLICATION_JSON)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .post(ClientResponse.class, query);
+                    if (response.getStatus() == HttpStatus.SC_OK) {
+                        String entity = response.getEntity(String.class);
+                        if (entity != null && !entity.isEmpty()) {
+                            query = entity;
+                        }
+                    }
+                    else {
+                        query = handlePipeError(query, pipeURL,
+                                response.getStatus() + " "
+                                        + response.getStatusInfo().toString());
+                    }
+                }
+                catch (Exception e) {
+                    query = handlePipeError(query, pipeURL,
+                            e.getMessage());
+                }
             }
         }
         return query;
+    }
+    
+    private String handlePipeError (String query, String url,
+            String message) throws KustvaktException {
+        jlog.error("Failed running the pipe at " + url + ". Message: "+ message);
+       
+        Notifications n = new Notifications();
+        n.addWarning(StatusCodes.PIPE_FAILED,
+                "Pipe failed", url, message);
+        JsonNode warning = n.toJsonNode();
+        
+        ObjectNode node = (ObjectNode) JsonUtils.readTree(query);
+        if (node.has("warnings")){
+            warning = warning.at("/warnings/0");
+            ArrayNode arrayNode = (ArrayNode) node.get("warnings");
+            arrayNode.add(warning);
+            node.set("warnings", arrayNode);
+        }
+        else{
+            node.setAll((ObjectNode) warning);
+        }
+        
+        return node.toString(); 
     }
 
     private void handleNonPublicFields (List<String> fieldList,

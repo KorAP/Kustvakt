@@ -6,6 +6,8 @@
      resolved #47) 
 12/12/2019
    - Added support for multiple cq parameters (margaretha, resolved #46)
+13/12/2019
+   - Handled pipe errors and added tests (margaretha)   
 
 # version 0.62.2
 13/11/2019
@@ -14,7 +16,7 @@
 14/11/2019
    - Added a check for OAuth2 client, VC, and group name length (margaretha)
 22/11/2019
-   - Updated the statistic API with KoralQuery (margaretha)  
+   - Updated the statistic API with KoralQuery (margaretha)
 
 # version 0.62.1
 08/07/2019
@@ -25,7 +27,7 @@
 11/07/2019
    - Added cq parameter to VC statistics API and deprecate corpusQuery (margaretha)
 15/07/2019
-   - Added backward compatibility support for corpusQuery parameter (margaretha)    
+   - Added backward compatibility support for corpusQuery parameter (margaretha)
 28/08/2019
    - Resolved #49. Added page param check in the search api (margaretha)
 23/09/2019   
@@ -69,7 +71,7 @@
    - Updated code structure (margaretha)
    - Removed spring security libraries and ManagerInterface (margaretha)
 21/01/2019
-   - Removed codes related to user registration & password management (margaretha)  
+   - Removed codes related to user registration & password management (margaretha)
 22/01/2019
    - Added create, edit, retrieve user default setting controllers (margaretha)
 24/01/2019
@@ -117,12 +119,12 @@ version 0.61.2
    - Moved license regex configuration to full (margaretha)
    - Added defaultRewriteConstraints (margaretha)
 29/10/2018
-    - Added javax.servlet-api (margaretha)
-    - Updated koral version (margaretha)
-    
+   - Added javax.servlet-api (margaretha)
+   - Updated koral version (margaretha)
+   
 version 0.61.1
 28/08/2018
-    - Added API URL versioning (margaretha)
+   - Added API URL versioning (margaretha)
 
 30/08/2018
    - Added backwards compability for URL versioning (margaretha)
@@ -130,65 +132,65 @@ version 0.61.1
 
 version 0.61.0
 13/08/2018
-	- Updated Krill and Koral versions enabling VC caching and referencing (margaretha)
-	- Set kustvakt configuration as Krill properties (margaretha)
-	
+   - Updated Krill and Koral versions enabling VC caching and referencing (margaretha)
+   - Set kustvakt configuration as Krill properties (margaretha)
+   
 version 0.60.5
 09/07/2018
-	- Fixed status codes (margaretha)
-	- Added KustvaktException for wrapping another exception (margaretha)
-	- Removed deprecated codes regarding KustvaktResource (margaretha)
-	
+   - Fixed status codes (margaretha)
+   - Added KustvaktException for wrapping another exception (margaretha)
+   - Removed deprecated codes regarding KustvaktResource (margaretha)
+   
 version 0.60.4
 25/06/2018
-	- added the redirect URI property in KustvaktException (margaretha)
-	- added openid related status codes (margaretha)
+   - added the redirect URI property in KustvaktException (margaretha)
+   - added openid related status codes (margaretha)
 
 version 0.60.3
 30/05/2018
-	- added parameter checker for collection (margaretha)
-	- updated krill version (margaretha)
-	
+   - added parameter checker for collection (margaretha)
+   - updated krill version (margaretha)
+   
 version 0.60.2
 25/04/2018
-	- rearranged and cleaned up codes (margaretha)
-	- generalized some KustvaktException methods (margaretha)
-	- added status codes (margaretha)
-	- updated FormRequestWrapper constructor (margaretha)
-	- fixed get request null parameter in FormRequestWrapper (margaretha)
-	
+   - rearranged and cleaned up codes (margaretha)
+   - generalized some KustvaktException methods (margaretha)
+   - added status codes (margaretha)
+   - updated FormRequestWrapper constructor (margaretha)
+   - fixed get request null parameter in FormRequestWrapper (margaretha)
+   
 version 0.60.1
 14/03/2018
-	- removed AdminHandlerIface (margaretha)
-	- removed isSystemAdmin in User class (margaretha)
+   - removed AdminHandlerIface (margaretha)
+   - removed isSystemAdmin in User class (margaretha)
 
 version 0.60
 13/03/2018
-	- removed old policy and deprecated code (margaretha)
-	- moved authentication related code to /full (margaretha)
-	- elaborated default layer names in the configuration file (margaretha)
-	- added GROUP_DELETED status code (margaretha)
+   - removed old policy and deprecated code (margaretha)
+   - moved authentication related code to /full (margaretha)
+   - elaborated default layer names in the configuration file (margaretha)
+   - added GROUP_DELETED status code (margaretha)
 
 version 0.59.10 
 20/02/2018
-	- updated hibernate and reflection versions (margaretha)
-	- added Changes file (margaretha)
-	- merged BeanConfigBaseTest to BeanConfigTest in /full (margaretha)
-	- added status code for already deleted entry (margaretha)
-	- updated library versions and java environment (margaretha)
-	- added status codes (margaretha)
-	- moved validation.properties (margaretha)
-	- fixed unrecognized media-type application/json (margaretha)
-	
-version 0.59.9 	
+   - updated hibernate and reflection versions (margaretha)
+   - added Changes file (margaretha)
+   - merged BeanConfigBaseTest to BeanConfigTest in /full (margaretha)
+   - added status code for already deleted entry (margaretha)
+   - updated library versions and java environment (margaretha)
+   - added status codes (margaretha)
+   - moved validation.properties (margaretha)
+   - fixed unrecognized media-type application/json (margaretha)
+   
+version 0.59.9
 08/11/2017
-	- fixed missing exception in JsonUtils (margaretha)
-	- fixed and restructured KustvaktResponseHandler (margaretha)
-	- updated status code in ParameterChecker (margaretha)
-	
+   - fixed missing exception in JsonUtils (margaretha)
+   - fixed and restructured KustvaktResponseHandler (margaretha)
+   - updated status code in ParameterChecker (margaretha)
+   
 version 0.59.8 
 24/10/2017
-	- restructured Kustvakt and created core project (margaretha)
-	- marked loader classes as deprecated (margaretha)
-	- updated Spring version (margaretha)
-	- moved unnecessary dependencies (margaretha)
+   - restructured Kustvakt and created core project (margaretha)
+   - marked loader classes as deprecated (margaretha)
+   - updated Spring version (margaretha)
+   - moved unnecessary dependencies (margaretha)

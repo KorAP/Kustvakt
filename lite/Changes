@@ -3,7 +3,9 @@
    - Implemented pipe extension in the search API (margaretha)
 12/12/2019
    - Added support for multiple cq parameters (margaretha, resolved #46)
-
+13/12/2019
+   - Handled pipe errors and added tests (margaretha)
+   
 # version 0.62.2
 13/11/2019
    - Added tests for issue #43 (margaretha)
@@ -17,21 +19,21 @@
 
 version 0.62
 19/03/2019
-  - Added close index controller (margaretha)  
+   - Added close index controller (margaretha)
 
 version 0.61.3
 05/02/2019
-  - Updated kustvakt-lite.conf (margaretha)
+   - Updated kustvakt-lite.conf (margaretha)
 18/02/2019
-  - Updated core version (margaretha)
+   - Updated core version (margaretha)
 
 version 0.61.2
 14/11/2018
    - Integrated lite and full services and controllers in core (margaretha)
    - Added annotation services (margaretha)
 19/12/2018
-  - Fixed getUser in DummyAuthenticationManager (margaretha)
-  - Fixed search test with fields parameter (margaretha)
+   - Fixed getUser in DummyAuthenticationManager (margaretha)
+   - Fixed search test with fields parameter (margaretha)
 
 version 0.61.1
 22/10/2018
@@ -39,9 +41,9 @@ version 0.61.1
 29/10/2018
    - Added rewrite handler post construct (margaretha)
 07/11/2018
-    - OpenJDK8u181-workaround (see Debian Bug report #911925; diewald)
+   - OpenJDK8u181-workaround (see Debian Bug report #911925; diewald)
 13/11/2018
-    - Added shutdown handler (margaretha)
+   - Added shutdown handler (margaretha)
 
 version 0.61.0
 30/08/2018
@@ -50,38 +52,38 @@ version 0.61.0
 
 version 0.60.2
 05/07/2018
-    - Added support for unrestricted corpus statistics (ndiewald)
-    - Do not pass broken queries to Krill (diewald)
+   - Added support for unrestricted corpus statistics (ndiewald)
+   - Do not pass broken queries to Krill (diewald)
 27/08/2018
-    - Added vc reference test (margaretha)
+   - Added vc reference test (margaretha)
 28/08/2018
    - Added API URL versioning (margaretha)
 
 version 0.60.1
 12/06/2018
-    - removed kustvakt_encryption (margaretha)
-    - updated kustvakt core version (margaretha)
-    - adopted statistics query parameter from full (ndiewald)
-  
+   - removed kustvakt_encryption (margaretha)
+   - updated kustvakt core version (margaretha)
+   - adopted statistics query parameter from full (ndiewald)
+   
 version 0.60
-23/03/2018  
-    - updated field type:date in the metadata test (margaretha)
-    - removed loading application context via BeanFactory (margaretha)
-    - fixed missing kustvakt-lite.conf (margaretha)
-    - added support for highlights in matchinfo (diewald)
+23/03/2018
+   - updated field type:date in the metadata test (margaretha)
+   - removed loading application context via BeanFactory (margaretha)
+   - fixed missing kustvakt-lite.conf (margaretha)
+   - added support for highlights in matchinfo (diewald)
 
 version 0.59.9 
 01/02/2018
-    - renamed light to lite (margaretha)
-    - added Changes file (margaretha)
-    - updated library versions and java environment (margaretha)
-    - added metadata test (diewald)
-  
+   - renamed light to lite (margaretha)
+   - added Changes file (margaretha)
+   - updated library versions and java environment (margaretha)
+   - added metadata test (diewald)
+   
 version 0.59.8 
 17/01/2018 
-    - restructured Kustvakt and created /lite project
-    - removed version from service paths (margaretha)
-    - updated query serialization tests (margaretha)
-    - added statistic service test (margaretha)
-    - updated KustvaktResponseHandler (margaretha)
-    - removed FastJerseyLight and simplified Jersey test configuration (margaretha)
+   - restructured Kustvakt and created /lite project
+   - removed version from service paths (margaretha)
+   - updated query serialization tests (margaretha)
+   - added statistic service test (margaretha)
+   - updated KustvaktResponseHandler (margaretha)
+   - removed FastJerseyLight and simplified Jersey test configuration (margaretha)

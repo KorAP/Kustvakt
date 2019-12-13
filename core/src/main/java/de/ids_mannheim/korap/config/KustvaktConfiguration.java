@@ -106,11 +106,13 @@ public class KustvaktConfiguration {
     // another variable might be needed to define which metadata fields are restricted 
     private boolean isMetadataRestricted = false;
     
+    // EM: Maybe needed we support pipe registration
+    @Deprecated
     public static Map<String, String> pipes = new HashMap<>();
     
     public KustvaktConfiguration (Properties properties) throws Exception {
         load(properties);
-        readPipesFile("pipes");
+//        readPipesFile("pipes");
         KrillProperties.setProp(properties);
     }
 
@@ -201,6 +203,7 @@ public class KustvaktConfiguration {
         // "accountCreation");
     }
     
+    @Deprecated
     public void readPipesFile (String filename) throws IOException {
         File file = new File(filename);
         if (file.exists()) {
