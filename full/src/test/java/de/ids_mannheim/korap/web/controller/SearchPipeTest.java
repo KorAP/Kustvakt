@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.web.controller;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 import org.junit.Test;
 
@@ -47,6 +48,21 @@ public class SearchPipeTest extends SpringJerseyTest {
         assertEquals("Kustvakt", node.at("/1/src").asText());
         assertEquals("operation:injection", node.at("/1/operation").asText());
         assertEquals("foundry", node.at("/1/scope").asText());
+    }
+    
+    @Test
+    public void testSearchWithUrlEncodedPipes () throws IOException, KustvaktException {
+        String glemmUri =
+                resource().getURI().toString() + API_VERSION + "/test/glemm";
+        glemmUri = URLEncoder.encode(glemmUri,"utf-8");
+        
+        ClientResponse response = resource().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("pipes", glemmUri).get(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(2, node.at("/query/wrap/key").size());
     }
 
     @Test

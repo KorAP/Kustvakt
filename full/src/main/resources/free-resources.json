@@ -29,7 +29,7 @@
 {
     "id": "WUD17",
     "de_title" : "Deutsche Wikipedia-Benutzerdiskussionskorpus 2017",
-    "en_title" : "German Wikipedia talk corpus 2017",
+    "en_title" : "German Wikipedia user talk corpus 2017",
     "en_description" : "A collection of user talk pages of German Wikipedia from July 1st, 2017.",
     "layers": [
         "corenlp/p",
