@@ -33,6 +33,7 @@ public class UserGroupConverter {
         UserGroupDto dto = new UserGroupDto();
         dto.setId(group.getId());
         dto.setName(group.getName());
+        dto.setDescription(group.getDescription());
         dto.setStatus(group.getStatus());
         dto.setOwner(group.getCreatedBy());
         dto.setUserMemberStatus(userMemberStatus);

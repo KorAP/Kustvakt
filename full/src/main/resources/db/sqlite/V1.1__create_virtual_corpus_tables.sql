@@ -20,6 +20,7 @@ CREATE UNIQUE INDEX privilege_index on privilege(name, role_id);
 CREATE TABLE IF NOT EXISTS user_group (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name VARCHAR(100) NOT NULL,
+  description VARCHAR(255)DEFAULT NULL,
   status VARCHAR(100) NOT NULL,
   created_by VARCHAR(100) NOT NULL,
   deleted_by VARCHAR(100) DEFAULT NULL

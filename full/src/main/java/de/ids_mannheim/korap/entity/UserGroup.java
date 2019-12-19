@@ -40,8 +40,8 @@ public class UserGroup implements Comparable<UserGroup> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     // unique
-    @Column(name = "name")
     private String name;
+    private String description;
     @Column(name = "created_by")
     private String createdBy;
     @Column(name = "deleted_by")

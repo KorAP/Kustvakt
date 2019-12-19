@@ -139,7 +139,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
     
     @Test
-    public void testCreateGroupEmptyMembers () throws UniformInterfaceException,
+    public void testCreateGroupEmptyDescription () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         String groupName = "empty_group";
         ClientResponse response = testCreateUserGroup(groupName,"");
@@ -150,20 +150,20 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
     
     @Test
-    public void testCreateGroupMissingMembers () throws UniformInterfaceException,
+    public void testCreateGroupMissingDescription () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        String groupName = "missing-member-group";
+        String groupName = "missing-desc-group";
 
-        ClientResponse response = testCreateGroupWithoutMembers(groupName);
+        ClientResponse response = testCreateGroupWithoutDescription(groupName);
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         deleteGroupByName(groupName);
     }
     
-    private ClientResponse testCreateUserGroup (String groupName, String members)
+    private ClientResponse testCreateUserGroup (String groupName, String description)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("members", members);
+        form.add("description", description);
         
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@"+groupName).type(MediaType.APPLICATION_FORM_URLENCODED)
@@ -175,7 +175,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         return response;
     }
     
-    private ClientResponse testCreateGroupWithoutMembers (String groupName)
+    private ClientResponse testCreateGroupWithoutDescription (String groupName)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
@@ -192,9 +192,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testCreateGroupInvalidName () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         String groupName = "invalid-group-name$"; 
-        String members = "marlin,nemo";
 
-        ClientResponse response = testCreateUserGroup(groupName, members);
+        ClientResponse response = testCreateGroupWithoutDescription(groupName);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
@@ -208,9 +207,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testCreateGroupNameTooShort () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         String groupName = "a"; 
-        String members = "marlin,nemo";
 
-        ClientResponse response = testCreateUserGroup(groupName, members);
+        ClientResponse response = testCreateGroupWithoutDescription(groupName);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
@@ -225,22 +223,24 @@ public class UserGroupControllerTest extends SpringJerseyTest {
             ClientHandlerException, KustvaktException {
 
         String groupName = "new-user-group";
-        String members = "marlin,nemo";
-
-        ClientResponse response = testCreateUserGroup(groupName,members);
+        String description= "This is new-user-group.";
+        
+        ClientResponse response =
+                testCreateUserGroup(groupName, description);
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         // same name
-        response = testCreateGroupWithoutMembers(groupName);
+        response = testCreateGroupWithoutDescription(groupName);
         assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
         // list user group
-        JsonNode node = retrieveUserGroups(username);;
+        JsonNode node = retrieveUserGroups(username);
         assertEquals(1, node.size());
         node = node.get(0);
         assertEquals("new-user-group", node.get("name").asText());
+        assertEquals(description, node.get("description").asText());
 
         assertEquals(username, node.get("owner").asText());
-        assertEquals(3, node.get("members").size());
+        assertEquals(1, node.get("members").size());
         assertEquals(username, node.at("/members/0/userId").asText());
         assertEquals(GroupMemberStatus.ACTIVE.name(),
                 node.at("/members/0/status").asText());
@@ -249,11 +249,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(PredefinedRole.VC_ACCESS_ADMIN.name(),
                 node.at("/members/0/roles/1").asText());
 
-        assertEquals("marlin", node.at("/members/1/userId").asText());
-        assertEquals(GroupMemberStatus.PENDING.name(),
-                node.at("/members/1/status").asText());
-        assertEquals(0, node.at("/members/1/roles").size());
-
+        testUpdateUserGroup(groupName);
         testInviteMember(groupName);
 
         testDeleteMemberUnauthorized(groupName);
@@ -264,12 +260,24 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         testUnsubscribeToDeletedGroup(groupName);
     }
 
+    private void testUpdateUserGroup (String groupName)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        String description = "Description is updated.";
+        ClientResponse response = testCreateUserGroup(groupName, description);
+        assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
+
+        JsonNode node = retrieveUserGroups(username);
+        assertEquals(1, node.size());
+        assertEquals(description, node.get(0).get("description").asText());
+    }
+
     private void testDeleteMember (String groupName)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        // delete marlin from group
+        // delete darla from group
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("@"+groupName).path("~marlin")
+                .path("@"+groupName).path("~darla")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -284,7 +292,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         node = node.get(0);
-        assertEquals(3, node.get("members").size());
+        assertEquals(1, node.get("members").size());
     }
 
     private void testDeleteMemberUnauthorized (String groupName)
@@ -292,7 +300,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
             KustvaktException {
         // nemo is a group member
         ClientResponse response = resource().path(API_VERSION).path("group")
-                .path("@"+groupName).path("~marlin")
+                .path("@"+groupName).path("~darla")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("nemo", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -473,12 +481,12 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         JsonNode node = JsonUtils.readTree(entity);
         node = node.get(0);
-        assertEquals(4, node.get("members").size());
+        assertEquals(2, node.get("members").size());
 
-        assertEquals("darla", node.at("/members/3/userId").asText());
+        assertEquals("darla", node.at("/members/1/userId").asText());
         assertEquals(GroupMemberStatus.PENDING.name(),
-                node.at("/members/3/status").asText());
-        assertEquals(0, node.at("/members/3/roles").size());
+                node.at("/members/1/status").asText());
+        assertEquals(0, node.at("/members/1/roles").size());
     }
 
     private void testInviteDeletedMember () throws UniformInterfaceException,

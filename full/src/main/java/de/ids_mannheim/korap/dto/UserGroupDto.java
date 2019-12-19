@@ -21,6 +21,7 @@ public class UserGroupDto {
 
     private int id;
     private String name;
+    private String description;
     private String owner;
     private UserGroupStatus status;
     

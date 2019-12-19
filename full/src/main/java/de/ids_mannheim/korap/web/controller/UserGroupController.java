@@ -149,48 +149,33 @@ public class UserGroupController {
     }
 
     /**
-     * Creates a user group where the user in the token context is the
-     * group owner, and invites all users specified as members, see
-     * {@link #inviteGroupMembers(SecurityContext, String, UserGroupJson)}.
-     * The invited users are added as group members with status
-     * GroupMemberStatus.PENDING.
-     * 
-     * If a user accepts the invitation by using the service:
-     * {@link UserGroupController#subscribeToGroup(SecurityContext, String)},
-     * his GroupMemberStatus will be updated to
-     * GroupMemberStatus.ACTIVE.
-     * 
-     * If a user rejects the invitation by using the service:
-     * {@link UserGroupController#unsubscribeFromGroup(SecurityContext, String)},
-     * his GroupMemberStatus will be updated to
-     * GroupMemberStatus.DELETED.
+     * Creates a user group with the group owner as the only group
+     * member. The group owner is the authenticated user in the token
+     * context.
      * 
      * @param securityContext
-     * @param members
-     *            usernames of users to be invited as group members
-     *            (separated by comma)
+     * @param groupName the name of the group            
      * @return if a new group created, HTTP response status 201
      *         Created, otherwise 204 No Content.
      */
     @PUT
     @Path("@{groupName}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response createUserGroup (@Context SecurityContext securityContext,
+    public Response createUpdateUserGroup (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
-            @FormParam("members") String members) {
+            @FormParam("description") String description) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.CREATE_USER_GROUP);
-            boolean groupExists = service.createUserGroup(groupName, members,
-                    context.getUsername());
+            boolean groupExists = service.createUpdateUserGroup(groupName,
+                    description, context.getUsername());
             if (groupExists) {
                 return Response.noContent().build();
             }
             else {
                 return Response.status(HttpStatus.SC_CREATED).build();
             }
-
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -256,7 +241,21 @@ public class UserGroupController {
 
     /**
      * Invites users to join a user-group specified by the
-     * groupName.Only user-group admins and system admins are allowed.
+     * groupName. Only user-group admins and system admins are
+     * allowed to use this service.
+     *  
+     * The invited users are added as group members with status
+     * GroupMemberStatus.PENDING.
+     * 
+     * If a user accepts the invitation by using the service:
+     * {@link UserGroupController#subscribeToGroup(SecurityContext, String)},
+     * his GroupMemberStatus will be updated to
+     * GroupMemberStatus.ACTIVE.
+     * 
+     * If a user rejects the invitation by using the service:
+     * {@link UserGroupController#unsubscribeFromGroup(SecurityContext, String)},
+     * his GroupMemberStatus will be updated to
+     * GroupMemberStatus.DELETED.
      * 
      * @param securityContext
      * @param members
@@ -289,9 +288,12 @@ public class UserGroupController {
      * as well.
      * 
      * @param securityContext
-     * @param groupName the group name
-     * @param memberUsername the username of a group-member 
-     * @param roleIds the role ids for the member
+     * @param groupName
+     *            the group name
+     * @param memberUsername
+     *            the username of a group-member
+     * @param roleIds
+     *            the role ids for the member
      * @return
      */
     @POST

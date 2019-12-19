@@ -1,13 +1,13 @@
 CREATE TABLE IF NOT EXISTS role (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
-  name varchar(100) NOT NULL,
+  name VARCHAR(100) NOT NULL,
   UNIQUE INDEX name_index(name)
 );
 
 
 CREATE TABLE IF NOT EXISTS privilege (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
-  name varchar(20) NOT NULL,
+  name VARCHAR(20) NOT NULL,
   role_id int NOT NULL,
   UNIQUE INDEX privilege_index(name, role_id),
   FOREIGN KEY (role_id) 
@@ -18,21 +18,22 @@ CREATE TABLE IF NOT EXISTS privilege (
 
 CREATE TABLE IF NOT EXISTS user_group (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
-  name varchar(100) NOT NULL,
-  status varchar(100) NOT NULL,
-  created_by varchar(100) NOT NULL,
-  deleted_by varchar(100) DEFAULT NULL,
+  name VARCHAR(100) NOT NULL,
+  description VARCHAR(255) DEFAULT NULL,
+  status VARCHAR(100) NOT NULL,
+  created_by VARCHAR(100) NOT NULL,
+  deleted_by VARCHAR(100) DEFAULT NULL,
   INDEX status_index(status),
   UNIQUE INDEX unique_name(name);
 );
 
 CREATE TABLE IF NOT EXISTS user_group_member (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
-  user_id varchar(100) NOT NULL,
+  user_id VARCHAR(100) NOT NULL,
   group_id int(11) NOT NULL,
-  status varchar(100) NOT NULL,
-  created_by varchar(100) NOT NULL,
-  deleted_by varchar(100) DEFAULT NULL,
+  status VARCHAR(100) NOT NULL,
+  created_by VARCHAR(100) NOT NULL,
+  deleted_by VARCHAR(100) DEFAULT NULL,
   status_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE INDEX unique_index (user_id,group_id),
   INDEX status_index(status),
@@ -56,14 +57,14 @@ CREATE TABLE IF NOT EXISTS group_member_role (
 
 CREATE TABLE IF NOT EXISTS virtual_corpus (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
-  name varchar(255) NOT NULL,
-  type varchar(100) NOT NULL,
-  required_access varchar(100) NOT NULL,
-  created_by varchar(100) NOT NULL,
-  description varchar(255) DEFAULT NULL,
-  status varchar(100) DEFAULT NULL,
+  name VARCHAR(255) NOT NULL,
+  type VARCHAR(100) NOT NULL,
+  required_access VARCHAR(100) NOT NULL,
+  created_by VARCHAR(100) NOT NULL,
+  description VARCHAR(255) DEFAULT NULL,
+  status VARCHAR(100) DEFAULT NULL,
   corpus_query TEXT NOT NULL,
-  definition varchar(255) DEFAULT NULL,
+  definition VARCHAR(255) DEFAULT NULL,
   is_cached BOOLEAN DEFAULT 0,
   UNIQUE INDEX unique_index (name,created_by),
   INDEX owner_index (created_by),
@@ -74,10 +75,10 @@ CREATE TABLE IF NOT EXISTS virtual_corpus_access (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
   virtual_corpus_id int(11) NOT NULL,
   user_group_id int(11) NOT NULL,
-  status varchar(100) NOT NULL,
-  created_by varchar(100) NOT NULL,
-  approved_by varchar(100) DEFAULT NULL,
-  deleted_by varchar(100) DEFAULT NULL,
+  status VARCHAR(100) NOT NULL,
+  created_by VARCHAR(100) NOT NULL,
+  approved_by VARCHAR(100) DEFAULT NULL,
+  deleted_by VARCHAR(100) DEFAULT NULL,
   UNIQUE INDEX unique_index (virtual_corpus_id,user_group_id),
   INDEX status_index(status),
   FOREIGN KEY (user_group_id) 

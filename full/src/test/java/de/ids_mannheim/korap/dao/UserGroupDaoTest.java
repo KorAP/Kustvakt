@@ -51,7 +51,7 @@ public class UserGroupDaoTest {
         String groupName = "test group";
         String createdBy = "test class";
         // create group
-        int groupId = userGroupDao.createGroup(groupName, createdBy,
+        int groupId = userGroupDao.createGroup(groupName, null, createdBy,
                 UserGroupStatus.ACTIVE);
 
         // retrieve group
@@ -123,20 +123,6 @@ public class UserGroupDaoTest {
 
         group = userGroupDao.retrieveGroupByUserId("pearl");
         assertEquals(0, group.size());
-    }
-
-    @Test
-    public void editExistingGroupName () throws KustvaktException {
-        UserGroup group = userGroupDao.retrieveGroupById(1);
-        String name = group.getName();
-        String newName = "new vc name";
-        userGroupDao.editGroupName(1, newName);
-        group = userGroupDao.retrieveGroupById(1);
-        assertEquals(newName, group.getName());
-
-        userGroupDao.editGroupName(1, name);
-        group = userGroupDao.retrieveGroupById(1);
-        assertEquals(name, group.getName());
     }
 
     @Test

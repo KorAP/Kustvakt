@@ -55,14 +55,15 @@ public class UserGroupDao {
     @Autowired
     private RoleDao roleDao;
 
-    public int createGroup (String name, String createdBy,
-            UserGroupStatus status) throws KustvaktException {
+    public int createGroup (String name, String description,
+            String createdBy, UserGroupStatus status) throws KustvaktException {
         ParameterChecker.checkStringValue(name, "name");
         ParameterChecker.checkStringValue(createdBy, "createdBy");
         ParameterChecker.checkObjectValue(status, "UserGroupStatus");
 
         UserGroup group = new UserGroup();
         group.setName(name);
+        group.setDescription(description);
         group.setStatus(status);
         group.setCreatedBy(createdBy);
         entityManager.persist(group);
@@ -112,13 +113,11 @@ public class UserGroupDao {
         }
     }
 
-    public void editGroupName (int groupId, String name)
-            throws KustvaktException {
-        UserGroup group = retrieveGroupById(groupId);
-        group.setName(name);
+    public void updateGroup (UserGroup group) throws KustvaktException {
+        ParameterChecker.checkObjectValue(group, "user-group");
         entityManager.merge(group);
     }
-
+    
     /**
      * Retrieves the UserGroup by the given group id. This methods
      * does not
@@ -156,7 +155,7 @@ public class UserGroupDao {
             return (UserGroup) q.getSingleResult();
         }
         catch (NoResultException e) {
-            throw new KustvaktException(StatusCodes.GROUP_NOT_FOUND,
+            throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
                     "Group with id " + groupId + " is not found",
                     String.valueOf(groupId), e);
         }

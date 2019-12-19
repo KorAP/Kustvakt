@@ -143,9 +143,6 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
 
         String groupName = "admin-test-group";
 
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("members", "marlin,nemo");
-
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@" + groupName)
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
@@ -153,7 +150,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(testUser,
                                         "password"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(form)
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .put(ClientResponse.class);
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
@@ -164,8 +161,8 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         node = node.get(0);
         assertEquals(groupName, node.get("name").asText());
 
-        testMemberRole("marlin", groupName);
         testInviteMember(groupName);
+        testMemberRole("marlin", groupName);
         testDeleteMember(groupName);
         testDeleteGroup(groupName);
     }
@@ -314,7 +311,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("members", "darla");
+        form.add("members", "marlin,nemo,darla");
 
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@" + groupName).path("invite")
@@ -333,8 +330,8 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
 
         assertEquals("darla", node.at("/members/3/userId").asText());
         assertEquals(GroupMemberStatus.PENDING.name(),
-                node.at("/members/3/status").asText());
-        assertEquals(0, node.at("/members/3/roles").size());
+                node.at("/members/1/status").asText());
+        assertEquals(0, node.at("/members/1/roles").size());
     }
 
 }

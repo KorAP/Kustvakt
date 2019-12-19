@@ -50,7 +50,6 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 @Path("/")
 @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
         DemoUserFilter.class, PiwikFilter.class })
-@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class SearchController {
 
     private static final boolean DEBUG = false;
@@ -86,6 +85,7 @@ public class SearchController {
 //     MH: ref query parameter removed!
 //    @GET
 //    @Path("{version}/query")
+//    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response serializeQuery (@Context Locale locale,
             @Context SecurityContext securityContext, @QueryParam("q") String q,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
@@ -116,6 +116,7 @@ public class SearchController {
 //    This web service is DISABLED until there is a need for it. 
 //    @POST
 //    @Path("{version}/search")
+//    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response searchPost (@Context SecurityContext context,
             @Context Locale locale, 
             @Context HttpHeaders headers,
@@ -173,6 +174,7 @@ public class SearchController {
      */
     @GET
     @Path("{version}/search")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response searchGet (@Context SecurityContext securityContext,
             @Context HttpServletRequest request,
             @Context HttpHeaders headers, @Context Locale locale,
@@ -209,6 +211,7 @@ public class SearchController {
     // EM: legacy support
     @Deprecated
     @GET
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("{version}/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
     public Response getMatchInfo (@Context SecurityContext ctx,
             @Context HttpHeaders headers, @Context Locale locale,
@@ -227,6 +230,7 @@ public class SearchController {
     }
     
     @GET
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("{version}/corpus/{corpusId}/{docId}/{textId}/{matchId}")
     public Response retrieveMatchInfo (@Context SecurityContext ctx,
             @Context HttpHeaders headers, @Context Locale locale,
@@ -264,6 +268,7 @@ public class SearchController {
     // This is currently identical to LiteService#getMeta(),
     // but may need auth code to work following policies
     @GET
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("{version}/corpus/{corpusId}/{docId}/{textId}")
     public Response getMetadata (@PathParam("corpusId") String corpusId,
             @PathParam("docId") String docId,
@@ -286,6 +291,7 @@ public class SearchController {
 //  EM: This web service requires Karang and is DISABLED.
 //    @POST
 //    @Path("{version}/colloc")
+//    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response getCollocationBase (@QueryParam("q") String query) {
         String result;
         try {

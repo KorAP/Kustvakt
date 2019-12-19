@@ -212,11 +212,11 @@ public class UserGroupService {
      * 
      * 
      */
-    public boolean createUserGroup (String groupName, String members, String createdBy)
+    public boolean createUpdateUserGroup (String groupName, String description, String createdBy)
             throws KustvaktException {
         ParameterChecker.checkNameValue(groupName, "groupName");
         ParameterChecker.checkStringValue(createdBy, "createdBy");
-        
+
         if (!groupNamePattern.matcher(groupName).matches()) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                     "User-group name must only contains letters, numbers, "
@@ -229,7 +229,6 @@ public class UserGroupService {
         try{
             userGroup = userGroupDao.retrieveGroupByName(groupName,false);
             groupExists = true;
-            
         }
         catch (KustvaktException e) {
             if (e.getStatusCode() != StatusCodes.NO_RESOURCE_FOUND){
@@ -239,7 +238,7 @@ public class UserGroupService {
         
         if (!groupExists){
             try {
-                userGroupDao.createGroup(groupName, createdBy,
+                userGroupDao.createGroup(groupName, description, createdBy,
                         UserGroupStatus.ACTIVE);
                 userGroup = userGroupDao.retrieveGroupByName(groupName,false);
             }
@@ -257,18 +256,10 @@ public class UserGroupService {
                 throw new KustvaktException(StatusCodes.DB_INSERT_FAILED,
                         cause.getMessage());
             }
-            
-            if (members != null && !members.isEmpty()){
-                String[] groupMembers = members.split(",");
-                for (String memberUsername : groupMembers) {
-                    if (memberUsername.equals(createdBy)) {
-                        // skip owner, already added while creating group.
-                        continue;
-                    }
-                    inviteGroupMember(memberUsername, userGroup, createdBy,
-                            GroupMemberStatus.PENDING);
-                }
-            }
+        }
+        else if (description != null) {
+            userGroup.setDescription(description);
+            userGroupDao.updateGroup(userGroup);
         }
         return groupExists;
     }
@@ -297,8 +288,8 @@ public class UserGroupService {
     public int createAutoHiddenGroup () throws KustvaktException {
         String code = random.createRandomCode();
         String groupName = "auto-"+code;
-        int groupId = userGroupDao.createGroup(groupName, "system",
-                UserGroupStatus.HIDDEN);
+        int groupId = userGroupDao.createGroup(groupName, "auto-hidden-group",
+                "system", UserGroupStatus.HIDDEN);
 
         return groupId;
     }
