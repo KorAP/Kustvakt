@@ -8,6 +8,8 @@
    - Added support for multiple cq parameters (margaretha, resolved #46)
 13/12/2019
    - Handled pipe errors and added tests (margaretha)   
+20/12/2019
+   - Removed transactional annotations from simple select queries (margaretha)   
 
 # version 0.62.2
 13/11/2019

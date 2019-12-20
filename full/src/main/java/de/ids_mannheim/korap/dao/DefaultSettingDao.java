@@ -23,7 +23,6 @@ import de.ids_mannheim.korap.utils.ParameterChecker;
  * @author margaretha
  *
  */
-@Transactional
 @Repository
 public class DefaultSettingDao {
 
@@ -41,6 +40,7 @@ public class DefaultSettingDao {
      *            default settings in json
      * @throws KustvaktException
      */
+    @Transactional
     public void createDefaultSetting (String username, String settings)
             throws KustvaktException {
         ParameterChecker.checkStringValue(username, "username");
@@ -49,12 +49,14 @@ public class DefaultSettingDao {
         entityManager.persist(us);
     }
 
+    @Transactional
     public void updateDefaultSetting (DefaultSetting defaultSetting)
             throws KustvaktException {
         ParameterChecker.checkObjectValue(defaultSetting, "defaultSetting");
         entityManager.merge(defaultSetting);
     }
 
+    @Transactional
     public void deleteDefaultSetting (String username)
             throws KustvaktException {
         ParameterChecker.checkObjectValue(username, "defaultSetting");

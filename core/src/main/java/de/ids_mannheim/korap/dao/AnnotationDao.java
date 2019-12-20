@@ -32,7 +32,6 @@ import de.ids_mannheim.korap.utils.ParameterChecker;
  *
  */
 @Repository
-@Transactional
 public class AnnotationDao {
 
     @PersistenceContext
@@ -154,6 +153,7 @@ public class AnnotationDao {
 
     }
 
+    @Transactional
     public Annotation createAnnotation (String code, String type, String text,
             String description) {
         Annotation ann = new Annotation(code, type, text, description);
@@ -161,6 +161,7 @@ public class AnnotationDao {
         return ann;
     }
 
+    @Transactional
     public AnnotationLayer createAnnotationLayer (Annotation foundry,
             Annotation layer) throws KustvaktException {
         ParameterChecker.checkObjectValue(foundry, "foundry");
@@ -175,14 +176,17 @@ public class AnnotationDao {
         return annotationLayer;
     }
 
+    @Transactional
     public void updateAnnotationLayer (AnnotationLayer layer) {
         entityManager.merge(layer);
     }
 
+    @Transactional
     public void updateAnnotationKey (AnnotationKey key) {
         entityManager.merge(key);
     }
 
+    @Transactional
     public AnnotationKey createAnnotationKey (AnnotationLayer layer,
             Annotation key) {
         AnnotationKey annotation =

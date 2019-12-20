@@ -22,7 +22,7 @@ import de.ids_mannheim.korap.user.User;
  * @author margaretha
  *
  */
-@Transactional
+//@Transactional
 @Repository
 public class AdminDaoImpl implements AdminDao {
 

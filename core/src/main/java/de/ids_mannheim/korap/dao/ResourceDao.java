@@ -27,7 +27,6 @@ import de.ids_mannheim.korap.utils.ParameterChecker;
  * @author margaretha
  *
  */
-@Transactional
 @Repository
 public class ResourceDao {
 
@@ -67,6 +66,7 @@ public class ResourceDao {
         }
     }
 
+    @Transactional
     public void createResource (String id, String germanTitle,
             String englishTitle, String englishDescription,
             Set<AnnotationLayer> layers) throws KustvaktException {
