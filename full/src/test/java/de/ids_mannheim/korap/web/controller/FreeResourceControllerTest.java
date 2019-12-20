@@ -18,7 +18,7 @@ public class FreeResourceControllerTest extends SpringJerseyTest {
     @Test
     public void testResource () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
-                .path("resource").path("info").get(ClientResponse.class);
+                .path("resource").get(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
         JsonNode n = JsonUtils.readTree(entity).get(0);

@@ -24,7 +24,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
  *
  */
 @Controller
-@Path("{version}/resource/")
+@Path("{version}/resource")
 @ResourceFilters({APIVersionFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ResourceController {
@@ -40,7 +40,6 @@ public class ResourceController {
      * the database. 
      */
     @GET
-    @Path("info")
     public List<ResourceDto> getAllResourceInfo () {
         return resourceService.getResourceDtos();
     }
