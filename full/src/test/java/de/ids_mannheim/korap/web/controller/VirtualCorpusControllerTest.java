@@ -131,6 +131,10 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals("system-vc", node.at("/name").asText());
         assertEquals(VirtualCorpusType.SYSTEM.displayName(),
                 node.at("/type").asText());
+        assertEquals(11, node.at("/numberOfDoc"));
+        assertEquals(772, node.at("/numberOfParagraphs"));
+        assertEquals(25074, node.at("/numberOfSentences"));
+        assertEquals(665842, node.at("/numberOfTokens"));
     }
 
     @Test

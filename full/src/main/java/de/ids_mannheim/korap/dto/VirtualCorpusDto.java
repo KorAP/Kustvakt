@@ -23,4 +23,8 @@ public class VirtualCorpusDto {
     private String createdBy;
     
     private int numberOfDoc;
+    private int numberOfParagraphs;
+    private int numberOfSentences;
+    private int numberOfTokens;
+    
     private String koralQuery;}

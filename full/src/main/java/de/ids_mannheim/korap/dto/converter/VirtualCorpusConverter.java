@@ -34,8 +34,10 @@ public class VirtualCorpusConverter {
         dto.setKoralQuery(vc.getKoralQuery());
 
         JsonNode node = JsonUtils.readTree(statistics);
-        int numberOfDoc = node.at("/documents").asInt();
-        dto.setNumberOfDoc(numberOfDoc);
+        dto.setNumberOfDoc(node.at("/documents").asInt());
+        dto.setNumberOfParagraphs(node.at("/paragraphs").asInt());
+        dto.setNumberOfSentences(node.at("/sentences").asInt());
+        dto.setNumberOfTokens(node.at("/tokens").asInt());
 
         return dto;
 
