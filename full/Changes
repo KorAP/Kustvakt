@@ -12,7 +12,10 @@
    - Updated create update user-group API (margaretha)
 20/12/2019
    - Removed transactional annotations from simple select queries (margaretha)
-   - Updated free resource controller (margaretha)  
+   - Updated free resource controller (margaretha)
+15/01-2020
+   - Added additional statistic figures to virtual corpus info API 
+     response (margaretha)   
     
 # version 0.62.2
 17/10/2019
