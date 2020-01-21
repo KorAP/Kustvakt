@@ -10,7 +10,8 @@ admin_token
 /bin/
 /db.sqlite
 /lite/liteDB.sqlite
-
+/full/vc/
+/lite/krill_cache/
 
 # FB specific Kustvakt.conf
 src\main\resources\Kustvakt.conf
