@@ -119,8 +119,7 @@ public class OAuth2ClientService {
             // specific device.
 
             secret = codeGenerator.createRandomCode();
-            secretHashcode = encryption.secureHash(secret,
-                    config.getPasscodeSaltField());
+            secretHashcode = encryption.secureHash(secret);
         }
 
         String id = codeGenerator.createRandomCode();
@@ -245,8 +244,7 @@ public class OAuth2ClientService {
                 || client.getRegisteredBy().equals(username)) {
 
             String secret = codeGenerator.createRandomCode();
-            String secretHashcode = encryption.secureHash(secret,
-                    config.getPasscodeSaltField());
+            String secretHashcode = encryption.secureHash(secret);
 
             client.setSecret(secretHashcode);
             clientDao.updateClient(client);
@@ -291,8 +289,7 @@ public class OAuth2ClientService {
                         OAuth2Error.INVALID_CLIENT);
             }
         }
-        else if (!encryption.checkHash(clientSecret, client.getSecret(),
-                config.getPasscodeSaltField())) {
+        else if (!encryption.checkHash(clientSecret, client.getSecret())) {
             throw new KustvaktException(
                     StatusCodes.CLIENT_AUTHENTICATION_FAILED,
                     "Invalid client credentials", OAuth2Error.INVALID_CLIENT);

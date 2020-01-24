@@ -1,16 +1,12 @@
 package de.ids_mannheim.korap.encryption;
 
-import de.ids_mannheim.korap.config.ContextHolder;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+
 import de.ids_mannheim.korap.config.Configurable;
+import de.ids_mannheim.korap.config.ContextHolder;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
-import de.ids_mannheim.korap.user.User;
-
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Map;
 
 /**
  * @author hanl
@@ -35,8 +31,7 @@ public class DefaultEncryption implements EncryptionIface {
 
 
     @Override
-    public String secureHash (String input) throws NoSuchAlgorithmException,
-            UnsupportedEncodingException, KustvaktException {
+    public String secureHash (String input) {
         return null;
     }
 

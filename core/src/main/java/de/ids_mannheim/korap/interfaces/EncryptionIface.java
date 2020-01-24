@@ -26,8 +26,7 @@ public interface EncryptionIface {
             throws KustvaktException;
 
 
-    public String secureHash (String input) throws NoSuchAlgorithmException,
-            UnsupportedEncodingException, KustvaktException;
+    public String secureHash (String input);
 
 
     /**

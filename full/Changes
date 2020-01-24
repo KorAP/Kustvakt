@@ -1,3 +1,7 @@
+# version 0.62.4
+24/01/2020
+   - Removed salt from config and updated config files.
+   
 # version 0.62.3
 03/12/2019
    - Implemented pipe extension in the search API (margaretha)

@@ -72,7 +72,6 @@ public class KustvaktConfiguration {
     private int tokenTTL;
     private int shortTokenTTL;
     private String[] rewrite_strategies;
-    private String passcodeSaltField;
 
     private String default_pos;
     private String default_morphology;
@@ -197,10 +196,6 @@ public class KustvaktConfiguration {
                 properties.getProperty("security.tokenTTL", "72H"));
         shortTokenTTL = TimeUtils.convertTimeToSeconds(
                 properties.getProperty("security.shortTokenTTL", "3H"));
-
-        // passcodeSaltField =
-        // properties.getProperty("security.passcode.salt",
-        // "accountCreation");
     }
     
     @Deprecated
