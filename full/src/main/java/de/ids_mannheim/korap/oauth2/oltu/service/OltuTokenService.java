@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.NoResultException;
+import javax.servlet.ServletContext;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.oltu.oauth2.as.request.AbstractOAuthTokenRequest;
@@ -509,5 +510,23 @@ public class OltuTokenService extends OAuth2TokenService {
         return dtoList;
     }
 
-   
+    public String clearAccessTokenCache (String adminToken, String accessToken,
+            ServletContext context) throws KustvaktException {
+        if (adminToken != null && !adminToken.isEmpty()
+                && adminToken.equals(context.getInitParameter("adminToken"))) {
+            
+            if (accessToken == null) {
+                tokenDao.clearCache();
+                return "Cache has been cleared";
+            }
+            else {
+                tokenDao.removeCacheEntry(accessToken);
+                return "Access token has been removed from the cache";
+            }
+        }
+        else {
+            throw new KustvaktException(StatusCodes.INCORRECT_ADMIN_TOKEN,
+                    "Admin token is incorrect");
+        }
+    }
 }

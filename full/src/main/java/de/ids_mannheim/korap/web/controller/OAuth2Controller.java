@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.web.controller;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
@@ -356,5 +357,22 @@ public class OAuth2Controller {
             throw responseHandler.throwit(e);
         }
 
+    }
+    
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Path("token/clear")
+    public Response clearAccessTokenCache (
+            @FormParam("token") String adminToken,
+            @FormParam("access_token") String accessToken,
+            @Context ServletContext context) {
+        try {
+            String response = tokenService.clearAccessTokenCache(adminToken, accessToken,
+                    context);
+            return Response.ok(response).build();
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
     }
 }
