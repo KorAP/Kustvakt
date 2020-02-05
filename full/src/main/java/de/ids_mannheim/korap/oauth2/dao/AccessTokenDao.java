@@ -12,6 +12,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken_;
+import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
@@ -44,6 +46,8 @@ public class AccessTokenDao extends KustvaktCacheable {
     private EntityManager entityManager;
     @Autowired
     private FullConfiguration config;
+    @Autowired
+    private OAuth2ClientDao clientDao;
 
     public AccessTokenDao () {
         super("access_token", "key:access_token");
@@ -53,7 +57,7 @@ public class AccessTokenDao extends KustvaktCacheable {
             Set<AccessScope> scopes, String userId, String clientId,
             ZonedDateTime authenticationTime) throws KustvaktException {
         ParameterChecker.checkStringValue(token, "access token");
-        ParameterChecker.checkObjectValue(refreshToken, "refresh token");
+//        ParameterChecker.checkObjectValue(refreshToken, "refresh token");
         ParameterChecker.checkObjectValue(scopes, "scopes");
         // ParameterChecker.checkStringValue(userId, "username");
         ParameterChecker.checkStringValue(clientId, "client_id");
@@ -63,15 +67,25 @@ public class AccessTokenDao extends KustvaktCacheable {
         ZonedDateTime now =
                 ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
 
+        ZonedDateTime expiry;
         AccessToken accessToken = new AccessToken();
+        
+        if (refreshToken != null) {
+            accessToken.setRefreshToken(refreshToken);
+            expiry = now.plusSeconds(config.getAccessTokenExpiry());
+        }
+        else {
+            expiry = now.plusSeconds(config.getAccessTokenLongExpiry());
+        }
+        
+        OAuth2Client client = clientDao.retrieveClientById(clientId);
+        
         accessToken.setCreatedDate(now);
-        accessToken
-                .setExpiryDate(now.plusSeconds(config.getAccessTokenExpiry()));
+        accessToken.setExpiryDate(expiry);
         accessToken.setToken(token);
-        accessToken.setRefreshToken(refreshToken);
         accessToken.setScopes(scopes);
         accessToken.setUserId(userId);
-        accessToken.setClientId(clientId);
+        accessToken.setClient(client);
         accessToken.setUserAuthenticationTime(authenticationTime);
         entityManager.persist(accessToken);
     }
@@ -115,13 +129,56 @@ public class AccessTokenDao extends KustvaktCacheable {
         }
     }
 
-    public List<AccessToken> retrieveAccessTokenByClientId (String clientId) {
+    public AccessToken retrieveAccessToken (String accessToken, String username)
+            throws KustvaktException {
+        ParameterChecker.checkStringValue(accessToken, "access_token");
+        ParameterChecker.checkStringValue(username, "username");
+        AccessToken token = (AccessToken) this.getCacheValue(accessToken);
+        if (token != null) {
+            return token;
+        }
+
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<AccessToken> query =
                 builder.createQuery(AccessToken.class);
         Root<AccessToken> root = query.from(AccessToken.class);
+        
+        Predicate condition = builder.and(
+                builder.equal(root.get(AccessToken_.userId), username),
+                builder.equal(root.get(AccessToken_.token), accessToken));
+        
         query.select(root);
-        query.where(builder.equal(root.get(AccessToken_.clientId), clientId));
+        query.where(condition);
+        Query q = entityManager.createQuery(query);
+        try {
+            token = (AccessToken) q.getSingleResult();
+            this.storeInCache(accessToken, token);
+            return token;
+        }
+        catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    
+    public List<AccessToken> retrieveAccessTokenByClientId (String clientId,
+            String username) throws KustvaktException {
+        ParameterChecker.checkStringValue(clientId, "client_id");
+        OAuth2Client client = clientDao.retrieveClientById(clientId);
+        
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<AccessToken> query =
+                builder.createQuery(AccessToken.class);
+        Root<AccessToken> root = query.from(AccessToken.class);
+        
+        Predicate condition = builder.equal(root.get(AccessToken_.client), client);
+        if (username != null && !username.isEmpty()){
+            condition = builder.and(condition,
+                    builder.equal(root.get(AccessToken_.userId), username));
+        }
+        
+        query.select(root);
+        query.where(condition);
         TypedQuery<AccessToken> q = entityManager.createQuery(query);
         return q.getResultList();
     }

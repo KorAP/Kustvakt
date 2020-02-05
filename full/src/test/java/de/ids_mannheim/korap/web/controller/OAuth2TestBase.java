@@ -42,6 +42,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     
     protected String publicClientId = "8bIDtZnH6NvRkW2Fq";
     protected String confidentialClientId = "9aHsGW6QflV13ixNpez";
+    protected String confidentialClientId2 = "9aHsGW6QflV13ixNpez";
     protected String superClientId = "fCBbQkAyYzI4NzUxMg";
     protected String clientSecret = "secret";
 
@@ -147,6 +148,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("grant_type", GrantType.REFRESH_TOKEN.toString());
         form.add("client_id", clientId);
+        form.add("client_secret", clientSecret);
         form.add("refresh_token", refreshToken);
         if (clientSecret != null) {
             form.add("client_secret", clientSecret);
@@ -186,6 +188,23 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
+    }
+    
+    protected void testRevokeTokenViaSuperClient (String token, String userAuthHeader) {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("token", token);
+        form.add("super_client_id", superClientId);
+        form.add("super_client_secret", clientSecret);
+
+        ClientResponse response = resource().path(API_VERSION)
+                .path("oauth2").path("revoke").path("super")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .header(Attributes.AUTHORIZATION, userAuthHeader)
+                .entity(form).post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals("SUCCESS", response.getEntity(String.class));
     }
 
 }

@@ -179,6 +179,20 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
 
         testSearchWithRevokedAccessToken(accessToken);
     }
+    
+    @Test
+    public void testRevokeAccessTokenPublicClientViaSuperClient()
+            throws KustvaktException {
+        String code = requestAuthorizationCode(publicClientId, "", null,
+                userAuthHeader);
+        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
+                publicClientId, "", code);
+        
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        String accessToken = node.at("/access_token").asText();
+        testRevokeTokenViaSuperClient(accessToken, userAuthHeader);
+        testSearchWithRevokedAccessToken(accessToken);
+    }
 
     private void testSearchWithRevokedAccessToken (String accessToken)
             throws KustvaktException {

@@ -45,8 +45,8 @@ public class AccessToken implements Serializable {
     private ZonedDateTime expiryDate;
     @Column(name = "user_id")
     private String userId;
-    @Column(name = "client_id")
-    private String clientId;
+//    @Column(name = "client_id")
+//    private String clientId;
     @Column(name = "is_revoked")
     private boolean isRevoked;
     @Column(name = "user_auth_time", updatable = false)
@@ -69,4 +69,8 @@ public class AccessToken implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "refresh_token")
     private RefreshToken refreshToken;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client")
+    private OAuth2Client client;
 }

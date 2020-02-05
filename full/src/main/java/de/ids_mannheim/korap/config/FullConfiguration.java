@@ -70,6 +70,7 @@ public class FullConfiguration extends KustvaktConfiguration {
     private Set<String> clientCredentialsScopes;
     private int maxAuthenticationAttempts;
 
+    private int accessTokenLongExpiry;
     private int accessTokenExpiry;
     private int refreshTokenExpiry;
     private int authorizationCodeExpiry;
@@ -251,6 +252,9 @@ public class FullConfiguration extends KustvaktConfiguration {
                 properties.getProperty("oauth2.refresh.token.expiry", "90D"));
         authorizationCodeExpiry = TimeUtils.convertTimeToSeconds(properties
                 .getProperty("oauth2.authorization.code.expiry", "10M"));
+        
+        setAccessTokenLongExpiry(TimeUtils.convertTimeToSeconds(
+                properties.getProperty("oauth2.access.token.long.expiry", "365D")));
     }
 
     private void setMailConfiguration (Properties properties) {
@@ -635,5 +639,13 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     public void setNamedVCPath (String namedVCPath) {
         this.namedVCPath = namedVCPath;
+    }
+
+    public int getAccessTokenLongExpiry () {
+        return accessTokenLongExpiry;
+    }
+
+    public void setAccessTokenLongExpiry (int accessTokenLongExpiry) {
+        this.accessTokenLongExpiry = accessTokenLongExpiry;
     }
 }

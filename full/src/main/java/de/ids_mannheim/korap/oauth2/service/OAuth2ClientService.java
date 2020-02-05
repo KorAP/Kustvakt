@@ -217,14 +217,14 @@ public class OAuth2ClientService {
 
         // revoke all related access tokens
         List<AccessToken> tokens =
-                tokenDao.retrieveAccessTokenByClientId(clientId);
+                tokenDao.retrieveAccessTokenByClientId(clientId,null);
         for (AccessToken token : tokens) {
             token.setRevoked(true);
             tokenDao.updateAccessToken(token);
         }
 
         List<RefreshToken> refreshTokens =
-                refreshDao.retrieveRefreshTokenByClientId(clientId);
+                refreshDao.retrieveRefreshTokenByClientId(clientId,null);
         for (RefreshToken token : refreshTokens) {
             token.setRevoked(true);
             refreshDao.updateRefreshToken(token);
@@ -358,10 +358,23 @@ public class OAuth2ClientService {
                     "Only super client is allowed to list user authorized clients.",
                     OAuth2Error.UNAUTHORIZED_CLIENT);
         }
+                
         List<OAuth2Client> userClients =
                 clientDao.retrieveUserAuthorizedClients(username);
-        Collections.sort(userClients);
-        return createClientDtos(userClients);
+        userClients.addAll(clientDao.retrieveClientsByAccessTokens(username));
+        
+        List<String> clientIds = new ArrayList<>();
+        List<OAuth2Client> uniqueClients = new ArrayList<>();
+        for (OAuth2Client c : userClients){
+            String id = c.getId();
+            if (!clientIds.contains(id)){
+                clientIds.add(id);
+                uniqueClients.add(c);
+            }        
+        }
+        
+        Collections.sort(uniqueClients);
+        return createClientDtos(uniqueClients);
     }
     
     public List<OAuth2UserClientDto> listUserRegisteredClients (String username,
@@ -390,5 +403,9 @@ public class OAuth2ClientService {
             dtoList.add(dto);
         }
         return dtoList;
+    }
+
+    public boolean isPublicClient (OAuth2Client oAuth2Client) {
+        return oAuth2Client.getType().equals(OAuth2ClientType.PUBLIC);
     }
 }

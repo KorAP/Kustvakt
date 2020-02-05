@@ -22,13 +22,16 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
+import de.ids_mannheim.korap.oauth2.entity.AccessToken;
+import de.ids_mannheim.korap.oauth2.entity.AccessToken_;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client_;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken_;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
-/** Manages database queries and transactions regarding OAuth2 clients. 
+/**
+ * Manages database queries and transactions regarding OAuth2 clients.
  * 
  * @author margaretha
  *
@@ -124,6 +127,32 @@ public class OAuth2ClientDao {
                 builder.greaterThan(
                         refreshToken
                                 .<ZonedDateTime> get(RefreshToken_.expiryDate),
+                        ZonedDateTime
+                                .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE))));
+        query.select(client);
+        query.where(condition);
+        query.distinct(true);
+        TypedQuery<OAuth2Client> q = entityManager.createQuery(query);
+        return q.getResultList();
+    }
+
+    public List<OAuth2Client> retrieveClientsByAccessTokens (String username)
+            throws KustvaktException {
+        ParameterChecker.checkStringValue(username, "username");
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<OAuth2Client> query =
+                builder.createQuery(OAuth2Client.class);
+
+        Root<OAuth2Client> client = query.from(OAuth2Client.class);
+        Join<OAuth2Client, AccessToken> accessToken =
+                client.join(OAuth2Client_.accessTokens);
+        Predicate condition = builder.and(
+                builder.equal(accessToken.get(AccessToken_.userId), username),
+                builder.equal(accessToken.get(AccessToken_.isRevoked), false),
+                builder.greaterThan(
+                        accessToken
+                                .<ZonedDateTime> get(AccessToken_.expiryDate),
                         ZonedDateTime
                                 .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE))));
         query.select(client);

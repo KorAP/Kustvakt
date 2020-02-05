@@ -3,6 +3,10 @@
    - Removed salt from config and updated config files (margaretha)
 03/02/2020
    - Added an admin API for clearing access token cache (margaretha)
+05/02/2020
+   - Added a config properties for a long-time access token expiry 
+     and excluded refresh tokens for public clients in OAuth2 token 
+     responses (margaretha) 
    
 # version 0.62.3
 03/12/2019

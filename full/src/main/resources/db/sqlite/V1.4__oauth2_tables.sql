@@ -77,13 +77,13 @@ CREATE TABLE IF NOT EXISTS oauth2_access_token (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	token VARCHAR(255) NOT NULL,
 	user_id VARCHAR(100) DEFAULT NULL,
-	client_id VARCHAR(100) DEFAULT NULL,
 	created_date TIMESTAMP NOT NULL,
 	expiry_date TIMESTAMP NOT NULL,
 	is_revoked BOOLEAN DEFAULT 0,
 	user_auth_time TIMESTAMP NOT NULL,
 	refresh_token INTEGER DEFAULT NULL,
-	FOREIGN KEY (client_id)
+	client VARCHAR(100) DEFAULT NULL,
+	FOREIGN KEY (client)
 	   REFERENCES oauth2_client(id)
 	   ON DELETE CASCADE
 	FOREIGN KEY (refresh_token)

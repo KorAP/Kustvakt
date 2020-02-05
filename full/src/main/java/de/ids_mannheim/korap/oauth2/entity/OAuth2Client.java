@@ -44,6 +44,9 @@ public class OAuth2Client implements Comparable<OAuth2Client>{
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "client")
     private List<RefreshToken> refreshTokens;
     
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "client")
+    private List<AccessToken> accessTokens;
+    
     @Override
     public String toString () {
         return "id=" + id + ", name=" + name + ", secret=" + secret + ", type="

@@ -125,7 +125,7 @@ public class OltuTokenService extends OAuth2TokenService {
                     OAuth2Error.INVALID_REQUEST);
         }
 
-        clientService.authenticateClient(clientId, clientSecret);
+        OAuth2Client oAuth2Client = clientService.authenticateClient(clientId, clientSecret);
 
         RefreshToken refreshToken;
         try {
@@ -166,7 +166,8 @@ public class OltuTokenService extends OAuth2TokenService {
 
         return createsAccessTokenResponse(scopes, requestedScopes, clientId,
                 refreshToken.getUserId(),
-                refreshToken.getUserAuthenticationTime());
+                refreshToken.getUserAuthenticationTime(),
+                clientService.isPublicClient(oAuth2Client));
 
         // without new refresh token
         // return createsAccessTokenResponse(scopes, requestedScopes,
@@ -201,10 +202,11 @@ public class OltuTokenService extends OAuth2TokenService {
 
         Set<String> scopes = scopeService
                 .convertAccessScopesToStringSet(authorization.getScopes());
+        OAuth2Client oAuth2Client = clientService.retrieveClient(clientId);
         return createsAccessTokenResponse(scopes, authorization.getScopes(),
                 authorization.getClientId(), authorization.getUserId(),
-                authorization.getUserAuthenticationTime());
-
+                authorization.getUserAuthenticationTime(),
+                clientService.isPublicClient(oAuth2Client));
     }
 
     /**
@@ -261,7 +263,8 @@ public class OltuTokenService extends OAuth2TokenService {
         Set<AccessScope> accessScopes =
                 scopeService.convertToAccessScope(scopes);
         return createsAccessTokenResponse(scopes, accessScopes, clientId,
-                username, authenticationTime);
+                username, authenticationTime,
+                false);
     }
 
     /**
@@ -290,7 +293,7 @@ public class OltuTokenService extends OAuth2TokenService {
         }
 
         // OAuth2Client client =
-        clientService.authenticateClient(clientId, clientSecret);
+        OAuth2Client oAuth2Client = clientService.authenticateClient(clientId, clientSecret);
 
         // if (!client.isNative()) {
         // throw new KustvaktException(
@@ -308,7 +311,7 @@ public class OltuTokenService extends OAuth2TokenService {
         Set<AccessScope> accessScopes =
                 scopeService.convertToAccessScope(scopes);
         return createsAccessTokenResponse(scopes, accessScopes, clientId, null,
-                authenticationTime);
+                authenticationTime,clientService.isPublicClient(oAuth2Client));
     }
 
     /**
@@ -339,14 +342,20 @@ public class OltuTokenService extends OAuth2TokenService {
      */
     private OAuthResponse createsAccessTokenResponse (Set<String> scopes,
             Set<AccessScope> accessScopes, String clientId, String userId,
-            ZonedDateTime authenticationTime)
+            ZonedDateTime authenticationTime, boolean isPublicClient)
             throws OAuthSystemException, KustvaktException {
 
         String random = randomGenerator.createRandomCode();
-        RefreshToken refreshToken = refreshDao.storeRefreshToken(random, userId,
-                authenticationTime, clientId, accessScopes);
-        return createsAccessTokenResponse(scopes, accessScopes, clientId,
-                userId, authenticationTime, refreshToken);
+        if (isPublicClient){
+            return createsAccessTokenResponse(scopes, accessScopes, clientId,
+                    userId, authenticationTime);
+            }
+        else {
+            RefreshToken refreshToken = refreshDao.storeRefreshToken(random, userId,
+                    authenticationTime, clientId, accessScopes);
+            return createsAccessTokenResponse(scopes, accessScopes, clientId,
+                    userId, authenticationTime, refreshToken);
+        }
     }
 
     private OAuthResponse createsAccessTokenResponse (Set<String> scopes,
@@ -363,6 +372,22 @@ public class OltuTokenService extends OAuth2TokenService {
                 .setTokenType(TokenType.BEARER.toString())
                 .setExpiresIn(String.valueOf(config.getAccessTokenExpiry()))
                 .setRefreshToken(refreshToken.getToken())
+                .setScope(String.join(" ", scopes)).buildJSONMessage();
+    }
+    
+    private OAuthResponse createsAccessTokenResponse (Set<String> scopes,
+            Set<AccessScope> accessScopes, String clientId, String userId,
+            ZonedDateTime authenticationTime)
+            throws OAuthSystemException, KustvaktException {
+
+        String accessToken = randomGenerator.createRandomCode();
+        tokenDao.storeAccessToken(accessToken, null, accessScopes,
+                userId, clientId, authenticationTime);
+
+        return OAuthASResponse.tokenResponse(Status.OK.getStatusCode())
+                .setAccessToken(accessToken)
+                .setTokenType(TokenType.BEARER.toString())
+                .setExpiresIn(String.valueOf(config.getAccessTokenLongExpiry()))
                 .setScope(String.join(" ", scopes)).buildJSONMessage();
     }
 
@@ -389,8 +414,7 @@ public class OltuTokenService extends OAuth2TokenService {
     private boolean revokeAccessToken (String token) throws KustvaktException {
         try {
             AccessToken accessToken = tokenDao.retrieveAccessToken(token);
-            accessToken.setRevoked(true);
-            tokenDao.updateAccessToken(accessToken);
+            revokeAccessToken(accessToken);
             return true;
         }
         catch (KustvaktException e) {
@@ -398,6 +422,14 @@ public class OltuTokenService extends OAuth2TokenService {
                 return false;
             }
             throw e;
+        }
+    }
+    
+    private void revokeAccessToken (AccessToken accessToken)
+            throws KustvaktException {
+        if (accessToken != null){
+            accessToken.setRevoked(true);
+            tokenDao.updateAccessToken(accessToken);
         }
     }
 
@@ -410,11 +442,10 @@ public class OltuTokenService extends OAuth2TokenService {
             return false;
         }
 
-        revokeRefreshToken(refreshToken);
-        return true;
+        return revokeRefreshToken(refreshToken);
     }
 
-    private void revokeRefreshToken (RefreshToken refreshToken)
+    private boolean revokeRefreshToken (RefreshToken refreshToken)
             throws KustvaktException {
         if (refreshToken != null){
             refreshToken.setRevoked(true);
@@ -425,7 +456,9 @@ public class OltuTokenService extends OAuth2TokenService {
                 accessToken.setRevoked(true);
                 tokenDao.updateAccessToken(accessToken);
             }
+            return true;
         }
+        return false;
     }
 
     public void revokeAllClientTokensViaSuperClient (String username,
@@ -442,11 +475,18 @@ public class OltuTokenService extends OAuth2TokenService {
         }
 
         String clientId = revokeTokenRequest.getClientId();
-        List<RefreshToken> refreshTokens =
-                refreshDao.retrieveRefreshTokenByClientId(clientId);
-
-        for (RefreshToken r : refreshTokens) {
-            if (r.getUserId().equals(username)){
+        OAuth2Client client = clientService.retrieveClient(clientId);
+        if (clientService.isPublicClient(client)) {
+            List<AccessToken> accessTokens =
+                    tokenDao.retrieveAccessTokenByClientId(clientId, username);
+            for (AccessToken t : accessTokens) {
+                revokeAccessToken(t);
+            }
+        }
+        else {
+            List<RefreshToken> refreshTokens = refreshDao
+                    .retrieveRefreshTokenByClientId(clientId, username);
+            for (RefreshToken r : refreshTokens) {
                 revokeRefreshToken(r);
             }
         }
@@ -466,7 +506,10 @@ public class OltuTokenService extends OAuth2TokenService {
         
         String token = revokeTokenRequest.getToken();
         RefreshToken refreshToken = refreshDao.retrieveRefreshToken(token, username);
-        revokeRefreshToken(refreshToken);
+        if (!revokeRefreshToken(refreshToken)){
+            AccessToken accessToken = tokenDao.retrieveAccessToken(token, username);
+            revokeAccessToken(accessToken);
+        }
     }
     
     public List<OAuth2RefreshTokenDto> listUserRefreshToken (String username, String clientId,
