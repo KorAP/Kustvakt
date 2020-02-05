@@ -124,17 +124,14 @@ public class OAuthClientController {
      */
     @DELETE
     @Path("deregister/{client_id}")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deregisterClient (
             @Context SecurityContext securityContext,
-            @PathParam("client_id") String clientId,
-            @FormParam("client_secret") String clientSecret) {
+            @PathParam("client_id") String clientId) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.DEREGISTER_CLIENT);
-            clientService.deregisterClient(clientId, clientSecret,
-                    context.getUsername());
+            clientService.deregisterClient(clientId, context.getUsername());
             return Response.ok().build();
         }
         catch (KustvaktException e) {
@@ -158,14 +155,12 @@ public class OAuthClientController {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public OAuth2ClientDto resetClientSecret (
             @Context SecurityContext securityContext,
-            @FormParam("client_id") String clientId,
-            @FormParam("client_secret") String clientSecret) {
+            @FormParam("client_id") String clientId) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.RESET_CLIENT_SECRET);
-            return clientService.resetSecret(clientId, clientSecret,
-                    context.getUsername());
+            return clientService.resetSecret(clientId, context.getUsername());
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);

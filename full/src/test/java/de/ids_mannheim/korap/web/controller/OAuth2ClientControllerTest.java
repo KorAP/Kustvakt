@@ -136,13 +136,11 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertNotNull(clientSecret);
 
         testRegisterClientNonUniqueURL();
+        testResetConfidentialClientSecret(clientId, clientSecret);
 
-        String newclientSecret =
-                testResetConfidentialClientSecret(clientId, clientSecret);
-
-        testDeregisterConfidentialClientMissingSecret(clientId);
-        testDeregisterClientIncorrectCredentials(clientId, clientSecret);
-        testDeregisterConfidentialClient(clientId, newclientSecret);
+//        testDeregisterConfidentialClientMissingSecret(clientId);
+//        testDeregisterClientIncorrectCredentials(clientId, clientSecret);
+        testDeregisterConfidentialClient(clientId);
     }
 
     private void testRegisterClientNonUniqueURL () throws KustvaktException {
@@ -291,24 +289,20 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
-    private void testDeregisterConfidentialClient (String clientId,
-            String clientSecret) throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
-
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("client_secret", clientSecret);
+    private void testDeregisterConfidentialClient (String clientId)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("client").path("deregister").path(clientId)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).delete(ClientResponse.class);
+                .delete(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
+    @Deprecated
     private void testDeregisterConfidentialClientMissingSecret (String clientId)
             throws KustvaktException {
 
@@ -329,6 +323,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 node.at("/error_description").asText());
     }
 
+    @Deprecated
     private void testDeregisterClientIncorrectCredentials (String clientId,
             String clientSecret) throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
@@ -424,7 +419,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         testAccessTokenAfterUpgradingClient(clientId, accessToken);
         testAccessTokenAfterDegradingSuperClient(clientId, accessToken);
 
-        testDeregisterConfidentialClient(clientId, clientSecret);
+        testDeregisterConfidentialClient(clientId);
     }
 
     // old access tokens retain their scopes

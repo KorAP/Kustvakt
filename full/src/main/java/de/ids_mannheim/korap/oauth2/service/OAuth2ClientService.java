@@ -184,14 +184,11 @@ public class OAuth2ClientService {
         return true;
     }
 
-    public void deregisterClient (String clientId, String clientSecret,
-            String username) throws KustvaktException {
+    public void deregisterClient (String clientId, String username)
+            throws KustvaktException {
 
         OAuth2Client client = clientDao.retrieveClientById(clientId);
-        if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
-            authenticateClient(clientId, clientSecret);
-        }
-
+        
         if (adminDao.isAdmin(username)
                 || client.getRegisteredBy().equals(username)) {
 
@@ -231,10 +228,10 @@ public class OAuth2ClientService {
         }
     }
 
-    public OAuth2ClientDto resetSecret (String clientId, String clientSecret,
-            String username) throws KustvaktException {
+    public OAuth2ClientDto resetSecret (String clientId, String username)
+            throws KustvaktException {
 
-        OAuth2Client client = authenticateClient(clientId, clientSecret);
+        OAuth2Client client = clientDao.retrieveClientById(clientId);
         if (!client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
             throw new KustvaktException(StatusCodes.NOT_ALLOWED,
                     "Operation is not allowed for public clients",

@@ -6,7 +6,9 @@
 05/02/2020
    - Added a config properties for a long-time access token expiry 
      and excluded refresh tokens for public clients in OAuth2 token 
-     responses (margaretha) 
+     responses (margaretha)
+   - Removed client authentication from the client deregistration and 
+     client-secret reset APIs (margaretha)   
    
 # version 0.62.3
 03/12/2019

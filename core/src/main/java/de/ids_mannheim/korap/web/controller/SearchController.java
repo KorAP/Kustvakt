@@ -65,6 +65,13 @@ public class SearchController {
     @Autowired
     private OAuth2ScopeService scopeService;
     
+    
+    @GET
+    @Path("{version}")
+    public Response index (){
+        return Response.ok("Welcome to KorAP API!").build();
+    }
+    
     @POST
     @Path("{version}/index/close")
     public Response closeIndexReader (@FormParam("token") String token){
