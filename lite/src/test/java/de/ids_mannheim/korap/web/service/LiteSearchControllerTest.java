@@ -25,6 +25,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.LiteJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -36,7 +37,9 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
 
     @Autowired
     private SearchKrill searchKrill;
-    
+    @Autowired
+    private KustvaktConfiguration config;
+
 //  EM: The API is disabled
     @Ignore   
     @Test
@@ -79,6 +82,16 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         String matches = response.getEntity(String.class);
         JsonNode match_node = JsonUtils.readTree(matches);
         assertNotEquals(0, match_node.path("matches").size());
+    }
+
+    @Test
+    public void testApiWelcomeMessage () {
+        ClientResponse response = resource().path(API_VERSION).path("")
+                .get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String message = response.getEntity(String.class);
+        assertEquals(message, config.getApiWelcomeMessage());
     }
 
     @Test
