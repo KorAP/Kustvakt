@@ -28,6 +28,7 @@ import org.springframework.stereotype.Controller;
 
 import com.sun.jersey.spi.container.ResourceFilters;
 
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
@@ -64,12 +65,13 @@ public class SearchController {
     private SearchService searchService;
     @Autowired
     private OAuth2ScopeService scopeService;
-    
+    @Autowired
+    private KustvaktConfiguration config;
     
     @GET
     @Path("{version}")
     public Response index (){
-        return Response.ok("Welcome to KorAP API!").build();
+        return Response.ok(config.getApiWelcomeMessage()).build();
     }
     
     @POST
