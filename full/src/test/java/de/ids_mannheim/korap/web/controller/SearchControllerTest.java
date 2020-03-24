@@ -66,6 +66,16 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals("[\"author\",\"title\"]",
                 node.at("/meta/fields").toString());
     }
+
+    @Test
+    public void testWelcome () throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("/")
+            .get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                     response.getStatus());
+        String welcome = response.getEntity(String.class);
+        assertEquals("Welcome to KorAP API!", welcome);
+    }
     
     @Test
     public void testSearchQueryPublicCorpora () throws KustvaktException {

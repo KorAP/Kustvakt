@@ -82,6 +82,16 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     }
 
     @Test
+    public void testWelcome () throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("/")
+            .get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                     response.getStatus());
+        String welcome = response.getEntity(String.class);
+        assertEquals("Welcome to KorAP API!", welcome);
+    }
+
+    @Test
     public void testQueryGet () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
