@@ -79,6 +79,7 @@ public class KustvaktConfiguration {
     private String default_orthography;
     private String default_dep;
     private String default_const;
+    private String apiWelcomeMessage;
     private String defaultStructureFoundry;
     private ArrayList<String> foundries;
     private ArrayList<String> layers;
@@ -135,7 +136,8 @@ public class KustvaktConfiguration {
      */
     protected void load (Properties properties) throws Exception {
         loadBasicProperties(properties);
-        
+
+        apiWelcomeMessage = properties.getProperty("api.welcome.message", "Welcome to KorAP API!");
         currentVersion = properties.getProperty("current.api.version", "v1.0");
         String supportedVersions =
                 properties.getProperty("supported.api.version", "");

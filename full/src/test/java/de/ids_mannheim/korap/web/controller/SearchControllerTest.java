@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import javax.ws.rs.core.MediaType;
 
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -22,6 +23,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author hanl, margaretha
@@ -29,6 +31,9 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  *
  */
 public class SearchControllerTest extends SpringJerseyTest {
+
+    @Autowired
+    private KustvaktConfiguration config;
 
     private JsonNode requestSearchWithFields(String fields) throws KustvaktException{
         ClientResponse response = resource().path(API_VERSION).path("search")
@@ -50,7 +55,17 @@ public class SearchControllerTest extends SpringJerseyTest {
         s.setQuery("Wasser", "poliqarp");
         return s.toJSON();
     }
-    
+
+    @Test
+    public void testApiWelcomeMessage () {
+        ClientResponse response = resource().path(API_VERSION).path("")
+                .get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String message = response.getEntity(String.class);
+        assertEquals(message, config.getApiWelcomeMessage());
+    }
+
     @Test
     public void testSearchWithField () throws KustvaktException {
         JsonNode node = requestSearchWithFields("author");
