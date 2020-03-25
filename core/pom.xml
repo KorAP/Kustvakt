@@ -51,10 +51,10 @@
 					<compilerVersion>${java.version}</compilerVersion>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
-					<processors>
+					<annotationProcessors>
 						<processor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</processor>
 						<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
-					</processors>
+					</annotationProcessors>
 				</configuration>
 			</plugin>
 

@@ -172,10 +172,10 @@
 					<!-- <compilerArguments> <processor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</processor> 
 						<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor> 
 						</compilerArguments> -->
-					<processors>
+					<annotationProcessors>
 						<processor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor</processor>
 						<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
-					</processors>
+					</annotationProcessors>
 				</configuration>
 			</plugin>
 			<plugin>
