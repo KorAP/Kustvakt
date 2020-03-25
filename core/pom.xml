@@ -32,7 +32,7 @@
 			<plugin>
 				<groupId>com.googlecode.maven-java-formatter-plugin</groupId>
 				<artifactId>maven-java-formatter-plugin</artifactId>
-				<version>${project.version}</version>
+				<version>0.4</version>
 				<configuration>
 					<configFile>${project.basedir}/Format.xml</configFile>
 					<overrideConfigCompilerVersion>true</overrideConfigCompilerVersion>
