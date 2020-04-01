@@ -238,7 +238,7 @@ public class SearchController {
             @QueryParam("hls") Boolean highlights) throws KustvaktException {
 
         return retrieveMatchInfo(ctx, headers, locale, corpusId, docId, textId,
-                matchId, foundries, layers, spans, highlights);
+                                 matchId, foundries, layers, spans, "sentence", highlights);
     }
     
     @GET
@@ -253,8 +253,14 @@ public class SearchController {
             @QueryParam("foundry") Set<String> foundries,
             @QueryParam("layer") Set<String> layers,
             @QueryParam("spans") Boolean spans, 
+            @QueryParam("expand") String expansion, 
             // Highlights may also be a list of valid highlight classes
             @QueryParam("hls") Boolean highlights) throws KustvaktException {
+
+        Boolean expandToSentence = true;
+        if (expansion != null && (expansion.equals("false") || expansion.equals("null"))) {
+            expandToSentence = false;
+        }
 
         TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
         scopeService.verifyScope(tokenContext, OAuth2Scope.MATCH_INFO);
@@ -265,7 +271,7 @@ public class SearchController {
         try{
             String results = searchService.retrieveMatchInfo(corpusId, docId,
                     textId, matchId, foundries, tokenContext.getUsername(),
-                    headers, layers, spans, highlights);
+                    headers, layers, spans, expandToSentence, highlights);
             return Response.ok(results).build();
         }
         catch (KustvaktException e) {

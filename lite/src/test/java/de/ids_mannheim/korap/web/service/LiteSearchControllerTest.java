@@ -223,6 +223,27 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     };
 
     @Test
+    public void testMatchInfoWithoutExtension () throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION)
+                .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42")
+                .queryParam("foundry", "-").queryParam("spans", "false")
+                .queryParam("expand","false")
+                .get(ClientResponse.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        String ent = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+        assertNotNull(node);
+        assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
+        assertEquals("match-GOE/AGA/01784-p36-46(5)37-45(2)38-42",
+                node.at("/matchID").asText());
+        assertEquals("<span class=\"context-left\"><span class=\"more\"></span></span><span class=\"match\"><mark>gefüttert; der Ort ist sehr zerschossen; dann über die Schiffbrücke</mark></span><span class=\"context-right\"><span class=\"more\"></span></span>",
+                node.at("/snippet").asText());
+        assertEquals("Belagerung von Mainz", node.at("/title").asText());
+    };
+
+    
+    @Test
     public void testMatchInfoGetWithHighlights () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
                 .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42/matchInfo")

@@ -5,6 +5,8 @@
    - Removed salt from config and updated config files.
 05/02/2020
    - Added welcome page.
+01/04/2020
+   - Support expand query parameter for match retrieval (diewald)
 11/05/2020
    - Added tool to create VC from list (diewald)
 29/05/2020

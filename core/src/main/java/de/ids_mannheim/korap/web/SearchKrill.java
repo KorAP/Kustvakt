@@ -33,10 +33,6 @@ public class SearchKrill {
 
     private static final boolean DEBUG = false;
 
-    // Temporary - shouldn't be here.
-    String indexDir = "/data/prep_corpus/index/";
-    String i = "/Users/hanl/Projects/prep_corpus";
-    String klinux10 = "/vol/work/hanl/indices";
     public static KrillIndex index;
 
     /**

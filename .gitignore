@@ -8,7 +8,7 @@ cache_store
 *.iml
 dependency-reduced-pom.xml
 admin_token
-/sandbox/
+/sandbox
 /bin/
 /db.sqlite
 /lite/liteDB.sqlite
