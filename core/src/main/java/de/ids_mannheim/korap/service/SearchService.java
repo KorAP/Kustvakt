@@ -360,13 +360,14 @@ public class SearchService extends BasicService{
     public String retrieveMatchInfo (String corpusId, String docId,
             String textId, String matchId, Set<String> foundries,
             String username, HttpHeaders headers, Set<String> layers,
-            boolean spans, boolean highlights) throws KustvaktException {
+            boolean spans, boolean sentenceExpansion,
+            boolean highlights) throws KustvaktException {
         String matchid =
                 searchKrill.getMatchId(corpusId, docId, textId, matchId);
 
         User user = createUser(username, headers);
         Pattern p = determineAvailabilityPattern(user);
-        
+
         boolean match_only = foundries == null || foundries.isEmpty();
         String results;
 //        try {
@@ -387,7 +388,7 @@ public class SearchService extends BasicService{
                 }
 
                 results = searchKrill.getMatch(matchid, foundryList, layerList,
-                        spans, highlights, true, p);
+                        spans, highlights, sentenceExpansion, p);
             }
             else {
                 results = searchKrill.getMatch(matchid, p);

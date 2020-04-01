@@ -2,7 +2,9 @@
 24/01/2020
    - Removed salt from config and updated config files.
 05/02/2020
-   - Added welcome page.   
+   - Added welcome page.
+01/04/2020
+   - Support expand query parameter for match retrieval (diewald)
 
 # version 0.62.3
 03/12/2019
