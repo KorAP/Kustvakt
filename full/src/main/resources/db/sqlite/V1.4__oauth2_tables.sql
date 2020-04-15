@@ -10,11 +10,11 @@ CREATE TABLE IF NOT EXISTS oauth2_client (
 	redirect_uri TEXT DEFAULT NULL,
 	description VARCHAR(255) NOT NULL,
 	registered_by VARCHAR(100) NOT NULL,
-	url_hashcode INTEGER,	
+	--url_hashcode INTEGER,	
 	url TEXT DEFAULT NULL
 );
 
-CREATE UNIQUE INDEX client_url_index on oauth2_client(url_hashcode);
+--CREATE UNIQUE INDEX client_url_index on oauth2_client(url_hashcode);
 
 CREATE TABLE IF NOT EXISTS oauth2_access_scope (
 	id VARCHAR(100) PRIMARY KEY NOT NULL

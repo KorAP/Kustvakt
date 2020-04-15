@@ -85,9 +85,7 @@ public class OAuth2ClientService {
         ParameterChecker.checkNameValue(clientJson.getName(), "clientName");
         
         String url = clientJson.getUrl();
-        int urlHashCode = 0;
         if (url != null && !url.isEmpty()) {
-            urlHashCode = clientJson.getUrl().hashCode();
             if (!urlValidator.isValid(url)) {
                 throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
                         url + " is invalid.", OAuth2Error.INVALID_REQUEST);
@@ -125,8 +123,8 @@ public class OAuth2ClientService {
         String id = codeGenerator.createRandomCode();
         try {
             clientDao.registerClient(id, secretHashcode, clientJson.getName(),
-                    clientJson.getType(), url, urlHashCode, redirectURI,
-                    registeredBy, clientJson.getDescription());
+                    clientJson.getType(), url, redirectURI, registeredBy,
+                    clientJson.getDescription());
         }
         catch (Exception e) {
             Throwable cause = e;
