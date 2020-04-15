@@ -44,9 +44,8 @@ public class OAuth2ClientDao {
     private EntityManager entityManager;
 
     public void registerClient (String id, String secretHashcode, String name,
-            OAuth2ClientType type, String url, int urlHashCode,
-            String redirectURI, String registeredBy, String description)
-            throws KustvaktException {
+            OAuth2ClientType type, String url, String redirectURI,
+            String registeredBy, String description) throws KustvaktException {
         ParameterChecker.checkStringValue(id, "client id");
         ParameterChecker.checkStringValue(name, "client name");
         ParameterChecker.checkObjectValue(type, "client type");
@@ -62,7 +61,6 @@ public class OAuth2ClientDao {
         client.setSecret(secretHashcode);
         client.setType(type);
         client.setUrl(url);
-        client.setUrlHashCode(urlHashCode);
         client.setRedirectURI(redirectURI);
         client.setRegisteredBy(registeredBy);
         client.setDescription(description);

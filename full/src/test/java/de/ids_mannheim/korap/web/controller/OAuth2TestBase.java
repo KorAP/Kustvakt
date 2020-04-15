@@ -79,7 +79,32 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
                 .fromUri(redirectUri).build().getQueryParams();
         return params.getFirst("code");
     }
+    
+    protected String requestAuthorizationCode (String clientId,
+            String clientSecret, String scope, String authHeader, 
+            String redirect_uri) throws KustvaktException {
 
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("response_type", "code");
+        form.add("client_id", clientId);
+        form.add("client_secret", clientSecret);
+        if (scope != null) {
+            form.add("scope", scope);
+        }
+        if (redirect_uri!=null){
+            form.add("redirect_uri", redirect_uri);
+        }
+
+        ClientResponse response = requestAuthorizationCode(form, authHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
+                response.getStatus());
+        URI redirectUri = response.getLocation();
+
+        MultiValueMap<String, String> params = UriComponentsBuilder
+                .fromUri(redirectUri).build().getQueryParams();
+        return params.getFirst("code");
+    }
+    
     protected ClientResponse requestToken (MultivaluedMap<String, String> form)
             throws KustvaktException {
         return resource().path(API_VERSION).path("oauth2").path("token")
@@ -99,6 +124,25 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         form.add("client_id", clientId);
         form.add("client_secret", clientSecret);
         form.add("code", code);
+
+        return resource().path(API_VERSION).path("oauth2").path("token")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
+    }
+    
+    protected ClientResponse requestTokenWithAuthorizationCodeAndForm (
+            String clientId, String clientSecret, String code,
+            String redirectUri) throws KustvaktException {
+
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("grant_type", "authorization_code");
+        form.add("client_id", clientId);
+        form.add("client_secret", clientSecret);
+        form.add("code", code);
+        if (redirectUri!=null){
+            form.add("redirect_uri", redirectUri);
+        }
 
         return resource().path(API_VERSION).path("oauth2").path("token")
                 .header(HttpHeaders.CONTENT_TYPE,
