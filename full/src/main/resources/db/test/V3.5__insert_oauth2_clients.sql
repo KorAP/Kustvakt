@@ -2,50 +2,50 @@
 
 -- plain secret value is "secret"
 INSERT INTO oauth2_client(id,name,secret,type,super,
-  redirect_uri,registered_by, description, url, url_hashcode) 
+  redirect_uri,registered_by, description, url) 
 VALUES ("fCBbQkAyYzI4NzUxMg","super confidential client",
   "$2a$08$vi1FbuN3p6GcI1tSxMAoeuIYL8Yw3j6A8wJthaN8ZboVnrQaTwLPq",
   "CONFIDENTIAL", 1, 
   "https://korap.ids-mannheim.de/confidential/redirect", "system",
   "This is a test super confidential client.", 
-  "http://korap.ids-mannheim.de/confidential", 2087150261);
+  "http://korap.ids-mannheim.de/confidential");
 
   
 -- plain secret value is "secret"
 INSERT INTO oauth2_client(id,name,secret,type,super,
-  redirect_uri,registered_by, description,url,url_hashcode) 
+  redirect_uri,registered_by, description,url) 
 VALUES ("9aHsGW6QflV13ixNpez","non super confidential client",
   "$2a$08$vi1FbuN3p6GcI1tSxMAoeuIYL8Yw3j6A8wJthaN8ZboVnrQaTwLPq",
   "CONFIDENTIAL", 0,
   "https://third.party.com/confidential/redirect", "system",
   "This is a test nonsuper confidential client.",
-  "http://third.party.com/confidential", 1712550103);
+  "http://third.party.com/confidential");
 
 INSERT INTO oauth2_client(id,name,secret,type,super,
-  redirect_uri,registered_by, description,url,url_hashcode) 
+  redirect_uri,registered_by, description,url) 
 VALUES ("52atrL0ajex_3_5imd9Mgw","confidential client 2",
   "$2a$08$vi1FbuN3p6GcI1tSxMAoeuIYL8Yw3j6A8wJthaN8ZboVnrQaTwLPq",
   "CONFIDENTIAL", 0,
   "https://example.client.de/redirect", "system",
   "This is a test nonsuper confidential client.",
-  "http://example.client.de", 1535365678);
+  "http://example.client.de");
 
 INSERT INTO oauth2_client(id,name,secret,type,super,
-  redirect_uri, registered_by, description, url,url_hashcode) 
+  redirect_uri, registered_by, description, url) 
 VALUES ("8bIDtZnH6NvRkW2Fq","third party client",null,
   "PUBLIC", 0,
   "https://third.party.client.com/redirect","system",
   "This is a test public client.",
-  "http://third.party.client.com", -2137275617);
+  "http://third.party.client.com");
 
   
 INSERT INTO oauth2_client(id,name,secret,type,super,
-  redirect_uri, registered_by, description,url,url_hashcode) 
+  redirect_uri, registered_by, description,url) 
 VALUES ("nW5qM63Rb2a7KdT9L","test public client",null,
   "PUBLIC", 0, 
   "https://korap.ids-mannheim.de/public/redirect","system", 
   "This is a test public client.",
-  "http://korap.ids-mannheim.de/public", 1360724310);
+  "http://korap.ids-mannheim.de/public");
   
 
 INSERT INTO oauth2_access_token(token,user_id,created_date, 

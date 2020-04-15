@@ -38,8 +38,6 @@ public class OAuth2Client implements Comparable<OAuth2Client>{
     private String description;
 
     private String url;
-    @Column(name = "url_hashcode")
-    private int urlHashCode;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "client")
     private List<RefreshToken> refreshTokens;
@@ -132,11 +130,4 @@ public class OAuth2Client implements Comparable<OAuth2Client>{
         this.url = url;
     }
 
-    public int getUrlHashCode () {
-        return urlHashCode;
-    }
-
-    public void setUrlHashCode (int urlHashCode) {
-        this.urlHashCode = urlHashCode;
-    }
 }

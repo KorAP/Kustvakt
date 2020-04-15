@@ -17,6 +17,8 @@
    - Updated methods dependent to Antrl4-maven-plugin libraries (margaretha)   
 05/02/2021
    - Add query reference web-service (diewald,margaretha)   
+10/02/2021
+   - Fixed problem with multiple desktop apps (diewald, margaretha)
 
 # version 0.62.4
 24/01/2020

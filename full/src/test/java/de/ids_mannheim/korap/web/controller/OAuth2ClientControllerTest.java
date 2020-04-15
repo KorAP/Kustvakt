@@ -135,7 +135,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertNotNull(clientId);
         assertNotNull(clientSecret);
 
-        testRegisterClientNonUniqueURL();
+//        testRegisterClientNonUniqueURL();
         testResetConfidentialClientSecret(clientId, clientSecret);
 
 //        testDeregisterConfidentialClientMissingSecret(clientId);
@@ -143,6 +143,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         testDeregisterConfidentialClient(clientId);
     }
 
+    @Deprecated
     private void testRegisterClientNonUniqueURL () throws KustvaktException {
         ClientResponse response = registerConfidentialClient();
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -188,9 +189,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertTrue(node.at("/client_secret").isMissingNode());
 
         testResetPublicClientSecret(clientId);
-        testAccessTokenAfterDeregistration(clientId, null);
+        testAccessTokenAfterDeregistration(clientId, null,null);
     }
-
+    
     @Test
     public void testRegisterDesktopApp () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
@@ -212,27 +213,73 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         testDeregisterPublicClientMissingId();
         testDeregisterPublicClient(clientId,username);
     }
+
+    @Test
+    public void testRegisterMultipleDesktopApps () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+
+        // First client
+        OAuth2ClientJson json = new OAuth2ClientJson();
+        json.setName("OAuth2DesktopClient1");
+        json.setType(OAuth2ClientType.PUBLIC);
+        json.setDescription("This is a desktop test client.");
+
+        ClientResponse response = registerClient(username, json);
+
+        String entity = response.getEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        JsonNode node = JsonUtils.readTree(entity);
+        String clientId1 = node.at("/client_id").asText();
+        assertNotNull(clientId1);
+        assertTrue(node.at("/client_secret").isMissingNode());
+
+        // Second client
+        json = new OAuth2ClientJson();
+        json.setName("OAuth2DesktopClient2");
+        json.setType(OAuth2ClientType.PUBLIC);
+        json.setDescription("This is another desktop test client.");
+
+        response = registerClient(username, json);
+
+        entity = response.getEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        node = JsonUtils.readTree(entity);
+        String clientId2 = node.at("/client_id").asText();
+        assertNotNull(clientId2);
+        assertTrue(node.at("/client_secret").isMissingNode());
+
+        testResetPublicClientSecret(clientId1);
+        testAccessTokenAfterDeregistration(clientId1, null,
+                "https://OAuth2DesktopClient1.com");
+        testResetPublicClientSecret(clientId2);
+        testAccessTokenAfterDeregistration(clientId2, null,
+                "https://OAuth2DesktopClient2.com");
+    }
+    
+    
+    
     
     private void testAccessTokenAfterDeregistration (String clientId,
-            String clientSecret) throws KustvaktException {
+            String clientSecret, String redirectUri) throws KustvaktException {
         String userAuthHeader = HttpAuthorizationHandler
                 .createBasicAuthorizationHeaderValue("dory", "password");
 
-        String code =
-                requestAuthorizationCode(clientId, "", null, userAuthHeader);
+        String code = requestAuthorizationCode(clientId, "", null,
+                userAuthHeader, redirectUri);
         ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
-                clientId, clientSecret, code);
+                clientId, clientSecret, code, redirectUri);
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         String accessToken = node.at("/access_token").asText();
 
         response = searchWithAccessToken(accessToken);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        code = requestAuthorizationCode(clientId, "", null, userAuthHeader);
+        code = requestAuthorizationCode(clientId, "", null, userAuthHeader,
+                redirectUri);
         testDeregisterPublicClient(clientId, username);
 
         response = requestTokenWithAuthorizationCodeAndForm(clientId,
-                clientSecret, code);
+                clientSecret, code, redirectUri);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         node = JsonUtils.readTree(response.getEntity(String.class));
         assertEquals(OAuth2Error.INVALID_CLIENT.toString(),

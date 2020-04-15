@@ -10,11 +10,11 @@ CREATE TABLE IF NOT EXISTS oauth2_client (
 	redirect_uri TEXT DEFAULT NULL,
 	description VARCHAR(255) NOT NULL,
 	registered_by VARCHAR(100) NOT NULL,
-	url_hashcode INTEGER,	
+	--url_hashcode INTEGER,	
 	url TEXT DEFAULT NULL
 );
 
-CREATE UNIQUE INDEX client_url_index on oauth2_client(url_hashcode);
+--CREATE UNIQUE INDEX client_url_index on oauth2_client(url_hashcode);
 
 CREATE TABLE IF NOT EXISTS oauth2_access_scope (
 	id VARCHAR(100) PRIMARY KEY NOT NULL
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS oauth2_refresh_token (
 	   ON DELETE CASCADE
 );
 
-CREATE TABLE oauth2_refresh_token_scope (
+CREATE TABLE IF NOT EXISTS oauth2_refresh_token_scope (
 	token_id INTEGER NOT NULL, 
 	scope_id VARCHAR(100) NOT NULL, 
 	CONSTRAINT primary_key PRIMARY KEY (token_id, scope_id)
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS oauth2_access_token (
 	   REFERENCES oauth2_refresh_token(id)
 );
 
-CREATE TABLE oauth2_access_token_scope (
+CREATE TABLE IF NOT EXISTS oauth2_access_token_scope (
 	token_id INTEGER NOT NULL, 
 	scope_id VARCHAR(100) NOT NULL, 
 	CONSTRAINT primary_key PRIMARY KEY (token_id, scope_id)

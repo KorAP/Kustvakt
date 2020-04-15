@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS role (
   name VARCHAR(100) NOT NULL
 );
 
-CREATE UNIQUE INDEX role_index on role(name);
+CREATE UNIQUE INDEX IF NOT EXISTS role_index on role(name);
 
 CREATE TABLE IF NOT EXISTS privilege (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS privilege (
   	ON DELETE CASCADE
 );
 
-CREATE UNIQUE INDEX privilege_index on privilege(name, role_id);
+CREATE UNIQUE INDEX IF NOT EXISTS privilege_index on privilege(name, role_id);
 
 
 CREATE TABLE IF NOT EXISTS user_group (
@@ -26,8 +26,8 @@ CREATE TABLE IF NOT EXISTS user_group (
   deleted_by VARCHAR(100) DEFAULT NULL
 );
 
-CREATE INDEX user_group_index ON user_group(status);
-CREATE UNIQUE INDEX user_group_name on user_group(name);
+CREATE INDEX IF NOT EXISTS user_group_index ON user_group(status);
+CREATE UNIQUE INDEX IF NOT EXISTS user_group_name on user_group(name);
 
 
 CREATE TABLE IF NOT EXISTS user_group_member (
@@ -44,9 +44,9 @@ CREATE TABLE IF NOT EXISTS user_group_member (
   	ON DELETE CASCADE
 ); 
 
-CREATE UNIQUE INDEX  user_group_member_index 
+CREATE UNIQUE INDEX IF NOT EXISTS  user_group_member_index 
 	ON user_group_member(user_id,group_id);
-CREATE INDEX user_group_member_status_index 
+CREATE INDEX IF NOT EXISTS user_group_member_status_index 
 	ON user_group_member(status);
 
 CREATE TABLE IF NOT EXISTS group_member_role (
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS group_member_role (
   	ON DELETE CASCADE
 );
 
-CREATE UNIQUE INDEX group_member_role_index 
+CREATE UNIQUE INDEX IF NOT EXISTS group_member_role_index 
 	ON group_member_role(group_member_id,role_id);
 
 
@@ -79,9 +79,9 @@ CREATE TABLE IF NOT EXISTS virtual_corpus (
   is_cached BOOLEAN DEFAULT 0
 );
 
-CREATE INDEX virtual_corpus_owner_index ON virtual_corpus(created_by);
-CREATE INDEX virtual_corpus_type_index ON virtual_corpus(type);
-CREATE UNIQUE INDEX  virtual_corpus_unique_name 
+CREATE INDEX IF NOT EXISTS virtual_corpus_owner_index ON virtual_corpus(created_by);
+CREATE INDEX IF NOT EXISTS virtual_corpus_type_index ON virtual_corpus(type);
+CREATE UNIQUE INDEX IF NOT EXISTS  virtual_corpus_unique_name 
 	ON virtual_corpus(name,created_by);
 
 CREATE TABLE IF NOT EXISTS virtual_corpus_access (
@@ -100,8 +100,8 @@ CREATE TABLE IF NOT EXISTS virtual_corpus_access (
   	ON DELETE CASCADE
 );
 
-CREATE INDEX virtual_corpus_status_index 
+CREATE INDEX IF NOT EXISTS virtual_corpus_status_index 
 	ON virtual_corpus_access(status);
-CREATE UNIQUE INDEX virtual_corpus_access_unique_index 
+CREATE UNIQUE INDEX IF NOT EXISTS virtual_corpus_access_unique_index 
 	ON virtual_corpus_access(virtual_corpus_id,user_group_id);
 
