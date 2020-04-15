@@ -190,7 +190,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         testResetPublicClientSecret(clientId);
         testAccessTokenAfterDeregistration(clientId, null);
     }
-
+    
     @Test
     public void testRegisterDesktopApp () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
@@ -212,6 +212,47 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         testDeregisterPublicClientMissingId();
         testDeregisterPublicClient(clientId,username);
     }
+
+    @Test
+    public void testRegisterMultipleDesktopApps () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+
+        // First client
+        OAuth2ClientJson json = new OAuth2ClientJson();
+        json.setName("OAuth2DesktopClient1");
+        json.setType(OAuth2ClientType.PUBLIC);
+        json.setDescription("This is a desktop test client.");
+
+        ClientResponse response = registerClient(username, json);
+
+        String entity = response.getEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        JsonNode node = JsonUtils.readTree(entity);
+        String clientId1 = node.at("/client_id").asText();
+        assertNotNull(clientId1);
+        assertTrue(node.at("/client_secret").isMissingNode());
+
+        // Second client
+        json = new OAuth2ClientJson();
+        json.setName("OAuth2DesktopClient2");
+        json.setType(OAuth2ClientType.PUBLIC);
+        json.setDescription("This is another desktop test client.");
+
+        response = registerClient(username, json);
+
+        entity = response.getEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        node = JsonUtils.readTree(entity);
+        String clientId2 = node.at("/client_id").asText();
+        assertNotNull(clientId2);
+        assertTrue(node.at("/client_secret").isMissingNode());
+
+        testResetPublicClientSecret(clientId1);
+        testAccessTokenAfterDeregistration(clientId1, null);
+        testResetPublicClientSecret(clientId2);
+        testAccessTokenAfterDeregistration(clientId2, null);
+    }
+    
     
     private void testAccessTokenAfterDeregistration (String clientId,
             String clientSecret) throws KustvaktException {
