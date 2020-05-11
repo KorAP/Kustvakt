@@ -2,7 +2,9 @@
 24/01/2020
    - Removed salt from config and updated config files.
 05/02/2020
-   - Added welcome page.   
+   - Added welcome page.
+11/05/2020
+   - Added tool to create VC from list (diewald)
 
 # version 0.62.3
 03/12/2019
