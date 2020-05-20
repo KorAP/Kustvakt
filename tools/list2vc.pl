@@ -1,23 +1,12 @@
 #!/usr/bin/env perl
-
-
-
-package main;
 use strict;
 use warnings;
 
+# 2020-05-20
+#   Preliminary support for C2 def-files.
+
+
 our @ARGV;
-
-sub shorten ($) {
-  my $line = shift;
-  if (length($line) < 20) {
-    return $line;
-  }
-  else {
-    return substr($line,0,17) . '...';
-  };
-};
-
 
 unless (@ARGV) {
   print <<'HELP';
@@ -30,6 +19,18 @@ text sigles into a virtual corpus query.
 HELP
 exit 0;
 };
+
+
+sub shorten ($) {
+  my $line = shift;
+  if (length($line) < 20) {
+    return $line;
+  }
+  else {
+    return substr($line,0,17) . '...';
+  };
+};
+
 
 my $fh;
 if ($ARGV[0] eq '-') {
@@ -58,23 +59,54 @@ while (!eof $fh) {
     next;
   };
 
+  my ($key, $value, $desc);
+
+  # Line-Type: <e>c</a>
+  if ($line =~ /^\s*<([^>]+)>\s*([^<]*)\s*<\/\1>\s*$/) {
+    $key = $1;
+    $value = $2 // undef;
+  }
+
+  # Line-Type: <e>c
+  elsif($line =~ /^\s*<([^>]+)>\s*([^<]+)\s*$/) {
+    $key = $1;
+    $value = $2;
+  }
+
   # Get text sigles
-  if ($line =~ m!^([^\/]+\/){2}[^\/]+$!) {
-    push @{$data{text}}, $line;
+  elsif ($line =~ m!^(?:[^\/\s]+\/){2}[^\/\s]+$!) {
+    $key = 'text';
+    $value = $line;
   }
 
   # Get doc sigles
-  elsif ($line =~ m!^[^\/]+\/[^\/]+$!) {
-    push @{$data{doc}}, $line;
+  elsif ($line =~ m!^([^\/\s]+\/[^\/\s]+?)(?:\s.+?)?$!) {
+    $key = 'doc';
+    $value = $1;
   }
 
   # Get corpus sigles
-  elsif ($line !~ m!\/!) {
-    push @{$data{corpus}}, $line;
+  elsif ($line !~ m!(?:\/|\s)!) {
+    $key = 'corpus';
+    $value = $line;
   }
 
+  # Not known
   else {
     warn shorten($line) . q! isn't a valid sigle!;
+    next;
+  };
+
+  if ($key eq 'text') {
+    push @{$data{text}}, $value;
+  }
+
+  elsif ($key eq 'doc') {
+    push @{$data{doc}}, $value;
+  }
+
+  elsif ($key eq 'corpus') {
+    push @{$data{corpus}}, $value;
   };
 };
 
