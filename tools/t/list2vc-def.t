@@ -33,4 +33,12 @@ is($op1->{'match'}, 'match:eq', 'match');
 is($op1->{'value'}->[0], "BRZ05/SEP", 'value');
 is($op1->{'value'}->[1], ,"BRZ05/OKT", 'value');
 is($op1->{'value'}->[-1], ,"BRZ08/FEB", 'value');
+
+my $op2 = $json->{'collection'}->{'operands'}->[1];
+is($op2->{'@type'}, 'koral:doc', 'type');
+is($op2->{'key'}, 'textSigle', 'key');
+is($op2->{'match'}, 'match:eq', 'match');
+is($op2->{'value'}->[0], "B19/AUG/01665", 'value');
+is($op2->{'value'}->[1], ,"B19/AUG/01666", 'value');
+
 done_testing;

@@ -98,6 +98,9 @@ while (!eof $fh) {
   };
 
   if ($key eq 'text') {
+
+    # Convert C2 sigle to KorAP form
+    $value =~ s!^([^/]+?/[^\.]+?)\.(.+?)$!$1\/$2!;
     push @{$data{text}}, $value;
   }
 
