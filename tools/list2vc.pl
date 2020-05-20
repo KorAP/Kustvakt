@@ -1,4 +1,8 @@
 #!/usr/bin/env perl
+
+
+
+package main;
 use strict;
 use warnings;
 
@@ -46,6 +50,13 @@ my %data = (
 while (!eof $fh) {
   my $line = readline($fh);
   chomp $line;
+
+
+  # Skip empty lines
+  if (!$line || length($line) == 0 || $line =~ /^[\s\t\n]*$/) {
+    # empty
+    next;
+  };
 
   # Get text sigles
   if ($line =~ m!^([^\/]+\/){2}[^\/]+$!) {
