@@ -50,6 +50,8 @@ $json = decode_json(join('', `$script $list2`));
 
 is($json->{'collection'}->{'@type'}, 'koral:docGroup', 'type');
 is($json->{'collection'}->{'operation'}, 'operation:or', 'operation');
+is($json->{'collection'}->{'comment'}, 'Name: "VAS-N91 (Stand \"2013\", korr. 2017)"', 'type');
+
 
 $op1 = $json->{'collection'}->{'operands'}->[0];
 is($op1->{'@type'}, 'koral:doc', 'type');

@@ -1,7 +1,55 @@
 #!/usr/bin/env perl
+package KorAP::VirtualCorpus;
+use strict;
+use warnings;
+
+# Get or set name of the VC
+sub name {
+  my $self = shift;
+  unless (@_) {
+    return $self->{name};
+  };
+  $self->{name} = shift;
+  return $self;
+};
+
+
+# Quote utility function
+sub quote {
+  shift;
+  my $str = shift;
+  $str =~ s/(["\\])/\\$1/g;
+  return qq{"$str"};
+};
+
+
+# Escaped quote utility function
+sub equote {
+  shift;
+  my $str = shift;
+  $str =~ s/(["\\])/\\$1/g;
+  $str =~ s/(["\\])/\\$1/g;
+  return '\\"' . $str . '\\"';
+};
+
+
+# Stringify globally
+sub to_string {
+  my $self = shift;
+  ## Create collection object
+  my $json = '{';
+  $json .= '"@context":"http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",';
+  $json .= '"collection":{';
+  $json .= $self->_to_fragment;
+  return $json .= '}}';
+};
+
+
 package KorAP::VirtualCorpus::Group;
 use strict;
 use warnings;
+use base 'KorAP::VirtualCorpus';
+
 
 # Construct a new VC group
 sub new {
@@ -21,19 +69,17 @@ sub add_field {
 };
 
 
-# Stringify
-sub to_string {
+# Stringify fragment
+sub _to_fragment {
   my $self = shift;
-  ## Create collection object
-  my $json = '{';
-  $json .= '"@context":"http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",';
-  $json .= '"collection":{';
+  my $json = '';
 
   unless (keys %{$self->{fields}}) {
     return $json . '}}';
   };
 
   $json .= '"@type":"koral:docGroup",';
+  $json .= '"comment":"Name: ' . $self->equote($self->name) .  '",' if $self->name;
   $json .= '"operation":"operation:' . $self->{op} . '",';
   $json .= '"operands":[';
 
@@ -54,8 +100,7 @@ sub to_string {
   # Remove the last comma
   chop $json;
 
-  $json .= ']}}';
-  return $json;
+  return $json . ']';
 };
 
 
@@ -203,6 +248,25 @@ while (!eof $fh) {
       warn 'Unknown extension value ' . $value;
     };
   }
+
+  # Set VC name
+  elsif ($key eq 'name') {
+    # "Name des virt. Korpus, der angezeigt wird.
+    # Wird auch intern zur Korpusbildung referenziert, z.B. für <and>,
+    # <add>, <sub>"
+
+    # No global name defined yet
+    unless ($$vc->name) {
+      $vc_ext->name($value);
+      $vc_int->name($value);
+      next;
+    };
+  }
+
+  # Unknown
+  else {
+    # warn $key . ' is an unknown field';
+  };
 };
 
 close($fh);
