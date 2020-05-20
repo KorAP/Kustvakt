@@ -1,10 +1,70 @@
 #!/usr/bin/env perl
+package KorAP::VirtualCorpus::Group;
+use strict;
+use warnings;
+
+# Construct a new VC group
+sub new {
+  my $class = shift;
+  bless {
+    op => shift,
+    fields => {}
+  }, $class;
+};
+
+
+# Add field information to group
+sub add_field {
+  my $self = shift;
+  my $field = shift;
+  push @{$self->{fields}->{$field}}, shift;
+};
+
+
+# Stringify
+sub to_string {
+  my $self = shift;
+  ## Create collection object
+  my $json = '{';
+  $json .= '"@context":"http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",';
+  $json .= '"collection":{';
+
+  unless (keys %{$self->{fields}}) {
+    return $json . '}}';
+  };
+
+  $json .= '"@type":"koral:docGroup",';
+  $json .= '"operation":"operation:' . $self->{op} . '",';
+  $json .= '"operands":[';
+
+  foreach my $field (sort keys %{$self->{fields}}) {
+    unless (@{$self->{fields}->{$field}}) {
+      next;
+    };
+    $json .= '{';
+    $json .= '"@type":"koral:doc",';
+    $json .= '"key":"' . $field . '",';
+    $json .= '"match":"match:eq",';
+    $json .= '"value":[';
+    $json .= join ',', map { '"' . $_ . '"' } @{$self->{fields}->{$field}};
+    $json .=  ']';
+    $json .= '},';
+  };
+
+  # Remove the last comma
+  chop $json;
+
+  $json .= ']}}';
+  return $json;
+};
+
+
+package main;
 use strict;
 use warnings;
 
 # 2020-05-20
 #   Preliminary support for C2 def-files.
-
 
 our @ARGV;
 
@@ -21,7 +81,7 @@ exit 0;
 };
 
 
-sub shorten ($) {
+sub _shorten ($) {
   my $line = shift;
   if (length($line) < 20) {
     return $line;
@@ -41,11 +101,9 @@ if ($ARGV[0] eq '-') {
 };
 
 
-my %data = (
-  corpus => [],
-  doc => [],
-  text => []
-);
+# Initial VC group
+my $vc = KorAP::VirtualCorpus::Group->new('or');
+
 
 # Iterate over the whole list
 while (!eof $fh) {
@@ -93,62 +151,30 @@ while (!eof $fh) {
 
   # Not known
   else {
-    warn shorten($line) . q! isn't a valid sigle!;
+    warn _shorten($line) . q! isn't a valid VC definition!;
     next;
   };
 
+  # Add text field
   if ($key eq 'text') {
 
     # Convert C2 sigle to KorAP form
     $value =~ s!^([^/]+?/[^\.]+?)\.(.+?)$!$1\/$2!;
-    push @{$data{text}}, $value;
+    $vc->add_field(textSigle => $value);
   }
 
+  # Add doc field
   elsif ($key eq 'doc') {
-    push @{$data{doc}}, $value;
+    $vc->add_field(docSigle => $value);
   }
 
+  # Add corpus field
   elsif ($key eq 'corpus') {
-    push @{$data{corpus}}, $value;
+    $vc->add_field(corpusSigle => $value);
   };
 };
-
-# Create collection object
-my $json = '{';
-$json .= '"@context":"http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",';
-$json .= '"collection":{';
-
-unless (@{$data{corpus}} || @{$data{doc}} || @{$data{text}}) {
-  $json .= '}}';
-  close($fh);
-  print $json;
-  exit(0);
-};
-
-$json .= '"@type":"koral:docGroup",';
-$json .= '"operation":"operation:or",';
-$json .= '"operands":[';
-
-foreach my $type (qw/corpus doc text/) {
-  unless (@{$data{$type}}) {
-    next;
-  };
-  $json .= '{';
-  $json .= '"@type":"koral:doc",';
-  $json .= '"key":"' . $type . 'Sigle",';
-  $json .= '"match":"match:eq",';
-  $json .= '"value":[';
-  $json .= join ',', map { '"' . $_ . '"' } @{$data{$type}};
-  $json .=  ']';
-  $json .= '},';
-};
-
-# Remove the last comma
-chop $json;
-
-$json .= ']}}';
 
 close($fh);
 
-print $json;
-
+# Stringify virtual corpus
+print $vc->to_string;
