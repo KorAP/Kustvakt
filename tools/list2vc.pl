@@ -101,9 +101,14 @@ if ($ARGV[0] eq '-') {
 };
 
 
-# Initial VC group
-my $vc = KorAP::VirtualCorpus::Group->new('or');
+# Create an intensional and an extensional VC
+my $vc_ext = KorAP::VirtualCorpus::Group->new('or');
+my $vc_int = KorAP::VirtualCorpus::Group->new('or');
 
+# Initial VC group
+my $vc = \$vc_ext;
+
+my $frozen = 0;
 
 # Iterate over the whole list
 while (!eof $fh) {
@@ -132,13 +137,13 @@ while (!eof $fh) {
   }
 
   # Get text sigles
-  elsif ($line =~ m!^(?:[^\/\s]+\/){2}[^\/\s]+$!) {
+  elsif ($line =~ m!^(?:\w+\/){2}\w+$!) {
     $key = 'text';
     $value = $line;
   }
 
   # Get doc sigles
-  elsif ($line =~ m!^([^\/\s]+\/[^\/\s]+?)(?:\s.+?)?$!) {
+  elsif ($line =~ m!^(\w+\/\w+?)(?:\s.+?)?$!) {
     $key = 'doc';
     $value = $1;
   }
@@ -160,21 +165,47 @@ while (!eof $fh) {
 
     # Convert C2 sigle to KorAP form
     $value =~ s!^([^/]+?/[^\.]+?)\.(.+?)$!$1\/$2!;
-    $vc->add_field(textSigle => $value);
+    ${$vc}->add_field(textSigle => $value);
   }
 
   # Add doc field
   elsif ($key eq 'doc') {
-    $vc->add_field(docSigle => $value);
+    ${$vc}->add_field(docSigle => $value);
   }
 
   # Add corpus field
   elsif ($key eq 'corpus') {
-    $vc->add_field(corpusSigle => $value);
-  };
+    ${$vc}->add_field(corpusSigle => $value);
+  }
+
+  # Mark the vc as frozen
+  # This means that an extended VC area is expected
+  elsif ($key eq 'frozen') {
+    $frozen = 1;
+  }
+
+  # Start/End intended VC area
+  elsif ($key eq 'intended') {
+    if ($value eq 'start') {
+      $$vc = $vc_int;
+    }
+    elsif ($value ne 'end') {
+      warn 'Unknown intension value ' . $value;
+    };
+  }
+
+  # Start/End extended VC area
+  elsif ($key eq 'extended') {
+    if ($value eq 'start') {
+      $$vc = $vc_ext;
+    }
+    elsif ($value ne 'end') {
+      warn 'Unknown extension value ' . $value;
+    };
+  }
 };
 
 close($fh);
 
-# Stringify virtual corpus
-print $vc->to_string;
+# Stringify current (extended) virtual corpus
+print $$vc->to_string;

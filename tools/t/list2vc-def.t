@@ -41,4 +41,21 @@ is($op2->{'match'}, 'match:eq', 'match');
 is($op2->{'value'}->[0], "B19/AUG/01665", 'value');
 is($op2->{'value'}->[1], ,"B19/AUG/01666", 'value');
 
+
+my $list2 = catfile(dirname(__FILE__), 'data', 'list3.def');
+
+# Check JSON
+# Only return extended area
+$json = decode_json(join('', `$script $list2`));
+
+is($json->{'collection'}->{'@type'}, 'koral:docGroup', 'type');
+is($json->{'collection'}->{'operation'}, 'operation:or', 'operation');
+
+$op1 = $json->{'collection'}->{'operands'}->[0];
+is($op1->{'@type'}, 'koral:doc', 'type');
+is($op1->{'key'}, 'textSigle', 'key');
+is($op1->{'match'}, 'match:eq', 'match');
+is($op1->{'value'}->[0], "A00/APR/23232", 'value');
+is($op1->{'value'}->[1], ,"A00/APR/23233", 'value');
+
 done_testing;
