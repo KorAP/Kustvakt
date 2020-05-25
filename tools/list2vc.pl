@@ -3,6 +3,7 @@ package KorAP::VirtualCorpus;
 use strict;
 use warnings;
 
+
 # Get or set name of the VC
 sub name {
   my $self = shift;
@@ -10,6 +11,19 @@ sub name {
     return $self->{name};
   };
   $self->{name} = shift;
+  return $self;
+};
+
+
+# Comment
+sub comment {
+  my $self = shift;
+  unless (@_) {
+    return $self->{comment};
+  };
+  $self->{comment} //= [];
+
+  push @{$self->{comment}}, shift;
   return $self;
 };
 
@@ -33,15 +47,44 @@ sub equote {
 };
 
 
+sub _commentparam_to_string {
+  my $self = shift;
+  my $comment = $self->_comment_to_string;
+  if ($comment) {
+    return qq!,"comment":"$comment"!;
+  };
+  return '';
+};
+
+
+sub _comment_to_string {
+  my $self = shift;
+  if (!$self->name && !$self->comment) {
+    return '';
+  };
+
+  my $json = '';
+  $json .= 'name:' . $self->equote($self->name) if $self->name;
+  if ($self->name && $self->comment) {
+    $json .= ','
+  };
+  $json .= join(',', @{$self->{comment}}) if $self->{comment};
+
+  return $json;
+};
+
+
 # Stringify globally
 sub to_string {
   my $self = shift;
   ## Create collection object
+
   my $json = '{';
   $json .= '"@context":"http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",';
-  $json .= '"comment":"Name: ' . $self->equote($self->name) .  '",' if $self->name;
   $json .= '"collection":';
   $json .= $self->_to_fragment;
+  # Set at the end, when all comments are done
+  $json .= $self->_commentparam_to_string;
   return $json .= '}';
 };
 
@@ -62,6 +105,7 @@ sub new {
     without_fields => {},
   }, $class;
 };
+
 
 # Define an operand to be "or"ed
 sub with {
@@ -91,6 +135,19 @@ sub without_field {
   push @{$self->{without_fields}->{$field}}, shift;
 };
 
+
+# VC contains only with fields
+sub only_with_fields {
+  my $self = shift;
+
+  if (keys %{$self->{without_fields}} || @{$self->{with}} || @{$self->{without}}) {
+    return 0;
+  };
+
+  return 1;
+};
+
+
 # Create a document vector field
 sub _doc_vec {
   my $field = shift;
@@ -113,7 +170,6 @@ sub _to_fragment {
 
   my $json = '{';
   $json .= '"@type":"koral:docGroup",';
-  $json .= '"comment":"Name: ' . $self->equote($self->name) .  '",' if $self->name;
 
   # Make the outer group "and"
   if (keys %{$self->{without_fields}}) {
@@ -136,19 +192,34 @@ sub _to_fragment {
   elsif (keys %{$self->{with_fields}} || @{$self->{with}}) {
     $json .= '"operation":"operation:or",';
 
-    # TODO:
-    #   Flatten embedded or-VCs!
     $json .= '"operands":[';
+
+    # Flatten embedded "or"-VCs
+    foreach my $op (@{$self->{with}}) {
+
+      # The embedded VC has only extending fields
+      if ($op->only_with_fields) {
+
+        $self->comment('embed:[' . $op->_comment_to_string . ']');
+
+        foreach my $k (keys %{$op->{with_fields}}) {
+          foreach my $v (@{$op->{with_fields}->{$k}}) {
+            $self->with_field($k, $v);
+          };
+        };
+      }
+
+      # Embed complex VC
+      else {
+        $json .= $op->_to_fragment . ',';
+      };
+    };
 
     foreach my $field (sort keys %{$self->{with_fields}}) {
       unless (@{$self->{with_fields}->{$field}}) {
         next;
       };
       $json .= _doc_vec($field, $self->{with_fields}->{$field});
-    };
-
-    foreach my $op (@{$self->{with}}) {
-      $json .= $op->_to_fragment . ',';
     };
 
     # Remove the last comma
@@ -163,6 +234,8 @@ sub _to_fragment {
     chop $json;
   };
 
+  # Set at the end, when all comments are done
+  $json .= $self->_commentparam_to_string;
   return $json . '}';
 };
 
@@ -209,13 +282,15 @@ if ($ARGV[0] eq '-') {
   exit(0);
 };
 
+# Initial VC group
+my $vc;
 
 # Create an intensional and an extensional VC
 my $vc_ext = KorAP::VirtualCorpus::Group->new;
 my $vc_int = KorAP::VirtualCorpus::Group->new;
 
-# Initial VC group
-my $vc = \$vc_ext;
+# Load ext initially
+$$vc = $vc_ext;
 
 # Collect all virtual corpora
 my %all_vcs;
@@ -356,6 +431,13 @@ while (!eof $fh) {
     };
 
     $$vc->with($all_vcs{$value});
+  }
+
+  # Add reduction value as a comment
+  elsif ($key eq 'redabs') {
+    # "red. Anz. Texte
+    # absoluter Wert der durch Reduktion zu erzielende Anzahl Texte"
+    $$vc->comment('redabs:' . $value);
   }
 
   # Unknown
