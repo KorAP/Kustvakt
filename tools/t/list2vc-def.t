@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 use File::Basename;
 use File::Spec::Functions;
+use Data::Dumper;
 
 use Test::Output;
 use Mojo::JSON 'decode_json';
@@ -41,17 +42,16 @@ is($op2->{'match'}, 'match:eq', 'match');
 is($op2->{'value'}->[0], "B19/AUG/01665", 'value');
 is($op2->{'value'}->[1], ,"B19/AUG/01666", 'value');
 
-
-my $list2 = catfile(dirname(__FILE__), 'data', 'list3.def');
+my $list3 = catfile(dirname(__FILE__), 'data', 'list3.def');
 
 # Check JSON
 # Only return extended area
-$json = decode_json(join('', `$script $list2`));
+$json = decode_json(join('', `$script $list3`));
 
 is($json->{'collection'}->{'@type'}, 'koral:docGroup', 'type');
 is($json->{'collection'}->{'operation'}, 'operation:or', 'operation');
-is($json->{'collection'}->{'comment'}, 'Name: "VAS-N91 (Stand \"2013\", korr. 2017)"', 'type');
-
+# is($json->{'collection'}->{'comment'}, 'Name: "VAS-N91 (Stand \"2013\", korr. 2017)"', 'type');
+is($json->{'collection'}->{'comment'}, 'Name: "VAS N91"', 'type');
 
 $op1 = $json->{'collection'}->{'operands'}->[0];
 is($op1->{'@type'}, 'koral:doc', 'type');
@@ -59,5 +59,17 @@ is($op1->{'key'}, 'textSigle', 'key');
 is($op1->{'match'}, 'match:eq', 'match');
 is($op1->{'value'}->[0], "A00/APR/23232", 'value');
 is($op1->{'value'}->[1], ,"A00/APR/23233", 'value');
+
+
+my $list4 = catfile(dirname(__FILE__), 'data', 'list4.def');
+
+# Only contains intended area
+$json = decode_json(join('', `$script $list4`));
+
+is($json->{'collection'}->{'@type'}, 'koral:docGroup', 'type');
+is($json->{'collection'}->{'operation'}, 'operation:or', 'operation');
+# is($json->{'collection'}->{'comment'}, 'Name: "VAS-N91 (Stand \"2013\", korr. 2017)"', 'type');
+is($json->{'collection'}->{'comment'}, 'Name: "VAS N91"', 'type');
+
 
 done_testing;

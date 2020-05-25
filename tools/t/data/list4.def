@@ -1,0 +1,27 @@
+<name>VAS-N91 (Stand "2013", korr. 2017)</name>
+
+<name>1991-2012</name>
+<date>m1=1991/1 bis 2012/12</date>
+<end></end>
+
+<name>Berliner Zeitung</name>
+<ql>Berliner Zeitung</ql>
+<and>1991-2012</and>
+<redabs>143237</redabs>
+<end></end>
+
+<name>Frankfurter Allgemeine</name>
+<cn>F97 Frankfurter Allgemeine 1997</cn>
+<cn>F99 Frankfurter Allgemeine 1999</cn>
+<cn>F01 Frankfurter Allgemeine 2001</cn>
+<cn>F03 Frankfurter Allgemeine 2003</cn>
+<cn>F05 Frankfurter Allgemeine 2005</cn>
+<redabs>301166</redabs>
+<end></end>
+
+<name>VAS N91</name>
+<add>Berliner Zeitung</add>
+<add>Frankfurter Allgemeine</add>
+<add>Frankfurter Rundschau</add>
+<and>1991-2012</and>
+<end></end>

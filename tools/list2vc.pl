@@ -39,9 +39,10 @@ sub to_string {
   ## Create collection object
   my $json = '{';
   $json .= '"@context":"http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",';
-  $json .= '"collection":{';
+  $json .= '"comment":"Name: ' . $self->equote($self->name) .  '",' if $self->name;
+  $json .= '"collection":';
   $json .= $self->_to_fragment;
-  return $json .= '}}';
+  return $json .= '}';
 };
 
 
@@ -55,52 +56,114 @@ use base 'KorAP::VirtualCorpus';
 sub new {
   my $class = shift;
   bless {
-    op => shift,
-    fields => {}
+    with => [],
+    with_fields => {},
+    without => [],
+    without_fields => {},
   }, $class;
 };
 
+# Define an operand to be "or"ed
+sub with {
+  my $self = shift;
+  push @{$self->{with}}, shift;
+};
 
-# Add field information to group
-sub add_field {
+
+# Define a field that should be "or"ed
+sub with_field {
   my $self = shift;
   my $field = shift;
-  push @{$self->{fields}->{$field}}, shift;
+  push @{$self->{with_fields}->{$field}}, shift;
 };
+
+# Define an operand to be "and"ed
+sub without {
+  my $self = shift;
+  push @{$self->{without}}, shift;
+};
+
+
+# Define a field that should be "and"ed
+sub without_field {
+  my $self = shift;
+  my $field = shift;
+  push @{$self->{without_fields}->{$field}}, shift;
+};
+
+# Create a document vector field
+sub _doc_vec {
+  my $field = shift;
+  my $vec = shift;
+  my $json = '{';
+  $json .= '"@type":"koral:doc",';
+  $json .= '"key":"' . $field . '",';
+  $json .= '"match":"match:eq",';
+  $json .= '"value":[';
+  $json .= join ',', map { '"' . $_ . '"' } @$vec;
+  $json .=  ']';
+  $json .= '},';
+  return $json;
+}
 
 
 # Stringify fragment
 sub _to_fragment {
   my $self = shift;
-  my $json = '';
 
-  unless (keys %{$self->{fields}}) {
-    return $json . '}}';
-  };
-
+  my $json = '{';
   $json .= '"@type":"koral:docGroup",';
   $json .= '"comment":"Name: ' . $self->equote($self->name) .  '",' if $self->name;
-  $json .= '"operation":"operation:' . $self->{op} . '",';
-  $json .= '"operands":[';
 
-  foreach my $field (sort keys %{$self->{fields}}) {
-    unless (@{$self->{fields}->{$field}}) {
-      next;
+  # Make the outer group "and"
+  if (keys %{$self->{without_fields}}) {
+    $json .= '"operation":"operation:and",';
+    $json .= '"operands":[';
+
+    foreach my $field (sort keys %{$self->{without_fields}}) {
+      unless (@{$self->{without_fields}->{$field}}) {
+        next;
+      };
+      $json .= _doc_vec($field, $self->{without_fields}->{$field});
     };
-    $json .= '{';
-    $json .= '"@type":"koral:doc",';
-    $json .= '"key":"' . $field . '",';
-    $json .= '"match":"match:eq",';
-    $json .= '"value":[';
-    $json .= join ',', map { '"' . $_ . '"' } @{$self->{fields}->{$field}};
-    $json .=  ']';
-    $json .= '},';
+
+    # Remove the last comma
+    chop $json;
+
+    $json .= ']';
+  }
+
+  elsif (keys %{$self->{with_fields}} || @{$self->{with}}) {
+    $json .= '"operation":"operation:or",';
+
+    # TODO:
+    #   Flatten embedded or-VCs!
+    $json .= '"operands":[';
+
+    foreach my $field (sort keys %{$self->{with_fields}}) {
+      unless (@{$self->{with_fields}->{$field}}) {
+        next;
+      };
+      $json .= _doc_vec($field, $self->{with_fields}->{$field});
+    };
+
+    foreach my $op (@{$self->{with}}) {
+      $json .= $op->_to_fragment . ',';
+    };
+
+    # Remove the last comma
+    chop $json;
+
+    $json .= ']';
+  }
+
+  # No operands in the group
+  else {
+    # Remove the last comma after the comment
+    chop $json;
   };
 
-  # Remove the last comma
-  chop $json;
-
-  return $json . ']';
+  return $json . '}';
 };
 
 
@@ -126,6 +189,7 @@ exit 0;
 };
 
 
+# Shorten long strings for logging
 sub _shorten ($) {
   my $line = shift;
   if (length($line) < 20) {
@@ -147,11 +211,14 @@ if ($ARGV[0] eq '-') {
 
 
 # Create an intensional and an extensional VC
-my $vc_ext = KorAP::VirtualCorpus::Group->new('or');
-my $vc_int = KorAP::VirtualCorpus::Group->new('or');
+my $vc_ext = KorAP::VirtualCorpus::Group->new;
+my $vc_int = KorAP::VirtualCorpus::Group->new;
 
 # Initial VC group
 my $vc = \$vc_ext;
+
+# Collect all virtual corpora
+my %all_vcs;
 
 my $frozen = 0;
 
@@ -210,17 +277,25 @@ while (!eof $fh) {
 
     # Convert C2 sigle to KorAP form
     $value =~ s!^([^/]+?/[^\.]+?)\.(.+?)$!$1\/$2!;
-    ${$vc}->add_field(textSigle => $value);
+    ${$vc}->with_field(textSigle => $value);
   }
 
   # Add doc field
   elsif ($key eq 'doc') {
-    ${$vc}->add_field(docSigle => $value);
+    ${$vc}->with_field(docSigle => $value);
   }
 
   # Add corpus field
   elsif ($key eq 'corpus') {
-    ${$vc}->add_field(corpusSigle => $value);
+    ${$vc}->with_field(corpusSigle => $value);
+  }
+
+  # Add corpus field
+  elsif ($key eq 'cn') {
+    # Korpussigle, z.B. 'F97 Frankfurter Allgemeine 1997'
+    if ($value =~ m!^([^\/\s]+)(?:\s.+?)?$!) {
+      ${$vc}->with_field(corpusSigle => $1);
+    };
   }
 
   # Mark the vc as frozen
@@ -256,11 +331,31 @@ while (!eof $fh) {
     # <add>, <sub>"
 
     # No global name defined yet
-    unless ($$vc->name) {
+    if ($$vc && !$$vc->name) {
       $vc_ext->name($value);
       $vc_int->name($value);
       next;
     };
+
+    ${$vc} = KorAP::VirtualCorpus::Group->new;
+    ${$vc}->name($value);
+  }
+
+  # End VC def
+  elsif ($key eq 'end') {
+    $all_vcs{${$vc}->name} = $$vc;
+    # $vc = undef;
+  }
+
+  # Add VC definition
+  elsif ($key eq 'add') {
+    unless (defined $all_vcs{$value}) {
+      #       warn 'VC ' . $value . ' not defined';
+      # exit(1);
+      next;
+    };
+
+    $$vc->with($all_vcs{$value});
   }
 
   # Unknown
@@ -271,5 +366,5 @@ while (!eof $fh) {
 
 close($fh);
 
-# Stringify current (extended) virtual corpus
+# Stringify current (extended?) virtual corpus
 print $$vc->to_string;
