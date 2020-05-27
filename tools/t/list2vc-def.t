@@ -67,6 +67,12 @@ $json = decode_json(join('', `$script $list4`));
 
 is($json->{'collection'}->{'@type'}, 'koral:docGroup', 'type');
 is($json->{'collection'}->{'operation'}, 'operation:or', 'operation');
+
+diag Dumper $json;
+
+done_testing;
+__END__
+
 like($json->{'collection'}->{'comment'}, qr!^name:"VAS N91"!, 'name');
 like($json->{'collection'}->{'comment'}, qr!embed:\[name:"Berliner Zeitung",redabs:143237\]!, 'embed');
 like($json->{'collection'}->{'comment'}, qr!embed:\[name:"Frankfurter Allgemeine",redabs:301166\]!, 'embed');
@@ -77,5 +83,6 @@ is($op1->{'key'}, 'corpusSigle', 'key');
 is($op1->{'match'}, 'match:eq', 'match');
 is($op1->{'value'}->[0], "F97", 'value');
 is($op1->{'value'}->[1], "F99", 'value');
+
 
 done_testing;
