@@ -95,4 +95,11 @@ public class StatisticService extends BasicService {
         }
         return stats;
     }
+
+    /**
+     * Return the fingerprint of the latest index revision.
+     */
+    public String getIndexFingerprint () {
+        return searchKrill.getIndexFingerprint();
+    }
 }

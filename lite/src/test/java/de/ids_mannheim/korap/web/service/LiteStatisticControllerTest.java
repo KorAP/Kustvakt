@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.junit.Test;
 
@@ -28,6 +29,12 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
+
+        assertEquals(
+            "Wes8Bd4h1OypPqbWF5njeQ==",
+            response.getMetadata().getFirst("X-Index-Revision")
+            );
+        
         String query = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertEquals(2, node.at("/documents").asInt());
@@ -120,6 +127,11 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                      response.getStatus());
         String ent = response.getEntity(String.class);
+
+        assertEquals(
+            "Wes8Bd4h1OypPqbWF5njeQ==",
+            response.getMetadata().getFirst("X-Index-Revision")
+            );
         
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(2, node.at("/documents").asInt());

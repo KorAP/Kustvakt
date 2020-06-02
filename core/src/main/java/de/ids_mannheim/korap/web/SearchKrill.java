@@ -359,4 +359,15 @@ public class SearchKrill {
                 .append(textID);
         return sb.toString();
     };
+
+    /**
+     * Return the fingerprint of the latest index revision.
+     */
+    public String getIndexFingerprint() {
+        if (index != null) {
+            return index.getFingerprint();
+        };
+        return "null";
+    }
+
 };
