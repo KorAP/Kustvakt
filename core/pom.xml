@@ -298,7 +298,7 @@
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Krill</artifactId>
-			<version>[0.59.1,)</version>
+			<version>[0.59.2,)</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.glassfish.jersey.containers</groupId>

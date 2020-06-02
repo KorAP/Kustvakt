@@ -8,6 +8,8 @@
 29/05/2020
    - Improved conversion tool to deal with Cosmas-II VC definitions
      (diewald)
+02/06/2020
+   - Introduced experimental X-Index-Revision header (diewald)
 
 # version 0.62.3
 03/12/2019

@@ -35,6 +35,11 @@ public class StatisticsControllerTest extends SpringJerseyTest {
 
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
 
+        assertEquals(
+            "Wes8Bd4h1OypPqbWF5njeQ==",
+            response.getMetadata().getFirst("X-Index-Revision")
+            );
+
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(node.get("documents").asInt(),0);
@@ -187,6 +192,11 @@ public class StatisticsControllerTest extends SpringJerseyTest {
                         + "\"match:eq\", \"type\": \"type:regex\", \"value\": "
                         + "\"CC-BY.*\"} }");
 
+        assertEquals(
+            "Wes8Bd4h1OypPqbWF5njeQ==",
+            response.getMetadata().getFirst("X-Index-Revision")
+            );
+        
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                      response.getStatus());
         String ent = response.getEntity(String.class);

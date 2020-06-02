@@ -71,7 +71,10 @@ public class SearchController {
     @GET
     @Path("{version}")
     public Response index (){
-        return Response.ok(config.getApiWelcomeMessage()).build();
+        return Response
+            .ok(config.getApiWelcomeMessage())
+            .header("X-Index-Revision", searchService.getIndexFingerprint())
+            .build();
     }
     
     @POST

@@ -62,6 +62,11 @@ public class SearchControllerTest extends SpringJerseyTest {
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
+        assertEquals(
+            "Wes8Bd4h1OypPqbWF5njeQ==",
+            response.getMetadata().getFirst("X-Index-Revision")
+            );
+
         String message = response.getEntity(String.class);
         assertEquals(message, config.getApiWelcomeMessage());
     }

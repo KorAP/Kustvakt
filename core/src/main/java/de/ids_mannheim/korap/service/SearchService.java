@@ -437,5 +437,11 @@ public class SearchService extends BasicService{
                     "Admin token is incorrect");
         }
     }
-    
+
+    /**
+     * Return the fingerprint of the latest index revision.
+     */
+    public String getIndexFingerprint () {
+        return searchKrill.getIndexFingerprint();
+    }
 }

@@ -82,7 +82,11 @@ public class StatisticController {
             if (DEBUG) {
                 jlog.debug("Stats: " + stats);
             }
-            return Response.ok(stats).build();
+
+            return Response
+                .ok(stats)
+                .header("X-Index-Revision", service.getIndexFingerprint())
+                .build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -96,7 +100,10 @@ public class StatisticController {
             String koralQuery) {
         try {
             String stats = service.retrieveStatisticsForKoralQuery(koralQuery);
-            return Response.ok(stats).build();
+            return Response
+                .ok(stats)
+                .header("X-Index-Revision", service.getIndexFingerprint())
+                .build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
