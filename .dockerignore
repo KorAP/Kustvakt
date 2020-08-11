@@ -1,0 +1,7 @@
+*
+!/core
+!/full
+!/lite
+!/sample-index
+!/LICENSE
+!.dockerignore
