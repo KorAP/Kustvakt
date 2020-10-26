@@ -11,6 +11,8 @@
      client-secret reset APIs (margaretha)   
 04/03/2020
    - Updated the sample index (diewald)
+26/10/2020
+   - Updated dependency of nimbus-jose-jwt and oauth2-oidc-sdk (diewald)
 
 # version 0.62.3
 03/12/2019

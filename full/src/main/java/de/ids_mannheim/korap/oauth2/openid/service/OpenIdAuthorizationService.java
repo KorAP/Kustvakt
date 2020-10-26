@@ -6,7 +6,10 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.List;
 import java.util.Set;
+
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,23 +64,24 @@ public class OpenIdAuthorizationService extends OAuth2AuthorizationService {
                 "redirect_uri is required", OAuth2Error.INVALID_REQUEST);
     }
 
-    public URI requestAuthorizationCode (Map<String, String> map,
+    public URI requestAuthorizationCode (MultivaluedMap<String, String> map,
             String username, boolean isAuthentication,
             ZonedDateTime authenticationTime)
             throws KustvaktException, ParseException {
 
         AuthorizationCode code = new AuthorizationCode();
         URI redirectUri = null;
+
         if (isAuthentication) {
             AuthenticationRequest authRequest = null;
-            authRequest = AuthenticationRequest.parse(map);
+            authRequest = AuthenticationRequest.parse((Map<String,List<String>>) map);
             redirectUri = handleAuthenticationRequest(authRequest, code,
                     username, authenticationTime);
             return new AuthenticationSuccessResponse(redirectUri, code, null,
                     null, authRequest.getState(), null, null).toURI();
         }
         else {
-            AuthorizationRequest authzRequest = AuthorizationRequest.parse(map);
+            AuthorizationRequest authzRequest = AuthorizationRequest.parse((Map<String,List<String>>) map);
             redirectUri = handleAuthorizationRequest(authzRequest, code,
                     username, authenticationTime, null);
             return new AuthorizationSuccessResponse(redirectUri, code, null,
