@@ -1,4 +1,6 @@
 # version 0.63
+26/10/2020
+   - Updated dependency of nimbus-jose-jwt and oauth2-oidc-sdk (diewald)
 
 # version 0.62.4
 24/01/2020

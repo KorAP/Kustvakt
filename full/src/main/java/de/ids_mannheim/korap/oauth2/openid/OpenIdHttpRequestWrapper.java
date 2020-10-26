@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.oauth2.openid;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,19 +17,19 @@ import com.nimbusds.oauth2.sdk.http.HTTPRequest;
  */
 public class OpenIdHttpRequestWrapper extends HTTPRequest {
 
-    private Map<String, String> params;
+    private Map<String, List<String>> params;
 
     public OpenIdHttpRequestWrapper (Method method, URL url) {
         super(method, url);
     }
 
     @Override
-    public Map<String, String> getQueryParameters () {
+    public Map<String, List<String>> getQueryParameters () {
         return this.params;
     }
 
     public void toHttpRequest (HttpServletRequest servletRequest,
-            Map<String, String> map) throws ParseException {
+                               Map<String, List<String>> map) throws ParseException {
 
         this.params = map;
         this.setClientIPAddress(servletRequest.getRemoteAddr());
