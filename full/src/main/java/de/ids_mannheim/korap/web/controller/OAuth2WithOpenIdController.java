@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -154,7 +155,7 @@ public class OAuth2WithOpenIdController {
             if (isAuthentication) {
                 authzService.checkRedirectUriParam(map);
             }
-            uri = authzService.requestAuthorizationCode(map, username,
+            uri = authzService.requestAuthorizationCode(form, username,
                     isAuthentication, authTime);
         }
         catch (ParseException e) {
@@ -191,7 +192,7 @@ public class OAuth2WithOpenIdController {
         try {
             OpenIdHttpRequestWrapper httpRequest =
                     new OpenIdHttpRequestWrapper(method, url);
-            httpRequest.toHttpRequest(servletRequest, map);
+            httpRequest.toHttpRequest(servletRequest, (Map<String, List<String>>) form);
 
             TokenRequest tokenRequest = TokenRequest.parse(httpRequest);
             AccessTokenResponse tokenResponse =
