@@ -203,6 +203,7 @@
 	<bean id="collectionCleanRewrite" class="de.ids_mannheim.korap.rewrite.CollectionCleanRewrite"/>
 	<bean id="virtualCorpusRewrite" class="de.ids_mannheim.korap.rewrite.VirtualCorpusRewrite"/>
 	<bean id="collectionConstraint" class="de.ids_mannheim.korap.rewrite.CollectionConstraint"/>
+ 	<bean id="queryReferenceRewrite" class="de.ids_mannheim.korap.rewrite.QueryReferenceRewrite"/>
 	
 	<util:list id="rewriteTasks"
 		value-type="de.ids_mannheim.korap.rewrite.RewriteTask">
@@ -211,6 +212,7 @@
 		<ref bean="foundryRewrite" />
 		<ref bean="collectionRewrite" />
 		<ref bean="virtualCorpusRewrite" />
+		<ref bean="queryReferenceRewrite" />
 	</util:list>
 	
 	<bean id="rewriteHandler" class="de.ids_mannheim.korap.rewrite.RewriteHandler">

@@ -1,6 +1,8 @@
 # version 0.63
 26/10/2020
    - Updated dependency of nimbus-jose-jwt and oauth2-oidc-sdk (diewald)
+29/10/2020
+   - First introduction of a query reference rewrite (diewald)
 
 # version 0.62.4
 24/01/2020
