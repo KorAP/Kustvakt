@@ -241,7 +241,7 @@
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Koral</artifactId>
-			<version>[0.36,)</version>
+			<version>[0.37,)</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.eclipse.jetty</groupId>
@@ -299,7 +299,7 @@
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Krill</artifactId>
-			<version>[0.59.2,)</version>
+			<version>[0.59.3,)</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.glassfish.jersey.containers</groupId>
