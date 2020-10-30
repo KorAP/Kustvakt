@@ -42,14 +42,18 @@ public class QueryRewriteTest extends SpringJerseyTest {
     public void testRewriteRefRewrite ()
             throws KustvaktException, Exception {
 
+        // Added in the database migration sql for tests
         ClientResponse response = resource().path(API_VERSION).path("search")
-            .queryParam("q", "[orth=der]{%23system/emptyToken} Baum")
+            .queryParam("q", "[orth=der]{%23dory/dory-q} Baum")
             .queryParam("ql", "poliqarp")
+            .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                    .createBasicAuthorizationHeaderValue("dory", "pass"))
             .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals("koral:token", node.at("/query/operands/1/@type").asText());
-        assertEquals("@type(koral:queryRef)", node.at("/query/operands/1/rewrites/0/scope").asText());
+        assertEquals("@type(koral:queryRef)",
+                     node.at("/query/operands/1/rewrites/0/scope").asText());
     }
 }

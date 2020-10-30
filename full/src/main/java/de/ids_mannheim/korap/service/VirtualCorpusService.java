@@ -331,7 +331,7 @@ public class VirtualCorpusService {
 
         if (!vcNamePattern.matcher(vcName).matches()) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
-                    "Virtual corpus name must only contains letters, numbers, "
+                    "Virtual corpus name must only contain letters, numbers, "
                             + "underscores, hypens and spaces",
                     vcName);
         }

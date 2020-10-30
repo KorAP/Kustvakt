@@ -30,7 +30,7 @@ public class QueryReferenceRewrite implements RewriteTask.RewriteQuery {
     private KustvaktConfiguration config;
 
     @Autowired
-    private QueryReferenceService refService;
+    private QueryReferenceService qService;
 
     @Override
     public KoralNode rewriteQuery (KoralNode node,
@@ -66,7 +66,7 @@ public class QueryReferenceRewrite implements RewriteTask.RewriteQuery {
                     }
                 }
 
-                JsonNode qref = refService.searchQueryByName(
+                JsonNode qref = qService.searchQueryByName(
                     username,
                     queryRefName,
                     queryRefOwner);
