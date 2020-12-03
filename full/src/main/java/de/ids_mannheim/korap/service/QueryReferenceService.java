@@ -145,7 +145,75 @@ public class QueryReferenceService {
         //   based on its type.
     };
 
+    /*
+    public Status handlePutRequest (String username,
+                                    String qCreator,
+                                    String qName,
+                                    String qJson) throws KustvaktException {
+        
+        verifyUsername(username, qCreator);
+        String q = vcDao.retrieveQueryByName(qName, qCreator);
+        // ParameterChecker.checkObjectValue(qJson, "request entity");
+        ParameterChecker.checkStringValue(qJson, "q");
+        if (q == null) {
+            storeQuery(qJson, qName, username);
+            return Status.CREATED;
+        }
+        else {
+            editQuery(q, qJson, qName, username);
+            return Status.NO_CONTENT;
+        };
+    };
+    */
 
+    /*
+    public void editQuery (QueryRefrence existingQ,
+                           String newQJson,
+                           String qName,
+                           String username) throws KustvaktException {
+
+        if (!username.equals(existingQ.getCreatedBy())
+            && !adminDao.isAdmin(username)) {
+            throw new KustvaktException(
+                StatusCodes.AUTHORIZATION_FAILED,
+                "Unauthorized operation for user: " + username, username);
+        };
+
+        String corpusQuery = newVC.getCorpusQuery();
+
+        if (newQJson != null && !newQJson.isEmpty()) {
+            koralQuery = serializeCorpusQuery(corpusQuery);
+            requiredAccess = determineRequiredAccess(newVC.isCached(), vcName,
+                    koralQuery);
+        };
+
+        VirtualCorpusType type = newVC.getType();
+        if (type != null) {
+            if (existingVC.getType().equals(VirtualCorpusType.PUBLISHED)) {
+                // withdraw from publication
+                if (!type.equals(VirtualCorpusType.PUBLISHED)) {
+                    VirtualCorpusAccess hiddenAccess =
+                            accessDao.retrieveHiddenAccess(existingVC.getId());
+                    deleteVCAccess(hiddenAccess.getId(), "system");
+                    int groupId = hiddenAccess.getUserGroup().getId();
+                    userGroupService.deleteAutoHiddenGroup(groupId, "system");
+                    // EM: should the users within the hidden group receive 
+                    // notifications? 
+                }
+                // else remains the same
+            }
+            else if (type.equals(VirtualCorpusType.PUBLISHED)) {
+                publishVC(existingVC.getId());
+            }
+        }
+
+        vcDao.editVirtualCorpus(existingVC, vcName, type, requiredAccess,
+                koralQuery, newVC.getDefinition(), newVC.getDescription(),
+                newVC.getStatus(), newVC.isCached());
+    }
+    */
+
+    
     /**
      * Only admin and the owner of the virtual corpus are allowed to
      * delete a virtual corpus.
@@ -180,4 +248,53 @@ public class QueryReferenceService {
                 "Unauthorized operation for user: " + username, username);
         };
     };
+
+
+    /*
+    public void editVC (
+        VirtualCorpus existingVC,
+        VirtualCorpusJson newVC,
+        String vcName,
+        String username) throws KustvaktException {
+
+        if (!username.equals(existingVC.getCreatedBy())
+                && !adminDao.isAdmin(username)) {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
+
+        String koralQuery = null;
+        CorpusAccess requiredAccess = null;
+        String corpusQuery = newVC.getCorpusQuery();
+        if (corpusQuery != null && !corpusQuery.isEmpty()) {
+            koralQuery = serializeCorpusQuery(corpusQuery);
+            requiredAccess = determineRequiredAccess(newVC.isCached(), vcName,
+                    koralQuery);
+        }
+
+        VirtualCorpusType type = newVC.getType();
+        if (type != null) {
+            if (existingVC.getType().equals(VirtualCorpusType.PUBLISHED)) {
+                // withdraw from publication
+                if (!type.equals(VirtualCorpusType.PUBLISHED)) {
+                    VirtualCorpusAccess hiddenAccess =
+                            accessDao.retrieveHiddenAccess(existingVC.getId());
+                    deleteVCAccess(hiddenAccess.getId(), "system");
+                    int groupId = hiddenAccess.getUserGroup().getId();
+                    userGroupService.deleteAutoHiddenGroup(groupId, "system");
+                    // EM: should the users within the hidden group receive 
+                    // notifications? 
+                }
+                // else remains the same
+            }
+            else if (type.equals(VirtualCorpusType.PUBLISHED)) {
+                publishVC(existingVC.getId());
+            }
+        }
+
+        vcDao.editVirtualCorpus(existingVC, vcName, type, requiredAccess,
+                koralQuery, newVC.getDefinition(), newVC.getDescription(),
+                newVC.getStatus(), newVC.isCached());
+    }
+    */
 };
