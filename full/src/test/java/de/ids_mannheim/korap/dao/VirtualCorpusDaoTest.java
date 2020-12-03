@@ -13,7 +13,8 @@ import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.config.SpringJerseyTest;
-import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.constant.QueryType;
+import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User;
@@ -29,7 +30,7 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest{
     @Test
     public void testListVCByType () throws KustvaktException {
         List<VirtualCorpus> vcList =
-                dao.retrieveVCByType(VirtualCorpusType.PUBLISHED, null);
+                dao.retrieveVCByType(ResourceType.PUBLISHED, null);
         assertEquals(1, vcList.size());
 
         VirtualCorpus vc = vcList.get(0);
@@ -41,13 +42,14 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest{
     @Test
     public void testSystemVC () throws KustvaktException {
         // insert vc
-        int id = dao.createVirtualCorpus("system-vc", VirtualCorpusType.SYSTEM,
-                User.CorpusAccess.FREE, "corpusSigle=GOE", "definition",
-                "description", "experimental", false, "test class");
+        int id = dao.createVirtualCorpus("system-vc", ResourceType.SYSTEM,
+                QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE,
+                "corpusSigle=GOE", "definition", "description", "experimental",
+                false, "test class");
 
         // select vc
         List<VirtualCorpus> vcList =
-                dao.retrieveVCByType(VirtualCorpusType.SYSTEM, null);
+                dao.retrieveVCByType(ResourceType.SYSTEM, null);
         assertEquals(2, vcList.size());
 
         VirtualCorpus vc = dao.retrieveVCById(id);
@@ -64,15 +66,16 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest{
         thrown.expect(PersistenceException.class);
         thrown.expectMessage("could not execute statement");
         
-        dao.createVirtualCorpus("system-vc", VirtualCorpusType.SYSTEM,
-                User.CorpusAccess.FREE, "corpusSigle=GOE", "definition",
-                "description", "experimental", false, "system");
+        dao.createVirtualCorpus("system-vc", ResourceType.SYSTEM,
+                QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE,
+                "corpusSigle=GOE", "definition", "description", "experimental",
+                false, "system");
     }
 
     @Test
     public void retrieveSystemVC () throws KustvaktException {
         List<VirtualCorpus> vc =
-                dao.retrieveVCByType(VirtualCorpusType.SYSTEM, null);
+                dao.retrieveVCByType(ResourceType.SYSTEM, null);
         assertEquals(1, vc.size());
     }
 

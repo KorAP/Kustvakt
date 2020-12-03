@@ -1,7 +1,8 @@
 package de.ids_mannheim.korap.web.input;
 
 
-import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.constant.QueryType;
+import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.service.VirtualCorpusService;
 import de.ids_mannheim.korap.web.controller.VirtualCorpusController;
 import lombok.Getter;
@@ -16,16 +17,22 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class VirtualCorpusJson {
+public class QueryJson {
     // default false
     private boolean isCached;
     
-    // required in creating VCs
-    private VirtualCorpusType type;
+    // required
+    private ResourceType type;
+    private QueryType queryType;
+    // required for queryType="VIRTUAL_CORPUS"
     private String corpusQuery;
+    // required for queryType="QUERY"
+    private String query;
+    private String queryLanguage;
     
     // optional
     private String definition;
     private String description;
     private String status;
+    private String queryVersion;
 }

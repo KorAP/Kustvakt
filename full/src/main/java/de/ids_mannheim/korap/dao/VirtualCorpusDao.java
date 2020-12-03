@@ -21,9 +21,10 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
+import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
-import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.entity.UserGroupMember_;
@@ -52,14 +53,15 @@ public class VirtualCorpusDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public int createVirtualCorpus (String name, VirtualCorpusType type,
-            CorpusAccess requiredAccess, String koralQuery, String definition,
-            String description, String status, boolean isCached,
-            String createdBy) throws KustvaktException {
+    public int createVirtualCorpus (String name, ResourceType type,
+            QueryType queryType, CorpusAccess requiredAccess, String koralQuery,
+            String definition, String description, String status,
+            boolean isCached, String createdBy) throws KustvaktException {
 
         VirtualCorpus vc = new VirtualCorpus();
         vc.setName(name);
         vc.setType(type);
+        vc.setQueryType(queryType);
         vc.setRequiredAccess(requiredAccess);
         vc.setKoralQuery(koralQuery);
         vc.setDefinition(definition);
@@ -73,7 +75,7 @@ public class VirtualCorpusDao {
     }
 
     public void editVirtualCorpus (VirtualCorpus vc, String name,
-            VirtualCorpusType type, CorpusAccess requiredAccess,
+            ResourceType type, CorpusAccess requiredAccess,
             String koralQuery, String definition, String description,
             String status, boolean isCached) throws KustvaktException {
 
@@ -121,14 +123,14 @@ public class VirtualCorpusDao {
      * retrieves virtual corpora of all users.
      * 
      * @param type
-     *            {@link VirtualCorpusType}
+     *            {@link ResourceType}
      * @param createdBy
      *            username of the virtual corpus creator
      * @return a list of {@link VirtualCorpus}
      * @throws KustvaktException
      */
     @SuppressWarnings("unchecked")
-    public List<VirtualCorpus> retrieveVCByType (VirtualCorpusType type,
+    public List<VirtualCorpus> retrieveVCByType (ResourceType type,
             String createdBy) throws KustvaktException {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -246,7 +248,7 @@ public class VirtualCorpusDao {
 
     @SuppressWarnings("unchecked")
     public List<VirtualCorpus> retrieveOwnerVCByType (String userId,
-            VirtualCorpusType type) throws KustvaktException {
+            ResourceType type) throws KustvaktException {
         ParameterChecker.checkStringValue(userId, "userId");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -322,7 +324,7 @@ public class VirtualCorpusDao {
                 builder.equal(virtualCorpus.get(VirtualCorpus_.createdBy),
                         userId),
                 builder.equal(virtualCorpus.get(VirtualCorpus_.type),
-                        VirtualCorpusType.SYSTEM));
+                        ResourceType.SYSTEM));
 
         query.select(virtualCorpus);
         query.where(predicate);

@@ -33,12 +33,13 @@ public class VirtualCorpusConverter {
         dto.setType(vc.getType().displayName());
         dto.setKoralQuery(vc.getKoralQuery());
 
-        JsonNode node = JsonUtils.readTree(statistics);
-        dto.setNumberOfDoc(node.at("/documents").asInt());
-        dto.setNumberOfParagraphs(node.at("/paragraphs").asInt());
-        dto.setNumberOfSentences(node.at("/sentences").asInt());
-        dto.setNumberOfTokens(node.at("/tokens").asInt());
-
+        if (statistics != null) {
+            JsonNode node = JsonUtils.readTree(statistics);
+            dto.setNumberOfDoc(node.at("/documents").asInt());
+            dto.setNumberOfParagraphs(node.at("/paragraphs").asInt());
+            dto.setNumberOfSentences(node.at("/sentences").asInt());
+            dto.setNumberOfTokens(node.at("/tokens").asInt());
+        }
         return dto;
 
     }

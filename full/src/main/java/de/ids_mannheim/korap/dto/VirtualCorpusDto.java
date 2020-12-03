@@ -1,5 +1,8 @@
 package de.ids_mannheim.korap.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import de.ids_mannheim.korap.entity.VirtualCorpus;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +15,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@JsonInclude(Include.NON_DEFAULT)
 public class VirtualCorpusDto {
 
     private int id;

@@ -14,7 +14,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.constant.QueryType;
+import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,7 +44,10 @@ public class VirtualCorpus implements Comparable<VirtualCorpus> {
     private int id;
     private String name;
     @Enumerated(EnumType.STRING)
-    private VirtualCorpusType type;
+    private ResourceType type;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "query_type")
+    private QueryType queryType;
     private String status;
     private String description;
     @Enumerated(EnumType.STRING)

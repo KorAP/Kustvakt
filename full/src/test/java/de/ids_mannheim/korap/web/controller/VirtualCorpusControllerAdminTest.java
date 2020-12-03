@@ -16,7 +16,7 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
@@ -64,7 +64,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
 
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals("group-vc", node.at("/name").asText());
-        assertEquals(VirtualCorpusType.PROJECT.displayName(),
+        assertEquals(ResourceType.PROJECT.displayName(),
                 node.at("/type").asText());
     }
 
@@ -103,8 +103,9 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
 
     @Test
     public void testCreateSystemVC () throws KustvaktException {
-        String json = "{\"type\": \"SYSTEM\","
-                + "\"corpusQuery\": \"creationDate since 1820\"}";
+        String json = "{\"type\": \"SYSTEM\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"corpusQuery\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+admin).path("new-system-vc")
@@ -140,8 +141,9 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     @Test
     public void testPrivateVC () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        String json = "{\"type\": \"PRIVATE\","
-                + "\"corpusQuery\": \"corpusSigle=GOE\"}";
+        String json = "{\"type\": \"PRIVATE\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
 
         String vcName = "new-vc";
         ClientResponse response = resource().path(API_VERSION).path("vc")
@@ -266,7 +268,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         String accessId = node.at("/accessId").asText();
         testDeleteVCAccess(accessId);
 
-        testEditVCType(admin, vcCreator, vcName, VirtualCorpusType.PRIVATE);
+        testEditVCType(admin, vcCreator, vcName, ResourceType.PRIVATE);
     }
 
     private void testCreateVCAccess (String vcCreator, String vcName,

@@ -17,7 +17,7 @@ import javax.persistence.criteria.Root;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 
-import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
 import de.ids_mannheim.korap.entity.QueryReference;
@@ -47,7 +47,7 @@ public class QueryReferenceDao {
      */
     public int createQuery(
         String qName,
-        VirtualCorpusType type,
+        ResourceType type,
         // CorpusAccess requiredAccess,
         String koralQuery,
         String definition,

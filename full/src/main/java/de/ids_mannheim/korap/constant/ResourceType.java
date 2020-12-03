@@ -12,7 +12,7 @@ import de.ids_mannheim.korap.entity.VirtualCorpus;
  *   This should probably be renamed to something like RessourceType,
  *   as QueryReferences will use the same types.
  */
-public enum VirtualCorpusType {
+public enum ResourceType {
     /**
      * available for all
      */

@@ -26,7 +26,7 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.AuthenticationScheme;
-import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -117,7 +117,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         JsonNode node = testSearchVC(testUser, "system", "system-vc");
         assertEquals("system-vc", node.at("/name").asText());
-        assertEquals(VirtualCorpusType.SYSTEM.displayName(),
+        assertEquals(ResourceType.SYSTEM.displayName(),
                 node.at("/type").asText());
     }
 
@@ -129,7 +129,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 .path("~system").path("system-vc").get(ClientResponse.class);
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         assertEquals("system-vc", node.at("/name").asText());
-        assertEquals(VirtualCorpusType.SYSTEM.displayName(),
+        assertEquals(ResourceType.SYSTEM.displayName(),
                 node.at("/type").asText());
         assertEquals(11, node.at("/numberOfDoc").asInt());
         assertEquals(772, node.at("/numberOfParagraphs").asInt());
@@ -144,7 +144,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         JsonNode node = testSearchVC("dory", "dory", "dory-vc");
         assertEquals("dory-vc", node.at("/name").asText());
-        assertEquals(VirtualCorpusType.PRIVATE.displayName(),
+        assertEquals(ResourceType.PRIVATE.displayName(),
                 node.at("/type").asText());
     }
 
@@ -175,7 +175,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         JsonNode node = testSearchVC("nemo", "dory", "group-vc");
         assertEquals("group-vc", node.at("/name").asText());
-        assertEquals(VirtualCorpusType.PROJECT.displayName(),
+        assertEquals(ResourceType.PROJECT.displayName(),
                 node.at("/type").asText());
     }
 
@@ -207,7 +207,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         JsonNode node = testSearchVC("gill", "marlin", "published-vc");
         assertEquals("published-vc", node.at("/name").asText());
-        assertEquals(VirtualCorpusType.PUBLISHED.displayName(),
+        assertEquals(ResourceType.PUBLISHED.displayName(),
                 node.at("/type").asText());
 
         // check gill in the hidden group of the vc
@@ -292,8 +292,9 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
     @Test
     public void testCreatePrivateVC () throws KustvaktException {
-        String json = "{\"type\": \"PRIVATE\","
-                + "\"corpusQuery\": \"corpusSigle=GOE\"}";
+        String json = "{\"type\": \"PRIVATE\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
@@ -321,6 +322,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     @Test
     public void testCreatePublishedVC () throws KustvaktException {
         String json = "{\"type\": \"PUBLISHED\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
                 + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
 
         String vcName = "new-published-vc";
@@ -448,8 +450,9 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
     @Test
     public void testCreateSystemVC () throws KustvaktException {
-        String json = "{\"type\": \"SYSTEM\","
-                + "\"corpusQuery\": \"creationDate since 1820\"}";
+        String json = "{\"type\": \"SYSTEM\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"corpusQuery\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
@@ -472,8 +475,9 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
     @Test
     public void testCreateVCInvalidName () throws KustvaktException {
-        String json = "{\"type\": \"PRIVATE\","
-                + "\"corpusQuery\": \"creationDate since 1820\"}";
+        String json = "{\"type\": \"PRIVATE\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"corpusQuery\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new $vc")
@@ -492,8 +496,9 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     
     @Test
     public void testCreateVCNameTooShort () throws KustvaktException {
-        String json = "{\"type\": \"PRIVATE\","
-                + "\"corpusQuery\": \"creationDate since 1820\"}";
+        String json = "{\"type\": \"PRIVATE\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"corpusQuery\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("ne")
@@ -535,7 +540,9 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
     @Test
     public void testCreateVCWithoutcorpusQuery () throws KustvaktException {
-        String json = "{\"type\": \"PRIVATE\"}";
+        String json = "{\"type\": \"PRIVATE\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + "}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
@@ -574,7 +581,9 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
     @Test
     public void testCreateVCWithoutType () throws KustvaktException {
-        String json = "{\"corpusQuery\": " + "\"creationDate since 1820\"}";
+        String json = "{\"corpusQuery\": " + "\"creationDate since 1820\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + "}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
@@ -595,8 +604,9 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
     @Test
     public void testCreateVCWithWrongType () throws KustvaktException {
-        String json = "{\"type\": \"PRIVAT\","
-                + "\"corpusQuery\": \"creationDate since 1820\"}";
+        String json = "{\"type\": \"PRIVAT\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"corpusQuery\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
@@ -613,7 +623,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 node.at("/errors/0/0").asInt());
         assertTrue(node.at("/errors/0/1").asText().startsWith(
                 "Cannot deserialize value of type `de.ids_mannheim.korap.constant."
-                        + "VirtualCorpusType` from String \"PRIVAT\""));
+                        + "ResourceType` from String \"PRIVAT\""));
     }
 
     @Test
@@ -729,7 +739,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         // check the vc type
         JsonNode node = testSearchVC("dory", "dory", vcName);
-        assertEquals(VirtualCorpusType.PROJECT.displayName(),
+        assertEquals(ResourceType.PROJECT.displayName(),
                 node.get("type").asText());
 
         // edit vc
@@ -746,7 +756,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         // check VC
         node = testListOwnerVC("dory");
         JsonNode n = node.get(1);
-        assertEquals(VirtualCorpusType.PUBLISHED.displayName(),
+        assertEquals(ResourceType.PUBLISHED.displayName(),
                 n.get("type").asText());
 
         // check hidden VC access
@@ -771,7 +781,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
         node = testListOwnerVC("dory");
-        assertEquals(VirtualCorpusType.PROJECT.displayName(),
+        assertEquals(ResourceType.PROJECT.displayName(),
                 node.get(1).get("type").asText());
 
         // check VC access
@@ -871,7 +881,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         node = testlistAccessByGroup("dory", groupName);
         assertEquals(1, node.size());
 
-        testEditVCType("marlin", "marlin", vcName, VirtualCorpusType.PRIVATE);
+        testEditVCType("marlin", "marlin", vcName, ResourceType.PRIVATE);
     }
 
     private ClientResponse testShareVCByCreator (String vcCreator,
