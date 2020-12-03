@@ -23,7 +23,7 @@ import org.springframework.stereotype.Controller;
 import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
-import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -36,7 +36,7 @@ import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
-import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
+import de.ids_mannheim.korap.web.input.QueryJson;
 
 /**
  * VirtualCorpusController defines web APIs related to virtual corpus
@@ -93,7 +93,7 @@ public class VirtualCorpusController {
     public Response createUpdateVC (@Context SecurityContext securityContext,
             @PathParam("vcCreator") String vcCreator,
             @PathParam("vcName") String vcName,
-            VirtualCorpusJson vc) throws KustvaktException {
+            QueryJson vc) throws KustvaktException {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
 
@@ -213,7 +213,7 @@ public class VirtualCorpusController {
      * @param createdBy
      *            username of virtual corpus creator
      * @param type
-     *            {@link VirtualCorpusType}
+     *            {@link ResourceType}
      * @return a list of virtual corpora
      */
     @GET
@@ -222,7 +222,7 @@ public class VirtualCorpusController {
     public List<VirtualCorpusDto> listVCByType (
             @Context SecurityContext securityContext,
             @QueryParam("createdBy") String createdBy,
-            @QueryParam("type") VirtualCorpusType type) {
+            @QueryParam("type") ResourceType type) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {

@@ -13,14 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
-import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.web.input.VirtualCorpusJson;
+import de.ids_mannheim.korap.web.input.QueryJson;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:test-config.xml")
@@ -43,9 +44,10 @@ public class VirtualCorpusServiceTest {
         // + "(UNIQUE constraint failed: virtual_corpus.name, "
         // + "virtual_corpus.created_by)");
 
-        VirtualCorpusJson vc = new VirtualCorpusJson();
+        QueryJson vc = new QueryJson();
         vc.setCorpusQuery("corpusSigle=GOE");
-        vc.setType(VirtualCorpusType.PRIVATE);
+        vc.setType(ResourceType.PRIVATE);
+        vc.setQueryType(QueryType.VIRTUAL_CORPUS);
         vcService.storeVC(vc, "dory-vc", "dory");
     }
 
@@ -53,9 +55,10 @@ public class VirtualCorpusServiceTest {
     public void createDeletePublishVC () throws KustvaktException {
         String vcName = "new-published-vc";
 
-        VirtualCorpusJson vc = new VirtualCorpusJson();
+        QueryJson vc = new QueryJson();
         vc.setCorpusQuery("corpusSigle=GOE");
-        vc.setType(VirtualCorpusType.PUBLISHED);
+        vc.setType(ResourceType.PUBLISHED);
+        vc.setQueryType(QueryType.VIRTUAL_CORPUS);
         String username = "VirtualCorpusServiceTest";
         vcService.storeVC(vc, vcName, username );
 
@@ -94,15 +97,15 @@ public class VirtualCorpusServiceTest {
         String vcName = "group-vc";
         VirtualCorpus existingVC =
                 vcService.searchVCByName(username, vcName, username);
-        VirtualCorpusJson vcJson = new VirtualCorpusJson();
-        vcJson.setType(VirtualCorpusType.PUBLISHED);
+        QueryJson vcJson = new QueryJson();
+        vcJson.setType(ResourceType.PUBLISHED);
 
         vcService.editVC(existingVC, vcJson, vcName, username);
 
         // check VC
         VirtualCorpusDto vcDto = vcService.searchVCById("dory", vcId);
         assertEquals(vcName, vcDto.getName());
-        assertEquals(VirtualCorpusType.PUBLISHED.displayName(),
+        assertEquals(ResourceType.PUBLISHED.displayName(),
                 vcDto.getType());
 
         // check access
@@ -121,15 +124,15 @@ public class VirtualCorpusServiceTest {
 
         // 2nd edit (withdraw from publication)
 
-        vcJson = new VirtualCorpusJson();
-        vcJson.setType(VirtualCorpusType.PROJECT);
+        vcJson = new QueryJson();
+        vcJson.setType(ResourceType.PROJECT);
 
         vcService.editVC(existingVC, vcJson, vcName, username);
 
         // check VC
         vcDto = vcService.searchVCById("dory", vcId);
         assertEquals("group-vc", vcDto.getName());
-        assertEquals(VirtualCorpusType.PROJECT.displayName(), vcDto.getType());
+        assertEquals(ResourceType.PROJECT.displayName(), vcDto.getType());
 
         // check access
         accesses = vcService.listVCAccessByUsername("admin");

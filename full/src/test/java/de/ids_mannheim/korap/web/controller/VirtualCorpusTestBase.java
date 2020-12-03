@@ -14,7 +14,7 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
-import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
@@ -37,7 +37,7 @@ public abstract class VirtualCorpusTestBase extends SpringJerseyTest{
     }
     
     protected void testEditVCType (String username, String vcCreator,
-            String vcName, VirtualCorpusType type)
+            String vcName, ResourceType type)
             throws KustvaktException {
         String json = "{\"type\": \"" + type + "\"}";
 

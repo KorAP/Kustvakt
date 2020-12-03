@@ -17,7 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.KrillCollection;
-import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.constant.QueryType;
+import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.service.VirtualCorpusService;
@@ -59,8 +60,9 @@ public class NamedVCLoader implements Runnable{
         String json = IOUtils.toString(is, "utf-8");
         if (json != null) {
             cacheVC(json, filename);
-            vcService.storeVC(filename, VirtualCorpusType.SYSTEM, json, null,
-                    null, null, true, "system");
+            vcService.storeVC(filename, ResourceType.SYSTEM,
+                    QueryType.VIRTUAL_CORPUS, json, null, null, null, true,
+                    "system");
         }
     }
 
@@ -100,8 +102,9 @@ public class NamedVCLoader implements Runnable{
                     // ignore
                     if (DEBUG) jlog.debug(e);
                 }
-                vcService.storeVC(filename, VirtualCorpusType.SYSTEM, json,
-                        null, null, null, true, "system");
+                vcService.storeVC(filename, ResourceType.SYSTEM,
+                        QueryType.VIRTUAL_CORPUS, json, null, null, null, true,
+                        "system");
             }
         }
     }

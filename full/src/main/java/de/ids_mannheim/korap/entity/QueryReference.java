@@ -14,7 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.constant.ResourceType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,7 +39,7 @@ public class QueryReference implements Comparable<QueryReference> {
     private int id;
     private String name;
     @Enumerated(EnumType.STRING)
-    private VirtualCorpusType type; // TODO (nd): This should be named RessourceType
+    private ResourceType type; // TODO (nd): This should be named RessourceType
     private String status;
     private String description;
     // @Enumerated(EnumType.STRING)

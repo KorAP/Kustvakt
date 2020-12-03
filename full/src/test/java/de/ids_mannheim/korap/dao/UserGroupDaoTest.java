@@ -18,9 +18,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
+import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
-import de.ids_mannheim.korap.constant.VirtualCorpusType;
+import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
@@ -134,8 +135,9 @@ public class UserGroupDaoTest {
         String createdBy = "dory";
         String name = "dory new vc";
         int id = virtualCorpusDao.createVirtualCorpus(name,
-                VirtualCorpusType.PROJECT, CorpusAccess.PUB,
-                "corpusSigle=WPD15", "", "", "", false, createdBy);
+                ResourceType.PROJECT, QueryType.VIRTUAL_CORPUS,
+                CorpusAccess.PUB, "corpusSigle=WPD15", "", "", "", false,
+                createdBy);
 
         VirtualCorpus virtualCorpus = virtualCorpusDao.retrieveVCById(id);
         userGroupDao.addVCToGroup(virtualCorpus, createdBy,
