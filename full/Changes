@@ -5,6 +5,8 @@
    - Introduction of a query reference rewrite mechanism (diewald)
 30/10/2020
    - Added database methods for storing query references (diewald) 
+04/12/2020
+   - Fix hibernate dialect for SQLite. (margaretha)
 
 # version 0.62.4
 24/01/2020
