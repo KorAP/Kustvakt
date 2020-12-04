@@ -155,6 +155,8 @@
 	<bean id="searchController" class="de.ids_mannheim.korap.web.controller.SearchController" />
 	<bean id="statisticController"
 		class="de.ids_mannheim.korap.web.controller.StatisticController" />
+	<!-- <bean id="testController"
+		class="de.ids_mannheim.korap.test.TestController" /> -->
 
 	<!-- Services -->
 	<bean id="scopeService"

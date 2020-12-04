@@ -7,6 +7,8 @@
    - Added database methods for storing query references (diewald) 
 04/12/2020
    - Fix hibernate dialect for SQLite. (margaretha)
+04/12/2020
+   - Fix pipe warning. (margaretha)
 
 # version 0.62.4
 24/01/2020

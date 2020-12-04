@@ -236,7 +236,7 @@ public class SearchService extends BasicService{
     
     private String handlePipeError (String query, String url,
             String message) throws KustvaktException {
-        jlog.error("Failed running the pipe at " + url + ". Message: "+ message);
+        jlog.warn("Failed running the pipe at " + url + ". Message: "+ message);
        
         Notifications n = new Notifications();
         n.addWarning(StatusCodes.PIPE_FAILED,
