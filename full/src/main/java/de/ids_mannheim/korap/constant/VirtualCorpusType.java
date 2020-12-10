@@ -7,6 +7,11 @@ import de.ids_mannheim.korap.entity.VirtualCorpus;
  * @author margaretha
  *
  */
+/*
+ * TODO (nd):
+ *   This should probably be renamed to something like RessourceType,
+ *   as QueryReferences will use the same types.
+ */
 public enum VirtualCorpusType {
     /**
      * available for all
