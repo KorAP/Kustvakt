@@ -89,9 +89,4 @@ public class KustvaktAuthenticationManagerTest extends BeanConfigTest {
         authenticationManager.getUserData(user, UserSettingProcessor.class);
     }
 
-
-    @Override
-    public void initMethod () throws KustvaktException {
-        helper().setupAccount();
-    }
 }

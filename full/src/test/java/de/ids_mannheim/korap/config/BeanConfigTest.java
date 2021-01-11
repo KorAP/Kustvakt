@@ -34,12 +34,9 @@ public abstract class BeanConfigTest {
         assertNotNull("Application context must not be null!", this.context);
         jlog.debug("running one-time before init for class "
                 + this.getClass().getSimpleName() + " ...");
-        BeansFactory.setKustvaktContext(getContext());
+//        BeansFactory.setKustvaktContext(getContext());
         assertNotNull(BeansFactory.getKustvaktContext());
-        initMethod();
     }
-
-    public abstract void initMethod () throws KustvaktException;
 
     public void close () {
         BeansFactory.closeApplication();
@@ -80,16 +77,16 @@ public abstract class BeanConfigTest {
         }
     }
 
-    protected ContextHolder getContext () {
-        return helper().getContext();
-    }
-
-    protected TestHelper helper () {
-        try {
-            return TestHelper.newInstance(this.context);
-        }
-        catch (Exception e) {
-            return null;
-        }
-    }
+//    protected ContextHolder getContext () {
+//        return helper().getContext();
+//    }
+//
+//    protected TestHelper helper () {
+//        try {
+//            return TestHelper.newInstance(this.context);
+//        }
+//        catch (Exception e) {
+//            return null;
+//        }
+//    }
 }

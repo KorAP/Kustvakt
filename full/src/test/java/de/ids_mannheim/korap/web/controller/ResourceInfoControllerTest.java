@@ -25,11 +25,6 @@ import de.ids_mannheim.korap.web.FastJerseyTest;
 @Ignore
 public class ResourceInfoControllerTest extends FastJerseyTest {
 
-    @Override
-    public void initMethod () throws KustvaktException {
-        // helper().runBootInterfaces();
-    }
-
     @Test
     public void testGetPublicVirtualCollectionInfo () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())

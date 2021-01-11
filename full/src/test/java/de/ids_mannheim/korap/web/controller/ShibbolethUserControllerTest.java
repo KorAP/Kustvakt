@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.net.URI;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +14,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.collections.map.LinkedMap;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +29,6 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.JWTSigner;
-import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -51,18 +48,6 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
     @Autowired
     FullConfiguration config;
 	private static String[] credentials;
-
-	@Override
-	public void initMethod() throws KustvaktException {
-		helper().setupAccount();
-	}
-
-	@BeforeClass
-	public static void setup() throws Exception {
-		credentials = new String[2];
-		credentials[0] = (String) TestHelper.getUserCredentials().get(Attributes.USERNAME);
-		credentials[1] = (String) TestHelper.getUserCredentials().get(Attributes.PASSWORD);
-	}
 
 	@Test
 	public void loginHTTP() throws KustvaktException {
@@ -203,7 +188,6 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 		assertNotNull(node);
 		assertEquals(StatusCodes.NO_RESOURCE_FOUND, node.at("/errors/0/0").asInt());
 		assertEquals("UserDetails", node.at("/errors/0/2").asText());
-		helper().dropUser("userservicetest");
 	}
 
 	@Test

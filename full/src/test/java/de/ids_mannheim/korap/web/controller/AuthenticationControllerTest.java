@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.joda.time.DateTime;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -15,10 +14,8 @@ import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.TestHelper;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.FastJerseyTest;
@@ -33,25 +30,6 @@ public class AuthenticationControllerTest extends FastJerseyTest {
 
     private static String[] credentials;
     
-    @BeforeClass
-    public static void configure () throws Exception {
-        credentials = new String[2];
-        credentials[0] = (String) TestHelper.getUserCredentials().get(Attributes.USERNAME);
-        credentials[1] = (String) TestHelper.getUserCredentials().get(Attributes.PASSWORD);
-    }
-
-
-    @Override
-    public void initMethod () throws KustvaktException {
-        helper().setupAccount();
-    }
-
-
-    @Test
-    public void testBasicHttp () {
-        User user = helper().getUser();
-    }
-
     @Test
     public void testSessionToken() throws KustvaktException {
         String auth = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue( 
