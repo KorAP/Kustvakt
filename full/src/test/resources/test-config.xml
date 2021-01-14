@@ -97,16 +97,20 @@
 	</bean>
 
 	<!-- to configure database for sqlite, mysql, etc. migrations -->
-	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+	<bean id="flywayConfig" class="org.flywaydb.core.api.configuration.ClassicConfiguration">
 		<!-- drop existing tables and create new tables -->
 		<property name="validateOnMigrate" value="true" />
 		<property name="cleanOnValidationError" value="true" />
-
 		<property name="baselineOnMigrate" value="false" />
-		<property name="locations" value="${jdbc.schemaPath}" />
+		<property name="locations" value="#{'${jdbc.schemaPath}'.split(',')}"/>
 		<property name="dataSource" ref="sqliteDataSource" />
 		<!-- <property name="dataSource" ref="dataSource" /> -->
 	</bean>
+	
+	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+	    <constructor-arg ref="flywayConfig"/>
+	</bean>
+	
 
 	<bean id="kustvakt_db" class="de.ids_mannheim.korap.handlers.JDBCClient">
 		<!-- <constructor-arg index="0" ref="dataSource" /> -->

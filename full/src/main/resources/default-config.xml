@@ -107,17 +107,20 @@
 	</bean>
 
 	<!-- to configure database for sqlite, mysql, etc. migrations -->
-	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+	<bean id="flywayConfig" class="org.flywaydb.core.api.configuration.ClassicConfiguration">
 		<property name="baselineOnMigrate" value="true" />
 		<!-- <property name="validateOnMigrate" value="false" /> -->
 		<!-- <property name="cleanOnValidationError" value="true" /> -->
-		<property name="locations" value="${jdbc.schemaPath}" />
+		<property name="locations" value="#{'${jdbc.schemaPath}'.split(',')}"/>
 		<!-- <property name="dataSource" ref="dataSource" /> -->
 		<property name="dataSource" ref="sqliteDataSource" />
 		<!-- <property name="dataSource" ref="c3p0DataSource" /> -->
 		
 	</bean>
-
+	
+	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+		<constructor-arg ref="flywayConfig"/>
+	</bean>
 
 	<bean id="kustvakt_db" class="de.ids_mannheim.korap.handlers.JDBCClient">
 		<constructor-arg index="0" ref="dataSource" />
@@ -126,7 +129,8 @@
 	</bean>
 
 	<bean id="entityManagerFactory"
-		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+		depends-on="flyway">
 		<!-- <property name="dataSource" ref="dataSource" /> -->
 		<property name="dataSource" ref="sqliteDataSource" />
 		<!-- <property name="dataSource" ref="c3p0DataSource" /> -->

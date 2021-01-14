@@ -71,14 +71,18 @@
 		<!--<property name="initialSize" value="2"/> -->
 		<!--<property name="poolPreparedStatements" value="true"/> -->
 	</bean>
-
-	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+	<bean id="flywayConfig" class="org.flywaydb.core.api.configuration.ClassicConfiguration">
 		<property name="baselineOnMigrate" value="true" />
 		<!-- <property name="validateOnMigrate" value="false" /> -->
 		<!-- <property name="cleanOnValidationError" value="true" /> -->
-		<property name="locations" value="${jdbc.schemaPath}" />
+		<property name="locations" value="#{'${jdbc.schemaPath}'.split(',')}"/>
 		<property name="dataSource" ref="sqliteDataSource" />
 	</bean>
+	
+	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+	    <constructor-arg ref="flywayConfig"/>
+	</bean>
+	
 
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
