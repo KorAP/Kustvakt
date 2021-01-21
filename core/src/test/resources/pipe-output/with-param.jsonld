@@ -1,0 +1,29 @@
+{
+    "meta": {
+        "snippets": true,
+        "timeout": 10000
+    },
+    "query": {
+        "@type": "koral:token",
+        "wrap": {
+            "@type": "koral:term",
+            "match": "match:eq",
+            "key": [
+                "der",
+                "das",
+		"die"
+            ],
+            "layer": "orth",
+            "rewrites": [
+                {
+                    "@type": "koral:rewrite",
+                    "src": "Glemm",
+                    "operation": "operation:override",
+                    "scope": "key"
+                }
+            ]
+        }
+    },
+    "@context": "http://korap.ids-mannheim.de/ns/koral/0.3/context.jsonld"
+}
+

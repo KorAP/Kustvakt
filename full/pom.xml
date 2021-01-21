@@ -205,7 +205,15 @@
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Kustvakt-core</artifactId>
-			<version>[0.62.4,)</version>
+			<version>[0.63.,)</version>
+		</dependency>
+		<dependency>
+			<groupId>de.ids_mannheim.korap</groupId>
+			<artifactId>Kustvakt-core</artifactId>
+			<version>[0.63.,)</version>
+			<classifier>tests</classifier>
+      		<type>test-jar</type>
+      		<scope>test</scope>
 		</dependency>
 		<!-- LDAP -->
 		<dependency>
@@ -323,6 +331,14 @@
 			<artifactId>lombok</artifactId>
 			<version>1.18.16</version>
 			<scope>provided</scope>
+		</dependency>
+		
+		<!-- Mockserver -->
+		<dependency>
+		    <groupId>org.mock-server</groupId>
+		    <artifactId>mockserver-netty</artifactId>
+		    <version>5.11.2</version>
+		    <scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

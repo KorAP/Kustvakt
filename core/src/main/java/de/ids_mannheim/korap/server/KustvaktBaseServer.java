@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
+import java.util.Scanner;
 
 import javax.servlet.ServletContextListener;
 
@@ -19,7 +21,6 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.springframework.web.context.ContextLoaderListener;
 
-import com.google.common.io.Files;
 import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
@@ -90,8 +91,9 @@ public abstract class KustvaktBaseServer {
             writer.close();
         }
         else {
-            adminToken = Files.readFirstLine(f, Charset.forName("utf-8"))
-                    .substring(6);
+            Scanner scanner = new Scanner(f);
+            adminToken = scanner.nextLine().substring(6);
+            scanner.close();
         }
 
         Server server = new Server();

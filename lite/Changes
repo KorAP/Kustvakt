@@ -1,6 +1,11 @@
 # version 0.63
 04/12/2020
   - Fix hibernate dialect for SQLite. (margaretha)
+14/01/2021
+   - Updated Flyway (margaretha)
+21/01/2021
+   - Fixed running pipe and updated tests with mockserver (margaretha)
+  
   
 # version 0.62.4
 24/01/2020

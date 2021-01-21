@@ -1,5 +1,10 @@
 package de.ids_mannheim.korap.service;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -8,7 +13,6 @@ import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 
@@ -21,9 +25,6 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import de.ids_mannheim.de.init.VCLoader;
@@ -207,22 +208,36 @@ public class SearchService extends BasicService{
             for (int i=0; i<pipeArray.length; i++){
                 String pipeURL = pipeArray[i];
                 try {
-                    Client client = Client.create();
-                    WebResource resource = client.resource(pipeURL);
-                    ClientResponse response =
-                            resource.type(MediaType.APPLICATION_JSON)
-                                    .accept(MediaType.APPLICATION_JSON)
-                                    .post(ClientResponse.class, query);
-                    if (response.getStatus() == HttpStatus.SC_OK) {
-                        String entity = response.getEntity(String.class);
-                        if (entity != null && !entity.isEmpty()) {
-                            query = entity;
+                    URL url = new URL(pipeURL);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("POST");
+                    connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    connection.setRequestProperty("Accept", "application/json");
+                    connection.setDoOutput(true);
+                    OutputStream os = connection.getOutputStream();
+                    byte[] input = query.getBytes("utf-8");
+                    os.write(input, 0, input.length);     
+                    
+                    String entity = null;
+                    if (connection.getResponseCode() == HttpStatus.SC_OK) {
+                        BufferedReader br =
+                                new BufferedReader(new InputStreamReader(
+                                        connection.getInputStream(), "utf-8"));
+                        StringBuilder response = new StringBuilder();
+                        String responseLine = null;
+                        while ((responseLine = br.readLine()) != null) {
+                            response.append(responseLine.trim());
                         }
+                        entity = response.toString();
+                    }
+
+                    if (entity != null && !entity.isEmpty()) {
+                        query = entity;
                     }
                     else {
                         query = handlePipeError(query, pipeURL,
-                                response.getStatus() + " "
-                                        + response.getStatusInfo().toString());
+                                connection.getResponseCode() + " "
+                                        + connection.getResponseMessage());
                     }
                 }
                 catch (Exception e) {
