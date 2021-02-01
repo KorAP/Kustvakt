@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.rewrite;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -21,7 +22,6 @@ import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 /** CollectionRewrite determines which availability field values are 
  *  possible for a user with respect to his mean and location of access.

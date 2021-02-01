@@ -13,6 +13,8 @@
    - Updated Flyway (margaretha)
 21/01/2021
    - Fixed running pipe and updated tests with mockserver (margaretha)
+01/02/2021
+   - Updated methods dependent to Antrl4-maven-plugin libraries (margaretha)   
 
 # version 0.62.4
 24/01/2020

@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.dto.converter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -12,7 +13,6 @@ import de.ids_mannheim.korap.dto.UserGroupMemberDto;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
-import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * UserGroupConverter manages conversion of {@link UserGroup} objects

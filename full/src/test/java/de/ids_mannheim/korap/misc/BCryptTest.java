@@ -10,11 +10,11 @@ public class BCryptTest {
     @Test
     public void testSalt () {
         String salt = BCrypt.gensalt(8);
-        System.out.println(salt);
+//        System.out.println(salt);
 
         String plain = "secret";
         String password = BCrypt.hashpw(plain, salt);
-        System.out.println(password);
+//        System.out.println(password);
         
         assertTrue(BCrypt.checkpw(plain, password));
     }
