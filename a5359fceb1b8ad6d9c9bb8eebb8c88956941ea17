@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c740f3ef_57620ed7",
+        "filename": "full/src/main/resources/db/sqlite/V1.4__oauth2_tables.sql",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2021-02-09T14:14:08Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be changed in a revision by droppong the index? I would expect this to fail with older databases.",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 2
+      },
+      "revId": "a5359fceb1b8ad6d9c9bb8eebb8c88956941ea17",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c",
+      "unresolved": true
+    }
+  ]
+}
