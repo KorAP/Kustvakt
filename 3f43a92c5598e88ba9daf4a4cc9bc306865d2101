@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "75b7e7dc_f86a1c80",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/service/VirtualCorpusService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2021-02-09T10:42:19Z",
+      "side": 1,
+      "message": "Wouldn\u0027t it be better to limit searchVCByName() to QueryType.VIRTUAL_CORPUS?",
+      "range": {
+        "startLine": 643,
+        "startChar": 12,
+        "endLine": 643,
+        "endChar": 62
+      },
+      "revId": "3f43a92c5598e88ba9daf4a4cc9bc306865d2101",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c",
+      "unresolved": true
+    }
+  ]
+}

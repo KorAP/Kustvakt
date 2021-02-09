@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b0dc3d79_fa3f9ac8",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/web/controller/QueryReferenceController.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2021-02-09T10:42:19Z",
+      "side": 1,
+      "message": "Does this mean, query, query language, description etc. will all be part of the json blob?",
+      "range": {
+        "startLine": 87,
+        "startChar": 21,
+        "endLine": 87,
+        "endChar": 25
+      },
+      "revId": "827ed7738edce51454868bce0fede2278b436e33",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c",
+      "unresolved": true
+    }
+  ]
+}
