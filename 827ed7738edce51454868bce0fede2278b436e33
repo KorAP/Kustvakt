@@ -22,6 +22,30 @@
       "revId": "827ed7738edce51454868bce0fede2278b436e33",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "464df9a6_0deebf6f",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/web/controller/QueryReferenceController.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2021-02-10T13:36:00Z",
+      "side": 1,
+      "message": "QueryJson only represents entity body of a request. The data will be stored similarly like VC, only KoralQuery is stored as Json.",
+      "parentUuid": "b0dc3d79_fa3f9ac8",
+      "range": {
+        "startLine": 87,
+        "startChar": 21,
+        "endLine": 87,
+        "endChar": 25
+      },
+      "revId": "827ed7738edce51454868bce0fede2278b436e33",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c",
+      "unresolved": false
     }
   ]
 }

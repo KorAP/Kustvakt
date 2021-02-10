@@ -22,6 +22,30 @@
       "revId": "3f43a92c5598e88ba9daf4a4cc9bc306865d2101",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0e714aa6_60feb863",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/service/VirtualCorpusService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2021-02-10T13:36:00Z",
+      "side": 1,
+      "message": "Yes, sure. there are still a lot of things to recheck. I think i re-use this for query to at the moment. will update it later.",
+      "parentUuid": "75b7e7dc_f86a1c80",
+      "range": {
+        "startLine": 643,
+        "startChar": 12,
+        "endLine": 643,
+        "endChar": 62
+      },
+      "revId": "3f43a92c5598e88ba9daf4a4cc9bc306865d2101",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c",
+      "unresolved": false
     }
   ]
 }
