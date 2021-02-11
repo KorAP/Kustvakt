@@ -22,6 +22,30 @@
       "revId": "a5359fceb1b8ad6d9c9bb8eebb8c88956941ea17",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "684a3782_9c345432",
+        "filename": "full/src/main/resources/db/sqlite/V1.4__oauth2_tables.sql",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2021-02-11T09:34:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c740f3ef_57620ed7",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 2
+      },
+      "revId": "a5359fceb1b8ad6d9c9bb8eebb8c88956941ea17",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c",
+      "unresolved": false
     }
   ]
 }
