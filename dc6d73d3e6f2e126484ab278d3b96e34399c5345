@@ -22,6 +22,30 @@
       "revId": "dc6d73d3e6f2e126484ab278d3b96e34399c5345",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "00745d32_9e487e28",
+        "filename": "full/src/main/resources/db/sqlite/V1.1__create_virtual_corpus_tables.sql",
+        "patchSetId": 4
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2021-02-11T09:24:30Z",
+      "side": 1,
+      "message": "Right. Better to do it in another commit though since it is not quite related to this commit topic.",
+      "parentUuid": "d0bd519a_8a36fe2a",
+      "range": {
+        "startLine": 72,
+        "startChar": 2,
+        "endLine": 72,
+        "endChar": 35
+      },
+      "revId": "dc6d73d3e6f2e126484ab278d3b96e34399c5345",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c",
+      "unresolved": false
     }
   ]
 }
