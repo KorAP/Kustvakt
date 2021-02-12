@@ -90,7 +90,7 @@ public class NamedVCLoader implements Runnable{
                 cacheVC(json, filename);
                 try {
                     VirtualCorpus vc = vcService.searchVCByName("system",
-                            filename, "system");
+                            filename, "system", QueryType.VIRTUAL_CORPUS);
                     if (vc != null) {
                         if (DEBUG) {
                             jlog.debug("Delete existing vc: " + filename);

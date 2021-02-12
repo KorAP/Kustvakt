@@ -96,7 +96,7 @@ public class VirtualCorpusServiceTest {
 
         String vcName = "group-vc";
         VirtualCorpus existingVC =
-                vcService.searchVCByName(username, vcName, username);
+                vcService.searchVCByName(username, vcName, username, QueryType.VIRTUAL_CORPUS);
         QueryJson vcJson = new QueryJson();
         vcJson.setType(ResourceType.PUBLISHED);
 

@@ -19,7 +19,7 @@ import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User;
 
-public class VirtualCorpusDaoTest extends SpringJerseyTest{
+public class VirtualCorpusDaoTest extends SpringJerseyTest {
 
     @Autowired
     private VirtualCorpusDao dao;
@@ -30,7 +30,7 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest{
     @Test
     public void testListVCByType () throws KustvaktException {
         List<VirtualCorpus> vcList =
-                dao.retrieveVCByType(ResourceType.PUBLISHED, null);
+                dao.retrieveVCByType(ResourceType.PUBLISHED, null, QueryType.VIRTUAL_CORPUS);
         assertEquals(1, vcList.size());
 
         VirtualCorpus vc = vcList.get(0);
@@ -49,7 +49,7 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest{
 
         // select vc
         List<VirtualCorpus> vcList =
-                dao.retrieveVCByType(ResourceType.SYSTEM, null);
+                dao.retrieveVCByType(ResourceType.SYSTEM, null, QueryType.VIRTUAL_CORPUS);
         assertEquals(2, vcList.size());
 
         VirtualCorpus vc = dao.retrieveVCById(id);
@@ -75,7 +75,7 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest{
     @Test
     public void retrieveSystemVC () throws KustvaktException {
         List<VirtualCorpus> vc =
-                dao.retrieveVCByType(ResourceType.SYSTEM, null);
+                dao.retrieveVCByType(ResourceType.SYSTEM, null, QueryType.VIRTUAL_CORPUS);
         assertEquals(1, vc.size());
     }
 
@@ -86,7 +86,8 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest{
      */
     @Test
     public void retrieveVCByUserDory () throws KustvaktException {
-        List<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("dory");
+        List<VirtualCorpus> virtualCorpora =
+                dao.retrieveVCByUser("dory", QueryType.VIRTUAL_CORPUS);
         // System.out.println(virtualCorpora);
         assertEquals(4, virtualCorpora.size());
         // ordered by id
@@ -105,7 +106,8 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest{
      */
     @Test
     public void retrieveVCByUserNemo () throws KustvaktException {
-        List<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("nemo");
+        List<VirtualCorpus> virtualCorpora =
+                dao.retrieveVCByUser("nemo", QueryType.VIRTUAL_CORPUS);
         assertEquals(3, virtualCorpora.size());
         Iterator<VirtualCorpus> i = virtualCorpora.iterator();
         assertEquals("group-vc", i.next().getName());
@@ -121,7 +123,8 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest{
      */
     @Test
     public void retrieveVCByUserMarlin () throws KustvaktException {
-        List<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("marlin");
+        List<VirtualCorpus> virtualCorpora =
+                dao.retrieveVCByUser("marlin", QueryType.VIRTUAL_CORPUS);
         assertEquals(3, virtualCorpora.size());
         Iterator<VirtualCorpus> i = virtualCorpora.iterator();
         assertEquals("system-vc", i.next().getName());
@@ -137,7 +140,8 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest{
      */
     @Test
     public void retrieveVCByUserPearl () throws KustvaktException {
-        List<VirtualCorpus> virtualCorpora = dao.retrieveVCByUser("pearl");
+        List<VirtualCorpus> virtualCorpora =
+                dao.retrieveVCByUser("pearl", QueryType.VIRTUAL_CORPUS);
         assertEquals(2, virtualCorpora.size());
         Iterator<VirtualCorpus> i = virtualCorpora.iterator();
         assertEquals("system-vc", i.next().getName());

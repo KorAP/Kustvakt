@@ -15,36 +15,54 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
+import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
-public class QueryReferenceControllerTest extends SpringJerseyTest{
+public class QueryReferenceControllerTest extends SpringJerseyTest {
 
     private String testUser = "qRefControllerTest";
-    
+
     @Test
     public void testCreatePrivateQuery () throws KustvaktException {
-        String json = "{\"type\": \"PRIVATE\""
-                + ",\"queryType\": \"QUERY\""
-                + ",\"queryLanguage\": \"poliqarp\""
-                + ",\"query\": \"der\"}";
-        
-        String qName="new_query";
+        String json = "{\"type\": \"PRIVATE\"" + ",\"queryType\": \"QUERY\""
+                + ",\"queryLanguage\": \"poliqarp\"" + ",\"query\": \"der\"}";
+
+        String qName = "new_query";
         ClientResponse response = resource().path(API_VERSION).path("query")
-                .path("~"+testUser).path(qName)
+                .path("~" + testUser).path(qName)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .put(ClientResponse.class, json);
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
         JsonNode node = testRetrieveQueryByName(testUser, testUser, qName);
-        System.out.println(node);
+        assertEquals(qName, node.at("/name").asText());
+        assertEquals(ResourceType.PRIVATE.displayName(),
+                node.at("/type").asText());
+        assertEquals(testUser, node.at("/createdBy").asText());
     }
-    
-    
+
+    @Test
+    public void testListAvailableQuery () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        String username = "dory";
+        ClientResponse response = resource().path(API_VERSION).path("query")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        String entity = response.getEntity(String.class);
+//        System.out.println(entity);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(2, node.size());
+    }
+
     private JsonNode testRetrieveQueryByName (String username, String qCreator,
             String qName) throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
@@ -54,10 +72,10 @@ public class QueryReferenceControllerTest extends SpringJerseyTest{
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
-//         System.out.println(entity);
+        // System.out.println(entity);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         return JsonUtils.readTree(entity);
     }
-    
+
 }

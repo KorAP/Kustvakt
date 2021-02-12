@@ -22,9 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.QueryType;
+import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
-import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.entity.UserGroupMember_;
@@ -75,9 +75,9 @@ public class VirtualCorpusDao {
     }
 
     public void editVirtualCorpus (VirtualCorpus vc, String name,
-            ResourceType type, CorpusAccess requiredAccess,
-            String koralQuery, String definition, String description,
-            String status, boolean isCached) throws KustvaktException {
+            ResourceType type, CorpusAccess requiredAccess, String koralQuery,
+            String definition, String description, String status,
+            boolean isCached) throws KustvaktException {
 
         if (name != null && !name.isEmpty()) {
             vc.setName(name);
@@ -131,31 +131,30 @@ public class VirtualCorpusDao {
      */
     @SuppressWarnings("unchecked")
     public List<VirtualCorpus> retrieveVCByType (ResourceType type,
-            String createdBy) throws KustvaktException {
+            String createdBy, QueryType queryType) throws KustvaktException {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<VirtualCorpus> query =
                 criteriaBuilder.createQuery(VirtualCorpus.class);
         Root<VirtualCorpus> virtualCorpus = query.from(VirtualCorpus.class);
 
-        Predicate conditions = null;
+        Predicate conditions = criteriaBuilder
+                .equal(virtualCorpus.get(VirtualCorpus_.queryType), queryType);
         if (createdBy != null && !createdBy.isEmpty()) {
-            conditions = criteriaBuilder.equal(
-                    virtualCorpus.get(VirtualCorpus_.createdBy), createdBy);
+            conditions = criteriaBuilder.and(conditions, criteriaBuilder.equal(
+                    virtualCorpus.get(VirtualCorpus_.createdBy), createdBy));
             if (type != null) {
                 conditions = criteriaBuilder.and(conditions, criteriaBuilder
                         .equal(virtualCorpus.get(VirtualCorpus_.type), type));
             }
         }
         else if (type != null) {
-            conditions = criteriaBuilder
-                    .equal(virtualCorpus.get(VirtualCorpus_.type), type);
+            conditions = criteriaBuilder.and(conditions, criteriaBuilder
+                    .equal(virtualCorpus.get(VirtualCorpus_.type), type));
         }
 
         query.select(virtualCorpus);
-        if (conditions != null) {
-            query.where(conditions);
-        }
+        query.where(conditions);
         Query q = entityManager.createQuery(query);
         return q.getResultList();
     }
@@ -178,7 +177,7 @@ public class VirtualCorpusDao {
         }
         catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
-                    "Virtual corpus with id: "+ id+" is not found",
+                    "Virtual corpus with id: " + id + " is not found",
                     String.valueOf(id), e);
         }
         return vc;
@@ -229,8 +228,8 @@ public class VirtualCorpusDao {
     }
 
     @SuppressWarnings("unchecked")
-    public List<VirtualCorpus> retrieveOwnerVC (String userId)
-            throws KustvaktException {
+    public List<VirtualCorpus> retrieveOwnerVC (String userId,
+            QueryType queryType) throws KustvaktException {
         ParameterChecker.checkStringValue(userId, "userId");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -238,9 +237,14 @@ public class VirtualCorpusDao {
                 builder.createQuery(VirtualCorpus.class);
 
         Root<VirtualCorpus> virtualCorpus = query.from(VirtualCorpus.class);
+        Predicate conditions = builder.and(
+                builder.equal(virtualCorpus.get(VirtualCorpus_.createdBy),
+                        userId),
+                builder.equal(virtualCorpus.get(VirtualCorpus_.queryType),
+                        queryType));
+
         query.select(virtualCorpus);
-        query.where(builder.equal(virtualCorpus.get(VirtualCorpus_.createdBy),
-                userId));
+        query.where(conditions);
 
         Query q = entityManager.createQuery(query);
         return q.getResultList();
@@ -269,7 +273,7 @@ public class VirtualCorpusDao {
     }
 
     @SuppressWarnings("unchecked")
-    public List<VirtualCorpus> retrieveGroupVCByUser (String userId)
+    public List<VirtualCorpus> retrieveGroupVCByUser (String userId, QueryType queryType)
             throws KustvaktException {
         ParameterChecker.checkStringValue(userId, "userId");
 
@@ -287,6 +291,9 @@ public class VirtualCorpusDao {
         // builder.notEqual(access.get(VirtualCorpusAccess_.status),
         // VirtualCorpusAccessStatus.DELETED));
 
+        Predicate type = builder
+                .equal(virtualCorpus.get(VirtualCorpus_.queryType), queryType);
+                
         Predicate corpusStatus =
                 builder.notEqual(access.get(VirtualCorpusAccess_.status),
                         VirtualCorpusAccessStatus.DELETED);
@@ -305,26 +312,29 @@ public class VirtualCorpusDao {
 
         query.select(virtualCorpus);
         query.where(
-                builder.and(corpusStatus, userGroupStatus, memberStatus, user));
+                builder.and(type, corpusStatus, userGroupStatus, memberStatus, user));
 
         Query q = entityManager.createQuery(query);
         return q.getResultList();
     }
 
-    public List<VirtualCorpus> retrieveVCByUser (String userId)
-            throws KustvaktException {
+    public List<VirtualCorpus> retrieveVCByUser (String userId,
+            QueryType queryType) throws KustvaktException {
         ParameterChecker.checkStringValue(userId, "userId");
+        ParameterChecker.checkObjectValue(queryType, "queryType");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<VirtualCorpus> query =
                 builder.createQuery(VirtualCorpus.class);
 
         Root<VirtualCorpus> virtualCorpus = query.from(VirtualCorpus.class);
-        Predicate predicate = builder.or(
-                builder.equal(virtualCorpus.get(VirtualCorpus_.createdBy),
-                        userId),
-                builder.equal(virtualCorpus.get(VirtualCorpus_.type),
-                        ResourceType.SYSTEM));
+        Predicate predicate = builder.and(
+                builder.equal(virtualCorpus.get(VirtualCorpus_.queryType),
+                        queryType),
+                builder.or(builder.equal(
+                        virtualCorpus.get(VirtualCorpus_.createdBy), userId),
+                        builder.equal(virtualCorpus.get(VirtualCorpus_.type),
+                                ResourceType.SYSTEM)));
 
         query.select(virtualCorpus);
         query.where(predicate);
@@ -333,7 +343,7 @@ public class VirtualCorpusDao {
 
         @SuppressWarnings("unchecked")
         List<VirtualCorpus> vcList = q.getResultList();
-        List<VirtualCorpus> groupVC = retrieveGroupVCByUser(userId);
+        List<VirtualCorpus> groupVC = retrieveGroupVCByUser(userId, queryType);
         Set<VirtualCorpus> vcSet = new HashSet<VirtualCorpus>();
         vcSet.addAll(vcList);
         vcSet.addAll(groupVC);

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Controller;
 import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
+import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
 import de.ids_mannheim.korap.dto.VirtualCorpusDto;
@@ -133,7 +134,7 @@ public class VirtualCorpusController {
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
             return service.retrieveVCByName(context.getUsername(), vcName,
-                    createdBy);
+                    createdBy, QueryType.VIRTUAL_CORPUS);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -165,7 +166,7 @@ public class VirtualCorpusController {
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
             return service.listAvailableVCForUser(context.getUsername(),
-                    username);
+                    username, QueryType.VIRTUAL_CORPUS);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -188,13 +189,14 @@ public class VirtualCorpusController {
     @Path("~{createdBy}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<VirtualCorpusDto> listUserVC (
-            @PathParam("createdBy") String createdBy, 
+            @PathParam("createdBy") String createdBy,
             @Context SecurityContext securityContext) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
-            return service.listOwnerVC(context.getUsername(), createdBy);
+            return service.listOwnerVC(context.getUsername(), createdBy,
+                    QueryType.VIRTUAL_CORPUS);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -227,7 +229,8 @@ public class VirtualCorpusController {
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.ADMIN);
-            return service.listVCByType(context.getUsername(), createdBy, type);
+            return service.listVCByType(context.getUsername(), createdBy, type,
+                    QueryType.VIRTUAL_CORPUS);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);

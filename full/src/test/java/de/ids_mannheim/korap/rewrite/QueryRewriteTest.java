@@ -1,21 +1,16 @@
 package de.ids_mannheim.korap.rewrite;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
 
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
@@ -35,7 +30,22 @@ public class QueryRewriteTest extends SpringJerseyTest {
 
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(node.at("/errors/0/1").asText(), "Query reference system/examplequery is not found.");
+        assertEquals("Query system/examplequery is not found.",
+                node.at("/errors/0/1").asText());
+    }
+    
+    @Test
+    public void testRewriteSystemQuery ()
+            throws KustvaktException, Exception {
+
+        ClientResponse response = resource().path(API_VERSION).path("search")
+            .queryParam("q", "[orth=der]{%23system-q} Baum")
+            .queryParam("ql", "poliqarp")
+            .get(ClientResponse.class);
+
+        String ent = response.getEntity(String.class);
+        System.out.println(ent);
+        JsonNode node = JsonUtils.readTree(ent);
     }
 
     @Test

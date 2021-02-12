@@ -7,11 +7,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.constant.QueryType;
+import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.rewrite.KoralNode.RewriteIdentifier;
-import de.ids_mannheim.korap.service.QueryReferenceService;
+import de.ids_mannheim.korap.service.VirtualCorpusService;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.util.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
@@ -27,10 +29,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class QueryReferenceRewrite implements RewriteTask.RewriteQuery {
 
     @Autowired
-    private KustvaktConfiguration config;
-
-    @Autowired
-    private QueryReferenceService qService;
+    private VirtualCorpusService service;
 
     @Override
     public KoralNode rewriteQuery (KoralNode node,
@@ -49,28 +48,34 @@ public class QueryReferenceRewrite implements RewriteTask.RewriteQuery {
             && koralNode.get("@type").equals("koral:queryRef")) {
             if (!koralNode.has("ref")) {
                 throw new KustvaktException(
-                    StatusCodes.MISSING_QUERY_REFERENCE,
+                    de.ids_mannheim.korap.util.StatusCodes.MISSING_QUERY_REFERENCE,
                     "ref is not found"
                     );
             }
             else {
                 String queryRefName = koralNode.get("ref");
                 String queryRefOwner = "system";
-                boolean ownerExist = false;
                 if (queryRefName.contains("/")) {
                     String[] names = queryRefName.split("/");
                     if (names.length == 2) {
                         queryRefOwner = names[0];
                         queryRefName = names[1];
-                        ownerExist = true;
                     }
                 }
 
-                JsonNode qref = qService.searchQueryByName(
-                    username,
-                    queryRefName,
-                    queryRefOwner);
+                VirtualCorpus qr = service.searchVCByName(username,
+                        queryRefName, queryRefOwner, QueryType.QUERY);
 
+                if (qr == null) {
+                    throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
+                            "Query reference " + queryRefName
+                                    + " is not found.",
+                            String.valueOf(queryRefName));
+                }
+
+                // TODO:
+                //   checkVCAcess(q, username);
+                JsonNode qref = JsonUtils.readTree(qr.getKoralQuery());;
                 rewriteQuery(qref,koralNode);
             }
         }
@@ -86,17 +91,6 @@ public class QueryReferenceRewrite implements RewriteTask.RewriteQuery {
         }
     }
 
-
-    private void removeOwner (String koralQuery,
-                              String queryRefOwner,
-                              KoralNode koralNode) throws KustvaktException {
-        JsonNode jsonNode = koralNode.rawNode();
-        String ref = jsonNode.at("/ref").asText();
-        koralNode.remove("ref", new RewriteIdentifier("ref", ref));
-
-        ref = ref.substring(queryRefOwner.length() + 1, ref.length());
-        koralNode.set("ref", ref, new RewriteIdentifier("ref", ref));
-    }
 
     private void rewriteQuery (JsonNode qref, KoralNode koralNode)
         throws KustvaktException {

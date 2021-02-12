@@ -23,7 +23,6 @@ public class QueryJson {
     
     // required
     private ResourceType type;
-    private QueryType queryType;
     // required for queryType="VIRTUAL_CORPUS"
     private String corpusQuery;
     // required for queryType="QUERY"
@@ -35,4 +34,5 @@ public class QueryJson {
     private String description;
     private String status;
     private String queryVersion;
+    private QueryType queryType;
 }

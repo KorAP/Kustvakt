@@ -91,15 +91,15 @@ public class VirtualCorpusService {
         }
     }
 
-    public List<VirtualCorpusDto> listOwnerVC (String username, String vcCreator)
-            throws KustvaktException {
+    public List<VirtualCorpusDto> listOwnerVC (String username,
+            String vcCreator, QueryType queryType) throws KustvaktException {
         verifyUsername(username, vcCreator);
-        List<VirtualCorpus> vcList = vcDao.retrieveOwnerVC(username);
-        return createVCDtos(vcList);
+        List<VirtualCorpus> vcList = vcDao.retrieveOwnerVC(username, queryType);
+        return createVCDtos(vcList, queryType);
     }
 
     public List<VirtualCorpusDto> listAvailableVCForUser (
-            String authenticatedUsername, String username)
+            String authenticatedUsername, String username, QueryType queryType)
             throws KustvaktException {
 
         boolean isAdmin = adminDao.isAdmin(authenticatedUsername);
@@ -115,20 +115,22 @@ public class VirtualCorpusService {
         else {
             username = authenticatedUsername;
         }
-        List<VirtualCorpus> vcList = vcDao.retrieveVCByUser(username);
-        return createVCDtos(vcList);
+        List<VirtualCorpus> vcList =
+                vcDao.retrieveVCByUser(username, queryType);
+        return createVCDtos(vcList, queryType);
     }
 
     public List<VirtualCorpusDto> listVCByType (String username,
-            String createdBy, ResourceType type) throws KustvaktException {
+            String createdBy, ResourceType type, QueryType queryType)
+            throws KustvaktException {
 
         boolean isAdmin = adminDao.isAdmin(username);
 
         if (isAdmin) {
             List<VirtualCorpus> virtualCorpora =
-                    vcDao.retrieveVCByType(type, createdBy);
+                    vcDao.retrieveVCByType(type, createdBy, queryType);
             Collections.sort(virtualCorpora);
-            return createVCDtos(virtualCorpora);
+            return createVCDtos(virtualCorpora, queryType);
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
@@ -137,14 +139,18 @@ public class VirtualCorpusService {
     }
 
     private ArrayList<VirtualCorpusDto> createVCDtos (
-            List<VirtualCorpus> vcList) throws KustvaktException {
+            List<VirtualCorpus> vcList, QueryType queryType)
+            throws KustvaktException {
         ArrayList<VirtualCorpusDto> dtos = new ArrayList<>(vcList.size());
         VirtualCorpus vc;
         Iterator<VirtualCorpus> i = vcList.iterator();
         while (i.hasNext()) {
             vc = i.next();
             String json = vc.getKoralQuery();
-            String statistics = krill.getStatistics(json);
+            String statistics = null;
+            if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
+                statistics = krill.getStatistics(json);
+            }
             VirtualCorpusDto vcDto =
                     converter.createVirtualCorpusDto(vc, statistics);
             dtos.add(vcDto);
@@ -204,7 +210,7 @@ public class VirtualCorpusService {
         if (vc == null) {
             String vcCode = createdBy + "/" + vcName;
             throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
-                    "Virtual corpus "+ vcCode+" is not found.",
+                    "Virtual corpus " + vcCode + " is not found.",
                     String.valueOf(vcCode));
         }
         else if (vc.getCreatedBy().equals(username)
@@ -217,7 +223,7 @@ public class VirtualCorpusService {
                 userGroupService.deleteAutoHiddenGroup(
                         access.getUserGroup().getId(), "system");
             }
-            if (KrillCollection.cache.get(vc.getName())!=null){
+            if (KrillCollection.cache.get(vc.getName()) != null) {
                 KrillCollection.cache.remove(vc.getName());
             }
             vcDao.deleteVirtualCorpus(vc);
@@ -228,17 +234,17 @@ public class VirtualCorpusService {
         }
     }
 
-//    @Deprecated
-//    public void editVC (VirtualCorpusJson vcJson, String username)
-//            throws KustvaktException {
-//        ParameterChecker.checkIntegerValue(vcJson.getId(), "id");
-//        VirtualCorpus vc = vcDao.retrieveVCById(vcJson.getId());
-//        editVC(vc, vcJson, vcJson.getName(), username);
-//    }
+    // @Deprecated
+    // public void editVC (VirtualCorpusJson vcJson, String username)
+    // throws KustvaktException {
+    // ParameterChecker.checkIntegerValue(vcJson.getId(), "id");
+    // VirtualCorpus vc = vcDao.retrieveVCById(vcJson.getId());
+    // editVC(vc, vcJson, vcJson.getName(), username);
+    // }
 
     public Status handlePutRequest (String username, String vcCreator,
             String vcName, QueryJson vcJson) throws KustvaktException {
-        
+
         verifyUsername(username, vcCreator);
         VirtualCorpus vc = vcDao.retrieveVCByName(vcName, vcCreator);
         ParameterChecker.checkObjectValue(vcJson, "request entity");
@@ -280,8 +286,9 @@ public class VirtualCorpusService {
                     deleteVCAccess(hiddenAccess.getId(), "system");
                     int groupId = hiddenAccess.getUserGroup().getId();
                     userGroupService.deleteAutoHiddenGroup(groupId, "system");
-                    // EM: should the users within the hidden group receive 
-                    // notifications? 
+                    // EM: should the users within the hidden group
+                    // receive
+                    // notifications?
                 }
                 // else remains the same
             }
@@ -318,24 +325,27 @@ public class VirtualCorpusService {
     public void storeVC (QueryJson vc, String vcName, String createdBy)
             throws KustvaktException {
         String koralQuery = null;
-        if (vc.getQueryType().equals(QueryType.VIRTUAL_CORPUS)){
-            ParameterChecker.checkStringValue(vc.getCorpusQuery(), "corpusQuery");
+        if (vc.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
+            ParameterChecker.checkStringValue(vc.getCorpusQuery(),
+                    "corpusQuery");
             koralQuery = serializeCorpusQuery(vc.getCorpusQuery());
         }
-        else if (vc.getQueryType().equals(QueryType.QUERY)){
+        else if (vc.getQueryType().equals(QueryType.QUERY)) {
             ParameterChecker.checkStringValue(vc.getQuery(), "query");
-            ParameterChecker.checkStringValue(vc.getQueryLanguage(), "queryLanguage");
+            ParameterChecker.checkStringValue(vc.getQueryLanguage(),
+                    "queryLanguage");
             koralQuery = serializeQuery(vc.getQuery(), vc.getQueryLanguage());
         }
-        
-        storeVC(vcName, vc.getType(), vc.getQueryType(), koralQuery, vc.getDefinition(),
-                vc.getDescription(), vc.getStatus(), vc.isCached(), createdBy);
+
+        storeVC(vcName, vc.getType(), vc.getQueryType(), koralQuery,
+                vc.getDefinition(), vc.getDescription(), vc.getStatus(),
+                vc.isCached(), createdBy);
     }
 
-    public void storeVC (String vcName, ResourceType type,
-            QueryType queryType, String koralQuery, String definition,
-            String description, String status, boolean isCached,
-            String username) throws KustvaktException {
+    public void storeVC (String vcName, ResourceType type, QueryType queryType,
+            String koralQuery, String definition, String description,
+            String status, boolean isCached, String username)
+            throws KustvaktException {
         ParameterChecker.checkNameValue(vcName, "vcName");
         ParameterChecker.checkObjectValue(type, "type");
 
@@ -398,12 +408,12 @@ public class VirtualCorpusService {
         }
         return koralQuery;
     }
-    
+
     private String serializeQuery (String query, String queryLanguage)
             throws KustvaktException {
         QuerySerializer serializer = new QuerySerializer();
         String koralQuery;
-            koralQuery = serializer.setQuery(query, queryLanguage).toJSON();
+        koralQuery = serializer.setQuery(query, queryLanguage).toJSON();
         if (DEBUG) {
             jlog.debug(koralQuery);
         }
@@ -452,15 +462,14 @@ public class VirtualCorpusService {
         return (numberOfDoc > 0) ? true : false;
     }
 
-
     public void shareVC (String username, String createdBy, String vcName,
             String groupName) throws KustvaktException {
 
         VirtualCorpus vc = vcDao.retrieveVCByName(vcName, createdBy);
-        if (vc == null){
+        if (vc == null) {
             String vcCode = createdBy + "/" + vcName;
             throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
-                    "Virtual corpus "+ vcCode+" is not found.",
+                    "Virtual corpus " + vcCode + " is not found.",
                     String.valueOf(vcCode));
         }
         if (!username.equals(vc.getCreatedBy())
@@ -469,7 +478,8 @@ public class VirtualCorpusService {
                     "Unauthorized operation for user: " + username, username);
         }
 
-        UserGroup userGroup = userGroupService.retrieveUserGroupByName(groupName);
+        UserGroup userGroup =
+                userGroupService.retrieveUserGroupByName(groupName);
 
         if (!isVCAccessAdmin(userGroup, username)
                 && !adminDao.isAdmin(username)) {
@@ -494,9 +504,9 @@ public class VirtualCorpusService {
                 throw new KustvaktException(StatusCodes.DB_INSERT_FAILED,
                         cause.getMessage());
             }
-            
-            vcDao.editVirtualCorpus(vc, null, ResourceType.PROJECT, null,
-                    null, null, null, null, vc.isCached());
+
+            vcDao.editVirtualCorpus(vc, null, ResourceType.PROJECT, null, null,
+                    null, null, null, vc.isCached());
         }
     }
 
@@ -528,7 +538,6 @@ public class VirtualCorpusService {
     // }
     // }
 
-    
     public List<VirtualCorpusAccessDto> listVCAccessByUsername (String username)
             throws KustvaktException {
         List<VirtualCorpusAccess> accessList = new ArrayList<>();
@@ -536,17 +545,18 @@ public class VirtualCorpusService {
             accessList = accessDao.retrieveAllAccess();
         }
         else {
-            List<UserGroup> groups = userGroupService.retrieveUserGroup(username);
-            for (UserGroup g: groups){
-                if (isVCAccessAdmin(g, username)){
-                    accessList.addAll(accessDao.retrieveActiveAccessByGroup(g.getId()));
-                }   
+            List<UserGroup> groups =
+                    userGroupService.retrieveUserGroup(username);
+            for (UserGroup g : groups) {
+                if (isVCAccessAdmin(g, username)) {
+                    accessList.addAll(
+                            accessDao.retrieveActiveAccessByGroup(g.getId()));
+                }
             }
         }
         return accessConverter.createVCADto(accessList);
     }
-    
-    
+
     public List<VirtualCorpusAccessDto> listVCAccessByVC (String username,
             String vcCreator, String vcName) throws KustvaktException {
 
@@ -587,17 +597,19 @@ public class VirtualCorpusService {
 
         return accessConverter.createVCADto(accessList);
     }
-    
+
     public List<VirtualCorpusAccessDto> listVCAccessByGroup (String username,
             String groupName) throws KustvaktException {
-        UserGroup userGroup = userGroupService.retrieveUserGroupByName(groupName);
+        UserGroup userGroup =
+                userGroupService.retrieveUserGroupByName(groupName);
 
         List<VirtualCorpusAccess> accessList;
         if (adminDao.isAdmin(username)) {
             accessList = accessDao.retrieveAllAccessByGroup(userGroup.getId());
         }
         else if (isVCAccessAdmin(userGroup, username)) {
-            accessList = accessDao.retrieveActiveAccessByGroup(userGroup.getId());
+            accessList =
+                    accessDao.retrieveActiveAccessByGroup(userGroup.getId());
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
@@ -623,12 +635,12 @@ public class VirtualCorpusService {
     }
 
     public VirtualCorpus searchVCByName (String username, String vcName,
-            String createdBy) throws KustvaktException {
+            String createdBy, QueryType queryType) throws KustvaktException {
         VirtualCorpus vc = vcDao.retrieveVCByName(vcName, createdBy);
         if (vc == null) {
             String vcCode = createdBy + "/" + vcName;
             throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
-                    "Virtual corpus "+ vcCode+" is not found.",
+                    queryType.displayName()+ " " + vcCode + " is not found.",
                     String.valueOf(vcCode));
         }
         checkVCAccess(vc, username);
@@ -636,11 +648,11 @@ public class VirtualCorpusService {
     }
 
     public VirtualCorpusDto retrieveVCByName (String username, String vcName,
-            String createdBy) throws KustvaktException {
-        VirtualCorpus vc = searchVCByName(username, vcName, createdBy);
+            String createdBy, QueryType queryType) throws KustvaktException {
+        VirtualCorpus vc = searchVCByName(username, vcName, createdBy, queryType);
         String json = vc.getKoralQuery();
         String statistics = null;
-        if (vc.getQueryType().equals(QueryType.VIRTUAL_CORPUS)){
+        if (vc.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
             statistics = krill.getStatistics(json);
         }
         return converter.createVirtualCorpusDto(vc, statistics);

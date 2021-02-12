@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.entity.VirtualCorpus;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.rewrite.KoralNode.RewriteIdentifier;
@@ -71,10 +72,11 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
                 }
                 
                 VirtualCorpus vc =
-                        vcService.searchVCByName(username, vcName, vcOwner);
+                        vcService.searchVCByName(username, vcName, vcOwner, QueryType.VIRTUAL_CORPUS);
                 if (!vc.isCached()) {
                     rewriteVC(vc, koralNode);
                 }
+                // required for named-vc since they are stored by filenames in the cache
                 else if (ownerExist) {
                     removeOwner(vc.getKoralQuery(), vcOwner, koralNode);
                 }

@@ -1,11 +1,14 @@
 package de.ids_mannheim.korap.web.controller;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -119,7 +122,7 @@ public class QueryReferenceController {
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
             return service.retrieveVCByName(context.getUsername(), qName,
-                    createdBy);
+                    createdBy, QueryType.QUERY);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -159,6 +162,22 @@ public class QueryReferenceController {
 
     
     // TODO: List all queries available to the logged in user
+    @GET
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public List<VirtualCorpusDto> listAvailableQuery (
+            @Context SecurityContext securityContext,
+            @QueryParam("username") String username) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
+            return service.listAvailableVCForUser(context.getUsername(),
+                    username, QueryType.QUERY);
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+    }
     // TODO: List all queries of a sepcific user
     // TODO: Some admin routes missing.
     // TODO: Some sharing routes missing
