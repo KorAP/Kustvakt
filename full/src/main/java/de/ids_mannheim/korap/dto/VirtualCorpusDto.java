@@ -32,5 +32,7 @@ public class VirtualCorpusDto {
     private int numberOfSentences;
     private int numberOfTokens;
     
+    private String query;
+    private String queryLanguage;
     private JsonNode koralQuery;
 }

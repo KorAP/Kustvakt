@@ -43,6 +43,8 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         assertEquals(ResourceType.PRIVATE.displayName(),
                 node.at("/type").asText());
         assertEquals(testUser, node.at("/createdBy").asText());
+        assertEquals("der", node.at("/query").asText());
+        assertEquals("poliqarp", node.at("/queryLanguage").asText());
     }
 
     @Test

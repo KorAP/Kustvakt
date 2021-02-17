@@ -45,7 +45,7 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
         int id = dao.createVirtualCorpus("system-vc", ResourceType.SYSTEM,
                 QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE,
                 "corpusSigle=GOE", "definition", "description", "experimental",
-                false, "test class");
+                false, "test class", null, null);
 
         // select vc
         List<VirtualCorpus> vcList =
@@ -69,7 +69,7 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
         dao.createVirtualCorpus("system-vc", ResourceType.SYSTEM,
                 QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE,
                 "corpusSigle=GOE", "definition", "description", "experimental",
-                false, "system");
+                false, "system", null, null);
     }
 
     @Test

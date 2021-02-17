@@ -339,13 +339,13 @@ public class VirtualCorpusService {
 
         storeVC(vcName, vc.getType(), vc.getQueryType(), koralQuery,
                 vc.getDefinition(), vc.getDescription(), vc.getStatus(),
-                vc.isCached(), createdBy);
+                vc.isCached(), createdBy, vc.getQuery(), vc.getQueryLanguage());
     }
 
     public void storeVC (String vcName, ResourceType type, QueryType queryType,
             String koralQuery, String definition, String description,
-            String status, boolean isCached, String username)
-            throws KustvaktException {
+            String status, boolean isCached, String username, String query,
+            String queryLanguage) throws KustvaktException {
         ParameterChecker.checkNameValue(vcName, "vcName");
         ParameterChecker.checkObjectValue(type, "type");
 
@@ -370,7 +370,7 @@ public class VirtualCorpusService {
         try {
             vcId = vcDao.createVirtualCorpus(vcName, type, queryType,
                     requiredAccess, koralQuery, definition, description, status,
-                    isCached, username);
+                    isCached, username, query, queryLanguage);
 
         }
         catch (Exception e) {

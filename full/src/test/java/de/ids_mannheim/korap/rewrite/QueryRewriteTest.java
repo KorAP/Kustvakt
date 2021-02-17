@@ -44,7 +44,7 @@ public class QueryRewriteTest extends SpringJerseyTest {
             .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
-        System.out.println(ent);
+//        System.out.println(ent);
         JsonNode node = JsonUtils.readTree(ent);
     }
 

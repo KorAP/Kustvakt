@@ -137,7 +137,7 @@ public class UserGroupDaoTest {
         int id = virtualCorpusDao.createVirtualCorpus(name,
                 ResourceType.PROJECT, QueryType.VIRTUAL_CORPUS,
                 CorpusAccess.PUB, "corpusSigle=WPD15", "", "", "", false,
-                createdBy);
+                createdBy, null, null);
 
         VirtualCorpus virtualCorpus = virtualCorpusDao.retrieveVCById(id);
         userGroupDao.addVCToGroup(virtualCorpus, createdBy,

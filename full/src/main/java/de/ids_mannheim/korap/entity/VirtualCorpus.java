@@ -45,9 +45,6 @@ public class VirtualCorpus implements Comparable<VirtualCorpus> {
     private String name;
     @Enumerated(EnumType.STRING)
     private ResourceType type;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "query_type")
-    private QueryType queryType;
     private String status;
     private String description;
     @Enumerated(EnumType.STRING)
@@ -60,6 +57,13 @@ public class VirtualCorpus implements Comparable<VirtualCorpus> {
     private String createdBy;
     @Column(name = "is_cached")
     private boolean isCached;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "query_type")
+    private QueryType queryType;
+    private String query;
+    @Column(name = "query_language")
+    private String queryLanguage;
 
     @OneToMany(mappedBy = "virtualCorpus", fetch = FetchType.LAZY,
             cascade = CascadeType.REMOVE)

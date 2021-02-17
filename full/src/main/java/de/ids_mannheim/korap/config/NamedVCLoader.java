@@ -62,7 +62,7 @@ public class NamedVCLoader implements Runnable{
             cacheVC(json, filename);
             vcService.storeVC(filename, ResourceType.SYSTEM,
                     QueryType.VIRTUAL_CORPUS, json, null, null, null, true,
-                    "system");
+                    "system", null, null);
         }
     }
 
@@ -104,7 +104,7 @@ public class NamedVCLoader implements Runnable{
                 }
                 vcService.storeVC(filename, ResourceType.SYSTEM,
                         QueryType.VIRTUAL_CORPUS, json, null, null, null, true,
-                        "system");
+                        "system", null, null);
             }
         }
     }

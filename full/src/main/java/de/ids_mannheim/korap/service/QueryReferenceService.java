@@ -31,6 +31,7 @@ import de.ids_mannheim.korap.entity.QueryReference;
  *
  * @author diewald
  */
+@Deprecated
 @Service
 public class QueryReferenceService {
 

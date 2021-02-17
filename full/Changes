@@ -19,6 +19,11 @@
    - Add query reference web-service (diewald,margaretha)   
 10/02/2021
    - Fixed problem with multiple desktop apps (diewald, margaretha)
+12/02/2021
+   - Added listing available queries for users (margaretha)
+17/02/2021
+   - Removed escaping for KoralQuery in VC and query reference responses (margaretha)
+   - Added query and query language in virtual corpus table (margaretha)
 
 # version 0.62.4
 24/01/2020

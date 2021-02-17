@@ -120,6 +120,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals(ResourceType.SYSTEM.displayName(),
                 node.at("/type").asText());
         assertEquals("koral:doc", node.at("/koralQuery/collection/@type").asText());
+        assertTrue(node.at("/query").isMissingNode());
+        assertTrue(node.at("/queryLanguage").isMissingNode());
     }
 
     @Test

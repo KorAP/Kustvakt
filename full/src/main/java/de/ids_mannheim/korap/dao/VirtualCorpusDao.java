@@ -56,7 +56,8 @@ public class VirtualCorpusDao {
     public int createVirtualCorpus (String name, ResourceType type,
             QueryType queryType, CorpusAccess requiredAccess, String koralQuery,
             String definition, String description, String status,
-            boolean isCached, String createdBy) throws KustvaktException {
+            boolean isCached, String createdBy, String query,
+            String queryLanguage) throws KustvaktException {
 
         VirtualCorpus vc = new VirtualCorpus();
         vc.setName(name);
@@ -69,6 +70,8 @@ public class VirtualCorpusDao {
         vc.setStatus(status);
         vc.setCreatedBy(createdBy);
         vc.setCached(isCached);
+        vc.setQuery(query);
+        vc.setQueryLanguage(queryLanguage);
 
         entityManager.persist(vc);
         return vc.getId();
