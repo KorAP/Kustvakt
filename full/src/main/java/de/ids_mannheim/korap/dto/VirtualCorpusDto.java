@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.entity.VirtualCorpus;
 import lombok.Getter;
@@ -31,4 +32,5 @@ public class VirtualCorpusDto {
     private int numberOfSentences;
     private int numberOfTokens;
     
-    private String koralQuery;}
+    private JsonNode koralQuery;
+}

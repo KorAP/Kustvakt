@@ -46,9 +46,32 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testListAvailableQuery () throws UniformInterfaceException,
+    public void testAvailableQueryForDory () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        String username = "dory";
+        JsonNode node = testListAvailableQuery("dory");
+        assertEquals(2, node.size());
+    }
+
+    @Test
+    public void testListAvailableQueryForPearl ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        
+        JsonNode node = testListAvailableQuery("pearl");
+        
+        assertEquals(1, node.size());
+        assertEquals("system-q", node.at("/0/name").asText());
+        assertEquals(ResourceType.SYSTEM.displayName(),
+                node.at("/0/type").asText());
+        assertEquals("\"system\" query", node.at("/0/description").asText());
+        assertEquals("koral:token", node.at("/0/koralQuery/@type").asText());
+
+    }
+
+    private JsonNode testListAvailableQuery (String username)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
@@ -58,11 +81,11 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         String entity = response.getEntity(String.class);
-//        System.out.println(entity);
+        // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(2, node.size());
+        return node;
     }
-
+    
     private JsonNode testRetrieveQueryByName (String username, String qCreator,
             String qName) throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {

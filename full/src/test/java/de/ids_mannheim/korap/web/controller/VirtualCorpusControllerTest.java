@@ -119,6 +119,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals("system-vc", node.at("/name").asText());
         assertEquals(ResourceType.SYSTEM.displayName(),
                 node.at("/type").asText());
+        assertEquals("koral:doc", node.at("/koralQuery/collection/@type").asText());
     }
 
     @Test
@@ -703,10 +704,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         // check VC
         JsonNode node = testListVC("dory");
-        String koralQuery = node.get(0).get("koralQuery").asText();
-        node = JsonUtils.readTree(koralQuery);
-        assertEquals("WPD17", node.at("/collection/value").asText());
-        assertTrue(koralQuery.contains("WPD17"));
+        assertEquals("WPD17", node.at("/0/koralQuery/collection/value").asText());
     }
 
     @Test

@@ -31,7 +31,8 @@ public class VirtualCorpusConverter {
         dto.setStatus(vc.getStatus());
         dto.setDescription(vc.getDescription());
         dto.setType(vc.getType().displayName());
-        dto.setKoralQuery(vc.getKoralQuery());
+        JsonNode kq = JsonUtils.readTree(vc.getKoralQuery());
+        dto.setKoralQuery(kq);
 
         if (statistics != null) {
             JsonNode node = JsonUtils.readTree(statistics);

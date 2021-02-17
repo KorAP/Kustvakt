@@ -171,8 +171,9 @@ public class QueryReferenceController {
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
-            return service.listAvailableVCForUser(context.getUsername(),
-                    username, QueryType.QUERY);
+            List<VirtualCorpusDto> dtos = service.listAvailableVCForUser(
+                    context.getUsername(), username, QueryType.QUERY);
+            return dtos;
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
