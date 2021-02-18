@@ -24,6 +24,9 @@
 17/02/2021
    - Removed escaping for KoralQuery in VC and query reference responses (margaretha)
    - Added query and query language in virtual corpus table (margaretha)
+18/02/2021
+   - Set corpus access public for stored query (margaretha)
+   
 
 # version 0.62.4
 24/01/2020

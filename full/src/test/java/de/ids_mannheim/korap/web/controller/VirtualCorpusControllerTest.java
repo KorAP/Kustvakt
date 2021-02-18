@@ -515,7 +515,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
-        assertEquals("vcName must contain at least 3 characters",
+        assertEquals("queryName must contain at least 3 characters",
                 node.at("/errors/0/1").asText());
     }
 

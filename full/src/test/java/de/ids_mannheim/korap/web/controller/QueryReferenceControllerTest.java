@@ -17,6 +17,7 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 public class QueryReferenceControllerTest extends SpringJerseyTest {
@@ -39,12 +40,14 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
         JsonNode node = testRetrieveQueryByName(testUser, testUser, qName);
+//        System.out.println(node);
         assertEquals(qName, node.at("/name").asText());
         assertEquals(ResourceType.PRIVATE.displayName(),
                 node.at("/type").asText());
         assertEquals(testUser, node.at("/createdBy").asText());
         assertEquals("der", node.at("/query").asText());
         assertEquals("poliqarp", node.at("/queryLanguage").asText());
+        assertEquals(CorpusAccess.PUB.name(), node.at("/requiredAccess").asText());
     }
 
     @Test

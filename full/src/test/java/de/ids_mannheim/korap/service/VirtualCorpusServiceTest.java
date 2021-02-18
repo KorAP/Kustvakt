@@ -48,7 +48,7 @@ public class VirtualCorpusServiceTest {
         vc.setCorpusQuery("corpusSigle=GOE");
         vc.setType(ResourceType.PRIVATE);
         vc.setQueryType(QueryType.VIRTUAL_CORPUS);
-        vcService.storeVC(vc, "dory-vc", "dory");
+        vcService.storeQuery(vc, "dory-vc", "dory");
     }
 
     @Test
@@ -60,7 +60,7 @@ public class VirtualCorpusServiceTest {
         vc.setType(ResourceType.PUBLISHED);
         vc.setQueryType(QueryType.VIRTUAL_CORPUS);
         String username = "VirtualCorpusServiceTest";
-        vcService.storeVC(vc, vcName, username );
+        vcService.storeQuery(vc, vcName, username );
 
         List<VirtualCorpusAccessDto> accesses =
                 vcService.listVCAccessByUsername("admin");

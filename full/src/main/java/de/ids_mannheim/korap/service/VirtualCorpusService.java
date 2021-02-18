@@ -62,7 +62,7 @@ public class VirtualCorpusService {
 
     public static boolean DEBUG = false;
 
-    public static Pattern vcNamePattern = Pattern.compile("[-\\w.]+");
+    public static Pattern queryNamePattern = Pattern.compile("[-\\w.]+");
 
     @Autowired
     private VirtualCorpusDao vcDao;
@@ -243,17 +243,17 @@ public class VirtualCorpusService {
     // }
 
     public Status handlePutRequest (String username, String vcCreator,
-            String vcName, QueryJson vcJson) throws KustvaktException {
+            String vcName, QueryJson queryJson) throws KustvaktException {
 
         verifyUsername(username, vcCreator);
         VirtualCorpus vc = vcDao.retrieveVCByName(vcName, vcCreator);
-        ParameterChecker.checkObjectValue(vcJson, "request entity");
+        ParameterChecker.checkObjectValue(queryJson, "request entity");
         if (vc == null) {
-            storeVC(vcJson, vcName, username);
+            storeQuery(queryJson, vcName, username);
             return Status.CREATED;
         }
         else {
-            editVC(vc, vcJson, vcName, username);
+            editVC(vc, queryJson, vcName, username);
             return Status.NO_CONTENT;
         }
     }
@@ -322,38 +322,40 @@ public class VirtualCorpusService {
         }
     }
 
-    public void storeVC (QueryJson vc, String vcName, String createdBy)
+    public void storeQuery (QueryJson query, String queryName, String createdBy)
             throws KustvaktException {
         String koralQuery = null;
-        if (vc.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
-            ParameterChecker.checkStringValue(vc.getCorpusQuery(),
+        if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
+            ParameterChecker.checkStringValue(query.getCorpusQuery(),
                     "corpusQuery");
-            koralQuery = serializeCorpusQuery(vc.getCorpusQuery());
+            koralQuery = serializeCorpusQuery(query.getCorpusQuery());
         }
-        else if (vc.getQueryType().equals(QueryType.QUERY)) {
-            ParameterChecker.checkStringValue(vc.getQuery(), "query");
-            ParameterChecker.checkStringValue(vc.getQueryLanguage(),
+        else if (query.getQueryType().equals(QueryType.QUERY)) {
+            ParameterChecker.checkStringValue(query.getQuery(), "query");
+            ParameterChecker.checkStringValue(query.getQueryLanguage(),
                     "queryLanguage");
-            koralQuery = serializeQuery(vc.getQuery(), vc.getQueryLanguage());
+            koralQuery =
+                    serializeQuery(query.getQuery(), query.getQueryLanguage());
         }
 
-        storeVC(vcName, vc.getType(), vc.getQueryType(), koralQuery,
-                vc.getDefinition(), vc.getDescription(), vc.getStatus(),
-                vc.isCached(), createdBy, vc.getQuery(), vc.getQueryLanguage());
+        storeQuery(queryName, query.getType(), query.getQueryType(), koralQuery,
+                query.getDefinition(), query.getDescription(),
+                query.getStatus(), query.isCached(), createdBy,
+                query.getQuery(), query.getQueryLanguage());
     }
 
-    public void storeVC (String vcName, ResourceType type, QueryType queryType,
+    public void storeQuery (String queryName, ResourceType type, QueryType queryType,
             String koralQuery, String definition, String description,
             String status, boolean isCached, String username, String query,
             String queryLanguage) throws KustvaktException {
-        ParameterChecker.checkNameValue(vcName, "vcName");
+        ParameterChecker.checkNameValue(queryName, "name");
         ParameterChecker.checkObjectValue(type, "type");
 
-        if (!vcNamePattern.matcher(vcName).matches()) {
+        if (!queryNamePattern.matcher(queryName).matches()) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
-                    "Virtual corpus name must only contain letters, numbers, "
-                            + "underscores, hypens and spaces",
-                    vcName);
+                    queryType.displayName() + " name must only contain "
+                            + "letters, numbers, underscores, hypens and spaces",
+                    queryName);
         }
 
         if (type.equals(ResourceType.SYSTEM) && !username.equals("system")
@@ -362,13 +364,18 @@ public class VirtualCorpusService {
                     "Unauthorized operation for user: " + username, username);
         }
 
-        CorpusAccess requiredAccess =
-                determineRequiredAccess(isCached, vcName, koralQuery);
+        CorpusAccess requiredAccess = CorpusAccess.PUB;
+        if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
+            requiredAccess =
+                    determineRequiredAccess(isCached, queryName, koralQuery);
+        }
 
-        if (DEBUG) jlog.debug("Storing VC " + vcName + "in the database ");
-        int vcId = 0;
+        if (DEBUG) jlog.debug("Storing virtul corpus or query: " + queryName
+                + "in the database ");
+        
+        int queryId = 0;
         try {
-            vcId = vcDao.createVirtualCorpus(vcName, type, queryType,
+            queryId = vcDao.createVirtualCorpus(queryName, type, queryType,
                     requiredAccess, koralQuery, definition, description, status,
                     isCached, username, query, queryLanguage);
 
@@ -387,7 +394,7 @@ public class VirtualCorpusService {
                     cause.getMessage());
         }
         if (type.equals(ResourceType.PUBLISHED)) {
-            publishVC(vcId);
+            publishVC(queryId);
         }
     }
 
