@@ -348,7 +348,7 @@ public class VirtualCorpusService {
             String koralQuery, String definition, String description,
             String status, boolean isCached, String username, String query,
             String queryLanguage) throws KustvaktException {
-        ParameterChecker.checkNameValue(queryName, "name");
+        ParameterChecker.checkNameValue(queryName, "queryName");
         ParameterChecker.checkObjectValue(type, "type");
 
         if (!queryNamePattern.matcher(queryName).matches()) {

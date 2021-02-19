@@ -31,6 +31,11 @@ public class ServiceInfo {
     private String cache_store;
 
 
+    @Getter
+    private String krillVersion;
+    @Getter
+    private String koralVersion;
+    
     private ServiceInfo () {
         load();
     }
@@ -48,6 +53,9 @@ public class ServiceInfo {
             this.logger = (String) props.get("kustvakt.logging");
             this.cacheable = Boolean.valueOf((String) props.get("kustvakt.cache"));
             this.cache_store = (String) props.get("kustvakt.cache_store");
+            
+            this.krillVersion=(String) props.get("krill.version");
+            this.koralVersion=(String) props.get("koral.version");
         }
         catch (IOException e) {
             this.version = UNKNOWN;
@@ -56,12 +64,15 @@ public class ServiceInfo {
             this.config = UNKNOWN;
             this.cacheable = false;
             this.cache_store = UNKNOWN;
+            
+            this.koralVersion = UNKNOWN;
+            this.krillVersion = UNKNOWN;
         }
     }
 
 
     private static InputStream getStream () throws IOException {
-        String path = "kustvakt.info";
+        String path = "service.properties";
         InputStream stream = ConfigLoader.loadConfigStream(path);
         if (stream == null)
             throw new IOException("stream for resource " + path

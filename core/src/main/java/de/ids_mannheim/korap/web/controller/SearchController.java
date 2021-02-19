@@ -1,9 +1,11 @@
 package de.ids_mannheim.korap.web.controller;// package
                                              // de.ids_mannheim.korap.ext.web;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -34,6 +36,8 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.SearchService;
+import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.utils.ServiceInfo;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
@@ -75,6 +79,24 @@ public class SearchController {
             .ok(config.getApiWelcomeMessage())
             .header("X-Index-Revision", searchService.getIndexFingerprint())
             .build();
+    }
+    
+    @GET
+    @Path("{version}/info")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public Response info (){
+        Map<String, Object> m = new HashMap<>();
+        m.put("latest_api_version", config.getCurrentVersion());
+        m.put("supported_api_versions", config.getSupportedVersions());
+        m.put("kustvakt_version", ServiceInfo.getInfo().getVersion());
+        m.put("krill_version", ServiceInfo.getInfo().getKrillVersion());
+        m.put("koral_version", ServiceInfo.getInfo().getKoralVersion());
+        try {
+            return Response.ok(JsonUtils.toJSON(m)).build();
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
     }
     
     @POST

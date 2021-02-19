@@ -139,10 +139,15 @@ public class KustvaktConfiguration {
 
         apiWelcomeMessage = properties.getProperty("api.welcome.message", "Welcome to KorAP API!");
         currentVersion = properties.getProperty("current.api.version", "v1.0");
+
         String supportedVersions =
-                properties.getProperty("supported.api.version", "");
+                properties.getProperty("supported.api.versions", "");
         
-        this.supportedVersions = new HashSet<>(Arrays.asList(supportedVersions.split(" ")));
+        this.supportedVersions = new HashSet<>();
+        if (!supportedVersions.isEmpty()){
+            List<String> versionArray = Arrays.asList(supportedVersions.split(" "));
+            this.supportedVersions.addAll(versionArray);
+        }
         this.supportedVersions.add(currentVersion);
 
         maxhits = new Integer(properties.getProperty("maxhits", "50000"));

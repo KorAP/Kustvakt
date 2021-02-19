@@ -26,6 +26,8 @@
    - Added query and query language in virtual corpus table (margaretha)
 18/02/2021
    - Set corpus access public for stored query (margaretha)
+19/02/2021
+   - Enabled API info web-service (margaretha)    
    
 
 # version 0.62.4

@@ -14,12 +14,15 @@
 		<hibernate.version>5.4.25.Final</hibernate.version>
 		<flyway.version>7.4.0</flyway.version>
 		<log4j.version>2.13.3</log4j.version>
+		<krill.version>[0.59.3,)</krill.version>
+		<koral.version>[0.37,)</koral.version>
 	</properties>
 	
 	<build>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
+				 <filtering>true</filtering>
 			</resource>
 		</resources>
 		<testResources>
@@ -248,7 +251,7 @@
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Koral</artifactId>
-			<version>[0.37,)</version>
+			<version>${koral.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.sonatype.sisu</groupId>
@@ -310,7 +313,7 @@
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Krill</artifactId>
-			<version>[0.59.3,)</version>
+			<version>${krill.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.glassfish.jersey.containers</groupId>
