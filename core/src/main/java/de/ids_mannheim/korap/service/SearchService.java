@@ -70,6 +70,11 @@ public class SearchService extends BasicService{
         this.graphDBhandler = new ClientsHandler(builder.build());
     }
 
+    public String getKrillVersion () {
+        return searchKrill.getIndex().getVersion();
+
+    }
+    
     @SuppressWarnings("unchecked")
     public String serializeQuery (String q, String ql, String v, String cq,
             Integer pageIndex, Integer startPage, Integer pageLength,

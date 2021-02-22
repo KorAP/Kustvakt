@@ -89,7 +89,7 @@ public class SearchController {
         m.put("latest_api_version", config.getCurrentVersion());
         m.put("supported_api_versions", config.getSupportedVersions());
         m.put("kustvakt_version", ServiceInfo.getInfo().getVersion());
-        m.put("krill_version", ServiceInfo.getInfo().getKrillVersion());
+        m.put("krill_version", searchService.getKrillVersion());
         m.put("koral_version", ServiceInfo.getInfo().getKoralVersion());
         try {
             return Response.ok(JsonUtils.toJSON(m)).build();

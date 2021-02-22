@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 
 import javax.management.RuntimeErrorException;
@@ -77,6 +78,8 @@ public class NamedVCLoader implements Runnable{
             throw new IOException("Directory " + dir + " is not valid");
         }
 
+        jlog.info(Arrays.toString(d.list()));
+        
         for (File file : d.listFiles()) {
             if (!file.exists()) {
                 throw new IOException("File " + file + " is not found.");

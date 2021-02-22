@@ -14,12 +14,16 @@ import de.ids_mannheim.korap.config.LiteJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.ServiceInfo;
+import de.ids_mannheim.korap.web.SearchKrill;
 
 public class InfoControllerTest extends LiteJerseyTest {
 
     @Autowired
     private KustvaktConfiguration config;
 
+    @Autowired
+    private SearchKrill krill;
+    
     @Test
     public void testInfo () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("info")
@@ -36,7 +40,7 @@ public class InfoControllerTest extends LiteJerseyTest {
 
         assertEquals(ServiceInfo.getInfo().getVersion(),
                 node.at("/kustvakt_version").asText());
-        assertEquals(ServiceInfo.getInfo().getKrillVersion(),
+        assertEquals(krill.getIndex().getVersion(),
                 node.at("/krill_version").asText());
         assertEquals(ServiceInfo.getInfo().getKoralVersion(),
                 node.at("/koral_version").asText());

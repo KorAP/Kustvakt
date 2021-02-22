@@ -59,6 +59,6 @@
 		maxBytesLocalDisk="1G"
 		diskExpiryThreadIntervalSeconds = "120" > 
 		<persistence strategy="localTempSwap"/>
-		<sizeOfPolicy maxDepth="2000" maxDepthExceededBehavior="abort" />
+		<sizeOfPolicy maxDepth="3000" maxDepthExceededBehavior="abort" />
 	</cache>        
 </ehcache>
