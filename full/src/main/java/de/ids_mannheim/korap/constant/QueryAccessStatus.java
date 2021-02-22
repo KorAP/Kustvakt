@@ -1,14 +1,14 @@
 package de.ids_mannheim.korap.constant;
 
-import de.ids_mannheim.korap.entity.VirtualCorpusAccess;
+import de.ids_mannheim.korap.entity.QueryAccess;
 
-/** Defines possible statuses of {@link VirtualCorpusAccess}
+/** Defines possible statuses of {@link QueryAccess}
  * 
  * @author margaretha
- * @see VirtualCorpusAccess
+ * @see QueryAccess
  *
  */
-public enum VirtualCorpusAccessStatus {
+public enum QueryAccessStatus {
 
     ACTIVE, DELETED,
     // has not been used yet

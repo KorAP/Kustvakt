@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import de.ids_mannheim.korap.entity.VirtualCorpus;
+import de.ids_mannheim.korap.entity.QueryDO;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Defines the structure of {@link VirtualCorpus} description to be 
+/** Defines the structure of {@link QueryDO} description to be 
  *  sent as JSON objects in HTTP responses. 
  * 
  * @author margaretha
@@ -17,7 +17,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonInclude(Include.NON_DEFAULT)
-public class VirtualCorpusDto {
+public class QueryDto {
 
     private int id;
     private String name;

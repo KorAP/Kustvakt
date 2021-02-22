@@ -14,25 +14,29 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
+import de.ids_mannheim.korap.user.User.CorpusAccess;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Describes the query reference table.
- *
- * It is yet not as complete as the Virtual Corpus implementation,
- * as it has no mechanism for sharing any query references.
+ * Describes the query table and its relation to {@link QueryAccess}.
  * 
- * @author diewald
+ * Any user may create a query and share it to a user group.
+ * However, if the user is not a user-group admin, the query
+ * will not be shared until a user-group admin accept his/her request.
+ * 
+ * @author margaretha
  *
- * @see VirtualCorpus
+ * @see QueryAccess
+ * @see UserGroup
  */
 @Setter
 @Getter
 @Entity
-@Table(name = "query_reference")
-public class QueryReference implements Comparable<QueryReference> {
+@Table(name = "query")
+public class QueryDO implements Comparable<QueryDO> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,33 +46,34 @@ public class QueryReference implements Comparable<QueryReference> {
     private ResourceType type;
     private String status;
     private String description;
-    // @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     @Column(name = "required_access")
-    private String requiredAccess;
-    //private CorpusAccess requiredAccess;
-    @Column(name = "query")
+    private CorpusAccess requiredAccess;
+    @Column(name = "koral_query")
     private String koralQuery;
     private String definition;
     @Column(name = "created_by")
     private String createdBy;
+    @Column(name = "is_cached")
+    private boolean isCached;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "query_type")
+    private QueryType queryType;
+    private String query;
+    @Column(name = "query_language")
+    private String queryLanguage;
 
-    /*
-    @OneToMany(mappedBy = "queryReference", fetch = FetchType.LAZY,
+    @OneToMany(mappedBy = "query", fetch = FetchType.LAZY,
             cascade = CascadeType.REMOVE)
-    private List<VirtualCorpusAccess> virtualCorpusAccess;
-    */
+    private List<QueryAccess> queryAccess;
 
     @Override
     public String toString () {
-        return "id=" + id +
-            ", name= " + name +
-            ", type= " + type +
-            ", status= " + status +
-            ", description=" + description +
-            // ", requiredAccess=" + requiredAccess +
-            ", query= " + koralQuery +
-            ", definition= " + definition +
-            ", createdBy= " + createdBy;
+        return "id=" + id + ", name= " + name + ", type= " + type + ", status= "
+                + status + ", description=" + description + ", requiredAccess="
+                + requiredAccess + ", koralQuery= " + koralQuery
+                + ", definition= " + definition + ", createdBy= " + createdBy;
     }
 
     @Override
@@ -83,12 +88,12 @@ public class QueryReference implements Comparable<QueryReference> {
 
     @Override
     public boolean equals (Object obj) {
-        QueryReference q = (QueryReference) obj;
-        return (this.id == q.getId()) ? true : false;
+        QueryDO query = (QueryDO) obj;
+        return (this.id == query.getId()) ? true : false;
     }
 
     @Override
-    public int compareTo (QueryReference o) {
+    public int compareTo (QueryDO o) {
         if (this.getId() > o.getId()) {
             return 1;
         }

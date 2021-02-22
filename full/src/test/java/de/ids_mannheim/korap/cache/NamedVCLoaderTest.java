@@ -12,8 +12,8 @@ import de.ids_mannheim.korap.KrillCollection;
 import de.ids_mannheim.korap.collection.CachedVCData;
 import de.ids_mannheim.korap.config.NamedVCLoader;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
-import de.ids_mannheim.korap.dao.VirtualCorpusDao;
-import de.ids_mannheim.korap.entity.VirtualCorpus;
+import de.ids_mannheim.korap.dao.QueryDao;
+import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.util.QueryException;
 import net.sf.ehcache.CacheManager;
@@ -24,7 +24,7 @@ public class NamedVCLoaderTest extends SpringJerseyTest {
     @Autowired
     private NamedVCLoader vcLoader;
     @Autowired
-    private VirtualCorpusDao dao;
+    private QueryDao dao;
 
     @Test
     public void testNamedVCLoader ()
@@ -41,7 +41,7 @@ public class NamedVCLoaderTest extends SpringJerseyTest {
         assertTrue(cachedData.getDocIdMap().size() > 0);
         
         KrillCollection.cache.removeAll();
-        VirtualCorpus vc = dao.retrieveVCByName("named-vc1", "system");
-        dao.deleteVirtualCorpus(vc);
+        QueryDO vc = dao.retrieveQueryByName("named-vc1", "system");
+        dao.deleteQuery(vc);
     }
 }

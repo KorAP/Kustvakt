@@ -244,9 +244,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(username, node.at("/members/0/userId").asText());
         assertEquals(GroupMemberStatus.ACTIVE.name(),
                 node.at("/members/0/status").asText());
-        assertEquals(PredefinedRole.USER_GROUP_ADMIN.name(),
+        assertEquals(PredefinedRole.QUERY_ACCESS_ADMIN.name(),
                 node.at("/members/0/roles/0").asText());
-        assertEquals(PredefinedRole.VC_ACCESS_ADMIN.name(),
+        assertEquals(PredefinedRole.USER_GROUP_ADMIN.name(),
                 node.at("/members/0/roles/1").asText());
 
         testUpdateUserGroup(groupName);
@@ -647,9 +647,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(0, group.at("/members").size());
         assertEquals(GroupMemberStatus.ACTIVE.name(),
                 group.at("/userMemberStatus").asText());
-        assertEquals(PredefinedRole.USER_GROUP_MEMBER.name(),
+        assertEquals(PredefinedRole.QUERY_ACCESS_MEMBER.name(),
                 group.at("/userRoles/0").asText());
-        assertEquals(PredefinedRole.VC_ACCESS_MEMBER.name(),
+        assertEquals(PredefinedRole.USER_GROUP_MEMBER.name(),
                 group.at("/userRoles/1").asText());
 
         // unsubscribe marlin from dory-group

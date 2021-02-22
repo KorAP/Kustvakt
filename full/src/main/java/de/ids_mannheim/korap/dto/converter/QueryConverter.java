@@ -4,38 +4,38 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import de.ids_mannheim.korap.dto.VirtualCorpusDto;
-import de.ids_mannheim.korap.entity.VirtualCorpus;
+import de.ids_mannheim.korap.dto.QueryDto;
+import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
- * VirtualCorpusConverter prepares data transfer objects (DTOs) from
- * {@link VirtualCorpus} entities. DTO structure defines controllers
+ * QueryConverter prepares data transfer objects (DTOs) from
+ * {@link QueryDO} entities. DTO structure defines controllers
  * output, namely the structure of JSON objects in HTTP responses.
  * 
  * @author margaretha
  *
  */
 @Component
-public class VirtualCorpusConverter {
+public class QueryConverter {
 
-    public VirtualCorpusDto createVirtualCorpusDto (VirtualCorpus vc,
+    public QueryDto createQueryDto (QueryDO query,
             String statistics) throws KustvaktException {
 
-        VirtualCorpusDto dto = new VirtualCorpusDto();
-        dto.setId(vc.getId());
-        dto.setName(vc.getName());
-        dto.setCreatedBy(vc.getCreatedBy());
-        dto.setRequiredAccess(vc.getRequiredAccess().name());
-        dto.setStatus(vc.getStatus());
-        dto.setDescription(vc.getDescription());
-        dto.setType(vc.getType().displayName());
+        QueryDto dto = new QueryDto();
+        dto.setId(query.getId());
+        dto.setName(query.getName());
+        dto.setCreatedBy(query.getCreatedBy());
+        dto.setRequiredAccess(query.getRequiredAccess().name());
+        dto.setStatus(query.getStatus());
+        dto.setDescription(query.getDescription());
+        dto.setType(query.getType().displayName());
         
-        dto.setQuery(vc.getQuery());
-        dto.setQueryLanguage(vc.getQueryLanguage());
+        dto.setQuery(query.getQuery());
+        dto.setQueryLanguage(query.getQueryLanguage());
         
-        JsonNode kq = JsonUtils.readTree(vc.getKoralQuery());
+        JsonNode kq = JsonUtils.readTree(query.getKoralQuery());
         dto.setKoralQuery(kq);
         
         if (statistics != null) {

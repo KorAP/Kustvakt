@@ -1,8 +1,8 @@
 package de.ids_mannheim.korap.constant;
 
-import de.ids_mannheim.korap.entity.VirtualCorpus;
+import de.ids_mannheim.korap.entity.QueryDO;
 
-/** Defines types of {@link VirtualCorpus} 
+/** Defines types of {@link QueryDO} 
  * 
  * @author margaretha
  *

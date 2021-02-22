@@ -20,9 +20,9 @@ import org.springframework.stereotype.Component;
 import de.ids_mannheim.korap.KrillCollection;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
-import de.ids_mannheim.korap.entity.VirtualCorpus;
+import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.service.VirtualCorpusService;
+import de.ids_mannheim.korap.service.QueryService;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.web.SearchKrill;
 
@@ -38,7 +38,7 @@ public class NamedVCLoader implements Runnable{
     @Autowired
     private SearchKrill searchKrill;
     @Autowired
-    private VirtualCorpusService vcService;
+    private QueryService vcService;
 
     public static Logger jlog = LogManager.getLogger(NamedVCLoader.class);
     public static boolean DEBUG = false;
@@ -92,7 +92,7 @@ public class NamedVCLoader implements Runnable{
             if (json != null) {
                 cacheVC(json, filename);
                 try {
-                    VirtualCorpus vc = vcService.searchVCByName("system",
+                    QueryDO vc = vcService.searchQueryByName("system",
                             filename, "system", QueryType.VIRTUAL_CORPUS);
                     if (vc != null) {
                         if (DEBUG) {

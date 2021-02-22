@@ -12,7 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
+import de.ids_mannheim.korap.constant.QueryAccessStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,14 +21,14 @@ import lombok.Setter;
  *  of group-access management.  
  * 
  * @author margaretha
- * @see VirtualCorpus
+ * @see QueryDO
  * @see UserGroup
  */
 @Setter
 @Getter
 @Entity
-@Table(name = "virtual_corpus_access")
-public class VirtualCorpusAccess {
+@Table(name = "query_access")
+public class QueryAccess {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,11 +41,11 @@ public class VirtualCorpusAccess {
     private String deletedBy;
 
     @Enumerated(EnumType.STRING)
-    private VirtualCorpusAccessStatus status;
+    private QueryAccessStatus status;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "virtual_corpus_id", referencedColumnName = "id")
-    private VirtualCorpus virtualCorpus;
+    @JoinColumn(name = "query_id", referencedColumnName = "id")
+    private QueryDO query;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_group_id", referencedColumnName = "id")
@@ -54,7 +54,7 @@ public class VirtualCorpusAccess {
 
     @Override
     public String toString () {
-        return "id=" + id + ", virtualCorpus= " + virtualCorpus
+        return "id=" + id + ", query= " + query
                 + ", userGroup= " + userGroup;
     }
 }

@@ -8,11 +8,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.QueryType;
-import de.ids_mannheim.korap.entity.VirtualCorpus;
+import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.rewrite.KoralNode.RewriteIdentifier;
-import de.ids_mannheim.korap.service.VirtualCorpusService;
+import de.ids_mannheim.korap.service.QueryService;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
@@ -29,7 +29,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class QueryReferenceRewrite implements RewriteTask.RewriteQuery {
 
     @Autowired
-    private VirtualCorpusService service;
+    private QueryService service;
 
     @Override
     public KoralNode rewriteQuery (KoralNode node,
@@ -63,7 +63,7 @@ public class QueryReferenceRewrite implements RewriteTask.RewriteQuery {
                     }
                 }
 
-                VirtualCorpus qr = service.searchVCByName(username,
+                QueryDO qr = service.searchQueryByName(username,
                         queryRefName, queryRefOwner, QueryType.QUERY);
 
                 if (qr == null) {

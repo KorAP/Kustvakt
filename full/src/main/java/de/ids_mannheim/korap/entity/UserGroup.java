@@ -20,7 +20,7 @@ import lombok.Setter;
 
 /**
  * Describes user group table and its relations to UserGroupMember and
- * VirtualCorpusAccess.
+ * {@link QueryAccess}.
  * 
  * Any user may create a user group and send invitations to group
  * member by username. Any group member may reject the invitation
@@ -28,7 +28,7 @@ import lombok.Setter;
  * 
  * @author margaretha
  * @see UserGroupMember
- * @see VirtualCorpusAccess
+ * @see QueryAccess
  */
 @Setter
 @Getter
@@ -56,7 +56,7 @@ public class UserGroup implements Comparable<UserGroup> {
 
     @OneToMany(mappedBy = "userGroup", fetch = FetchType.LAZY,
             cascade = CascadeType.REMOVE)
-    private List<VirtualCorpusAccess> virtualCorpusAccess;
+    private List<QueryAccess> queryAccess;
 
     @Override
     public String toString () {

@@ -30,7 +30,7 @@ public class UserGroupMemberDaoTest {
     public void testRetrieveMemberByRole () throws KustvaktException {
         // dory group
         List<UserGroupMember> vcaAdmins = dao.retrieveMemberByRole(2,
-                PredefinedRole.VC_ACCESS_ADMIN.getId());
+                PredefinedRole.QUERY_ACCESS_ADMIN.getId());
         // System.out.println(vcaAdmins);
         assertEquals(1, vcaAdmins.size());
         assertEquals("dory", vcaAdmins.get(0).getUserId());

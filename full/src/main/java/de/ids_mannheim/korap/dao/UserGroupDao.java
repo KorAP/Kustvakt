@@ -22,16 +22,16 @@ import org.springframework.transaction.annotation.Transactional;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
-import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
+import de.ids_mannheim.korap.constant.QueryAccessStatus;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.entity.UserGroupMember_;
 import de.ids_mannheim.korap.entity.UserGroup_;
-import de.ids_mannheim.korap.entity.VirtualCorpus;
-import de.ids_mannheim.korap.entity.VirtualCorpusAccess;
-import de.ids_mannheim.korap.entity.VirtualCorpusAccess_;
-import de.ids_mannheim.korap.entity.VirtualCorpus_;
+import de.ids_mannheim.korap.entity.QueryDO;
+import de.ids_mannheim.korap.entity.QueryAccess;
+import de.ids_mannheim.korap.entity.QueryAccess_;
+import de.ids_mannheim.korap.entity.QueryDO_;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.ParameterChecker;
@@ -72,7 +72,7 @@ public class UserGroupDao {
         roles.add(roleDao
                 .retrieveRoleById(PredefinedRole.USER_GROUP_ADMIN.getId()));
         roles.add(roleDao
-                .retrieveRoleById(PredefinedRole.VC_ACCESS_ADMIN.getId()));
+                .retrieveRoleById(PredefinedRole.QUERY_ACCESS_ADMIN.getId()));
 
         UserGroupMember owner = new UserGroupMember();
         owner.setUserId(createdBy);
@@ -233,37 +233,37 @@ public class UserGroupDao {
         }
     }
 
-    public UserGroup retrieveHiddenGroupByVC (int vcId)
+    public UserGroup retrieveHiddenGroupByQuery (int queryId)
             throws KustvaktException {
-        ParameterChecker.checkIntegerValue(vcId, "vcId");
+        ParameterChecker.checkIntegerValue(queryId, "queryId");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<UserGroup> query =
+        CriteriaQuery<UserGroup> criteriaQuery =
                 criteriaBuilder.createQuery(UserGroup.class);
 
-        Root<UserGroup> root = query.from(UserGroup.class);
-        Join<UserGroup, VirtualCorpusAccess> access =
-                root.join(UserGroup_.virtualCorpusAccess);
-        Join<VirtualCorpusAccess, VirtualCorpus> vc =
-                access.join(VirtualCorpusAccess_.virtualCorpus);
+        Root<UserGroup> root = criteriaQuery.from(UserGroup.class);
+        Join<UserGroup, QueryAccess> access =
+                root.join(UserGroup_.queryAccess);
+        Join<QueryAccess, QueryDO> query =
+                access.join(QueryAccess_.query);
 
         Predicate p = criteriaBuilder.and(
                 criteriaBuilder.equal(root.get(UserGroup_.status),
                         UserGroupStatus.HIDDEN),
-                criteriaBuilder.equal(vc.get(VirtualCorpus_.id), vcId));
+                criteriaBuilder.equal(query.get(QueryDO_.id), queryId));
 
-        query.select(root);
-        query.where(p);
-        Query q = entityManager.createQuery(query);
+        criteriaQuery.select(root);
+        criteriaQuery.where(p);
+        Query q = entityManager.createQuery(criteriaQuery);
 
         try {
             return (UserGroup) q.getSingleResult();
         }
         catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                    "No hidden group for virtual corpus with id " + vcId
+                    "No hidden group for query with id " + queryId
                             + " is found",
-                    String.valueOf(vcId), e);
+                    String.valueOf(queryId), e);
         }
 
     }
@@ -325,51 +325,51 @@ public class UserGroupDao {
 
     }
 
-    public void addVCToGroup (VirtualCorpus virtualCorpus, String createdBy,
-            VirtualCorpusAccessStatus status, UserGroup group) {
-        VirtualCorpusAccess accessGroup = new VirtualCorpusAccess();
+    public void addQueryToGroup (QueryDO query, String createdBy,
+            QueryAccessStatus status, UserGroup group) {
+        QueryAccess accessGroup = new QueryAccess();
         accessGroup.setCreatedBy(createdBy);
         accessGroup.setStatus(status);
         accessGroup.setUserGroup(group);
-        accessGroup.setVirtualCorpus(virtualCorpus);
+        accessGroup.setQuery(query);;
         entityManager.persist(accessGroup);
     }
 
-    public void addVCToGroup (List<VirtualCorpus> virtualCorpora,
+    public void addQueryToGroup (List<QueryDO> queries,
             String createdBy, UserGroup group,
-            VirtualCorpusAccessStatus status) {
+            QueryAccessStatus status) {
 
-        for (VirtualCorpus vc : virtualCorpora) {
-            addVCToGroup(vc, createdBy, status, group);
+        for (QueryDO q : queries) {
+            addQueryToGroup(q, createdBy, status, group);
         }
     }
 
-    public void deleteVCFromGroup (int virtualCorpusId, int groupId)
+    public void deleteQueryFromGroup (int queryId, int groupId)
             throws KustvaktException {
-        ParameterChecker.checkIntegerValue(virtualCorpusId, "virtualCorpusId");
+        ParameterChecker.checkIntegerValue(queryId, "queryId");
         ParameterChecker.checkIntegerValue(groupId, "groupId");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<VirtualCorpusAccess> query =
-                criteriaBuilder.createQuery(VirtualCorpusAccess.class);
+        CriteriaQuery<QueryAccess> criteriaQuery =
+                criteriaBuilder.createQuery(QueryAccess.class);
 
-        Root<VirtualCorpusAccess> root = query.from(VirtualCorpusAccess.class);
-        Join<VirtualCorpusAccess, VirtualCorpus> vc =
-                root.join(VirtualCorpusAccess_.virtualCorpus);
-        Join<VirtualCorpusAccess, UserGroup> group =
-                root.join(VirtualCorpusAccess_.userGroup);
+        Root<QueryAccess> root = criteriaQuery.from(QueryAccess.class);
+        Join<QueryAccess, QueryDO> queryAccess =
+                root.join(QueryAccess_.query);
+        Join<QueryAccess, UserGroup> group =
+                root.join(QueryAccess_.userGroup);
 
-        Predicate virtualCorpus = criteriaBuilder
-                .equal(vc.get(VirtualCorpus_.id), virtualCorpusId);
+        Predicate query = criteriaBuilder
+                .equal(queryAccess.get(QueryDO_.id), queryId);
         Predicate userGroup =
                 criteriaBuilder.equal(group.get(UserGroup_.id), groupId);
 
-        query.select(root);
-        query.where(criteriaBuilder.and(virtualCorpus, userGroup));
-        Query q = entityManager.createQuery(query);
-        VirtualCorpusAccess vcAccess =
-                (VirtualCorpusAccess) q.getSingleResult();
-        entityManager.remove(vcAccess);
+        criteriaQuery.select(root);
+        criteriaQuery.where(criteriaBuilder.and(query, userGroup));
+        Query q = entityManager.createQuery(criteriaQuery);
+        QueryAccess access =
+                (QueryAccess) q.getSingleResult();
+        entityManager.remove(access);
     }
 
 }

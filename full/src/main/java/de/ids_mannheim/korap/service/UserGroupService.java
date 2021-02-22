@@ -137,9 +137,9 @@ public class UserGroupService {
         return userGroupDao.retrieveGroupByName(groupName, false);
     }
 
-    public UserGroup retrieveHiddenUserGroupByVC (int vcId)
+    public UserGroup retrieveHiddenUserGroupByQuery (int queryId)
             throws KustvaktException {
-        return userGroupDao.retrieveHiddenGroupByVC(vcId);
+        return userGroupDao.retrieveHiddenGroupByQuery(queryId);
     }
 
     public List<UserGroupDto> retrieveUserGroupByStatus (String username,
@@ -172,10 +172,10 @@ public class UserGroupService {
         }
     }
 
-    public List<UserGroupMember> retrieveVCAccessAdmins (UserGroup userGroup)
+    public List<UserGroupMember> retrieveQueryAccessAdmins (UserGroup userGroup)
             throws KustvaktException {
         List<UserGroupMember> groupAdmins = groupMemberDao.retrieveMemberByRole(
-                userGroup.getId(), PredefinedRole.VC_ACCESS_ADMIN.getId());
+                userGroup.getId(), PredefinedRole.QUERY_ACCESS_ADMIN.getId());
         return groupAdmins;
     }
 
@@ -185,7 +185,7 @@ public class UserGroupService {
             memberRoles.add(roleDao.retrieveRoleById(
                     PredefinedRole.USER_GROUP_MEMBER.getId()));
             memberRoles.add(roleDao
-                    .retrieveRoleById(PredefinedRole.VC_ACCESS_MEMBER.getId()));
+                    .retrieveRoleById(PredefinedRole.QUERY_ACCESS_MEMBER.getId()));
         }
     }
 
@@ -194,15 +194,15 @@ public class UserGroupService {
      * Do not include owners in group members.
      * 
      * {@link PredefinedRole#USER_GROUP_MEMBER} and
-     * {@link PredefinedRole#VC_ACCESS_MEMBER} roles are
+     * {@link PredefinedRole#QUERY_ACCESS_MEMBER} roles are
      * automatically assigned to each group member.
      * 
      * {@link PredefinedRole#USER_GROUP_MEMBER} restrict users
      * to see other group members and allow users to remove
      * themselves from the groups.
      * 
-     * {@link PredefinedRole#VC_ACCESS_MEMBER} allow user to
-     * read group VC.
+     * {@link PredefinedRole#QUERY_ACCESS_MEMBER} allow user to
+     * read group query.
      * 
      * @see /full/src/main/resources/db/predefined/V3.2__insert_predefined_roles.sql
      * 
@@ -318,7 +318,7 @@ public class UserGroupService {
      * @param userGroup
      *            a user group
      * @param createdBy
-     *            the user (VCA/system) adding the user the user-group
+     *            the user (query-access admin/system) adding the user the user-group
      * @param status
      *            the status of the membership
      * @throws KustvaktException

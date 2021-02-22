@@ -20,12 +20,12 @@ import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
-import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
+import de.ids_mannheim.korap.constant.QueryAccessStatus;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
-import de.ids_mannheim.korap.entity.VirtualCorpus;
+import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -37,7 +37,7 @@ public class UserGroupDaoTest {
     @Autowired
     private UserGroupDao userGroupDao;
     @Autowired
-    private VirtualCorpusDao virtualCorpusDao;
+    private QueryDao virtualCorpusDao;
     @Autowired
     private RoleDao roleDao;
     @Autowired
@@ -78,11 +78,11 @@ public class UserGroupDaoTest {
         Collections.sort(roleList);
         assertEquals(PredefinedRole.USER_GROUP_ADMIN.getId(),
                 roleList.get(0).getId());
-        assertEquals(PredefinedRole.VC_ACCESS_ADMIN.getId(),
+        assertEquals(PredefinedRole.QUERY_ACCESS_ADMIN.getId(),
                 roleList.get(1).getId());
 
         //retrieve VC by group
-        List<VirtualCorpus> vc = virtualCorpusDao.retrieveVCByGroup(groupId);
+        List<QueryDO> vc = virtualCorpusDao.retrieveQueryByGroup(groupId);
         assertEquals(0, vc.size());
 
         // soft delete group
@@ -113,7 +113,7 @@ public class UserGroupDaoTest {
 
         assertEquals(PredefinedRole.USER_GROUP_MEMBER.name(),
                 sortedRoles.get(0).getName());
-        assertEquals(PredefinedRole.VC_ACCESS_MEMBER.name(),
+        assertEquals(PredefinedRole.QUERY_ACCESS_MEMBER.name(),                
                 sortedRoles.get(1).getName());
     }
 
@@ -134,26 +134,26 @@ public class UserGroupDaoTest {
         UserGroup group = userGroupDao.retrieveGroupById(groupId);
         String createdBy = "dory";
         String name = "dory new vc";
-        int id = virtualCorpusDao.createVirtualCorpus(name,
+        int id = virtualCorpusDao.createQuery(name,
                 ResourceType.PROJECT, QueryType.VIRTUAL_CORPUS,
                 CorpusAccess.PUB, "corpusSigle=WPD15", "", "", "", false,
                 createdBy, null, null);
 
-        VirtualCorpus virtualCorpus = virtualCorpusDao.retrieveVCById(id);
-        userGroupDao.addVCToGroup(virtualCorpus, createdBy,
-                VirtualCorpusAccessStatus.ACTIVE, group);
+        QueryDO virtualCorpus = virtualCorpusDao.retrieveQueryById(id);
+        userGroupDao.addQueryToGroup(virtualCorpus, createdBy,
+                QueryAccessStatus.ACTIVE, group);
 
-        List<VirtualCorpus> vc = virtualCorpusDao.retrieveVCByGroup(groupId);
+        List<QueryDO> vc = virtualCorpusDao.retrieveQueryByGroup(groupId);
         assertEquals(2, vc.size());
         assertEquals(name, vc.get(1).getName());
 
         // delete vc from group
-        userGroupDao.deleteVCFromGroup(virtualCorpus.getId(), groupId);
+        userGroupDao.deleteQueryFromGroup(virtualCorpus.getId(), groupId);
 
-        vc = virtualCorpusDao.retrieveVCByGroup(groupId);
+        vc = virtualCorpusDao.retrieveQueryByGroup(groupId);
         assertEquals(1, vc.size());
 
         // delete vc
-        virtualCorpusDao.deleteVirtualCorpus(virtualCorpus);
+        virtualCorpusDao.deleteQuery(virtualCorpus);
     }
 }

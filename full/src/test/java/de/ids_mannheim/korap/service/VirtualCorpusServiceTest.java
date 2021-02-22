@@ -16,10 +16,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.constant.ResourceType;
-import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
-import de.ids_mannheim.korap.dto.VirtualCorpusDto;
+import de.ids_mannheim.korap.dto.QueryAccessDto;
+import de.ids_mannheim.korap.dto.QueryDto;
 import de.ids_mannheim.korap.entity.UserGroup;
-import de.ids_mannheim.korap.entity.VirtualCorpus;
+import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.web.input.QueryJson;
 
@@ -28,7 +28,7 @@ import de.ids_mannheim.korap.web.input.QueryJson;
 public class VirtualCorpusServiceTest {
 
     @Autowired
-    private VirtualCorpusService vcService;
+    private QueryService vcService;
     @Autowired
     private UserGroupService groupService;
 
@@ -62,12 +62,12 @@ public class VirtualCorpusServiceTest {
         String username = "VirtualCorpusServiceTest";
         vcService.storeQuery(vc, vcName, username );
 
-        List<VirtualCorpusAccessDto> accesses =
-                vcService.listVCAccessByUsername("admin");
+        List<QueryAccessDto> accesses =
+                vcService.listQueryAccessByUsername("admin");
         int size = accesses.size();
 
-        VirtualCorpusAccessDto dto = accesses.get(accesses.size() - 1);
-        assertEquals(vcName, dto.getVcName());
+        QueryAccessDto dto = accesses.get(accesses.size() - 1);
+        assertEquals(vcName, dto.getQueryName());
         assertEquals("system", dto.getCreatedBy());
         assertTrue(dto.getUserGroupName().startsWith("auto"));
 
@@ -77,10 +77,10 @@ public class VirtualCorpusServiceTest {
         assertEquals(UserGroupStatus.HIDDEN, group.getStatus());
 
         //delete vc
-        vcService.deleteVCByName(username, vcName, username);
+        vcService.deleteQueryByName(username, vcName, username);
         
         // check hidden access
-        accesses = vcService.listVCAccessByUsername("admin");
+        accesses = vcService.listQueryAccessByUsername("admin");
         assertEquals(size-1, accesses.size());
         
         // check hidden group
@@ -95,25 +95,25 @@ public class VirtualCorpusServiceTest {
         int vcId = 2;
 
         String vcName = "group-vc";
-        VirtualCorpus existingVC =
-                vcService.searchVCByName(username, vcName, username, QueryType.VIRTUAL_CORPUS);
+        QueryDO existingVC =
+                vcService.searchQueryByName(username, vcName, username, QueryType.VIRTUAL_CORPUS);
         QueryJson vcJson = new QueryJson();
         vcJson.setType(ResourceType.PUBLISHED);
 
-        vcService.editVC(existingVC, vcJson, vcName, username);
+        vcService.editQuery(existingVC, vcJson, vcName, username);
 
         // check VC
-        VirtualCorpusDto vcDto = vcService.searchVCById("dory", vcId);
+        QueryDto vcDto = vcService.searchQueryById("dory", vcId);
         assertEquals(vcName, vcDto.getName());
         assertEquals(ResourceType.PUBLISHED.displayName(),
                 vcDto.getType());
 
         // check access
-        List<VirtualCorpusAccessDto> accesses =
-                vcService.listVCAccessByUsername("admin");
+        List<QueryAccessDto> accesses =
+                vcService.listQueryAccessByUsername("admin");
         int size = accesses.size();
-        VirtualCorpusAccessDto dto = accesses.get(accesses.size() - 1);
-        assertEquals(vcName, dto.getVcName());
+        QueryAccessDto dto = accesses.get(accesses.size() - 1);
+        assertEquals(vcName, dto.getQueryName());
         assertEquals("system", dto.getCreatedBy());
         assertTrue(dto.getUserGroupName().startsWith("auto"));
 
@@ -127,15 +127,15 @@ public class VirtualCorpusServiceTest {
         vcJson = new QueryJson();
         vcJson.setType(ResourceType.PROJECT);
 
-        vcService.editVC(existingVC, vcJson, vcName, username);
+        vcService.editQuery(existingVC, vcJson, vcName, username);
 
         // check VC
-        vcDto = vcService.searchVCById("dory", vcId);
+        vcDto = vcService.searchQueryById("dory", vcId);
         assertEquals("group-vc", vcDto.getName());
         assertEquals(ResourceType.PROJECT.displayName(), vcDto.getType());
 
         // check access
-        accesses = vcService.listVCAccessByUsername("admin");
+        accesses = vcService.listQueryAccessByUsername("admin");
         assertEquals(size - 1, accesses.size());
 
         thrown.expect(KustvaktException.class);

@@ -18,8 +18,8 @@ import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.NamedVCLoader;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
-import de.ids_mannheim.korap.dao.VirtualCorpusDao;
-import de.ids_mannheim.korap.entity.VirtualCorpus;
+import de.ids_mannheim.korap.dao.QueryDao;
+import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.util.QueryException;
@@ -31,7 +31,7 @@ public class VCReferenceTest extends SpringJerseyTest {
     @Autowired
     private NamedVCLoader vcLoader;
     @Autowired
-    private VirtualCorpusDao dao;
+    private QueryDao dao;
 
     @Test
     public void testRefPredefinedVC ()
@@ -52,10 +52,10 @@ public class VCReferenceTest extends SpringJerseyTest {
         testSearchWithVCRefNotEqual();
 
         KrillCollection.cache.removeAll();
-        VirtualCorpus vc = dao.retrieveVCByName("named-vc1", "system");
-        dao.deleteVirtualCorpus(vc);
-        vc = dao.retrieveVCByName("named-vc2", "system");
-        dao.deleteVirtualCorpus(vc);
+        QueryDO vc = dao.retrieveQueryByName("named-vc1", "system");
+        dao.deleteQuery(vc);
+        vc = dao.retrieveQueryByName("named-vc2", "system");
+        dao.deleteQuery(vc);
     }
 
     private void testSearchWithoutVCRefOr () throws KustvaktException {

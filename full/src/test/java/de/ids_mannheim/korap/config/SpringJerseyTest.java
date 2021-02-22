@@ -76,7 +76,8 @@ public abstract class SpringJerseyTest extends JerseyTest {
             socket.close();
         }
         catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            System.out.println("[WARNING] " + e.getMessage());
             port = getPort(port);
         }
         return port;

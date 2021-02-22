@@ -78,10 +78,10 @@ CREATE TABLE IF NOT EXISTS virtual_corpus (
   is_cached BOOLEAN DEFAULT 0
 );
 
-CREATE INDEX IF NOT EXISTS virtual_corpus_owner_index ON virtual_corpus(created_by);
-CREATE INDEX IF NOT EXISTS virtual_corpus_type_index ON virtual_corpus(type);
-CREATE UNIQUE INDEX IF NOT EXISTS  virtual_corpus_unique_name 
-	ON virtual_corpus(name,created_by);
+--CREATE INDEX IF NOT EXISTS virtual_corpus_owner_index ON virtual_corpus(created_by);
+--CREATE INDEX IF NOT EXISTS virtual_corpus_type_index ON virtual_corpus(type);
+--CREATE UNIQUE INDEX IF NOT EXISTS  virtual_corpus_unique_name 
+--	ON virtual_corpus(name,created_by);
 
 CREATE TABLE IF NOT EXISTS virtual_corpus_access (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

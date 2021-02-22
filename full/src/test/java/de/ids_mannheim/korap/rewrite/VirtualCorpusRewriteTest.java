@@ -17,8 +17,8 @@ import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.NamedVCLoader;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
-import de.ids_mannheim.korap.dao.VirtualCorpusDao;
-import de.ids_mannheim.korap.entity.VirtualCorpus;
+import de.ids_mannheim.korap.dao.QueryDao;
+import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -33,7 +33,7 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
     @Autowired
     private NamedVCLoader vcLoader;
     @Autowired
-    private VirtualCorpusDao dao;
+    private QueryDao dao;
 
     @Test
     public void testCachedVCRef ()
@@ -56,8 +56,8 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         testCachedVCRefWithUsername();
 
         KrillCollection.cache.removeAll();
-        VirtualCorpus vc = dao.retrieveVCByName("named-vc1", "system");
-        dao.deleteVirtualCorpus(vc);
+        QueryDO vc = dao.retrieveQueryByName("named-vc1", "system");
+        dao.deleteQuery(vc);
     }
 
     private void testCachedVCRefWithUsername ()

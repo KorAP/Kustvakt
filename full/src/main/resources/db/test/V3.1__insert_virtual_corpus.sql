@@ -61,52 +61,52 @@ INSERT INTO user_group_member(user_id, group_id, status, created_by)
 
 		
 -- virtual corpora
-INSERT INTO virtual_corpus(name, type, query_type, required_access, created_by, description, status, corpus_query) 
+INSERT INTO query(name, type, query_type, required_access, created_by, description, status, koral_query) 
 	VALUES ("dory-vc", "PRIVATE", "VIRTUAL_CORPUS", "FREE", "dory", "test vc", "experimental",
 	'{"collection": { "@type": "koral:docGroup", "operands": [ { "@type": "koral:doc", "key": "corpusSigle", "match": "match:eq", "value": "GOE" }, { "@type": "koral:doc", "key": "creationDate", "match": "match:geq", "type": "type:date", "value": "1820" } ], "operation": "operation:and" }}');
 	
-INSERT INTO virtual_corpus(name, type, query_type, required_access, created_by, description, status, corpus_query) 
+INSERT INTO query(name, type, query_type, required_access, created_by, description, status, koral_query) 
 	VALUES ("group-vc", "PROJECT", "VIRTUAL_CORPUS", "PUB", "dory", "test vc", "experimental",
 	'{"collection": { "@type": "koral:docGroup", "operands": [ { "@type": "koral:doc", "key": "corpusSigle", "match": "match:eq", "value": "GOE" }, { "@type": "koral:doc", "key": "creationDate", "match": "match:leq", "type": "type:date", "value": "1810" } ], "operation": "operation:and" }}');
 
-INSERT INTO virtual_corpus(name, type, query_type, required_access, created_by, description, status, corpus_query) 
+INSERT INTO query(name, type, query_type, required_access, created_by, description, status, koral_query) 
 	VALUES ("system-vc", "SYSTEM", "VIRTUAL_CORPUS", "ALL", "system", "test vc", "experimental",
 	'{"collection":{"@type":"koral:doc","value":"GOE","match":"match:eq","key":"corpusSigle"}}');
 
-INSERT INTO virtual_corpus(name, type, query_type, required_access, created_by, description, status, corpus_query) 
+INSERT INTO query(name, type, query_type, required_access, created_by, description, status, koral_query) 
 	VALUES ("published-vc", "PUBLISHED", "VIRTUAL_CORPUS", "ALL", "marlin", "test vc", "experimental",
 	'{"collection":{"@type":"koral:doc","value":"GOE","match":"match:eq","key":"corpusSigle"}}');
 
-INSERT INTO virtual_corpus(name, type, query_type, required_access, created_by, description, status, corpus_query) 
+INSERT INTO query(name, type, query_type, required_access, created_by, description, status, koral_query) 
 	VALUES ("marlin-vc", "PRIVATE", "VIRTUAL_CORPUS", "FREE", "marlin", "marlin test share vc", "experimental",
 	'{"collection": { "@type": "koral:docGroup", "operands": [ { "@type": "koral:doc", "key": "corpusSigle", "match": "match:eq", "value": "GOE" }, { "@type": "koral:doc", "key": "creationDate", "match": "match:geq", "type": "type:date", "value": "1820" } ], "operation": "operation:and" }}');
 
-INSERT INTO virtual_corpus(name, type, query_type, required_access, created_by, description, status, corpus_query) 
+INSERT INTO query(name, type, query_type, required_access, created_by, description, status, koral_query) 
 	VALUES ("nemo-vc", "PRIVATE", "VIRTUAL_CORPUS", "ALL", "nemo", "nemo test vc", "experimental",
 	'{"collection":{"@type":"koral:doc","value":"GOE","match":"match:eq","key":"corpusSigle"}}');	
 	
 -- virtual corpus access
-INSERT INTO virtual_corpus_access(virtual_corpus_id, user_group_id, status, created_by) 
+INSERT INTO query_access(query_id, user_group_id, status, created_by) 
 	SELECT 
-		(SELECT id from virtual_corpus where name = "group-vc"), 
+		(SELECT id from query where name = "group-vc"), 
 		(SELECT id from user_group where name = "dory-group"), 
 		"ACTIVE", "dory";
 
---INSERT INTO virtual_corpus_access(virtual_corpus_id, user_group_id, status, created_by) 
+--INSERT INTO query_access(query_id, user_group_id, status, created_by) 
 --	SELECT 
---		(SELECT id from virtual_corpus where name = "system-vc"), 
+--		(SELECT id from query where name = "system-vc"), 
 --		(SELECT id from user_group where name = "all users"),
 --		"ACTIVE", "system";
 
-INSERT INTO virtual_corpus_access(virtual_corpus_id, user_group_id, status, created_by) 
+INSERT INTO query_access(query_id, user_group_id, status, created_by) 
 	SELECT 
-		(SELECT id from virtual_corpus where name = "published-vc"),
+		(SELECT id from query where name = "published-vc"),
 		(SELECT id from user_group where name = "marlin-group"),
 		"ACTIVE", "marlin";
 
-INSERT INTO virtual_corpus_access(virtual_corpus_id, user_group_id, status, created_by) 
+INSERT INTO query_access(query_id, user_group_id, status, created_by) 
 	SELECT 
-		(SELECT id from virtual_corpus where name = "published-vc"),
+		(SELECT id from query where name = "published-vc"),
 		(SELECT id from user_group where name = "auto-group"),
 		"HIDDEN", "system";
 

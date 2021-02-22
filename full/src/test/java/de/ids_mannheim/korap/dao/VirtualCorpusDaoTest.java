@@ -15,25 +15,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
-import de.ids_mannheim.korap.entity.VirtualCorpus;
+import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User;
 
 public class VirtualCorpusDaoTest extends SpringJerseyTest {
 
     @Autowired
-    private VirtualCorpusDao dao;
+    private QueryDao dao;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void testListVCByType () throws KustvaktException {
-        List<VirtualCorpus> vcList =
-                dao.retrieveVCByType(ResourceType.PUBLISHED, null, QueryType.VIRTUAL_CORPUS);
+        List<QueryDO> vcList =
+                dao.retrieveQueryByType(ResourceType.PUBLISHED, null, QueryType.VIRTUAL_CORPUS);
         assertEquals(1, vcList.size());
 
-        VirtualCorpus vc = vcList.get(0);
+        QueryDO vc = vcList.get(0);
         assertEquals(4, vc.getId());
         assertEquals("published-vc", vc.getName());
         assertEquals("marlin", vc.getCreatedBy());
@@ -42,23 +42,23 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
     @Test
     public void testSystemVC () throws KustvaktException {
         // insert vc
-        int id = dao.createVirtualCorpus("system-vc", ResourceType.SYSTEM,
+        int id = dao.createQuery("system-vc", ResourceType.SYSTEM,
                 QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE,
                 "corpusSigle=GOE", "definition", "description", "experimental",
                 false, "test class", null, null);
 
         // select vc
-        List<VirtualCorpus> vcList =
-                dao.retrieveVCByType(ResourceType.SYSTEM, null, QueryType.VIRTUAL_CORPUS);
+        List<QueryDO> vcList =
+                dao.retrieveQueryByType(ResourceType.SYSTEM, null, QueryType.VIRTUAL_CORPUS);
         assertEquals(2, vcList.size());
 
-        VirtualCorpus vc = dao.retrieveVCById(id);
+        QueryDO vc = dao.retrieveQueryById(id);
         // delete vc
-        dao.deleteVirtualCorpus(vc);
+        dao.deleteQuery(vc);
 
         // check if vc has been deleted
         thrown.expect(KustvaktException.class);
-        dao.retrieveVCById(id);
+        dao.retrieveQueryById(id);
     }
 
     @Test
@@ -66,7 +66,7 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
         thrown.expect(PersistenceException.class);
         thrown.expectMessage("could not execute statement");
         
-        dao.createVirtualCorpus("system-vc", ResourceType.SYSTEM,
+        dao.createQuery("system-vc", ResourceType.SYSTEM,
                 QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE,
                 "corpusSigle=GOE", "definition", "description", "experimental",
                 false, "system", null, null);
@@ -74,8 +74,8 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
 
     @Test
     public void retrieveSystemVC () throws KustvaktException {
-        List<VirtualCorpus> vc =
-                dao.retrieveVCByType(ResourceType.SYSTEM, null, QueryType.VIRTUAL_CORPUS);
+        List<QueryDO> vc =
+                dao.retrieveQueryByType(ResourceType.SYSTEM, null, QueryType.VIRTUAL_CORPUS);
         assertEquals(1, vc.size());
     }
 
@@ -86,12 +86,12 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
      */
     @Test
     public void retrieveVCByUserDory () throws KustvaktException {
-        List<VirtualCorpus> virtualCorpora =
-                dao.retrieveVCByUser("dory", QueryType.VIRTUAL_CORPUS);
+        List<QueryDO> virtualCorpora =
+                dao.retrieveQueryByUser("dory", QueryType.VIRTUAL_CORPUS);
         // System.out.println(virtualCorpora);
         assertEquals(4, virtualCorpora.size());
         // ordered by id
-        Iterator<VirtualCorpus> i = virtualCorpora.iterator();
+        Iterator<QueryDO> i = virtualCorpora.iterator();
         assertEquals("dory-vc", i.next().getName());
         assertEquals("group-vc", i.next().getName());
         assertEquals("system-vc", i.next().getName());
@@ -106,10 +106,10 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
      */
     @Test
     public void retrieveVCByUserNemo () throws KustvaktException {
-        List<VirtualCorpus> virtualCorpora =
-                dao.retrieveVCByUser("nemo", QueryType.VIRTUAL_CORPUS);
+        List<QueryDO> virtualCorpora =
+                dao.retrieveQueryByUser("nemo", QueryType.VIRTUAL_CORPUS);
         assertEquals(3, virtualCorpora.size());
-        Iterator<VirtualCorpus> i = virtualCorpora.iterator();
+        Iterator<QueryDO> i = virtualCorpora.iterator();
         assertEquals("group-vc", i.next().getName());
         assertEquals("system-vc", i.next().getName());
         assertEquals("nemo-vc", i.next().getName());
@@ -123,10 +123,10 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
      */
     @Test
     public void retrieveVCByUserMarlin () throws KustvaktException {
-        List<VirtualCorpus> virtualCorpora =
-                dao.retrieveVCByUser("marlin", QueryType.VIRTUAL_CORPUS);
+        List<QueryDO> virtualCorpora =
+                dao.retrieveQueryByUser("marlin", QueryType.VIRTUAL_CORPUS);
         assertEquals(3, virtualCorpora.size());
-        Iterator<VirtualCorpus> i = virtualCorpora.iterator();
+        Iterator<QueryDO> i = virtualCorpora.iterator();
         assertEquals("system-vc", i.next().getName());
         assertEquals("published-vc", i.next().getName());
         assertEquals("marlin-vc", i.next().getName());
@@ -140,10 +140,10 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
      */
     @Test
     public void retrieveVCByUserPearl () throws KustvaktException {
-        List<VirtualCorpus> virtualCorpora =
-                dao.retrieveVCByUser("pearl", QueryType.VIRTUAL_CORPUS);
+        List<QueryDO> virtualCorpora =
+                dao.retrieveQueryByUser("pearl", QueryType.VIRTUAL_CORPUS);
         assertEquals(2, virtualCorpora.size());
-        Iterator<VirtualCorpus> i = virtualCorpora.iterator();
+        Iterator<QueryDO> i = virtualCorpora.iterator();
         assertEquals("system-vc", i.next().getName());
         assertEquals("published-vc", i.next().getName());
     }

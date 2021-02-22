@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Defines the structure of virtual corpus accesses, e.g. as JSON
+ * Defines the structure of query accesses, e.g. as JSON
  * objects in HTTP Responses.
  * 
  * @author margaretha
@@ -12,18 +12,18 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class VirtualCorpusAccessDto {
+public class QueryAccessDto {
     private int accessId;
     private String createdBy;
-    private int vcId;
-    private String vcName;
+    private int queryId;
+    private String queryName;
     private int userGroupId;
     private String userGroupName;
 
     @Override
     public String toString () {
-        return "accessId=" + accessId + ", createdBy=" + createdBy + " , vcId="
-                + vcId + ", vcName=" + vcName + ", userGroupId=" + userGroupId
+        return "accessId=" + accessId + ", createdBy=" + createdBy + " , queryId="
+                + queryId + ", queryName=" + queryName + ", userGroupId=" + userGroupId
                 + ", userGroupName=" + userGroupName;
     }
 }

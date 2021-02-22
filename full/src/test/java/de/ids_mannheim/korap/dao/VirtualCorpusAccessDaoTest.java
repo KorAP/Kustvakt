@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
+import de.ids_mannheim.korap.constant.QueryAccessStatus;
 import de.ids_mannheim.korap.entity.UserGroup;
-import de.ids_mannheim.korap.entity.VirtualCorpusAccess;
+import de.ids_mannheim.korap.entity.QueryAccess;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -22,16 +22,16 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 public class VirtualCorpusAccessDaoTest {
 
     @Autowired
-    private VirtualCorpusAccessDao dao;
+    private QueryAccessDao dao;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void getAccessByVC () throws KustvaktException {
-        List<VirtualCorpusAccess> vcaList = dao.retrieveActiveAccessByVC(2);
-        VirtualCorpusAccess access = vcaList.get(0);
-        assertEquals(VirtualCorpusAccessStatus.ACTIVE, access.getStatus());
+        List<QueryAccess> vcaList = dao.retrieveActiveAccessByQuery(2);
+        QueryAccess access = vcaList.get(0);
+        assertEquals(QueryAccessStatus.ACTIVE, access.getStatus());
         assertEquals("dory", access.getCreatedBy());
         
         UserGroup group = access.getUserGroup();

@@ -21,19 +21,19 @@ import de.ids_mannheim.korap.KrillCollection;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.QueryType;
-import de.ids_mannheim.korap.constant.VirtualCorpusAccessStatus;
+import de.ids_mannheim.korap.constant.QueryAccessStatus;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.dao.AdminDao;
-import de.ids_mannheim.korap.dao.VirtualCorpusAccessDao;
-import de.ids_mannheim.korap.dao.VirtualCorpusDao;
-import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
-import de.ids_mannheim.korap.dto.VirtualCorpusDto;
-import de.ids_mannheim.korap.dto.converter.VirtualCorpusAccessConverter;
-import de.ids_mannheim.korap.dto.converter.VirtualCorpusConverter;
+import de.ids_mannheim.korap.dao.QueryAccessDao;
+import de.ids_mannheim.korap.dao.QueryDao;
+import de.ids_mannheim.korap.dto.QueryAccessDto;
+import de.ids_mannheim.korap.dto.QueryDto;
+import de.ids_mannheim.korap.dto.converter.QueryAccessConverter;
+import de.ids_mannheim.korap.dto.converter.QueryConverter;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
-import de.ids_mannheim.korap.entity.VirtualCorpus;
-import de.ids_mannheim.korap.entity.VirtualCorpusAccess;
+import de.ids_mannheim.korap.entity.QueryDO;
+import de.ids_mannheim.korap.entity.QueryAccess;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
@@ -48,26 +48,26 @@ import de.ids_mannheim.korap.web.input.QueryJson;
 /**
  * VirtualCorpusService handles the logic behind
  * {@link VirtualCorpusController}.
- * It communicates with {@link VirtualCorpusDao} and returns
- * {@link VirtualCorpusDto} to {@link VirtualCorpusController}.
+ * It communicates with {@link QueryDao} and returns
+ * {@link QueryDto} to {@link VirtualCorpusController}.
  * 
  * @author margaretha
  *
  */
 @Service
-public class VirtualCorpusService {
+public class QueryService {
 
     public static Logger jlog =
-            LogManager.getLogger(VirtualCorpusService.class);
+            LogManager.getLogger(QueryService.class);
 
     public static boolean DEBUG = false;
 
     public static Pattern queryNamePattern = Pattern.compile("[-\\w.]+");
 
     @Autowired
-    private VirtualCorpusDao vcDao;
+    private QueryDao queryDao;
     @Autowired
-    private VirtualCorpusAccessDao accessDao;
+    private QueryAccessDao accessDao;
     @Autowired
     private AdminDao adminDao;
     @Autowired
@@ -77,9 +77,9 @@ public class VirtualCorpusService {
     @Autowired
     private FullConfiguration config;
     @Autowired
-    private VirtualCorpusConverter converter;
+    private QueryConverter converter;
     @Autowired
-    private VirtualCorpusAccessConverter accessConverter;
+    private QueryAccessConverter accessConverter;
 
     private void verifyUsername (String contextUsername, String pathUsername)
             throws KustvaktException {
@@ -91,14 +91,14 @@ public class VirtualCorpusService {
         }
     }
 
-    public List<VirtualCorpusDto> listOwnerVC (String username,
-            String vcCreator, QueryType queryType) throws KustvaktException {
-        verifyUsername(username, vcCreator);
-        List<VirtualCorpus> vcList = vcDao.retrieveOwnerVC(username, queryType);
-        return createVCDtos(vcList, queryType);
+    public List<QueryDto> listOwnerQuery (String username,
+            String queryCreator, QueryType queryType) throws KustvaktException {
+        verifyUsername(username, queryCreator);
+        List<QueryDO> list = queryDao.retrieveOwnerQuery(username, queryType);
+        return createQueryDtos(list, queryType);
     }
 
-    public List<VirtualCorpusDto> listAvailableVCForUser (
+    public List<QueryDto> listAvailableQueryForUser (
             String authenticatedUsername, String username, QueryType queryType)
             throws KustvaktException {
 
@@ -115,22 +115,22 @@ public class VirtualCorpusService {
         else {
             username = authenticatedUsername;
         }
-        List<VirtualCorpus> vcList =
-                vcDao.retrieveVCByUser(username, queryType);
-        return createVCDtos(vcList, queryType);
+        List<QueryDO> list =
+                queryDao.retrieveQueryByUser(username, queryType);
+        return createQueryDtos(list, queryType);
     }
 
-    public List<VirtualCorpusDto> listVCByType (String username,
+    public List<QueryDto> listQueryByType (String username,
             String createdBy, ResourceType type, QueryType queryType)
             throws KustvaktException {
 
         boolean isAdmin = adminDao.isAdmin(username);
 
         if (isAdmin) {
-            List<VirtualCorpus> virtualCorpora =
-                    vcDao.retrieveVCByType(type, createdBy, queryType);
+            List<QueryDO> virtualCorpora =
+                    queryDao.retrieveQueryByType(type, createdBy, queryType);
             Collections.sort(virtualCorpora);
-            return createVCDtos(virtualCorpora, queryType);
+            return createQueryDtos(virtualCorpora, queryType);
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
@@ -138,51 +138,51 @@ public class VirtualCorpusService {
         }
     }
 
-    private ArrayList<VirtualCorpusDto> createVCDtos (
-            List<VirtualCorpus> vcList, QueryType queryType)
+    private ArrayList<QueryDto> createQueryDtos (
+            List<QueryDO> queryList, QueryType queryType)
             throws KustvaktException {
-        ArrayList<VirtualCorpusDto> dtos = new ArrayList<>(vcList.size());
-        VirtualCorpus vc;
-        Iterator<VirtualCorpus> i = vcList.iterator();
+        ArrayList<QueryDto> dtos = new ArrayList<>(queryList.size());
+        QueryDO query;
+        Iterator<QueryDO> i = queryList.iterator();
         while (i.hasNext()) {
-            vc = i.next();
-            String json = vc.getKoralQuery();
+            query = i.next();
+            String json = query.getKoralQuery();
             String statistics = null;
             if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
                 statistics = krill.getStatistics(json);
             }
-            VirtualCorpusDto vcDto =
-                    converter.createVirtualCorpusDto(vc, statistics);
-            dtos.add(vcDto);
+            QueryDto dto =
+                    converter.createQueryDto(query, statistics);
+            dtos.add(dto);
         }
         return dtos;
     }
 
     /**
-     * Only admin and the owner of the virtual corpus are allowed to
-     * delete a virtual corpus.
+     * Only admin and the owner of the query are allowed to
+     * delete a query.
      * 
      * @param username
      *            username
-     * @param vcId
-     *            virtual corpus id
+     * @param queryId
+     *            query id
      * @throws KustvaktException
      */
     @Deprecated
     public void deleteVC (String username, int vcId) throws KustvaktException {
 
-        VirtualCorpus vc = vcDao.retrieveVCById(vcId);
+        QueryDO vc = queryDao.retrieveQueryById(vcId);
 
         if (vc.getCreatedBy().equals(username) || adminDao.isAdmin(username)) {
 
             if (vc.getType().equals(ResourceType.PUBLISHED)) {
-                VirtualCorpusAccess access =
+                QueryAccess access =
                         accessDao.retrieveHiddenAccess(vcId);
                 accessDao.deleteAccess(access, "system");
                 userGroupService.deleteAutoHiddenGroup(
                         access.getUserGroup().getId(), "system");
             }
-            vcDao.deleteVirtualCorpus(vc);
+            queryDao.deleteQuery(vc);
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
@@ -196,37 +196,37 @@ public class VirtualCorpusService {
      * 
      * @param username
      *            username
-     * @param vcName
+     * @param queryName
      *            virtual corpus name
      * @param createdBy
      *            virtual corpus creator
      * @throws KustvaktException
      */
-    public void deleteVCByName (String username, String vcName,
+    public void deleteQueryByName (String username, String queryName,
             String createdBy) throws KustvaktException {
 
-        VirtualCorpus vc = vcDao.retrieveVCByName(vcName, createdBy);
+        QueryDO query = queryDao.retrieveQueryByName(queryName, createdBy);
 
-        if (vc == null) {
-            String vcCode = createdBy + "/" + vcName;
+        if (query == null) {
+            String code = createdBy + "/" + queryName;
             throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
-                    "Virtual corpus " + vcCode + " is not found.",
-                    String.valueOf(vcCode));
+                    "Virtual corpus " + code + " is not found.",
+                    String.valueOf(code));
         }
-        else if (vc.getCreatedBy().equals(username)
+        else if (query.getCreatedBy().equals(username)
                 || adminDao.isAdmin(username)) {
 
-            if (vc.getType().equals(ResourceType.PUBLISHED)) {
-                VirtualCorpusAccess access =
-                        accessDao.retrieveHiddenAccess(vc.getId());
+            if (query.getType().equals(ResourceType.PUBLISHED)) {
+                QueryAccess access =
+                        accessDao.retrieveHiddenAccess(query.getId());
                 accessDao.deleteAccess(access, "system");
                 userGroupService.deleteAutoHiddenGroup(
                         access.getUserGroup().getId(), "system");
             }
-            if (KrillCollection.cache.get(vc.getName()) != null) {
-                KrillCollection.cache.remove(vc.getName());
+            if (KrillCollection.cache.get(query.getName()) != null) {
+                KrillCollection.cache.remove(query.getName());
             }
-            vcDao.deleteVirtualCorpus(vc);
+            queryDao.deleteQuery(query);
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
@@ -234,34 +234,26 @@ public class VirtualCorpusService {
         }
     }
 
-    // @Deprecated
-    // public void editVC (VirtualCorpusJson vcJson, String username)
-    // throws KustvaktException {
-    // ParameterChecker.checkIntegerValue(vcJson.getId(), "id");
-    // VirtualCorpus vc = vcDao.retrieveVCById(vcJson.getId());
-    // editVC(vc, vcJson, vcJson.getName(), username);
-    // }
+    public Status handlePutRequest (String username, String queryCreator,
+            String queryName, QueryJson queryJson) throws KustvaktException {
 
-    public Status handlePutRequest (String username, String vcCreator,
-            String vcName, QueryJson queryJson) throws KustvaktException {
-
-        verifyUsername(username, vcCreator);
-        VirtualCorpus vc = vcDao.retrieveVCByName(vcName, vcCreator);
+        verifyUsername(username, queryCreator);
+        QueryDO query = queryDao.retrieveQueryByName(queryName, queryCreator);
         ParameterChecker.checkObjectValue(queryJson, "request entity");
-        if (vc == null) {
-            storeQuery(queryJson, vcName, username);
+        if (query == null) {
+            storeQuery(queryJson, queryName, username);
             return Status.CREATED;
         }
         else {
-            editVC(vc, queryJson, vcName, username);
+            editQuery(query, queryJson, queryName, username);
             return Status.NO_CONTENT;
         }
     }
 
-    public void editVC (VirtualCorpus existingVC, QueryJson newVC,
-            String vcName, String username) throws KustvaktException {
+    public void editQuery (QueryDO existingQuery, QueryJson newQuery,
+            String queryName, String username) throws KustvaktException {
 
-        if (!username.equals(existingVC.getCreatedBy())
+        if (!username.equals(existingQuery.getCreatedBy())
                 && !adminDao.isAdmin(username)) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
@@ -269,21 +261,21 @@ public class VirtualCorpusService {
 
         String koralQuery = null;
         CorpusAccess requiredAccess = null;
-        String corpusQuery = newVC.getCorpusQuery();
+        String corpusQuery = newQuery.getCorpusQuery();
         if (corpusQuery != null && !corpusQuery.isEmpty()) {
             koralQuery = serializeCorpusQuery(corpusQuery);
-            requiredAccess = determineRequiredAccess(newVC.isCached(), vcName,
+            requiredAccess = determineRequiredAccess(newQuery.isCached(), queryName,
                     koralQuery);
         }
 
-        ResourceType type = newVC.getType();
+        ResourceType type = newQuery.getType();
         if (type != null) {
-            if (existingVC.getType().equals(ResourceType.PUBLISHED)) {
+            if (existingQuery.getType().equals(ResourceType.PUBLISHED)) {
                 // withdraw from publication
                 if (!type.equals(ResourceType.PUBLISHED)) {
-                    VirtualCorpusAccess hiddenAccess =
-                            accessDao.retrieveHiddenAccess(existingVC.getId());
-                    deleteVCAccess(hiddenAccess.getId(), "system");
+                    QueryAccess hiddenAccess =
+                            accessDao.retrieveHiddenAccess(existingQuery.getId());
+                    deleteQueryAccess(hiddenAccess.getId(), "system");
                     int groupId = hiddenAccess.getUserGroup().getId();
                     userGroupService.deleteAutoHiddenGroup(groupId, "system");
                     // EM: should the users within the hidden group
@@ -293,31 +285,31 @@ public class VirtualCorpusService {
                 // else remains the same
             }
             else if (type.equals(ResourceType.PUBLISHED)) {
-                publishVC(existingVC.getId());
+                publishQuery(existingQuery.getId());
             }
         }
 
-        vcDao.editVirtualCorpus(existingVC, vcName, type, requiredAccess,
-                koralQuery, newVC.getDefinition(), newVC.getDescription(),
-                newVC.getStatus(), newVC.isCached());
+        queryDao.editQuery(existingQuery, queryName, type, requiredAccess,
+                koralQuery, newQuery.getDefinition(), newQuery.getDescription(),
+                newQuery.getStatus(), newQuery.isCached());
     }
 
-    private void publishVC (int vcId) throws KustvaktException {
+    private void publishQuery (int queryId) throws KustvaktException {
 
-        VirtualCorpusAccess access = accessDao.retrieveHiddenAccess(vcId);
+        QueryAccess access = accessDao.retrieveHiddenAccess(queryId);
         // check if hidden access exists
         if (access == null) {
-            VirtualCorpus vc = vcDao.retrieveVCById(vcId);
+            QueryDO query = queryDao.retrieveQueryById(queryId);
             // create and assign a new hidden group
             int groupId = userGroupService.createAutoHiddenGroup();
             UserGroup autoHidden =
                     userGroupService.retrieveUserGroupById(groupId);
-            accessDao.createAccessToVC(vc, autoHidden, "system",
-                    VirtualCorpusAccessStatus.HIDDEN);
+            accessDao.createAccessToQuery(query, autoHidden, "system",
+                    QueryAccessStatus.HIDDEN);
         }
         else {
             // should not happened
-            jlog.error("Cannot publish VC with id: " + vcId
+            jlog.error("Cannot publish query with id: " + queryId
                     + ". Hidden access exists! Access id: " + access.getId());
         }
     }
@@ -370,12 +362,13 @@ public class VirtualCorpusService {
                     determineRequiredAccess(isCached, queryName, koralQuery);
         }
 
-        if (DEBUG) jlog.debug("Storing virtul corpus or query: " + queryName
-                + "in the database ");
+        if (DEBUG){
+            jlog.debug("Storing query: " + queryName + "in the database ");
+        }
         
         int queryId = 0;
         try {
-            queryId = vcDao.createVirtualCorpus(queryName, type, queryType,
+            queryId = queryDao.createQuery(queryName, type, queryType,
                     requiredAccess, koralQuery, definition, description, status,
                     isCached, username, query, queryLanguage);
 
@@ -394,7 +387,7 @@ public class VirtualCorpusService {
                     cause.getMessage());
         }
         if (type.equals(ResourceType.PUBLISHED)) {
-            publishVC(queryId);
+            publishQuery(queryId);
         }
     }
 
@@ -469,17 +462,17 @@ public class VirtualCorpusService {
         return (numberOfDoc > 0) ? true : false;
     }
 
-    public void shareVC (String username, String createdBy, String vcName,
+    public void shareQuery (String username, String createdBy, String queryName,
             String groupName) throws KustvaktException {
 
-        VirtualCorpus vc = vcDao.retrieveVCByName(vcName, createdBy);
-        if (vc == null) {
-            String vcCode = createdBy + "/" + vcName;
+        QueryDO query = queryDao.retrieveQueryByName(queryName, createdBy);
+        if (query == null) {
+            String code = createdBy + "/" + queryName;
             throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
-                    "Virtual corpus " + vcCode + " is not found.",
-                    String.valueOf(vcCode));
+                    "Query " + code + " is not found.",
+                    String.valueOf(code));
         }
-        if (!username.equals(vc.getCreatedBy())
+        if (!username.equals(query.getCreatedBy())
                 && !adminDao.isAdmin(username)) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
@@ -488,15 +481,15 @@ public class VirtualCorpusService {
         UserGroup userGroup =
                 userGroupService.retrieveUserGroupByName(groupName);
 
-        if (!isVCAccessAdmin(userGroup, username)
+        if (!isQueryAccessAdmin(userGroup, username)
                 && !adminDao.isAdmin(username)) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
         else {
             try {
-                accessDao.createAccessToVC(vc, userGroup, username,
-                        VirtualCorpusAccessStatus.ACTIVE);
+                accessDao.createAccessToQuery(query, userGroup, username,
+                        QueryAccessStatus.ACTIVE);
             }
             catch (Exception e) {
                 Throwable cause = e;
@@ -512,15 +505,15 @@ public class VirtualCorpusService {
                         cause.getMessage());
             }
 
-            vcDao.editVirtualCorpus(vc, null, ResourceType.PROJECT, null, null,
-                    null, null, null, vc.isCached());
+            queryDao.editQuery(query, null, ResourceType.PROJECT, null, null,
+                    null, null, null, query.isCached());
         }
     }
 
-    private boolean isVCAccessAdmin (UserGroup userGroup, String username)
+    private boolean isQueryAccessAdmin (UserGroup userGroup, String username)
             throws KustvaktException {
         List<UserGroupMember> accessAdmins =
-                userGroupService.retrieveVCAccessAdmins(userGroup);
+                userGroupService.retrieveQueryAccessAdmins(userGroup);
         for (UserGroupMember m : accessAdmins) {
             if (username.equals(m.getUserId())) {
                 return true;
@@ -545,9 +538,9 @@ public class VirtualCorpusService {
     // }
     // }
 
-    public List<VirtualCorpusAccessDto> listVCAccessByUsername (String username)
+    public List<QueryAccessDto> listQueryAccessByUsername (String username)
             throws KustvaktException {
-        List<VirtualCorpusAccess> accessList = new ArrayList<>();
+        List<QueryAccess> accessList = new ArrayList<>();
         if (adminDao.isAdmin(username)) {
             accessList = accessDao.retrieveAllAccess();
         }
@@ -555,46 +548,46 @@ public class VirtualCorpusService {
             List<UserGroup> groups =
                     userGroupService.retrieveUserGroup(username);
             for (UserGroup g : groups) {
-                if (isVCAccessAdmin(g, username)) {
+                if (isQueryAccessAdmin(g, username)) {
                     accessList.addAll(
                             accessDao.retrieveActiveAccessByGroup(g.getId()));
                 }
             }
         }
-        return accessConverter.createVCADto(accessList);
+        return accessConverter.createQueryAccessDto(accessList);
     }
 
-    public List<VirtualCorpusAccessDto> listVCAccessByVC (String username,
-            String vcCreator, String vcName) throws KustvaktException {
+    public List<QueryAccessDto> listQueryAccessByQuery (String username,
+            String queryCreator, String queryName) throws KustvaktException {
 
-        List<VirtualCorpusAccess> accessList;
+        List<QueryAccess> accessList;
         if (adminDao.isAdmin(username)) {
-            accessList = accessDao.retrieveAllAccessByVC(vcCreator, vcName);
+            accessList = accessDao.retrieveAllAccessByQuery(queryCreator, queryName);
         }
         else {
-            accessList = accessDao.retrieveActiveAccessByVC(vcCreator, vcName);
-            List<VirtualCorpusAccess> filteredAccessList = new ArrayList<>();
-            for (VirtualCorpusAccess access : accessList) {
+            accessList = accessDao.retrieveActiveAccessByQuery(queryCreator, queryName);
+            List<QueryAccess> filteredAccessList = new ArrayList<>();
+            for (QueryAccess access : accessList) {
                 UserGroup userGroup = access.getUserGroup();
-                if (isVCAccessAdmin(userGroup, username)) {
+                if (isQueryAccessAdmin(userGroup, username)) {
                     filteredAccessList.add(access);
                 }
             }
             accessList = filteredAccessList;
         }
-        return accessConverter.createVCADto(accessList);
+        return accessConverter.createQueryAccessDto(accessList);
     }
 
     @Deprecated
-    public List<VirtualCorpusAccessDto> listVCAccessByGroup (String username,
+    public List<QueryAccessDto> listVCAccessByGroup (String username,
             int groupId) throws KustvaktException {
         UserGroup userGroup = userGroupService.retrieveUserGroupById(groupId);
 
-        List<VirtualCorpusAccess> accessList;
+        List<QueryAccess> accessList;
         if (adminDao.isAdmin(username)) {
             accessList = accessDao.retrieveAllAccessByGroup(groupId);
         }
-        else if (isVCAccessAdmin(userGroup, username)) {
+        else if (isQueryAccessAdmin(userGroup, username)) {
             accessList = accessDao.retrieveActiveAccessByGroup(groupId);
         }
         else {
@@ -602,19 +595,19 @@ public class VirtualCorpusService {
                     "Unauthorized operation for user: " + username, username);
         }
 
-        return accessConverter.createVCADto(accessList);
+        return accessConverter.createQueryAccessDto(accessList);
     }
 
-    public List<VirtualCorpusAccessDto> listVCAccessByGroup (String username,
+    public List<QueryAccessDto> listQueryAccessByGroup (String username,
             String groupName) throws KustvaktException {
         UserGroup userGroup =
                 userGroupService.retrieveUserGroupByName(groupName);
 
-        List<VirtualCorpusAccess> accessList;
+        List<QueryAccess> accessList;
         if (adminDao.isAdmin(username)) {
             accessList = accessDao.retrieveAllAccessByGroup(userGroup.getId());
         }
-        else if (isVCAccessAdmin(userGroup, username)) {
+        else if (isQueryAccessAdmin(userGroup, username)) {
             accessList =
                     accessDao.retrieveActiveAccessByGroup(userGroup.getId());
         }
@@ -622,15 +615,15 @@ public class VirtualCorpusService {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
         }
-        return accessConverter.createVCADto(accessList);
+        return accessConverter.createQueryAccessDto(accessList);
     }
 
-    public void deleteVCAccess (int accessId, String username)
+    public void deleteQueryAccess (int accessId, String username)
             throws KustvaktException {
 
-        VirtualCorpusAccess access = accessDao.retrieveAccessById(accessId);
+        QueryAccess access = accessDao.retrieveAccessById(accessId);
         UserGroup userGroup = access.getUserGroup();
-        if (isVCAccessAdmin(userGroup, username)
+        if (isQueryAccessAdmin(userGroup, username)
                 || adminDao.isAdmin(username)) {
             accessDao.deleteAccess(access, username);
         }
@@ -641,49 +634,49 @@ public class VirtualCorpusService {
 
     }
 
-    public VirtualCorpus searchVCByName (String username, String vcName,
+    public QueryDO searchQueryByName (String username, String queryName,
             String createdBy, QueryType queryType) throws KustvaktException {
-        VirtualCorpus vc = vcDao.retrieveVCByName(vcName, createdBy);
-        if (vc == null) {
-            String vcCode = createdBy + "/" + vcName;
+        QueryDO query = queryDao.retrieveQueryByName(queryName, createdBy);
+        if (query == null) {
+            String code = createdBy + "/" + queryName;
             throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
-                    queryType.displayName()+ " " + vcCode + " is not found.",
-                    String.valueOf(vcCode));
+                    queryType.displayName()+ " " + code + " is not found.",
+                    String.valueOf(code));
         }
-        checkVCAccess(vc, username);
-        return vc;
+        checkQueryAccess(query, username);
+        return query;
     }
 
-    public VirtualCorpusDto retrieveVCByName (String username, String vcName,
+    public QueryDto retrieveQueryByName (String username, String queryName,
             String createdBy, QueryType queryType) throws KustvaktException {
-        VirtualCorpus vc = searchVCByName(username, vcName, createdBy, queryType);
-        String json = vc.getKoralQuery();
+        QueryDO query = searchQueryByName(username, queryName, createdBy, queryType);
+        String json = query.getKoralQuery();
         String statistics = null;
-        if (vc.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
+        if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
             statistics = krill.getStatistics(json);
         }
-        return converter.createVirtualCorpusDto(vc, statistics);
+        return converter.createQueryDto(query, statistics);
     }
 
-    public VirtualCorpusDto searchVCById (String username, int vcId)
+    public QueryDto searchQueryById (String username, int queryId)
             throws KustvaktException {
 
-        VirtualCorpus vc = vcDao.retrieveVCById(vcId);
-        checkVCAccess(vc, username);
-        String json = vc.getKoralQuery();
+        QueryDO query = queryDao.retrieveQueryById(queryId);
+        checkQueryAccess(query, username);
+        String json = query.getKoralQuery();
         String statistics = krill.getStatistics(json);
-        return converter.createVirtualCorpusDto(vc, statistics);
+        return converter.createQueryDto(query, statistics);
     }
 
-    private void checkVCAccess (VirtualCorpus vc, String username)
+    private void checkQueryAccess (QueryDO query, String username)
             throws KustvaktException {
-        ResourceType type = vc.getType();
+        ResourceType type = query.getType();
 
         if (!adminDao.isAdmin(username)
-                && !username.equals(vc.getCreatedBy())) {
+                && !username.equals(query.getCreatedBy())) {
             if (type.equals(ResourceType.PRIVATE)
                     || (type.equals(ResourceType.PROJECT)
-                            && !hasAccess(username, vc.getId()))) {
+                            && !hasAccess(username, query.getId()))) {
                 throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                         "Unauthorized operation for user: " + username,
                         username);
@@ -691,9 +684,9 @@ public class VirtualCorpusService {
 
             else if (ResourceType.PUBLISHED.equals(type)
                     && !username.equals("guest")) {
-                // add user in the VC's auto group
+                // add user in the query's auto group
                 UserGroup userGroup = userGroupService
-                        .retrieveHiddenUserGroupByVC(vc.getId());
+                        .retrieveHiddenUserGroupByQuery(query.getId());
                 try {
                     userGroupService.addGroupMember(username, userGroup,
                             "system", GroupMemberStatus.ACTIVE);
@@ -708,12 +701,12 @@ public class VirtualCorpusService {
         }
     }
 
-    private boolean hasAccess (String username, int vcId)
+    private boolean hasAccess (String username, int queryId)
             throws KustvaktException {
         UserGroup userGroup;
-        List<VirtualCorpusAccess> accessList =
-                accessDao.retrieveActiveAccessByVC(vcId);
-        for (VirtualCorpusAccess access : accessList) {
+        List<QueryAccess> accessList =
+                accessDao.retrieveActiveAccessByQuery(queryId);
+        for (QueryAccess access : accessList) {
             userGroup = access.getUserGroup();
             if (userGroupService.isMember(username, userGroup)) {
                 return true;

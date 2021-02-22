@@ -8,10 +8,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.QueryType;
-import de.ids_mannheim.korap.entity.VirtualCorpus;
+import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.rewrite.KoralNode.RewriteIdentifier;
-import de.ids_mannheim.korap.service.VirtualCorpusService;
+import de.ids_mannheim.korap.service.QueryService;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.util.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
@@ -29,7 +29,7 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
     @Autowired
     private KustvaktConfiguration config;
     @Autowired
-    private VirtualCorpusService vcService;
+    private QueryService queryService;
 
     @Override
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
@@ -71,8 +71,8 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
                             koralNode.get("ref"));
                 }
                 
-                VirtualCorpus vc =
-                        vcService.searchVCByName(username, vcName, vcOwner, QueryType.VIRTUAL_CORPUS);
+                QueryDO vc =
+                        queryService.searchQueryByName(username, vcName, vcOwner, QueryType.VIRTUAL_CORPUS);
                 if (!vc.isCached()) {
                     rewriteVC(vc, koralNode);
                 }
@@ -105,7 +105,7 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
         koralNode.set("ref", ref, new RewriteIdentifier("ref", ref));
     }
 
-    private void rewriteVC (VirtualCorpus vc, KoralNode koralNode)
+    private void rewriteVC (QueryDO vc, KoralNode koralNode)
             throws KustvaktException {
         String koralQuery = vc.getKoralQuery();
         JsonNode kq = JsonUtils.readTree(koralQuery).at("/collection");

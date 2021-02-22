@@ -349,9 +349,9 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         node = testlistAccessByGroup("admin", "");
         node = node.get(node.size() - 1);
         assertEquals("system", node.at("/createdBy").asText());
-        assertEquals(vcName, node.at("/vcName").asText());
+        assertEquals(vcName, node.at("/queryName").asText());
         assertTrue(node.at("/userGroupName").asText().startsWith("auto"));
-        assertEquals(vcName, node.at("/vcName").asText());
+        assertEquals(vcName, node.at("/queryName").asText());
 
         String groupName = node.at("/userGroupName").asText();
 
@@ -763,7 +763,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         node = testlistAccessByGroup("admin", "");
         assertEquals(4, node.size());
         node = node.get(node.size() - 1);
-        assertEquals(vcName, node.at("/vcName").asText());
+        assertEquals(vcName, node.at("/queryName").asText());
         assertEquals("system", node.at("/createdBy").asText());
         assertTrue(node.at("/userGroupName").asText().startsWith("auto"));
 
@@ -831,8 +831,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(1, node.at("/0/accessId").asInt());
-        assertEquals(2, node.at("/0/vcId").asInt());
-        assertEquals("group-vc", node.at("/0/vcName").asText());
+        assertEquals(2, node.at("/0/queryId").asInt());
+        assertEquals("group-vc", node.at("/0/queryName").asText());
         assertEquals(2, node.at("/0/userGroupId").asInt());
 
         assertEquals("dory-group", node.at("/0/userGroupName").asText());
@@ -862,8 +862,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         node = testlistAccessByGroup("marlin", groupName);
         assertEquals(2, node.size());
         node = node.get(1);
-        assertEquals(5, node.at("/vcId").asInt());
-        assertEquals(vcName, node.at("/vcName").asText());
+        assertEquals(5, node.at("/queryId").asInt());
+        assertEquals(vcName, node.at("/queryName").asText());
         assertEquals(1, node.at("/userGroupId").asInt());
         assertEquals(groupName, node.at("/userGroupName").asText());
 

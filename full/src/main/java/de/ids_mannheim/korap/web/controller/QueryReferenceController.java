@@ -22,11 +22,11 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.constant.QueryType;
-import de.ids_mannheim.korap.dto.VirtualCorpusDto;
+import de.ids_mannheim.korap.dto.QueryDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
-import de.ids_mannheim.korap.service.VirtualCorpusService;
+import de.ids_mannheim.korap.service.QueryService;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
@@ -53,7 +53,7 @@ public class QueryReferenceController {
     @Autowired
     private KustvaktResponseHandler kustvaktResponseHandler;
     @Autowired
-    private VirtualCorpusService service;
+    private QueryService service;
     @Autowired
     private OAuth2ScopeService scopeService;
 
@@ -113,7 +113,7 @@ public class QueryReferenceController {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
         DemoUserFilter.class, PiwikFilter.class })
-    public VirtualCorpusDto retrieveQueryByName (
+    public QueryDto retrieveQueryByName (
             @Context SecurityContext securityContext,
             @PathParam("createdBy") String createdBy,
             @PathParam("qName") String qName) {
@@ -121,7 +121,7 @@ public class QueryReferenceController {
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
-            return service.retrieveVCByName(context.getUsername(), qName,
+            return service.retrieveQueryByName(context.getUsername(), qName,
                     createdBy, QueryType.QUERY);
         }
         catch (KustvaktException e) {
@@ -161,17 +161,31 @@ public class QueryReferenceController {
     */
 
     
-    // TODO: List all queries available to the logged in user
+    /**
+     * Lists all queries available to the authenticated user.
+     *
+     * System-admins can list available queries for a specific user by
+     * specifiying the username parameter.
+     * 
+     * Normal users cannot list queries available for other users. 
+     * Thus, username parameter is optional
+     * and must be identical to the authenticated username.
+     * 
+     * @param securityContext
+     * @param username
+     *            a username (optional)
+     * @return a list of queries
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public List<VirtualCorpusDto> listAvailableQuery (
+    public List<QueryDto> listAvailableQuery (
             @Context SecurityContext securityContext,
             @QueryParam("username") String username) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
-            List<VirtualCorpusDto> dtos = service.listAvailableVCForUser(
+            List<QueryDto> dtos = service.listAvailableQueryForUser(
                     context.getUsername(), username, QueryType.QUERY);
             return dtos;
         }
@@ -179,7 +193,39 @@ public class QueryReferenceController {
             throw kustvaktResponseHandler.throwit(e);
         }
     }
-    // TODO: List all queries of a sepcific user
+    
+//    // TODO: List all queries of a sepcific user
+//    /**
+//     * Lists all queries created by a user. This list is only
+//     * available to the owner of the queries. Users, except system-admins, 
+//     * are not allowed to list queries created by other users. 
+//     * 
+//     * Thus, the path parameter "createdBy" must be the same as the
+//     * authenticated username. 
+//     * 
+//     * @param securityContext
+//     * @return a list of queries created by the user
+//     *         in the security context.
+//     */
+//    @GET
+//    @Path("~{createdBy}")
+//    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+//    public List<VirtualCorpusDto> listUserVC (
+//            @PathParam("createdBy") String createdBy,
+//            @Context SecurityContext securityContext) {
+//        TokenContext context =
+//                (TokenContext) securityContext.getUserPrincipal();
+//        try {
+//            scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
+//            return service.listOwnerVC(context.getUsername(), createdBy,
+//                    QueryType.QUERY);
+//        }
+//        catch (KustvaktException e) {
+//            throw kustvaktResponseHandler.throwit(e);
+//        }
+//    }
+    
+    
     // TODO: Some admin routes missing.
     // TODO: Some sharing routes missing
 };

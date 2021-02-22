@@ -25,12 +25,12 @@ import com.sun.jersey.spi.container.ResourceFilters;
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
-import de.ids_mannheim.korap.dto.VirtualCorpusAccessDto;
-import de.ids_mannheim.korap.dto.VirtualCorpusDto;
+import de.ids_mannheim.korap.dto.QueryAccessDto;
+import de.ids_mannheim.korap.dto.QueryDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
-import de.ids_mannheim.korap.service.VirtualCorpusService;
+import de.ids_mannheim.korap.service.QueryService;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
@@ -66,7 +66,7 @@ public class VirtualCorpusController {
     @Autowired
     private KustvaktResponseHandler kustvaktResponseHandler;
     @Autowired
-    private VirtualCorpusService service;
+    private QueryService service;
     @Autowired
     private OAuth2ScopeService scopeService;
 
@@ -125,7 +125,7 @@ public class VirtualCorpusController {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
         DemoUserFilter.class, PiwikFilter.class })
-    public VirtualCorpusDto retrieveVCByName (
+    public QueryDto retrieveVCByName (
             @Context SecurityContext securityContext,
             @PathParam("createdBy") String createdBy,
             @PathParam("vcName") String vcName) {
@@ -133,7 +133,7 @@ public class VirtualCorpusController {
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
-            return service.retrieveVCByName(context.getUsername(), vcName,
+            return service.retrieveQueryByName(context.getUsername(), vcName,
                     createdBy, QueryType.VIRTUAL_CORPUS);
         }
         catch (KustvaktException e) {
@@ -158,14 +158,14 @@ public class VirtualCorpusController {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public List<VirtualCorpusDto> listAvailableVC (
+    public List<QueryDto> listAvailableVC (
             @Context SecurityContext securityContext,
             @QueryParam("username") String username) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
-            return service.listAvailableVCForUser(context.getUsername(),
+            return service.listAvailableQueryForUser(context.getUsername(),
                     username, QueryType.VIRTUAL_CORPUS);
         }
         catch (KustvaktException e) {
@@ -188,14 +188,14 @@ public class VirtualCorpusController {
     @GET
     @Path("~{createdBy}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public List<VirtualCorpusDto> listUserVC (
+    public List<QueryDto> listUserVC (
             @PathParam("createdBy") String createdBy,
             @Context SecurityContext securityContext) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
-            return service.listOwnerVC(context.getUsername(), createdBy,
+            return service.listOwnerQuery(context.getUsername(), createdBy,
                     QueryType.VIRTUAL_CORPUS);
         }
         catch (KustvaktException e) {
@@ -221,7 +221,7 @@ public class VirtualCorpusController {
     @GET
     @Path("list/system-admin")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public List<VirtualCorpusDto> listVCByType (
+    public List<QueryDto> listVCByType (
             @Context SecurityContext securityContext,
             @QueryParam("createdBy") String createdBy,
             @QueryParam("type") ResourceType type) {
@@ -229,7 +229,7 @@ public class VirtualCorpusController {
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.ADMIN);
-            return service.listVCByType(context.getUsername(), createdBy, type,
+            return service.listQueryByType(context.getUsername(), createdBy, type,
                     QueryType.VIRTUAL_CORPUS);
         }
         catch (KustvaktException e) {
@@ -259,7 +259,7 @@ public class VirtualCorpusController {
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.DELETE_VC);
-            service.deleteVCByName(context.getUsername(), vcName, createdBy);
+            service.deleteQueryByName(context.getUsername(), vcName, createdBy);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -294,7 +294,7 @@ public class VirtualCorpusController {
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.SHARE_VC);
-            service.shareVC(context.getUsername(), vcCreator, vcName, groupName);
+            service.shareQuery(context.getUsername(), vcCreator, vcName, groupName);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -322,7 +322,7 @@ public class VirtualCorpusController {
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.DELETE_VC_ACCESS);
-            service.deleteVCAccess(accessId, context.getUsername());
+            service.deleteQueryAccess(accessId, context.getUsername());
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -342,7 +342,7 @@ public class VirtualCorpusController {
     @GET
     @Path("access")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public List<VirtualCorpusAccessDto> listVCAccesses (
+    public List<QueryAccessDto> listVCAccesses (
             @Context SecurityContext securityContext,
             @QueryParam("groupName") String groupName) {
         TokenContext context =
@@ -350,10 +350,10 @@ public class VirtualCorpusController {
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_ACCESS_INFO);
             if (groupName!=null && !groupName.isEmpty()){
-                return service.listVCAccessByGroup(context.getUsername(), groupName);
+                return service.listQueryAccessByGroup(context.getUsername(), groupName);
             }
             else {
-                return service.listVCAccessByUsername(context.getUsername());
+                return service.listQueryAccessByUsername(context.getUsername());
             }
         }
         catch (KustvaktException e) {
