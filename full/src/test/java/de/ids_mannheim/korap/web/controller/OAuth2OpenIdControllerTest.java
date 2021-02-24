@@ -156,7 +156,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
-        assertEquals("Invalid request: Missing \"client_id\" parameter",
+        assertEquals("Invalid request: Missing client_id parameter",
                 node.at("/error_description").asText());
 
     }
@@ -177,7 +177,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
-        assertEquals("Invalid request: Missing \"response_type\" parameter",
+        assertEquals("Invalid request: Missing response_type parameter",
                 node.at("/error_description").asText());
     }
 
@@ -305,7 +305,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
-        assertEquals("Invalid request: Missing \"grant_type\" parameter",
+        assertEquals("Invalid request: Missing grant_type parameter",
                 node.at("/error_description").asText());
     }
 
@@ -315,7 +315,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
-        assertEquals("Invalid request: Missing required \"client_id\" "
+        assertEquals("Invalid request: Missing required client_id "
                 + "parameter", node.at("/error_description").asText());
     }
 
@@ -383,7 +383,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
-        assertEquals("Invalid request: Missing or empty \"username\" parameter",
+        assertEquals("Invalid request: Missing or empty username parameter",
                 node.at("/error_description").asText());
     }
 
@@ -393,7 +393,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
-        assertEquals("Invalid request: Missing or empty \"password\" parameter",
+        assertEquals("Invalid request: Missing or empty password parameter",
                 node.at("/error_description").asText());
     }
 
