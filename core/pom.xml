@@ -12,7 +12,7 @@
 		<jersey.version>1.19.4</jersey.version>
 		<jetty.version>9.4.36.v20210114</jetty.version>
 		<hibernate.version>5.4.28.Final</hibernate.version>
-		<flyway.version>7.4.0</flyway.version>
+		<flyway.version>7.5.4</flyway.version>
 		<log4j.version>2.14.0</log4j.version>
 		<krill.version>[0.59.3,)</krill.version>
 		<koral.version>[0.37,)</koral.version>
