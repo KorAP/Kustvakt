@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.web.controller;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -60,7 +61,8 @@ public class QueryReferenceController {
     /**
      * Creates a query reference according to the given Json.
      * The query reference creator must be the same as the
-     * authenticated username.
+     * authenticated username, except for admins. Admins may create
+     * and update system queries and queries for/of any users.
      * 
      * TODO: In the future, this may also update a query.
      *
@@ -69,9 +71,12 @@ public class QueryReferenceController {
      *            the username of the vc creator, must be the same
      *            as the authenticated username
      * @param qName
-     *           the vc name
-     * @param query a json object describing the query and its properties
-     * @return
+     *            the vc name
+     * @param query
+     *            a json object describing the query and its
+     *            properties
+     * @return HTTP Status 201 Created when creating a new query, or 204
+     *         No Content when updating an existing query.
      * @throws KustvaktException
      */
     @PUT
@@ -130,35 +135,35 @@ public class QueryReferenceController {
     }
 
     /**
-     * Only the VC owner and system admins can delete VC. VCA admins
-     * can delete VC-accesses e.g. of project VC, but not the VC
-     * themselves.
+     * Only the query owner and system admins can delete queries.
+     * Query access admins can delete query-accesses e.g. of project
+     * queries, but not the queries themselves.
      * 
      * @param securityContext
      * @param createdBy
-     *            vc creator
-     * @param vcName
-     *            vc name
+     *            query creator
+     * @param qName
+     *            query name
      * @return HTTP status 200, if successful
      */
-    /*
+    
     @DELETE
-    @Path("~{createdBy}/{vcName}")
+    @Path("~{createdBy}/{qName}")
     public Response deleteVCByName (@Context SecurityContext securityContext,
             @PathParam("createdBy") String createdBy,
-            @PathParam("vcName") String vcName) {
+            @PathParam("qName") String qName) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.DELETE_VC);
-            service.deleteVCByName(context.getUsername(), vcName, createdBy);
+            service.deleteQueryByName(context.getUsername(), qName, createdBy,
+                    QueryType.QUERY);
         }
         catch (KustvaktException e) {
         throw kustvaktResponseHandler.throwit(e);
         }
         return Response.ok().build();
     };
-    */
 
     
     /**

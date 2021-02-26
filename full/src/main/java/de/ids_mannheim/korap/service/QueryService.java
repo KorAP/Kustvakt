@@ -42,14 +42,22 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 import de.ids_mannheim.korap.web.SearchKrill;
+import de.ids_mannheim.korap.web.controller.QueryReferenceController;
 import de.ids_mannheim.korap.web.controller.VirtualCorpusController;
 import de.ids_mannheim.korap.web.input.QueryJson;
 
 /**
- * VirtualCorpusService handles the logic behind
- * {@link VirtualCorpusController}.
- * It communicates with {@link QueryDao} and returns
- * {@link QueryDto} to {@link VirtualCorpusController}.
+ * QueryService handles the logic behind
+ * {@link VirtualCorpusController} and
+ * {@link QueryReferenceController}. Virtual corpora and
+ * stored-queries are both treated as queries of different types.
+ * Thus, they are handled logically similarly.
+ * 
+ * QueryService communicates with {@link QueryDao}, handles
+ * {@link QueryDO} and
+ * returns
+ * {@link QueryDto} to {@link VirtualCorpusController} and
+ * {@link QueryReferenceController}.
  * 
  * @author margaretha
  *
@@ -158,59 +166,15 @@ public class QueryService {
         return dtos;
     }
 
-    /**
-     * Only admin and the owner of the query are allowed to
-     * delete a query.
-     * 
-     * @param username
-     *            username
-     * @param queryId
-     *            query id
-     * @throws KustvaktException
-     */
-    @Deprecated
-    public void deleteVC (String username, int vcId) throws KustvaktException {
-
-        QueryDO vc = queryDao.retrieveQueryById(vcId);
-
-        if (vc.getCreatedBy().equals(username) || adminDao.isAdmin(username)) {
-
-            if (vc.getType().equals(ResourceType.PUBLISHED)) {
-                QueryAccess access =
-                        accessDao.retrieveHiddenAccess(vcId);
-                accessDao.deleteAccess(access, "system");
-                userGroupService.deleteAutoHiddenGroup(
-                        access.getUserGroup().getId(), "system");
-            }
-            queryDao.deleteQuery(vc);
-        }
-        else {
-            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: " + username, username);
-        }
-    }
-
-    /**
-     * Only admin and the owner of the virtual corpus are allowed to
-     * delete a virtual corpus.
-     * 
-     * @param username
-     *            username
-     * @param queryName
-     *            virtual corpus name
-     * @param createdBy
-     *            virtual corpus creator
-     * @throws KustvaktException
-     */
     public void deleteQueryByName (String username, String queryName,
-            String createdBy) throws KustvaktException {
+            String createdBy, QueryType type) throws KustvaktException {
 
         QueryDO query = queryDao.retrieveQueryByName(queryName, createdBy);
 
         if (query == null) {
             String code = createdBy + "/" + queryName;
             throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
-                    "Virtual corpus " + code + " is not found.",
+                    "Query " + code + " is not found.",
                     String.valueOf(code));
         }
         else if (query.getCreatedBy().equals(username)
@@ -223,7 +187,8 @@ public class QueryService {
                 userGroupService.deleteAutoHiddenGroup(
                         access.getUserGroup().getId(), "system");
             }
-            if (KrillCollection.cache.get(query.getName()) != null) {
+            if (type.equals(QueryType.VIRTUAL_CORPUS)
+                    && KrillCollection.cache.get(query.getName()) != null) {
                 KrillCollection.cache.remove(query.getName());
             }
             queryDao.deleteQuery(query);

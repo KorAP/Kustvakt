@@ -71,21 +71,27 @@ public class VirtualCorpusController {
     private OAuth2ScopeService scopeService;
 
     /**
-     * Updates a vc according to the given VirtualCorpusJson, if the
-     * VC exists, otherwise creates a new VC with the given VC creator
-     * and VC name specified as the path parameters. The vc creator
-     * must be the same as the authenticated username.
+     * Creates a new VC with the given VC creator and VC name
+     * specified as the path parameters. If a VC with the same name
+     * and creator exists, the VC will be updated instead.
      * 
      * VC name cannot be updated.
+     * 
+     * The VC creator must be the same as the authenticated username,
+     * except for admins. Admins can create or update system VC as
+     * well as VC for any users.
+     * 
      * 
      * @param securityContext
      * @param vcCreator
      *            the username of the vc creator, must be the same
-     *            as the authenticated username
+     *            as the authenticated username, except admins
      * @param vcName
-     *           the vc name
-     * @param vc a json object describing the VC
-     * @return
+     *            the vc name
+     * @param vc
+     *            a json object describing the VC
+     * @return HTTP Status 201 Created when creating a new VC, or 204
+     *         No Content when updating an existing VC.
      * @throws KustvaktException
      */
     @PUT
@@ -259,7 +265,8 @@ public class VirtualCorpusController {
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.DELETE_VC);
-            service.deleteQueryByName(context.getUsername(), vcName, createdBy);
+            service.deleteQueryByName(context.getUsername(), vcName, createdBy,
+                    QueryType.VIRTUAL_CORPUS);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);

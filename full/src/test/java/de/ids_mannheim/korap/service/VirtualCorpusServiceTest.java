@@ -1,25 +1,25 @@
 package de.ids_mannheim.korap.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.junit.Rule;
+import org.junit.Assert;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import de.ids_mannheim.korap.constant.QueryType;
-import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.constant.ResourceType;
+import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.dto.QueryAccessDto;
 import de.ids_mannheim.korap.dto.QueryDto;
-import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.QueryDO;
+import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.web.input.QueryJson;
 
@@ -32,12 +32,9 @@ public class VirtualCorpusServiceTest {
     @Autowired
     private UserGroupService groupService;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Test
     public void testCreateNonUniqueVC () throws KustvaktException {
-        thrown.expect(KustvaktException.class);
+        
         // EM: message differs depending on the database used
         // for testing. The message below is from sqlite.
         // thrown.expectMessage("A UNIQUE constraint failed "
@@ -48,7 +45,9 @@ public class VirtualCorpusServiceTest {
         vc.setCorpusQuery("corpusSigle=GOE");
         vc.setType(ResourceType.PRIVATE);
         vc.setQueryType(QueryType.VIRTUAL_CORPUS);
-        vcService.storeQuery(vc, "dory-vc", "dory");
+        
+        Assert.assertThrows(KustvaktException.class,
+                () -> vcService.storeQuery(vc, "dory-vc", "dory"));
     }
 
     @Test
@@ -77,16 +76,18 @@ public class VirtualCorpusServiceTest {
         assertEquals(UserGroupStatus.HIDDEN, group.getStatus());
 
         //delete vc
-        vcService.deleteQueryByName(username, vcName, username);
+        vcService.deleteQueryByName(username, vcName, username,
+                QueryType.VIRTUAL_CORPUS);
         
         // check hidden access
         accesses = vcService.listQueryAccessByUsername("admin");
         assertEquals(size-1, accesses.size());
         
         // check hidden group
-        thrown.expect(KustvaktException.class);
-        group = groupService.retrieveUserGroupById(groupId);
-        thrown.expectMessage("Group with id "+groupId+" is not found");
+        KustvaktException e = assertThrows(KustvaktException.class,
+                () -> groupService.retrieveUserGroupById(groupId));
+        assertEquals("Group with id " + groupId + " is not found",
+                e.getMessage());
     }
 
     @Test
@@ -138,9 +139,10 @@ public class VirtualCorpusServiceTest {
         accesses = vcService.listQueryAccessByUsername("admin");
         assertEquals(size - 1, accesses.size());
 
-        thrown.expect(KustvaktException.class);
-        group = groupService.retrieveUserGroupById(groupId);
-        thrown.expectMessage("Group with id 5 is not found");
+        KustvaktException e = assertThrows(KustvaktException.class,
+                () -> groupService.retrieveUserGroupById(groupId));
+        
+        assertEquals("Group with id 5 is not found", e.getMessage());
     }
 
 }

@@ -17,17 +17,21 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 public class QueryReferenceControllerTest extends SpringJerseyTest {
 
     private String testUser = "qRefControllerTest";
+    private String adminUser = "admin";
 
     @Test
     public void testCreatePrivateQuery () throws KustvaktException {
-        String json = "{\"type\": \"PRIVATE\"" + ",\"queryType\": \"QUERY\""
-                + ",\"queryLanguage\": \"poliqarp\"" + ",\"query\": \"der\"}";
+        String json = "{\"type\": \"PRIVATE\"" 
+                + ",\"queryType\": \"QUERY\""
+                + ",\"queryLanguage\": \"poliqarp\"" 
+                + ",\"query\": \"der\"}";
 
         String qName = "new_query";
         ClientResponse response = resource().path(API_VERSION).path("query")
@@ -48,6 +52,109 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         assertEquals("der", node.at("/query").asText());
         assertEquals("poliqarp", node.at("/queryLanguage").asText());
         assertEquals(CorpusAccess.PUB.name(), node.at("/requiredAccess").asText());
+        
+        testDeleteQueryByName(qName, testUser);
+    }
+
+    @Test
+    public void testCreateUserQueryByAdmin () throws KustvaktException {
+        String json = "{\"type\": \"PRIVATE\""
+                + ",\"queryType\": \"QUERY\""
+                + ",\"queryLanguage\": \"poliqarp\"" 
+                + ",\"query\": \"Sommer\"}";
+
+        String qName = "marlin-query";
+        ClientResponse response = resource().path(API_VERSION).path("query")
+                .path("~marlin").path(qName)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(adminUser, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .entity(json).put(ClientResponse.class);
+
+        assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+        testDeleteQueryByName(qName, "admin");
+    }
+    
+    @Test
+    public void testCreateSystemQuery () throws KustvaktException {
+        String json = "{\"type\": \"SYSTEM\""
+                + ",\"queryType\": \"QUERY\""
+                + ",\"queryLanguage\": \"poliqarp\"" 
+                + ",\"query\": \"Sommer\"}";
+
+        String qName = "system-query";
+        ClientResponse response = resource().path(API_VERSION).path("query")
+                .path("~system").path(qName)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(adminUser, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .entity(json).put(ClientResponse.class);
+
+        assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+        testDeleteQueryByName(qName, "admin");
+    }
+    
+    @Test
+    public void testCreateSystemQueryUnauthorized () throws KustvaktException {
+        String json = "{\"type\": \"SYSTEM\""
+                + ",\"queryType\": \"QUERY\""
+                + ",\"queryLanguage\": \"poliqarp\"" 
+                + ",\"query\": \"Sommer\"}";
+
+        ClientResponse response = resource().path(API_VERSION).path("query")
+                .path("~"+testUser).path("system-query")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(testUser, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .entity(json).put(ClientResponse.class);
+
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Unauthorized operation for user: " + testUser,
+                node.at("/errors/0/1").asText());
+    }
+    
+    @Test
+    public void testDeleteQueryUnauthorized () throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("query")
+                .path("~dory").path("dory-q")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(testUser, "pass"))
+                .delete(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Unauthorized operation for user: " + testUser,
+                node.at("/errors/0/1").asText());
+    }
+    
+    @Test
+    public void testDeleteNonExistingQuery () throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("query")
+                .path("~dory").path("non-existing-query")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("dory", "pass"))
+                .delete(ClientResponse.class);
+
+        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Query dory/non-existing-query is not found.",
+                node.at("/errors/0/1").asText());
+        assertEquals("dory/non-existing-query",
+                node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -104,6 +211,17 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         return JsonUtils.readTree(entity);
+    }
+
+    private void testDeleteQueryByName (String qName, String username)
+            throws KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("query")
+                .path("~" + username).path(qName)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .delete(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
 }

@@ -98,7 +98,8 @@ public class NamedVCLoader implements Runnable{
                         if (DEBUG) {
                             jlog.debug("Delete existing vc: " + filename);
                         }
-                        vcService.deleteVC("system", vc.getId());
+                        vcService.deleteQueryByName("system", vc.getName(),
+                                vc.getCreatedBy(), QueryType.VIRTUAL_CORPUS);
                     }
                 }
                 catch (KustvaktException e) {

@@ -3,7 +3,8 @@
  - Updated libraries (margaretha)
  - Renamed virtual corpus to query (margaretha)
 2021-02-26
- - Added query access roles and fixed vc access roles.
+ - Added query access roles and fixed vc access roles (margaretha)
+ - Added delete query webservice and tests (margaretha) 
  
 # version 0.63
 26/10/2020

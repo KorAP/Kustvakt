@@ -40,7 +40,7 @@ import de.ids_mannheim.korap.utils.ParameterChecker;
 
 /**
  * QueryDao manages database queries and transactions
- * regarding KorAP queries, e.g. retrieving and storing queries.
+ * regarding virtual corpus and KorAP queries.
  * 
  * @author margaretha
  *

@@ -455,6 +455,24 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     public void testCreateSystemVC () throws KustvaktException {
         String json = "{\"type\": \"SYSTEM\""
                 + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"corpusQuery\": \"pubDate since 1820\"}";
+
+        String vcName = "new_system_vc";
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("~system").path(vcName)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("admin", "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .entity(json).put(ClientResponse.class);
+
+        assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+        testDeleteVC(vcName, "admin");
+    }        
+    
+    @Test
+    public void testCreateSystemVCUnauthorized () throws KustvaktException {
+        String json = "{\"type\": \"SYSTEM\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
                 + ",\"corpusQuery\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
