@@ -175,7 +175,7 @@ public class UserGroupService {
     public List<UserGroupMember> retrieveQueryAccessAdmins (UserGroup userGroup)
             throws KustvaktException {
         List<UserGroupMember> groupAdmins = groupMemberDao.retrieveMemberByRole(
-                userGroup.getId(), PredefinedRole.QUERY_ACCESS_ADMIN.getId());
+                userGroup.getId(), PredefinedRole.VC_ACCESS_ADMIN.getId());
         return groupAdmins;
     }
 
@@ -185,7 +185,7 @@ public class UserGroupService {
             memberRoles.add(roleDao.retrieveRoleById(
                     PredefinedRole.USER_GROUP_MEMBER.getId()));
             memberRoles.add(roleDao
-                    .retrieveRoleById(PredefinedRole.QUERY_ACCESS_MEMBER.getId()));
+                    .retrieveRoleById(PredefinedRole.VC_ACCESS_MEMBER.getId()));
         }
     }
 
@@ -194,14 +194,14 @@ public class UserGroupService {
      * Do not include owners in group members.
      * 
      * {@link PredefinedRole#USER_GROUP_MEMBER} and
-     * {@link PredefinedRole#QUERY_ACCESS_MEMBER} roles are
+     * {@link PredefinedRole#VC_ACCESS_MEMBER} roles are
      * automatically assigned to each group member.
      * 
      * {@link PredefinedRole#USER_GROUP_MEMBER} restrict users
      * to see other group members and allow users to remove
      * themselves from the groups.
      * 
-     * {@link PredefinedRole#QUERY_ACCESS_MEMBER} allow user to
+     * {@link PredefinedRole#VC_ACCESS_MEMBER} allow user to
      * read group query.
      * 
      * @see /full/src/main/resources/db/predefined/V3.2__insert_predefined_roles.sql

@@ -72,7 +72,7 @@ public class UserGroupDao {
         roles.add(roleDao
                 .retrieveRoleById(PredefinedRole.USER_GROUP_ADMIN.getId()));
         roles.add(roleDao
-                .retrieveRoleById(PredefinedRole.QUERY_ACCESS_ADMIN.getId()));
+                .retrieveRoleById(PredefinedRole.VC_ACCESS_ADMIN.getId()));
 
         UserGroupMember owner = new UserGroupMember();
         owner.setUserId(createdBy);

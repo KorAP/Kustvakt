@@ -78,7 +78,7 @@ public class UserGroupDaoTest {
         Collections.sort(roleList);
         assertEquals(PredefinedRole.USER_GROUP_ADMIN.getId(),
                 roleList.get(0).getId());
-        assertEquals(PredefinedRole.QUERY_ACCESS_ADMIN.getId(),
+        assertEquals(PredefinedRole.VC_ACCESS_ADMIN.getId(),
                 roleList.get(1).getId());
 
         //retrieve VC by group
@@ -113,7 +113,7 @@ public class UserGroupDaoTest {
 
         assertEquals(PredefinedRole.USER_GROUP_MEMBER.name(),
                 sortedRoles.get(0).getName());
-        assertEquals(PredefinedRole.QUERY_ACCESS_MEMBER.name(),                
+        assertEquals(PredefinedRole.VC_ACCESS_MEMBER.name(),                
                 sortedRoles.get(1).getName());
     }
 

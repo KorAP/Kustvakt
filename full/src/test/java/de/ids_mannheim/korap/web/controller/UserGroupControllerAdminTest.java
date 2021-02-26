@@ -214,7 +214,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
             if (member.at("/userId").asText().equals(memberUsername)) {
                 assertEquals(3, member.at("/roles").size());
                 assertEquals(PredefinedRole.USER_GROUP_ADMIN.name(),
-                        member.at("/roles/1").asText());
+                        member.at("/roles/0").asText());
                 break;
             }
         }

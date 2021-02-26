@@ -1,553 +1,556 @@
 # version 0.63.1
 2021-02-22
-   - Updated libraries.
-
+ - Updated libraries (margaretha)
+ - Renamed virtual corpus to query (margaretha)
+2021-02-26
+ - Added query access roles and fixed vc access roles.
+ 
 # version 0.63
 26/10/2020
-   - Updated dependency of nimbus-jose-jwt and oauth2-oidc-sdk (diewald)
+ - Updated dependency of nimbus-jose-jwt and oauth2-oidc-sdk (diewald)
 29/10/2020
-   - Introduction of a query reference rewrite mechanism (diewald)
+ - Introduction of a query reference rewrite mechanism (diewald)
 30/10/2020
-   - Added database methods for storing query references (diewald) 
+ - Added database methods for storing query references (diewald) 
 04/12/2020
-   - Fix hibernate dialect for SQLite. (margaretha)
+ - Fix hibernate dialect for SQLite. (margaretha)
 04/12/2020
-   - Fix pipe warning. (margaretha)
+ - Fix pipe warning. (margaretha)
 14/01/2021
-   - Updated Flyway (margaretha)
+ - Updated Flyway (margaretha)
 21/01/2021
-   - Fixed running pipe and updated tests with mockserver (margaretha)
+ - Fixed running pipe and updated tests with mockserver (margaretha)
 01/02/2021
-   - Updated methods dependent to Antrl4-maven-plugin libraries (margaretha)   
+ - Updated methods dependent to Antrl4-maven-plugin libraries (margaretha) 
 05/02/2021
-   - Add query reference web-service (diewald,margaretha)   
+ - Add query reference web-service (diewald,margaretha) 
 10/02/2021
-   - Fixed problem with multiple desktop apps (diewald, margaretha)
+ - Fixed problem with multiple desktop apps (diewald, margaretha)
 12/02/2021
-   - Added listing available queries for users (margaretha)
+ - Added listing available queries for users (margaretha)
 17/02/2021
-   - Removed escaping for KoralQuery in VC and query reference responses (margaretha)
-   - Added query and query language in virtual corpus table (margaretha)
+ - Removed escaping for KoralQuery in VC and query reference responses (margaretha)
+ - Added query and query language in virtual corpus table (margaretha)
 18/02/2021
-   - Set corpus access public for stored query (margaretha)
+ - Set corpus access public for stored query (margaretha)
 19/02/2021
-   - Enabled API info web-service (margaretha)    
-   
+ - Enabled API info web-service (margaretha)  
+ 
 
 # version 0.62.4
 24/01/2020
-   - Removed salt from config and updated config files (margaretha)
+ - Removed salt from config and updated config files (margaretha)
 03/02/2020
-   - Added an admin API for clearing access token cache (margaretha)
+ - Added an admin API for clearing access token cache (margaretha)
 05/02/2020
-   - Added a config properties for a long-time access token expiry 
-     and excluded refresh tokens for public clients in OAuth2 token 
-     responses (margaretha)
-   - Removed client authentication from the client deregistration and 
-     client-secret reset APIs (margaretha)   
+ - Added a config properties for a long-time access token expiry 
+  and excluded refresh tokens for public clients in OAuth2 token 
+  responses (margaretha)
+ - Removed client authentication from the client deregistration and 
+  client-secret reset APIs (margaretha) 
 04/03/2020
-   - Updated the sample index (diewald)
+ - Updated the sample index (diewald)
 
 # version 0.62.3
 03/12/2019
-   - Implemented pipe extension in the search API (margaretha)
+ - Implemented pipe extension in the search API (margaretha)
 11/12/2019
-   - Added errors when requesting VC in caching process (margaretha, 
-   resolved #47)
+ - Added errors when requesting VC in caching process (margaretha, 
+ resolved #47)
 12/12/2019
-   - Added support for multiple cq parameters (margaretha, resolved #46)
+ - Added support for multiple cq parameters (margaretha, resolved #46)
 13/12/2019
-   - Handled pipe errors and added tests (margaretha)
+ - Handled pipe errors and added tests (margaretha)
 19/12/2019
-   - Updated create update user-group API (margaretha)
+ - Updated create update user-group API (margaretha)
 20/12/2019
-   - Removed transactional annotations from simple select queries (margaretha)
-   - Updated free resource controller (margaretha)
+ - Removed transactional annotations from simple select queries (margaretha)
+ - Updated free resource controller (margaretha)
 15/01-2020
-   - Added additional statistic figures to virtual corpus info API 
-     response (margaretha)   
-    
+ - Added additional statistic figures to virtual corpus info API 
+  response (margaretha) 
+  
 # version 0.62.2
 17/10/2019
-   - Handled vulnerability CVE-2019-17195. (margaretha)
+ - Handled vulnerability CVE-2019-17195. (margaretha)
 8/11/2019
-   - Added user-group name pattern (margaretha, issue #33)
+ - Added user-group name pattern (margaretha, issue #33)
 11/11/2019
-   - Updated user group service paths and replaced groupId with groupName 
-     (margaretha, resolved #33)
+ - Updated user group service paths and replaced groupId with groupName 
+  (margaretha, resolved #33)
 12/11/2019
-   - Removed UserGroupJson & updated listUserGroups and createUserGroup 
-     services (margaretha)
-   - Added prefixes to username and groupname parameters in service paths 
-     (margaretha, resolved #35)
+ - Removed UserGroupJson & updated listUserGroups and createUserGroup 
+  services (margaretha)
+ - Added prefixes to username and groupname parameters in service paths 
+  (margaretha, resolved #35)
 13/11/2019
-   - Added tests for issue #43 (margaretha)
+ - Added tests for issue #43 (margaretha)
 14/11/2019
-   - Added client description and URL to list-authorized-clients service 
-     (margaretha, close #53)
-   - Implemented a service to list clients registered by a user (margaretha, 
-     close #52)
-   - Added a check for OAuth2 client, VC, and group name length (margaretha)
+ - Added client description and URL to list-authorized-clients service 
+  (margaretha, close #53)
+ - Implemented a service to list clients registered by a user (margaretha, 
+  close #52)
+ - Added a check for OAuth2 client, VC, and group name length (margaretha)
 15/11/2019
-   - Merged list authorized client and list registered client services
-     (margaretha)
+ - Merged list authorized client and list registered client services
+  (margaretha)
 21/11/2019
-   - Added a service to list active refresh tokens of a user (margaretha)
-   - Added username filtering to token revocation service via super client 
-     (margaretha)
+ - Added a service to list active refresh tokens of a user (margaretha)
+ - Added username filtering to token revocation service via super client 
+  (margaretha)
 26/11/2019
-   - Added a service to revoke a single refresh token via super client 
-     (margaretha)  
+ - Added a service to revoke a single refresh token via super client 
+  (margaretha) 
 
 # version 0.62.1
 08/07/2019
-   - Added tests for public metadata response in search api (margaretha, 
-     issue #43)
-   - Disabled some tests of unused/disabled web-services (margaretha)
+ - Added tests for public metadata response in search api (margaretha, 
+  issue #43)
+ - Disabled some tests of unused/disabled web-services (margaretha)
 07/08/2019
-   - Fixed missing scopes after requesting access token with refresh token 
-     (margaretha)
-   - Fixed post requests with status OK and empty body (margaretha)
+ - Fixed missing scopes after requesting access token with refresh token 
+  (margaretha)
+ - Fixed post requests with status OK and empty body (margaretha)
 07/08/2019
-   - Added users to hidden group when searching in a published VC (margaretha, 
-     resolved #40)
+ - Added users to hidden group when searching in a published VC (margaretha, 
+  resolved #40)
 15/08/2019
-   - Updated the response statuses of VC PUT requests (margaretha)
+ - Updated the response statuses of VC PUT requests (margaretha)
 
 # version 0.62
 28/02/2019
-   - Removed old VC controllers and updated tests (margaretha, issue #34)
-   - Updated VC access controllers (margaretha)
+ - Removed old VC controllers and updated tests (margaretha, issue #34)
+ - Updated VC access controllers (margaretha)
 19/03/2019
-   - Added close index controller (margaretha)
+ - Added close index controller (margaretha)
 11/04/2019
-   - Fixed unknown authentication scheme, missing VC entity, and parameter 
-     checker (margaretha)
-   - Fixed sharing unknown VC, updating corpusQuery, and handling non-
-     unique group name and unknown VC access (margaretha)
+ - Fixed unknown authentication scheme, missing VC entity, and parameter 
+  checker (margaretha)
+ - Fixed sharing unknown VC, updating corpusQuery, and handling non-
+  unique group name and unknown VC access (margaretha)
 27/06/2019
-   - Handled LDAP errors, fixed #45 (margaretha)
+ - Handled LDAP errors, fixed #45 (margaretha)
 03/07/2019
-   - Added re-caching VC at closing-index service, resolved #44 (margaretha)
-   - Changed the response media-type of authentication controllers (margaretha)
-   - Fixed bugs: allow guest to retrieve system VC, 
-     remove VC from cache when it is deleted (margaretha)
+ - Added re-caching VC at closing-index service, resolved #44 (margaretha)
+ - Changed the response media-type of authentication controllers (margaretha)
+ - Fixed bugs: allow guest to retrieve system VC, 
+  remove VC from cache when it is deleted (margaretha)
 04/07/2019
-   - Updated VC name pattern and tests (margaretha)
+ - Updated VC name pattern and tests (margaretha)
 
 # version 0.61.6
 04/02/2019
-   - Fixed SQL data and merged oauth2_client_url and oauth2_client (margaretha)
-   - Updated client deregistration behavior (margaretha)
+ - Fixed SQL data and merged oauth2_client_url and oauth2_client (margaretha)
+ - Updated client deregistration behavior (margaretha)
 05/02/2019
-   - Added delete-group-by-name controller (margaretha)
-   - Added unique index to group name (margaretha)
+ - Added delete-group-by-name controller (margaretha)
+ - Added unique index to group name (margaretha)
 06/02/2019
-   - Updated a user setting test using array for multiple values (margaretha)
-   - Added metadata controller tests (margaretha)
+ - Updated a user setting test using array for multiple values (margaretha)
+ - Added metadata controller tests (margaretha)
 18/02/2019
-   - Fixed tests (margaretha)
-   - Updated handling errors from Koral (margaretha)
+ - Fixed tests (margaretha)
+ - Updated handling errors from Koral (margaretha)
 19/02/2019
-   - Added fields to metadata controller (margaretha, issue #39)
+ - Added fields to metadata controller (margaretha, issue #39)
 
 # version 0.61.5
 17/12/2018
-   - Added a search timeout test (margaretha)
+ - Added a search timeout test (margaretha)
 18/12/2018
-   - Updated tests using BeanConfigTest to use SpringJerseyTest (margaretha)
+ - Updated tests using BeanConfigTest to use SpringJerseyTest (margaretha)
 08/01/2019
-   - Improved predefined vc caching (issue #28, margaretha)
+ - Improved predefined vc caching (issue #28, margaretha)
 09/01/2019
-   - Added comments (margaretha)
-   - Updated code structure (margaretha)
+ - Added comments (margaretha)
+ - Updated code structure (margaretha)
 11/01/2019
-   - Degraded API version to 1.0 (margaretha)
-   - Added OAuth2 client info tests (margaretha)
+ - Degraded API version to 1.0 (margaretha)
+ - Added OAuth2 client info tests (margaretha)
 14/01/2019
-   - Added retrieveVCByName and deleteVCByName controllers (margaretha)
+ - Added retrieveVCByName and deleteVCByName controllers (margaretha)
 16/01/2019
-   - Added a PUT request for both creating and editing vc (margaretha)
-   - Added aliases to some VC controllers (margaretha)
-   - Merged VC access list controllers (margaretha)
+ - Added a PUT request for both creating and editing vc (margaretha)
+ - Added aliases to some VC controllers (margaretha)
+ - Merged VC access list controllers (margaretha)
 21/01/2019
-   - Removed codes related to user registration & password management (margaretha)
+ - Removed codes related to user registration & password management (margaretha)
 22/01/2019
-   - Added create, edit, retrieve user default setting controllers (margaretha)
+ - Added create, edit, retrieve user default setting controllers (margaretha)
 22/01/2019
-   - Updated default setting controllers & added tests (margaretha)
-   - Added delete key in setting controllers (margaretha)
+ - Updated default setting controllers & added tests (margaretha)
+ - Added delete key in setting controllers (margaretha)
 23/01/2019
-   - Added default setting key validation (margaretha)
-   - Fixed UserdataTest (margaretha) 
+ - Added default setting key validation (margaretha)
+ - Fixed UserdataTest (margaretha) 
 24/01/2019
-   - Added default setting key validation & fixed UserdataTest (margaretha)
-25/01/2019   
-   - Added VC reference and MapUtil tests (margaretha)
+ - Added default setting key validation & fixed UserdataTest (margaretha)
+25/01/2019 
+ - Added VC reference and MapUtil tests (margaretha)
 28/01/2019
-   - Fixed username verification in DefaultSettingService (margaretha)
-   - Added foundry rewrite with user default setting (margaretha)
-   - Added default foundry for morphology layer (margaretha)
+ - Fixed username verification in DefaultSettingService (margaretha)
+ - Added foundry rewrite with user default setting (margaretha)
+ - Added default foundry for morphology layer (margaretha)
 29/01/2019
-   - Fixed share VC type (margaretha)
-   - Added delete setting controller (margaretha)
-   - Handled "no resource found" cases (margaretha, issue #37)
+ - Fixed share VC type (margaretha)
+ - Added delete setting controller (margaretha)
+ - Handled "no resource found" cases (margaretha, issue #37)
 30/01/2019
-   - Added server shutdown description in readme (margaretha) 
+ - Added server shutdown description in readme (margaretha) 
 
 # version 0.61.4
 14/11/2018
-   - Integrated lite and full services and controllers in core (margaretha)
+ - Integrated lite and full services and controllers in core (margaretha)
 21/11/2018
-   - Updated OAuth2 refresh token request to create a new refresh token and 
-     revoke the old one per request (margaretha)
+ - Updated OAuth2 refresh token request to create a new refresh token and 
+  revoke the old one per request (margaretha)
 28/11/2018
-   - Updated NamedVCLoader to delete existing VC in DB (margaretha)
-   - Handled storing cached VC with VC reference (margaretha)
+ - Updated NamedVCLoader to delete existing VC in DB (margaretha)
+ - Handled storing cached VC with VC reference (margaretha)
 29/11/2018
-   - Added a controller for listing user clients having active refresh tokens 
-     (margaretha)
+ - Added a controller for listing user clients having active refresh tokens 
+  (margaretha)
 6/12/2018
-   - Added debug flags to mitigate log4j debugging performance (margaretha)
-   - Fixed KoralNode at() method (margaretha)
+ - Added debug flags to mitigate log4j debugging performance (margaretha)
+ - Fixed KoralNode at() method (margaretha)
 11/12/2018
-   - Implemented revoking all tokens of a user client via a super client
-   (margaretha)   
-   - Removed document controllers and KustvaktResource (margaretha)
-   - Fixed rewrite bugs (updated rewriteQuery & KoralNode) (margaretha)
+ - Implemented revoking all tokens of a user client via a super client
+ (margaretha) 
+ - Removed document controllers and KustvaktResource (margaretha)
+ - Fixed rewrite bugs (updated rewriteQuery & KoralNode) (margaretha)
 
-   
+ 
 # version 0.61.3
 17/10/2018
-   - Updated NamedVCLoader to be optional (margaretha)
-   - Updated annotation tables & implemented key-value structure (margaretha)
-   - Added annotation parser for annotation data from kalamar (margaretha)
-   - Implemented parsing free resource info from json (margaretha)
+ - Updated NamedVCLoader to be optional (margaretha)
+ - Updated annotation tables & implemented key-value structure (margaretha)
+ - Added annotation parser for annotation data from kalamar (margaretha)
+ - Implemented parsing free resource info from json (margaretha)
 22/10/2018
-   - Updated jetty, spring and hibernate versions (margaretha)
-   - Fixed the order of annotation keys and values, and added tests (margaretha)
-   - Fixed resource DAO & added tests (margaretha)
+ - Updated jetty, spring and hibernate versions (margaretha)
+ - Fixed the order of annotation keys and values, and added tests (margaretha)
+ - Fixed resource DAO & added tests (margaretha)
 24/10/2018
-   - Fixed query serialization service (margaretha)
-   - Added "highlights" parameter to matchInfo controller (margaretha)
-   - Added "fields" parameter to search controllers (margaretha)
-   - Integrated lite controllers, services and tests in full version (margaretha)
+ - Fixed query serialization service (margaretha)
+ - Added "highlights" parameter to matchInfo controller (margaretha)
+ - Added "fields" parameter to search controllers (margaretha)
+ - Integrated lite controllers, services and tests in full version (margaretha)
 29/10/2018
-   - Moved javax.servlet-api to core (margaretha)
+ - Moved javax.servlet-api to core (margaretha)
 07/11/2018
-   - OpenJDK8u181-workaround (see Debian Bug report #911925; diewald)
+ - OpenJDK8u181-workaround (see Debian Bug report #911925; diewald)
 13/11/2018
-   - Added Shutdown handler to Jetty server (margaretha)
-   - Fixed storing VC order in NamedVCLoader (margaretha)
+ - Added Shutdown handler to Jetty server (margaretha)
+ - Fixed storing VC order in NamedVCLoader (margaretha)
 
 # version 0.61.2
 12/09/2018
-   - Added various log4j2 configurations (margaretha)
+ - Added various log4j2 configurations (margaretha)
 13/09/2018
-   - Implemented VirtualCorpusRewrite (margaretha)
+ - Implemented VirtualCorpusRewrite (margaretha)
 14/09/2018
-   - Fixed SpringJerseyTest ApplicationContext (margaretha)
-   - Handled VCRef with username in VirtualCorpusRewrite (margaretha)
-   - Enabled VCReferenceTest in maven test suite (margaretha)
+ - Fixed SpringJerseyTest ApplicationContext (margaretha)
+ - Handled VCRef with username in VirtualCorpusRewrite (margaretha)
+ - Enabled VCReferenceTest in maven test suite (margaretha)
 18/09/2018
-   - Handled unique constraints / inserting duplicate items to DB (margaretha)
-   - Added a controller for editing user group member roles (margaretha)
+ - Handled unique constraints / inserting duplicate items to DB (margaretha)
+ - Added a controller for editing user group member roles (margaretha)
 19/09/2018
-   - Fixed cached-VC ref with username (margaretha)   
+ - Fixed cached-VC ref with username (margaretha) 
 
 # version 0.61.1
 28/08/2018
-   - Added API URL versioning (margaretha)
-   - Deactivated IdRewrite (margaretha)
-   - Fixed kustvakt controller (margaretha)
+ - Added API URL versioning (margaretha)
+ - Deactivated IdRewrite (margaretha)
+ - Fixed kustvakt controller (margaretha)
 30/08/2018
-   - Fixed root packages & added api version properties in kustvakt.conf
-     (margaretha)
-   - Fixed versioning in SearchController (margaretha)
-   - Added API versioning tests (margaretha)
+ - Fixed root packages & added api version properties in kustvakt.conf
+  (margaretha)
+ - Fixed versioning in SearchController (margaretha)
+ - Added API versioning tests (margaretha)
 
 # version 0.61.0
 
 02/08/2018
-   - Added VC reference tests (margaretha)
-   - Implemented loading and caching named VCs (margaretha)
-03/08/2018   
-   - Implemented OAuth2 revoke token (margaretha)
-   - Updated OAuth2 refresh token implementation (margaretha)
-14/08/2018   
-   - Implemented revoke all OAuth2 access tokens and authorization codes of
-   client users when deregistering/deleting a client (margaretha)
-   - Fixed update OAuth2 access token (margaretha)
-   - Implemented reset client secret (margaretha)
-   - Fixed revoking latest access token when refreshing OAuth2 access token
-     (margaretha)
+ - Added VC reference tests (margaretha)
+ - Implemented loading and caching named VCs (margaretha)
+03/08/2018 
+ - Implemented OAuth2 revoke token (margaretha)
+ - Updated OAuth2 refresh token implementation (margaretha)
+14/08/2018 
+ - Implemented revoke all OAuth2 access tokens and authorization codes of
+ client users when deregistering/deleting a client (margaretha)
+ - Fixed update OAuth2 access token (margaretha)
+ - Implemented reset client secret (margaretha)
+ - Fixed revoking latest access token when refreshing OAuth2 access token
+  (margaretha)
 15/08/2018
-   - Implemented OAuth2 client info controller (margaretha)
-   - Implemented update OAuth2 client privilege controller for admins
-     (margaretha)
-   - Implemented unlimited authorization scope for super clients with OAuth2
-     password grant (margaretha)
-   - Marked native clients implementation to deprecated in favour of super
-     clients (margaretha)
-   - Enabled using Bearer tokens as user authentication tokens (Authorization
-     header value) for many controllers including OAuth2 controllers (margaretha)
+ - Implemented OAuth2 client info controller (margaretha)
+ - Implemented update OAuth2 client privilege controller for admins
+  (margaretha)
+ - Implemented unlimited authorization scope for super clients with OAuth2
+  password grant (margaretha)
+ - Marked native clients implementation to deprecated in favour of super
+  clients (margaretha)
+ - Enabled using Bearer tokens as user authentication tokens (Authorization
+  header value) for many controllers including OAuth2 controllers (margaretha)
 16/08/2018
-   - Implemented degrading super clients (margaretha)
-   - Improved and added OAuth2 tests (margaretha)
+ - Implemented degrading super clients (margaretha)
+ - Improved and added OAuth2 tests (margaretha)
 21/08/2018
-   - Added VC name pattern check (margaretha)
+ - Added VC name pattern check (margaretha)
 22/08/2018
-   - Implemented loading VC from gz files (margaretha)
-   - Updated OAuth2 authorization codes' & access tokens' expiry check
-     (margaretha)
-23/08/2018   
-   - Updated RefreshToken implementations with separate DB tables (margaretha)
-   - Allows multiple access tokens per refresh token (margaretha)
+ - Implemented loading VC from gz files (margaretha)
+ - Updated OAuth2 authorization codes' & access tokens' expiry check
+  (margaretha)
+23/08/2018 
+ - Updated RefreshToken implementations with separate DB tables (margaretha)
+ - Allows multiple access tokens per refresh token (margaretha)
 27/08/2018
-   - Added statistic with VC reference tests (margaretha)
-   - Fixed OAuth2 SQL files (margaretha) 
+ - Added statistic with VC reference tests (margaretha)
+ - Fixed OAuth2 SQL files (margaretha) 
 28/08/2018
-   - Added c3p0 datasource configuration to Spring default-config-xml
-     (margaretha)
-   - Added running Kustvakt server with custom spring config in the readme
-     (margaretha)
-   - Removed old OAuth2 codes (margaretha)
-   - Moved non-config test codes to misc (margaretha)
-   
+ - Added c3p0 datasource configuration to Spring default-config-xml
+  (margaretha)
+ - Added running Kustvakt server with custom spring config in the readme
+  (margaretha)
+ - Removed old OAuth2 codes (margaretha)
+ - Moved non-config test codes to misc (margaretha)
+ 
 
 # version 0.60.5
 
 09/07/2018
-   - Added service layer to the search controller (margaretha)
-   - Added OAuth2 scope checking in search and VC controllers (margaretha)
-   - Added handling OAuth2 bearer token for VC access and User group
-     controllers (margaretha)
-   - Added default scope to password grant (margaretha)
+ - Added service layer to the search controller (margaretha)
+ - Added OAuth2 scope checking in search and VC controllers (margaretha)
+ - Added handling OAuth2 bearer token for VC access and User group
+  controllers (margaretha)
+ - Added default scope to password grant (margaretha)
 10/07/2018
-   - Made createBasicAuthorizationHeaderValue static (margaretha)
-   - Added store access token in openID token service (margaretha)
-   - Fixed empty scope in openID authorization and token service (margaretha)
-   - Implemented storing authorization code in cache (margaretha)
+ - Made createBasicAuthorizationHeaderValue static (margaretha)
+ - Added store access token in openID token service (margaretha)
+ - Fixed empty scope in openID authorization and token service (margaretha)
+ - Implemented storing authorization code in cache (margaretha)
 11/07/2018
-   - Fixed authentication time in authentication controller (margaretha)
-   - Added OAuth2 access token tests (margaretha)
+ - Fixed authentication time in authentication controller (margaretha)
+ - Added OAuth2 access token tests (margaretha)
 12/07/2018
-   - Updated maven surefire setting for faster test suite runtime (margaretha)
-   - Implemented refreshing OAuth2 access token (margaretha)
+ - Updated maven surefire setting for faster test suite runtime (margaretha)
+ - Implemented refreshing OAuth2 access token (margaretha)
 26/07/2018
-   - Fixed issue #27 (margaretha)
+ - Fixed issue #27 (margaretha)
 02/08/2018s
-   - Fixed clientId encoding in OAuth2ClientControllerTest (margaretha)
+ - Fixed clientId encoding in OAuth2ClientControllerTest (margaretha)
 
-   
+ 
 # version 0.60.4
 
 05/07/2018
-   - implemented OAuth2 authorization code request with OpenID Authentication
-     (margaretha)
-   - enabled OAuth2 authorization without OpenID authentication using Nimbus
-     library (margaretha)
-   - implemented response handler for OpenID authentication errors in authorization
-     requests (margaretha)
-   - added tests regarding OpenID authentication in authorization requests
-     (margaretha)
-   - implemented OAuth2 authorization error response via redirect URI instead of
-     JSON (margaretha)
-   - added state to OAuth2 authorization error response (margaretha)
-   - implemented OpenID token service for authorization code flow (margaretha)
-   - implemented signed OpenID token with default algorithm RSA256 (margaretha)
-   - implemented JSON Web Key (JWK) set web-controller listing kustvakt public
-     keys (margaretha)
-   - implemented OpenId configuration (margaretha)
-   - added authentication time and support for auth_time in id_token (margaretha)
-   - implemented support for nonce and max_age parameters in OpenID authentication
-     (margaretha)
-   - implemented OAuth2 token request with password grant using Nimbus library
-     (margaretha)
-   - updated redirect URI validator (margaretha)
-   - updated client registration requirement to allow desktop applications
-     (margaretha)
-   - fixed RSA key configuration (margaretha)
-   - merged OAuth2 client deregistration controllers (margaretha)
-   - fixed OAuth2 client unique URL-hashcode (margaretha)
-   - migrated logging to log4j 2 and adapted java.util.logging to log4j(margaretha)
-   - Added support for unrestricted corpus statistics (ndiewald)
-   - updated paths of user-group deletion-controllers (margaretha)
-   - Do not pass broken queries to Krill (diewald)
-   - added OAuth2 token request with client authentication via Authorization
-     header (margaretha)
-   - added port checking in test suite (margaretha)
-   
+ - implemented OAuth2 authorization code request with OpenID Authentication
+  (margaretha)
+ - enabled OAuth2 authorization without OpenID authentication using Nimbus
+  library (margaretha)
+ - implemented response handler for OpenID authentication errors in authorization
+  requests (margaretha)
+ - added tests regarding OpenID authentication in authorization requests
+  (margaretha)
+ - implemented OAuth2 authorization error response via redirect URI instead of
+  JSON (margaretha)
+ - added state to OAuth2 authorization error response (margaretha)
+ - implemented OpenID token service for authorization code flow (margaretha)
+ - implemented signed OpenID token with default algorithm RSA256 (margaretha)
+ - implemented JSON Web Key (JWK) set web-controller listing kustvakt public
+  keys (margaretha)
+ - implemented OpenId configuration (margaretha)
+ - added authentication time and support for auth_time in id_token (margaretha)
+ - implemented support for nonce and max_age parameters in OpenID authentication
+  (margaretha)
+ - implemented OAuth2 token request with password grant using Nimbus library
+  (margaretha)
+ - updated redirect URI validator (margaretha)
+ - updated client registration requirement to allow desktop applications
+  (margaretha)
+ - fixed RSA key configuration (margaretha)
+ - merged OAuth2 client deregistration controllers (margaretha)
+ - fixed OAuth2 client unique URL-hashcode (margaretha)
+ - migrated logging to log4j 2 and adapted java.util.logging to log4j(margaretha)
+ - Added support for unrestricted corpus statistics (ndiewald)
+ - updated paths of user-group deletion-controllers (margaretha)
+ - Do not pass broken queries to Krill (diewald)
+ - added OAuth2 token request with client authentication via Authorization
+  header (margaretha)
+ - added port checking in test suite (margaretha)
+ 
 # version 0.60.3
 
 06/06/2018
-   - improved user authentication by using authentication filter for authorization
-     code request (margaretha)
-   - limited client authentication to client id checking in authorization code
-     request (margaretha)
-   - added user_id in the oauth2_access_token database table (margaretha)
-   - implemented OAuth2Authentication provider for token context management
-     (margaretha)
-   - added parameter checking for authorization DAO (margaretha)
-   - added controller tests using OAuth2 access token (margaretha)
-   - added database tables for MySQL (margaretha)
-   - updated JWT library and related codes (margaretha)
-   
+ - improved user authentication by using authentication filter for authorization
+  code request (margaretha)
+ - limited client authentication to client id checking in authorization code
+  request (margaretha)
+ - added user_id in the oauth2_access_token database table (margaretha)
+ - implemented OAuth2Authentication provider for token context management
+  (margaretha)
+ - added parameter checking for authorization DAO (margaretha)
+ - added controller tests using OAuth2 access token (margaretha)
+ - added database tables for MySQL (margaretha)
+ - updated JWT library and related codes (margaretha)
+ 
 # version 0.60.2
 
 03/05/2018
-   - implemented OAuth2 client registration (margaretha)
-   - implemented OAuth2 client authentication (margaretha)
-   - changed virtual corpus search to retrieval (margaretha)
-   - implemented public client deregistration task (margaretha)
-   - added client registration and deregistration tests (margaretha)
-   - implemented confidential client deregistration task (margaretha)
-   - fixed storing client secret (margaretha)
-   - implemented OAuth2 response handler (margaretha)
-   - implemented OAuth2 request access token with client credentials grant
-     (margaretha)
-   - implemented OAuth2 request access token with resource owner password grant
-     (margaretha)
-   - implemented OAuth2 authorization code request (margaretha)
-   - added OAuth2 error codes (margaretha)
-   - added OAuth2 authorization, scope and access token tables for SQLite
-     (margaretha)
-   - implemented OAuth2 authorization, scope and access token DAO (margaretha)
-   - implemented OAuth2 request access token with authorization code grant
-     (margaretha)
-   - added setting default scopes in the config file (margaretha)
-   - fixed loading spring config multiple times in the test suite (margaretha)
-   - added SQLite created_date trigger for access token (margaretha)
-   - added a join table for access token scopes (margaretha)
-   - added access scopes handling (margaretha)
-   - added tests about request token with authorization code (margaretha)
-   
+ - implemented OAuth2 client registration (margaretha)
+ - implemented OAuth2 client authentication (margaretha)
+ - changed virtual corpus search to retrieval (margaretha)
+ - implemented public client deregistration task (margaretha)
+ - added client registration and deregistration tests (margaretha)
+ - implemented confidential client deregistration task (margaretha)
+ - fixed storing client secret (margaretha)
+ - implemented OAuth2 response handler (margaretha)
+ - implemented OAuth2 request access token with client credentials grant
+  (margaretha)
+ - implemented OAuth2 request access token with resource owner password grant
+  (margaretha)
+ - implemented OAuth2 authorization code request (margaretha)
+ - added OAuth2 error codes (margaretha)
+ - added OAuth2 authorization, scope and access token tables for SQLite
+  (margaretha)
+ - implemented OAuth2 authorization, scope and access token DAO (margaretha)
+ - implemented OAuth2 request access token with authorization code grant
+  (margaretha)
+ - added setting default scopes in the config file (margaretha)
+ - fixed loading spring config multiple times in the test suite (margaretha)
+ - added SQLite created_date trigger for access token (margaretha)
+ - added a join table for access token scopes (margaretha)
+ - added access scopes handling (margaretha)
+ - added tests about request token with authorization code (margaretha)
+ 
 # version 0.60.1
 
 28/03/2018
-   - added admin-related SQL codes (margaretha)
-   - updated AdminDao (margaretha)
-   - added optional username query parameter to group list controller (margaretha)
-   - fixed non hierarchical URI of kustvakt conf files (margaretha)
-   - added delete group member triggers (margaretha)
-   - added list user-group by username and status for system admin (margaretha)
-   - added user-group status in user-group DTO (margaretha)
-   - added check for hidden groups in user-group tests (margaretha)
-   - added database trigger test on deleting members when deleting group
-     (margaretha)
-   - renamed VC type PREDEFINED to SYSTEM (margaretha)
-   - added VC list controller for system admin (margaretha)
-   - added VC controller tests with for system admin (margaretha)
-   - added hidden access removal when deleting published VC (margaretha)
-   - added check for hidden groups in VC controller tests (margaretha)
-   - added search user-group controller (margaretha)
-   - removed createdBy from VirtualCorpusJson (margaretha)
-   - moved member role setting from the invitation phase to the after-subscription
-     phase (margaretha)
-   - added member role removal after deleting members (margaretha)
-   - added add and delete member role controllers (margaretha)
-   
+ - added admin-related SQL codes (margaretha)
+ - updated AdminDao (margaretha)
+ - added optional username query parameter to group list controller (margaretha)
+ - fixed non hierarchical URI of kustvakt conf files (margaretha)
+ - added delete group member triggers (margaretha)
+ - added list user-group by username and status for system admin (margaretha)
+ - added user-group status in user-group DTO (margaretha)
+ - added check for hidden groups in user-group tests (margaretha)
+ - added database trigger test on deleting members when deleting group
+  (margaretha)
+ - renamed VC type PREDEFINED to SYSTEM (margaretha)
+ - added VC list controller for system admin (margaretha)
+ - added VC controller tests with for system admin (margaretha)
+ - added hidden access removal when deleting published VC (margaretha)
+ - added check for hidden groups in VC controller tests (margaretha)
+ - added search user-group controller (margaretha)
+ - removed createdBy from VirtualCorpusJson (margaretha)
+ - moved member role setting from the invitation phase to the after-subscription
+  phase (margaretha)
+ - added member role removal after deleting members (margaretha)
+ - added add and delete member role controllers (margaretha)
+ 
 # version 0.60
 
 14/03/2018
-   - set up mail settings using localhost port 25 (margaretha)
-   - added mail template in kustvakt configuration (margaretha)
-   - added mail settings to readme (margaretha)
-   - disabled email notification for auto group (margaretha)
-   - added metadata retrieval (diewald)
-   - enabled custom implementation for email address retrieval (margaretha)
-   - removed old policy and deprecated code (margaretha)
-   - moved authentication related code to /full (margaretha)
-   - added userRoles attribute to UserGroupDto. (margaretha)
-   - fixed sqlite trigger (margaretha)
-   - fixed member exist error message (margaretha)
-   - fixed member invitation to join deleted group (margaretha)
-   - added checking deleted group (margaretha)
+ - set up mail settings using localhost port 25 (margaretha)
+ - added mail template in kustvakt configuration (margaretha)
+ - added mail settings to readme (margaretha)
+ - disabled email notification for auto group (margaretha)
+ - added metadata retrieval (diewald)
+ - enabled custom implementation for email address retrieval (margaretha)
+ - removed old policy and deprecated code (margaretha)
+ - moved authentication related code to /full (margaretha)
+ - added userRoles attribute to UserGroupDto. (margaretha)
+ - fixed sqlite trigger (margaretha)
+ - fixed member exist error message (margaretha)
+ - fixed member invitation to join deleted group (margaretha)
+ - added checking deleted group (margaretha)
 
 # version 0.59.10
-   
+ 
 20/02/2018 
-   - added sort VC by id (margaretha)
-   - added test cases regarding VC sharing (margaretha)
-   - implemented withdraw VC from publication (margaretha)
-   - added Changes file (margaretha)
-   - implemented add/invite users to group (margaretha)
-   - implemented delete user-group and member tasks (margaretha)
-   - added userMemberStatus in group lists (margaretha)
-   - updated and added SQL test data (margaretha)
-   - added user group related tests (margaretha)
-   - implemented custom configuration for deleting user groups and members (margaretha)
-   - updated library versions and java environment (margaretha)
-   - added expiration time check for member invitation (margaretha)
-   - moved .properties files (margaretha)
-   - merged changelog file to Changes (margaretha)
-   - updated status codes and error messages to be more detailed (margaretha)
-   - testing mail implementation using embedded jetty jndi (margaretha)
-   - fixed collection rewrite regarding OR operation with other fields
-     (margaretha)
-   - implemented sending mail using spring injection and removed jetty jndi
-     (margaretha)
-   - fixed unrecognized application/json (margaretha)
-   - fixed and updated velocity template (margaretha)
-   
+ - added sort VC by id (margaretha)
+ - added test cases regarding VC sharing (margaretha)
+ - implemented withdraw VC from publication (margaretha)
+ - added Changes file (margaretha)
+ - implemented add/invite users to group (margaretha)
+ - implemented delete user-group and member tasks (margaretha)
+ - added userMemberStatus in group lists (margaretha)
+ - updated and added SQL test data (margaretha)
+ - added user group related tests (margaretha)
+ - implemented custom configuration for deleting user groups and members (margaretha)
+ - updated library versions and java environment (margaretha)
+ - added expiration time check for member invitation (margaretha)
+ - moved .properties files (margaretha)
+ - merged changelog file to Changes (margaretha)
+ - updated status codes and error messages to be more detailed (margaretha)
+ - testing mail implementation using embedded jetty jndi (margaretha)
+ - fixed collection rewrite regarding OR operation with other fields
+  (margaretha)
+ - implemented sending mail using spring injection and removed jetty jndi
+  (margaretha)
+ - fixed unrecognized application/json (margaretha)
+ - fixed and updated velocity template (margaretha)
+ 
 # version 0.59.9 
 
 19/01/2018
-   - restructured basic authentication (margaretha)
-   - fixed AuthenticationException to include authentication scheme (margaretha)
-   - fixed rewrite redundancy in collection rewrite (margaretha)
-   - fixed foundry rewrite for constituents (margaretha)
-   - introduced authentication methods, schemes and tokens (margaretha)
-   - implemented collection rewrite with multiple licenses (margaretha)
-   - fixed foundry rewrite for korap span without wrap node (margaretha)
-   - implemented list user group (margaretha)
-   - implemented delete VC task (margaretha)
-   - implemented create user-group, subscribe to user-groups, unsubscribe to
-     user-groups tasks(margaretha)
-   - fixed handling JSON mapping exception for missing enums (margaretha)
-   - implemented list VC task (margaretha)
-   - added KoralQuery in VC lists (margaretha)
-   - implemented edit VC task (margaretha)
-   - implemented publish VC task (margaretha)
-   - implemented share VC task (margaretha)
-   - implemented list only owned VC task (margaretha)
-   - implemented list VC access task (margaretha)
-   - implemented search VC by id task (margaretha)
-   - implemented delete VC access (margaretha)
-   - implemented search for project VC (margaretha)
-   - added search VC related tests (margaretha)
-   - removed PredefinedUserGroup.ALL and related codes (margaretha)
-   - implemented search for published VC (margaretha)
-   
+ - restructured basic authentication (margaretha)
+ - fixed AuthenticationException to include authentication scheme (margaretha)
+ - fixed rewrite redundancy in collection rewrite (margaretha)
+ - fixed foundry rewrite for constituents (margaretha)
+ - introduced authentication methods, schemes and tokens (margaretha)
+ - implemented collection rewrite with multiple licenses (margaretha)
+ - fixed foundry rewrite for korap span without wrap node (margaretha)
+ - implemented list user group (margaretha)
+ - implemented delete VC task (margaretha)
+ - implemented create user-group, subscribe to user-groups, unsubscribe to
+  user-groups tasks(margaretha)
+ - fixed handling JSON mapping exception for missing enums (margaretha)
+ - implemented list VC task (margaretha)
+ - added KoralQuery in VC lists (margaretha)
+ - implemented edit VC task (margaretha)
+ - implemented publish VC task (margaretha)
+ - implemented share VC task (margaretha)
+ - implemented list only owned VC task (margaretha)
+ - implemented list VC access task (margaretha)
+ - implemented search VC by id task (margaretha)
+ - implemented delete VC access (margaretha)
+ - implemented search for project VC (margaretha)
+ - added search VC related tests (margaretha)
+ - removed PredefinedUserGroup.ALL and related codes (margaretha)
+ - implemented search for published VC (margaretha)
+ 
 # version 0.59.8
  
 21/09/2017
-   - restructured statistics service (margaretha)
-   - removed deprecated loader codes and tests (margaretha)
-   - removed old Spring java configurations (margaretha)
-   - implemented entity classes for the new database (margaretha)
-   - added MySQL codes regarding VC and for testing (margaretha)
-   - added dao methods regarding VC (margaretha)
-   - added similar SQL codes (to MySQL) for sqlite (margaretha)
-   - added dao methods regarding user groups (margaretha)
-   - restructured web-service codes into controller and logic/business-service
-     (margaretha)
-   - implemented user role and privilege, and added tests (margaretha)
-   - prepared test suite using new database (margaretha)
-   - implemented UserGroupDao and tests (margaretha)
-   - fixed missing exceptions in JsonUtils (margaretha)
-   - restructured web filters and authentication codes (margaretha)
-   - implemented create/store VC (margaretha)
-   - fixed collection rewrite bug regarding availability with operation or
-     (margaretha)
+ - restructured statistics service (margaretha)
+ - removed deprecated loader codes and tests (margaretha)
+ - removed old Spring java configurations (margaretha)
+ - implemented entity classes for the new database (margaretha)
+ - added MySQL codes regarding VC and for testing (margaretha)
+ - added dao methods regarding VC (margaretha)
+ - added similar SQL codes (to MySQL) for sqlite (margaretha)
+ - added dao methods regarding user groups (margaretha)
+ - restructured web-service codes into controller and logic/business-service
+  (margaretha)
+ - implemented user role and privilege, and added tests (margaretha)
+ - prepared test suite using new database (margaretha)
+ - implemented UserGroupDao and tests (margaretha)
+ - fixed missing exceptions in JsonUtils (margaretha)
+ - restructured web filters and authentication codes (margaretha)
+ - implemented create/store VC (margaretha)
+ - fixed collection rewrite bug regarding availability with operation or
+  (margaretha)
 
 # version 0.59.7
 
 13/10/2016
-   - MOD: updated search to use new siglen (diewald)
-   - MOD: fixed matchinfo retrieval in light service (diewald)
+ - MOD: updated search to use new siglen (diewald)
+ - MOD: fixed matchinfo retrieval in light service (diewald)
 
 05/05/2015
-   - ADD: rest test suite for user service (hanl)
-   - MOD: setup parameter modification (hanl)
-   - ADD: oauth2 client unique constraint (hanl)
+ - ADD: rest test suite for user service (hanl)
+ - MOD: setup parameter modification (hanl)
+ - ADD: oauth2 client unique constraint (hanl)
