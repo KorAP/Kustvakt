@@ -142,7 +142,7 @@ public class VirtualCorpusServiceTest {
         KustvaktException e = assertThrows(KustvaktException.class,
                 () -> groupService.retrieveUserGroupById(groupId));
         
-        assertEquals("Group with id 5 is not found", e.getMessage());
+        assertEquals("Group with id " + groupId  + " is not found", e.getMessage());
     }
 
 }
