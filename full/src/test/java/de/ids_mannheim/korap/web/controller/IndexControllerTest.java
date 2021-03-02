@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -48,7 +49,7 @@ public class IndexControllerTest extends SpringJerseyTest {
         if (!Files.exists(vcPath)) {
             Files.createDirectory(vcPath);
         }
-        if (Files.exists(symLink)) {
+        if (Files.exists(symLink, LinkOption.NOFOLLOW_LINKS)) {
             Files.delete(symLink);
         }
         Files.createSymbolicLink(symLink, toLink);
