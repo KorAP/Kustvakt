@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b084602_0a225ae1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2021-03-15T17:06:26Z",
+      "side": 1,
+      "message": "Maybe edit dependabot.yml first.\n\nAs shown in:\n\nhttps://docs.github.com/en/github/administering-a-repository/enabling-and-disabling-version-updates#disabling-dependabot-version-updates",
+      "revId": "d70dda567f4208b681f7185f560a005999f7e9be",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
