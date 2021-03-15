@@ -9,10 +9,23 @@ updates:
     directory: "/core" # Location of package manifests
     schedule:
       interval: "daily"
+    ignore:
+      # Jetty >= 10 requires JDK 11
+      - dependency-name: "org.eclipse.jetty:jetty-server"
+        versions:
+          - ">= 10.0.0"
+      - dependency-name: "org.eclipse.jetty:jetty-servlet"
+        versions:
+          - ">= 10.0.0"
+      - dependency-name: "org.eclipse.jetty:jetty-webapp"
+        versions:
+          - ">= 10.0.0"
+
   - package-ecosystem: "maven" # See documentation for possible values
     directory: "/lite" # Location of package manifests
     schedule:
       interval: "daily"
+
   - package-ecosystem: "maven" # See documentation for possible values
     directory: "/full" # Location of package manifests
     schedule:
