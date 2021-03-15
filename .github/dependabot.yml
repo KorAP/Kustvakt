@@ -20,13 +20,16 @@ updates:
       - dependency-name: "org.eclipse.jetty:jetty-webapp"
         versions:
           - ">= 10.0.0"
+    open-pull-requests-limit: 50
 
   - package-ecosystem: "maven" # See documentation for possible values
     directory: "/lite" # Location of package manifests
     schedule:
       interval: "daily"
+    open-pull-requests-limit: 50
 
   - package-ecosystem: "maven" # See documentation for possible values
     directory: "/full" # Location of package manifests
     schedule:
       interval: "daily"
+    open-pull-requests-limit: 50
