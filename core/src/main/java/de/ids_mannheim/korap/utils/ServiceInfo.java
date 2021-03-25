@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.utils;
 
 import de.ids_mannheim.korap.config.ConfigLoader;
+import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import lombok.Getter;
 
 import java.io.IOException;
@@ -44,6 +45,7 @@ public class ServiceInfo {
     private void load () {
         Properties props = new Properties();
         try {
+            
             InputStream stream = getStream();
             props.load(stream);
             stream.close();
@@ -55,7 +57,9 @@ public class ServiceInfo {
             this.cache_store = (String) props.get("kustvakt.cache_store");
             
             this.krillVersion=(String) props.get("krill.version");
-            this.koralVersion=(String) props.get("koral.version");
+            
+            QuerySerializer s = new QuerySerializer();
+            this.koralVersion = s.getVersion() ;
         }
         catch (IOException e) {
             this.version = UNKNOWN;
