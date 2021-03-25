@@ -28,7 +28,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
 import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
-import de.ids_mannheim.korap.oauth2.dto.OAuth2RefreshTokenDto;
+import de.ids_mannheim.korap.oauth2.dto.OAuth2TokenDto;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
@@ -512,7 +512,7 @@ public class OltuTokenService extends OAuth2TokenService {
         }
     }
     
-    public List<OAuth2RefreshTokenDto> listUserRefreshToken (String username, String clientId,
+    public List<OAuth2TokenDto> listUserRefreshToken (String username, String clientId,
             String clientSecret) throws KustvaktException {
         
         OAuth2Client client = clientService.authenticateClient(clientId, clientSecret);
@@ -523,13 +523,13 @@ public class OltuTokenService extends OAuth2TokenService {
         }
 
         List<RefreshToken> tokens = refreshDao.retrieveRefreshTokenByUser(username);
-        List<OAuth2RefreshTokenDto> dtoList = new ArrayList<>(tokens.size());
+        List<OAuth2TokenDto> dtoList = new ArrayList<>(tokens.size());
         for (RefreshToken t : tokens){
             OAuth2Client tokenClient = t.getClient();
             if (tokenClient.getId().equals(client.getId())){
                 continue;
             }
-            OAuth2RefreshTokenDto dto = new OAuth2RefreshTokenDto();
+            OAuth2TokenDto dto = new OAuth2TokenDto();
             dto.setClientId(tokenClient.getId());
             dto.setClientName(tokenClient.getName());
             dto.setClientUrl(tokenClient.getUrl());

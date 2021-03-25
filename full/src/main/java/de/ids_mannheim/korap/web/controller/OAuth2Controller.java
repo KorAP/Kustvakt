@@ -30,7 +30,7 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.oauth2.dto.OAuth2RefreshTokenDto;
+import de.ids_mannheim.korap.oauth2.dto.OAuth2TokenDto;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2AuthorizationRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeAllTokenSuperRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
@@ -341,7 +341,7 @@ public class OAuth2Controller {
     @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public List<OAuth2RefreshTokenDto> listUserRefreshToken (
+    public List<OAuth2TokenDto> listUserRefreshToken (
             @Context SecurityContext context,
             @FormParam("client_id") String clientId,
             @FormParam("client_secret") String clientSecret) {
