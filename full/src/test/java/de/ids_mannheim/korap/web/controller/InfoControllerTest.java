@@ -12,6 +12,7 @@ import com.sun.jersey.api.client.ClientResponse.Status;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.ServiceInfo;
 import de.ids_mannheim.korap.web.SearchKrill;
@@ -41,7 +42,7 @@ public class InfoControllerTest extends SpringJerseyTest {
                 node.at("/kustvakt_version").asText());
         assertEquals(krill.getIndex().getVersion(),
                 node.at("/krill_version").asText());
-        assertEquals(ServiceInfo.getInfo().getKoralVersion(),
-                node.at("/koral_version").asText());
+        QuerySerializer s = new QuerySerializer();
+        assertEquals(s.getVersion(), node.at("/koral_version").asText());
     }
 }
