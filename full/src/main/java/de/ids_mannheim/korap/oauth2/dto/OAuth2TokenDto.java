@@ -8,7 +8,7 @@ import java.util.Set;
  * @author margaretha
  *
  */
-public class OAuth2RefreshTokenDto {
+public class OAuth2TokenDto {
 
     private String token;
     private String createdDate;
