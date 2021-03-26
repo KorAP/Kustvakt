@@ -41,7 +41,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     public String userAuthHeader;
     public static String ACCESS_TOKEN_TYPE = "access_token";
     public static String REFRESH_TOKEN_TYPE = "refresh_token";
-    
+
     public OAuth2ControllerTest () throws KustvaktException {
         userAuthHeader = HttpAuthorizationHandler
                 .createBasicAuthorizationHeaderValue("dory", "password");
@@ -181,8 +181,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
                 node.at("/token_type").asText());
         assertEquals(31536000, node.at("/expires_in").asInt());
 
-        testRevokeToken(accessToken, publicClientId,null,
-                ACCESS_TOKEN_TYPE);
+        testRevokeToken(accessToken, publicClientId, null, ACCESS_TOKEN_TYPE);
 
         assertTrue(node.at("/refresh_token").isMissingNode());
     }
@@ -217,17 +216,14 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertNotNull(node.at("/expires_in").asText());
 
         testRequestTokenWithUsedAuthorization(code);
-        
+
         String refreshToken = node.at("/refresh_token").asText();
-        
+
         testRequestRefreshTokenInvalidScope(confidentialClientId, refreshToken);
         testRequestRefreshTokenInvalidClient(refreshToken);
         testRequestRefreshTokenInvalidRefreshToken(confidentialClientId);
-        
-        testRevokeToken(refreshToken, confidentialClientId,clientSecret,
-                REFRESH_TOKEN_TYPE);
-        testRequestTokenWithRevokedRefreshToken(confidentialClientId,
-                clientSecret, refreshToken);
+
+        testRequestRefreshToken(confidentialClientId, clientSecret, refreshToken);
     }
 
     private void testRequestTokenWithUsedAuthorization (String code)
@@ -337,7 +333,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(TokenType.BEARER.toString(),
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
-        
+
         RefreshToken refreshToken = refreshTokenDao
                 .retrieveRefreshToken(node.at("/refresh_token").asText());
         Set<AccessScope> scopes = refreshToken.getScopes();
@@ -348,8 +344,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     @Test
     public void testRequestTokenPasswordGrantConfidentialNonSuper ()
             throws KustvaktException {
-        ClientResponse response =
-                requestTokenWithDoryPassword(confidentialClientId, clientSecret);
+        ClientResponse response = requestTokenWithDoryPassword(
+                confidentialClientId, clientSecret);
         String entity = response.getEntity(String.class);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
@@ -363,7 +359,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     @Test
     public void testRequestTokenPasswordGrantPublic ()
             throws KustvaktException {
-        ClientResponse response = requestTokenWithDoryPassword(publicClientId, "");
+        ClientResponse response =
+                requestTokenWithDoryPassword(publicClientId, "");
         String entity = response.getEntity(String.class);
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -384,12 +381,13 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.add("username", "dory");
         form.add("password", "password");
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
-                .header(HttpHeaders.AUTHORIZATION,
-                        "Basic ZkNCYlFrQXlZekk0TnpVeE1nOnNlY3JldA==")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+        ClientResponse response =
+                resource().path(API_VERSION).path("oauth2").path("token")
+                        .header(HttpHeaders.AUTHORIZATION,
+                                "Basic ZkNCYlFrQXlZekk0TnpVeE1nOnNlY3JldA==")
+                        .header(HttpHeaders.CONTENT_TYPE,
+                                ContentType.APPLICATION_FORM_URLENCODED)
+                        .entity(form).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
@@ -414,12 +412,13 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.add("username", "dory");
         form.add("password", "password");
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
-                .header(HttpHeaders.AUTHORIZATION,
-                        "Basic ZkNCYlFrQXlZekk0TnpVeE1nOnNlY3JldA==")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+        ClientResponse response =
+                resource().path(API_VERSION).path("oauth2").path("token")
+                        .header(HttpHeaders.AUTHORIZATION,
+                                "Basic ZkNCYlFrQXlZekk0TnpVeE1nOnNlY3JldA==")
+                        .header(HttpHeaders.CONTENT_TYPE,
+                                ContentType.APPLICATION_FORM_URLENCODED)
+                        .entity(form).post(ClientResponse.class);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
@@ -447,7 +446,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     @Test
     public void testRequestTokenPasswordGrantMissingClientId ()
             throws KustvaktException {
-        ClientResponse response = requestTokenWithDoryPassword(null, clientSecret);
+        ClientResponse response =
+                requestTokenWithDoryPassword(null, clientSecret);
         String entity = response.getEntity(String.class);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
@@ -544,11 +544,12 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("grant_type", "blahblah");
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+        ClientResponse response =
+                resource().path(API_VERSION).path("oauth2").path("token")
+                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                        .header(HttpHeaders.CONTENT_TYPE,
+                                ContentType.APPLICATION_FORM_URLENCODED)
+                        .entity(form).post(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
@@ -569,46 +570,54 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.add("refresh_token", refreshToken);
         form.add("scope", "search serialize_query");
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+        ClientResponse response =
+                resource().path(API_VERSION).path("oauth2").path("token")
+                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                        .header(HttpHeaders.CONTENT_TYPE,
+                                ContentType.APPLICATION_FORM_URLENCODED)
+                        .entity(form).post(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_SCOPE, node.at("/error").asText());
     }
 
-    private void testRequestRefreshTokenPublicClient (String clientId,
+    private void testRequestRefreshToken (String clientId, String clientSecret,
             String refreshToken) throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("grant_type", GrantType.REFRESH_TOKEN.toString());
         form.add("client_id", clientId);
+        form.add("client_secret", clientSecret);
         form.add("refresh_token", refreshToken);
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+        ClientResponse response =
+                resource().path(API_VERSION).path("oauth2").path("token")
+                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                        .header(HttpHeaders.CONTENT_TYPE,
+                                ContentType.APPLICATION_FORM_URLENCODED)
+                        .entity(form).post(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
-        assertNotNull(node.at("/refresh_token").asText());
+        
+        String newRefreshToken = node.at("/refresh_token").asText();
+        assertNotNull(newRefreshToken);
         assertEquals(TokenType.BEARER.toString(),
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
 
-        assertTrue(!node.at("/refresh_token").asText().equals(refreshToken));
+        assertTrue(!newRefreshToken.equals(refreshToken));
         
-        RefreshToken rt = refreshTokenDao.retrieveRefreshToken(refreshToken);
-        assertEquals(true, rt.isRevoked());
-        Set<AccessScope> scopes = rt.getScopes();
-        assertEquals(3, scopes.size());
+        testRequestTokenWithRevokedRefreshToken(clientId, clientSecret,
+                refreshToken);
+        
+        testRevokeToken(newRefreshToken, clientId, clientSecret,
+                REFRESH_TOKEN_TYPE);
+        testRequestTokenWithRevokedRefreshToken(clientId, clientSecret,
+                newRefreshToken);
     }
 
     private void testRequestRefreshTokenInvalidClient (String refreshToken)
@@ -618,11 +627,12 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.add("client_id", "iBr3LsTCxOj7D2o0A5m");
         form.add("refresh_token", refreshToken);
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+        ClientResponse response =
+                resource().path(API_VERSION).path("oauth2").path("token")
+                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                        .header(HttpHeaders.CONTENT_TYPE,
+                                ContentType.APPLICATION_FORM_URLENCODED)
+                        .entity(form).post(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -637,11 +647,12 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.add("client_secret", clientSecret);
         form.add("refresh_token", "Lia8s8w8tJeZSBlaQDrYV8ion3l");
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+        ClientResponse response =
+                resource().path(API_VERSION).path("oauth2").path("token")
+                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                        .header(HttpHeaders.CONTENT_TYPE,
+                                ContentType.APPLICATION_FORM_URLENCODED)
+                        .entity(form).post(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -654,21 +665,51 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.add("token_type", tokenType);
         form.add("token", token);
         form.add("client_id", clientId);
-        if (clientSecret!=null){
+        if (clientSecret != null) {
             form.add("client_secret", clientSecret);
         }
-        
-        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("revoke")
+
+        ClientResponse response =
+                resource().path(API_VERSION).path("oauth2").path("revoke")
+                        .header(HttpHeaders.CONTENT_TYPE,
+                                ContentType.APPLICATION_FORM_URLENCODED)
+                        .entity(form).post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals("SUCCESS", response.getEntity(String.class));
+    }
+
+    private JsonNode requestTokenList (String userAuthHeader, String tokenType,
+            String clientId) throws KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("super_client_id", superClientId);
+        form.add("super_client_secret", clientSecret);
+        form.add("token_type", tokenType);
+
+        if (clientId != null && !clientId.isEmpty()){
+            form.add("client_id", clientId);
+        }
+            
+        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+                .path("token").path("list")
+                .header(Attributes.AUTHORIZATION, userAuthHeader)
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).post(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        assertEquals("SUCCESS", response.getEntity(String.class));
+
+        String entity = response.getEntity(String.class);
+        return JsonUtils.readTree(entity);
+    }
+    
+    private JsonNode requestTokenList (String userAuthHeader, String tokenType)
+            throws KustvaktException {
+        return requestTokenList(userAuthHeader, tokenType, null);
     }
     
     @Test
-    public void testListRefreshToken () throws KustvaktException {
+    public void testListRefreshTokenConfidentialClient () throws KustvaktException {
         String username = "gurgle";
         String password = "pwd";
         userAuthHeader = HttpAuthorizationHandler
@@ -682,8 +723,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String refreshToken1 = node.at("/refresh_token").asText();
 
         // client 1
-        String code = requestAuthorizationCode(confidentialClientId, clientSecret,
-                null, userAuthHeader);
+        String code = requestAuthorizationCode(confidentialClientId,
+                clientSecret, null, userAuthHeader);
         response = requestTokenWithAuthorizationCodeAndForm(
                 confidentialClientId, clientSecret, code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -696,11 +737,11 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         // list
-        node = requestRefreshTokenList(userAuthHeader);
+        node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(2, node.size());
         assertEquals(confidentialClientId, node.at("/0/clientId").asText());
         assertEquals(confidentialClientId2, node.at("/1/clientId").asText());
-        
+
         // client 1
         code = requestAuthorizationCode(confidentialClientId, clientSecret,
                 null, userAuthHeader);
@@ -711,61 +752,95 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         // another user
         String darlaAuthHeader = HttpAuthorizationHandler
                 .createBasicAuthorizationHeaderValue("darla", "pwd");
+
+        // test listing clients
+        node = requestTokenList(darlaAuthHeader, REFRESH_TOKEN_TYPE);
+        assertEquals(0, node.size());
+
         // client 1
         code = requestAuthorizationCode(confidentialClientId, clientSecret,
                 null, darlaAuthHeader);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         response = requestTokenWithAuthorizationCodeAndForm(
                 confidentialClientId, clientSecret, code);
-        
+
         node = JsonUtils.readTree(response.getEntity(String.class));
         String refreshToken5 = node.at("/refresh_token").asText();
-        
-        // list
-        node = requestRefreshTokenList(userAuthHeader);
+
+        // list all refresh tokens
+        node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(3, node.size());
+
+        // list refresh tokens from client 1
+        node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE, confidentialClientId);
+        assertEquals(2, node.size());
         
         testRevokeToken(refreshToken1, superClientId, clientSecret,
                 REFRESH_TOKEN_TYPE);
-        testRevokeToken(node.at("/0/token").asText(), confidentialClientId, 
+        testRevokeToken(node.at("/0/token").asText(), confidentialClientId,
                 clientSecret, REFRESH_TOKEN_TYPE);
         testRevokeToken(node.at("/1/token").asText(), confidentialClientId2,
                 clientSecret, REFRESH_TOKEN_TYPE);
-        
-        node = requestRefreshTokenList(userAuthHeader);
+
+        node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(1, node.size());
-        
-        testRevokeTokenViaSuperClient(node.at("/0/token").asText(), userAuthHeader);
-        node = requestRefreshTokenList(userAuthHeader);
+
+        testRevokeTokenViaSuperClient(node.at("/0/token").asText(),
+                userAuthHeader);
+        node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(0, node.size());
-        
+
         // try revoking a token belonging to another user
         // should not return any errors
         testRevokeTokenViaSuperClient(refreshToken5, userAuthHeader);
-        node = requestRefreshTokenList(darlaAuthHeader);
+        node = requestTokenList(darlaAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(1, node.size());
-        
+
         testRevokeTokenViaSuperClient(refreshToken5, darlaAuthHeader);
-        node = requestRefreshTokenList(darlaAuthHeader);
+        node = requestTokenList(darlaAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(0, node.size());
     }
-    
-    private JsonNode requestRefreshTokenList (String userAuthHeader)
-            throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("client_id", superClientId);
-        form.add("client_secret", clientSecret);
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
-                .path("token").path("list")
-                .header(Attributes.AUTHORIZATION, userAuthHeader)
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
 
+    @Test
+    public void testListTokenPublicClient () throws KustvaktException {
+        String username = "nemo";
+        String password = "pwd";
+        userAuthHeader = HttpAuthorizationHandler
+                .createBasicAuthorizationHeaderValue(username, password);
+
+        // access token 1
+        String code = requestAuthorizationCode(publicClientId, clientSecret,
+                null, userAuthHeader);
+        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(publicClientId, "",
+                code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        String accessToken1 = node.at("/access_token").asText();
 
-        String entity = response.getEntity(String.class);
-        return JsonUtils.readTree(entity);
+        // access token 2
+        code = requestAuthorizationCode(publicClientId, clientSecret, null,
+                userAuthHeader);
+        response = requestTokenWithAuthorizationCodeAndForm(publicClientId, "",
+                code);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        node = JsonUtils.readTree(response.getEntity(String.class));
+        String accessToken2 = node.at("/access_token").asText();
+        
+        // list access tokens
+        node = requestTokenList(userAuthHeader, ACCESS_TOKEN_TYPE);
+        assertEquals(2, node.size());
+        
+        // list refresh tokens
+        node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE);
+        assertEquals(0, node.size());
+        
+        testRevokeTokenViaSuperClient(accessToken1, userAuthHeader);
+        node = requestTokenList(userAuthHeader, ACCESS_TOKEN_TYPE);
+        assertEquals(1, node.size());
+        
+        testRevokeTokenViaSuperClient(accessToken2, userAuthHeader);
+        node = requestTokenList(userAuthHeader, ACCESS_TOKEN_TYPE);
+        assertEquals(0, node.size());
     }
 }

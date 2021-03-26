@@ -143,7 +143,8 @@ public class RefreshTokenDao {
         return q.getResultList();
     }
 
-    public List<RefreshToken> retrieveRefreshTokenByUser (String username)
+    public List<RefreshToken> retrieveRefreshTokenByUser (String username,
+            String clientId)
             throws KustvaktException {
         ParameterChecker.checkStringValue(username, "username");
 
@@ -160,6 +161,12 @@ public class RefreshTokenDao {
                         root.<ZonedDateTime> get(RefreshToken_.expiryDate),
                         ZonedDateTime
                                 .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE))));
+        if (clientId != null && !clientId.isEmpty()) {
+            OAuth2Client client = clientDao.retrieveClientById(clientId);
+            condition = builder.and(condition,
+                    builder.equal(root.get(RefreshToken_.client), client));
+        }
+        
         query.select(root);
         query.where(condition);
         TypedQuery<RefreshToken> q = entityManager.createQuery(query);
