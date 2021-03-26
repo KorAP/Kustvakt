@@ -183,4 +183,32 @@ public class AccessTokenDao extends KustvaktCacheable {
         return q.getResultList();
     }
 
+    public List<AccessToken> retrieveAccessTokenByUser (String username, String clientId)
+            throws KustvaktException {
+        ParameterChecker.checkStringValue(username, "username");
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<AccessToken> query =
+                builder.createQuery(AccessToken.class);
+
+        Root<AccessToken> root = query.from(AccessToken.class);
+        root.fetch(AccessToken_.client);
+        Predicate condition = builder.and(
+                builder.equal(root.get(AccessToken_.userId), username),
+                builder.equal(root.get(AccessToken_.isRevoked), false),
+                builder.greaterThan(
+                        root.<ZonedDateTime> get(AccessToken_.expiryDate),
+                        ZonedDateTime
+                                .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE))));
+        if (clientId != null && !clientId.isEmpty()) {
+            OAuth2Client client = clientDao.retrieveClientById(clientId);
+            condition = builder.and(condition,
+                    builder.equal(root.get(AccessToken_.client), client));
+        }
+            
+        query.select(root);
+        query.where(condition);
+        TypedQuery<AccessToken> q = entityManager.createQuery(query);
+        return q.getResultList();
+    }
 }

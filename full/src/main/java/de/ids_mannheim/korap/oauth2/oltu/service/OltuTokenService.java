@@ -28,7 +28,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
 import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
-import de.ids_mannheim.korap.oauth2.dto.OAuth2RefreshTokenDto;
+import de.ids_mannheim.korap.oauth2.dto.OAuth2TokenDto;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
@@ -104,7 +104,7 @@ public class OltuTokenService extends OAuth2TokenService {
      * credentials.
      * 
      * TODO: should create a new refresh token when the old refresh
-     * token is used
+     * token is used (DONE)
      * 
      * @param refreshTokenStr
      * @param scopes
@@ -322,9 +322,9 @@ public class OltuTokenService extends OAuth2TokenService {
      * Base64.
      * 
      * <br /><br />
-     * Additionally, a refresh token is issued. It can be used to
-     * request a new access token without requiring user
-     * reauthentication.
+     * Additionally, a refresh token is issued for confidential clients. 
+     * It can be used to request a new access token without requiring user
+     * re-authentication.
      * 
      * @param scopes
      *            a set of access token scopes in String
@@ -512,24 +512,66 @@ public class OltuTokenService extends OAuth2TokenService {
         }
     }
     
-    public List<OAuth2RefreshTokenDto> listUserRefreshToken (String username, String clientId,
-            String clientSecret) throws KustvaktException {
+    public List<OAuth2TokenDto> listUserRefreshToken (String username, String superClientId,
+            String superClientSecret, String clientId) throws KustvaktException {
         
-        OAuth2Client client = clientService.authenticateClient(clientId, clientSecret);
+        OAuth2Client client = clientService.authenticateClient(superClientId, superClientSecret);
         if (!client.isSuper()) {
             throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
                     "Only super client is allowed.",
                     OAuth2Error.UNAUTHORIZED_CLIENT);
         }
 
-        List<RefreshToken> tokens = refreshDao.retrieveRefreshTokenByUser(username);
-        List<OAuth2RefreshTokenDto> dtoList = new ArrayList<>(tokens.size());
+        List<RefreshToken> tokens = refreshDao.retrieveRefreshTokenByUser(username, clientId);
+        List<OAuth2TokenDto> dtoList = new ArrayList<>(tokens.size());
         for (RefreshToken t : tokens){
             OAuth2Client tokenClient = t.getClient();
             if (tokenClient.getId().equals(client.getId())){
                 continue;
             }
-            OAuth2RefreshTokenDto dto = new OAuth2RefreshTokenDto();
+            OAuth2TokenDto dto = new OAuth2TokenDto();
+            dto.setClientId(tokenClient.getId());
+            dto.setClientName(tokenClient.getName());
+            dto.setClientUrl(tokenClient.getUrl());
+            dto.setClientDescription(tokenClient.getDescription());
+            
+            DateTimeFormatter f = DateTimeFormatter.ISO_DATE_TIME;
+            dto.setCreatedDate(t.getCreatedDate().format(f));
+            dto.setExpiryDate(t.getExpiryDate().format(f));
+            dto.setUserAuthenticationTime(
+                    t.getUserAuthenticationTime().format(f));
+            dto.setToken(t.getToken());
+            
+            Set<AccessScope> accessScopes = t.getScopes();
+            Set<String> scopes = new HashSet<>(accessScopes.size());
+            for (AccessScope s : accessScopes){
+                scopes.add(s.getId().toString());
+            }
+            dto.setScopes(scopes);
+            dtoList.add(dto);
+        }
+        return dtoList;
+    }
+    
+    public List<OAuth2TokenDto> listUserAccessToken (String username, String superClientId,
+            String superClientSecret, String clientId) throws KustvaktException {
+        
+        OAuth2Client superClient = clientService.authenticateClient(superClientId, superClientSecret);
+        if (!superClient.isSuper()) {
+            throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
+                    "Only super client is allowed.",
+                    OAuth2Error.UNAUTHORIZED_CLIENT);
+        }
+
+        List<AccessToken> tokens =
+                tokenDao.retrieveAccessTokenByUser(username, clientId);
+        List<OAuth2TokenDto> dtoList = new ArrayList<>(tokens.size());
+        for (AccessToken t : tokens){
+            OAuth2Client tokenClient = t.getClient();
+            if (tokenClient.getId().equals(superClient.getId())){
+                continue;
+            }
+            OAuth2TokenDto dto = new OAuth2TokenDto();
             dto.setClientId(tokenClient.getId());
             dto.setClientName(tokenClient.getName());
             dto.setClientUrl(tokenClient.getUrl());

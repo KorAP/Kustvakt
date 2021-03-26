@@ -30,7 +30,9 @@ import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.oauth2.dto.OAuth2RefreshTokenDto;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
+import de.ids_mannheim.korap.oauth2.dto.OAuth2TokenDto;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2AuthorizationRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeAllTokenSuperRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
@@ -130,13 +132,20 @@ public class OAuth2Controller {
      * Grants a client an access token, namely a string used in
      * authenticated requests representing user authorization for
      * the client to access user resources. An additional refresh
-     * token strictly associated to the access token is also granted.
+     * token strictly associated to the access token is also granted
+     * for confidential clients. Both public and confidential clients
+     * may issue multiple access tokens.
      * 
      * <br /><br />
      * 
-     * Clients may request refresh access token using this endpoint.
-     * This request will grants a new access token. The refresh token
-     * is not changed and can be used until it expires.
+     * Confidential clients may request refresh access token using
+     * this endpoint. This request will grant a new access token.
+     * 
+     * Usually the given refresh token is not changed and can be used
+     * until it expires. However, currently there is a limitation of
+     * one access token per one refresh token. Thus, the given refresh
+     * token will be revoked, and a new access token and a new refresh
+     * token will be returned.
      * 
      * <br /><br />
      * 
@@ -260,7 +269,6 @@ public class OAuth2Controller {
         }
     }
 
-    
     @POST
     @Path("revoke/super")
     @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
@@ -290,7 +298,7 @@ public class OAuth2Controller {
             throw responseHandler.throwit(e);
         }
     }
-    
+
     /**
      * Revokes all tokens of a client for the authenticated user from
      * a super client. This service is not part of the OAUTH2
@@ -341,24 +349,37 @@ public class OAuth2Controller {
     @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public List<OAuth2RefreshTokenDto> listUserRefreshToken (
+    public List<OAuth2TokenDto> listUserRefreshToken (
             @Context SecurityContext context,
-            @FormParam("client_id") String clientId,
-            @FormParam("client_secret") String clientSecret) {
+            @FormParam("super_client_id") String superClientId,
+            @FormParam("super_client_secret") String superClientSecret,
+            @FormParam("client_id") String clientId, // optional
+            @FormParam("token_type") String tokenType) {
 
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
         String username = tokenContext.getUsername();
 
         try {
-            return tokenService.listUserRefreshToken(username, clientId,
-                    clientSecret);
+            if (tokenType.equals("access_token")) {
+                return tokenService.listUserAccessToken(username, superClientId,
+                        superClientSecret, clientId);
+            }
+            else if (tokenType.equals("refresh_token")) {
+                return tokenService.listUserRefreshToken(username,
+                        superClientId, superClientSecret, clientId);
+            }
+            else {
+                throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
+                        "Missing token_type parameter value",
+                        OAuth2Error.INVALID_REQUEST);
+            }
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
 
     }
-    
+
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("token/clear")
@@ -367,8 +388,8 @@ public class OAuth2Controller {
             @FormParam("access_token") String accessToken,
             @Context ServletContext context) {
         try {
-            String response = tokenService.clearAccessTokenCache(adminToken, accessToken,
-                    context);
+            String response = tokenService.clearAccessTokenCache(adminToken,
+                    accessToken, context);
             return Response.ok(response).build();
         }
         catch (KustvaktException e) {

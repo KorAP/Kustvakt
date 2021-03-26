@@ -42,7 +42,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     
     protected String publicClientId = "8bIDtZnH6NvRkW2Fq";
     protected String confidentialClientId = "9aHsGW6QflV13ixNpez";
-    protected String confidentialClientId2 = "9aHsGW6QflV13ixNpez";
+    protected String confidentialClientId2 = "52atrL0ajex_3_5imd9Mgw";
     protected String superClientId = "fCBbQkAyYzI4NzUxMg";
     protected String clientSecret = "secret";
 
