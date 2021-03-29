@@ -8,6 +8,8 @@
 2021-03-25
  - Updated OAuth2 token list with token type and user clientId 
    parameters (margaretha) 
+2021-03-29
+ - Added client type in the client list web-service (margaretha)  
  
 # version 0.63
 26/10/2020
