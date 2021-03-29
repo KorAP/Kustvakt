@@ -716,6 +716,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         
         assertEquals(1, node.size());
         assertEquals(clientName, node.at("/0/clientName").asText());
+        assertEquals(OAuth2ClientType.PUBLIC.name(), node.at("/0/clientType").asText());
         String clientId = node.at("/0/clientId").asText();
         testDeregisterPublicClient(clientId, "dory");
     }

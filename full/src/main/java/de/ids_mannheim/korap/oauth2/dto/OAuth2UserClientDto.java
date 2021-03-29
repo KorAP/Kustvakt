@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.oauth2.dto;
 
+import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
+
 /** Lists authorized OAuth2 clients of a user
  * 
  * @author margaretha
@@ -9,6 +11,7 @@ public class OAuth2UserClientDto {
     
     private String clientId;
     private String clientName;
+    private OAuth2ClientType clientType;
     private String description;
     private String url;
     
@@ -35,5 +38,11 @@ public class OAuth2UserClientDto {
     }
     public void setUrl (String url) {
         this.url = url;
+    }
+    public OAuth2ClientType getClientType () {
+        return clientType;
+    }
+    public void setClientType (OAuth2ClientType clientType) {
+        this.clientType = clientType;
     }
 }
