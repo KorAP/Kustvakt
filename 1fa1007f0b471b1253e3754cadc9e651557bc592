@@ -16,6 +16,23 @@
       "message": "Great! Krill should be implemented in the same way, too.\n\nI guess the OAuth change was just accidental. ;-) I get 4 errors in full - I guess because of this.\n\n```\n[ERROR] COMPILATION ERROR : \n[INFO] -------------------------------------------------------------\n[ERROR] /home/ndiewald/Repositories/korap-git/Kustvakt/full/src/main/java/de/ids_mannheim/korap/web/controller/OAuth2Controller.java:[33,40] cannot find symbol\n  symbol:   class OAuth2RefreshTokenDto\n  location: package de.ids_mannheim.korap.oauth2.dto\n[ERROR] /home/ndiewald/Repositories/korap-git/Kustvakt/full/src/main/java/de/ids_mannheim/korap/oauth2/oltu/service/OltuTokenService.java:[31,40] cannot find symbol\n  symbol:   class OAuth2RefreshTokenDto\n  location: package de.ids_mannheim.korap.oauth2.dto\n[ERROR] /home/ndiewald/Repositories/korap-git/Kustvakt/full/src/main/java/de/ids_mannheim/korap/web/controller/OAuth2Controller.java:[344,17] cannot find symbol\n  symbol:   class OAuth2RefreshTokenDto\n  location: class de.ids_mannheim.korap.web.controller.OAuth2Controller\n[ERROR] /home/ndiewald/Repositories/korap-git/Kustvakt/full/src/main/java/de/ids_mannheim/korap/oauth2/oltu/service/OltuTokenService.java:[515,17] cannot find symbol\n  symbol:   class OAuth2RefreshTokenDto\n  location: class de.ids_mannheim.korap.oauth2.oltu.service.OltuTokenService\n[INFO] 4 errors \n```",
       "revId": "1fa1007f0b471b1253e3754cadc9e651557bc592",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b06cf1f_cd7a7eea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2021-04-12T13:39:39Z",
+      "side": 1,
+      "message": "Ah right. I think I fixed it in the next commit,so it should be fine if we submit them together. Or should I fix it here?",
+      "revId": "1fa1007f0b471b1253e3754cadc9e651557bc592",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
