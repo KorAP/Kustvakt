@@ -68,6 +68,24 @@
       "message": "just next one. \n\nsorry i didnt fix it here. it was because of the renaming. hm, i should be able to do the renaming in the other commit. will try it on thursday.",
       "revId": "1fa1007f0b471b1253e3754cadc9e651557bc592",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b7b9c9e_03baf967",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2021-04-12T16:19:10Z",
+      "side": 1,
+      "message": "If they depend on each other, you can +2 and commit - otherwise you would have to go the cherrypicking route etc. If not, you should fix it, I guess. I am fine with both solutions.",
+      "parentUuid": "bb39ab8c_cd0ab497",
+      "revId": "1fa1007f0b471b1253e3754cadc9e651557bc592",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
