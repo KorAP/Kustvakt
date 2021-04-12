@@ -33,6 +33,24 @@
       "message": "Ah right. I think I fixed it in the next commit,so it should be fine if we submit them together. Or should I fix it here?",
       "revId": "1fa1007f0b471b1253e3754cadc9e651557bc592",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22af3415_3280b03d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2021-04-12T13:48:12Z",
+      "side": 1,
+      "message": "Hm - are the commits dependent on each other?",
+      "parentUuid": "4b06cf1f_cd7a7eea",
+      "revId": "1fa1007f0b471b1253e3754cadc9e651557bc592",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
