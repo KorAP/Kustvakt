@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac96c9c2_5d9694a4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2021-04-14T22:10:34Z",
+      "side": 1,
+      "message": "I think it would be good to have the same expiration form as with new tokens, also the same scope serialization etc. Otherwise works as expected!",
+      "revId": "6bf7809a6f482fb96e7ed5da98cbe40a8a9b2e8d",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
