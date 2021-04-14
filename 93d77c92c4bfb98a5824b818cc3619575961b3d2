@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e99d3bb2_932dcb02",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2021-04-14T10:38:12Z",
+      "side": 1,
+      "message": "Fixes: CVE-2021-28164\n",
+      "revId": "93d77c92c4bfb98a5824b818cc3619575961b3d2",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
