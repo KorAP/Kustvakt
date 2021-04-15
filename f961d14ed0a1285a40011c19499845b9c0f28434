@@ -16,6 +16,24 @@
       "message": "This is not yet in the test instance, right?",
       "revId": "f961d14ed0a1285a40011c19499845b9c0f28434",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05b06866_06ba6e55",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2021-04-15T13:29:46Z",
+      "side": 1,
+      "message": "No, not yet, do you need it? Should I update the test instance?",
+      "parentUuid": "9f8b8121_dee5acd5",
+      "revId": "f961d14ed0a1285a40011c19499845b9c0f28434",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
