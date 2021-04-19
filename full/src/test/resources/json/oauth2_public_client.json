@@ -1,0 +1,6 @@
+{
+  "name":"my client",
+  "type": "PUBLIC",
+  "redirect_uri": "https://my.client.com",
+  "description":"my public client"
+}

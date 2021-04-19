@@ -10,6 +10,8 @@
    parameters (margaretha) 
 2021-03-29
  - Added client type in the client list web-service (margaretha)  
+2021-04-19
+ - Updated OAuth2Client JSON definition and controller tests (margaretha)
  
 # version 0.63
 26/10/2020

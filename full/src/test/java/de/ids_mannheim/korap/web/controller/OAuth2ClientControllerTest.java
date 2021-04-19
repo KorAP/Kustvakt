@@ -4,12 +4,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.entity.ContentType;
 import org.junit.Test;
 
@@ -162,10 +166,28 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         ClientResponse response = registerClient(username, json);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.INVALID_ARGUMENT,
-                node.at("/errors/0/0").asInt());
         assertEquals("clientName must contain at least 3 characters",
-                node.at("/errors/0/1").asText());
+                node.at("/error_description").asText());
+        assertEquals("invalid_request",
+                node.at("/error").asText());
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+    
+    @Test
+    public void testRegisterClientMissingDescription ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        OAuth2ClientJson json = new OAuth2ClientJson();
+        json.setName("R client");
+        json.setType(OAuth2ClientType.PUBLIC);
+
+        ClientResponse response = registerClient(username, json);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals("client description is null",
+                node.at("/error_description").asText());
+        assertEquals("invalid_request",
+                node.at("/error").asText());
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
     
@@ -190,6 +212,35 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         testResetPublicClientSecret(clientId);
         testAccessTokenAfterDeregistration(clientId, null,null);
+    }
+    
+    @Test
+    public void testRegisterClientUsingPlainJson ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException, IOException {
+
+        InputStream is = getClass().getClassLoader()
+                .getResourceAsStream("json/oauth2_public_client.json");
+        String json = IOUtils.toString(is, Charset.defaultCharset());
+
+        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+                .path("client").path("register")
+                .header(Attributes.AUTHORIZATION,
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue(username,
+                                        "password"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .entity(json).post(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        JsonNode node = JsonUtils.readTree(entity);
+        String clientId = node.at("/client_id").asText();
+        assertNotNull(clientId);
+        assertTrue(node.at("/client_secret").isMissingNode());
+
+        testResetPublicClientSecret(clientId);
+        testAccessTokenAfterDeregistration(clientId, null, null);
     }
     
     @Test

@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.web.input;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 
 /**
@@ -23,6 +25,7 @@ public class OAuth2ClientJson {
     private String url;
     // redirect URI determines where the OAuth 2.0 service will return
     // the user to after they have authorized a client.
+    @JsonProperty("redirect_uri")
     private String redirectURI;
     
 
