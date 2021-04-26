@@ -12,6 +12,8 @@
  - Added client type in the client list web-service (margaretha)  
 2021-04-19
  - Updated OAuth2Client JSON definition and controller tests (margaretha)
+2021-04-26
+ - Updated OAuth2 Client list (margaretha)
  
 # version 0.63
 26/10/2020

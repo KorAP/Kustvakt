@@ -139,20 +139,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertNotNull(clientId);
         assertNotNull(clientSecret);
 
-//        testRegisterClientNonUniqueURL();
         testResetConfidentialClientSecret(clientId, clientSecret);
-
-//        testDeregisterConfidentialClientMissingSecret(clientId);
-//        testDeregisterClientIncorrectCredentials(clientId, clientSecret);
         testDeregisterConfidentialClient(clientId);
-    }
-
-    @Deprecated
-    private void testRegisterClientNonUniqueURL () throws KustvaktException {
-        ClientResponse response = registerConfidentialClient();
-        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
-        assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
     }
 
     @Test
@@ -307,9 +295,6 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 "https://OAuth2DesktopClient2.com");
     }
     
-    
-    
-    
     private void testAccessTokenAfterDeregistration (String clientId,
             String clientSecret, String redirectUri) throws KustvaktException {
         String userAuthHeader = HttpAuthorizationHandler
@@ -398,54 +383,6 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 .delete(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-    }
-
-    @Deprecated
-    private void testDeregisterConfidentialClientMissingSecret (String clientId)
-            throws KustvaktException {
-
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
-                .path("client").path("deregister").path(clientId)
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .delete(ClientResponse.class);
-
-        String entity = response.getEntity(String.class);
-        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
-        assertEquals("Missing parameters: client_secret",
-                node.at("/error_description").asText());
-    }
-
-    @Deprecated
-    private void testDeregisterClientIncorrectCredentials (String clientId,
-            String clientSecret) throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
-
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("client_secret", clientSecret);
-
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
-                .path("client").path("deregister").path(clientId)
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).delete(ClientResponse.class);
-
-        String entity = response.getEntity(String.class);
-        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuth2Error.INVALID_CLIENT, node.at("/error").asText());
-        assertEquals("Invalid client credentials",
-                node.at("/error_description").asText());
-
-        checkWWWAuthenticateHeader(response);
     }
 
     private void testResetPublicClientSecret (String clientId)
@@ -577,7 +514,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("client_id", superClientId);
         form.add("client_secret", clientSecret);
-        form.add("authorized-only", "true");
+        form.add("authorized_only", "true");
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("client").path("list")
@@ -628,7 +565,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         requestAuthorizedClientList(userAuthHeader);
         testListAuthorizedClientWithMultipleRefreshTokens(userAuthHeader);
         testListAuthorizedClientWithMultipleAccessTokens(userAuthHeader);
-        testWithClientsFromAnotherUser(userAuthHeader);
+        testListWithClientsFromAnotherUser(userAuthHeader);
         
         // revoke client 1
         testRevokeAllTokenViaSuperClient(publicClientId, userAuthHeader,
@@ -670,7 +607,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         requestAuthorizedClientList(userAuthHeader);
     }
     
-    private void testWithClientsFromAnotherUser (
+    private void testListWithClientsFromAnotherUser (
             String userAuthHeader) throws KustvaktException {
 
         String aaaAuthHeader = HttpAuthorizationHandler

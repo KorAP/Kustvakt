@@ -111,15 +111,12 @@ public class OAuthClientController {
     }
 
     /**
-     * Deregisters a client requires client owner authentication. For
-     * confidential clients, client authentication is also required.
+     * Deregisters a client requires client owner authentication. 
      * 
      * 
      * @param securityContext
      * @param clientId
      *            the client id
-     * @param clientSecret
-     *            the client secret
      * @return HTTP Response OK if successful.
      */
     @DELETE
@@ -251,7 +248,7 @@ public class OAuthClientController {
             @Context SecurityContext context,
             @FormParam("client_id") String clientId,
             @FormParam("client_secret") String clientSecret,
-            @FormParam("authorized-only") boolean authorizedOnly) {
+            @FormParam("authorized_only") boolean authorizedOnly) {
 
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
         String username = tokenContext.getUsername();
