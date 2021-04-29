@@ -14,6 +14,8 @@
  - Updated OAuth2Client JSON definition and controller tests (margaretha)
 2021-04-26
  - Updated OAuth2 Client list (margaretha)
+2021-04-29 
+ - Updated the parameter of user role management web-service for coherency (margaretha) 
  
 # version 0.63
 26/10/2020
