@@ -301,8 +301,8 @@ public class UserGroupController {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response editMemberRoles (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
-            @FormParam("memberUsername") String memberUsername,
-            @FormParam("roleIds") List<Integer> roleIds) {
+            @FormParam("member_username") String memberUsername,
+            @FormParam("role_id") List<Integer> roleIds) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
