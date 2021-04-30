@@ -349,7 +349,7 @@ public class OAuth2Controller {
     @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public List<OAuth2TokenDto> listUserRefreshToken (
+    public List<OAuth2TokenDto> listUserToken (
             @Context SecurityContext context,
             @FormParam("super_client_id") String superClientId,
             @FormParam("super_client_secret") String superClientSecret,

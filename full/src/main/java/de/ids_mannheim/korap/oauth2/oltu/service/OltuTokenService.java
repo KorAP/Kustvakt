@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.oauth2.oltu.service;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -39,6 +40,7 @@ import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenSuperRequest;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ClientService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
+import de.ids_mannheim.korap.utils.TimeUtils;
 
 /** Implementation of token service using Apache Oltu.
  * 
@@ -537,7 +539,9 @@ public class OltuTokenService extends OAuth2TokenService {
             
             DateTimeFormatter f = DateTimeFormatter.ISO_DATE_TIME;
             dto.setCreatedDate(t.getCreatedDate().format(f));
-            dto.setExpiryDate(t.getExpiryDate().format(f));
+            long difference = ChronoUnit.SECONDS.between(ZonedDateTime.now(), t.getExpiryDate());
+            dto.setExpiresIn(difference);
+            
             dto.setUserAuthenticationTime(
                     t.getUserAuthenticationTime().format(f));
             dto.setToken(t.getToken());
@@ -547,7 +551,7 @@ public class OltuTokenService extends OAuth2TokenService {
             for (AccessScope s : accessScopes){
                 scopes.add(s.getId().toString());
             }
-            dto.setScopes(scopes);
+            dto.setScope(scopes);
             dtoList.add(dto);
         }
         return dtoList;
@@ -579,7 +583,10 @@ public class OltuTokenService extends OAuth2TokenService {
             
             DateTimeFormatter f = DateTimeFormatter.ISO_DATE_TIME;
             dto.setCreatedDate(t.getCreatedDate().format(f));
-            dto.setExpiryDate(t.getExpiryDate().format(f));
+            
+            long difference = ChronoUnit.SECONDS.between(ZonedDateTime.now(), t.getExpiryDate());
+            dto.setExpiresIn(difference);
+                    
             dto.setUserAuthenticationTime(
                     t.getUserAuthenticationTime().format(f));
             dto.setToken(t.getToken());
@@ -589,7 +596,7 @@ public class OltuTokenService extends OAuth2TokenService {
             for (AccessScope s : accessScopes){
                 scopes.add(s.getId().toString());
             }
-            dto.setScopes(scopes);
+            dto.setScope(scopes);
             dtoList.add(dto);
         }
         return dtoList;

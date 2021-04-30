@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.oauth2.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 
 /** Lists authorized OAuth2 clients of a user
@@ -8,9 +10,11 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
  *
  */
 public class OAuth2UserClientDto {
-    
+    @JsonProperty("client_id")
     private String clientId;
+    @JsonProperty("client_name")
     private String clientName;
+    @JsonProperty("client_type")
     private OAuth2ClientType clientType;
     private String description;
     private String url;

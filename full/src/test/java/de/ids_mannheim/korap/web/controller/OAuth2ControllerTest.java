@@ -739,8 +739,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         // list
         node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(2, node.size());
-        assertEquals(confidentialClientId, node.at("/0/clientId").asText());
-        assertEquals(confidentialClientId2, node.at("/1/clientId").asText());
+        assertEquals(confidentialClientId, node.at("/0/client_id").asText());
+        assertEquals(confidentialClientId2, node.at("/1/client_id").asText());
 
         // client 1
         code = requestAuthorizationCode(confidentialClientId, clientSecret,
@@ -837,7 +837,19 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         
         testRevokeTokenViaSuperClient(accessToken1, userAuthHeader);
         node = requestTokenList(userAuthHeader, ACCESS_TOKEN_TYPE);
+        System.out.println(node);
         assertEquals(1, node.size());
+        assertEquals(accessToken2, node.at("/0/token").asText());
+        assertTrue(node.at("/0/scope").size()>0);
+        assertNotNull(node.at("/0/created_date").asText());
+        assertNotNull(node.at("/0/expires_in").asLong());
+        assertNotNull(node.at("/0/user_authentication_time").asText());
+        
+        assertEquals(publicClientId, node.at("/0/client_id").asText());
+        assertNotNull(node.at("/0/client_name").asText());
+        assertNotNull(node.at("/0/client_description").asText());
+        assertNotNull(node.at("/0/client_url").asText());
+        
         
         testRevokeTokenViaSuperClient(accessToken2, userAuthHeader);
         node = requestTokenList(userAuthHeader, ACCESS_TOKEN_TYPE);

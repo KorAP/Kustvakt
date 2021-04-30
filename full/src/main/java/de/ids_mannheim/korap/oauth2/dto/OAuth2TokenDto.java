@@ -2,6 +2,8 @@ package de.ids_mannheim.korap.oauth2.dto;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Describes OAuth2 refresh tokens
  * 
@@ -11,14 +13,21 @@ import java.util.Set;
 public class OAuth2TokenDto {
 
     private String token;
+    @JsonProperty("created_date")
     private String createdDate;
-    private String expiryDate;
+    @JsonProperty("expires_in")
+    private long expiresIn;
+    @JsonProperty("user_authentication_time")
     private String userAuthenticationTime;
-    private Set<String> scopes;
+    private Set<String> scope;
 
+    @JsonProperty("client_id")
     private String clientId;
+    @JsonProperty("client_name")
     private String clientName;
+    @JsonProperty("client_description")
     private String clientDescription;
+    @JsonProperty("client_url")
     private String clientUrl;
 
     public String getToken () {
@@ -69,12 +78,12 @@ public class OAuth2TokenDto {
         this.createdDate = createdDate;
     }
 
-    public String getExpiryDate () {
-        return expiryDate;
+    public long getExpiresIn () {
+        return expiresIn;
     }
 
-    public void setExpiryDate (String expiryDate) {
-        this.expiryDate = expiryDate;
+    public void setExpiresIn (long expiresIn) {
+        this.expiresIn = expiresIn;
     }
 
     public String getUserAuthenticationTime () {
@@ -86,12 +95,12 @@ public class OAuth2TokenDto {
         this.userAuthenticationTime = userAuthenticationTime;
     }
 
-    public Set<String> getScopes () {
-        return scopes;
+    public Set<String> getScope () {
+        return scope;
     }
 
-    public void setScopes (Set<String> scopes) {
-        this.scopes = scopes;
+    public void setScope (Set<String> scope) {
+        this.scope = scope;
     }
 
 }
