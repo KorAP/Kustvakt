@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.oauth2.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
@@ -17,8 +18,10 @@ public class OAuth2ClientInfoDto {
     private String id;
     private String name;
     private String description;
+    @JsonProperty("is_super")
     private String isSuper;
     private String url;
+    @JsonProperty("registered_by")
     private String registeredBy;
     private OAuth2ClientType type;
 

@@ -19,7 +19,7 @@
 2021-04-30
  - Updated parameters in the error responses and the VC creation and 
    access list APIs  for coherence (margaretha)
- 
+ - Updated OAuth2 API responses for coherence (margaretha) 
  
 # version 0.63
 26/10/2020

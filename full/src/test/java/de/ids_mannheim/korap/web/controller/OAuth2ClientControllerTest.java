@@ -110,13 +110,14 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertNotNull(clientInfo.at("/description"));
         assertNotNull(clientInfo.at("/url"));
         assertEquals("PUBLIC", clientInfo.at("/type").asText());
+        assertEquals("system", clientInfo.at("/registered_by").asText());
 
         // confidential client
         clientInfo = retrieveClientInfo(confidentialClientId, "system");
         assertEquals(confidentialClientId, clientInfo.at("/id").asText());
         assertEquals("non super confidential client", clientInfo.at("/name").asText());
         assertNotNull(clientInfo.at("/url"));
-        assertEquals(false,clientInfo.at("/isSuper").asBoolean());
+        assertEquals(false,clientInfo.at("/is_super").asBoolean());
         assertEquals("CONFIDENTIAL", clientInfo.at("/type").asText());
         
         // super client
@@ -125,7 +126,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertEquals("super confidential client", clientInfo.at("/name").asText());
         assertNotNull(clientInfo.at("/url"));
         assertEquals("CONFIDENTIAL", clientInfo.at("/type").asText());
-        assertTrue(clientInfo.at("/isSuper").asBoolean());
+        assertTrue(clientInfo.at("/is_super").asBoolean());
     }
     
     @Test
@@ -466,7 +467,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         updateClientPrivilege(form);
         JsonNode node = retrieveClientInfo(clientId, "admin");
-        assertTrue(node.at("/isSuper").asBoolean());
+        assertTrue(node.at("/is_super").asBoolean());
 
         // list vc
         ClientResponse response = resource().path(API_VERSION).path("vc")
@@ -528,8 +529,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.size());
-        assertEquals(confidentialClientId, node.at("/0/clientId").asText());
-        assertEquals(publicClientId, node.at("/1/clientId").asText());
+        assertEquals(confidentialClientId, node.at("/0/client_id").asText());
+        assertEquals(publicClientId, node.at("/1/client_id").asText());
     }
 
     @Test
@@ -703,9 +704,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         JsonNode node = JsonUtils.readTree(entity);
         
         assertEquals(1, node.size());
-        assertEquals(clientName, node.at("/0/clientName").asText());
-        assertEquals(OAuth2ClientType.PUBLIC.name(), node.at("/0/clientType").asText());
-        String clientId = node.at("/0/clientId").asText();
+        assertEquals(clientName, node.at("/0/client_name").asText());
+        assertEquals(OAuth2ClientType.PUBLIC.name(), node.at("/0/client_type").asText());
+        String clientId = node.at("/0/client_id").asText();
         testDeregisterPublicClient(clientId, "dory");
     }
 }
