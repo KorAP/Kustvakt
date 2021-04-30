@@ -104,8 +104,8 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     @Test
     public void testCreateSystemVC () throws KustvaktException {
         String json = "{\"type\": \"SYSTEM\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
-                + ",\"corpusQuery\": \"creationDate since 1820\"}";
+                + ",\"query_type\": \"VIRTUAL_CORPUS\""
+                + ",\"corpus_query\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+admin).path("new-system-vc")
@@ -142,8 +142,8 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     public void testPrivateVC () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         String json = "{\"type\": \"PRIVATE\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
-                + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
+                + ",\"query_type\": \"VIRTUAL_CORPUS\""
+                + ",\"corpus_query\": \"corpusSigle=GOE\"}";
 
         String vcName = "new-vc";
         ClientResponse response = resource().path(API_VERSION).path("vc")
@@ -244,7 +244,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
             throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("access")
-                .queryParam("groupName", groupName)
+                .queryParam("group_name", groupName)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(admin, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")

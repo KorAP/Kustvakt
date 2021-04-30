@@ -52,14 +52,14 @@ public class DefaultSettingDao {
     @Transactional
     public void updateDefaultSetting (DefaultSetting defaultSetting)
             throws KustvaktException {
-        ParameterChecker.checkObjectValue(defaultSetting, "defaultSetting");
+        ParameterChecker.checkObjectValue(defaultSetting, "default_setting");
         entityManager.merge(defaultSetting);
     }
 
     @Transactional
     public void deleteDefaultSetting (String username)
             throws KustvaktException {
-        ParameterChecker.checkObjectValue(username, "defaultSetting");
+        ParameterChecker.checkObjectValue(username, "default_setting");
         DefaultSetting defaultSetting = retrieveDefaultSetting(username);
         if (defaultSetting != null){
             entityManager.remove(defaultSetting);

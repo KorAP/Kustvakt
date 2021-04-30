@@ -48,7 +48,7 @@ public class RefreshTokenDao {
     public RefreshToken storeRefreshToken (String refreshToken, String userId,
             ZonedDateTime userAuthenticationTime, String clientId,
             Set<AccessScope> scopes) throws KustvaktException {
-        ParameterChecker.checkStringValue(refreshToken, "refresh token");
+        ParameterChecker.checkStringValue(refreshToken, "refresh_token");
         // ParameterChecker.checkStringValue(userId, "username");
         ParameterChecker.checkStringValue(clientId, "client_id");
         ParameterChecker.checkObjectValue(scopes, "scopes");
@@ -80,7 +80,7 @@ public class RefreshTokenDao {
 
     public RefreshToken retrieveRefreshToken (String token)
             throws KustvaktException {
-        ParameterChecker.checkStringValue(token, "refresh token");
+        ParameterChecker.checkStringValue(token, "refresh_token");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<RefreshToken> query =
@@ -97,7 +97,7 @@ public class RefreshTokenDao {
     public RefreshToken retrieveRefreshToken (String token, String username)
             throws KustvaktException {
 
-        ParameterChecker.checkStringValue(token, "refresh token");
+        ParameterChecker.checkStringValue(token, "refresh_token");
         ParameterChecker.checkStringValue(username, "username");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();

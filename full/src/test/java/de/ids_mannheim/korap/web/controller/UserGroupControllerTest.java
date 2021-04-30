@@ -213,9 +213,9 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         assertEquals(StatusCodes.INVALID_ARGUMENT, node.at("/errors/0/0").asInt());
-        assertEquals("groupName must contain at least 3 characters",
+        assertEquals("group_name must contain at least 3 characters",
                 node.at("/errors/0/1").asText());
-        assertEquals("groupName", node.at("/errors/0/2").asText());
+        assertEquals("group_name", node.at("/errors/0/2").asText());
     }
     
     @Test

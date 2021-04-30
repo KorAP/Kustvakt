@@ -42,19 +42,19 @@ public class UserGroupMemberDao {
     private EntityManager entityManager;
 
     public void addMember (UserGroupMember member) throws KustvaktException {
-        ParameterChecker.checkObjectValue(member, "userGroupMember");
+        ParameterChecker.checkObjectValue(member, "user_group_member");
         entityManager.persist(member);
     }
 
     public void updateMember (UserGroupMember member) throws KustvaktException {
-        ParameterChecker.checkObjectValue(member, "UserGroupMember");
+        ParameterChecker.checkObjectValue(member, "user_group_member");
         entityManager.merge(member);
     }
 
     public void deleteMember (UserGroupMember member, String deletedBy,
             boolean isSoftDelete) throws KustvaktException {
-        ParameterChecker.checkObjectValue(member, "UserGroupMember");
-        ParameterChecker.checkStringValue(deletedBy, "deletedBy");
+        ParameterChecker.checkObjectValue(member, "user_group_member");
+        ParameterChecker.checkStringValue(deletedBy, "deleted_by");
 
         if (!entityManager.contains(member)) {
             member = entityManager.merge(member);
@@ -74,8 +74,8 @@ public class UserGroupMemberDao {
 
     public UserGroupMember retrieveMemberById (String userId, int groupId)
             throws KustvaktException {
-        ParameterChecker.checkStringValue(userId, "userId");
-        ParameterChecker.checkIntegerValue(groupId, "groupId");
+        ParameterChecker.checkStringValue(userId, "user_id");
+        ParameterChecker.checkIntegerValue(groupId, "group_id");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<UserGroupMember> query =
@@ -106,8 +106,8 @@ public class UserGroupMemberDao {
     @SuppressWarnings("unchecked")
     public List<UserGroupMember> retrieveMemberByRole (int groupId, int roleId)
             throws KustvaktException {
-        ParameterChecker.checkIntegerValue(roleId, "roleId");
-        ParameterChecker.checkIntegerValue(groupId, "groupId");
+        ParameterChecker.checkIntegerValue(roleId, "role_id");
+        ParameterChecker.checkIntegerValue(groupId, "group_id");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<UserGroupMember> query =

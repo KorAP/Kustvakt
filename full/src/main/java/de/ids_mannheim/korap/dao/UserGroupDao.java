@@ -58,8 +58,8 @@ public class UserGroupDao {
     public int createGroup (String name, String description,
             String createdBy, UserGroupStatus status) throws KustvaktException {
         ParameterChecker.checkStringValue(name, "name");
-        ParameterChecker.checkStringValue(createdBy, "createdBy");
-        ParameterChecker.checkObjectValue(status, "UserGroupStatus");
+        ParameterChecker.checkStringValue(createdBy, "created_by");
+        ParameterChecker.checkObjectValue(status, "user_group_status");
 
         UserGroup group = new UserGroup();
         group.setName(name);
@@ -87,8 +87,8 @@ public class UserGroupDao {
 
     public void deleteGroup (int groupId, String deletedBy,
             boolean isSoftDelete) throws KustvaktException {
-        ParameterChecker.checkIntegerValue(groupId, "groupId");
-        ParameterChecker.checkStringValue(deletedBy, "deletedBy");
+        ParameterChecker.checkIntegerValue(groupId, "group_id");
+        ParameterChecker.checkStringValue(deletedBy, "deleted_by");
 
         UserGroup group = null;
         try {
@@ -114,7 +114,7 @@ public class UserGroupDao {
     }
 
     public void updateGroup (UserGroup group) throws KustvaktException {
-        ParameterChecker.checkObjectValue(group, "user-group");
+        ParameterChecker.checkObjectValue(group, "user_group");
         entityManager.merge(group);
     }
     
@@ -137,7 +137,7 @@ public class UserGroupDao {
 
     public UserGroup retrieveGroupById (int groupId, boolean fetchMembers)
             throws KustvaktException {
-        ParameterChecker.checkIntegerValue(groupId, "groupId");
+        ParameterChecker.checkIntegerValue(groupId, "group_id");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<UserGroup> query =
@@ -173,7 +173,7 @@ public class UserGroupDao {
     @SuppressWarnings("unchecked")
     public List<UserGroup> retrieveGroupByUserId (String userId)
             throws KustvaktException {
-        ParameterChecker.checkStringValue(userId, "userId");
+        ParameterChecker.checkStringValue(userId, "user_id");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<UserGroup> query =
@@ -209,7 +209,7 @@ public class UserGroupDao {
 
     public UserGroup retrieveGroupByName (String groupName, boolean fetchMembers)
             throws KustvaktException {
-        ParameterChecker.checkStringValue(groupName, "groupName");
+        ParameterChecker.checkStringValue(groupName, "group_name");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<UserGroup> query =
@@ -235,7 +235,7 @@ public class UserGroupDao {
 
     public UserGroup retrieveHiddenGroupByQuery (int queryId)
             throws KustvaktException {
-        ParameterChecker.checkIntegerValue(queryId, "queryId");
+        ParameterChecker.checkIntegerValue(queryId, "query_id");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<UserGroup> criteriaQuery =
@@ -346,8 +346,8 @@ public class UserGroupDao {
 
     public void deleteQueryFromGroup (int queryId, int groupId)
             throws KustvaktException {
-        ParameterChecker.checkIntegerValue(queryId, "queryId");
-        ParameterChecker.checkIntegerValue(groupId, "groupId");
+        ParameterChecker.checkIntegerValue(queryId, "query_id");
+        ParameterChecker.checkIntegerValue(groupId, "group_id");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<QueryAccess> criteriaQuery =

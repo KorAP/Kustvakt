@@ -154,7 +154,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         ClientResponse response = registerClient(username, json);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals("clientName must contain at least 3 characters",
+        assertEquals("client_name must contain at least 3 characters",
                 node.at("/error_description").asText());
         assertEquals("invalid_request",
                 node.at("/error").asText());
@@ -172,7 +172,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         ClientResponse response = registerClient(username, json);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals("client description is null",
+        assertEquals("client_description is null",
                 node.at("/error_description").asText());
         assertEquals("invalid_request",
                 node.at("/error").asText());

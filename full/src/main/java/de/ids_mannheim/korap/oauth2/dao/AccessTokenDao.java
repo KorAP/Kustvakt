@@ -56,7 +56,7 @@ public class AccessTokenDao extends KustvaktCacheable {
     public void storeAccessToken (String token, RefreshToken refreshToken,
             Set<AccessScope> scopes, String userId, String clientId,
             ZonedDateTime authenticationTime) throws KustvaktException {
-        ParameterChecker.checkStringValue(token, "access token");
+        ParameterChecker.checkStringValue(token, "access_token");
 //        ParameterChecker.checkObjectValue(refreshToken, "refresh token");
         ParameterChecker.checkObjectValue(scopes, "scopes");
         // ParameterChecker.checkStringValue(userId, "username");

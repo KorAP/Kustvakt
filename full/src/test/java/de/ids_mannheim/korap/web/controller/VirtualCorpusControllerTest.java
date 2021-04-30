@@ -101,7 +101,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     private JsonNode testlistAccessByGroup (String username, String groupName)
             throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
-                .path("access").queryParam("groupName", groupName)
+                .path("access").queryParam("group_name", groupName)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -296,8 +296,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     @Test
     public void testCreatePrivateVC () throws KustvaktException {
         String json = "{\"type\": \"PRIVATE\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
-                + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
+                + ",\"query_type\": \"VIRTUAL_CORPUS\""
+                + ",\"corpus_query\": \"corpusSigle=GOE\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
@@ -325,8 +325,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     @Test
     public void testCreatePublishedVC () throws KustvaktException {
         String json = "{\"type\": \"PUBLISHED\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
-                + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
+                + ",\"query_type\": \"VIRTUAL_CORPUS\""
+                + ",\"corpus_query\": \"corpusSigle=GOE\"}";
 
         String vcName = "new-published-vc";
 
@@ -338,6 +338,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .put(ClientResponse.class, json);
 
+        System.out.println(response.getEntity(String.class));
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
         // test list owner vc
@@ -388,7 +389,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     public void testCreateVCWithInvalidToken ()
             throws IOException, KustvaktException {
         String json = "{\"type\": \"PRIVATE\","
-                + "\"corpusQuery\": \"corpusSigle=GOE\"}";
+                + "\"corpus_query\": \"corpusSigle=GOE\"}";
 
         InputStream is = getClass().getClassLoader()
                 .getResourceAsStream("test-invalid-signature.token");
@@ -424,7 +425,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     public void testCreateVCWithExpiredToken ()
             throws IOException, KustvaktException {
         String json = "{\"type\": \"PRIVATE\","
-                + "\"corpusQuery\": \"corpusSigle=GOE\"}";
+                + "\"corpus_query\": \"corpusSigle=GOE\"}";
 
         String authToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0VXNlci"
                 + "IsImlzcyI6Imh0dHBzOlwvXC9rb3JhcC5pZHMtbWFubmhlaW0uZG"
@@ -454,8 +455,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     @Test
     public void testCreateSystemVC () throws KustvaktException {
         String json = "{\"type\": \"SYSTEM\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
-                + ",\"corpusQuery\": \"pubDate since 1820\"}";
+                + ",\"query_type\": \"VIRTUAL_CORPUS\""
+                + ",\"corpus_query\": \"pubDate since 1820\"}";
 
         String vcName = "new_system_vc";
         ClientResponse response = resource().path(API_VERSION).path("vc")
@@ -472,8 +473,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     @Test
     public void testCreateSystemVCUnauthorized () throws KustvaktException {
         String json = "{\"type\": \"SYSTEM\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
-                + ",\"corpusQuery\": \"creationDate since 1820\"}";
+                + ",\"query_type\": \"VIRTUAL_CORPUS\""
+                + ",\"corpus_query\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
@@ -497,8 +498,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     @Test
     public void testCreateVCInvalidName () throws KustvaktException {
         String json = "{\"type\": \"PRIVATE\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
-                + ",\"corpusQuery\": \"creationDate since 1820\"}";
+                + ",\"query_type\": \"VIRTUAL_CORPUS\""
+                + ",\"corpus_query\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new $vc")
@@ -518,8 +519,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     @Test
     public void testCreateVCNameTooShort () throws KustvaktException {
         String json = "{\"type\": \"PRIVATE\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
-                + ",\"corpusQuery\": \"creationDate since 1820\"}";
+                + ",\"query_type\": \"VIRTUAL_CORPUS\""
+                + ",\"corpus_query\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("ne")
@@ -533,14 +534,14 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
-        assertEquals("queryName must contain at least 3 characters",
+        assertEquals("query_name must contain at least 3 characters",
                 node.at("/errors/0/1").asText());
     }
 
     @Test
     public void testCreateVCUnauthorized () throws KustvaktException {
         String json = "{\"type\": \"PRIVATE\","
-                + "\"corpusQuery\": \"creationDate since 1820\"}";
+                + "\"corpus_query\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
@@ -562,7 +563,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     @Test
     public void testCreateVCWithoutcorpusQuery () throws KustvaktException {
         String json = "{\"type\": \"PRIVATE\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"query_type\": \"VIRTUAL_CORPUS\""
                 + "}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
@@ -578,8 +579,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
-        assertEquals("corpusQuery is null", node.at("/errors/0/1").asText());
-        assertEquals("corpusQuery", node.at("/errors/0/2").asText());
+        assertEquals("corpus_query is null", node.at("/errors/0/1").asText());
+        assertEquals("corpus_query", node.at("/errors/0/2").asText());
     }
 
     @Test
@@ -596,14 +597,14 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
-        assertEquals("request entity is null", node.at("/errors/0/1").asText());
-        assertEquals("request entity", node.at("/errors/0/2").asText());
+        assertEquals("request_entity is null", node.at("/errors/0/1").asText());
+        assertEquals("request_entity", node.at("/errors/0/2").asText());
     }
 
     @Test
     public void testCreateVCWithoutType () throws KustvaktException {
-        String json = "{\"corpusQuery\": " + "\"creationDate since 1820\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+        String json = "{\"corpus_query\": " + "\"creationDate since 1820\""
+                + ",\"query_type\": \"VIRTUAL_CORPUS\""
                 + "}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
@@ -626,8 +627,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     @Test
     public void testCreateVCWithWrongType () throws KustvaktException {
         String json = "{\"type\": \"PRIVAT\""
-                + ",\"queryType\": \"VIRTUAL_CORPUS\""
-                + ",\"corpusQuery\": \"creationDate since 1820\"}";
+                + ",\"query_type\": \"VIRTUAL_CORPUS\""
+                + ",\"corpus_query\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
@@ -710,7 +711,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     @Test
     public void testEditCorpusQuery () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        String json = "{\"corpusQuery\": \"corpusSigle=WPD17\"}";
+        String json = "{\"corpus_query\": \"corpusSigle=WPD17\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~dory").path("dory-vc")
@@ -840,7 +841,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     @Test
     public void testlistAccessByGroup () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
-                .path("access").queryParam("groupName", "dory-group")
+                .path("access").queryParam("group_name", "dory-group")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")

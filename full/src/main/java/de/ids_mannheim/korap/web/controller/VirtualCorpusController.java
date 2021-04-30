@@ -351,7 +351,7 @@ public class VirtualCorpusController {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<QueryAccessDto> listVCAccesses (
             @Context SecurityContext securityContext,
-            @QueryParam("groupName") String groupName) {
+            @QueryParam("group_name") String groupName) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {

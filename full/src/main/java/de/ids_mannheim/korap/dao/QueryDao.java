@@ -185,8 +185,8 @@ public class QueryDao {
 
     public QueryDO retrieveQueryByName (String queryName, String createdBy)
             throws KustvaktException {
-        ParameterChecker.checkStringValue(createdBy, "createdBy");
-        ParameterChecker.checkStringValue(queryName, "queryName");
+        ParameterChecker.checkStringValue(createdBy, "created_by");
+        ParameterChecker.checkStringValue(queryName, "query_name");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<QueryDO> criteriaQuery =
@@ -223,7 +223,7 @@ public class QueryDao {
     @SuppressWarnings("unchecked")
     public List<QueryDO> retrieveOwnerQuery (String userId,
             QueryType queryType) throws KustvaktException {
-        ParameterChecker.checkStringValue(userId, "userId");
+        ParameterChecker.checkStringValue(userId, "user_id");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<QueryDO> cq =
@@ -246,7 +246,7 @@ public class QueryDao {
     @SuppressWarnings("unchecked")
     public List<QueryDO> retrieveOwnerQueryByType (String userId,
             ResourceType type) throws KustvaktException {
-        ParameterChecker.checkStringValue(userId, "userId");
+        ParameterChecker.checkStringValue(userId, "user_id");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<QueryDO> cq =
@@ -268,7 +268,7 @@ public class QueryDao {
     @SuppressWarnings("unchecked")
     public List<QueryDO> retrieveGroupQueryByUser (String userId, QueryType queryType)
             throws KustvaktException {
-        ParameterChecker.checkStringValue(userId, "userId");
+        ParameterChecker.checkStringValue(userId, "user_id");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<QueryDO> cq =
@@ -313,8 +313,8 @@ public class QueryDao {
 
     public List<QueryDO> retrieveQueryByUser (String userId,
             QueryType queryType) throws KustvaktException {
-        ParameterChecker.checkStringValue(userId, "userId");
-        ParameterChecker.checkObjectValue(queryType, "queryType");
+        ParameterChecker.checkStringValue(userId, "user_id");
+        ParameterChecker.checkObjectValue(queryType, "query_type");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<QueryDO> criteriaQuery =
@@ -351,7 +351,7 @@ public class QueryDao {
     @SuppressWarnings("unchecked")
     public List<QueryDO> retrieveQueryByGroup (int groupId)
             throws KustvaktException {
-        ParameterChecker.checkIntegerValue(groupId, "groupId");
+        ParameterChecker.checkIntegerValue(groupId, "group_id");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<QueryDO> criteriaQuery =

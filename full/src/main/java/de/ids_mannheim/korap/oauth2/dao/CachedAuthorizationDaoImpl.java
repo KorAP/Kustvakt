@@ -43,11 +43,11 @@ public class CachedAuthorizationDaoImpl extends KustvaktCacheable
             ZonedDateTime authenticationTime, String nonce)
             throws KustvaktException {
         ParameterChecker.checkStringValue(clientId, "client_id");
-        ParameterChecker.checkStringValue(userId, "userId");
-        ParameterChecker.checkStringValue(code, "authorization code");
+        ParameterChecker.checkStringValue(userId, "user_id");
+        ParameterChecker.checkStringValue(code, "authorization_code");
         ParameterChecker.checkCollection(scopes, "scopes");
         ParameterChecker.checkObjectValue(authenticationTime,
-                "user authentication time");
+                "user_authentication_time");
 
         Authorization authorization = new Authorization();
         authorization.setCode(code);

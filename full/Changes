@@ -15,7 +15,11 @@
 2021-04-26
  - Updated OAuth2 Client list (margaretha)
 2021-04-29 
- - Updated the parameter of user role management web-service for coherency (margaretha) 
+ - Updated the parameter of user role management web-service for coherence (margaretha) 
+2021-04-30
+ - Updated parameters in the error responses and the VC creation and 
+   access list APIs  for coherence (margaretha)
+ 
  
 # version 0.63
 26/10/2020

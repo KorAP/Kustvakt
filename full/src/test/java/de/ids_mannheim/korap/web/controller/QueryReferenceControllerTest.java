@@ -29,8 +29,8 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
     @Test
     public void testCreatePrivateQuery () throws KustvaktException {
         String json = "{\"type\": \"PRIVATE\"" 
-                + ",\"queryType\": \"QUERY\""
-                + ",\"queryLanguage\": \"poliqarp\"" 
+                + ",\"query_type\": \"QUERY\""
+                + ",\"query_language\": \"poliqarp\"" 
                 + ",\"query\": \"der\"}";
 
         String qName = "new_query";
@@ -59,8 +59,8 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
     @Test
     public void testCreateUserQueryByAdmin () throws KustvaktException {
         String json = "{\"type\": \"PRIVATE\""
-                + ",\"queryType\": \"QUERY\""
-                + ",\"queryLanguage\": \"poliqarp\"" 
+                + ",\"query_type\": \"QUERY\""
+                + ",\"query_language\": \"poliqarp\"" 
                 + ",\"query\": \"Sommer\"}";
 
         String qName = "marlin-query";
@@ -78,8 +78,8 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
     @Test
     public void testCreateSystemQuery () throws KustvaktException {
         String json = "{\"type\": \"SYSTEM\""
-                + ",\"queryType\": \"QUERY\""
-                + ",\"queryLanguage\": \"poliqarp\"" 
+                + ",\"query_type\": \"QUERY\""
+                + ",\"query_language\": \"poliqarp\"" 
                 + ",\"query\": \"Sommer\"}";
 
         String qName = "system-query";
@@ -97,8 +97,8 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
     @Test
     public void testCreateSystemQueryUnauthorized () throws KustvaktException {
         String json = "{\"type\": \"SYSTEM\""
-                + ",\"queryType\": \"QUERY\""
-                + ",\"queryLanguage\": \"poliqarp\"" 
+                + ",\"query_type\": \"QUERY\""
+                + ",\"query_language\": \"poliqarp\"" 
                 + ",\"query\": \"Sommer\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("query")

@@ -204,7 +204,7 @@ public class QueryService {
 
         verifyUsername(username, queryCreator);
         QueryDO query = queryDao.retrieveQueryByName(queryName, queryCreator);
-        ParameterChecker.checkObjectValue(queryJson, "request entity");
+        ParameterChecker.checkObjectValue(queryJson, "request_entity");
         if (query == null) {
             storeQuery(queryJson, queryName, username);
             return Status.CREATED;
@@ -284,13 +284,13 @@ public class QueryService {
         String koralQuery = null;
         if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
             ParameterChecker.checkStringValue(query.getCorpusQuery(),
-                    "corpusQuery");
+                    "corpus_query");
             koralQuery = serializeCorpusQuery(query.getCorpusQuery());
         }
         else if (query.getQueryType().equals(QueryType.QUERY)) {
             ParameterChecker.checkStringValue(query.getQuery(), "query");
             ParameterChecker.checkStringValue(query.getQueryLanguage(),
-                    "queryLanguage");
+                    "query_language");
             koralQuery =
                     serializeQuery(query.getQuery(), query.getQueryLanguage());
         }
@@ -305,7 +305,7 @@ public class QueryService {
             String koralQuery, String definition, String description,
             String status, boolean isCached, String username, String query,
             String queryLanguage) throws KustvaktException {
-        ParameterChecker.checkNameValue(queryName, "queryName");
+        ParameterChecker.checkNameValue(queryName, "query_name");
         ParameterChecker.checkObjectValue(type, "type");
 
         if (!queryNamePattern.matcher(queryName).matches()) {
