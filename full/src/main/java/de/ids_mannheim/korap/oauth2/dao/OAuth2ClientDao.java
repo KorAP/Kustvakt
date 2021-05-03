@@ -46,14 +46,14 @@ public class OAuth2ClientDao {
     public void registerClient (String id, String secretHashcode, String name,
             OAuth2ClientType type, String url, String redirectURI,
             String registeredBy, String description) throws KustvaktException {
-        ParameterChecker.checkStringValue(id, "client id");
-        ParameterChecker.checkStringValue(name, "client name");
-        ParameterChecker.checkObjectValue(type, "client type");
-        ParameterChecker.checkStringValue(description, "client description");
+        ParameterChecker.checkStringValue(id, "client_id");
+        ParameterChecker.checkStringValue(name, "client_name");
+        ParameterChecker.checkObjectValue(type, "client_type");
+        ParameterChecker.checkStringValue(description, "client_description");
         // ParameterChecker.checkStringValue(url, "client url");
         // ParameterChecker.checkStringValue(redirectURI, "client
         // redirect uri");
-        ParameterChecker.checkStringValue(registeredBy, "registeredBy");
+        ParameterChecker.checkStringValue(registeredBy, "registered_by");
 
         OAuth2Client client = new OAuth2Client();
         client.setId(id);
