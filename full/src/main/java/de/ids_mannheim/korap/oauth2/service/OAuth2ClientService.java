@@ -82,7 +82,7 @@ public class OAuth2ClientService {
     public OAuth2ClientDto registerClient (OAuth2ClientJson clientJson,
             String registeredBy) throws KustvaktException {
         try {
-            ParameterChecker.checkNameValue(clientJson.getName(), "clientName");
+            ParameterChecker.checkNameValue(clientJson.getName(), "client_name");
         }
         catch (KustvaktException e) {
             throw new KustvaktException(e.getStatusCode(), e.getMessage(),
