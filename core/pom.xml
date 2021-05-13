@@ -12,7 +12,7 @@
 		<jersey.version>1.19.4</jersey.version>
 		<jetty.version>9.4.40.v20210413</jetty.version>
 		<hibernate.version>5.4.29.Final</hibernate.version>
-		<flyway.version>7.8.0</flyway.version>
+		<flyway.version>7.8.1</flyway.version>
 		<log4j.version>2.14.1</log4j.version>
 		<krill.version>[0.59.3,)</krill.version>
 		<koral.version>[0.37,)</koral.version>
@@ -168,7 +168,7 @@
 		<dependency>
 			<groupId>net.minidev</groupId>
 			<artifactId>json-smart</artifactId>
-			<version>2.4.2</version>
+			<version>2.4.7</version>
 		</dependency>
 		
 		<!-- Jersey 1x originally uses codehaus -->
@@ -228,7 +228,7 @@
 		<dependency>
 			<groupId>org.javassist</groupId>
 			<artifactId>javassist</artifactId>
-			<version>3.27.0-GA</version>
+			<version>3.28.0-GA</version>
 		</dependency>
 
 		<!-- EM:done -->
