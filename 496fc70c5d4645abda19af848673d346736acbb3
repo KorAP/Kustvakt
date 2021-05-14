@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8480bb1_6588f5b9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2021-05-14T06:10:38Z",
+      "side": 1,
+      "message": "@margaretha: works perfectly also from you klinux10 account.\nThe trick is to import the PRs before pushing other commits.",
+      "revId": "496fc70c5d4645abda19af848673d346736acbb3",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
