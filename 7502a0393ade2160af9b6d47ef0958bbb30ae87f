@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "96f45fa1_2b06fc4c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2021-05-18T05:34:20Z",
+      "side": 1,
+      "message": "Tools/bin/import_github_pull_requests seems to work consistently on klinux10",
+      "revId": "7502a0393ade2160af9b6d47ef0958bbb30ae87f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
