@@ -837,7 +837,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         
         testRevokeTokenViaSuperClient(accessToken1, userAuthHeader);
         node = requestTokenList(userAuthHeader, ACCESS_TOKEN_TYPE);
-        System.out.println(node);
+//        System.out.println(node);
         assertEquals(1, node.size());
         assertEquals(accessToken2, node.at("/0/token").asText());
         assertTrue(node.at("/0/scope").size()>0);

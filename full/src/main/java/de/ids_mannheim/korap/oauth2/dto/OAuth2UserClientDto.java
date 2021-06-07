@@ -16,7 +16,9 @@ public class OAuth2UserClientDto {
     private String clientName;
     @JsonProperty("client_type")
     private OAuth2ClientType clientType;
+    @JsonProperty("client_description")
     private String description;
+    @JsonProperty("client_url")
     private String url;
     
     public String getClientName () {

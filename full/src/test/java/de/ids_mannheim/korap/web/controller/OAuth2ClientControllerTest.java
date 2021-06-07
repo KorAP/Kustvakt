@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.web.controller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -527,10 +528,16 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         String entity = response.getEntity(String.class);
+//        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.size());
         assertEquals(confidentialClientId, node.at("/0/client_id").asText());
         assertEquals(publicClientId, node.at("/1/client_id").asText());
+        
+        assertEquals("non super confidential client",node.at("/0/client_name").asText());
+        assertEquals("CONFIDENTIAL",node.at("/0/client_type").asText());
+        assertFalse(node.at("/0/client_url").isMissingNode());
+        assertFalse(node.at("/0/client_description").isMissingNode());
     }
 
     @Test
