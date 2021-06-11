@@ -1,7 +1,7 @@
 # version 0.63.2
 2021-06-11
  - Updated OAuth2 token length & secure random algorithm config.
-
+ - Added character set filter to random code generator, e.g. for client_id.
 # version 0.63.1
 2021-03-25
  - Updated Koral version for InfoController.

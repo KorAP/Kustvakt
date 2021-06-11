@@ -141,6 +141,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertNotNull(clientId);
         assertNotNull(clientSecret);
 
+        assertFalse(clientId.contains("a"));
+            
         testResetConfidentialClientSecret(clientId, clientSecret);
         testDeregisterConfidentialClient(clientId);
     }

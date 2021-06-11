@@ -3,7 +3,11 @@ package de.ids_mannheim.korap.encryption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -26,6 +30,15 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 @Component
 public class RandomCodeGenerator {
 
+    public static String alphanumeric = "34679bdfhmnprtFGHJLMNPRT";
+    public static List<Character> charList = alphanumeric.chars()
+            .mapToObj(c -> (char) c).collect(Collectors.toList());
+
+    public final static List<String> LIMITED_CHARACTERS =
+            Arrays.asList(new String[] { "3", "4", "6", "7", "9", "b", "d", "f",
+                    "h", "m", "n", "p", "r", "t", "F", "G", "H", "J", "L", "M",
+                    "N", "P", "R", "T" });
+
     @Autowired
     public KustvaktConfiguration config;
 
@@ -33,15 +46,15 @@ public class RandomCodeGenerator {
 
     @PostConstruct
     public void init () throws NoSuchAlgorithmException {
-        String algorithm = config.getSecureRandomAlgorithm(); 
+        String algorithm = config.getSecureRandomAlgorithm();
         if (!algorithm.isEmpty()) {
-            secureRandom =
-                    SecureRandom.getInstance(algorithm);    
+            secureRandom = SecureRandom.getInstance(algorithm);
         }
         else {
             secureRandom = new SecureRandom();
         }
-        System.out.println("Secure random algorithm: "+secureRandom.getAlgorithm());        
+        System.out.println(
+                "Secure random algorithm: " + secureRandom.getAlgorithm());
     }
 
     public String createRandomCode (KustvaktConfiguration c)
@@ -75,4 +88,16 @@ public class RandomCodeGenerator {
         }
     }
 
+    public String filterRandomCode (String code) {
+        StringBuffer s = new StringBuffer();
+        for (char c : code.toCharArray()) {
+            if (!charList.contains(c)) {
+                int n = ThreadLocalRandom.current().nextInt(0,
+                        charList.size());
+                c = charList.get(n);
+            }
+            s.append(c);
+        }
+        return s.toString();
+    }
 }

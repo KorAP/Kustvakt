@@ -126,6 +126,7 @@ public class OAuth2ClientService {
         }
 
         String id = codeGenerator.createRandomCode();
+        id = codeGenerator.filterRandomCode(id);
         try {
             clientDao.registerClient(id, secretHashcode, clientJson.getName(),
                     clientJson.getType(), url, redirectURI, registeredBy,
