@@ -122,7 +122,7 @@ public class KustvaktConfiguration {
         port = new Integer(properties.getProperty("server.port", "8095"));
         baseURL = properties.getProperty("kustvakt.base.url", "/api/*");
         setSecureRandomAlgorithm(properties
-                .getProperty("security.secure.random.algorithm", "SHA1PRNG"));
+                .getProperty("security.secure.random.algorithm", ""));
         setMessageDigestAlgorithm(
                 properties.getProperty("security.md.algorithm", "MD5"));
     }

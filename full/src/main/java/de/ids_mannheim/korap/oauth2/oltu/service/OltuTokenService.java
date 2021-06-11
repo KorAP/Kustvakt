@@ -348,6 +348,7 @@ public class OltuTokenService extends OAuth2TokenService {
             throws OAuthSystemException, KustvaktException {
 
         String random = randomGenerator.createRandomCode();
+        random += randomGenerator.createRandomCode();
         if (isPublicClient){
             return createsAccessTokenResponse(scopes, accessScopes, clientId,
                     userId, authenticationTime);
@@ -366,6 +367,7 @@ public class OltuTokenService extends OAuth2TokenService {
             throws OAuthSystemException, KustvaktException {
 
         String accessToken = randomGenerator.createRandomCode();
+        accessToken +=randomGenerator.createRandomCode();
         tokenDao.storeAccessToken(accessToken, refreshToken, accessScopes,
                 userId, clientId, authenticationTime);
 
@@ -383,6 +385,7 @@ public class OltuTokenService extends OAuth2TokenService {
             throws OAuthSystemException, KustvaktException {
 
         String accessToken = randomGenerator.createRandomCode();
+        accessToken +=randomGenerator.createRandomCode();
         tokenDao.storeAccessToken(accessToken, null, accessScopes,
                 userId, clientId, authenticationTime);
 

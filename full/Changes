@@ -1,3 +1,7 @@
+# version 0.63.2
+2021-06-11
+ - Updated OAuth2 token length & secure random algorithm config.
+
 # version 0.63.1
 2021-02-22
  - Updated libraries (margaretha)
@@ -17,7 +21,9 @@
 2021-04-30
  - Updated parameters in the error responses of OAuth2 APIs for coherence (margaretha)
  - Updated OAuth2 API responses for coherence (margaretha) 
- 
+2021-06-07
+ - Updated OAuth2 client dto (margaretha)
+  
 # version 0.63
 26/10/2020
  - Updated dependency of nimbus-jose-jwt and oauth2-oidc-sdk (diewald)

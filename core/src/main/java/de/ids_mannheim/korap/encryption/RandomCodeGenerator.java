@@ -33,8 +33,15 @@ public class RandomCodeGenerator {
 
     @PostConstruct
     public void init () throws NoSuchAlgorithmException {
-        secureRandom =
-                SecureRandom.getInstance(config.getSecureRandomAlgorithm());
+        String algorithm = config.getSecureRandomAlgorithm(); 
+        if (!algorithm.isEmpty()) {
+            secureRandom =
+                    SecureRandom.getInstance(algorithm);    
+        }
+        else {
+            secureRandom = new SecureRandom();
+        }
+        System.out.println("Secure random algorithm: "+secureRandom.getAlgorithm());        
     }
 
     public String createRandomCode (KustvaktConfiguration c)
