@@ -232,9 +232,9 @@ public class OAuthClientController {
      * user and client authentications.
      * 
      * @param context
-     * @param clientId
+     * @param superClientId
      *            the client id of the super client
-     * @param clientSecret
+     * @param superClientSecret
      *            the client secret of the super client
      * @return a list of clients having refresh tokens of the
      *         given user
@@ -246,8 +246,8 @@ public class OAuthClientController {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<OAuth2UserClientDto> listUserAuthorizedClients (
             @Context SecurityContext context,
-            @FormParam("client_id") String clientId,
-            @FormParam("client_secret") String clientSecret,
+            @FormParam("super_client_id") String superClientId,
+            @FormParam("super_client_secret") String superClientSecret,
             @FormParam("authorized_only") boolean authorizedOnly) {
 
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
@@ -258,11 +258,11 @@ public class OAuthClientController {
                     OAuth2Scope.LIST_USER_CLIENT);
             if(authorizedOnly){
                 return clientService.listUserAuthorizedClients(username,
-                        clientId, clientSecret);
+                        superClientId, superClientSecret);
             }
             else {
                 return clientService.listUserRegisteredClients(username,
-                        clientId, clientSecret);                
+                        superClientId, superClientSecret);                
             }
         }
         catch (KustvaktException e) {

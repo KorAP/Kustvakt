@@ -516,8 +516,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     private void requestAuthorizedClientList (String userAuthHeader)
             throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("client_id", superClientId);
-        form.add("client_secret", clientSecret);
+        form.add("super_client_id", superClientId);
+        form.add("super_client_secret", clientSecret);
         form.add("authorized_only", "true");
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
@@ -697,8 +697,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         registerClient("dory", json);
         
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("client_id", superClientId);
-        form.add("client_secret", clientSecret);
+        form.add("super_client_id", superClientId);
+        form.add("super_client_secret", clientSecret);
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("client").path("list")

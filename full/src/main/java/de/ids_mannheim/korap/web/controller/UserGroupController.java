@@ -292,8 +292,8 @@ public class UserGroupController {
      *            the group name
      * @param memberUsername
      *            the username of a group-member
-     * @param roleIds
-     *            the role ids for the member
+     * @param roleId
+     *            a role id or multiple role ids
      * @return
      */
     @POST
@@ -302,7 +302,7 @@ public class UserGroupController {
     public Response editMemberRoles (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
             @FormParam("memberUsername") String memberUsername,
-            @FormParam("roleIds") List<Integer> roleIds) {
+            @FormParam("roleId") List<Integer> roleIds) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
@@ -326,8 +326,8 @@ public class UserGroupController {
      *            a group name
      * @param memberUsername
      *            a username of a group member
-     * @param roleIds
-     *            list of role ids
+     * @param roleId
+     *            a role id or multiple role ids
      * @return if successful, HTTP response status OK
      */
     @POST
@@ -336,7 +336,7 @@ public class UserGroupController {
     public Response addMemberRoles (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
             @FormParam("memberUsername") String memberUsername,
-            @FormParam("roleIds") List<Integer> roleIds) {
+            @FormParam("roleId") List<Integer> roleIds) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
@@ -361,8 +361,8 @@ public class UserGroupController {
      *            a group name
      * @param memberUsername
      *            a username of a group member
-     * @param roleIds
-     *            list of role ids
+     * @param roleId
+     *            a role id or multiple role ids
      * @return if successful, HTTP response status OK
      */
     @POST
@@ -371,7 +371,7 @@ public class UserGroupController {
     public Response deleteMemberRoles (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
             @FormParam("memberUsername") String memberUsername,
-            @FormParam("roleIds") List<Integer> roleIds) {
+            @FormParam("roleId") List<Integer> roleIds) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {

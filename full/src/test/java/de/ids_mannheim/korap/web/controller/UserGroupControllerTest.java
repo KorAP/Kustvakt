@@ -912,7 +912,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
             ClientHandlerException, KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("memberUsername", "dory");
-        form.add("roleIds", "1");
+        form.add("roleId", "1");
 
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@marlin-group").path("role").path("add")
@@ -933,7 +933,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
             ClientHandlerException, KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("memberUsername", "dory");
-        form.add("roleIds", "1");
+        form.add("roleId", "1");
 
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@marlin-group").path("role").path("delete")
@@ -978,8 +978,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
             KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("memberUsername", "dory");
-        form.add("roleIds", "1");
-        form.add("roleIds", "3");
+        form.add("roleId", "1");
+        form.add("roleId", "3");
 
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@marlin-group").path("role").path("edit")

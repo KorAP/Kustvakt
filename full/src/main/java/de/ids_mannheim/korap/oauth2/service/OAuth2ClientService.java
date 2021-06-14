@@ -356,9 +356,9 @@ public class OAuth2ClientService {
     }
 
     public List<OAuth2UserClientDto> listUserAuthorizedClients (String username,
-            String clientId, String clientSecret) throws KustvaktException {
-        OAuth2Client client = authenticateClient(clientId, clientSecret);
-        if (!client.isSuper()) {
+            String superClientId, String superClientSecret) throws KustvaktException {
+        OAuth2Client superClient = authenticateClient(superClientId, superClientSecret);
+        if (!superClient.isSuper()) {
             throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
                     "Only super client is allowed to list user authorized clients.",
                     OAuth2Error.UNAUTHORIZED_CLIENT);
