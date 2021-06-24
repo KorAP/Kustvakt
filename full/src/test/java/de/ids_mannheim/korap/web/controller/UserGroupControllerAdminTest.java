@@ -192,8 +192,8 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
             KustvaktException {
         MultivaluedMap<String, String> map = new MultivaluedMapImpl();
         map.add("memberUsername", memberUsername);
-        map.add("roleIds", "1"); // USER_GROUP_ADMIN
-        map.add("roleIds", "2"); // USER_GROUP_MEMBER
+        map.add("roleId", "1"); // USER_GROUP_ADMIN
+        map.add("roleId", "2"); // USER_GROUP_MEMBER
 
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@" + groupName).path("role").path("add")
@@ -225,7 +225,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
             KustvaktException {
         MultivaluedMap<String, String> map = new MultivaluedMapImpl();
         map.add("memberUsername", memberUsername);
-        map.add("roleIds", "1"); // USER_GROUP_ADMIN
+        map.add("roleId", "1"); // USER_GROUP_ADMIN
 
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@" + groupName).path("role").path("delete")
