@@ -20,6 +20,9 @@ updates:
       - dependency-name: "org.eclipse.jetty:jetty-webapp"
         versions:
           - ">= 10.0.0"
+      - dependency-name: "org.hibernate.org:hibernate-*"
+        versions:
+          - ">= 5.5.0"
     open-pull-requests-limit: 50
 
   - package-ecosystem: "maven" # See documentation for possible values
@@ -32,4 +35,8 @@ updates:
     directory: "/full" # Location of package manifests
     schedule:
       interval: "daily"
+    ignore:
+      - dependency-name: "org.hibernate.org:hibernate-*"
+        versions:
+          - ">= 5.5.0"
     open-pull-requests-limit: 50
