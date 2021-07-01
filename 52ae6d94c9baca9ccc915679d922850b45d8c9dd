@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d0aec43_0dd6a6ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2021-07-01T17:15:55Z",
+      "side": 1,
+      "message": "Let\u0027s see if this works with wildcards.",
+      "revId": "52ae6d94c9baca9ccc915679d922850b45d8c9dd",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
