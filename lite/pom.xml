@@ -146,13 +146,6 @@
 
 
 	<dependencies>
-		<!-- Mockserver -->
-		<dependency>
-		    <groupId>org.mock-server</groupId>
-		    <artifactId>mockserver-netty</artifactId>
-		    <version>5.11.2</version>
-		    <scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Kustvakt-core</artifactId>
@@ -165,7 +158,7 @@
 			<classifier>tests</classifier>
       		<type>test-jar</type>
       		<scope>test</scope>
-      	</dependency>	
+      	</dependency>
 		<!-- Jersey test framework -->
 		<dependency>
 			<groupId>com.sun.jersey.jersey-test-framework</groupId>
@@ -194,6 +187,11 @@
 			<version>2.7</version>
 			<scope>test</scope>
 			<exclusions>
+			    <!-- multiple slf4j binding -->
+		      	<exclusion>
+		      		<groupId>ch.qos.logback</groupId>
+		      		<artifactId>logback-classic</artifactId>
+		      	</exclusion>
 				<exclusion>
 					<groupId>org.apache.commons</groupId>
 					<artifactId>commons-lang3</artifactId>
@@ -210,6 +208,14 @@
 			<groupId>backport-util-concurrent</groupId>
 			<artifactId>backport-util-concurrent</artifactId>
 			<version>3.1</version>
+		</dependency>
+		
+		<!-- Mockserver -->
+		<dependency>
+		    <groupId>org.mock-server</groupId>
+		    <artifactId>mockserver-netty</artifactId>
+		    <version>5.11.2</version>
+		    <scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>
