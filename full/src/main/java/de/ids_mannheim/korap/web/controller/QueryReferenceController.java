@@ -149,7 +149,7 @@ public class QueryReferenceController {
     
     @DELETE
     @Path("~{createdBy}/{qName}")
-    public Response deleteVCByName (@Context SecurityContext securityContext,
+    public Response deleteQueryByName (@Context SecurityContext securityContext,
             @PathParam("createdBy") String createdBy,
             @PathParam("qName") String qName) {
         TokenContext context =

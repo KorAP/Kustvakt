@@ -13,6 +13,8 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +41,8 @@ public class RandomCodeGenerator {
                     "h", "m", "n", "p", "r", "t", "F", "G", "H", "J", "L", "M",
                     "N", "P", "R", "T" });
 
+    private Logger log = LogManager.getLogger(RandomCodeGenerator.class);
+    
     @Autowired
     public KustvaktConfiguration config;
 
@@ -53,7 +57,7 @@ public class RandomCodeGenerator {
         else {
             secureRandom = new SecureRandom();
         }
-        System.out.println(
+        log.info(
                 "Secure random algorithm: " + secureRandom.getAlgorithm());
     }
 

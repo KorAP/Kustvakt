@@ -2,6 +2,10 @@
 2021-06-11
  - Updated OAuth2 token length & secure random algorithm config.
  - Added character set filter to random code generator, e.g. for client_id.
+2021-06-14
+ - Updated roleId and super client parameters.
+2021-06-24
+ - Fixed broken test. 
  
 # version 0.63.1
 2021-02-22
@@ -11,10 +15,11 @@
  - Added query access roles and fixed vc access roles (margaretha)
  - Added delete query webservice and tests (margaretha) 
 2021-03-25
+ - Updated Koral version for Info Controller (margaretha)
  - Updated OAuth2 token list with token type and user clientId 
    parameters (margaretha) 
 2021-03-29
- - Added client type in the client list web-service (margaretha)  
+ - Added client type in the client list web-service. Resolved #58 (margaretha)  
 2021-04-19
  - Updated OAuth2Client JSON definition and controller tests (margaretha)
 2021-04-26

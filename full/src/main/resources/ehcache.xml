@@ -56,7 +56,7 @@
 		eternal="true" 
 		memoryStoreEvictionPolicy="LRU"
 		maxBytesLocalHeap="256M" 
-		maxBytesLocalDisk="1G"
+		maxBytesLocalDisk="2G"
 		diskExpiryThreadIntervalSeconds = "120" > 
 		<persistence strategy="localTempSwap"/>
 		<sizeOfPolicy maxDepth="3000" maxDepthExceededBehavior="abort" />
