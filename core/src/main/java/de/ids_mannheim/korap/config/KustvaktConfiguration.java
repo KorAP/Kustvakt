@@ -16,17 +16,10 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
 import de.ids_mannheim.korap.util.KrillProperties;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.Getter;
 import lombok.Setter;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.config.CacheConfiguration;
 
 /**
  * Describes configuration for Kustvakt by importing properties 
@@ -44,8 +37,6 @@ import net.sf.ehcache.config.CacheConfiguration;
 @Getter
 public class KustvaktConfiguration {
 
-	private Logger log = LogManager.getLogger(KustvaktConfiguration.class);
-	
     public static final Map<String, Object> KUSTVAKT_USER = new HashMap<>();
 
     private String vcInCaching;
@@ -115,7 +106,7 @@ public class KustvaktConfiguration {
     // another variable might be needed to define which metadata fields are restricted 
     private boolean isMetadataRestricted = false;
     
-    // EM: Maybe needed we support pipe registration
+    // EM: Maybe needed when we support pipe registration
     @Deprecated
     public static Map<String, String> pipes = new HashMap<>();
     
@@ -212,13 +203,6 @@ public class KustvaktConfiguration {
                 properties.getProperty("security.tokenTTL", "72H"));
         shortTokenTTL = TimeUtils.convertTimeToSeconds(
                 properties.getProperty("security.shortTokenTTL", "3H"));
-        
-        Cache cache = CacheManager.newInstance().getCache("named_vc");
-        CacheConfiguration config = cache.getCacheConfiguration();
-        config.setMaxBytesLocalHeap(properties.getProperty("cache.max.bytes.local.heap", "256m"));
-        config.setMaxBytesLocalDisk(properties.getProperty("cache.max.bytes.local.disk", "2G"));
-        log.info("max local heap:"+config.getMaxBytesLocalHeapAsString());
-        log.info("max local disk:"+config.getMaxBytesLocalDiskAsString());
     }
     
     @Deprecated

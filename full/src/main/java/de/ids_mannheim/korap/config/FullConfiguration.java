@@ -18,6 +18,9 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -28,6 +31,9 @@ import de.ids_mannheim.korap.constant.AuthenticationMethod;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.oauth2.openid.OpenIdConfiguration;
 import de.ids_mannheim.korap.utils.TimeUtils;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.config.CacheConfiguration;
 
 /**
  * Configuration for Kustvakt full version including properties
@@ -38,6 +44,7 @@ import de.ids_mannheim.korap.utils.TimeUtils;
  */
 
 public class FullConfiguration extends KustvaktConfiguration {
+    public static Logger jlog = LogManager.getLogger(FullConfiguration.class);    
     // mail configuration
     private boolean isMailEnabled;
     private String testEmail;
@@ -112,6 +119,14 @@ public class FullConfiguration extends KustvaktConfiguration {
         setRSAKeys(properties);
 
         setNamedVCPath(properties.getProperty("krill.namedVC", ""));
+        
+        Cache cache = CacheManager.newInstance().getCache("named_vc");
+        CacheConfiguration config = cache.getCacheConfiguration();
+        config.setMaxBytesLocalHeap(properties.getProperty("cache.max.bytes.local.heap", "256m"));
+        config.setMaxBytesLocalDisk(properties.getProperty("cache.max.bytes.local.disk", "2G"));
+        jlog.info("max local heap:"+config.getMaxBytesLocalHeapAsString());
+        jlog.info("max local disk:"+config.getMaxBytesLocalDiskAsString());
+
     }
 
     private void setSecurityConfiguration (Properties properties) {

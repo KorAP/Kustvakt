@@ -10,6 +10,7 @@
 2021-07-26
  - Replaced annotation parsing with restoring the annotation tables to the
    database.
+ - Moved cache config to the full config. 
 
 # version 0.63
 14/01/2021

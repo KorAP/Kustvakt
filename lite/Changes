@@ -12,6 +12,7 @@
 2021-07-26
  - Replaced annotation parsing with restoring the annotation tables to the
    database.
+ - Excluded jackson core libraries from Mockserver. 
   
 # version 0.62.4
 24/01/2020
