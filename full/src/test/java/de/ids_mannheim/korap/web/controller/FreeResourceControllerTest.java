@@ -12,7 +12,7 @@ import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
-@ContextConfiguration("classpath:test-annotation-config.xml")
+@ContextConfiguration("classpath:test-resource-config.xml")
 public class FreeResourceControllerTest extends SpringJerseyTest {
     
     @Test
@@ -22,7 +22,6 @@ public class FreeResourceControllerTest extends SpringJerseyTest {
 
         String entity = response.getEntity(String.class);
         JsonNode n = JsonUtils.readTree(entity).get(0);
-        
         assertEquals("WPD17",n.at("/resourceId").asText());
         assertEquals("Deutsche Wikipedia Artikel 2017", n.at("/titles/de").asText());
         assertEquals("German Wikipedia Articles 2017", n.at("/titles/en").asText());

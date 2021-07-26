@@ -194,8 +194,8 @@
 		<constructor-arg name="properties" ref="props" />
 	</bean>
 
-	<bean id="initializator" class="de.ids_mannheim.de.init.InitializatorImpl"
-		init-method="initAnnotation">
+	<bean id="initializator" class="de.ids_mannheim.de.init.Initializator"
+		init-method="init">
 	</bean>
 	
 	<bean id="vcLoader" class="de.ids_mannheim.de.init.VCLoaderImpl"/>

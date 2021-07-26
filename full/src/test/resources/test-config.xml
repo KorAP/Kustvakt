@@ -175,7 +175,7 @@
 		<constructor-arg name="properties" ref="props" />
 	</bean>
 
-	<bean id="initializator" class="de.ids_mannheim.de.init.InitializatorImpl"
+	<bean id="initializator" class="de.ids_mannheim.de.init.Initializator"
 		init-method="initTest">
 	</bean>
 

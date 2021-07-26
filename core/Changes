@@ -5,6 +5,11 @@
 # version 0.63.1
 2021-03-25
  - Updated Koral version for InfoController.
+2021-07-22
+ - Updated cache settings and some loggings.
+2021-07-26
+ - Replaced annotation parsing with restoring the annotation tables to the
+   database.
 
 # version 0.63
 14/01/2021

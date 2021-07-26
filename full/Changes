@@ -6,7 +6,12 @@
  - Updated roleId and super client parameters.
 2021-06-24
  - Fixed broken test. 
- 
+2021-07-22
+ - Updated cache settings and some loggings.
+2021-07-26
+ - Replaced annotation parsing with restoring the annotation tables to the
+   database.
+   
 # version 0.63.1
 2021-02-22
  - Updated libraries (margaretha)

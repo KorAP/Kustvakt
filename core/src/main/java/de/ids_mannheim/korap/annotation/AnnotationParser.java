@@ -28,6 +28,7 @@ import de.ids_mannheim.korap.entity.AnnotationLayer;
  * @author margaretha
  *
  */
+@Deprecated
 @Component
 public class AnnotationParser {
 

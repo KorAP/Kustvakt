@@ -127,13 +127,6 @@
 		<property name="dataSource" ref="sqliteDataSource" />
 	</bean>
 
-	<!-- Initialization -->
-	<bean id="initializator" class="de.ids_mannheim.de.init.LiteInitializatorImpl"
-		init-method="initTest">
-	</bean>
-	<bean id="annotationParser" class="de.ids_mannheim.korap.annotation.AnnotationParser"
-		scope="singleton" />
-
 	<bean id="vcLoader" class="de.ids_mannheim.de.init.VCLoaderImpl"/>
 
 	<!-- Krill -->

@@ -5,7 +5,6 @@ import java.util.EnumSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.ids_mannheim.korap.annotation.AnnotationParser;
 import de.ids_mannheim.korap.annotation.FreeResourceParser;
 import de.ids_mannheim.korap.config.NamedVCLoader;
 import de.ids_mannheim.korap.constant.OAuth2Scope;
@@ -20,49 +19,30 @@ import de.ids_mannheim.korap.util.QueryException;
  * @author margaretha
  *
  */
-public class InitializatorImpl implements Initializator {
+public class Initializator{
 
     @Autowired
     private AccessScopeDao accessScopeDao;
     @Autowired
     private NamedVCLoader vcLoader;
     @Autowired
-    private AnnotationParser annotationParser;
-    @Autowired
     private FreeResourceParser resourceParser;
     
-    public InitializatorImpl () {}
+    public Initializator () {}
 
-    /* (non-Javadoc)
-     * @see de.ids_mannheim.de.init.Initializator#init()
-     */
-    @Override
     public void init () throws IOException, QueryException, KustvaktException {
         setInitialAccessScope();
-        Thread t = new Thread(vcLoader);
-        t.start();
-    }
-
-    public void initAnnotation ()
-            throws IOException, QueryException, KustvaktException {
-        setInitialAccessScope();
-        annotationParser.run();
         resourceParser.run();
         Thread t = new Thread(vcLoader);
         t.start();
     }
 
-    /* (non-Javadoc)
-     * @see de.ids_mannheim.de.init.Initializator#initTest()
-     */
-    @Override
-    public void initTest () {
+    public void initTest () throws IOException, KustvaktException {
         setInitialAccessScope();
     }
     
-    public void initAnnotationTest () throws IOException, KustvaktException {
+    public void initResourceTest () throws IOException, KustvaktException {
         setInitialAccessScope();
-        annotationParser.run();
         resourceParser.run();
     }
 

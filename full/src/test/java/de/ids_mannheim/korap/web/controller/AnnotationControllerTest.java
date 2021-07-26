@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.Test;
-import org.springframework.test.context.ContextConfiguration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientResponse;
@@ -18,7 +17,6 @@ import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
-@ContextConfiguration("classpath:test-annotation-config.xml")
 public class AnnotationControllerTest extends SpringJerseyTest {
     @Test
     public void testAnnotationLayers () throws KustvaktException {

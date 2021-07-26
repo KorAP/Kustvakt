@@ -156,7 +156,7 @@ public class NamedVCLoader implements Runnable{
             collection.storeInCache(filename);
         }
         end = System.currentTimeMillis();
-        jlog.info("{} caching duration: {}", filename, (end - start));
+        jlog.info("{} Caching duration: {}", filename, (end - start));
         if (DEBUG) {
             jlog.debug("memory cache: "
                     + KrillCollection.cache.calculateInMemorySize());

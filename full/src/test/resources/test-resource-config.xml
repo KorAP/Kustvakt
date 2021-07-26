@@ -16,8 +16,8 @@
            http://www.springframework.org/schema/util/spring-util.xsd">
 
 	<import resource="classpath:test-config.xml"/>
-	<bean id="initializator" class="de.ids_mannheim.de.init.InitializatorImpl"
-		init-method="initAnnotationTest">
+	<bean id="initializator" class="de.ids_mannheim.de.init.Initializator"
+		init-method="initResourceTest">
 	</bean>
 
 </beans>

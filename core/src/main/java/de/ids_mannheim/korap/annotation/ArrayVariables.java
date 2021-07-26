@@ -19,6 +19,7 @@ import de.ids_mannheim.korap.entity.Annotation;
  * @author margaretha
  *
  */
+@Deprecated
 public class ArrayVariables {
 
     public static HashMap<String, List<Annotation>> annotationMap =
