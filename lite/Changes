@@ -1,3 +1,15 @@
+# version 0.64
+2021-07-29
+- Updated the change files and made a new version.
+
+# version 0.63.2
+2021-07-19
+ - Updated mockserver dependency-order in pom.
+2021-07-26
+ - Replaced annotation parsing with restoring the annotation tables to the
+   database.
+ - Excluded jackson core libraries from Mockserver. 
+
 # version 0.63
 04/12/2020
   - Fix hibernate dialect for SQLite. (margaretha)
@@ -7,12 +19,6 @@
    - Fixed running pipe and updated tests with mockserver (margaretha)
 19/02/2021
    - Enabled API info web-service (margaretha)    
-2021-07-19
- - Fixed mockserver dependency-order in pom
-2021-07-26
- - Replaced annotation parsing with restoring the annotation tables to the
-   database.
- - Excluded jackson core libraries from Mockserver. 
   
 # version 0.62.4
 24/01/2020
