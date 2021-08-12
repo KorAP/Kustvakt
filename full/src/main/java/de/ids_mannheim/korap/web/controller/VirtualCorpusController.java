@@ -106,6 +106,9 @@ public class VirtualCorpusController {
 
         try {
             scopeService.verifyScope(context, OAuth2Scope.EDIT_VC);
+            if (vc.getQueryType() == null) {
+                vc.setQueryType(QueryType.VIRTUAL_CORPUS);
+            }
             Status status = service.handlePutRequest(context.getUsername(),
                     vcCreator, vcName, vc);
             return Response.status(status).build();

@@ -93,6 +93,9 @@ public class QueryReferenceController {
 
         try {
             scopeService.verifyScope(context, OAuth2Scope.EDIT_VC);
+            if (query.getQueryType() == null) {
+                query.setQueryType(QueryType.QUERY);
+            }
             Status status = service.handlePutRequest(context.getUsername(),
                     qCreator, qName, query);
             return Response.status(status).build();

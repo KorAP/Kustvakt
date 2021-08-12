@@ -26,6 +26,19 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
     private String testUser = "qRefControllerTest";
     private String adminUser = "admin";
 
+    private void checkAndDeleteQuery (JsonNode node, String qName, String query,
+            String username, ResourceType resourceType, CorpusAccess access)
+            throws KustvaktException {
+        assertEquals(qName, node.at("/name").asText());
+        assertEquals(resourceType.displayName(), node.at("/type").asText());
+        assertEquals(username, node.at("/createdBy").asText());
+        assertEquals(query, node.at("/query").asText());
+        assertEquals("poliqarp", node.at("/queryLanguage").asText());
+        assertEquals(access.name(), node.at("/requiredAccess").asText());
+
+        testDeleteQueryByName(qName, username);
+    }
+    
     @Test
     public void testCreatePrivateQuery () throws KustvaktException {
         String json = "{\"type\": \"PRIVATE\"" 
@@ -44,16 +57,8 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
         JsonNode node = testRetrieveQueryByName(testUser, testUser, qName);
-//        System.out.println(node);
-        assertEquals(qName, node.at("/name").asText());
-        assertEquals(ResourceType.PRIVATE.displayName(),
-                node.at("/type").asText());
-        assertEquals(testUser, node.at("/createdBy").asText());
-        assertEquals("der", node.at("/query").asText());
-        assertEquals("poliqarp", node.at("/queryLanguage").asText());
-        assertEquals(CorpusAccess.PUB.name(), node.at("/requiredAccess").asText());
-        
-        testDeleteQueryByName(qName, testUser);
+        checkAndDeleteQuery(node, qName, "der", testUser, ResourceType.PRIVATE,
+                CorpusAccess.PUB);
     }
 
     @Test
@@ -116,6 +121,95 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 node.at("/errors/0/0").asInt());
         assertEquals("Unauthorized operation for user: " + testUser,
                 node.at("/errors/0/1").asText());
+    }
+    
+    @Test
+    public void testCreateQueryMissingQueryType () throws KustvaktException {
+        String json = "{\"type\": \"PRIVATE\"" 
+                + ",\"queryLanguage\": \"poliqarp\""
+                + ",\"query\": \"Sohn\"}";
+
+        String qName = "new_query";
+        ClientResponse response = resource().path(API_VERSION).path("query")
+                .path("~" + testUser).path(qName)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(testUser, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .put(ClientResponse.class, json);
+
+        assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+
+        JsonNode node = testRetrieveQueryByName(testUser, testUser, qName);
+        checkAndDeleteQuery(node, qName, "Sohn", testUser, ResourceType.PRIVATE,
+                CorpusAccess.PUB);
+    }
+    
+    @Test
+    public void testCreateQueryMissingQueryLanguage () throws KustvaktException {
+        String json = "{\"type\": \"PRIVATE\"" 
+                + ",\"queryType\": \"QUERY\""
+                + ",\"query\": \"Sohn\"}";
+
+        String qName = "new_query";
+        ClientResponse response = resource().path(API_VERSION).path("query")
+                .path("~" + testUser).path(qName)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(testUser, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .put(ClientResponse.class, json);
+
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.INVALID_ARGUMENT, node.at("/errors/0/0").asInt());
+        assertEquals("queryLanguage is null", node.at("/errors/0/1").asText());
+        assertEquals("queryLanguage", node.at("/errors/0/2").asText());
+    }
+    
+    @Test
+    public void testCreateQueryMissingQuery () throws KustvaktException {
+        String json = "{\"type\": \"PRIVATE\"" 
+                + ",\"queryType\": \"QUERY\""
+                + ",\"queryLanguage\": \"poliqarp\"}";
+
+        String qName = "new_query";
+        ClientResponse response = resource().path(API_VERSION).path("query")
+                .path("~" + testUser).path(qName)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(testUser, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .put(ClientResponse.class, json);
+
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.INVALID_ARGUMENT, node.at("/errors/0/0").asInt());
+        assertEquals("query is null", node.at("/errors/0/1").asText());
+        assertEquals("query", node.at("/errors/0/2").asText());
+    }
+    
+    @Test
+    public void testCreateQueryMissingResourceType () throws KustvaktException {
+        String json = "{\"query\": \"Wind\""
+                + ",\"queryLanguage\": \"poliqarp\"}";
+
+        String qName = "new_query";
+        ClientResponse response = resource().path(API_VERSION).path("query")
+                .path("~" + testUser).path(qName)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(testUser, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .put(ClientResponse.class, json);
+
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.INVALID_ARGUMENT, node.at("/errors/0/0").asInt());
+        assertEquals("type is null", node.at("/errors/0/1").asText());
+        assertEquals("type", node.at("/errors/0/2").asText());
     }
     
     @Test
