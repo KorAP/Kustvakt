@@ -130,9 +130,9 @@
 	</bean>
 
 	<!-- Initialization -->
-	<bean id="initializator" class="de.ids_mannheim.de.init.LiteInitializatorImpl"
+	<!-- <bean id="initializator" class="de.ids_mannheim.de.init.LiteInitializatorImpl"
 		init-method="init">
-	</bean>
+	</bean> -->
 	<bean id="annotationParser" class="de.ids_mannheim.korap.annotation.AnnotationParser"
 		scope="singleton" />
 

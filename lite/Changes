@@ -1,6 +1,8 @@
 # version 0.64
 2021-07-29
 - Updated the change files and made a new version.
+2021-08-12
+- Removed initializator from lite config.
 
 # version 0.63.2
 2021-07-19
