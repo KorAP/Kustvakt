@@ -227,10 +227,16 @@ public class QueryService {
         String koralQuery = null;
         CorpusAccess requiredAccess = null;
         String corpusQuery = newQuery.getCorpusQuery();
+        String query = newQuery.getQuery();
+        String queryLanguage = newQuery.getQueryLanguage();
         if (corpusQuery != null && !corpusQuery.isEmpty()) {
             koralQuery = serializeCorpusQuery(corpusQuery);
             requiredAccess = determineRequiredAccess(newQuery.isCached(), queryName,
                     koralQuery);
+        }
+        else if (query != null && !query.isEmpty() && queryLanguage != null
+                && !queryLanguage.isEmpty()) {
+            koralQuery = serializeQuery(query, queryLanguage);
         }
 
         ResourceType type = newQuery.getType();
@@ -256,7 +262,7 @@ public class QueryService {
 
         queryDao.editQuery(existingQuery, queryName, type, requiredAccess,
                 koralQuery, newQuery.getDefinition(), newQuery.getDescription(),
-                newQuery.getStatus(), newQuery.isCached());
+                newQuery.getStatus(), newQuery.isCached(), query, queryLanguage);
     }
 
     private void publishQuery (int queryId) throws KustvaktException {
@@ -471,7 +477,7 @@ public class QueryService {
             }
 
             queryDao.editQuery(query, null, ResourceType.PROJECT, null, null,
-                    null, null, null, query.isCached());
+                    null, null, null, query.isCached(), null, null);
         }
     }
 

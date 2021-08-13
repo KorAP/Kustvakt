@@ -5,6 +5,7 @@
 - Fixed errors due to missing query type and added tests.
 2021-08-13
 - Fixed missing request entity.
+- Updated the query service to enable editing query references.
 
 # version 0.63.2
 2021-06-11

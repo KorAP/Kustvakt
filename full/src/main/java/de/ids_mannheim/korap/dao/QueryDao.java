@@ -76,34 +76,40 @@ public class QueryDao {
         return q.getId();
     }
 
-    public void editQuery (QueryDO query, String name,
-            ResourceType type, CorpusAccess requiredAccess, String koralQuery,
-            String definition, String description, String status,
-            boolean isCached) throws KustvaktException {
+    public void editQuery (QueryDO queryDO, String name, ResourceType type,
+            CorpusAccess requiredAccess, String koralQuery, String definition,
+            String description, String status, boolean isCached,
+            String queryStr, String queryLanguage) throws KustvaktException {
 
         if (name != null && !name.isEmpty()) {
-            query.setName(name);
+            queryDO.setName(name);
         }
         if (type != null) {
-            query.setType(type);
+            queryDO.setType(type);
         }
         if (requiredAccess != null) {
-            query.setRequiredAccess(requiredAccess);
+            queryDO.setRequiredAccess(requiredAccess);
         }
         if (koralQuery != null) {
-            query.setKoralQuery(koralQuery);
+            queryDO.setKoralQuery(koralQuery);
         }
         if (definition != null && !definition.isEmpty()) {
-            query.setDefinition(definition);
+            queryDO.setDefinition(definition);
         }
         if (description != null && !description.isEmpty()) {
-            query.setDescription(description);
+            queryDO.setDescription(description);
         }
         if (status != null && !status.isEmpty()) {
-            query.setStatus(status);
+            queryDO.setStatus(status);
         }
-        query.setCached(isCached);
-        entityManager.merge(query);
+        if(queryStr!=null && !queryStr.isEmpty()) {
+            queryDO.setQuery(queryStr);
+        }
+        if(queryLanguage!=null && !queryLanguage.isEmpty()) {
+            queryDO.setQueryLanguage(queryLanguage);
+        }
+        queryDO.setCached(isCached);
+        entityManager.merge(queryDO);
     }
 
     public void deleteQuery (QueryDO query)

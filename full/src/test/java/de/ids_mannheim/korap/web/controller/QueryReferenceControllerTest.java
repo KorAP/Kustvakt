@@ -26,17 +26,16 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
     private String testUser = "qRefControllerTest";
     private String adminUser = "admin";
 
-    private void checkAndDeleteQuery (JsonNode node, String qName, String query,
+    private void checkQuery (String qName, String query,
             String username, ResourceType resourceType, CorpusAccess access)
             throws KustvaktException {
+        JsonNode node = testRetrieveQueryByName(username, username, qName);
         assertEquals(qName, node.at("/name").asText());
         assertEquals(resourceType.displayName(), node.at("/type").asText());
         assertEquals(username, node.at("/createdBy").asText());
         assertEquals(query, node.at("/query").asText());
         assertEquals("poliqarp", node.at("/queryLanguage").asText());
         assertEquals(access.name(), node.at("/requiredAccess").asText());
-
-        testDeleteQueryByName(qName, username);
     }
     
     @Test
@@ -56,11 +55,35 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
-        JsonNode node = testRetrieveQueryByName(testUser, testUser, qName);
-        checkAndDeleteQuery(node, qName, "der", testUser, ResourceType.PRIVATE,
+        checkQuery(qName, "der", testUser, ResourceType.PRIVATE,
                 CorpusAccess.PUB);
+        testDeleteQueryByName(qName, testUser);
     }
 
+    @Test
+    public void testCreatePublishQuery () throws KustvaktException {
+        String json = "{\"type\": \"PUBLISHED\"" 
+                + ",\"queryType\": \"QUERY\""
+                + ",\"queryLanguage\": \"poliqarp\"" 
+                + ",\"query\": \"Regen\"}";
+
+        String qName = "publish_query";
+        ClientResponse response = resource().path(API_VERSION).path("query")
+                .path("~" + testUser).path(qName)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(testUser, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .put(ClientResponse.class, json);
+
+        assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+
+        checkQuery(qName, "Regen", testUser, ResourceType.PUBLISHED,
+                CorpusAccess.PUB);
+        testDeleteQueryByName(qName, testUser);
+        // check if hidden group has been created
+        
+    }
+    
     @Test
     public void testCreateUserQueryByAdmin () throws KustvaktException {
         String json = "{\"type\": \"PRIVATE\""
@@ -96,9 +119,30 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 .entity(json).put(ClientResponse.class);
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-        testDeleteQueryByName(qName, "admin");
+        
+        checkQuery(qName, "Sommer", adminUser, ResourceType.SYSTEM, CorpusAccess.PUB);
+        testUpdateQuery(qName);
     }
     
+    private void testUpdateQuery (String qName)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        String json = "{\"query\": \"Sonne\""
+                + ",\"queryLanguage\": \"poliqarp\"}";
+        
+        ClientResponse response = resource().path(API_VERSION).path("query")
+                .path("~admin").path(qName)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(adminUser, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .entity(json).put(ClientResponse.class);
+        
+        assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        
+        checkQuery(qName, "Sonne", adminUser, ResourceType.SYSTEM, CorpusAccess.PUB);
+        testDeleteQueryByName(qName, adminUser);
+    }
+
     @Test
     public void testCreateSystemQueryUnauthorized () throws KustvaktException {
         String json = "{\"type\": \"SYSTEM\""
@@ -139,9 +183,9 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
-        JsonNode node = testRetrieveQueryByName(testUser, testUser, qName);
-        checkAndDeleteQuery(node, qName, "Sohn", testUser, ResourceType.PRIVATE,
+        checkQuery(qName, "Sohn", testUser, ResourceType.PRIVATE,
                 CorpusAccess.PUB);
+        testDeleteQueryByName(qName, testUser);
     }
     
     @Test
