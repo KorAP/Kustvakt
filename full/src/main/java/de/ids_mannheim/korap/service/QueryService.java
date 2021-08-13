@@ -204,7 +204,7 @@ public class QueryService {
 
         verifyUsername(username, queryCreator);
         QueryDO query = queryDao.retrieveQueryByName(queryName, queryCreator);
-        ParameterChecker.checkObjectValue(queryJson, "request entity");
+        
         if (query == null) {
             storeQuery(queryJson, queryName, username);
             return Status.CREATED;

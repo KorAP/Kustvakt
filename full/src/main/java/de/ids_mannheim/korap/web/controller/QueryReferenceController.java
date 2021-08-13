@@ -28,6 +28,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.QueryService;
+import de.ids_mannheim.korap.utils.ParameterChecker;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
@@ -93,6 +94,7 @@ public class QueryReferenceController {
 
         try {
             scopeService.verifyScope(context, OAuth2Scope.EDIT_VC);
+            ParameterChecker.checkObjectValue(query, "request entity");
             if (query.getQueryType() == null) {
                 query.setQueryType(QueryType.QUERY);
             }

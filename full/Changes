@@ -1,6 +1,10 @@
 # version 0.64
 2021-07-29
 - Updated the change files and made a new version.
+2021-08-12
+- Fixed errors due to missing query type and added tests.
+2021-08-13
+- Fixed missing request entity.
 
 # version 0.63.2
 2021-06-11
