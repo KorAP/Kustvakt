@@ -47,7 +47,7 @@ public class VirtualCorpusServiceTest {
         vc.setQueryType(QueryType.VIRTUAL_CORPUS);
         
         Assert.assertThrows(KustvaktException.class,
-                () -> vcService.storeQuery(vc, "dory-vc", "dory"));
+                () -> vcService.storeQuery(vc, "dory-vc", "dory", "dory"));
     }
 
     @Test
@@ -59,7 +59,7 @@ public class VirtualCorpusServiceTest {
         vc.setType(ResourceType.PUBLISHED);
         vc.setQueryType(QueryType.VIRTUAL_CORPUS);
         String username = "VirtualCorpusServiceTest";
-        vcService.storeQuery(vc, vcName, username );
+        vcService.storeQuery(vc, vcName, username, username);
 
         List<QueryAccessDto> accesses =
                 vcService.listQueryAccessByUsername("admin");

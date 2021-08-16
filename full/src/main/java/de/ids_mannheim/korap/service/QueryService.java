@@ -206,7 +206,7 @@ public class QueryService {
         QueryDO query = queryDao.retrieveQueryByName(queryName, queryCreator);
         
         if (query == null) {
-            storeQuery(queryJson, queryName, username);
+            storeQuery(queryJson, queryName, queryCreator, username);
             return Status.CREATED;
         }
         else {
@@ -284,9 +284,9 @@ public class QueryService {
                     + ". Hidden access exists! Access id: " + access.getId());
         }
     }
-
-    public void storeQuery (QueryJson query, String queryName, String createdBy)
-            throws KustvaktException {
+    
+    public void storeQuery (QueryJson query, String queryName,
+            String queryCreator, String username) throws KustvaktException {
         String koralQuery = null;
         if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
             ParameterChecker.checkStringValue(query.getCorpusQuery(),
@@ -301,15 +301,16 @@ public class QueryService {
                     serializeQuery(query.getQuery(), query.getQueryLanguage());
         }
 
-        storeQuery(queryName, query.getType(), query.getQueryType(), koralQuery,
-                query.getDefinition(), query.getDescription(),
-                query.getStatus(), query.isCached(), createdBy,
+        storeQuery(username, queryName, query.getType(), query.getQueryType(),
+                koralQuery, query.getDefinition(), query.getDescription(),
+                query.getStatus(), query.isCached(), queryCreator,
                 query.getQuery(), query.getQueryLanguage());
     }
 
-    public void storeQuery (String queryName, ResourceType type, QueryType queryType,
-            String koralQuery, String definition, String description,
-            String status, boolean isCached, String username, String query,
+    public void storeQuery (String username, String queryName,
+            ResourceType type, QueryType queryType, String koralQuery,
+            String definition, String description, String status,
+            boolean isCached, String queryCreator, String query,
             String queryLanguage) throws KustvaktException {
         ParameterChecker.checkNameValue(queryName, "queryName");
         ParameterChecker.checkObjectValue(type, "type");
@@ -321,11 +322,16 @@ public class QueryService {
                     queryName);
         }
 
-        if (type.equals(ResourceType.SYSTEM) && !username.equals("system")
-                && !adminDao.isAdmin(username)) {
-            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: " + username, username);
+        if (type.equals(ResourceType.SYSTEM)){
+            if (adminDao.isAdmin(username)) {
+                queryCreator="system";
+            }
+            else if (!username.equals("system")) {
+                throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                        "Unauthorized operation for user: " + username, username);    
+            }
         }
+        
 
         CorpusAccess requiredAccess = CorpusAccess.PUB;
         if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
@@ -341,7 +347,7 @@ public class QueryService {
         try {
             queryId = queryDao.createQuery(queryName, type, queryType,
                     requiredAccess, koralQuery, definition, description, status,
-                    isCached, username, query, queryLanguage);
+                    isCached, queryCreator, query, queryLanguage);
 
         }
         catch (Exception e) {
