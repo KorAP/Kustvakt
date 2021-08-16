@@ -25,14 +25,15 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
 
     private String testUser = "qRefControllerTest";
     private String adminUser = "admin";
+    private String system = "system";
 
-    private void checkQuery (String qName, String query,
+    private void checkQuery (String qName, String query, String queryCreator,
             String username, ResourceType resourceType, CorpusAccess access)
             throws KustvaktException {
-        JsonNode node = testRetrieveQueryByName(username, username, qName);
+        JsonNode node = testRetrieveQueryByName(qName, queryCreator, username);
         assertEquals(qName, node.at("/name").asText());
         assertEquals(resourceType.displayName(), node.at("/type").asText());
-        assertEquals(username, node.at("/createdBy").asText());
+        assertEquals(queryCreator, node.at("/createdBy").asText());
         assertEquals(query, node.at("/query").asText());
         assertEquals("poliqarp", node.at("/queryLanguage").asText());
         assertEquals(access.name(), node.at("/requiredAccess").asText());
@@ -55,9 +56,11 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
-        checkQuery(qName, "der", testUser, ResourceType.PRIVATE,
+        checkQuery(qName, "der", testUser, testUser, ResourceType.PRIVATE,
                 CorpusAccess.PUB);
-        testDeleteQueryByName(qName, testUser);
+        
+        testUpdateQuery(qName, testUser, testUser,ResourceType.PRIVATE);
+        testDeleteQueryByName(qName, testUser, testUser);
     }
 
     @Test
@@ -77,9 +80,9 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
-        checkQuery(qName, "Regen", testUser, ResourceType.PUBLISHED,
+        checkQuery(qName, "Regen", testUser, testUser, ResourceType.PUBLISHED,
                 CorpusAccess.PUB);
-        testDeleteQueryByName(qName, testUser);
+        testDeleteQueryByName(qName, testUser, testUser);
         // check if hidden group has been created
         
     }
@@ -100,7 +103,11 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 .entity(json).put(ClientResponse.class);
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-        testDeleteQueryByName(qName, "admin");
+        
+        checkQuery(qName, "Sommer", "marlin", adminUser, ResourceType.PRIVATE, CorpusAccess.PUB);
+        
+        testUpdateQuery(qName, "marlin", adminUser, ResourceType.PRIVATE);
+        testDeleteQueryByName(qName, "marlin", adminUser);
     }
     
     @Test
@@ -120,27 +127,28 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         
-        checkQuery(qName, "Sommer", adminUser, ResourceType.SYSTEM, CorpusAccess.PUB);
-        testUpdateQuery(qName);
+        checkQuery(qName, "Sommer", system, adminUser, ResourceType.SYSTEM, CorpusAccess.PUB);
+        testUpdateQuery(qName, system, adminUser, ResourceType.SYSTEM);
+        testDeleteQueryByName(qName, system, adminUser);
     }
     
-    private void testUpdateQuery (String qName)
+    private void testUpdateQuery (String qName, String qCreator,
+            String username, ResourceType type)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         String json = "{\"query\": \"Sonne\""
                 + ",\"queryLanguage\": \"poliqarp\"}";
         
         ClientResponse response = resource().path(API_VERSION).path("query")
-                .path("~admin").path(qName)
+                .path("~"+qCreator).path(qName)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(adminUser, "pass"))
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).put(ClientResponse.class);
         
         assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
         
-        checkQuery(qName, "Sonne", adminUser, ResourceType.SYSTEM, CorpusAccess.PUB);
-        testDeleteQueryByName(qName, adminUser);
+        checkQuery(qName, "Sonne", qCreator, username, type, CorpusAccess.PUB);
     }
 
     @Test
@@ -183,9 +191,9 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
-        checkQuery(qName, "Sohn", testUser, ResourceType.PRIVATE,
+        checkQuery(qName, "Sohn", testUser, testUser, ResourceType.PRIVATE,
                 CorpusAccess.PUB);
-        testDeleteQueryByName(qName, testUser);
+        testDeleteQueryByName(qName, testUser, testUser);
     }
     
     @Test
@@ -336,8 +344,8 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         return node;
     }
     
-    private JsonNode testRetrieveQueryByName (String username, String qCreator,
-            String qName) throws UniformInterfaceException,
+    private JsonNode testRetrieveQueryByName (String qName, String qCreator,
+            String username) throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .path("~" + qCreator).path(qName)
@@ -351,15 +359,15 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         return JsonUtils.readTree(entity);
     }
 
-    private void testDeleteQueryByName (String qName, String username)
+    private void testDeleteQueryByName (String qName, String qCreator, String username)
             throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("query")
-                .path("~" + username).path(qName)
+                .path("~" + qCreator).path(qName)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .delete(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
-
+    
 }

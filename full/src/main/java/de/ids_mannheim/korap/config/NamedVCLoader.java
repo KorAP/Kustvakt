@@ -61,7 +61,7 @@ public class NamedVCLoader implements Runnable{
         String json = IOUtils.toString(is, "utf-8");
         if (json != null) {
             cacheVC(json, filename);
-            vcService.storeQuery(filename, ResourceType.SYSTEM,
+            vcService.storeQuery("system",filename, ResourceType.SYSTEM,
                     QueryType.VIRTUAL_CORPUS, json, null, null, null, true,
                     "system", null, null);
         }
@@ -106,7 +106,7 @@ public class NamedVCLoader implements Runnable{
                     // ignore
                     if (DEBUG) jlog.debug(e);
                 }
-                vcService.storeQuery(filename, ResourceType.SYSTEM,
+                vcService.storeQuery("system",filename, ResourceType.SYSTEM,
                         QueryType.VIRTUAL_CORPUS, json, null, null, null, true,
                         "system", null, null);
             }
