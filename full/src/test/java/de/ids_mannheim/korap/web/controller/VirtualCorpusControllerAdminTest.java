@@ -89,7 +89,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
             ClientHandlerException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("list").path("system-admin").queryParam("type", "SYSTEM")
-                .queryParam("createdBy", admin)
+                .queryParam("createdBy", "system")
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(admin, "pass"))
@@ -108,7 +108,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
                 + ",\"corpusQuery\": \"creationDate since 1820\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
-                .path("~"+admin).path("new-system-vc")
+                .path("~system").path("new-system-vc")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(admin, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -117,7 +117,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
         JsonNode node = testListSystemVC();
-        assertEquals(1, node.size());
+        assertEquals(2, node.size());
 
         testDeleteSystemVC(admin, "new-system-vc");
     }
@@ -126,7 +126,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
-                .path("~"+vcCreator).path(vcName)
+                .path("~system").path(vcName)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(admin, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -135,7 +135,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         JsonNode node = testListSystemVC();
-        assertEquals(0, node.size());
+        assertEquals(1, node.size());
     }
 
     @Test

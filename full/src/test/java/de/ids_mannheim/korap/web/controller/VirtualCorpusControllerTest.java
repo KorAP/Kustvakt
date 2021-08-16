@@ -86,10 +86,10 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         return JsonUtils.readTree(entity);
     }
 
-    private void testDeleteVC (String vcName, String username)
+    private void testDeleteVC (String vcName, String vcCreator, String username)
             throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
-                .path("~" + username).path(vcName)
+                .path("~" + vcCreator).path(vcName)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -315,7 +315,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals("new_vc", node.get(1).get("name").asText());
 
         // delete new VC
-        testDeleteVC("new_vc", testUser);
+        testDeleteVC("new_vc", testUser, testUser);
 
         // list VC
         node = testListVC(testUser);
@@ -360,7 +360,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals("HIDDEN", node.at("/status").asText());
 
         // EM: delete vc
-        testDeleteVC(vcName, testUser);
+        testDeleteVC(vcName, testUser, testUser);
 
         // EM: check if the hidden groups are deleted as well
         node = testCheckHiddenGroup(groupName);
@@ -466,7 +466,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 .entity(json).put(ClientResponse.class);
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
-        testDeleteVC(vcName, "admin");
+        testDeleteVC(vcName, "system","admin");
     }        
     
     @Test
