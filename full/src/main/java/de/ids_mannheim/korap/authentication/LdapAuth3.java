@@ -53,33 +53,32 @@ import de.ids_mannheim.korap.constant.TokenType;
 public class LdapAuth3 extends APIAuthentication {
 
     /* For SSL Connection to LDAP, see: https://www.novell.com/documentation/developer/jldap/jldapenu/data/cchcbejj.html.
-	* and use DEFAULT_SSL_PORT.
-   * For now, plain text connection is used.
-	* FB
-	*/
-	final static Boolean DEBUGLOG = false; // log debug output.
+	 * and use DEFAULT_SSL_PORT.
+     * For now, plain text connection is used.
+	 * FB
+	 */
+	final static Boolean DEBUGLOG 	= false;		// log debug output.
 	final static String attC2 		= "idsC2";		// if value == TRUE: registered for COSMAS II (KorAP) Service.
 	final static String attStatus	= "idsStatus";	// value must be 0..2, 3 = locked account.
-	final static int ldapPort 		= 389; //LDAPConnection.DEFAULT_PORT;
-	// final static int ldapVersion 	= LDAPConnection.LDAP_V3;
+	final static String attEmail	= "mail";		// attribute whose value is the requested email.
+	final static int ldapPort 		= 389; 			//LDAPConnection.DEFAULT_PORT;
+	// final static int ldapVersion	= LDAPConnection.LDAP_V3;
 	final static String ldapHost 	= "ldap.ids-mannheim.de";
 	final static String ldapBase	= "dc=ids-mannheim,dc=de";
 	final static String sLoginDN 	= "cn=casaling,dc=ids-mannheim,dc=de";
 	static String sPwd 				= null;
 
 	/**
-	 * return   : 0 = OK, User Account + Pwd are OK, no restrictions;
-	 *            1 = internal error: cannot verify User+Pwd;
-	 *            2 = User Account or Pwd unknown;
-	 *            3 = User Account locked;
-	 *            4 = User known, but has not registered to KorAP/C2 Service yet;
+	 * return codes for functions of this class:
 	 */
 
 	public static final int LDAP_AUTH_ROK		= 0; 
-	public static final int LDAP_AUTH_RINTERR	= 1;
-	public static final int LDAP_AUTH_RUNKNOWN	= 2;
-	public static final int LDAP_AUTH_RLOCKED	= 3;
-	public static final int LDAP_AUTH_RNOTREG	= 4;
+	public static final int LDAP_AUTH_RCONNECT	= 1; // cannot connect to LDAP Server
+	public static final int LDAP_AUTH_RINTERR	= 2; // internal error: cannot verify User+Pwd.
+	public static final int LDAP_AUTH_RUNKNOWN	= 3; // User Account or Pwd unknown;
+	public static final int LDAP_AUTH_RLOCKED	= 4; // User Account locked;
+	public static final int LDAP_AUTH_RNOTREG	= 5; // User known, but has not registered to KorAP/C2 Service yet;
+	public static final int LDAP_AUTH_RNOEMAIL	= 6; // cannot obtain email for sUserDN.
 
     public LdapAuth3 (FullConfiguration config) throws JOSEException {
         super(config);
@@ -105,6 +104,8 @@ public class LdapAuth3 extends APIAuthentication {
 		{
 	case LDAP_AUTH_ROK: 
 		return "LDAP Authentication successfull.";
+	case LDAP_AUTH_RCONNECT:
+		return "LDAP Authentication: connecting to LDAP Server failed!";
 	case LDAP_AUTH_RINTERR: 
 		return "LDAP Authentication failed due to an internal error!";
 	case LDAP_AUTH_RUNKNOWN:
@@ -113,6 +114,8 @@ public class LdapAuth3 extends APIAuthentication {
 		return "LDAP Authentication: known user is locked!";
 	case LDAP_AUTH_RNOTREG:
 		return "LDAP Authentication: known user has not registered yet for COSMAS II/KorAP!";
+	case LDAP_AUTH_RNOEMAIL:
+		return "LDAP Authentication: known user, but cannot obtain email!";
 	default:
 		return "LDAP Authentication failed with unknown error code!";
 		}
@@ -154,16 +157,8 @@ public class LdapAuth3 extends APIAuthentication {
             return null;
             }
 
-        if( in == null )
-	        {
-        	System.err.printf("Error: LDAP.loadProp: cannot load Property file '%s'!\n", sConfFile); 
-	        return null;
-	        }
-	    else
-	        {
-	        if( DEBUGLOG ) System.out.println("Debug: loaded: " + sConfFile);
-	        }
-
+        if( DEBUGLOG ) System.out.println("Debug: loaded: " + sConfFile);
+	    
         prop = new Properties();
         Enumeration<?> e;
         
@@ -205,20 +200,25 @@ public class LdapAuth3 extends APIAuthentication {
 	 *  idsC2 = FALSE (bzw Attribut nicht vorhanden) 
 	 *		            -> kein Zugang zu C2 (nicht zugelassen, egal ob registriert oder nicht)
 	 *
-	 *	 idsStatus = 0 -> Nutzerkennung OK;
-	 *	 idsStatus = 1 -> Nutzer ist kein aktiver IDS-Mitarbeiter
+	 *	idsStatus = 0 -> Nutzerkennung OK;
+	 *	idsStatus = 1 -> Nutzer ist kein aktiver IDS-Mitarbeiter
 	 *  idsStatus = 3 -> Nutzer ist LDAP-weit gesperrt
 	 */
 
 	public static int login(String sUserDN, String sUserPwd, String ldapConfig) throws LDAPException
 
 	{
-
 	String sUserC2DN	= sUserDN;
 	String sUserC2Pwd	= sUserPwd;
 
-	String ldapFilter = String.format("(|(&(uid=%s)(userPassword=%s))(&(idsC2Profile=%s)(idsC2Password=%s)))",
+	/* login with e-mail - 15.09.21/FB:
+	 */
+	String ldapFilter = String.format("(|(&(mail=%s)(userPassword=%s))(&(uid=%s)(userPassword=%s))(&(idsC2Profile=%s)(idsC2Password=%s)))",
+			sUserDN, sUserPwd, sUserDN, sUserPwd, sUserC2DN, sUserC2Pwd);
+	/* without e-mail login:
+	 * String ldapFilter = String.format("(|(&(uid=%s)(userPassword=%s))(&(idsC2Profile=%s)(idsC2Password=%s)))",
 												 sUserDN, sUserPwd, sUserC2DN, sUserC2Pwd);
+	 */
 	SearchResult srchRes = null;
 
 	try{
@@ -248,8 +248,8 @@ public class LdapAuth3 extends APIAuthentication {
 		}
 	catch( LDAPException e) 	
 		{
-		System.out.printf("Connecting to LDAP Server: failed: '%s'!\n", e.toString());
-		return LDAP_AUTH_RINTERR;
+		System.err.printf("Error: login: Connecting to LDAP Server: failed: '%s'!\n", e.toString());
+		return ldapTerminate(lc, LDAP_AUTH_RCONNECT);
 		}
 
 	if( DEBUGLOG ) 
@@ -263,7 +263,7 @@ public class LdapAuth3 extends APIAuthentication {
 		}
 	catch( LDAPException e )
 		{
-		System.out.printf("Binding failed: '%s'!\n", e.toString());
+		System.err.printf("Error: login: Binding failed: '%s'!\n", e.toString());
 		return ldapTerminate(lc, LDAP_AUTH_RINTERR);
 		}
 
@@ -284,7 +284,7 @@ public class LdapAuth3 extends APIAuthentication {
 		}
 	catch( LDAPSearchException e )
 		{
-		System.out.printf("Search for User failed: '%s'!\n", e.toString());
+		System.err.printf("Error: login: Search for User failed: '%s'!\n", e.toString());
 		return ldapTerminate(lc, LDAP_AUTH_RUNKNOWN);
 		}
 
@@ -343,11 +343,145 @@ public class LdapAuth3 extends APIAuthentication {
 		}
 
 	if( bStatus == true && bC2 == true )
+		{
 		return ldapTerminate(lc, LDAP_AUTH_ROK); // OK.
+		}
 	else
 		return ldapTerminate(lc, LDAP_AUTH_RNOTREG); // Attribute konnten nicht gepr�ft werden.
 	
 	} // ldapLogin
+
+	/**
+	 *                getEmail():
+	 * 
+	 * Arguments:
+	 * sUserDN  	: either COSMAS II specific Account Name or IDS wide (IDM) account name;
+	 * ldapConfig	: path+file name of LDAP configuration file.
+	 * 
+	 * Returns		: the requested Email of sUserDN.
+	 * Notices:
+	 * - no password needed. Assuming that sUserDN is already authorized and active.
+	 * 
+	 * 
+	 * 16.09.21/FB
+	 */
+
+	public static String getEmail(String sUserDN, String ldapConfig) throws LDAPException
+
+	{
+	final String func = "LdapAuth3.getEmail";
+	
+	// sUSerDN is either C2/KorAP specific account name or the IDS wide account name:
+	String ldapFilter = String.format("(|(uid=%s)(idsC2Profile=%s))", sUserDN, sUserDN);
+
+	SearchResult srchRes = null;
+
+	try{
+		sPwd = loadProp(ldapConfig);
+		}
+	catch( IOException e )
+		{
+		System.err.printf("Error: %s: cannot load Property file '%s'!", func, ldapConfig);
+		return null;
+		}
+															
+	if( DEBUGLOG )
+		{
+		//System.out.printf("LDAP Version      = %d.\n", LDAPConnection.LDAP_V3);
+		System.out.printf("%s: LDAP Host & Port  = '%s':%d.\n", func, ldapHost, ldapPort);
+		System.out.printf("%s: User Account      = '%s'\n", func, sUserDN);
+		}
+
+	// LDAP Connection:
+	if( DEBUGLOG ) System.out.println("");
+
+	LDAPConnection 
+		lc = new LDAPConnection();
+	
+	try {
+		// connect to LDAP Server:
+		lc.connect(ldapHost, ldapPort);
+		if( DEBUGLOG ) System.out.println("LDAP Connection = OK\n");
+		}
+	catch( LDAPException e) 	
+		{
+		System.err.printf("Error: %s: Connecting to LDAP Server: failed: '%s'!\n", func, e.toString());
+		ldapTerminate(lc, LDAP_AUTH_RCONNECT);
+		return null;
+		}
+
+	if( DEBUGLOG ) 
+		System.out.printf("Debug: isConnected=%d\n", lc.isConnected() ? 1 : 0);
+	
+	try {
+		// bind to server:
+		if( DEBUGLOG ) System.out.printf("Binding with '%s' + '%s'...\n", sLoginDN, sPwd);
+		lc.bind(sLoginDN, sPwd);
+		if( DEBUGLOG ) System.out.printf("Binding: OK.\n");
+		}
+	catch( LDAPException e )
+		{
+		System.err.printf("Error: %s: Binding failed: '%s'!\n", func, e.toString());
+		ldapTerminate(lc, LDAP_AUTH_RINTERR);
+		return null;
+		}
+
+	if( DEBUGLOG ) 
+		System.out.printf("Debug: isConnected=%d\n", lc.isConnected() ? 1 : 0);
+		
+	if( DEBUGLOG ) System.out.printf("Finding user '%s'...\n", sUserDN);
+	try{
+		// SCOPE_SUB = Scope Subtree.
+		if( DEBUGLOG ) System.out.printf("Finding Filter: '%s'.\n", ldapFilter);
+
+		// requested attribute is attEmail:
+		srchRes = lc.search(ldapBase, SearchScope.SUB, ldapFilter, attEmail);
+
+		if( DEBUGLOG ) System.out.printf("Finding '%s': %d entries.\n", sUserDN, srchRes.getEntryCount());
+		}
+	catch( LDAPSearchException e )
+		{
+		System.err.printf("Error: %s: Search for User '%s' failed: '%s'!\n", func, sUserDN, e.toString());
+		ldapTerminate(lc, LDAP_AUTH_RUNKNOWN);
+		return null;
+		}
+
+	if( srchRes.getEntryCount() == 0 )
+		{
+		if( DEBUGLOG ) System.out.printf("Error: %s: account '%s': 0 entries found!\n", func, sUserDN);
+		ldapTerminate(lc, LDAP_AUTH_RUNKNOWN);
+		return null;
+		}
+
+	if( DEBUGLOG ) System.out.printf("Debug: %s: Extract email from results.\n", func);
+
+	// Now get email from result.
+	// expected: 1 result with 1 attribute value:
+	
+	SearchResultEntry 
+		e;
+	Attribute
+		attr;
+	String
+		email;
+	
+	if( (e = srchRes.getSearchEntries().get(0)) != null &&
+		(attr = e.getAttribute(attEmail)) != null && 
+		(email = attr.getValue()) != null )
+		{
+		// return email:
+		if( DEBUGLOG ) 
+			System.out.printf("Debug: %s: account '%s' has email = '%s'.\n", func, sUserDN, email);
+		ldapTerminate(lc, LDAP_AUTH_ROK); // OK.
+		return email;
+		}
+	
+	// cannot obtain email from result:
+	System.err.printf("Error: %s: account '%s': no attribute '%s' for email found!\n", func, sUserDN, attEmail);
+	
+	ldapTerminate(lc, LDAP_AUTH_RNOEMAIL); // no email found.
+	return null;
+	} // getEmail
 
 /**
  * ldapTerminate
