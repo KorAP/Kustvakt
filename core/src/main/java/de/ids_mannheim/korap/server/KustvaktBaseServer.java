@@ -13,6 +13,7 @@ import java.util.Scanner;
 import javax.servlet.ServletContextListener;
 
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerList;
@@ -117,6 +118,8 @@ public abstract class KustvaktBaseServer {
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(kargs.port);
         connector.setIdleTimeout(60000);
+        connector.getConnectionFactory(HttpConnectionFactory.class)
+        .getHttpConfiguration().setRequestHeaderSize(64000);
 
         ShutdownHandler shutdownHandler = new ShutdownHandler(adminToken,true,true);
 

@@ -148,9 +148,9 @@ public class SearchController {
 
     
 //    This web service is DISABLED until there is a need for it. 
-//    @POST
-//    @Path("{version}/search")
-//    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @POST
+    @Path("{version}/search")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response searchPost (@Context SecurityContext context,
             @Context Locale locale, 
             @Context HttpHeaders headers,
