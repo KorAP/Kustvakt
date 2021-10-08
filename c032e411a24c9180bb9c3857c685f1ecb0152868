@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf4f52aa_854b9b45",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2021-10-08T09:52:12Z",
+      "side": 1,
+      "message": "This should only accept a limited portion of C2 VCs, right?\nPerhaps it would be a good idea to fail early, when the C2 VC doesn\u0027t comply - instead of a comparation of the leftovers.",
+      "revId": "c032e411a24c9180bb9c3857c685f1ecb0152868",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
