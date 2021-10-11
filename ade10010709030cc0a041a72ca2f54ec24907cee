@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de710aa6_a6a5a195",
+        "filename": "tools/compareVC.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2021-10-11T15:54:19Z",
+      "side": 1,
+      "message": "This doesn\u0027t look correct ... can you give an example where this is triggered?",
+      "range": {
+        "startLine": 23,
+        "startChar": 5,
+        "endLine": 23,
+        "endChar": 21
+      },
+      "revId": "ade10010709030cc0a041a72ca2f54ec24907cee",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
