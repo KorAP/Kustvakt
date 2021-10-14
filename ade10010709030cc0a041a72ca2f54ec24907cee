@@ -22,6 +22,30 @@
       },
       "revId": "ade10010709030cc0a041a72ca2f54ec24907cee",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04924ee2_6b4065e6",
+        "filename": "tools/compareVC.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2021-10-14T13:00:06Z",
+      "side": 1,
+      "message": "Sorry you are right. I wanted to check if the file doesn\u0027t contain \u003ctext\u003e. Anyway I uploaded patch 4 in which I check the firstline if it startswith \u003ctext\u003e.",
+      "parentUuid": "de710aa6_a6a5a195",
+      "range": {
+        "startLine": 23,
+        "startChar": 5,
+        "endLine": 23,
+        "endChar": 21
+      },
+      "revId": "ade10010709030cc0a041a72ca2f54ec24907cee",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
