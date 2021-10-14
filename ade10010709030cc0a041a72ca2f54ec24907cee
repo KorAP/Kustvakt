@@ -46,6 +46,30 @@
       },
       "revId": "ade10010709030cc0a041a72ca2f54ec24907cee",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae5960db_186a0349",
+        "filename": "tools/compareVC.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2021-10-14T13:15:35Z",
+      "side": 1,
+      "message": "Okay - looks fine now. But I guess you accidentally added the DolomitenKindergarten.jsonld.gz",
+      "parentUuid": "04924ee2_6b4065e6",
+      "range": {
+        "startLine": 23,
+        "startChar": 5,
+        "endLine": 23,
+        "endChar": 21
+      },
+      "revId": "ade10010709030cc0a041a72ca2f54ec24907cee",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
