@@ -11,8 +11,8 @@ dependency-reduced-pom.xml
 admin_token
 /sandbox
 /bin/
-/db.sqlite
-/lite/liteDB.sqlite
+*.sqlite
+*.bak
 /full/vc/
 /lite/krill_cache/
 
