@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7e368dc_622e9232",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2021-11-29T16:29:03Z",
+      "side": 1,
+      "message": "Requires Krill #5218 and #5219!",
+      "revId": "b4c9f15b4cd2f00a214c86a1e23ac55c12d801d1",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
