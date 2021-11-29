@@ -1,6 +1,8 @@
 package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -13,8 +15,8 @@ import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
 
-import de.ids_mannheim.korap.KrillCollection;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.NamedVCLoader;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
@@ -24,7 +26,6 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import net.sf.ehcache.CacheManager;
 
 public class VCReferenceTest extends SpringJerseyTest {
 
@@ -34,31 +35,34 @@ public class VCReferenceTest extends SpringJerseyTest {
     private QueryDao dao;
 
     @Test
-    public void testRefPredefinedVC ()
+    public void testRefPrecachedVC ()
             throws KustvaktException, IOException, QueryException {
-        testSearchWithoutVCRefOr();
-        testSearchWithoutVCRefAnd();
-
-        KrillCollection.cache = CacheManager.newInstance().getCache("named_vc");
+        int numOfMatches = testSearchWithoutRef_VC1();
         vcLoader.loadVCToCache("named-vc1", "/vc/named-vc1.jsonld");
+        assertTrue(VirtualCorpusCache.contains("named-vc1"));
+        testSearchWithRef_VC1(numOfMatches);
         testStatisticsWithVCReference();
 
-        // TODO: test auto-caching (disabled in krill)
+        numOfMatches = testSearchWithoutRef_VC2();
         vcLoader.loadVCToCache("named-vc2", "/vc/named-vc2.jsonld");
-        testSearchWithVCRefNotEqual();
+        assertTrue(VirtualCorpusCache.contains("named-vc2"));
+        testSearchWithRef_VC2(numOfMatches);
+        
+        VirtualCorpusCache.delete("named-vc2");
+        assertFalse(VirtualCorpusCache.contains("named-vc2"));
 
-        // retrieve from cache
-        testSearchWithVCRefEqual();
-        testSearchWithVCRefNotEqual();
-
-        KrillCollection.cache.removeAll();
         QueryDO vc = dao.retrieveQueryByName("named-vc1", "system");
         dao.deleteQuery(vc);
+        vc = dao.retrieveQueryByName("named-vc1", "system");
+        assertNull(vc);
+        
         vc = dao.retrieveQueryByName("named-vc2", "system");
         dao.deleteQuery(vc);
+        vc = dao.retrieveQueryByName("named-vc2", "system");
+        assertNull(vc);
     }
-
-    private void testSearchWithoutVCRefOr () throws KustvaktException {
+    
+    private int testSearchWithoutRef_VC1 () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq",
@@ -67,10 +71,12 @@ public class VCReferenceTest extends SpringJerseyTest {
 
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertTrue(node.at("/matches").size() > 0);
+        int size = node.at("/matches").size();
+        assertTrue(size > 0);
+        return size;
     }
 
-    private void testSearchWithoutVCRefAnd () throws KustvaktException {
+    private int testSearchWithoutRef_VC2 () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq",
@@ -79,10 +85,12 @@ public class VCReferenceTest extends SpringJerseyTest {
 
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertTrue(node.at("/matches").size() > 0);
+        int size = node.at("/matches").size();
+        assertTrue(size > 0);
+        return size;
     }
 
-    public void testSearchWithVCRefEqual () throws KustvaktException {
+    private void testSearchWithRef_VC1 (int numOfMatches) throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"system/named-vc1\"")
@@ -90,10 +98,11 @@ public class VCReferenceTest extends SpringJerseyTest {
 
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertTrue(node.at("/matches").size() > 0);
+        assertEquals(node.at("/matches").size(), numOfMatches);
     }
 
-    public void testSearchWithVCRefNotEqual () throws KustvaktException {
+    private void testSearchWithRef_VC2 (int numOfMatches) throws KustvaktException {
+        
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo named-vc2")
@@ -101,9 +110,10 @@ public class VCReferenceTest extends SpringJerseyTest {
 
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertTrue(node.at("/matches").size() > 0);
+        assertEquals(node.at("/matches").size(), numOfMatches);
     }
 
+    @Test
     public void testStatisticsWithVCReference () throws KustvaktException {
         String corpusQuery = "availability = /CC-BY.*/ & referTo named-vc1";
         ClientResponse response = resource().path(API_VERSION)
@@ -113,6 +123,9 @@ public class VCReferenceTest extends SpringJerseyTest {
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(2, node.at("/documents").asInt());
+        
+        VirtualCorpusCache.delete("named-vc1");
+        assertFalse(VirtualCorpusCache.contains("named-vc1"));
     }
 
     @Test

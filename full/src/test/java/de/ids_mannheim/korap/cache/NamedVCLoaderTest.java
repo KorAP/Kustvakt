@@ -1,23 +1,23 @@
 package de.ids_mannheim.korap.cache;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import de.ids_mannheim.korap.KrillCollection;
-import de.ids_mannheim.korap.collection.CachedVCData;
+import de.ids_mannheim.korap.collection.DocBits;
 import de.ids_mannheim.korap.config.NamedVCLoader;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.dao.QueryDao;
 import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.util.QueryException;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 
 public class NamedVCLoaderTest extends SpringJerseyTest {
 
@@ -29,19 +29,20 @@ public class NamedVCLoaderTest extends SpringJerseyTest {
     @Test
     public void testNamedVCLoader ()
             throws IOException, QueryException, KustvaktException {
-        KrillCollection.cache = CacheManager.newInstance().getCache("named_vc");
-        Element element = KrillCollection.cache.get("named-vc1");
-        assertTrue(element == null);
-
-        vcLoader.loadVCToCache("named-vc1", "/vc/named-vc1.jsonld");
-
-        element = KrillCollection.cache.get("named-vc1");
-        assertNotNull(element);
-        CachedVCData cachedData = (CachedVCData) element.getObjectValue();
-        assertTrue(cachedData.getDocIdMap().size() > 0);
+        String vcId = "named-vc1";
+        vcLoader.loadVCToCache(vcId, "/vc/named-vc1.jsonld");
+        assertTrue(VirtualCorpusCache.contains(vcId));
         
-        KrillCollection.cache.removeAll();
-        QueryDO vc = dao.retrieveQueryByName("named-vc1", "system");
+        Map<String, DocBits> cachedData = VirtualCorpusCache.retrieve(vcId);
+        assertTrue(cachedData.size() > 0);
+        
+        VirtualCorpusCache.delete(vcId);
+        assertFalse(VirtualCorpusCache.contains(vcId));
+        
+        QueryDO vc = dao.retrieveQueryByName(vcId, "system");
+        assertNotNull(vc);
         dao.deleteQuery(vc);
+        vc = dao.retrieveQueryByName(vcId, "system");
+        assertNull(vc);
     }
 }
