@@ -17,11 +17,11 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import de.ids_mannheim.korap.KrillCollection;
+import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
-import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.QueryAccessStatus;
+import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.dao.QueryAccessDao;
@@ -30,10 +30,10 @@ import de.ids_mannheim.korap.dto.QueryAccessDto;
 import de.ids_mannheim.korap.dto.QueryDto;
 import de.ids_mannheim.korap.dto.converter.QueryAccessConverter;
 import de.ids_mannheim.korap.dto.converter.QueryConverter;
+import de.ids_mannheim.korap.entity.QueryAccess;
+import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
-import de.ids_mannheim.korap.entity.QueryDO;
-import de.ids_mannheim.korap.entity.QueryAccess;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
@@ -188,8 +188,8 @@ public class QueryService {
                         access.getUserGroup().getId(), "system");
             }
             if (type.equals(QueryType.VIRTUAL_CORPUS)
-                    && KrillCollection.cache.get(query.getName()) != null) {
-                KrillCollection.cache.remove(query.getName());
+                    && VirtualCorpusCache.contains(queryName)) {
+               VirtualCorpusCache.delete(queryName);
             }
             queryDao.deleteQuery(query);
         }
