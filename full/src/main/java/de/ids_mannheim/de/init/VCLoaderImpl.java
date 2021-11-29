@@ -12,7 +12,7 @@ public class VCLoaderImpl implements VCLoader{
     
     @Override
     public void recachePredefinedVC () {
-        KrillCollection.cache.removeAll();
+//        KrillCollection.cache.removeAll();
         Thread t = new Thread(vcLoader);
         t.start();
     }
