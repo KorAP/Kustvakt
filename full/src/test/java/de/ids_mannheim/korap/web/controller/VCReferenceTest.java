@@ -1,6 +1,8 @@
 package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -13,8 +15,8 @@ import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
 
-import de.ids_mannheim.korap.KrillCollection;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.NamedVCLoader;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
@@ -24,7 +26,6 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import net.sf.ehcache.CacheManager;
 
 public class VCReferenceTest extends SpringJerseyTest {
 
@@ -33,32 +34,54 @@ public class VCReferenceTest extends SpringJerseyTest {
     @Autowired
     private QueryDao dao;
 
+    /**
+     * VC data exists, but it has not been cached, so it is not found
+     * in the DB.
+     * 
+     * @throws KustvaktException
+     */
     @Test
-    public void testRefPredefinedVC ()
+    public void testRefVcNotPrecached () throws KustvaktException {
+        JsonNode node = testSearchWithRef_VC1();
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Virtual corpus system/named-vc1 is not found.",
+                node.at("/errors/0/1").asText());
+        assertEquals("system/named-vc1", node.at("/errors/0/2").asText());
+    }
+    
+    @Test
+    public void testRefVcPrecached ()
             throws KustvaktException, IOException, QueryException {
-        testSearchWithoutVCRefOr();
-        testSearchWithoutVCRefAnd();
-
-        KrillCollection.cache = CacheManager.newInstance().getCache("named_vc");
+        int numOfMatches = testSearchWithoutRef_VC1();
         vcLoader.loadVCToCache("named-vc1", "/vc/named-vc1.jsonld");
-        testStatisticsWithVCReference();
+        assertTrue(VirtualCorpusCache.contains("named-vc1"));
+        JsonNode node = testSearchWithRef_VC1();
+        assertEquals(numOfMatches,node.at("/matches").size());
+        
+        testStatisticsWithRef();
 
-        // TODO: test auto-caching (disabled in krill)
+        numOfMatches = testSearchWithoutRef_VC2();
         vcLoader.loadVCToCache("named-vc2", "/vc/named-vc2.jsonld");
-        testSearchWithVCRefNotEqual();
+        assertTrue(VirtualCorpusCache.contains("named-vc2"));
+        node = testSearchWithRef_VC2();
+        assertEquals(numOfMatches,node.at("/matches").size());
+        
+        VirtualCorpusCache.delete("named-vc2");
+        assertFalse(VirtualCorpusCache.contains("named-vc2"));
 
-        // retrieve from cache
-        testSearchWithVCRefEqual();
-        testSearchWithVCRefNotEqual();
-
-        KrillCollection.cache.removeAll();
         QueryDO vc = dao.retrieveQueryByName("named-vc1", "system");
         dao.deleteQuery(vc);
+        vc = dao.retrieveQueryByName("named-vc1", "system");
+        assertNull(vc);
+        
         vc = dao.retrieveQueryByName("named-vc2", "system");
         dao.deleteQuery(vc);
+        vc = dao.retrieveQueryByName("named-vc2", "system");
+        assertNull(vc);
     }
-
-    private void testSearchWithoutVCRefOr () throws KustvaktException {
+    
+    private int testSearchWithoutRef_VC1 () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq",
@@ -67,10 +90,12 @@ public class VCReferenceTest extends SpringJerseyTest {
 
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertTrue(node.at("/matches").size() > 0);
+        int size = node.at("/matches").size();
+        assertTrue(size > 0);
+        return size;
     }
 
-    private void testSearchWithoutVCRefAnd () throws KustvaktException {
+    private int testSearchWithoutRef_VC2 () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq",
@@ -79,32 +104,34 @@ public class VCReferenceTest extends SpringJerseyTest {
 
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertTrue(node.at("/matches").size() > 0);
+        int size = node.at("/matches").size();
+        assertTrue(size > 0);
+        return size;
     }
 
-    public void testSearchWithVCRefEqual () throws KustvaktException {
+    private JsonNode testSearchWithRef_VC1 () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"system/named-vc1\"")
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
-        JsonNode node = JsonUtils.readTree(ent);
-        assertTrue(node.at("/matches").size() > 0);
+        return JsonUtils.readTree(ent);
     }
 
-    public void testSearchWithVCRefNotEqual () throws KustvaktException {
+    private JsonNode testSearchWithRef_VC2 () throws KustvaktException {
+        
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo named-vc2")
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
-        JsonNode node = JsonUtils.readTree(ent);
-        assertTrue(node.at("/matches").size() > 0);
+        return JsonUtils.readTree(ent);
     }
 
-    public void testStatisticsWithVCReference () throws KustvaktException {
+    @Test
+    public void testStatisticsWithRef () throws KustvaktException {
         String corpusQuery = "availability = /CC-BY.*/ & referTo named-vc1";
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics").queryParam("corpusQuery", corpusQuery)
@@ -113,10 +140,13 @@ public class VCReferenceTest extends SpringJerseyTest {
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(2, node.at("/documents").asInt());
+        
+        VirtualCorpusCache.delete("named-vc1");
+        assertFalse(VirtualCorpusCache.contains("named-vc1"));
     }
 
     @Test
-    public void testRefVCNotExist () throws KustvaktException {
+    public void testRefVcNotExist () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"username/vc1\"")
@@ -144,7 +174,7 @@ public class VCReferenceTest extends SpringJerseyTest {
     }
     
     @Test
-    public void testSearchWithPublishedVCRefGuest () throws KustvaktException {
+    public void testSearchWithRefPublishedVcGuest () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"marlin/published-vc\"")
@@ -169,7 +199,7 @@ public class VCReferenceTest extends SpringJerseyTest {
     }
     
     @Test
-    public void testSearchWithPublishedVCRef () throws KustvaktException {
+    public void testSearchWithRefPublishedVc () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"marlin/published-vc\"")
