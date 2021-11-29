@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.rewrite;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -12,8 +13,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientResponse;
 
-import de.ids_mannheim.korap.KrillCollection;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.NamedVCLoader;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
@@ -22,7 +23,6 @@ import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import net.sf.ehcache.CacheManager;
 
 /**
  * @author margaretha
@@ -36,10 +36,10 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
     private QueryDao dao;
 
     @Test
-    public void testCachedVCRef ()
+    public void testRefCachedVC ()
             throws KustvaktException, IOException, QueryException {
-        KrillCollection.cache = CacheManager.newInstance().getCache("named_vc");
         vcLoader.loadVCToCache("named-vc1", "/vc/named-vc1.jsonld");
+        assertTrue(VirtualCorpusCache.contains("named-vc1"));
 
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
@@ -53,14 +53,16 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         assertEquals("koral:docGroup", node.at("/@type").asText());
         assertTrue(node.at("/operands/1/rewrites").isMissingNode());
 
-        testCachedVCRefWithUsername();
+        testRefCachedVCWithUsername();
 
-        KrillCollection.cache.removeAll();
         QueryDO vc = dao.retrieveQueryByName("named-vc1", "system");
         dao.deleteQuery(vc);
+        vc = dao.retrieveQueryByName("named-vc1", "system");
+        assertNull(vc);
+//        VirtualCorpusCache.reset();
     }
 
-    private void testCachedVCRefWithUsername ()
+    private void testRefCachedVCWithUsername ()
             throws KustvaktException, IOException, QueryException {
 
         ClientResponse response = resource().path(API_VERSION).path("search")

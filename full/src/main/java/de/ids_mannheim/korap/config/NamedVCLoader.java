@@ -17,7 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import de.ids_mannheim.korap.KrillCollection;
+import de.ids_mannheim.korap.cache.VirtualCorpusCache;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.entity.QueryDO;
@@ -26,7 +26,18 @@ import de.ids_mannheim.korap.service.QueryService;
 import de.ids_mannheim.korap.util.QueryException;
 import de.ids_mannheim.korap.web.SearchKrill;
 
-/** Loads predefined virtual corpora at server start up and cache them.
+/**
+ * <p>Loads predefined virtual corpora at server start up and caches
+ * them, if the VC have not been cached before. If there are changes
+ * in the index, the cache will be updated.
+ * </p>
+ * 
+ * <p>
+ * All predefined VC are set as SYSTEM VC. The filenames are used as
+ * VC names. Acceptable file extensions are .jsonld.gz or .jsonld. The
+ * VC should be located at the folder indicated by <em>krill.namedVC</em>
+ * specified in kustvakt.conf.
+ * </p>
  * 
  * @author margaretha
  *
@@ -48,19 +59,27 @@ public class NamedVCLoader implements Runnable{
         try {
             loadVCToCache();
         }
-        catch (IOException | QueryException | KustvaktException e) {
+        catch (IOException | QueryException e) {
 //            e.printStackTrace();
             throw new RuntimeErrorException(new Error(e.getMessage(), e.getCause()));
         }
     }
     
+    /** Used for testing 
+     * 
+     * @param filename
+     * @param filePath
+     * @throws IOException
+     * @throws QueryException
+     * @throws KustvaktException
+     */
     public void loadVCToCache (String filename, String filePath)
             throws IOException, QueryException, KustvaktException {
 
         InputStream is = NamedVCLoader.class.getResourceAsStream(filePath);
         String json = IOUtils.toString(is, "utf-8");
         if (json != null) {
-            cacheVC(json, filename);
+            cacheVC(filename,json);
             vcService.storeQuery("system",filename, ResourceType.SYSTEM,
                     QueryType.VIRTUAL_CORPUS, json, null, null, null, true,
                     "system", null, null);
@@ -68,7 +87,7 @@ public class NamedVCLoader implements Runnable{
     }
 
     public void loadVCToCache ()
-            throws IOException, QueryException, KustvaktException {
+            throws IOException, QueryException {
 
         String dir = config.getNamedVCPath();
         if (dir.isEmpty()) return;
@@ -90,31 +109,14 @@ public class NamedVCLoader implements Runnable{
             filename = strArr[0];
             String json = strArr[1];
             if (json != null) {
-                cacheVC(json, filename);
-                try {
-                    QueryDO vc = vcService.searchQueryByName("system",
-                            filename, "system", QueryType.VIRTUAL_CORPUS);
-                    if (vc != null) {
-                        if (DEBUG) {
-                            jlog.debug("Delete existing vc: " + filename);
-                        }
-                        vcService.deleteQueryByName("system", vc.getName(),
-                                vc.getCreatedBy(), QueryType.VIRTUAL_CORPUS);
-                    }
-                }
-                catch (KustvaktException e) {
-                    // ignore
-                    if (DEBUG) jlog.debug(e);
-                }
-                vcService.storeQuery("system",filename, ResourceType.SYSTEM,
-                        QueryType.VIRTUAL_CORPUS, json, null, null, null, true,
-                        "system", null, null);
+                cacheVC(filename,json);
+                storeVCinDB(filename, json);
             }
         }
     }
 
     private String[] readFile (File file, String filename)
-            throws IOException, KustvaktException {
+            throws IOException {
         String json = null;
         long start = System.currentTimeMillis();
         if (filename.endsWith(".jsonld")) {
@@ -142,25 +144,51 @@ public class NamedVCLoader implements Runnable{
         return new String[] { filename, json };
     }
 
-    private void cacheVC (String json, String filename)
+    /**
+     * Caches the given VC if the VC is not found in cache and updates
+     * the VC if it exists and there are changes in the index.
+     * 
+     * @param vcId
+     *            vc-name
+     * @param koralQuery
+     * @throws IOException
+     * @throws QueryException
+     */
+    private void cacheVC (String vcId, String koralQuery)
             throws IOException, QueryException {
-        config.setVcInCaching(filename);
+        config.setVcInCaching(vcId);
+        jlog.info("Storing {} in cache ", vcId);
         long start, end;
         start = System.currentTimeMillis();
-
-        KrillCollection collection = new KrillCollection(json);
-        collection.setIndex(searchKrill.getIndex());
-
-        jlog.info("Storing {} in cache ", filename);
-        if (collection != null) {
-            collection.storeInCache(filename);
-        }
+        VirtualCorpusCache.store(vcId, searchKrill.getIndex());
         end = System.currentTimeMillis();
-        jlog.info("{} Caching duration: {}", filename, (end - start));
-        if (DEBUG) {
-            jlog.debug("memory cache: "
-                    + KrillCollection.cache.calculateInMemorySize());
-        }
+        jlog.info("{} Caching duration: {}", vcId, (end - start));
         config.setVcInCaching("");
+    }
+    
+    /** Stores the VC if it doesn't exist in the database. 
+     * 
+     * @param vcId
+     * @param koralQuery
+     */
+    private void storeVCinDB (String vcId, String koralQuery) {
+        try {
+            QueryDO vc = vcService.searchQueryByName("system",
+                    vcId, "system", QueryType.VIRTUAL_CORPUS);
+            if (vc == null) {
+                if (DEBUG) {
+                    jlog.debug("Delete existing vc: " + vcId);
+                }
+//                vcService.deleteQueryByName("system", vc.getName(),
+//                        vc.getCreatedBy(), QueryType.VIRTUAL_CORPUS);
+                vcService.storeQuery("system",vcId, ResourceType.SYSTEM,
+                        QueryType.VIRTUAL_CORPUS, koralQuery, null, null, null, true,
+                        "system", null, null);
+            }
+        }
+        catch (KustvaktException e) {
+            // ignore
+            if (DEBUG) jlog.debug(e);
+        }
     }
 }
