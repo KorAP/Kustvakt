@@ -105,6 +105,13 @@ public class QueryService {
         List<QueryDO> list = queryDao.retrieveOwnerQuery(username, queryType);
         return createQueryDtos(list, queryType);
     }
+    
+    public List<QueryDto> listSystemQuery (QueryType queryType)
+            throws KustvaktException {
+        List<QueryDO> list = queryDao.retrieveQueryByType(ResourceType.SYSTEM,
+                null, queryType);
+        return createQueryDtos(list, queryType);
+    }
 
     public List<QueryDto> listAvailableQueryForUser (
             String authenticatedUsername, String username, QueryType queryType)

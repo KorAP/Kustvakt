@@ -185,35 +185,47 @@ public class VirtualCorpusController {
     }
 
     /**
-     * Lists all virtual corpora created by a user. This list is only
-     * available to the owner of the vc. Users, except system-admins, 
-     * are not allowed to list vc created by other users. 
+     * Lists all system virtual corpora, if PathParam
+     * <em>createdBy</em> is specified to system or SYSTEM.
+     * Otherwise, lists all virtual corpora created by the given user.
      * 
-     * Thus, the path parameter "createdBy" must be the same as the
-     * authenticated username. 
+     * This web-service is only available to the owner of the vc.
+     * Users, except system-admins, are not allowed to list vc created
+     * by other users.
      * 
+     * Beside "system or SYSTEM', the path parameter "createdBy" must
+     * be the same as the
+     * authenticated username.
+     * 
+     * @param createdBy
+     *            system or username
      * @param securityContext
-     * @return a list of virtual corpora created by the user
-     *         in the security context.
+     * @return all system VC, if createdBy=system, otherwise a list of
+     *         virtual corpora created by the authorized user.
      */
     @GET
     @Path("~{createdBy}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public List<QueryDto> listUserVC (
+    public List<QueryDto> listUserOrSystemVC (
             @PathParam("createdBy") String createdBy,
             @Context SecurityContext securityContext) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
-            return service.listOwnerQuery(context.getUsername(), createdBy,
-                    QueryType.VIRTUAL_CORPUS);
+            if (createdBy.toLowerCase().equals("system")) {
+                return service.listSystemQuery(QueryType.VIRTUAL_CORPUS);
+            }
+            else {
+                return service.listOwnerQuery(context.getUsername(), createdBy,
+                        QueryType.VIRTUAL_CORPUS);
+            }
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
     }
-
+    
     /**
      * Lists virtual corpora by creator and type. This is a controller
      * for system admin requiring valid system admin authentication.
@@ -224,7 +236,7 @@ public class VirtualCorpusController {
      * 
      * @param securityContext
      * @param createdBy
-     *            username of virtual corpus creator
+     *            username of virtual corpus creator (optional)
      * @param type
      *            {@link ResourceType}
      * @return a list of virtual corpora
