@@ -161,11 +161,11 @@ public class QueryService {
         Iterator<QueryDO> i = queryList.iterator();
         while (i.hasNext()) {
             query = i.next();
-            String json = query.getKoralQuery();
+//            String json = query.getKoralQuery();
             String statistics = null;
-            if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
-                statistics = krill.getStatistics(json);
-            }
+//            if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
+//                statistics = krill.getStatistics(json);
+//            }
             QueryDto dto =
                     converter.createQueryDto(query, statistics);
             dtos.add(dto);
@@ -634,11 +634,15 @@ public class QueryService {
     public QueryDto retrieveQueryByName (String username, String queryName,
             String createdBy, QueryType queryType) throws KustvaktException {
         QueryDO query = searchQueryByName(username, queryName, createdBy, queryType);
-        String json = query.getKoralQuery();
+//        String json = query.getKoralQuery();
         String statistics = null;
-        if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
-            statistics = krill.getStatistics(json);
-        }
+//        long start,end;
+//        start = System.currentTimeMillis();
+//        if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
+//            statistics = krill.getStatistics(json);
+//        }
+//        end = System.currentTimeMillis();
+//        jlog.debug("{} statistics duration: {}", queryName, (end - start));
         return converter.createQueryDto(query, statistics);
     }
 
@@ -647,9 +651,9 @@ public class QueryService {
 
         QueryDO query = queryDao.retrieveQueryById(queryId);
         checkQueryAccess(query, username);
-        String json = query.getKoralQuery();
-        String statistics = krill.getStatistics(json);
-        return converter.createQueryDto(query, statistics);
+//        String json = query.getKoralQuery();
+//        String statistics = krill.getStatistics(json);
+        return converter.createQueryDto(query, null);
     }
 
     private void checkQueryAccess (QueryDO query, String username)

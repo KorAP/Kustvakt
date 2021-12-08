@@ -157,12 +157,18 @@ public class NamedVCLoader implements Runnable{
     private void cacheVC (String vcId, String koralQuery)
             throws IOException, QueryException {
         config.setVcInCaching(vcId);
-        jlog.info("Storing {} in cache ", vcId);
+        if (VirtualCorpusCache.contains(vcId)) {
+            jlog.info("Checking {} in cache ", vcId);
+        }
+        else {
+            jlog.info("Storing {} in cache ", vcId);
+        }
+        
         long start, end;
         start = System.currentTimeMillis();
         VirtualCorpusCache.store(vcId, searchKrill.getIndex());
         end = System.currentTimeMillis();
-        jlog.info("{} Caching duration: {}", vcId, (end - start));
+        jlog.info("Duration : {}", (end - start));
         config.setVcInCaching("");
     }
     

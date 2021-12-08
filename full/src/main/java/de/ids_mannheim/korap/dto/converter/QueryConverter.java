@@ -20,8 +20,8 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 @Component
 public class QueryConverter {
 
-    public QueryDto createQueryDto (QueryDO query,
-            String statistics) throws KustvaktException {
+    public QueryDto createQueryDto (QueryDO query, String statistics)
+            throws KustvaktException {
 
         QueryDto dto = new QueryDto();
         dto.setId(query.getId());
@@ -31,13 +31,13 @@ public class QueryConverter {
         dto.setStatus(query.getStatus());
         dto.setDescription(query.getDescription());
         dto.setType(query.getType().displayName());
-        
+
         dto.setQuery(query.getQuery());
         dto.setQueryLanguage(query.getQueryLanguage());
-        
-        JsonNode kq = JsonUtils.readTree(query.getKoralQuery());
-        dto.setKoralQuery(kq);
-        
+
+        // JsonNode kq = JsonUtils.readTree(query.getKoralQuery());
+        // dto.setKoralQuery(kq);
+
         if (statistics != null) {
             JsonNode node = JsonUtils.readTree(statistics);
             dto.setNumberOfDoc(node.at("/documents").asInt());
@@ -46,6 +46,5 @@ public class QueryConverter {
             dto.setNumberOfTokens(node.at("/tokens").asInt());
         }
         return dto;
-
     }
 }

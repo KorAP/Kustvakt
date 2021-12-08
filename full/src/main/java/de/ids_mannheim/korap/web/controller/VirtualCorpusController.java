@@ -152,6 +152,7 @@ public class VirtualCorpusController {
         }
     }
 
+
     /**
      * Lists all virtual corpora available to the authenticated user.
      *

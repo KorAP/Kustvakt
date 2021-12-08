@@ -362,8 +362,9 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         assertEquals(ResourceType.SYSTEM.displayName(),
                 node.at("/0/type").asText());
         assertEquals("\"system\" query", node.at("/0/description").asText());
-        assertEquals("koral:token", node.at("/0/koralQuery/@type").asText());
-
+        assertEquals("[]", node.at("/0/query").asText());
+        assertEquals(CorpusAccess.FREE.name(), node.at("/0/requiredAccess").asText());
+//        assertEquals("koral:token", node.at("/0/koralQuery/@type").asText());
     }
 
     private JsonNode testListAvailableQuery (String username)
