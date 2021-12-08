@@ -5,6 +5,7 @@
 - Enabled listing system vc for authorized users.
 2021-12-08
 - Removed koralQuery and statistics from VC list.
+- Added a web-service to retrieve KoralQuery of a VC
 
 # version 0.64.1
 2021-10-26

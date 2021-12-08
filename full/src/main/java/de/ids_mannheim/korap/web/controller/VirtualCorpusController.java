@@ -20,6 +20,7 @@ import javax.ws.rs.core.SecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
@@ -123,6 +124,7 @@ public class VirtualCorpusController {
 
     /**
      * Returns the virtual corpus with the given name and creator.
+     * This web-service is also available for guests.
      * 
      * @param securityContext
      * @param createdBy
@@ -152,7 +154,26 @@ public class VirtualCorpusController {
         }
     }
 
-
+    @GET
+    @Path("/koralQuery/~{createdBy}/{vcName}")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public JsonNode retrieveVCKoralQuery (
+            @Context SecurityContext securityContext,
+            @PathParam("createdBy") String createdBy,
+            @PathParam("vcName") String vcName) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
+            return service.retrieveKoralQuery(context.getUsername(), vcName,
+                    createdBy, QueryType.VIRTUAL_CORPUS);
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+    }
+    
+    
     /**
      * Lists all virtual corpora available to the authenticated user.
      *

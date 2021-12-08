@@ -617,6 +617,14 @@ public class QueryService {
         }
 
     }
+    
+    public JsonNode retrieveKoralQuery (String username, String queryName,
+            String createdBy, QueryType queryType) throws KustvaktException {
+        QueryDO query = searchQueryByName(username, queryName, createdBy, queryType);
+        String koralQuery = query.getKoralQuery();
+        JsonNode kq = JsonUtils.readTree(koralQuery); 
+        return kq;
+    }
 
     public QueryDO searchQueryByName (String username, String queryName,
             String createdBy, QueryType queryType) throws KustvaktException {

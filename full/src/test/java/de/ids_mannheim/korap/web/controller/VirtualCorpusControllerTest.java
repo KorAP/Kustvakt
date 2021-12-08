@@ -726,6 +726,11 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     @Test
     public void testEditCorpusQuery () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
+        JsonNode node = testRetrieveKoralQuery("dory", "dory-vc");
+        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
+        assertEquals("operation:and", node.at("/collection/operation").asText());
+        assertEquals(2, node.at("/collection/operands").size());
+        
         String json = "{\"corpusQuery\": \"corpusSigle=WPD17\"}";
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
@@ -737,9 +742,26 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
-        // check VC
-//        JsonNode node = testListVC("dory");
-//        assertEquals("WPD17", node.at("/0/koralQuery/collection/value").asText());
+        node = testRetrieveKoralQuery("dory", "dory-vc");
+        assertEquals("koral:doc", node.at("/collection/@type").asText());
+        assertEquals("corpusSigle", node.at("/collection/key").asText());
+        assertEquals("WPD17", node.at("/collection/value").asText());
+    }
+    
+    private JsonNode testRetrieveKoralQuery (String username, String vcName)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("koralQuery").path("~" + username).path(vcName)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("dory", "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .get(ClientResponse.class);
+        
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        return node;
     }
 
     @Test
