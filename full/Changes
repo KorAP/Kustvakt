@@ -1,26 +1,38 @@
 # version 0.65
+
+!!! includes security updates - please update all Kustvakt libraries
+!!! Please also update Krill to version 0.60.2 and Koral to version 0.38 
+
 2021-12-02
-- Updated VC cache.
+ - Updated VC cache.
 2021-12-03
-- Enabled listing system vc for authorized users.
+ - Enabled listing system vc for authorized users.
 2021-12-08
-- Removed koralQuery and statistics from VC list.
-- Added a web-service to retrieve KoralQuery of a VC
+ - Removed koralQuery and statistics from VC list.
+ - Added a web-service to retrieve KoralQuery of a VC
+2021-12-10
+ - [security] Updated log4j libs due to CVE-2021-44228.
+2021-12-13
+ - Fixed broken test suite.
+
+
 
 # version 0.64.1
+
 2021-10-26
-- Bump Kustvakt and Krill versions.
+ - Bump Kustvakt and Krill versions.
+
 
 # version 0.64
 2021-07-29
-- Updated the change files and made a new version.
+ - Updated the change files and made a new version.
 2021-08-12
-- Fixed errors due to missing query type and added tests.
+ - Fixed errors due to missing query type and added tests.
 2021-08-13
-- Fixed missing request entity.
-- Updated the query service to enable editing query references.
+ - Fixed missing request entity.
+ - Updated the query service to enable editing query references.
 2021-08-16
-- Fixed creator param when storing query or VC by admins for 
+ - Fixed creator param when storing query or VC by admins for 
   the system or other users.
 
 # version 0.63.2
@@ -35,9 +47,9 @@
  - Updated cache settings and some loggings.
 2021-07-26
  - Replaced annotation parsing with restoring the annotation tables to the
-   database.
+database.
  - Moved cache config to the full config. 
-   
+
 # version 0.63.1
 2021-02-22
  - Updated libraries (margaretha)
@@ -48,7 +60,7 @@
 2021-03-25
  - Updated Koral version for Info Controller (margaretha)
  - Updated OAuth2 token list with token type and user clientId 
-   parameters (margaretha) 
+parameters (margaretha) 
 2021-03-29
  - Added client type in the client list web-service. Resolved #58 (margaretha)  
 2021-04-19

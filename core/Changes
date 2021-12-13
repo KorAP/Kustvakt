@@ -1,8 +1,20 @@
+# version 0.65
+
+!!! includes security updates - please update all Kustvakt libraries
+!!! Please also update Krill to version 0.60.2 and Koral to version 0.38 
+
+
+2021-12-10
+ - [security] Updated log4j libs due to CVE-2021-44228.
+
+
 # version 0.64
+
 2021-07-29
-- Updated the change files and made a new version.
+ - Updated the change files and made a new version.
 
 # version 0.63.2
+
 2021-06-11
  - Updated OAuth2 token length & secure random algorithm config.
  - Added character set filter to random code generator, e.g. for client_id.
@@ -10,7 +22,7 @@
  - Updated cache settings and some loggings.
 2021-07-26
  - Replaced annotation parsing with restoring the annotation tables to the
-   database.
+ database.
  - Moved cache config to the full config. 
 
 # version 0.63.1
@@ -19,222 +31,222 @@
 
 # version 0.63
 14/01/2021
-   - Updated Flyway (margaretha)
+ - Updated Flyway (margaretha)
 21/01/2021
-   - Fixed running pipe and updated tests with mockserver (margaretha)
+ - Fixed running pipe and updated tests with mockserver (margaretha)
 19/02/2021
-   - Enabled API info web-service (margaretha)    
-   
+ - Enabled API info web-service (margaretha)  
+ 
 # version 0.62.4
 24/01/2020
-   - Removed salt from config and updated config files.
+ - Removed salt from config and updated config files.
 05/02/2020
-   - Added welcome page.
+ - Added welcome page.
 01/04/2020
-   - Support expand query parameter for match retrieval (diewald)
+ - Support expand query parameter for match retrieval (diewald)
 11/05/2020
-   - Added tool to create VC from list (diewald)
+ - Added tool to create VC from list (diewald)
 29/05/2020
-   - Improved conversion tool to deal with Cosmas-II VC definitions
-     (diewald)
+ - Improved conversion tool to deal with Cosmas-II VC definitions
+   (diewald)
 02/06/2020
-   - Introduced experimental X-Index-Revision header (diewald)
+ - Introduced experimental X-Index-Revision header (diewald)
 
 # version 0.62.3
 03/12/2019
-   - Implemented pipe extension in the search API (margaretha)
+ - Implemented pipe extension in the search API (margaretha)
 11/12/2019
-   - Added errors when requesting VC in caching process (margaretha, 
-     resolved #47) 
+ - Added errors when requesting VC in caching process (margaretha, 
+   resolved #47) 
 12/12/2019
-   - Added support for multiple cq parameters (margaretha, resolved #46)
+ - Added support for multiple cq parameters (margaretha, resolved #46)
 13/12/2019
-   - Handled pipe errors and added tests (margaretha)   
+ - Handled pipe errors and added tests (margaretha) 
 20/12/2019
-   - Removed transactional annotations from simple select queries (margaretha)   
+ - Removed transactional annotations from simple select queries (margaretha) 
 
 # version 0.62.2
 13/11/2019
-   - Added warnings when requesting non-public fields via the search API with 
-     accessRewriteDisabled (margaretha, resolved #43).
+ - Added warnings when requesting non-public fields via the search API with 
+   accessRewriteDisabled (margaretha, resolved #43).
 14/11/2019
-   - Added a check for OAuth2 client, VC, and group name length (margaretha)
+ - Added a check for OAuth2 client, VC, and group name length (margaretha)
 22/11/2019
-   - Updated the statistic API with KoralQuery (margaretha)
+ - Updated the statistic API with KoralQuery (margaretha)
 
 # version 0.62.1
 08/07/2019
-   - Added support for public metadata response in search api (margaretha, 
-     issue #43)
-   - Disabled some unused web-services: search post, query serialization, 
-     collocation base (margaretha)
+ - Added support for public metadata response in search api (margaretha, 
+   issue #43)
+ - Disabled some unused web-services: search post, query serialization, 
+   collocation base (margaretha)
 11/07/2019
-   - Added cq parameter to VC statistics API and deprecate corpusQuery (margaretha)
+ - Added cq parameter to VC statistics API and deprecate corpusQuery (margaretha)
 15/07/2019
-   - Added backward compatibility support for corpusQuery parameter (margaretha)
+ - Added backward compatibility support for corpusQuery parameter (margaretha)
 28/08/2019
-   - Resolved #49. Added page param check in the search api (margaretha)
-23/09/2019   
-   - Resolved #50. Added statistics API with KoralQuery input (margaretha)
-   
+ - Resolved #49. Added page param check in the search api (margaretha)
+23/09/2019 
+ - Resolved #50. Added statistics API with KoralQuery input (margaretha)
+ 
 
 # version 0.62
 18/03/2019
-   - Added close index controller (margaretha)
+ - Added close index controller (margaretha)
 11/04/2019
-   - Fixed multiple Jackson implementations (margaretha)
+ - Fixed multiple Jackson implementations (margaretha)
 25/04/2019
-   - Updated Jetty version due to vulnerabilities (margaretha)
+ - Updated Jetty version due to vulnerabilities (margaretha)
 27/06/2019
-   - Updated Jetty version, fixed server hanging problem (margaretha)
+ - Updated Jetty version, fixed server hanging problem (margaretha)
 03/07/2019
-   - Added VCLoader interface (margaretha)
+ - Added VCLoader interface (margaretha)
 
 # version 0.61.6
 06/02/2019
-   - Added default foundry for structure layer (margaretha)
-   - Added authentication to metadata controller (margaretha, issue #38)
-   - Updated search krill error handling (margaretha)
+ - Added default foundry for structure layer (margaretha)
+ - Added authentication to metadata controller (margaretha, issue #38)
+ - Updated search krill error handling (margaretha)
 18/02/2019
-   - Updated handling errors from Koral (margaretha)
+ - Updated handling errors from Koral (margaretha)
 19/02/2019
-   - Added fields to metadata controller (margaretha, issue #39)   
+ - Added fields to metadata controller (margaretha, issue #39) 
 
 # version 0.61.5
 17/12/2018
-   - Added search timeout in meta query (margaretha)
+ - Added search timeout in meta query (margaretha)
 18/12/2018
-   - Updated RewriteHandler (margaretha)
+ - Updated RewriteHandler (margaretha)
 19/12/2018
-   - Added debug flags (margaretha)
-   - Added order on the fields parameter of search get request (margaretha)
+ - Added debug flags (margaretha)
+ - Added order on the fields parameter of search get request (margaretha)
 07/01/2019
-   - Disabled send shutdown to existing jetty web server at start (margaretha)
+ - Disabled send shutdown to existing jetty web server at start (margaretha)
 09/01/2019
-   - Added comments (margaretha)
-   - Updated code structure (margaretha)
-   - Removed spring security libraries and ManagerInterface (margaretha)
+ - Added comments (margaretha)
+ - Updated code structure (margaretha)
+ - Removed spring security libraries and ManagerInterface (margaretha)
 21/01/2019
-   - Removed codes related to user registration & password management (margaretha)
+ - Removed codes related to user registration & password management (margaretha)
 22/01/2019
-   - Added create, edit, retrieve user default setting controllers (margaretha)
+ - Added create, edit, retrieve user default setting controllers (margaretha)
 24/01/2019
-   - Added default setting key validation & fixed UserdataTest (margaretha)   
+ - Added default setting key validation & fixed UserdataTest (margaretha) 
 28/01/2019
-   - Updated Rewrite handler (margaretha)
+ - Updated Rewrite handler (margaretha)
 29/01/2019
-   - Handled "no resource found" cases (margaretha, issue #37)
+ - Handled "no resource found" cases (margaretha, issue #37)
 30/01/2019
-   - Updated shutdownToken (margaretha)
-   - Added server shutdown description in readme (margaretha) 
+ - Updated shutdownToken (margaretha)
+ - Added server shutdown description in readme (margaretha) 
 
 version 0.61.4
 14/11/2018
-   - Integrated lite and full services and controllers in core (margaretha)
+ - Integrated lite and full services and controllers in core (margaretha)
 29/11/2018
-   - Added OAuth2 scope for listing user clients (margaretha)
+ - Added OAuth2 scope for listing user clients (margaretha)
 30/11/2018
-   - Updated sample-index to Krill v0.58.1 (diewald)
+ - Updated sample-index to Krill v0.58.1 (diewald)
 06/12/2018
-   - Fixed KoralNode at method (margaretha)
+ - Fixed KoralNode at method (margaretha)
 11/12/2018
-   - Removed document controllers and KustvaktResource (margaretha) 
-   - Fixed rewrite bugs (updated rewriteQuery & KoralNode) (margaretha)   
+ - Removed document controllers and KustvaktResource (margaretha) 
+ - Fixed rewrite bugs (updated rewriteQuery & KoralNode) (margaretha) 
 
 version 0.61.3
 22/10/2018
-   - Updated jetty, spring and hibernate versions (margaretha)
+ - Updated jetty, spring and hibernate versions (margaretha)
 13/11/2018
-   - Moved secureRandomAlgorithm and messageDigestAlgorithm configuration 
-     to full (margaretha)
+ - Moved secureRandomAlgorithm and messageDigestAlgorithm configuration 
+   to full (margaretha)
 
 version 0.61.2
 12/09/2018
-   - Removed log4j loader and old OAuth2 implementation codes(margaretha)
+ - Removed log4j loader and old OAuth2 implementation codes(margaretha)
 13/09/2018
-   - Updated KoralNode and enforced order of RewriteTask (margaretha)
+ - Updated KoralNode and enforced order of RewriteTask (margaretha)
 14/09/2018
-   - Added a status code for non-unique results (margaretha)
+ - Added a status code for non-unique results (margaretha)
 19/09/2018
-   - Updated supported version configuration (margaretha)
+ - Updated supported version configuration (margaretha)
 22/10/2018
-   - Updated spring, jetty and hibernate versions (margaretha)
+ - Updated spring, jetty and hibernate versions (margaretha)
 24/10/2018
-   - Moved license regex configuration to full (margaretha)
-   - Added defaultRewriteConstraints (margaretha)
+ - Moved license regex configuration to full (margaretha)
+ - Added defaultRewriteConstraints (margaretha)
 29/10/2018
-   - Added javax.servlet-api (margaretha)
-   - Updated koral version (margaretha)
-   
+ - Added javax.servlet-api (margaretha)
+ - Updated koral version (margaretha)
+ 
 version 0.61.1
 28/08/2018
-   - Added API URL versioning (margaretha)
+ - Added API URL versioning (margaretha)
 
 30/08/2018
-   - Added backwards compability for URL versioning (margaretha)
-   - Updated API version filter (margaretha)
+ - Added backwards compability for URL versioning (margaretha)
+ - Updated API version filter (margaretha)
 
 version 0.61.0
 13/08/2018
-   - Updated Krill and Koral versions enabling VC caching and referencing (margaretha)
-   - Set kustvakt configuration as Krill properties (margaretha)
-   
+ - Updated Krill and Koral versions enabling VC caching and referencing (margaretha)
+ - Set kustvakt configuration as Krill properties (margaretha)
+ 
 version 0.60.5
 09/07/2018
-   - Fixed status codes (margaretha)
-   - Added KustvaktException for wrapping another exception (margaretha)
-   - Removed deprecated codes regarding KustvaktResource (margaretha)
-   
+ - Fixed status codes (margaretha)
+ - Added KustvaktException for wrapping another exception (margaretha)
+ - Removed deprecated codes regarding KustvaktResource (margaretha)
+ 
 version 0.60.4
 25/06/2018
-   - added the redirect URI property in KustvaktException (margaretha)
-   - added openid related status codes (margaretha)
+ - added the redirect URI property in KustvaktException (margaretha)
+ - added openid related status codes (margaretha)
 
 version 0.60.3
 30/05/2018
-   - added parameter checker for collection (margaretha)
-   - updated krill version (margaretha)
-   
+ - added parameter checker for collection (margaretha)
+ - updated krill version (margaretha)
+ 
 version 0.60.2
 25/04/2018
-   - rearranged and cleaned up codes (margaretha)
-   - generalized some KustvaktException methods (margaretha)
-   - added status codes (margaretha)
-   - updated FormRequestWrapper constructor (margaretha)
-   - fixed get request null parameter in FormRequestWrapper (margaretha)
-   
+ - rearranged and cleaned up codes (margaretha)
+ - generalized some KustvaktException methods (margaretha)
+ - added status codes (margaretha)
+ - updated FormRequestWrapper constructor (margaretha)
+ - fixed get request null parameter in FormRequestWrapper (margaretha)
+ 
 version 0.60.1
 14/03/2018
-   - removed AdminHandlerIface (margaretha)
-   - removed isSystemAdmin in User class (margaretha)
+ - removed AdminHandlerIface (margaretha)
+ - removed isSystemAdmin in User class (margaretha)
 
 version 0.60
 13/03/2018
-   - removed old policy and deprecated code (margaretha)
-   - moved authentication related code to /full (margaretha)
-   - elaborated default layer names in the configuration file (margaretha)
-   - added GROUP_DELETED status code (margaretha)
+ - removed old policy and deprecated code (margaretha)
+ - moved authentication related code to /full (margaretha)
+ - elaborated default layer names in the configuration file (margaretha)
+ - added GROUP_DELETED status code (margaretha)
 
 version 0.59.10 
 20/02/2018
-   - updated hibernate and reflection versions (margaretha)
-   - added Changes file (margaretha)
-   - merged BeanConfigBaseTest to BeanConfigTest in /full (margaretha)
-   - added status code for already deleted entry (margaretha)
-   - updated library versions and java environment (margaretha)
-   - added status codes (margaretha)
-   - moved validation.properties (margaretha)
-   - fixed unrecognized media-type application/json (margaretha)
-   
+ - updated hibernate and reflection versions (margaretha)
+ - added Changes file (margaretha)
+ - merged BeanConfigBaseTest to BeanConfigTest in /full (margaretha)
+ - added status code for already deleted entry (margaretha)
+ - updated library versions and java environment (margaretha)
+ - added status codes (margaretha)
+ - moved validation.properties (margaretha)
+ - fixed unrecognized media-type application/json (margaretha)
+ 
 version 0.59.9
 08/11/2017
-   - fixed missing exception in JsonUtils (margaretha)
-   - fixed and restructured KustvaktResponseHandler (margaretha)
-   - updated status code in ParameterChecker (margaretha)
-   
+ - fixed missing exception in JsonUtils (margaretha)
+ - fixed and restructured KustvaktResponseHandler (margaretha)
+ - updated status code in ParameterChecker (margaretha)
+ 
 version 0.59.8 
 24/10/2017
-   - restructured Kustvakt and created core project (margaretha)
-   - marked loader classes as deprecated (margaretha)
-   - updated Spring version (margaretha)
-   - moved unnecessary dependencies (margaretha)
+ - restructured Kustvakt and created core project (margaretha)
+ - marked loader classes as deprecated (margaretha)
+ - updated Spring version (margaretha)
+ - moved unnecessary dependencies (margaretha)
