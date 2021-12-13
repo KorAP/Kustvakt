@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.rewrite;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -59,7 +60,8 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         dao.deleteQuery(vc);
         vc = dao.retrieveQueryByName("named-vc1", "system");
         assertNull(vc);
-//        VirtualCorpusCache.reset();
+        VirtualCorpusCache.delete("named-vc1");
+        assertFalse(VirtualCorpusCache.contains("named-vc1"));
     }
 
     private void testRefCachedVCWithUsername ()
