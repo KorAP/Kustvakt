@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fae110b7_832d63df",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2021-12-17T11:50:31Z",
+      "side": 1,
+      "message": "Fails for me with:\n\n[ERROR] Failures: \n[ERROR]   VirtualCorpusDaoTest.retrieveSystemVC:79 expected:\u003c1\u003e but was:\u003c5\u003e\n[ERROR]   VirtualCorpusDaoTest.retrieveVCByUserDory:92 expected:\u003c4\u003e but was:\u003c8\u003e\n[ERROR]   VirtualCorpusDaoTest.retrieveVCByUserMarlin:128 expected:\u003c3\u003e but was:\u003c7\u003e\n[ERROR]   VirtualCorpusDaoTest.retrieveVCByUserNemo:111 expected:\u003c3\u003e but was:\u003c7\u003e\n[ERROR]   VirtualCorpusDaoTest.retrieveVCByUserPearl:145 expected:\u003c2\u003e but was:\u003c6\u003e\n[ERROR]   VirtualCorpusDaoTest.testSystemVC:53 expected:\u003c2\u003e but was:\u003c5\u003e\n[ERROR]   OAuth2AccessTokenTest.testCustomScope:80 expected:\u003c4\u003e but was:\u003c5\u003e\n[ERROR]   VirtualCorpusControllerAdminTest.testCreateSystemVC:120 expected:\u003c2\u003e but was:\u003c3\u003e\n[ERROR]   VirtualCorpusControllerAdminTest.testListDoryVC:85 expected:\u003c4\u003e but was:\u003c5\u003e\n[ERROR]   VirtualCorpusControllerTest.testCreatePrivateVC:328 expected:\u003c2\u003e but was:\u003c4\u003e\n[ERROR]   VirtualCorpusControllerTest.testCreateSystemVC:484-\u003etestListSystemVC:303 expected:\u003c2\u003e but was:\u003c4\u003e\n[ERROR]   VirtualCorpusControllerTest.testCreateSystemVCUnauthorized:501 expected:\u003c401\u003e but was:\u003c204\u003e\n[ERROR]   VirtualCorpusControllerTest.testListAvailableVCDory:253 expected:\u003c4\u003e but was:\u003c6\u003e\n[ERROR]   VirtualCorpusControllerTest.testListAvailableVCNemo:237 expected:\u003c3\u003e but was:\u003c5\u003e\n[ERROR]   VirtualCorpusControllerTest.testListAvailableVCPearl:245 expected:\u003c2\u003e but was:\u003c4\u003e\n[ERROR] Errors: \n[ERROR]   VCReferenceTest.testRefVcPrecached:65 » Runtime de.ids_mannheim.korap.util.Que...\n[INFO] \n[ERROR] Tests run: 387, Failures: 15, Errors: 1, Skipped: 14\n\n\nAlso:\n\n- Should request both the updated Krill and Koral versions with log4j \u003e\u003d 2.16\n- The Changes file is not properly layouted",
+      "revId": "61e6254c4a67138ed3dc24f00dce5faf1e34c4c2",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
