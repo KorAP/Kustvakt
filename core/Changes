@@ -9,6 +9,7 @@
 2022-01-03
  - [security] More log4j security updates
  - Cleaned up LDAP libraries
+ - Bumped spring.version from 5.3.13 to 5.3.14
 
 
 # version 0.64
