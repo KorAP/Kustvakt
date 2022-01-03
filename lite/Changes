@@ -3,23 +3,24 @@
 !!! includes security updates  - please update all Kustvakt libraries
 !!! Please also update Krill to version 0.60.2 and Koral to version 0.38 
 
-2021 -12 -10
+2021-12-10
  - [security] Updated log4j libs due to CVE -2021 -44228.
-
+2022-01-03
+ - [security] More log4j security updates
 
 
 # version 0.64
 
-2021 -07 -29
+2021-07-29
  - Updated the change files and made a new version.
-2021 -08 -12
+2021-08-12
  - Removed initializator from lite config.
 
 # version 0.63.2
 
-2021 -07 -19
+2021-07-19
  - Updated mockserver dependency -order in pom.
-2021 -07 -26
+2021-07-26
  - Replaced annotation parsing with restoring the annotation tables to the
 database.
  - Excluded jackson core libraries from Mockserver. 
