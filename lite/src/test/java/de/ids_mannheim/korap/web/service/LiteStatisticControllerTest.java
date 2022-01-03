@@ -32,7 +32,7 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
 
         assertEquals(
             "Wes8Bd4h1OypPqbWF5njeQ==",
-            response.getMetadata().getFirst("X-Index-Revision")
+            response.getHeaders().getFirst("X-Index-Revision")
             );
         
         String query = response.getEntity(String.class);

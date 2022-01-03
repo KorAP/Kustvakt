@@ -37,7 +37,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
 
         assertEquals(
             "Wes8Bd4h1OypPqbWF5njeQ==",
-            response.getMetadata().getFirst("X-Index-Revision")
+            response.getHeaders().getFirst("X-Index-Revision")
             );
 
         String ent = response.getEntity(String.class);
@@ -194,7 +194,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
 
         assertEquals(
             "Wes8Bd4h1OypPqbWF5njeQ==",
-            response.getMetadata().getFirst("X-Index-Revision")
+            response.getHeaders().getFirst("X-Index-Revision")
             );
         
         assertEquals(ClientResponse.Status.OK.getStatusCode(),

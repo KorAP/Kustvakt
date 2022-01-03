@@ -1,15 +1,15 @@
 package de.ids_mannheim.korap.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.PersistenceException;
 
-import org.junit.Rule;
+import org.hibernate.exception.GenericJDBCException;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.config.SpringJerseyTest;
@@ -17,15 +17,13 @@ import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.user.User;
 
 public class VirtualCorpusDaoTest extends SpringJerseyTest {
 
     @Autowired
     private QueryDao dao;
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void testListVCByType () throws KustvaktException {
@@ -57,19 +55,27 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
         dao.deleteQuery(vc);
 
         // check if vc has been deleted
-        thrown.expect(KustvaktException.class);
-        dao.retrieveQueryById(id);
+        KustvaktException exception =
+                assertThrows(KustvaktException.class, () -> {
+                    dao.retrieveQueryById(id);
+                });
+        
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                exception.getStatusCode().intValue());
     }
 
     @Test
     public void testNonUniqueVC () throws KustvaktException {
-        thrown.expect(PersistenceException.class);
-        thrown.expectMessage("could not execute statement");
         
-        dao.createQuery("system-vc", ResourceType.SYSTEM,
-                QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE,
-                "corpusSigle=GOE", "definition", "description", "experimental",
-                false, "system", null, null);
+        PersistenceException exception = assertThrows(PersistenceException.class, ()->{
+            dao.createQuery("system-vc", ResourceType.SYSTEM,
+                    QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE,
+                    "corpusSigle=GOE", "definition", "description", "experimental",
+                    false, "system", null, null);
+        });        
+        assertEquals(
+                "org.hibernate.exception.GenericJDBCException: could not execute statement",
+                exception.getMessage());
     }
 
     @Test

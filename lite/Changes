@@ -7,6 +7,7 @@
  - [security] Updated log4j libs due to CVE -2021 -44228.
 2022-01-03
  - [security] More log4j security updates
+ - Updated tests.
 
 
 # version 0.64
