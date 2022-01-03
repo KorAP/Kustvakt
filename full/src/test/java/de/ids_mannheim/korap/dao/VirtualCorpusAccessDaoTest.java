@@ -1,20 +1,18 @@
 package de.ids_mannheim.korap.dao;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import de.ids_mannheim.korap.constant.QueryAccessStatus;
-import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.QueryAccess;
+import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -23,9 +21,6 @@ public class VirtualCorpusAccessDaoTest {
 
     @Autowired
     private QueryAccessDao dao;
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void getAccessByVC () throws KustvaktException {
@@ -37,6 +32,5 @@ public class VirtualCorpusAccessDaoTest {
         UserGroup group = access.getUserGroup();
         assertEquals(2, group.getId());
     }
-    
     
 }

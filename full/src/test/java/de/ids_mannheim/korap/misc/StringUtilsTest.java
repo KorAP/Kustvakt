@@ -1,13 +1,10 @@
 package de.ids_mannheim.korap.misc;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import de.ids_mannheim.korap.authentication.BasicAuthentication;
 import de.ids_mannheim.korap.authentication.http.AuthorizationData;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.authentication.http.TransferEncoding;
@@ -31,9 +28,8 @@ public class StringUtilsTest {
 
     @Test
     public void testBasicHttpSplit () throws KustvaktException {
-        TransferEncoding transferEncoding = new TransferEncoding();
         String s2 = new String(Base64.encodeBase64("test:testPass".getBytes()));
-        String[] f2 = transferEncoding.decodeBase64(s2);
+        String[] f2 = TransferEncoding.decodeBase64(s2);
         assertEquals("test", f2[0]);
         assertEquals("testPass", f2[1]);
 

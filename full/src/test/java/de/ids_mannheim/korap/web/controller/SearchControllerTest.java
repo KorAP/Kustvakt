@@ -64,7 +64,7 @@ public class SearchControllerTest extends SpringJerseyTest {
                 response.getStatus());
         assertEquals(
             "Wes8Bd4h1OypPqbWF5njeQ==",
-            response.getMetadata().getFirst("X-Index-Revision")
+            response.getHeaders().getFirst("X-Index-Revision")
             );
 
         String message = response.getEntity(String.class);

@@ -2,14 +2,13 @@ package de.ids_mannheim.korap.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -18,15 +17,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
-import de.ids_mannheim.korap.constant.QueryType;
-import de.ids_mannheim.korap.constant.UserGroupStatus;
 import de.ids_mannheim.korap.constant.QueryAccessStatus;
+import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
+import de.ids_mannheim.korap.constant.UserGroupStatus;
+import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.entity.Role;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
-import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import edu.emory.mathcs.backport.java.util.Collections;
 
@@ -42,10 +42,6 @@ public class UserGroupDaoTest {
     private RoleDao roleDao;
     @Autowired
     private FullConfiguration config;
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
 
     @Test
     public void createDeleteNewUserGroup () throws KustvaktException {
@@ -93,8 +89,14 @@ public class UserGroupDaoTest {
 
         // hard delete
         userGroupDao.deleteGroup(groupId, createdBy, false);
-        thrown.expect(KustvaktException.class);
-        group = userGroupDao.retrieveGroupById(groupId);
+        
+        KustvaktException exception = assertThrows(KustvaktException.class, () -> {
+            userGroupDao.retrieveGroupById(groupId);
+        });
+        
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                exception.getStatusCode().intValue());
+        assertEquals("Group with id 5 is not found", exception.getMessage());
     }
 
     @Test
