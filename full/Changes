@@ -17,6 +17,7 @@
 2022-01-03
  - [security] More log4j security updates
  - Bumped unboundid-ldapsdk
+ - Updated tests.
 
 
 # version 0.64.1
