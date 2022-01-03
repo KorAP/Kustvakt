@@ -23,6 +23,9 @@ updates:
       - dependency-name: "org.hibernate.org:hibernate-*"
         versions:
           - ">= 5.5.0"
+      - dependency-name: "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider"
+        versions:
+          - ">= 2.13.0"
     open-pull-requests-limit: 50
 
   - package-ecosystem: "maven" # See documentation for possible values
