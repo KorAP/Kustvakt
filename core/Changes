@@ -8,6 +8,7 @@
  - [security] Updated log4j libs due to CVE-2021-44228.
 2022-01-03
  - [security] More log4j security updates
+ - Cleaned up LDAP libraries
 
 
 # version 0.64
