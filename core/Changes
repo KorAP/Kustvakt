@@ -10,7 +10,8 @@
  - [security] More log4j security updates
  - Cleaned up LDAP libraries
  - Bumped spring.version from 5.3.13 to 5.3.14
-
+2022-01-25
+ - Added show-tokens option to the search API.
 
 # version 0.64
 

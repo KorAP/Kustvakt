@@ -18,7 +18,8 @@
  - [security] More log4j security updates
  - Bumped unboundid-ldapsdk
  - Updated tests.
-
+2022-01-25
+ - Added show-tokens option to the search API.
 
 # version 0.64.1
 

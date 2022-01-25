@@ -135,7 +135,8 @@ public class SearchService extends BasicService{
     public String search (String engine, String username, HttpHeaders headers,
             String q, String ql, String v, List<String> cqList, String fields,
             String pipes, Integer pageIndex, Integer pageInteger, String ctx,
-            Integer pageLength, Boolean cutoff, boolean accessRewriteDisabled)
+            Integer pageLength, Boolean cutoff, boolean accessRewriteDisabled,
+            boolean showTokens)
             throws KustvaktException {
 
         if (pageInteger != null && pageInteger < 1) {
@@ -168,7 +169,8 @@ public class SearchService extends BasicService{
         handleNonPublicFields(fieldList, accessRewriteDisabled, serializer);
         
         MetaQueryBuilder meta = createMetaQuery(pageIndex, pageInteger, ctx,
-                pageLength, cutoff, corpusAccess, fieldList, accessRewriteDisabled);
+                pageLength, cutoff, corpusAccess, fieldList, accessRewriteDisabled,
+                showTokens);
         serializer.setMeta(meta.raw());
         
         // There is an error in query processing
@@ -178,6 +180,15 @@ public class SearchService extends BasicService{
         }
 
         String query = serializer.toJSON();
+        
+        if (accessRewriteDisabled && showTokens) {
+            Notifications n = new Notifications();
+            n.addWarning(StatusCodes.NOT_ALLOWED,
+                    "Tokens cannot be shown without access.");
+            JsonNode warning = n.toJsonNode();
+            query = addWarning(query, warning);
+        }
+        
         query = runPipes(query,pipeArray);
         
         query = this.rewriteHandler.processQuery(query, user);
@@ -263,6 +274,14 @@ public class SearchService extends BasicService{
                 "Pipe failed", url, message);
         JsonNode warning = n.toJsonNode();
         
+        query = addWarning(query, warning);
+        return query; 
+    }
+    
+
+    private String addWarning (String query, JsonNode warning)
+            throws KustvaktException {
+        
         ObjectNode node = (ObjectNode) JsonUtils.readTree(query);
         if (node.has("warnings")){
             warning = warning.at("/warnings/0");
@@ -273,8 +292,7 @@ public class SearchService extends BasicService{
         else{
             node.setAll((ObjectNode) warning);
         }
-        
-        return node.toString(); 
+        return node.toString();
     }
 
     private void handleNonPublicFields (List<String> fieldList,
@@ -300,7 +318,8 @@ public class SearchService extends BasicService{
     private MetaQueryBuilder createMetaQuery (Integer pageIndex,
             Integer pageInteger, String ctx, Integer pageLength,
             Boolean cutoff, CorpusAccess corpusAccess, List<String> fieldList,
-            boolean accessRewriteDisabled) {
+            boolean accessRewriteDisabled,
+            boolean showTokens) {
         MetaQueryBuilder meta = new MetaQueryBuilder();
         meta.addEntry("startIndex", pageIndex);
         meta.addEntry("startPage", pageInteger);
@@ -309,6 +328,10 @@ public class SearchService extends BasicService{
         // todo: what happened to cutoff?
         meta.addEntry("cutOff", cutoff);
         meta.addEntry("snippets", !accessRewriteDisabled);
+        if (!accessRewriteDisabled) {
+            meta.addEntry("tokens", showTokens);
+        }
+        
         // meta.addMeta(pageIndex, pageInteger, pageLength, ctx,
         // cutoff);
         // fixme: should only apply to CQL queries per default!
