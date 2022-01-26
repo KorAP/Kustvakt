@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9d0270c_e930f85b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-01-26T14:15:29Z",
+      "side": 1,
+      "message": "I could imagine that a `show-snippet` could be useful here as well.",
+      "revId": "9c6493ed3569fc5288f895bcdd12e3faab642f80",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
