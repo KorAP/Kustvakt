@@ -8,7 +8,8 @@
 2022-01-03
  - [security] More log4j security updates
  - Updated tests.
-
+2022-01-25
+ - Added show-tokens option to the search API.
 
 # version 0.64
 

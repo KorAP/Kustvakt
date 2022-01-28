@@ -17,7 +17,7 @@ import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
-public class PublicMetadataTest extends SpringJerseyTest {
+public class SearchPublicMetadataTest extends SpringJerseyTest {
 
     @Test
     public void testSearchPublicMetadata () throws KustvaktException {
