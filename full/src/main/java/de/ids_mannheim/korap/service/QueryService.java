@@ -65,8 +65,7 @@ import de.ids_mannheim.korap.web.input.QueryJson;
 @Service
 public class QueryService {
 
-    public static Logger jlog =
-            LogManager.getLogger(QueryService.class);
+    public static Logger jlog = LogManager.getLogger(QueryService.class);
 
     public static boolean DEBUG = false;
 
@@ -99,13 +98,13 @@ public class QueryService {
         }
     }
 
-    public List<QueryDto> listOwnerQuery (String username,
-            String queryCreator, QueryType queryType) throws KustvaktException {
+    public List<QueryDto> listOwnerQuery (String username, String queryCreator,
+            QueryType queryType) throws KustvaktException {
         verifyUsername(username, queryCreator);
         List<QueryDO> list = queryDao.retrieveOwnerQuery(username, queryType);
         return createQueryDtos(list, queryType);
     }
-    
+
     public List<QueryDto> listSystemQuery (QueryType queryType)
             throws KustvaktException {
         List<QueryDO> list = queryDao.retrieveQueryByType(ResourceType.SYSTEM,
@@ -130,14 +129,12 @@ public class QueryService {
         else {
             username = authenticatedUsername;
         }
-        List<QueryDO> list =
-                queryDao.retrieveQueryByUser(username, queryType);
+        List<QueryDO> list = queryDao.retrieveQueryByUser(username, queryType);
         return createQueryDtos(list, queryType);
     }
 
-    public List<QueryDto> listQueryByType (String username,
-            String createdBy, ResourceType type, QueryType queryType)
-            throws KustvaktException {
+    public List<QueryDto> listQueryByType (String username, String createdBy,
+            ResourceType type, QueryType queryType) throws KustvaktException {
 
         boolean isAdmin = adminDao.isAdmin(username);
 
@@ -153,21 +150,19 @@ public class QueryService {
         }
     }
 
-    private ArrayList<QueryDto> createQueryDtos (
-            List<QueryDO> queryList, QueryType queryType)
-            throws KustvaktException {
+    private ArrayList<QueryDto> createQueryDtos (List<QueryDO> queryList,
+            QueryType queryType) throws KustvaktException {
         ArrayList<QueryDto> dtos = new ArrayList<>(queryList.size());
         QueryDO query;
         Iterator<QueryDO> i = queryList.iterator();
         while (i.hasNext()) {
             query = i.next();
-//            String json = query.getKoralQuery();
+            // String json = query.getKoralQuery();
             String statistics = null;
-//            if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
-//                statistics = krill.getStatistics(json);
-//            }
-            QueryDto dto =
-                    converter.createQueryDto(query, statistics);
+            // if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
+            // statistics = krill.getStatistics(json);
+            // }
+            QueryDto dto = converter.createQueryDto(query, statistics);
             dtos.add(dto);
         }
         return dtos;
@@ -181,8 +176,7 @@ public class QueryService {
         if (query == null) {
             String code = createdBy + "/" + queryName;
             throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
-                    "Query " + code + " is not found.",
-                    String.valueOf(code));
+                    "Query " + code + " is not found.", String.valueOf(code));
         }
         else if (query.getCreatedBy().equals(username)
                 || adminDao.isAdmin(username)) {
@@ -196,7 +190,7 @@ public class QueryService {
             }
             if (type.equals(QueryType.VIRTUAL_CORPUS)
                     && VirtualCorpusCache.contains(queryName)) {
-               VirtualCorpusCache.delete(queryName);
+                VirtualCorpusCache.delete(queryName);
             }
             queryDao.deleteQuery(query);
         }
@@ -211,7 +205,7 @@ public class QueryService {
 
         verifyUsername(username, queryCreator);
         QueryDO query = queryDao.retrieveQueryByName(queryName, queryCreator);
-        
+
         if (query == null) {
             storeQuery(queryJson, queryName, queryCreator, username);
             return Status.CREATED;
@@ -238,8 +232,8 @@ public class QueryService {
         String queryLanguage = newQuery.getQueryLanguage();
         if (corpusQuery != null && !corpusQuery.isEmpty()) {
             koralQuery = serializeCorpusQuery(corpusQuery);
-            requiredAccess = determineRequiredAccess(newQuery.isCached(), queryName,
-                    koralQuery);
+            requiredAccess = determineRequiredAccess(newQuery.isCached(),
+                    queryName, koralQuery);
         }
         else if (query != null && !query.isEmpty() && queryLanguage != null
                 && !queryLanguage.isEmpty()) {
@@ -251,8 +245,8 @@ public class QueryService {
             if (existingQuery.getType().equals(ResourceType.PUBLISHED)) {
                 // withdraw from publication
                 if (!type.equals(ResourceType.PUBLISHED)) {
-                    QueryAccess hiddenAccess =
-                            accessDao.retrieveHiddenAccess(existingQuery.getId());
+                    QueryAccess hiddenAccess = accessDao
+                            .retrieveHiddenAccess(existingQuery.getId());
                     deleteQueryAccess(hiddenAccess.getId(), "system");
                     int groupId = hiddenAccess.getUserGroup().getId();
                     userGroupService.deleteAutoHiddenGroup(groupId, "system");
@@ -269,7 +263,8 @@ public class QueryService {
 
         queryDao.editQuery(existingQuery, queryName, type, requiredAccess,
                 koralQuery, newQuery.getDefinition(), newQuery.getDescription(),
-                newQuery.getStatus(), newQuery.isCached(), query, queryLanguage);
+                newQuery.getStatus(), newQuery.isCached(), query,
+                queryLanguage);
     }
 
     private void publishQuery (int queryId) throws KustvaktException {
@@ -291,7 +286,7 @@ public class QueryService {
                     + ". Hidden access exists! Access id: " + access.getId());
         }
     }
-    
+
     public void storeQuery (QueryJson query, String queryName,
             String queryCreator, String username) throws KustvaktException {
         String koralQuery = null;
@@ -323,22 +318,22 @@ public class QueryService {
         ParameterChecker.checkObjectValue(type, "type");
 
         if (!queryNamePattern.matcher(queryName).matches()) {
-            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
-                    queryType.displayName() + " name must only contain "
-                            + "letters, numbers, underscores, hypens and spaces",
+            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, queryType
+                    .displayName() + " name must only contain "
+                    + "letters, numbers, underscores, hypens and spaces",
                     queryName);
         }
 
-        if (type.equals(ResourceType.SYSTEM)){
+        if (type.equals(ResourceType.SYSTEM)) {
             if (adminDao.isAdmin(username)) {
-                queryCreator="system";
+                queryCreator = "system";
             }
             else if (!username.equals("system")) {
                 throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                        "Unauthorized operation for user: " + username, username);    
+                        "Unauthorized operation for user: " + username,
+                        username);
             }
         }
-        
 
         CorpusAccess requiredAccess = CorpusAccess.PUB;
         if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
@@ -346,10 +341,10 @@ public class QueryService {
                     determineRequiredAccess(isCached, queryName, koralQuery);
         }
 
-        if (DEBUG){
+        if (DEBUG) {
             jlog.debug("Storing query: " + queryName + "in the database ");
         }
-        
+
         int queryId = 0;
         try {
             queryId = queryDao.createQuery(queryName, type, queryType,
@@ -453,8 +448,7 @@ public class QueryService {
         if (query == null) {
             String code = createdBy + "/" + queryName;
             throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
-                    "Query " + code + " is not found.",
-                    String.valueOf(code));
+                    "Query " + code + " is not found.", String.valueOf(code));
         }
         if (!username.equals(query.getCreatedBy())
                 && !adminDao.isAdmin(username)) {
@@ -546,10 +540,12 @@ public class QueryService {
 
         List<QueryAccess> accessList;
         if (adminDao.isAdmin(username)) {
-            accessList = accessDao.retrieveAllAccessByQuery(queryCreator, queryName);
+            accessList =
+                    accessDao.retrieveAllAccessByQuery(queryCreator, queryName);
         }
         else {
-            accessList = accessDao.retrieveActiveAccessByQuery(queryCreator, queryName);
+            accessList = accessDao.retrieveActiveAccessByQuery(queryCreator,
+                    queryName);
             List<QueryAccess> filteredAccessList = new ArrayList<>();
             for (QueryAccess access : accessList) {
                 UserGroup userGroup = access.getUserGroup();
@@ -617,13 +613,29 @@ public class QueryService {
         }
 
     }
-    
+
     public JsonNode retrieveKoralQuery (String username, String queryName,
             String createdBy, QueryType queryType) throws KustvaktException {
-        QueryDO query = searchQueryByName(username, queryName, createdBy, queryType);
+        QueryDO query =
+                searchQueryByName(username, queryName, createdBy, queryType);
         String koralQuery = query.getKoralQuery();
-        JsonNode kq = JsonUtils.readTree(koralQuery); 
+        JsonNode kq = JsonUtils.readTree(koralQuery);
         return kq;
+    }
+
+    public JsonNode retrieveFieldValues (String username, String queryName,
+            String createdBy, QueryType queryType, String fieldName)
+            throws KustvaktException {
+        if (fieldName.equals("tokens") || fieldName.equals("base")) {
+            throw new KustvaktException(StatusCodes.NOT_ALLOWED,
+                    "Retrieving values of field "+fieldName+" is not allowed.");
+        }
+        else {
+            QueryDO query = searchQueryByName(username, queryName, createdBy,
+                    queryType);
+            String koralQuery = query.getKoralQuery();
+            return krill.getFieldValuesForVC(koralQuery, fieldName);
+        }
     }
 
     public QueryDO searchQueryByName (String username, String queryName,
@@ -632,7 +644,7 @@ public class QueryService {
         if (query == null) {
             String code = createdBy + "/" + queryName;
             throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
-                    queryType.displayName()+ " " + code + " is not found.",
+                    queryType.displayName() + " " + code + " is not found.",
                     String.valueOf(code));
         }
         checkQueryAccess(query, username);
@@ -641,16 +653,19 @@ public class QueryService {
 
     public QueryDto retrieveQueryByName (String username, String queryName,
             String createdBy, QueryType queryType) throws KustvaktException {
-        QueryDO query = searchQueryByName(username, queryName, createdBy, queryType);
-//        String json = query.getKoralQuery();
+        QueryDO query =
+                searchQueryByName(username, queryName, createdBy, queryType);
+        // String json = query.getKoralQuery();
         String statistics = null;
-//        long start,end;
-//        start = System.currentTimeMillis();
-//        if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
-//            statistics = krill.getStatistics(json);
-//        }
-//        end = System.currentTimeMillis();
-//        jlog.debug("{} statistics duration: {}", queryName, (end - start));
+        // long start,end;
+        // start = System.currentTimeMillis();
+        // if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS))
+        // {
+        // statistics = krill.getStatistics(json);
+        // }
+        // end = System.currentTimeMillis();
+        // jlog.debug("{} statistics duration: {}", queryName, (end -
+        // start));
         return converter.createQueryDto(query, statistics);
     }
 
@@ -659,8 +674,8 @@ public class QueryService {
 
         QueryDO query = queryDao.retrieveQueryById(queryId);
         checkQueryAccess(query, username);
-//        String json = query.getKoralQuery();
-//        String statistics = krill.getStatistics(json);
+        // String json = query.getKoralQuery();
+        // String statistics = krill.getStatistics(json);
         return converter.createQueryDto(query, null);
     }
 

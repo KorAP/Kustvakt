@@ -173,6 +173,25 @@ public class VirtualCorpusController {
         }
     }
     
+    @GET
+    @Path("/field/~{createdBy}/{vcName}")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public JsonNode retrieveVCField (
+            @Context SecurityContext securityContext,
+            @PathParam("createdBy") String createdBy,
+            @PathParam("vcName") String vcName,
+            @QueryParam("fieldName") String fieldName) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
+            return service.retrieveFieldValues(context.getUsername(), vcName,
+                    createdBy, QueryType.VIRTUAL_CORPUS, fieldName);
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+    }
     
     /**
      * Lists all virtual corpora available to the authenticated user.
