@@ -1,0 +1,9 @@
+{
+    "collection": {
+        "@type": "koral:doc",
+        "key": "title",
+        "match": "match:eq",
+        "type": "type:string",
+        "value": "Italienische Reise"
+    }
+}
