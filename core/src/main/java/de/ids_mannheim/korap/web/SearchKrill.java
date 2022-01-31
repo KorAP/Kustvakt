@@ -12,6 +12,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.store.MMapDirectory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import de.ids_mannheim.korap.Krill;
 import de.ids_mannheim.korap.KrillCollection;
 import de.ids_mannheim.korap.KrillIndex;
@@ -364,6 +366,10 @@ public class SearchKrill {
             return index.getFingerprint();
         };
         return "null";
+    }
+    
+    public JsonNode getTextSiglesForVC (String koralQuery) {
+        return new Krill().createTextSigles(koralQuery, index);
     }
 
 };

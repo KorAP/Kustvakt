@@ -625,6 +625,14 @@ public class QueryService {
         JsonNode kq = JsonUtils.readTree(koralQuery); 
         return kq;
     }
+    
+    public JsonNode retrieveTextSigles (String username, String queryName,
+            String createdBy, QueryType queryType) throws KustvaktException {
+        QueryDO query = searchQueryByName(username, queryName, createdBy, queryType);
+        String koralQuery = query.getKoralQuery();
+        return krill.getTextSiglesForVC(koralQuery);
+    }
+
 
     public QueryDO searchQueryByName (String username, String queryName,
             String createdBy, QueryType queryType) throws KustvaktException {

@@ -173,6 +173,24 @@ public class VirtualCorpusController {
         }
     }
     
+    @GET
+    @Path("/textSigle/~{createdBy}/{vcName}")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public JsonNode retrieveVCTextSigles (
+            @Context SecurityContext securityContext,
+            @PathParam("createdBy") String createdBy,
+            @PathParam("vcName") String vcName) {
+        TokenContext context =
+                (TokenContext) securityContext.getUserPrincipal();
+        try {
+            scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
+            return service.retrieveTextSigles(context.getUsername(), vcName,
+                    createdBy, QueryType.VIRTUAL_CORPUS);
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+    }
     
     /**
      * Lists all virtual corpora available to the authenticated user.
