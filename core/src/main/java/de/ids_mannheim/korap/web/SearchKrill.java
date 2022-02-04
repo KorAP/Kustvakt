@@ -12,6 +12,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.store.MMapDirectory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import de.ids_mannheim.korap.Krill;
 import de.ids_mannheim.korap.KrillCollection;
 import de.ids_mannheim.korap.KrillIndex;
@@ -60,11 +62,13 @@ public class SearchKrill {
         };
     };
 
+
     public KrillIndex getIndex () {
         return index;
     };
-    
-    public void closeIndexReader() throws KustvaktException{
+
+
+    public void closeIndexReader () throws KustvaktException {
         try {
             index.closeReader();
         }
@@ -72,6 +76,7 @@ public class SearchKrill {
             throw new KustvaktException(500, "Failed closing index reader");
         }
     }
+
 
     /**
      * Search in the Lucene index.
@@ -96,6 +101,7 @@ public class SearchKrill {
         return kr.toJsonString();
     };
 
+
     /**
      * Search in the Lucene index and return matches as token lists.
      * 
@@ -115,6 +121,7 @@ public class SearchKrill {
         return kr.toJsonString();
     };
 
+
     /**
      * Get info on a match - by means of a richly annotated html
      * snippet.
@@ -124,7 +131,8 @@ public class SearchKrill {
      * @param availabilityList
      * @throws KustvaktException
      */
-    public String getMatch (String id, Pattern licensePattern) throws KustvaktException {
+    public String getMatch (String id, Pattern licensePattern)
+            throws KustvaktException {
         Match km;
         if (index != null) {
             try {
@@ -143,6 +151,7 @@ public class SearchKrill {
         }
         return km.toJsonString();
     };
+
 
     private void checkAvailability (Pattern licensePattern, String availability,
             String id) throws KustvaktException {
@@ -165,12 +174,13 @@ public class SearchKrill {
         }
 
     }
-    
+
+
     /*
      * Retrieve the meta fields for a certain document
      */
-    public String getFields (String id, List<String> fields, Pattern licensePattern)
-            throws KustvaktException {
+    public String getFields (String id, List<String> fields,
+            Pattern licensePattern) throws KustvaktException {
         MetaFields meta;
 
         // No index found
@@ -180,7 +190,7 @@ public class SearchKrill {
         }
 
         // Index available
-        else if (fields !=null){
+        else if (fields != null) {
             // Get fields
             meta = index.getFields(id, fields);
         }
@@ -188,7 +198,7 @@ public class SearchKrill {
             // Get fields
             meta = index.getFields(id);
         }
-        
+
         // EM: this approach forbids the whole metadata
         // this should be refined by filtering out only the restricted
         // metadata fields
@@ -197,7 +207,7 @@ public class SearchKrill {
 
         return meta.toJsonString();
     };
-    
+
 
     public String getMatch (String id, List<String> foundries,
             List<String> layers, boolean includeSpans,
@@ -222,6 +232,7 @@ public class SearchKrill {
         }
         return km.toJsonString();
     };
+
 
     /**
      * Get info on a match - by means of a richly annotated html
@@ -270,6 +281,7 @@ public class SearchKrill {
         return km.toJsonString();
     };
 
+
     /**
      * Get statistics on (virtual) collections.
      * 
@@ -277,7 +289,7 @@ public class SearchKrill {
      * 
      * @param json
      *            JSON-LD string with potential meta filters.
-     * @throws KustvaktException 
+     * @throws KustvaktException
      */
     public String getStatistics (String json) throws KustvaktException {
         if (index == null) {
@@ -317,7 +329,7 @@ public class SearchKrill {
         catch (IOException e) {
             e.printStackTrace();
         };
-        
+
         if (kc.hasErrors()) {
             throw new KustvaktException(
                     "{\"errors\":" + kc.getErrors().toJsonString() + "}");
@@ -329,6 +341,7 @@ public class SearchKrill {
                 .append(",\"paragraphs\":").append(paragraphs).append("}");
         return sb.toString();
     };
+
 
     /**
      * Return the match identifier as a string.
@@ -345,6 +358,7 @@ public class SearchKrill {
         return sb.toString();
     };
 
+
     /**
      * Return the text sigle as a string.
      */
@@ -356,14 +370,20 @@ public class SearchKrill {
         return sb.toString();
     };
 
+
     /**
      * Return the fingerprint of the latest index revision.
      */
-    public String getIndexFingerprint() {
+    public String getIndexFingerprint () {
         if (index != null) {
             return index.getFingerprint();
         };
         return "null";
+    }
+
+
+    public JsonNode getFieldValuesForVC (String koralQuery, String fieldName) {
+        return new Krill().retrieveFieldValues(koralQuery, index, fieldName);
     }
 
 };

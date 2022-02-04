@@ -315,6 +315,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		return false;
 	}
 
+	@Deprecated
 	private User authenticateShib(Map<String, Object> attributes) throws KustvaktException {
 		// todo use persistent id, since eppn is not unique
 		String eppn = (String) attributes.get(Attributes.EPPN);
@@ -648,8 +649,8 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 
 		entHandler.createAccount(user);
 
-		s.setUserId(user.getId());
-		d.setUserId(user.getId());
+//		s.setUserId(user.getId());
+//		d.setUserId(user.getId());
 
 		UserDataDbIface dao = BeansFactory.getTypeFactory().getTypeInterfaceBean(userdatadaos, UserDetails.class);
 		assert dao != null;
