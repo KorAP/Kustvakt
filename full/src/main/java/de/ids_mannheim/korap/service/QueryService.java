@@ -626,6 +626,12 @@ public class QueryService {
     public JsonNode retrieveFieldValues (String username, String queryName,
             String createdBy, QueryType queryType, String fieldName)
             throws KustvaktException {
+        
+        if (!adminDao.isAdmin(username)) {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Unauthorized operation for user: " + username, username);
+        }
+        
         if (fieldName.equals("tokens") || fieldName.equals("base")) {
             throw new KustvaktException(StatusCodes.NOT_ALLOWED,
                     "Retrieving values of field "+fieldName+" is not allowed.");

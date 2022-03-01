@@ -184,7 +184,7 @@ public class VirtualCorpusController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
+            scopeService.verifyScope(context, OAuth2Scope.ADMIN);
             return service.retrieveFieldValues(context.getUsername(), vcName,
                     createdBy, QueryType.VIRTUAL_CORPUS, fieldName);
         }

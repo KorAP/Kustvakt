@@ -40,7 +40,7 @@ public class VirtualCorpusFieldTest extends VirtualCorpusTestBase {
                 .path("field").path("~" + username).path(vcName)
                 .queryParam("fieldName", field)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("dory", "pass"))
+                        .createBasicAuthorizationHeaderValue("admin", "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .get(ClientResponse.class);
 
@@ -57,7 +57,7 @@ public class VirtualCorpusFieldTest extends VirtualCorpusTestBase {
                 .path("field").path("~" + username).path(vcName)
                 .queryParam("fieldName", field)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("dory", "pass"))
+                        .createBasicAuthorizationHeaderValue("admin", "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .get(ClientResponse.class);
 
@@ -129,6 +129,29 @@ public class VirtualCorpusFieldTest extends VirtualCorpusTestBase {
         assertEquals(1, n.size());
         assertEquals("GOE/AGI/00000", n.get(0).asText());
 
+        VirtualCorpusCache.delete("named-vc3");
+        deleteVcFromDB("named-vc3");
+    }
+    
+    @Test
+    public void testRetrieveFieldUnauthorized () throws KustvaktException, IOException, QueryException {
+        vcLoader.loadVCToCache("named-vc3", "/vc/named-vc3.jsonld");
+        
+        ClientResponse response = resource().path(API_VERSION).path("vc")
+                .path("field").path("~system").path("named-vc3")
+                .queryParam("fieldName", "textSigle")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("dory", "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .get(ClientResponse.class);
+
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED, node.at("/errors/0/0").asInt());
+        assertEquals("Unauthorized operation for user: dory", node.at("/errors/0/1").asText());
+        
+        
         VirtualCorpusCache.delete("named-vc3");
         deleteVcFromDB("named-vc3");
     }
