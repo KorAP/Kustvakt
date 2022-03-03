@@ -76,6 +76,7 @@
 		<!-- <property name="cleanOnValidationError" value="true" /> -->
 		<property name="locations" value="#{'${jdbc.schemaPath}'.split(',')}"/>
 		<property name="dataSource" ref="sqliteDataSource" />
+		<property name="outOfOrder" value="true" />
 	</bean>
 	
 	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
@@ -126,8 +127,6 @@
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="sqliteDataSource" />
 	</bean>
-
-	<bean id="vcLoader" class="de.ids_mannheim.de.init.VCLoaderImpl"/>
 
 	<!-- Krill -->
 	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">

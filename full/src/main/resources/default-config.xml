@@ -115,7 +115,7 @@
 		<!-- <property name="dataSource" ref="dataSource" /> -->
 		<property name="dataSource" ref="sqliteDataSource" />
 		<!-- <property name="dataSource" ref="c3p0DataSource" /> -->
-		
+		<property name="outOfOrder" value="true" />
 	</bean>
 	
 	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
@@ -197,8 +197,6 @@
 	<bean id="initializator" class="de.ids_mannheim.de.init.Initializator"
 		init-method="init">
 	</bean>
-	
-	<bean id="vcLoader" class="de.ids_mannheim.de.init.VCLoaderImpl"/>
 	
 	<!-- Krill -->
 	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">
