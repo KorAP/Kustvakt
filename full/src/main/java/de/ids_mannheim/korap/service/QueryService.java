@@ -627,6 +627,8 @@ public class QueryService {
             String createdBy, QueryType queryType, String fieldName)
             throws KustvaktException {
         
+        ParameterChecker.checkStringValue(fieldName, "fieldName");
+        
         if (!adminDao.isAdmin(username)) {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: " + username, username);
