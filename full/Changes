@@ -3,6 +3,9 @@
 2022-03-03
  - Removed VCLoader.
  - Added foreign keys to the DB tables of access and refresh token scopes.
+2022-03-07
+ - Added more parameter checks and OAuth2Client web-service tests.
+
 
 # version 0.65.1
 
