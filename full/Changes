@@ -5,7 +5,8 @@
  - Added foreign keys to the DB tables of access and refresh token scopes.
 2022-03-07
  - Added more parameter checks and OAuth2Client web-service tests.
-
+2022-03-17
+ - Updated admin filter by using admin token and role checks.
 
 # version 0.65.1
 
