@@ -57,7 +57,8 @@ public class AccessTokenDao extends KustvaktCacheable {
             Set<AccessScope> scopes, String userId, String clientId,
             ZonedDateTime authenticationTime) throws KustvaktException {
         ParameterChecker.checkStringValue(token, "access_token");
-//        ParameterChecker.checkObjectValue(refreshToken, "refresh token");
+        // ParameterChecker.checkObjectValue(refreshToken, "refresh
+        // token");
         ParameterChecker.checkObjectValue(scopes, "scopes");
         // ParameterChecker.checkStringValue(userId, "username");
         ParameterChecker.checkStringValue(clientId, "client_id");
@@ -69,7 +70,7 @@ public class AccessTokenDao extends KustvaktCacheable {
 
         ZonedDateTime expiry;
         AccessToken accessToken = new AccessToken();
-        
+
         if (refreshToken != null) {
             accessToken.setRefreshToken(refreshToken);
             expiry = now.plusSeconds(config.getAccessTokenExpiry());
@@ -77,9 +78,9 @@ public class AccessTokenDao extends KustvaktCacheable {
         else {
             expiry = now.plusSeconds(config.getAccessTokenLongExpiry());
         }
-        
+
         OAuth2Client client = clientDao.retrieveClientById(clientId);
-        
+
         accessToken.setCreatedDate(now);
         accessToken.setExpiryDate(expiry);
         accessToken.setToken(token);
@@ -142,11 +143,11 @@ public class AccessTokenDao extends KustvaktCacheable {
         CriteriaQuery<AccessToken> query =
                 builder.createQuery(AccessToken.class);
         Root<AccessToken> root = query.from(AccessToken.class);
-        
+
         Predicate condition = builder.and(
                 builder.equal(root.get(AccessToken_.userId), username),
                 builder.equal(root.get(AccessToken_.token), accessToken));
-        
+
         query.select(root);
         query.where(condition);
         Query q = entityManager.createQuery(query);
@@ -160,31 +161,31 @@ public class AccessTokenDao extends KustvaktCacheable {
         }
     }
 
-    
     public List<AccessToken> retrieveAccessTokenByClientId (String clientId,
             String username) throws KustvaktException {
         ParameterChecker.checkStringValue(clientId, "client_id");
         OAuth2Client client = clientDao.retrieveClientById(clientId);
-        
+
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<AccessToken> query =
                 builder.createQuery(AccessToken.class);
         Root<AccessToken> root = query.from(AccessToken.class);
-        
-        Predicate condition = builder.equal(root.get(AccessToken_.client), client);
-        if (username != null && !username.isEmpty()){
+
+        Predicate condition =
+                builder.equal(root.get(AccessToken_.client), client);
+        if (username != null && !username.isEmpty()) {
             condition = builder.and(condition,
                     builder.equal(root.get(AccessToken_.userId), username));
         }
-        
+
         query.select(root);
         query.where(condition);
         TypedQuery<AccessToken> q = entityManager.createQuery(query);
         return q.getResultList();
     }
 
-    public List<AccessToken> retrieveAccessTokenByUser (String username, String clientId)
-            throws KustvaktException {
+    public List<AccessToken> retrieveAccessTokenByUser (String username,
+            String clientId) throws KustvaktException {
         ParameterChecker.checkStringValue(username, "username");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -205,7 +206,31 @@ public class AccessTokenDao extends KustvaktCacheable {
             condition = builder.and(condition,
                     builder.equal(root.get(AccessToken_.client), client));
         }
-            
+
+        query.select(root);
+        query.where(condition);
+        TypedQuery<AccessToken> q = entityManager.createQuery(query);
+        return q.getResultList();
+    }
+
+    public void deleteInvalidAccessTokens () {
+        List<AccessToken> invalidAccessTokens = retrieveInvalidAccessTokens();
+        invalidAccessTokens.forEach(token -> entityManager.remove(token));
+    }
+    
+    public List<AccessToken> retrieveInvalidAccessTokens () {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<AccessToken> query =
+                builder.createQuery(AccessToken.class);
+
+        Root<AccessToken> root = query.from(AccessToken.class);
+        Predicate condition = builder.or(
+                builder.equal(root.get(AccessToken_.isRevoked), true),
+                builder.lessThan(
+                        root.<ZonedDateTime> get(AccessToken_.expiryDate),
+                        ZonedDateTime
+                                .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE))));
+
         query.select(root);
         query.where(condition);
         TypedQuery<AccessToken> q = entityManager.createQuery(query);

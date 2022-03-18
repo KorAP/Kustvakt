@@ -7,6 +7,8 @@
  - Added more parameter checks and OAuth2Client web-service tests.
 2022-03-17
  - Updated admin filter by using admin token and role checks.
+2022-03-18
+ - Added an OAuth2 admin API to delete expired/revoked access and refresh tokens.
 
 # version 0.65.1
 

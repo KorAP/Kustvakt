@@ -40,7 +40,6 @@ import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenSuperRequest;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ClientService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
-import de.ids_mannheim.korap.utils.TimeUtils;
 
 /** Implementation of token service using Apache Oltu.
  * 

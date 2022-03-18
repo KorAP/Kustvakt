@@ -50,13 +50,13 @@ VALUES ("nW5qM63Rb2a7KdT9L","test public client",null,
 
 INSERT INTO oauth2_access_token(token,user_id,created_date, 
 expiry_date, user_auth_time)
-VALUES("fia0123ikBWn931470H8s5gRqx7Moc4p","marlin","2018-05-30 16:25:50", 
-"2018-05-31 16:25:50", "2018-05-30 16:23:10");
+VALUES("fia0123ikBWn931470H8s5gRqx7Moc4p","marlin",1527776750000, 
+1527776750000, 1527690190000);
 
 INSERT INTO oauth2_refresh_token(token,user_id,user_auth_time, 
 created_date, expiry_date, client)
-VALUES("js9iQ4lw1Ri7fz06l0dXl8fCVp3Yn7vmq8","pearl","2017-05-30 16:25:50", 
-"2017-05-31 16:26:35", 1527784020000, "nW5qM63Rb2a7KdT9L");
+VALUES("js9iQ4lw1Ri7fz06l0dXl8fCVp3Yn7vmq8","pearl",1496154350000, 
+1496240795000, 1527784020000, "nW5qM63Rb2a7KdT9L");
 
 -- EM: expiry date must be in epoch milis format for testing with sqlite,
 -- on the contrary, for testing using mysql use this format: "2018-05-31 16:27:00"
