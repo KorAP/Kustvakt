@@ -46,6 +46,9 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     protected String superClientId = "fCBbQkAyYzI4NzUxMg";
     protected String clientSecret = "secret";
 
+    public static String ACCESS_TOKEN_TYPE = "access_token";
+    public static String REFRESH_TOKEN_TYPE = "refresh_token";
+
     protected ClientResponse requestAuthorizationCode (
             MultivaluedMap<String, String> form, String authHeader)
             throws KustvaktException {
@@ -251,4 +254,23 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         assertEquals("SUCCESS", response.getEntity(String.class));
     }
 
+    protected void testRevokeToken (String token, String clientId,
+            String clientSecret, String tokenType) {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("token_type", tokenType);
+        form.add("token", token);
+        form.add("client_id", clientId);
+        if (clientSecret != null) {
+            form.add("client_secret", clientSecret);
+        }
+
+        ClientResponse response =
+                resource().path(API_VERSION).path("oauth2").path("revoke")
+                        .header(HttpHeaders.CONTENT_TYPE,
+                                ContentType.APPLICATION_FORM_URLENCODED)
+                        .entity(form).post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertEquals("SUCCESS", response.getEntity(String.class));
+    }
 }

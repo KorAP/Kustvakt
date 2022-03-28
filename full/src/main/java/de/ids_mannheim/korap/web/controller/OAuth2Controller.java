@@ -3,7 +3,6 @@ package de.ids_mannheim.korap.web.controller;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
@@ -60,7 +59,7 @@ import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
  */
 @Controller
 @Path("{version}/oauth2")
-@ResourceFilters({ APIVersionFilter.class })
+@ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class, BlockingFilter.class })
 public class OAuth2Controller {
 
     @Autowired
@@ -95,7 +94,6 @@ public class OAuth2Controller {
      */
     @POST
     @Path("authorize")
-    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response requestAuthorizationCode (
             @Context HttpServletRequest request,
@@ -192,6 +190,7 @@ public class OAuth2Controller {
      */
     @POST
     @Path("token")
+    @ResourceFilters({APIVersionFilter.class})
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response requestAccessToken (@Context HttpServletRequest request,
@@ -247,6 +246,7 @@ public class OAuth2Controller {
      */
     @POST
     @Path("revoke")
+    @ResourceFilters({APIVersionFilter.class})
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response revokeAccessToken (@Context HttpServletRequest request,
             MultivaluedMap<String, String> form) {
@@ -271,7 +271,6 @@ public class OAuth2Controller {
 
     @POST
     @Path("revoke/super")
-    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response revokeTokenViaSuperClient (@Context SecurityContext context,
             @Context HttpServletRequest request,
@@ -315,7 +314,6 @@ public class OAuth2Controller {
      */
     @POST
     @Path("revoke/super/all")
-    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response revokeAllClientTokensViaSuperClient (
             @Context SecurityContext context,
@@ -346,7 +344,6 @@ public class OAuth2Controller {
 
     @POST
     @Path("token/list")
-    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<OAuth2TokenDto> listUserToken (
@@ -378,22 +375,5 @@ public class OAuth2Controller {
             throw responseHandler.throwit(e);
         }
 
-    }
-
-    @POST
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Path("token/clear")
-    public Response clearAccessTokenCache (
-            @FormParam("token") String adminToken,
-            @FormParam("access_token") String accessToken,
-            @Context ServletContext context) {
-        try {
-            String response = tokenService.clearAccessTokenCache(adminToken,
-                    accessToken, context);
-            return Response.ok(response).build();
-        }
-        catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
-        }
     }
 }

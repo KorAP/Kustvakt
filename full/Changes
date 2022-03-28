@@ -12,6 +12,7 @@
 2022-03-28
  - Updated admin filter (admintoken as a form param) and uses 
    it for the closing index reader API. 
+ - Removed unused admin API: clear access token cache.
 
 # version 0.65.1
 

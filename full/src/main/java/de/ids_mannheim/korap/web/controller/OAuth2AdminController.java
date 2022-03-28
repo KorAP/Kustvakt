@@ -1,6 +1,5 @@
 package de.ids_mannheim.korap.web.controller;
 
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -19,13 +18,10 @@ import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AdminFilter;
-import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
-import de.ids_mannheim.korap.web.filter.BlockingFilter;
 
 @Controller
 @Path("{version}/oauth2/admin")
-@ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
-        BlockingFilter.class, AdminFilter.class })
+@ResourceFilters({ APIVersionFilter.class, AdminFilter.class })
 public class OAuth2AdminController {
 
     @Autowired
@@ -34,19 +30,18 @@ public class OAuth2AdminController {
     private OAuth2ScopeService scopeService;
     @Autowired
     private OAuth2ResponseHandler responseHandler;
-    
-    @POST
-    @Path("/token/clean")
+
+    @Path("token/clean")
     public Response cleanExpiredInvalidToken (
             @Context SecurityContext securityContext) {
 
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
-        
+
         try {
             scopeService.verifyScope(context, OAuth2Scope.ADMIN);
             adminService.cleanTokens();
-            
+
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);

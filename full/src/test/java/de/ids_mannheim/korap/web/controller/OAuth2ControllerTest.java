@@ -39,8 +39,6 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class OAuth2ControllerTest extends OAuth2TestBase {
 
     public String userAuthHeader;
-    public static String ACCESS_TOKEN_TYPE = "access_token";
-    public static String REFRESH_TOKEN_TYPE = "refresh_token";
 
     public OAuth2ControllerTest () throws KustvaktException {
         userAuthHeader = HttpAuthorizationHandler
@@ -657,26 +655,6 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
-    }
-
-    private void testRevokeToken (String token, String clientId,
-            String clientSecret, String tokenType) {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("token_type", tokenType);
-        form.add("token", token);
-        form.add("client_id", clientId);
-        if (clientSecret != null) {
-            form.add("client_secret", clientSecret);
-        }
-
-        ClientResponse response =
-                resource().path(API_VERSION).path("oauth2").path("revoke")
-                        .header(HttpHeaders.CONTENT_TYPE,
-                                ContentType.APPLICATION_FORM_URLENCODED)
-                        .entity(form).post(ClientResponse.class);
-
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        assertEquals("SUCCESS", response.getEntity(String.class));
     }
 
     private JsonNode requestTokenList (String userAuthHeader, String tokenType,
