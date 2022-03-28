@@ -37,7 +37,7 @@ public class OAuth2AdminController {
     
     @POST
     @Path("/token/clean")
-    public Response cleanExpiredInvalidToken (String token,
+    public Response cleanExpiredInvalidToken (
             @Context SecurityContext securityContext) {
 
         TokenContext context =

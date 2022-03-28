@@ -2,6 +2,9 @@
 
 2022-03-03
  - Removed VCLoader.
+2022-03-28
+ - Updated admin filter (admintoken as a form param) and uses 
+   it for the closing index reader API. 
 
 # version 0.65.1
 

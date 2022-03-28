@@ -36,34 +36,40 @@ public class AdminFilter extends AuthenticationFilter {
     @Override
     public ContainerRequest filter (ContainerRequest request) {
         ContainerRequest superRequest = super.filter(request);
-
-        String adminToken = superRequest.getEntity(String.class);
-
-        SecurityContext securityContext = superRequest.getSecurityContext();
-        TokenContext tokenContext =
-                (TokenContext) securityContext.getUserPrincipal();
-        String username = tokenContext.getUsername();
-
+        String username = "guest";
+        
+        // legacy support for kustvakt core
+        String adminToken = superRequest.getFormParameters().getFirst("token");
         if (adminToken != null && !adminToken.isEmpty()) {
             // startswith token=
-            adminToken = adminToken.substring(6);
-            if (adminToken.equals(servletContext.getInitParameter("adminToken"))) {
+            // adminToken = adminToken.substring(6);
+            if (adminToken
+                    .equals(servletContext.getInitParameter("adminToken"))) {
                 return superRequest;
             }
         }
 
-        if (adminDao.isAdmin(username)) {
-            return superRequest;
+        SecurityContext securityContext = superRequest.getSecurityContext();
+        TokenContext tokenContext = (TokenContext) securityContext
+                .getUserPrincipal();
+        
+        if (tokenContext != null) {
+            username = tokenContext.getUsername();
+            if (adminDao.isAdmin(username)) {
+                return superRequest;
+            }
         }
         throw kustvaktResponseHandler.throwit(new KustvaktException(
                 StatusCodes.AUTHORIZATION_FAILED,
                 "Unauthorized operation for user: " + username, username));
     }
 
+
     @Override
     public ContainerRequestFilter getRequestFilter () {
         return this;
     }
+
 
     @Override
     public ContainerResponseFilter getResponseFilter () {

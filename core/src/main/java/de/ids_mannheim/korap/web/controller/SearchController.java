@@ -10,7 +10,6 @@ import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -40,6 +39,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.ServiceInfo;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
+import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
@@ -101,9 +101,11 @@ public class SearchController {
     
     @POST
     @Path("{version}/index/close")
-    public Response closeIndexReader (@FormParam("token") String token){
+    // overrides the whole filters
+    @ResourceFilters({APIVersionFilter.class,AdminFilter.class})
+    public Response closeIndexReader (){
         try {
-            searchService.closeIndexReader(token, context);
+            searchService.closeIndexReader();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);

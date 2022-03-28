@@ -169,6 +169,7 @@ public class StatusCodes {
      * MH: service level messages and callbacks
      */
 
+    @Deprecated
     public static final int INCORRECT_ADMIN_TOKEN = 2000;
     
     public static final int AUTHENTICATION_FAILED = 2001;
