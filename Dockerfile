@@ -22,10 +22,13 @@ RUN mkdir Koral && git clone https://github.com/KorAP/Koral.git Koral && \
 RUN rm -r Koral
 
 # Install Krill
-RUN git clone https://github.com/KorAP/Krill.git Krill && \
+RUN mkdir built && \
+    git clone https://github.com/KorAP/Krill.git Krill && \
     cd Krill && \
     git checkout master && \
-    mvn clean install
+    mvn clean install && \
+    mvn -Dmaven.test.skip=true package && \
+    mv target/Krill-Indexer.jar /kustvakt/built/Krill-Indexer.jar
 
 RUN rm -r Krill
 
@@ -34,8 +37,7 @@ RUN cd core && \
     mvn clean install
 
 # Package lite
-RUN mkdir built && \
-    cd lite && \
+RUN cd lite && \
     mvn clean package && \
     find target/Kustvakt-lite-*.jar -exec mv {} ../built/Kustvakt-lite.jar ';'
 
@@ -67,7 +69,9 @@ USER kustvakt
 
 EXPOSE 8089
 
-CMD ["java", "-jar", "Kustvakt-lite.jar"]
+ENTRYPOINT [ "java", "-jar" ]
+
+CMD [ "Kustvakt-lite.jar" ]
 
 # TODO:
 #   - support lite build
