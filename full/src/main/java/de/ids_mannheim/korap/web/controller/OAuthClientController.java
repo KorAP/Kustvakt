@@ -164,43 +164,6 @@ public class OAuthClientController {
         }
     }
 
-    /**
-     * Facilitates editing client privileges for admin purposes, e.g.
-     * setting a specific client to be a super client.
-     * Only confidential clients are allowed to be super clients.
-     * 
-     * When upgrading clients to super clients, existing access tokens
-     * and authorization codes retain their scopes.
-     * 
-     * When degrading super clients, all existing tokens and
-     * authorization codes are invalidated.
-     * 
-     * @param securityContext
-     * @param clientId
-     *            OAuth2 client id
-     * @param super
-     *            true indicating super client, false otherwise
-     * @return Response status OK, if successful
-     */
-    @POST
-    @Path("privilege")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response updateClientPrivilege (
-            @Context SecurityContext securityContext,
-            @FormParam("client_id") String clientId,
-            @FormParam("super") String isSuper) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
-        try {
-            scopeService.verifyScope(context, OAuth2Scope.ADMIN);
-            clientService.updatePrivilege(context.getUsername(), clientId,
-                    Boolean.valueOf(isSuper));
-            return Response.ok("SUCCESS").build();
-        }
-        catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
-        }
-    }
 
     @GET
     @Path("{client_id}")

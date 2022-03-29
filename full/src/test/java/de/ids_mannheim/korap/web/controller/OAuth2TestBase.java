@@ -24,9 +24,11 @@ import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
 /**
  * Provides common methods and variables for OAuth2 tests,
@@ -214,19 +216,60 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         assertEquals("Refresh token has been revoked",
                 node.at("/error_description").asText());
     }
+    
+    protected ClientResponse registerClient (String username,
+            OAuth2ClientJson json) throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        return resource().path(API_VERSION).path("oauth2").path("client")
+                .path("register")
+                .header(Attributes.AUTHORIZATION,
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue(username,
+                                        "password"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .entity(json).post(ClientResponse.class);
+    }
+    
+    protected ClientResponse registerConfidentialClient (String username)
+            throws KustvaktException {
 
-    protected void updateClientPrivilege (MultivaluedMap<String, String> form)
+        OAuth2ClientJson json = new OAuth2ClientJson();
+        json.setName("OAuth2ClientTest");
+        json.setType(OAuth2ClientType.CONFIDENTIAL);
+        json.setUrl("http://example.client.com");
+        json.setRedirectURI("https://example.client.com/redirect");
+        json.setDescription("This is a confidential test client.");
+
+        return registerClient(username, json);
+    }
+    
+    protected void deregisterConfidentialClient (String username, String clientId)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+
+        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+                .path("client").path("deregister").path(clientId)
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .delete(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+
+    protected JsonNode retrieveClientInfo (String clientId, String username)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
-                .path("client").path("privilege")
+                .path("client").path(clientId)
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("admin", "pass"))
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .get(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        String entity = response.getEntity(String.class);
+        return JsonUtils.readTree(entity);
     }
 
     protected ClientResponse searchWithAccessToken (String accessToken) {

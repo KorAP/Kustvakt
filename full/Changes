@@ -13,6 +13,8 @@
  - Updated admin filter (admintoken as a form param) and uses 
    it for the closing index reader API. 
  - Removed unused admin API: clear access token cache.
+2022-03-29
+ - Updated and moved admin API: updateClientPrivilege to OAuth2AdminController
 
 # version 0.65.1
 

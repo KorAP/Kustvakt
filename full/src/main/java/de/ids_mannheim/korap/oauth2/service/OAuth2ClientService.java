@@ -210,7 +210,7 @@ public class OAuth2ClientService {
         }
     }
 
-    private void revokeAllAuthorizationsByClientId (String clientId)
+    public void revokeAllAuthorizationsByClientId (String clientId)
             throws KustvaktException {
 
         // revoke all related authorization codes
@@ -312,30 +312,6 @@ public class OAuth2ClientService {
         }
 
         return clientDao.retrieveClientById(clientId);
-    }
-
-    public void updatePrivilege (String username, String clientId,
-            boolean isSuper) throws KustvaktException {
-
-        if (adminDao.isAdmin(username)) {
-            OAuth2Client client = clientDao.retrieveClientById(clientId);
-            if (isSuper) {
-                if (!client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
-                    throw new KustvaktException(StatusCodes.NOT_ALLOWED,
-                            "Only confidential clients are allowed to be super clients.");
-                }
-            }
-            else {
-                revokeAllAuthorizationsByClientId(clientId);
-            }
-
-            client.setSuper(isSuper);
-            clientDao.updateClient(client);
-        }
-        else {
-            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: " + username, username);
-        }
     }
 
     public OAuth2ClientInfoDto retrieveClientInfo (String username,

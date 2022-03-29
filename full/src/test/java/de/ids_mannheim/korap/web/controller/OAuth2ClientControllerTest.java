@@ -76,48 +76,6 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
     }
 
-    private ClientResponse registerClient (String username,
-            OAuth2ClientJson json) throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
-        return resource().path(API_VERSION).path("oauth2").path("client")
-                .path("register")
-                .header(Attributes.AUTHORIZATION,
-                        HttpAuthorizationHandler
-                                .createBasicAuthorizationHeaderValue(username,
-                                        "password"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .entity(json).post(ClientResponse.class);
-    }
-
-    private ClientResponse registerConfidentialClient ()
-            throws KustvaktException {
-
-        OAuth2ClientJson json = new OAuth2ClientJson();
-        json.setName("OAuth2ClientTest");
-        json.setType(OAuth2ClientType.CONFIDENTIAL);
-        json.setUrl("http://example.client.com");
-        json.setRedirectURI("https://example.client.com/redirect");
-        json.setDescription("This is a confidential test client.");
-
-        return registerClient(username, json);
-    }
-
-    private JsonNode retrieveClientInfo (String clientId, String username)
-            throws UniformInterfaceException, ClientHandlerException,
-            KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
-                .path("client").path(clientId)
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .get(ClientResponse.class);
-
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
-        String entity = response.getEntity(String.class);
-        return JsonUtils.readTree(entity);
-    }
-
     @Test
     public void testRetrieveClientInfo () throws KustvaktException {
         // public client
@@ -150,7 +108,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
     @Test
     public void testRegisterConfidentialClient () throws KustvaktException {
-        ClientResponse response = registerConfidentialClient();
+        ClientResponse response = registerConfidentialClient(username);
         String entity = response.getEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
@@ -162,7 +120,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertFalse(clientId.contains("a"));
 
         testResetConfidentialClientSecret(clientId, clientSecret);
-        testDeregisterConfidentialClient(clientId);
+        deregisterConfidentialClient(username, clientId);
     }
 
     @Test
@@ -469,19 +427,6 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
-    private void testDeregisterConfidentialClient (String clientId)
-            throws UniformInterfaceException, ClientHandlerException,
-            KustvaktException {
-
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
-                .path("client").path("deregister").path(clientId)
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .delete(ClientResponse.class);
-
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-    }
-
     private void testResetPublicClientSecret (String clientId)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
@@ -529,81 +474,6 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertTrue(!clientSecret.equals(newClientSecret));
 
         return newClientSecret;
-    }
-
-    @Test
-    public void testUpdateClientPrivilege () throws KustvaktException {
-        // register a client
-        ClientResponse response = registerConfidentialClient();
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
-        String clientId = node.at("/client_id").asText();
-        String clientSecret = node.at("/client_secret").asText();
-
-        // request an access token
-        String clientAuthHeader = HttpAuthorizationHandler
-                .createBasicAuthorizationHeaderValue(clientId, clientSecret);
-        String code = requestAuthorizationCode(clientId, clientSecret, null,
-                userAuthHeader);
-        node = requestTokenWithAuthorizationCodeAndHeader(clientId, code,
-                clientAuthHeader);
-        String accessToken = node.at("/access_token").asText();
-
-        testAccessTokenAfterUpgradingClient(clientId, accessToken);
-        testAccessTokenAfterDegradingSuperClient(clientId, accessToken);
-
-        testDeregisterConfidentialClient(clientId);
-    }
-
-    // old access tokens retain their scopes
-    private void testAccessTokenAfterUpgradingClient (String clientId,
-            String accessToken) throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("client_id", clientId);
-        form.add("super", "true");
-
-        updateClientPrivilege(form);
-        JsonNode node = retrieveClientInfo(clientId, "admin");
-        assertTrue(node.at("/is_super").asBoolean());
-
-        // list vc
-        ClientResponse response = resource().path(API_VERSION).path("vc")
-                .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
-                .get(ClientResponse.class);
-
-        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
-                response.getStatus());
-        String entity = response.getEntity(String.class);
-        node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
-                node.at("/errors/0/0").asInt());
-        assertEquals("Scope vc_info is not authorized",
-                node.at("/errors/0/1").asText());
-
-        // search
-        response = searchWithAccessToken(accessToken);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-    }
-
-    private void testAccessTokenAfterDegradingSuperClient (String clientId,
-            String accessToken) throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("client_id", clientId);
-        form.add("super", "false");
-
-        updateClientPrivilege(form);
-        JsonNode node = retrieveClientInfo(clientId, username);
-        assertTrue(node.at("/isSuper").isMissingNode());
-
-        ClientResponse response = searchWithAccessToken(accessToken);
-        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
-                response.getStatus());
-
-        String entity = response.getEntity(String.class);
-        node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
-                node.at("/errors/0/0").asInt());
-        assertEquals("Access token is invalid",
-                node.at("/errors/0/1").asText());
     }
 
     private void requestAuthorizedClientList (String userAuthHeader)
