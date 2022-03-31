@@ -49,7 +49,8 @@ public class UserGroupService {
     public static Logger jlog = LogManager.getLogger(UserGroupService.class);
     public static boolean DEBUG = false;
     
-    public static Pattern groupNamePattern = Pattern.compile("[-\\w.]+");
+    public static Pattern groupNamePattern = Pattern
+            .compile("[a-zA-Z0-9]+[a-zA-Z_0-9-.]+");
     
     @Autowired
     private UserGroupDao userGroupDao;
@@ -219,8 +220,9 @@ public class UserGroupService {
 
         if (!groupNamePattern.matcher(groupName).matches()) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
-                    "User-group name must only contains letters, numbers, "
-                            + "underscores, hypens and spaces",
+                    "User-group name must consists of alphanumerical characters "
+                            + "(limited to ASCII), underscores, dashes and periods. "
+                            + "The name has to start with an alphanumerical character.",
                     groupName);
         }
         
