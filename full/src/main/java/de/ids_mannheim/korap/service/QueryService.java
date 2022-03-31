@@ -69,7 +69,8 @@ public class QueryService {
 
     public static boolean DEBUG = false;
 
-    public static Pattern queryNamePattern = Pattern.compile("[-\\w.]+");
+    public static Pattern queryNamePattern = Pattern.compile("[a-zA-Z0-9]+[a-zA-Z_0-9-.]+");
+
 
     @Autowired
     private QueryDao queryDao;
@@ -319,8 +320,9 @@ public class QueryService {
 
         if (!queryNamePattern.matcher(queryName).matches()) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, queryType
-                    .displayName() + " name must only contain "
-                    + "letters, numbers, underscores, hypens and spaces",
+                    .displayName() + " must consists of alphanumerical characters "
+                            + "(limited to ASCII), underscores, dashes and periods. "
+                            + "The name has to start with an alphanumerical character.",
                     queryName);
         }
 
