@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.net.URI;
 
@@ -50,6 +51,9 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
     public static String ACCESS_TOKEN_TYPE = "access_token";
     public static String REFRESH_TOKEN_TYPE = "refresh_token";
+    
+    private String clientURL = "http://example.client.com";
+    private String clientRedirectUri = "https://example.client.com/redirect";
 
     protected ClientResponse requestAuthorizationCode (
             MultivaluedMap<String, String> form, String authHeader)
@@ -237,11 +241,25 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         OAuth2ClientJson json = new OAuth2ClientJson();
         json.setName("OAuth2ClientTest");
         json.setType(OAuth2ClientType.CONFIDENTIAL);
-        json.setUrl("http://example.client.com");
-        json.setRedirectURI("https://example.client.com/redirect");
+        json.setUrl(clientURL);
+        json.setRedirectURI(clientRedirectUri);
         json.setDescription("This is a confidential test client.");
 
         return registerClient(username, json);
+    }
+    
+    protected void testConfidentialClientInfo (String clientId, String username)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        JsonNode clientInfo = retrieveClientInfo(clientId, username);
+        assertEquals(clientId, clientInfo.at("/id").asText());
+        assertEquals("OAuth2ClientTest", clientInfo.at("/name").asText());
+        assertEquals(OAuth2ClientType.CONFIDENTIAL.name(),
+                clientInfo.at("/type").asText());
+        assertEquals(username, clientInfo.at("/registered_by").asText());
+        assertEquals(clientURL, clientInfo.at("/url").asText());
+        assertEquals(clientRedirectUri, clientInfo.at("/redirect_uri").asText());
+        assertNotNull(clientInfo.at("/description"));
     }
     
     protected void deregisterConfidentialClient (String username, String clientId)
