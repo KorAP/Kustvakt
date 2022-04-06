@@ -86,6 +86,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertNotNull(clientInfo.at("/url"));
         assertEquals("PUBLIC", clientInfo.at("/type").asText());
         assertEquals("system", clientInfo.at("/registered_by").asText());
+        System.out.println(clientInfo);
 
         // confidential client
         clientInfo = retrieveClientInfo(confidentialClientId, "system");
@@ -93,6 +94,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertEquals("non super confidential client",
                 clientInfo.at("/name").asText());
         assertNotNull(clientInfo.at("/url"));
+        assertNotNull(clientInfo.at("/redirect_uri"));
         assertEquals(false, clientInfo.at("/is_super").asBoolean());
         assertEquals("CONFIDENTIAL", clientInfo.at("/type").asText());
 
@@ -102,6 +104,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertEquals("super confidential client",
                 clientInfo.at("/name").asText());
         assertNotNull(clientInfo.at("/url"));
+        assertNotNull(clientInfo.at("/redirect_uri"));
         assertEquals("CONFIDENTIAL", clientInfo.at("/type").asText());
         assertTrue(clientInfo.at("/is_super").asBoolean());
     }
@@ -118,7 +121,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertNotNull(clientSecret);
 
         assertFalse(clientId.contains("a"));
-
+        
+        testConfidentialClientInfo(clientId, username);
         testResetConfidentialClientSecret(clientId, clientSecret);
         deregisterConfidentialClient(username, clientId);
     }
