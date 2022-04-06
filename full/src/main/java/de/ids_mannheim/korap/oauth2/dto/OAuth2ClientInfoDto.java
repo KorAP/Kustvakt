@@ -21,6 +21,7 @@ public class OAuth2ClientInfoDto {
     @JsonProperty("is_super")
     private String isSuper;
     private String url;
+    private String redirect_uri;
     @JsonProperty("registered_by")
     private String registeredBy;
     private OAuth2ClientType type;
@@ -92,6 +93,14 @@ public class OAuth2ClientInfoDto {
 
     public void setType (OAuth2ClientType type) {
         this.type = type;
+    }
+
+    public String getRedirect_uri () {
+        return redirect_uri;
+    }
+
+    public void setRedirect_uri (String redirect_uri) {
+        this.redirect_uri = redirect_uri;
     }
 
 }
