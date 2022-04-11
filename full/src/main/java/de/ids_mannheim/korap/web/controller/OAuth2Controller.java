@@ -6,9 +6,11 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -92,13 +94,17 @@ public class OAuth2Controller {
      *            form parameters
      * @return a redirect URL
      */
-    @POST
+    @GET
     @Path("authorize")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response requestAuthorizationCode (
             @Context HttpServletRequest request,
-            @Context SecurityContext context, @FormParam("state") String state,
-            MultivaluedMap<String, String> form) {
+            @Context SecurityContext context,
+//            @QueryParam("response_type") String responseType,
+//            @QueryParam("client_id") String clientId,
+//            @QueryParam("redirect_uri") String redirectUri,
+//            @QueryParam("scope") String scope,
+            @QueryParam("state") String state
+            ) {
 
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
         String username = tokenContext.getUsername();
@@ -107,12 +113,10 @@ public class OAuth2Controller {
         try {
             scopeService.verifyScope(tokenContext, OAuth2Scope.AUTHORIZE);
 
-            HttpServletRequest requestWithForm =
-                    new FormRequestWrapper(request, form);
             OAuth2AuthorizationRequest authzRequest =
-                    new OAuth2AuthorizationRequest(requestWithForm);
+                    new OAuth2AuthorizationRequest(request);
             String uri = authorizationService.requestAuthorizationCode(
-                    requestWithForm, authzRequest, username, authTime);
+                    request, authzRequest, username, authTime);
             return responseHandler.sendRedirect(uri);
         }
         catch (OAuthSystemException e) {

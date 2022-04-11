@@ -24,12 +24,11 @@ VALUES ("9aHsGW6QflV13ixNpez","non super confidential client",
   "http://third.party.com/confidential", CURRENT_TIMESTAMP,1);
 
 INSERT INTO oauth2_client(id,name,secret,type,super,
-  redirect_uri,registered_by, description,url, registration_date, 
+  registered_by, description,url, registration_date, 
   is_permitted) 
 VALUES ("52atrL0ajex_3_5imd9Mgw","confidential client 2",
   "$2a$08$vi1FbuN3p6GcI1tSxMAoeuIYL8Yw3j6A8wJthaN8ZboVnrQaTwLPq",
-  "CONFIDENTIAL", 0,
-  "https://example.client.de/redirect", "system",
+  "CONFIDENTIAL", 0,"system",
   "This is a test nonsuper confidential client.",
   "http://example.client.de", CURRENT_TIMESTAMP, 1);
 

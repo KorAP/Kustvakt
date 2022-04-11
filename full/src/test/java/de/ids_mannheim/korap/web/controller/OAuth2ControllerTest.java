@@ -47,13 +47,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
     @Test
     public void testAuthorizeConfidentialClient () throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("response_type", "code");
-        form.add("client_id", confidentialClientId);
-        form.add("state", "thisIsMyState");
-
-        ClientResponse response =
-                requestAuthorizationCode(form, userAuthHeader);
+        ClientResponse response = requestAuthorizationCode("code",
+                confidentialClientId, "", "", state, userAuthHeader);
 
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
                 response.getStatus());
@@ -66,22 +61,15 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
     @Test
     public void testAuthorizePublicClient () throws KustvaktException {
-        String code = requestAuthorizationCode(publicClientId, clientSecret,
-                null, userAuthHeader);
+        String code = requestAuthorizationCode(publicClientId, userAuthHeader);
         assertNotNull(code);
     }
 
     @Test
     public void testAuthorizeInvalidRedirectUri () throws KustvaktException {
         String redirectUri = "https://different.uri/redirect";
-
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("response_type", "code");
-        form.add("client_id", confidentialClientId);
-        form.add("redirect_uri", redirectUri);
-        form.add("state", "thisIsMyState");
-        ClientResponse response =
-                requestAuthorizationCode(form, userAuthHeader);
+        ClientResponse response = requestAuthorizationCode("code",
+                confidentialClientId, redirectUri, "", state, userAuthHeader);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
@@ -93,15 +81,23 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
                 node.at("/error_description").asText());
         assertEquals("thisIsMyState", node.at("/state").asText());
     }
+    
+//    @Test
+//    public void testAuthorizeRedirectUriLocalhost () throws KustvaktException {
+//        String redirectUri = "http://localhost:1410/";
+//        ClientResponse response =
+//                requestAuthorizationCode("code", confidentialClientId2,
+//                        redirectUri, null, "myState", userAuthHeader);
+//        System.out.println(response.getStatus());
+//        System.out.println(response.getEntity(String.class));
+//    }
 
     @Test
     public void testAuthorizeMissingRequiredParameters ()
             throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("state", "thisIsMyState");
         // missing response_type
-        ClientResponse response =
-                requestAuthorizationCode(form, userAuthHeader);
+        ClientResponse response = requestAuthorizationCode("",
+                confidentialClientId, "", "", state, userAuthHeader);
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
@@ -114,8 +110,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals("thisIsMyState", node.at("/state").asText());
 
         // missing client_id
-        form.add("response_type", "code");
-        response = requestAuthorizationCode(form, userAuthHeader);
+        response = requestAuthorizationCode("code","", "", "", "", userAuthHeader);
         entity = response.getEntity(String.class);
         node = JsonUtils.readTree(entity);
         assertEquals("Missing parameters: client_id",
@@ -128,8 +123,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.add("response_type", "string");
         form.add("state", "thisIsMyState");
 
-        ClientResponse response =
-                requestAuthorizationCode(form, userAuthHeader);
+        ClientResponse response = requestAuthorizationCode("string",
+                confidentialClientId, "", "", state, userAuthHeader);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         String entity = response.getEntity(String.class);
@@ -143,14 +138,10 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
     @Test
     public void testAuthorizeInvalidScope () throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("response_type", "code");
-        form.add("client_id", confidentialClientId);
-        form.add("scope", "read_address");
-        form.add("state", "thisIsMyState");
+        String scope = "read_address";
 
-        ClientResponse response =
-                requestAuthorizationCode(form, userAuthHeader);
+        ClientResponse response = requestAuthorizationCode("code",
+                confidentialClientId, "", scope, state, userAuthHeader);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         URI location = response.getLocation();
@@ -165,8 +156,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     @Test
     public void testRequestTokenAuthorizationPublic ()
             throws KustvaktException {
-        String code = requestAuthorizationCode(publicClientId, "", null,
-                userAuthHeader);
+        String code =
+                requestAuthorizationCode(publicClientId, userAuthHeader);
 
         ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
                 publicClientId, clientSecret, code);
@@ -188,13 +179,9 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     public void testRequestTokenAuthorizationConfidential ()
             throws KustvaktException {
 
-        MultivaluedMap<String, String> authForm = new MultivaluedMapImpl();
-        authForm.add("response_type", "code");
-        authForm.add("client_id", confidentialClientId);
-        authForm.add("scope", "search");
-
-        ClientResponse response =
-                requestAuthorizationCode(authForm, userAuthHeader);
+        String scope = "search";
+        ClientResponse response = requestAuthorizationCode("code",
+                confidentialClientId, "", scope, state, userAuthHeader);
         URI redirectUri = response.getLocation();
         MultivaluedMap<String, String> params =
                 UriComponent.decodeQuery(redirectUri, true);
@@ -256,15 +243,12 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     @Test
     public void testRequestTokenAuthorizationReplyAttack ()
             throws KustvaktException {
-        String uri = "https://third.party.com/confidential/redirect";
-        MultivaluedMap<String, String> authForm = new MultivaluedMapImpl();
-        authForm.add("response_type", "code");
-        authForm.add("client_id", confidentialClientId);
-        authForm.add("scope", "search");
-        authForm.add("redirect_uri", uri);
+        String redirect_uri = "https://third.party.com/confidential/redirect";
+        String scope = "search";
 
         ClientResponse response =
-                requestAuthorizationCode(authForm, userAuthHeader);
+                requestAuthorizationCode("code", confidentialClientId,
+                        redirect_uri, scope, state, userAuthHeader);
         URI redirectUri = response.getLocation();
         MultivaluedMap<String, String> params =
                 UriComponent.decodeQuery(redirectUri, true);
@@ -272,7 +256,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
         testRequestTokenAuthorizationInvalidClient(code);
         testRequestTokenAuthorizationInvalidRedirectUri(code);
-        testRequestTokenAuthorizationRevoked(code, uri);
+        testRequestTokenAuthorizationRevoked(code, redirect_uri);
     }
 
     private void testRequestTokenAuthorizationInvalidClient (String code)
@@ -701,17 +685,17 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String refreshToken1 = node.at("/refresh_token").asText();
 
         // client 1
-        String code = requestAuthorizationCode(confidentialClientId,
-                clientSecret, null, userAuthHeader);
+        String code =
+                requestAuthorizationCode(confidentialClientId, userAuthHeader);
         response = requestTokenWithAuthorizationCodeAndForm(
                 confidentialClientId, clientSecret, code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         // client 2
-        code = requestAuthorizationCode(confidentialClientId2, clientSecret,
-                null, userAuthHeader);
+        code = requestAuthorizationCode(confidentialClientId2,
+                clientRedirectUri, userAuthHeader);
         response = requestTokenWithAuthorizationCodeAndForm(
-                confidentialClientId2, clientSecret, code);
+                confidentialClientId2, clientSecret, code, clientRedirectUri);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         // list
@@ -721,8 +705,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(confidentialClientId2, node.at("/1/client_id").asText());
 
         // client 1
-        code = requestAuthorizationCode(confidentialClientId, clientSecret,
-                null, userAuthHeader);
+        code = requestAuthorizationCode(confidentialClientId, userAuthHeader);
         response = requestTokenWithAuthorizationCodeAndForm(
                 confidentialClientId, clientSecret, code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -736,8 +719,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(0, node.size());
 
         // client 1
-        code = requestAuthorizationCode(confidentialClientId, clientSecret,
-                null, darlaAuthHeader);
+        code = requestAuthorizationCode(confidentialClientId, darlaAuthHeader);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         response = requestTokenWithAuthorizationCodeAndForm(
                 confidentialClientId, clientSecret, code);
@@ -788,8 +770,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
                 .createBasicAuthorizationHeaderValue(username, password);
 
         // access token 1
-        String code = requestAuthorizationCode(publicClientId, clientSecret,
-                null, userAuthHeader);
+        String code = requestAuthorizationCode(publicClientId, userAuthHeader);
         ClientResponse response = requestTokenWithAuthorizationCodeAndForm(publicClientId, "",
                 code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -797,8 +778,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String accessToken1 = node.at("/access_token").asText();
 
         // access token 2
-        code = requestAuthorizationCode(publicClientId, clientSecret, null,
-                userAuthHeader);
+        code = requestAuthorizationCode(publicClientId, userAuthHeader);
         response = requestTokenWithAuthorizationCodeAndForm(publicClientId, "",
                 code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
