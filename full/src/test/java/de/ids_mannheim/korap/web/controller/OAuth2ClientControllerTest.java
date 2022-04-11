@@ -118,12 +118,42 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         String clientSecret = node.at("/client_secret").asText();
         assertNotNull(clientId);
         assertNotNull(clientSecret);
-
         assertFalse(clientId.contains("a"));
         
         testConfidentialClientInfo(clientId, username);
         testResetConfidentialClientSecret(clientId, clientSecret);
         deregisterConfidentialClient(username, clientId);
+    }
+    
+    @Test
+    public void testRegisterPlugin () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        JsonNode source = JsonUtils.readTree("{ \"plugin\" : \"source\"}");
+                
+        OAuth2ClientJson json = new OAuth2ClientJson();
+        json.setName("Plugin");
+        json.setType(OAuth2ClientType.CONFIDENTIAL);
+        json.setDescription("This is a plugin test client.");
+        json.setSource(source);
+        
+        ClientResponse response = registerClient(username, json);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        String clientId = node.at("/client_id").asText();
+        String clientSecret = node.at("/client_secret").asText();
+        assertNotNull(clientId);
+        assertNotNull(clientSecret);
+        
+        JsonNode clientInfo = retrieveClientInfo(clientId, username);
+        assertEquals(clientId, clientInfo.at("/id").asText());
+        assertEquals("Plugin", clientInfo.at("/name").asText());
+        assertEquals(OAuth2ClientType.CONFIDENTIAL.name(),
+                clientInfo.at("/type").asText());
+        assertEquals(username, clientInfo.at("/registered_by").asText());
+        assertNotNull(clientInfo.at("/registration_date"));
+        
+        assertFalse(clientInfo.at("/permitted").asBoolean());
+        assertNotNull(clientInfo.at("/source"));
     }
 
     @Test

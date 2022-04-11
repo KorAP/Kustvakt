@@ -79,6 +79,7 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     private int accessTokenLongExpiry;
     private int accessTokenExpiry;
+    private int refreshTokenLongExpiry;
     private int refreshTokenExpiry;
     private int authorizationCodeExpiry;
 
@@ -270,6 +271,8 @@ public class FullConfiguration extends KustvaktConfiguration {
         
         setAccessTokenLongExpiry(TimeUtils.convertTimeToSeconds(
                 properties.getProperty("oauth2.access.token.long.expiry", "365D")));
+        setRefreshTokenLongExpiry(TimeUtils.convertTimeToSeconds(
+                properties.getProperty("oauth2.refresh.token.long.expiry", "365D")));
     }
 
     private void setMailConfiguration (Properties properties) {
@@ -662,5 +665,13 @@ public class FullConfiguration extends KustvaktConfiguration {
 
     public void setAccessTokenLongExpiry (int accessTokenLongExpiry) {
         this.accessTokenLongExpiry = accessTokenLongExpiry;
+    }
+
+    public int getRefreshTokenLongExpiry () {
+        return refreshTokenLongExpiry;
+    }
+
+    public void setRefreshTokenLongExpiry (int refreshTokenLongExpiry) {
+        this.refreshTokenLongExpiry = refreshTokenLongExpiry;
     }
 }

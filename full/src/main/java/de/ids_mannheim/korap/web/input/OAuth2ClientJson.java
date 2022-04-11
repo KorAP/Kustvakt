@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.web.input;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 
@@ -10,6 +11,8 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
  * 
  * To accommodate desktop applications such as R, url and redirectURI
  * are not compulsory.
+ * 
+ * Source is json description of a plugin.
  * 
  * @author margaretha
  *
@@ -27,7 +30,11 @@ public class OAuth2ClientJson {
     // the user to after they have authorized a client.
     @JsonProperty("redirect_uri")
     private String redirectURI;
+    // Default 365 days
+    private int refreshTokenExpiry; // in seconds
     
+    // plugins
+    private JsonNode source;
 
     public String getName () {
         return name;
@@ -67,5 +74,21 @@ public class OAuth2ClientJson {
 
     public void setDescription (String description) {
         this.description = description;
+    }
+
+    public int getRefreshTokenExpiry () {
+        return refreshTokenExpiry;
+    }
+
+    public void setRefreshTokenExpiry (int refreshTokenExpiry) {
+        this.refreshTokenExpiry = refreshTokenExpiry;
+    }
+
+    public JsonNode getSource () {
+        return source;
+    }
+
+    public void setSource (JsonNode source2) {
+        this.source = source2;
     }
 }

@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
 
@@ -260,6 +261,10 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         assertEquals(clientURL, clientInfo.at("/url").asText());
         assertEquals(clientRedirectUri, clientInfo.at("/redirect_uri").asText());
         assertNotNull(clientInfo.at("/description"));
+        assertNotNull(clientInfo.at("/registration_date"));
+        assertTrue(clientInfo.at("/permitted").asBoolean());
+        assertTrue(clientInfo.at("/source").isMissingNode());
+        
     }
     
     protected void deregisterConfidentialClient (String username, String clientId)
