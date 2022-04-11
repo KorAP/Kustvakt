@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.net.URI;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
@@ -12,6 +13,8 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.junit.Test;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
@@ -60,9 +63,17 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
 
     @Test
     public void testCustomScope () throws KustvaktException {
-        String code = requestAuthorizationCode(confidentialClientId,
-                clientSecret, OAuth2Scope.VC_INFO.toString(), userAuthHeader);
-        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
+        ClientResponse response =
+                requestAuthorizationCode("code", confidentialClientId, "",
+                        OAuth2Scope.VC_INFO.toString(), "", userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
+                response.getStatus());
+        URI redirectUri = response.getLocation();
+        MultiValueMap<String, String> params = UriComponentsBuilder
+                .fromUri(redirectUri).build().getQueryParams();
+        String code = params.getFirst("code");
+        
+        response = requestTokenWithAuthorizationCodeAndForm(
                 confidentialClientId, clientSecret, code);
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
 
@@ -82,8 +93,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
 
     @Test
     public void testDefaultScope () throws KustvaktException, IOException {
-        String code = requestAuthorizationCode(confidentialClientId, clientSecret,
-                null, userAuthHeader);
+        String code = requestAuthorizationCode(confidentialClientId, userAuthHeader);
         ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
                 confidentialClientId, clientSecret, code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -160,7 +170,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
     public void testRevokeAccessTokenConfidentialClient ()
             throws KustvaktException {
         String code = requestAuthorizationCode(confidentialClientId,
-                clientSecret, null, userAuthHeader);
+                userAuthHeader);
         JsonNode node = requestTokenWithAuthorizationCodeAndHeader(
                 confidentialClientId, code, clientAuthHeader);
 
@@ -183,7 +193,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
     @Test
     public void testRevokeAccessTokenPublicClientViaSuperClient()
             throws KustvaktException {
-        String code = requestAuthorizationCode(publicClientId, "", null,
+        String code = requestAuthorizationCode(publicClientId,
                 userAuthHeader);
         ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
                 publicClientId, "", code);
@@ -211,8 +221,8 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
     @Test
     public void testAccessTokenAfterRequestRefreshToken ()
             throws KustvaktException, IOException {
-        String code = requestAuthorizationCode(confidentialClientId,
-                clientSecret, null, userAuthHeader);
+        String code =
+                requestAuthorizationCode(confidentialClientId, userAuthHeader);
         JsonNode node = requestTokenWithAuthorizationCodeAndHeader(
                 confidentialClientId, code, clientAuthHeader);
 
@@ -245,22 +255,13 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
     public void testRequestAuthorizationWithBearerTokenUnauthorized ()
             throws KustvaktException {
         String code = requestAuthorizationCode(confidentialClientId,
-                clientSecret, null, userAuthHeader);
+                userAuthHeader);
         JsonNode node = requestTokenWithAuthorizationCodeAndHeader(
                 confidentialClientId, code, clientAuthHeader);
         String userAuthToken = node.at("/access_token").asText();
 
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("response_type", "code");
-        form.add("client_id", confidentialClientId);
-        form.add("client_secret", clientSecret);
-
-        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("authorize")
-                .header(Attributes.AUTHORIZATION, "Bearer " + userAuthToken)
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+        ClientResponse response = requestAuthorizationCode("code",
+                confidentialClientId, "", "", "", "Bearer " + userAuthToken);
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
@@ -286,7 +287,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         assertNotNull(node.at("/expires_in").asText());
 
         String code = requestAuthorizationCode(superClientId,
-                clientSecret, null, "Bearer " + userAuthToken);
+                "Bearer " + userAuthToken);
         assertNotNull(code);
     }
 

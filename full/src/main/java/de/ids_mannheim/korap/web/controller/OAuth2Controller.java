@@ -6,9 +6,11 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -92,6 +94,7 @@ public class OAuth2Controller {
      *            form parameters
      * @return a redirect URL
      */
+    @Deprecated
     @POST
     @Path("authorize")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -113,6 +116,38 @@ public class OAuth2Controller {
                     new OAuth2AuthorizationRequest(requestWithForm);
             String uri = authorizationService.requestAuthorizationCode(
                     requestWithForm, authzRequest, username, authTime);
+            return responseHandler.sendRedirect(uri);
+        }
+        catch (OAuthSystemException e) {
+            throw responseHandler.throwit(e, state);
+        }
+        catch (OAuthProblemException e) {
+            throw responseHandler.throwit(e, state);
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e, state);
+        }
+    }
+    
+    @GET
+    @Path("authorize")
+    public Response requestAuthorizationCode (
+            @Context HttpServletRequest request,
+            @Context SecurityContext context,
+            @QueryParam("state") String state
+            ) {
+
+        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+        String username = tokenContext.getUsername();
+        ZonedDateTime authTime = tokenContext.getAuthenticationTime();
+
+        try {
+            scopeService.verifyScope(tokenContext, OAuth2Scope.AUTHORIZE);
+
+            OAuth2AuthorizationRequest authzRequest =
+                    new OAuth2AuthorizationRequest(request);
+            String uri = authorizationService.requestAuthorizationCode(
+                    request, authzRequest, username, authTime);
             return responseHandler.sendRedirect(uri);
         }
         catch (OAuthSystemException e) {
