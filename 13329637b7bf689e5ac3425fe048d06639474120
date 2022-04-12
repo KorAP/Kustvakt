@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "041d75bc_68bc9459",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-04-12T15:21:37Z",
+      "side": 1,
+      "message": "If I see this correct, this would remove POST completely and therefore breaks backwards compatibility (also with Kalamar). I don\u0027t think we can do that without slowly deprecating endpoints.",
+      "revId": "13329637b7bf689e5ac3425fe048d06639474120",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
