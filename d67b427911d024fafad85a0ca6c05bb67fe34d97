@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b49c58f2_e76d8960",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-04-13T07:00:31Z",
+      "side": 1,
+      "message": "I just restored a few tests for the POST variant, because it was a massive change in the tests to use GET.",
+      "revId": "d67b427911d024fafad85a0ca6c05bb67fe34d97",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
