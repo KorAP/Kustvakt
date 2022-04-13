@@ -9,7 +9,9 @@
    to the oauth2_client database table, and updated the OAuth2 client 
    registration mechanism.
  - Added authorization request with GET and deprecated that with POST.
-
+2022-04-13
+ - Updated OAuth2Client list API (added redirect_uri, registration_date, 
+   permitted, source to OAuth2UserClientDto).
 
 # version 0.65.2
 
