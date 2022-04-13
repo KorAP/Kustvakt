@@ -13,8 +13,6 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
@@ -59,6 +57,10 @@ import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
  */
 @Service
 public class OAuth2ClientService {
+    
+//    public static final UrlValidator redirectURIValidator =
+//            new UrlValidator(new String[] { "http", "https" },
+//                    UrlValidator.NO_FRAGMENTS + UrlValidator.ALLOW_LOCAL_URLS);
 
     @Autowired
     private OAuth2ClientDao clientDao;
@@ -337,15 +339,8 @@ public class OAuth2ClientService {
         return clientDao.retrieveClientById(clientId);
     }
 
-    public List<OAuth2UserClientDto> listUserAuthorizedClients (String username,
-            String superClientId, String superClientSecret) throws KustvaktException {
-        OAuth2Client superClient = authenticateClient(superClientId, superClientSecret);
-        if (!superClient.isSuper()) {
-            throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
-                    "Only super client is allowed to list user authorized clients.",
-                    OAuth2Error.UNAUTHORIZED_CLIENT);
-        }
-                
+    public List<OAuth2UserClientDto> listUserAuthorizedClients (String username)
+            throws KustvaktException {
         List<OAuth2Client> userClients =
                 clientDao.retrieveUserAuthorizedClients(username);
         userClients.addAll(clientDao.retrieveClientsByAccessTokens(username));
@@ -364,30 +359,20 @@ public class OAuth2ClientService {
         return createClientDtos(uniqueClients);
     }
     
-    public List<OAuth2UserClientDto> listUserRegisteredClients (String username,
-            String clientId, String clientSecret) throws KustvaktException {
-        OAuth2Client client = authenticateClient(clientId, clientSecret);
-        if (!client.isSuper()) {
-            throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
-                    "Only super client is allowed to list user registered clients.",
-                    OAuth2Error.UNAUTHORIZED_CLIENT);
-        }
+    public List<OAuth2UserClientDto> listUserRegisteredClients (String username)
+            throws KustvaktException {
         List<OAuth2Client> userClients =
                 clientDao.retrieveUserRegisteredClients(username);
         Collections.sort(userClients);
         return createClientDtos(userClients);
     }
     
-    private List<OAuth2UserClientDto> createClientDtos (List<OAuth2Client> userClients) {
+    private List<OAuth2UserClientDto> createClientDtos (
+            List<OAuth2Client> userClients) throws KustvaktException {
         List<OAuth2UserClientDto> dtoList = new ArrayList<>(userClients.size());
         for (OAuth2Client uc : userClients) {
             if (uc.isSuper()) continue;
-            OAuth2UserClientDto dto = new OAuth2UserClientDto();
-            dto.setClientId(uc.getId());
-            dto.setClientName(uc.getName());
-            dto.setDescription(uc.getDescription());
-            dto.setUrl(uc.getUrl());
-            dto.setClientType(uc.getType());
+            OAuth2UserClientDto dto = new OAuth2UserClientDto(uc);
             dtoList.add(dto);
         }
         return dtoList;
@@ -395,5 +380,15 @@ public class OAuth2ClientService {
 
     public boolean isPublicClient (OAuth2Client oAuth2Client) {
         return oAuth2Client.getType().equals(OAuth2ClientType.PUBLIC);
+    }
+
+    public void verifySuperClient (String clientId, String clientSecret)
+            throws KustvaktException {
+        OAuth2Client client = authenticateClient(clientId, clientSecret);
+        if (!client.isSuper()) {
+            throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
+                    "Only super client is allowed to list user registered clients.",
+                    OAuth2Error.UNAUTHORIZED_CLIENT);
+        }
     }
 }

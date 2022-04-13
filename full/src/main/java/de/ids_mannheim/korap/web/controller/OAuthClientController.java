@@ -204,7 +204,6 @@ public class OAuthClientController {
      */
     @POST
     @Path("/list")
-    @ResourceFilters({ AuthenticationFilter.class, BlockingFilter.class })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<OAuth2UserClientDto> listUserAuthorizedClients (
@@ -219,13 +218,13 @@ public class OAuthClientController {
         try {
             scopeService.verifyScope(tokenContext,
                     OAuth2Scope.LIST_USER_CLIENT);
-            if(authorizedOnly){
-                return clientService.listUserAuthorizedClients(username,
-                        superClientId, superClientSecret);
+
+            clientService.verifySuperClient(superClientId, superClientSecret);
+            if (authorizedOnly) {
+                return clientService.listUserAuthorizedClients(username);
             }
             else {
-                return clientService.listUserRegisteredClients(username,
-                        superClientId, superClientSecret);                
+                return clientService.listUserRegisteredClients(username);
             }
         }
         catch (KustvaktException e) {
