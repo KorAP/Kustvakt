@@ -33,6 +33,24 @@
       "message": "Will you update https://github.com/KorAP/Kustvakt/wiki/Service:-OAuth2-Authorization-Code ? Also with regard to client_secret?",
       "revId": "d67b427911d024fafad85a0ca6c05bb67fe34d97",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bdfff5e_b234b3d4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-04-14T08:29:17Z",
+      "side": 1,
+      "message": "Yes, thanks for the reminder.",
+      "parentUuid": "ab222d8e_b7bfc834",
+      "revId": "d67b427911d024fafad85a0ca6c05bb67fe34d97",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
