@@ -16,6 +16,23 @@
       "message": "I just restored a few tests for the POST variant, because it was a massive change in the tests to use GET.",
       "revId": "d67b427911d024fafad85a0ca6c05bb67fe34d97",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab222d8e_b7bfc834",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-04-14T08:23:38Z",
+      "side": 1,
+      "message": "Will you update https://github.com/KorAP/Kustvakt/wiki/Service:-OAuth2-Authorization-Code ? Also with regard to client_secret?",
+      "revId": "d67b427911d024fafad85a0ca6c05bb67fe34d97",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
