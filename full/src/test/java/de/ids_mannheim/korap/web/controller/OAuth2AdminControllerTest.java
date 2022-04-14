@@ -96,9 +96,7 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
     public void testCleanRevokedTokens () throws KustvaktException {
 
         int accessTokensBefore = accessDao.retrieveInvalidAccessTokens().size();
-
-        String code = requestAuthorizationCode(publicClientId, "", null,
-                userAuthHeader);
+        String code = requestAuthorizationCode(publicClientId, userAuthHeader);
 
         ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
                 publicClientId, clientSecret, code);
@@ -129,8 +127,7 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         // request an access token
         String clientAuthHeader = HttpAuthorizationHandler
                 .createBasicAuthorizationHeaderValue(clientId, clientSecret);
-        String code = requestAuthorizationCode(clientId, clientSecret, null,
-                userAuthHeader);
+        String code = requestAuthorizationCode(clientId, userAuthHeader);
         node = requestTokenWithAuthorizationCodeAndHeader(clientId, code,
                 clientAuthHeader);
         String accessToken = node.at("/access_token").asText();

@@ -119,7 +119,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertNotNull(clientId);
         assertNotNull(clientSecret);
         assertFalse(clientId.contains("a"));
-        
+
         testConfidentialClientInfo(clientId, username);
         testResetConfidentialClientSecret(clientId, clientSecret);
         deregisterConfidentialClient(username, clientId);
@@ -238,11 +238,12 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     @Test
     public void testRegisterPublicClient () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
+        String redirectUri = "https://test.public.client.com/redirect";
         OAuth2ClientJson clientJson =
                 createOAuth2ClientJson("OAuth2PublicClient",
                         OAuth2ClientType.PUBLIC, "A public test client.");
         clientJson.setUrl("http://test.public.client.com");
-        clientJson.setRedirectURI("https://test.public.client.com/redirect");
+        clientJson.setRedirectURI(redirectUri);
 
         ClientResponse response = registerClient(username, clientJson);
 
@@ -255,7 +256,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         testRegisterClientUnauthorizedScope(clientId);
         testResetPublicClientSecret(clientId);
-        testAccessTokenAfterDeregistration(clientId, null, null);
+        testAccessTokenAfterDeregistration(clientId, null, "");
     }
 
     private void testRegisterClientUnauthorizedScope (String clientId)
@@ -264,10 +265,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         String userAuthHeader = HttpAuthorizationHandler
                 .createBasicAuthorizationHeaderValue("dory", "password");
-        String code = requestAuthorizationCode(clientId, "", null,
-                userAuthHeader, null);
+        String code = requestAuthorizationCode(clientId, userAuthHeader);
         ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
-                clientId, clientSecret, code, null);
+                clientId, clientSecret, code);
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
 
         assertEquals("match_info search", node.at("/scope").asText());
@@ -318,7 +318,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertTrue(node.at("/client_secret").isMissingNode());
 
         testResetPublicClientSecret(clientId);
-        testAccessTokenAfterDeregistration(clientId, null, null);
+        testAccessTokenAfterDeregistration(clientId, null, "");
     }
 
     @Test
@@ -387,8 +387,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         String userAuthHeader = HttpAuthorizationHandler
                 .createBasicAuthorizationHeaderValue("dory", "password");
 
-        String code = requestAuthorizationCode(clientId, "", null,
-                userAuthHeader, redirectUri);
+        String code = requestAuthorizationCode(clientId, redirectUri, userAuthHeader);
+        
         ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
                 clientId, clientSecret, code, redirectUri);
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
@@ -397,8 +397,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         response = searchWithAccessToken(accessToken);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        code = requestAuthorizationCode(clientId, "", null, userAuthHeader,
-                redirectUri);
+        code = requestAuthorizationCode(clientId, redirectUri, userAuthHeader);
         testDeregisterPublicClient(clientId, username);
 
         response = requestTokenWithAuthorizationCodeAndForm(clientId,
@@ -552,8 +551,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         // client 1
-        String code = requestAuthorizationCode(publicClientId, "", null,
-                userAuthHeader);
+        String code = requestAuthorizationCode(publicClientId, userAuthHeader);
         response = requestTokenWithAuthorizationCodeAndForm(publicClientId, "",
                 code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -562,8 +560,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         String accessToken = node.at("/access_token").asText();
 
         // client 2
-        code = requestAuthorizationCode(confidentialClientId, clientSecret,
-                null, userAuthHeader);
+        code = requestAuthorizationCode(confidentialClientId, userAuthHeader);
         response = requestTokenWithAuthorizationCodeAndForm(
                 confidentialClientId, clientSecret, code);
         String refreshToken = node.at("/refresh_token").asText();
@@ -591,8 +588,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     private void testListAuthorizedClientWithMultipleRefreshTokens (
             String userAuthHeader) throws KustvaktException {
         // client 2
-        String code = requestAuthorizationCode(confidentialClientId,
-                clientSecret, null, userAuthHeader);
+        String code =
+                requestAuthorizationCode(confidentialClientId, userAuthHeader);
         ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
                 confidentialClientId, clientSecret, code);
 
@@ -604,8 +601,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     private void testListAuthorizedClientWithMultipleAccessTokens (
             String userAuthHeader) throws KustvaktException {
         // client 1
-        String code = requestAuthorizationCode(publicClientId, "", null,
-                userAuthHeader);
+        String code = requestAuthorizationCode(publicClientId, userAuthHeader);
         ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
                 publicClientId, "", code);
 
@@ -621,8 +617,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 .createBasicAuthorizationHeaderValue("aaa", "pwd");
 
         // client 1
-        String code = requestAuthorizationCode(publicClientId, "", null,
-                aaaAuthHeader);
+        String code = requestAuthorizationCode(publicClientId, aaaAuthHeader);
         ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
                 publicClientId, "", code);
 
@@ -630,8 +625,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         String accessToken1 = node.at("/access_token").asText();
 
         // client 2
-        code = requestAuthorizationCode(confidentialClientId, clientSecret,
-                null, aaaAuthHeader);
+        code = requestAuthorizationCode(confidentialClientId, aaaAuthHeader);
         response = requestTokenWithAuthorizationCodeAndForm(
                 confidentialClientId, clientSecret, code);
 

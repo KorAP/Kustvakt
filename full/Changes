@@ -8,6 +8,8 @@
  - Added registration_date, refresh_token_expiry, source and is_permitted
    to the oauth2_client database table, and updated the OAuth2 client 
    registration mechanism.
+ - Added authorization request with GET and deprecated that with POST.
+
 
 # version 0.65.2
 

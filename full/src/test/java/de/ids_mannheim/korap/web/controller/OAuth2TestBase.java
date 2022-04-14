@@ -49,38 +49,33 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     protected String confidentialClientId2 = "52atrL0ajex_3_5imd9Mgw";
     protected String superClientId = "fCBbQkAyYzI4NzUxMg";
     protected String clientSecret = "secret";
+    protected String state = "thisIsMyState";
 
     public static String ACCESS_TOKEN_TYPE = "access_token";
     public static String REFRESH_TOKEN_TYPE = "refresh_token";
     
-    private String clientURL = "http://example.client.com";
-    private String clientRedirectUri = "https://example.client.com/redirect";
+    protected String clientURL = "http://example.client.com";
+    protected String clientRedirectUri = "https://example.client.com/redirect";
 
-    protected ClientResponse requestAuthorizationCode (
-            MultivaluedMap<String, String> form, String authHeader)
-            throws KustvaktException {
+    protected ClientResponse requestAuthorizationCode (String responseType,
+            String clientId, String redirectUri, String scope, String state,
+            String authHeader) throws KustvaktException {
 
         return resource().path(API_VERSION).path("oauth2").path("authorize")
+                .queryParam("response_type", responseType)
+                .queryParam("client_id", clientId)
+                .queryParam("redirect_uri", redirectUri)
+                .queryParam("scope", scope)
+                .queryParam("state", state)
                 .header(Attributes.AUTHORIZATION, authHeader)
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+                .get(ClientResponse.class);
     }
 
-    protected String requestAuthorizationCode (String clientId,
-            String clientSecret, String scope, String authHeader)
-            throws KustvaktException {
+    protected String requestAuthorizationCode (String clientId, 
+            String authHeader) throws KustvaktException {
 
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("response_type", "code");
-        form.add("client_id", clientId);
-        form.add("client_secret", clientSecret);
-        if (scope != null) {
-            form.add("scope", scope);
-        }
-
-        ClientResponse response = requestAuthorizationCode(form, authHeader);
+        ClientResponse response = requestAuthorizationCode("code", clientId,
+                "", "", "", authHeader);
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
                 response.getStatus());
         URI redirectUri = response.getLocation();
@@ -90,22 +85,10 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         return params.getFirst("code");
     }
     
-    protected String requestAuthorizationCode (String clientId,
-            String clientSecret, String scope, String authHeader, 
-            String redirect_uri) throws KustvaktException {
-
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("response_type", "code");
-        form.add("client_id", clientId);
-        form.add("client_secret", clientSecret);
-        if (scope != null) {
-            form.add("scope", scope);
-        }
-        if (redirect_uri!=null){
-            form.add("redirect_uri", redirect_uri);
-        }
-
-        ClientResponse response = requestAuthorizationCode(form, authHeader);
+    protected String requestAuthorizationCode (String clientId, String redirect_uri,
+            String authHeader) throws KustvaktException {
+        ClientResponse response = requestAuthorizationCode("code", clientId,
+                redirect_uri, "", "", authHeader);
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
                 response.getStatus());
         URI redirectUri = response.getLocation();
