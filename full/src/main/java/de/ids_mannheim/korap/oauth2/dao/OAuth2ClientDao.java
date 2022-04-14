@@ -15,10 +15,14 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
@@ -42,10 +46,13 @@ public class OAuth2ClientDao {
 
     @PersistenceContext
     private EntityManager entityManager;
+    @Autowired
+    private FullConfiguration config;
 
     public void registerClient (String id, String secretHashcode, String name,
             OAuth2ClientType type, String url, String redirectURI,
-            String registeredBy, String description) throws KustvaktException {
+            String registeredBy, String description, int refreshTokenExpiry,
+            JsonNode source) throws KustvaktException {
         ParameterChecker.checkStringValue(id, "client_id");
         ParameterChecker.checkStringValue(name, "client_name");
         ParameterChecker.checkObjectValue(type, "client_type");
@@ -63,7 +70,17 @@ public class OAuth2ClientDao {
         client.setUrl(url);
         client.setRedirectURI(redirectURI);
         client.setRegisteredBy(registeredBy);
+        client.setRegistrationDate(ZonedDateTime.now());
         client.setDescription(description);
+        if (source !=null && !source.isNull()) {
+            client.setSource(source.toString());
+        }
+        else {
+            client.setPermitted(true);
+        }
+        if (refreshTokenExpiry <= 0) {
+           refreshTokenExpiry = config.getRefreshTokenLongExpiry();
+        }
         entityManager.persist(client);
     }
 

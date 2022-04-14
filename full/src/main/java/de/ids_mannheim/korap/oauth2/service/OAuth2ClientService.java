@@ -13,6 +13,8 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
@@ -128,10 +130,13 @@ public class OAuth2ClientService {
 
         String id = codeGenerator.createRandomCode();
         id = codeGenerator.filterRandomCode(id);
+        
         try {
             clientDao.registerClient(id, secretHashcode, clientJson.getName(),
                     clientJson.getType(), url, redirectURI, registeredBy,
-                    clientJson.getDescription());
+                    clientJson.getDescription(),
+                    clientJson.getRefreshTokenExpiry(),
+                    clientJson.getSource());
         }
         catch (KustvaktException e) {
             throw new KustvaktException(e.getStatusCode(),

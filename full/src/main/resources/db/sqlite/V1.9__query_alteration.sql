@@ -23,14 +23,11 @@ CREATE UNIQUE INDEX IF NOT EXISTS  query_unique_name
 	ON query(name,created_by);
 
 
-
 ALTER TABLE virtual_corpus_access 
 RENAME COLUMN virtual_corpus_id TO query_id;
 
 ALTER TABLE virtual_corpus_access
 RENAME TO query_access;
-
-
 
 
 DROP TABLE IF EXISTS query_reference;

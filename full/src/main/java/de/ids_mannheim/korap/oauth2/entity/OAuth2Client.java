@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.oauth2.entity;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -33,12 +34,20 @@ public class OAuth2Client implements Comparable<OAuth2Client>{
     private boolean isSuper;
     @Column(name = "redirect_uri")
     private String redirectURI;
-    @Column(name = "registered_by")
+    @Column(name = "registered_by", updatable = false)
     private String registeredBy;
+    @Column(name = "registration_date", updatable = false)
+    private ZonedDateTime registrationDate;
+    
+    @Column(name = "refresh_token_expiry")
+    private int refresTokenExpiry;
     private String description;
-
     private String url;
 
+    private String source;
+    @Column(name = "is_permitted")
+    private boolean isPermitted;
+    
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "client")
     private List<RefreshToken> refreshTokens;
     
@@ -113,6 +122,13 @@ public class OAuth2Client implements Comparable<OAuth2Client>{
     public void setRegisteredBy (String registeredBy) {
         this.registeredBy = registeredBy;
     }
+    
+    public ZonedDateTime getRegistrationDate () {
+        return registrationDate;
+    }
+    public void setRegistrationDate (ZonedDateTime registrationDate) {
+        this.registrationDate = registrationDate;
+    }
 
     public String getDescription () {
         return description;
@@ -130,4 +146,19 @@ public class OAuth2Client implements Comparable<OAuth2Client>{
         this.url = url;
     }
 
+    public String getSource () {
+        return source;
+    }
+
+    public void setSource (String source) {
+        this.source = source;
+    }
+
+    public boolean isPermitted () {
+        return isPermitted;
+    }
+    
+    public void setPermitted (boolean isPermitted) {
+        this.isPermitted = isPermitted;
+    }
 }
