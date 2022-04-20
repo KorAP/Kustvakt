@@ -43,13 +43,12 @@ VALUES ("8bIDtZnH6NvRkW2Fq","third party client",null,
 
   
 INSERT INTO oauth2_client(id,name,secret,type,super,
-  redirect_uri, registered_by, description, url, registration_date, 
+  registered_by, description, url, registration_date, 
   is_permitted) 
 VALUES ("nW5qM63Rb2a7KdT9L","test public client",null,
-  "PUBLIC", 0, 
-  "https://korap.ids-mannheim.de/public/redirect","system", 
-  "This is a test public client.",
-  "http://korap.ids-mannheim.de/public", CURRENT_TIMESTAMP, 1);
+  "PUBLIC", 0, "https://korap.ids-mannheim.de/public/redirect",
+  "system", "http://korap.ids-mannheim.de/public", 
+  CURRENT_TIMESTAMP, 1);
   
 
 INSERT INTO oauth2_access_token(token,user_id,created_date, 

@@ -15,13 +15,10 @@ import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.junit.Test;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
@@ -47,22 +44,111 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
     @Test
     public void testAuthorizeConfidentialClient () throws KustvaktException {
-        ClientResponse response = requestAuthorizationCode("code",
-                confidentialClientId, "", "", state, userAuthHeader);
+        // with registered redirect URI
+        ClientResponse response =
+                requestAuthorizationCode("code", confidentialClientId, "",
+                        "match_info search client_info", state, userAuthHeader);
 
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
                 response.getStatus());
         URI redirectUri = response.getLocation();
-        MultiValueMap<String, String> params = UriComponentsBuilder
-                .fromUri(redirectUri).build().getQueryParams();
+        MultivaluedMap<String, String> params =
+                getQueryParamsFromURI(redirectUri);
         assertNotNull(params.getFirst("code"));
         assertEquals("thisIsMyState", params.getFirst("state"));
+        assertEquals("match_info search client_info", params.getFirst("scope"));
     }
 
     @Test
     public void testAuthorizePublicClient () throws KustvaktException {
+        // with registered redirect URI
         String code = requestAuthorizationCode(publicClientId, userAuthHeader);
         assertNotNull(code);
+    }
+
+    @Test
+    public void testAuthorizePublicClientWithRedirectUri () throws KustvaktException {
+        ClientResponse response =
+                requestAuthorizationCode("code", publicClientId2,
+                        "https://public.com/redirect", "", "", userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
+                response.getStatus());
+        
+        URI redirectUri = response.getLocation();
+        assertEquals(redirectUri.getScheme(), "https");
+        assertEquals(redirectUri.getHost(), "public.com");
+        assertEquals(redirectUri.getPath(), "/redirect");
+
+        String[] queryParts = redirectUri.getQuery().split("&");
+        assertTrue(queryParts[0].startsWith("code="));
+        assertEquals(queryParts[1], "scope=match_info+search");
+    }
+    
+    @Test
+    public void testAuthorizeWithoutScope () throws KustvaktException {
+        ClientResponse response = requestAuthorizationCode("code",
+                confidentialClientId, "", "", "", userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
+                response.getStatus());
+
+        URI redirectUri = response.getLocation();
+        assertEquals(redirectUri.getScheme(), "https");
+        assertEquals(redirectUri.getHost(), "third.party.com");
+        assertEquals(redirectUri.getPath(), "/confidential/redirect");
+
+        String[] queryParts = redirectUri.getQuery().split("&");
+        assertTrue(queryParts[0].startsWith("code="));
+        assertEquals(queryParts[1], "scope=match_info+search");
+    }
+
+    @Test
+    public void testAuthorizeMissingClientId () throws KustvaktException {
+        ClientResponse response = requestAuthorizationCode("code", "", "", "",
+                "", userAuthHeader);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals("Missing parameters: client_id",
+                node.at("/error_description").asText());
+    }
+
+    @Test
+    public void testAuthorizeMissingRedirectUri () throws KustvaktException {
+        ClientResponse response = requestAuthorizationCode("code",
+                publicClientId2, "", "", state, userAuthHeader);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
+                node.at("/error").asText());
+        assertEquals("Redirect URI is required",
+                node.at("/error_description").asText());
+        assertEquals("thisIsMyState", node.at("/state").asText());
+    }
+
+    @Test
+    public void testAuthorizeMissingResponseType () throws KustvaktException {
+        ClientResponse response = requestAuthorizationCode("",
+                confidentialClientId, "", "", "", userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
+                response.getStatus());
+
+        assertEquals("https://third.party.com/confidential/redirect?"
+                + "error_description=Missing+parameters%3A+response_type&"
+                + "error=invalid_request", response.getLocation().toString());
+    }
+
+    @Test
+    public void testAuthorizeInvalidClientId () throws KustvaktException {
+        ClientResponse response = requestAuthorizationCode("code",
+                "unknown-client-id", "", "", "", userAuthHeader);
+//        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        String entity = response.getEntity(String.class);
+        System.out.println(entity);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals("Unknown client with unknown-client-id.",
+                node.at("/error_description").asText());
     }
 
     @Test
@@ -81,57 +167,54 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
                 node.at("/error_description").asText());
         assertEquals("thisIsMyState", node.at("/state").asText());
     }
-    
-//    @Test
-//    public void testAuthorizeRedirectUriLocalhost () throws KustvaktException {
-//        String redirectUri = "http://localhost:1410/";
-//        ClientResponse response =
-//                requestAuthorizationCode("code", confidentialClientId2,
-//                        redirectUri, null, "myState", userAuthHeader);
-//        System.out.println(response.getStatus());
-//        System.out.println(response.getEntity(String.class));
-//    }
-
-    @Test
-    public void testAuthorizeMissingRequiredParameters ()
-            throws KustvaktException {
-        // missing response_type
-        ClientResponse response = requestAuthorizationCode("",
-                confidentialClientId, "", "", state, userAuthHeader);
-
-        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-
-        String entity = response.getEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
-                node.at("/error").asText());
-        assertEquals("Missing response_type parameter value",
-                node.at("/error_description").asText());
-        assertEquals("thisIsMyState", node.at("/state").asText());
-
-        // missing client_id
-        response = requestAuthorizationCode("code","", "", "", "", userAuthHeader);
-        entity = response.getEntity(String.class);
-        node = JsonUtils.readTree(entity);
-        assertEquals("Missing parameters: client_id",
-                node.at("/error_description").asText());
-    }
 
     @Test
     public void testAuthorizeInvalidResponseType () throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("response_type", "string");
-        form.add("state", "thisIsMyState");
-
+        // without redirect URI in the request
         ClientResponse response = requestAuthorizationCode("string",
                 confidentialClientId, "", "", state, userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
+                response.getStatus());
+
+        assertEquals("https://third.party.com/confidential/redirect?"
+                + "error_description=Invalid+response_type+parameter+"
+                + "value&state=thisIsMyState&" + "error=invalid_request",
+                response.getLocation().toString());
+
+        // with redirect URI, and no registered redirect URI
+        response = requestAuthorizationCode("string", publicClientId2,
+                "https://public.client.com/redirect", "", state,
+                userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
+                response.getStatus());
+
+        assertEquals("https://public.client.com/redirect?error_description="
+                + "Invalid+response_type+parameter+value&state=thisIsMyState&"
+                + "error=invalid_request", response.getLocation().toString());
+
+        // with different redirect URI
+        String redirectUri = "https://different.uri/redirect";
+        response = requestAuthorizationCode("string", confidentialClientId,
+                redirectUri, "", state, userAuthHeader);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
-        String entity = response.getEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
                 node.at("/error").asText());
-        assertEquals("Invalid response_type parameter value",
+        assertEquals("Invalid redirect URI",
+                node.at("/error_description").asText());
+        assertEquals("thisIsMyState", node.at("/state").asText());
+
+        // without redirect URI in the request and no registered
+        // redirect URI
+        response = requestAuthorizationCode("string", publicClientId2, "", "",
+                state, userAuthHeader);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        node = JsonUtils.readTree(response.getEntity(String.class));
+        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
+                node.at("/error").asText());
+        assertEquals("Redirect URI is required",
                 node.at("/error_description").asText());
         assertEquals("thisIsMyState", node.at("/state").asText());
     }
@@ -139,18 +222,30 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     @Test
     public void testAuthorizeInvalidScope () throws KustvaktException {
         String scope = "read_address";
-
         ClientResponse response = requestAuthorizationCode("code",
                 confidentialClientId, "", scope, state, userAuthHeader);
-        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
+                response.getStatus());
 
-        URI location = response.getLocation();
-        MultiValueMap<String, String> params =
-                UriComponentsBuilder.fromUri(location).build().getQueryParams();
-        assertEquals(OAuth2Error.INVALID_SCOPE, params.getFirst("error"));
-        assertEquals("read_address+is+an+invalid+scope",
-                params.getFirst("error_description"));
-        assertEquals("thisIsMyState", params.getFirst("state"));
+        assertEquals(
+                "https://third.party.com/confidential/redirect?"
+                + "error_description=read_address+is+an+invalid+scope&"
+                + "state=thisIsMyState&error=invalid_scope",
+                response.getLocation().toString());
+    }
+
+    @Test
+    public void testAuthorizeUnsupportedTokenResponseType ()
+            throws KustvaktException {
+        ClientResponse response = requestAuthorizationCode("token",
+                confidentialClientId, "", "", state, userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
+                response.getStatus());
+
+        assertEquals("https://third.party.com/confidential/redirect?"
+                + "error_description=response_type+token+is+not+"
+                + "supported&state=thisIsMyState&error=unsupported_"
+                + "response_type", response.getLocation().toString());
     }
 
     @Test
@@ -182,9 +277,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String scope = "search";
         ClientResponse response = requestAuthorizationCode("code",
                 confidentialClientId, "", scope, state, userAuthHeader);
-        URI redirectUri = response.getLocation();
         MultivaluedMap<String, String> params =
-                UriComponent.decodeQuery(redirectUri, true);
+                getQueryParamsFromURI(response.getLocation());
         String code = params.get("code").get(0);
         String scopes = params.get("scope").get(0);
 
@@ -249,9 +343,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         ClientResponse response =
                 requestAuthorizationCode("code", confidentialClientId,
                         redirect_uri, scope, state, userAuthHeader);
-        URI redirectUri = response.getLocation();
         MultivaluedMap<String, String> params =
-                UriComponent.decodeQuery(redirectUri, true);
+                getQueryParamsFromURI(response.getLocation());
         String code = params.get("code").get(0);
 
         testRequestTokenAuthorizationInvalidClient(code);
