@@ -18,9 +18,12 @@ import lombok.Setter;
 @Getter
 public class KustvaktException extends Exception {
 
+    private static final long serialVersionUID = -1955783565699446322L;
     protected List<AuditRecord> records = new ArrayList<>();
     private String userid;
     private Integer statusCode;
+    private int responseStatus;
+    
     private String entity;
     private String notification;
     private boolean isNotification;

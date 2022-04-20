@@ -12,6 +12,11 @@
 2022-04-13
  - Updated OAuth2Client list API (added redirect_uri, registration_date, 
    permitted, source to OAuth2UserClientDto).
+2022-04-20
+ - Updated authorization error response. (Included error and error 
+   description in the client redirect URI except for missing or 
+   invalid client id or redirect URI.
+ 
 
 # version 0.65.2
 
