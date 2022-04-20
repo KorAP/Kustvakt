@@ -72,6 +72,7 @@ public class OAuth2AuthorizationService {
         return String.join(" ", scopeSet);
     }
 
+    @Deprecated
     protected void checkResponseType (String responseType)
             throws KustvaktException {
         if (responseType == null || responseType.isEmpty()) {
@@ -124,7 +125,7 @@ public class OAuth2AuthorizationService {
             }
             else {
                 throw new KustvaktException(StatusCodes.MISSING_REDIRECT_URI,
-                        "redirect_uri is required",
+                        "Redirect URI is required",
                         OAuth2Error.INVALID_REQUEST);
             }
         }

@@ -100,7 +100,10 @@ public class OAuth2Controller {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response requestAuthorizationCode (
             @Context HttpServletRequest request,
-            @Context SecurityContext context, @FormParam("state") String state,
+            @Context SecurityContext context, 
+            @FormParam("state") String state,
+            @FormParam("client_id") String clientId,
+            @FormParam("redirect_uri") String redirectUri,
             MultivaluedMap<String, String> form) {
 
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
@@ -122,9 +125,12 @@ public class OAuth2Controller {
             throw responseHandler.throwit(e, state);
         }
         catch (OAuthProblemException e) {
-            throw responseHandler.throwit(e, state);
+            e.state(state);
+            e = authorizationService.checkRedirectUri(e, clientId, redirectUri);
+            throw responseHandler.throwit(e);
         }
         catch (KustvaktException e) {
+            e = authorizationService.checkRedirectUri(e, clientId, redirectUri);
             throw responseHandler.throwit(e, state);
         }
     }
@@ -134,6 +140,8 @@ public class OAuth2Controller {
     public Response requestAuthorizationCode (
             @Context HttpServletRequest request,
             @Context SecurityContext context,
+            @QueryParam("client_id") String clientId,
+            @QueryParam("redirect_uri") String redirectUri,
             @QueryParam("state") String state
             ) {
 
@@ -151,13 +159,16 @@ public class OAuth2Controller {
             return responseHandler.sendRedirect(uri);
         }
         catch (OAuthSystemException e) {
-            throw responseHandler.throwit(e, state);
+            throw responseHandler.throwit(e,state);
         }
         catch (OAuthProblemException e) {
-            throw responseHandler.throwit(e, state);
+            e.state(state);
+            e = authorizationService.checkRedirectUri(e,clientId,redirectUri);
+            throw responseHandler.throwit(e);
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e, state);
+            e = authorizationService.checkRedirectUri(e, clientId, redirectUri);
+            throw responseHandler.throwit(e,state);
         }
     }
 
