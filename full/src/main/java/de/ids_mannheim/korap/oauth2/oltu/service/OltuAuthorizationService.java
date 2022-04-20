@@ -6,8 +6,10 @@ import java.time.ZonedDateTime;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.http.HttpStatus;
 import org.apache.oltu.oauth2.as.request.OAuthAuthzRequest;
 import org.apache.oltu.oauth2.as.response.OAuthASResponse;
+import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.OAuthResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.service.OAuth2AuthorizationService;
+import de.ids_mannheim.korap.oauth2.service.OAuth2ClientService;
 
 /**
  * OAuth2 authorization service using Apache Oltu
@@ -33,8 +36,10 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
 
     @Autowired
     private RandomCodeGenerator codeGenerator;
+    @Autowired
+    private OAuth2ClientService clientService;
 
-    /**
+    /**e.description("Redirect URI is required");
      * Authorization code request does not require client
      * authentication, but only checks if the client id exists.
      * 
@@ -70,7 +75,7 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
 
         String scope, code;
         try {
-            checkResponseType(authzRequest.getResponseType());
+            //checkResponseType(authzRequest.getResponseType(), redirectURI);
             code = codeGenerator.createRandomCode();
             scope = createAuthorization(username, authzRequest.getClientId(),
                     redirectUriStr, authzRequest.getScopes(), code,
@@ -86,7 +91,8 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
             oAuthResponse = OAuthASResponse
                     .authorizationResponse(request,
                             Status.FOUND.getStatusCode())
-                    .setCode(code).setScope(scope).location(verifiedRedirectUri)
+                    .setCode(code).setScope(scope)
+                    .location(verifiedRedirectUri)
                     .buildQueryMessage();
         }
         catch (OAuthSystemException e) {
@@ -98,5 +104,86 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
             throw ke;
         }
         return oAuthResponse.getLocationUri();
+    }
+
+    public OAuthProblemException checkRedirectUri (OAuthProblemException e,
+            String clientId, String redirectUri) {
+        if (!clientId.isEmpty()) {
+            String registeredUri = null;
+            try {
+                OAuth2Client client = clientService.retrieveClient(clientId);
+                registeredUri = client.getRedirectURI();
+            }
+            catch (KustvaktException e1) {}
+
+            if (redirectUri != null && !redirectUri.isEmpty()) {
+                if (registeredUri != null && !registeredUri.isEmpty()
+                        && !redirectUri.equals(registeredUri)) {
+                    e.description("Invalid redirect URI");
+                }
+                else {
+                    e.setRedirectUri(redirectUri);
+                    e.responseStatus(HttpStatus.SC_TEMPORARY_REDIRECT);
+                }
+            }
+            else if (registeredUri != null && !registeredUri.isEmpty()) {
+                e.setRedirectUri(registeredUri);
+                e.responseStatus(HttpStatus.SC_TEMPORARY_REDIRECT);
+            }
+            else {
+                e.description("Redirect URI is required");
+            }
+        }
+
+        return e;
+    }
+    
+    public KustvaktException checkRedirectUri (KustvaktException e,
+            String clientId, String redirectUri){
+        int statusCode = e.getStatusCode();
+        if (!clientId.isEmpty()
+                && statusCode != StatusCodes.CLIENT_NOT_FOUND
+                && statusCode != StatusCodes.AUTHORIZATION_FAILED) {
+            String registeredUri = null;
+            try {
+                OAuth2Client client = clientService.retrieveClient(clientId);
+                registeredUri = client.getRedirectURI();
+            }
+            catch (KustvaktException e1) {}
+
+            if (redirectUri != null && !redirectUri.isEmpty()) {
+                if (registeredUri != null && !registeredUri.isEmpty()
+                        && !redirectUri.equals(registeredUri)) {
+                    return new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
+                            "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
+                }
+                else {
+                    try {
+                        e.setRedirectUri(new URI(redirectUri));
+                    }
+                    catch (URISyntaxException e1) {
+                        return new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
+                                "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
+                    }
+                    e.setResponseStatus(HttpStatus.SC_TEMPORARY_REDIRECT);
+                }
+            }
+            else if (registeredUri != null && !registeredUri.isEmpty()) {
+                try {
+                    e.setRedirectUri(new URI(registeredUri));
+                }
+                catch (URISyntaxException e1) {
+                    return new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
+                            "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
+                }
+                e.setResponseStatus(HttpStatus.SC_TEMPORARY_REDIRECT);
+            }
+            else {
+                return new KustvaktException(StatusCodes.MISSING_REDIRECT_URI,
+                        "Redirect URI is required", OAuth2Error.INVALID_REQUEST);
+            }
+        }
+
+        return e;
     }
 }

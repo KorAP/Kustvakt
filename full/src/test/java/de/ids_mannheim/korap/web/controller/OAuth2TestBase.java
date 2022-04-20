@@ -20,6 +20,7 @@ import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
@@ -45,6 +46,8 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     protected RefreshTokenDao refreshTokenDao;
     
     protected String publicClientId = "8bIDtZnH6NvRkW2Fq";
+    // without registered redirect URI
+    protected String publicClientId2 = "nW5qM63Rb2a7KdT9L";
     protected String confidentialClientId = "9aHsGW6QflV13ixNpez";
     protected String confidentialClientId2 = "52atrL0ajex_3_5imd9Mgw";
     protected String superClientId = "fCBbQkAyYzI4NzUxMg";
@@ -56,6 +59,10 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     
     protected String clientURL = "http://example.client.com";
     protected String clientRedirectUri = "https://example.client.com/redirect";
+    
+    protected MultivaluedMap<String, String> getQueryParamsFromURI (URI uri) {
+        return UriComponent.decodeQuery(uri, true);
+    };
 
     protected ClientResponse requestAuthorizationCode (String responseType,
             String clientId, String redirectUri, String scope, String state,
