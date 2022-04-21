@@ -113,15 +113,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         String clientName = "OAuth2DoryClient";
         OAuth2ClientJson json = createOAuth2ClientJson(clientName,
                 OAuth2ClientType.PUBLIC, "Dory's client.");
-
         registerClient("dory", json);
 
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("super_client_id", superClientId);
-        form.add("super_client_secret", clientSecret);
-
-        JsonNode node = testListUserRegisteredClients("dory");
-        
+        JsonNode node = listUserRegisteredClients("dory");
         assertEquals(1, node.size());
         assertEquals(clientName, node.at("/0/client_name").asText());
         assertEquals(OAuth2ClientType.PUBLIC.name(),
@@ -150,40 +144,6 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         deregisterConfidentialClient(username, clientId);
     }
     
-    @Test
-    public void testRegisterPlugin () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
-        JsonNode source = JsonUtils.readTree("{ \"plugin\" : \"source\"}");
-                
-        OAuth2ClientJson json = new OAuth2ClientJson();
-        json.setName("Plugin");
-        json.setType(OAuth2ClientType.CONFIDENTIAL);
-        json.setDescription("This is a plugin test client.");
-        json.setSource(source);
-        
-        ClientResponse response = registerClient(username, json);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
-        String clientId = node.at("/client_id").asText();
-        String clientSecret = node.at("/client_secret").asText();
-        assertNotNull(clientId);
-        assertNotNull(clientSecret);
-        
-        JsonNode clientInfo = retrieveClientInfo(clientId, username);
-        assertEquals(clientId, clientInfo.at("/id").asText());
-        assertEquals("Plugin", clientInfo.at("/name").asText());
-        assertEquals(OAuth2ClientType.CONFIDENTIAL.name(),
-                clientInfo.at("/type").asText());
-        assertEquals(username, clientInfo.at("/registered_by").asText());
-        assertNotNull(clientInfo.at("/registration_date"));
-        
-        assertFalse(clientInfo.at("/permitted").asBoolean());
-        assertNotNull(clientInfo.at("/source"));
-        
-        testListUserRegisteredClients(username);
-        deregisterConfidentialClient(username, clientId);
-    }
-
     @Test
     public void testRegisterClientNameTooShort ()
             throws UniformInterfaceException, ClientHandlerException,
@@ -538,9 +498,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
     private void requestAuthorizedClientList (String userAuthHeader)
             throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("super_client_id", superClientId);
-        form.add("super_client_secret", clientSecret);
+        MultivaluedMap<String, String> form = getSuperClientForm();
         form.add("authorized_only", "true");
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
@@ -672,30 +630,6 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 clientSecret, refreshToken);
     }
     
-    private JsonNode testListUserRegisteredClients (String username)
-            throws UniformInterfaceException, ClientHandlerException,
-            KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("super_client_id", superClientId);
-        form.add("super_client_secret", clientSecret);
-
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
-                .path("client").path("list")
-                .header(Attributes.AUTHORIZATION,
-                        HttpAuthorizationHandler
-                                .createBasicAuthorizationHeaderValue(username,
-                                        "password"))
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
-
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
-        String entity = response.getEntity(String.class);
-//        System.out.println(entity);
-        return JsonUtils.readTree(entity);
-    }
-
     private void testRevokeAllTokenViaSuperClient (String clientId,
             String userAuthHeader, String accessToken)
             throws KustvaktException {
@@ -704,10 +638,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         assertTrue(node.at("/matches").size() > 0);
 
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        MultivaluedMap<String, String> form = getSuperClientForm();
         form.add("client_id", clientId);
-        form.add("super_client_id", superClientId);
-        form.add("super_client_secret", clientSecret);
 
         response = resource().path(API_VERSION).path("oauth2").path("revoke")
                 .path("super").path("all")
