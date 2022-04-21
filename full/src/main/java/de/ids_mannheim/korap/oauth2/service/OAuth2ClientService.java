@@ -367,6 +367,15 @@ public class OAuth2ClientService {
         return createClientDtos(userClients);
     }
     
+       
+    public List<OAuth2UserClientDto> listPlugins (boolean isPermitted)
+            throws KustvaktException {
+
+        List<OAuth2Client> plugins = clientDao.retrievePlugins(isPermitted);
+        Collections.sort(plugins);
+        return createClientDtos(plugins);
+    }
+
     private List<OAuth2UserClientDto> createClientDtos (
             List<OAuth2Client> userClients) throws KustvaktException {
         List<OAuth2UserClientDto> dtoList = new ArrayList<>(userClients.size());
@@ -391,4 +400,6 @@ public class OAuth2ClientService {
                     OAuth2Error.UNAUTHORIZED_CLIENT);
         }
     }
+
+    
 }
