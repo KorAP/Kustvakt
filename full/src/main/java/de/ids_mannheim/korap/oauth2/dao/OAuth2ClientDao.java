@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.FullConfiguration;
+import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
@@ -48,6 +49,8 @@ public class OAuth2ClientDao {
     private EntityManager entityManager;
     @Autowired
     private FullConfiguration config;
+    @Autowired
+    private AdminDao adminDao;
 
     public void registerClient (String id, String secretHashcode, String name,
             OAuth2ClientType type, String url, String redirectURI,
@@ -189,6 +192,27 @@ public class OAuth2ClientDao {
         query.select(client);
         query.where(builder.equal(client.get(OAuth2Client_.registeredBy),
                 username));
+        query.distinct(true);
+        TypedQuery<OAuth2Client> q = entityManager.createQuery(query);
+        return q.getResultList();
+    }
+
+    public List<OAuth2Client> retrievePlugins (boolean isPermittedOnly)
+            throws KustvaktException {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<OAuth2Client> query =
+                builder.createQuery(OAuth2Client.class);
+
+        Root<OAuth2Client> client = query.from(OAuth2Client.class);
+        Predicate restrictions =
+                builder.isNotNull(client.get(OAuth2Client_.SOURCE));
+        if (isPermittedOnly) {
+            restrictions = builder.and(restrictions,
+                    builder.isTrue(client.get(OAuth2Client_.IS_PERMITTED)));
+        }
+
+        query.select(client);
+        query.where(restrictions);
         query.distinct(true);
         TypedQuery<OAuth2Client> q = entityManager.createQuery(query);
         return q.getResultList();

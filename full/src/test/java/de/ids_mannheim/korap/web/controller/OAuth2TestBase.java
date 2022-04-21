@@ -44,7 +44,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
     @Autowired
     protected RefreshTokenDao refreshTokenDao;
-    
+
     protected String publicClientId = "8bIDtZnH6NvRkW2Fq";
     // without registered redirect URI
     protected String publicClientId2 = "nW5qM63Rb2a7KdT9L";
@@ -56,13 +56,20 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
     public static String ACCESS_TOKEN_TYPE = "access_token";
     public static String REFRESH_TOKEN_TYPE = "refresh_token";
-    
+
     protected String clientURL = "http://example.client.com";
     protected String clientRedirectUri = "https://example.client.com/redirect";
-    
+
     protected MultivaluedMap<String, String> getQueryParamsFromURI (URI uri) {
         return UriComponent.decodeQuery(uri, true);
     };
+
+    protected MultivaluedMap<String, String> getSuperClientForm () {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("super_client_id", superClientId);
+        form.add("super_client_secret", clientSecret);
+        return form;
+    }
 
     protected ClientResponse requestAuthorizationCode (String responseType,
             String clientId, String redirectUri, String scope, String state,
@@ -72,17 +79,16 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
                 .queryParam("response_type", responseType)
                 .queryParam("client_id", clientId)
                 .queryParam("redirect_uri", redirectUri)
-                .queryParam("scope", scope)
-                .queryParam("state", state)
+                .queryParam("scope", scope).queryParam("state", state)
                 .header(Attributes.AUTHORIZATION, authHeader)
                 .get(ClientResponse.class);
     }
 
-    protected String requestAuthorizationCode (String clientId, 
+    protected String requestAuthorizationCode (String clientId,
             String authHeader) throws KustvaktException {
 
-        ClientResponse response = requestAuthorizationCode("code", clientId,
-                "", "", "", authHeader);
+        ClientResponse response = requestAuthorizationCode("code", clientId, "",
+                "", "", authHeader);
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
                 response.getStatus());
         URI redirectUri = response.getLocation();
@@ -91,9 +97,9 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
                 .fromUri(redirectUri).build().getQueryParams();
         return params.getFirst("code");
     }
-    
-    protected String requestAuthorizationCode (String clientId, String redirect_uri,
-            String authHeader) throws KustvaktException {
+
+    protected String requestAuthorizationCode (String clientId,
+            String redirect_uri, String authHeader) throws KustvaktException {
         ClientResponse response = requestAuthorizationCode("code", clientId,
                 redirect_uri, "", "", authHeader);
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
@@ -104,7 +110,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
                 .fromUri(redirectUri).build().getQueryParams();
         return params.getFirst("code");
     }
-    
+
     protected ClientResponse requestToken (MultivaluedMap<String, String> form)
             throws KustvaktException {
         return resource().path(API_VERSION).path("oauth2").path("token")
@@ -130,7 +136,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).post(ClientResponse.class);
     }
-    
+
     protected ClientResponse requestTokenWithAuthorizationCodeAndForm (
             String clientId, String clientSecret, String code,
             String redirectUri) throws KustvaktException {
@@ -140,7 +146,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         form.add("client_id", clientId);
         form.add("client_secret", clientSecret);
         form.add("code", code);
-        if (redirectUri!=null){
+        if (redirectUri != null) {
             form.add("redirect_uri", redirectUri);
         }
 
@@ -151,8 +157,9 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     }
 
     // client credentials in authorization header
-    protected JsonNode requestTokenWithAuthorizationCodeAndHeader (String clientId,
-            String code, String authHeader) throws KustvaktException {
+    protected JsonNode requestTokenWithAuthorizationCodeAndHeader (
+            String clientId, String code, String authHeader)
+            throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("grant_type", "authorization_code");
         form.add("client_id", clientId);
@@ -186,7 +193,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
         return requestToken(form);
     }
-    
+
     protected void testRequestTokenWithRevokedRefreshToken (String clientId,
             String clientSecret, String refreshToken) throws KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
@@ -211,7 +218,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         assertEquals("Refresh token has been revoked",
                 node.at("/error_description").asText());
     }
-    
+
     protected ClientResponse registerClient (String username,
             OAuth2ClientJson json) throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
@@ -225,7 +232,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
     }
-    
+
     protected ClientResponse registerConfidentialClient (String username)
             throws KustvaktException {
 
@@ -238,7 +245,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
         return registerClient(username, json);
     }
-    
+
     protected void testConfidentialClientInfo (String clientId, String username)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
@@ -249,17 +256,18 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
                 clientInfo.at("/type").asText());
         assertEquals(username, clientInfo.at("/registered_by").asText());
         assertEquals(clientURL, clientInfo.at("/url").asText());
-        assertEquals(clientRedirectUri, clientInfo.at("/redirect_uri").asText());
+        assertEquals(clientRedirectUri,
+                clientInfo.at("/redirect_uri").asText());
         assertNotNull(clientInfo.at("/description"));
         assertNotNull(clientInfo.at("/registration_date"));
         assertTrue(clientInfo.at("/permitted").asBoolean());
         assertTrue(clientInfo.at("/source").isMissingNode());
-        
+
     }
-    
-    protected void deregisterConfidentialClient (String username, String clientId)
-            throws UniformInterfaceException, ClientHandlerException,
-            KustvaktException {
+
+    protected void deregisterConfidentialClient (String username,
+            String clientId) throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("client").path("deregister").path(clientId)
@@ -292,19 +300,20 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
     }
-    
-    protected void testRevokeTokenViaSuperClient (String token, String userAuthHeader) {
+
+    protected void testRevokeTokenViaSuperClient (String token,
+            String userAuthHeader) {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("token", token);
         form.add("super_client_id", superClientId);
         form.add("super_client_secret", clientSecret);
 
-        ClientResponse response = resource().path(API_VERSION)
-                .path("oauth2").path("revoke").path("super")
+        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+                .path("revoke").path("super")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
-                .header(Attributes.AUTHORIZATION, userAuthHeader)
-                .entity(form).post(ClientResponse.class);
+                .header(Attributes.AUTHORIZATION, userAuthHeader).entity(form)
+                .post(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         assertEquals("SUCCESS", response.getEntity(String.class));
@@ -328,5 +337,22 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         assertEquals("SUCCESS", response.getEntity(String.class));
+    }
+
+    protected JsonNode listUserRegisteredClients (String username)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+                .path("client").path("list")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pwd"))
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(getSuperClientForm()).post(ClientResponse.class);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        String entity = response.getEntity(String.class);
+        return JsonUtils.readTree(entity);
     }
 }
