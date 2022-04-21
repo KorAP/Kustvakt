@@ -206,7 +206,7 @@ public class OAuthClientController {
     @Path("/list")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public List<OAuth2UserClientDto> listUserAuthorizedClients (
+    public List<OAuth2UserClientDto> listUserClients (
             @Context SecurityContext context,
             @FormParam("super_client_id") String superClientId,
             @FormParam("super_client_secret") String superClientSecret,
@@ -226,6 +226,30 @@ public class OAuthClientController {
             else {
                 return clientService.listUserRegisteredClients(username);
             }
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
+    
+    @POST
+    @Path("/plugins")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public List<OAuth2UserClientDto> listPlugins (
+            @Context SecurityContext context,
+            @FormParam("super_client_id") String superClientId,
+            @FormParam("super_client_secret") String superClientSecret,
+            @FormParam("permitted_only") boolean permittedOnly) {
+
+        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+
+        try {
+            scopeService.verifyScope(tokenContext,
+                    OAuth2Scope.LIST_USER_CLIENT);
+
+            clientService.verifySuperClient(superClientId, superClientSecret);
+            return clientService.listPlugins(permittedOnly);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
