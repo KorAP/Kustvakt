@@ -25,28 +25,28 @@ VALUES ("9aHsGW6QflV13ixNpez","non super confidential client",
 
 INSERT INTO oauth2_client(id,name,secret,type,super,
   registered_by, description,url, registration_date, 
-  is_permitted) 
+  is_permitted,source) 
 VALUES ("52atrL0ajex_3_5imd9Mgw","confidential client 2",
   "$2a$08$vi1FbuN3p6GcI1tSxMAoeuIYL8Yw3j6A8wJthaN8ZboVnrQaTwLPq",
   "CONFIDENTIAL", 0,"system",
   "This is a test nonsuper confidential client.",
-  "http://example.client.de", CURRENT_TIMESTAMP, 1);
+  "http://example.client.de", CURRENT_TIMESTAMP, 1,'{"key":"value"}');
 
 INSERT INTO oauth2_client(id,name,secret,type,super,
   redirect_uri, registered_by, description, url, registration_date, 
-  is_permitted)
-VALUES ("8bIDtZnH6NvRkW2Fq","third party client",null,
-  "PUBLIC", 0,
+  is_permitted,source)
+VALUES ("8bIDtZnH6NvRkW2Fq","public client plugin with redirect uri",
+  null, "PUBLIC", 0,
   "https://third.party.client.com/redirect","system",
-  "This is a test public client.",
-  "http://third.party.client.com", CURRENT_TIMESTAMP,1);
+  "A public client that is a plugin with registered redirect URI",
+  "http://third.party.client.com", CURRENT_TIMESTAMP,1,'{"key":"value"}');
 
   
 INSERT INTO oauth2_client(id,name,secret,type,super,
   registered_by, description, url, registration_date, 
   is_permitted) 
 VALUES ("nW5qM63Rb2a7KdT9L","test public client",null,
-  "PUBLIC", 0, "https://korap.ids-mannheim.de/public/redirect",
+  "PUBLIC", 0, "without redirect uri",
   "system", "http://korap.ids-mannheim.de/public", 
   CURRENT_TIMESTAMP, 1);
   

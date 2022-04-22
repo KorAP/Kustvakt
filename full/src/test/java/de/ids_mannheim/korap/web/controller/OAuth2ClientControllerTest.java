@@ -16,6 +16,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.entity.ContentType;
+import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -81,7 +82,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         // public client
         JsonNode clientInfo = retrieveClientInfo(publicClientId, "system");
         assertEquals(publicClientId, clientInfo.at("/id").asText());
-        assertEquals("third party client", clientInfo.at("/name").asText());
+        assertEquals("public client plugin with redirect uri",
+                clientInfo.at("/name").asText());
         assertNotNull(clientInfo.at("/description"));
         assertNotNull(clientInfo.at("/url"));
         assertEquals("PUBLIC", clientInfo.at("/type").asText());
@@ -113,15 +115,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         String clientName = "OAuth2DoryClient";
         OAuth2ClientJson json = createOAuth2ClientJson(clientName,
                 OAuth2ClientType.PUBLIC, "Dory's client.");
-
         registerClient("dory", json);
 
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("super_client_id", superClientId);
-        form.add("super_client_secret", clientSecret);
-
-        JsonNode node = testListUserRegisteredClients("dory");
-        
+        JsonNode node = listUserRegisteredClients("dory");
         assertEquals(1, node.size());
         assertEquals(clientName, node.at("/0/client_name").asText());
         assertEquals(OAuth2ClientType.PUBLIC.name(),
@@ -150,40 +146,6 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         deregisterConfidentialClient(username, clientId);
     }
     
-    @Test
-    public void testRegisterPlugin () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
-        JsonNode source = JsonUtils.readTree("{ \"plugin\" : \"source\"}");
-                
-        OAuth2ClientJson json = new OAuth2ClientJson();
-        json.setName("Plugin");
-        json.setType(OAuth2ClientType.CONFIDENTIAL);
-        json.setDescription("This is a plugin test client.");
-        json.setSource(source);
-        
-        ClientResponse response = registerClient(username, json);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
-        String clientId = node.at("/client_id").asText();
-        String clientSecret = node.at("/client_secret").asText();
-        assertNotNull(clientId);
-        assertNotNull(clientSecret);
-        
-        JsonNode clientInfo = retrieveClientInfo(clientId, username);
-        assertEquals(clientId, clientInfo.at("/id").asText());
-        assertEquals("Plugin", clientInfo.at("/name").asText());
-        assertEquals(OAuth2ClientType.CONFIDENTIAL.name(),
-                clientInfo.at("/type").asText());
-        assertEquals(username, clientInfo.at("/registered_by").asText());
-        assertNotNull(clientInfo.at("/registration_date"));
-        
-        assertFalse(clientInfo.at("/permitted").asBoolean());
-        assertNotNull(clientInfo.at("/source"));
-        
-        testListUserRegisteredClients(username);
-        deregisterConfidentialClient(username, clientId);
-    }
-
     @Test
     public void testRegisterClientNameTooShort ()
             throws UniformInterfaceException, ClientHandlerException,
@@ -262,15 +224,75 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertEquals("invalid_request", node.at("/error").asText());
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
+    
+    @Test
+    public void testRegisterClientInvalidRedirectURI ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        // invalid hostname
+        String redirectUri = "https://test.public.client/redirect";
+        OAuth2ClientJson clientJson =
+                createOAuth2ClientJson("OAuth2PublicClient",
+                        OAuth2ClientType.PUBLIC, "A public test client.");
+        clientJson.setRedirectURI(redirectUri);
+        ClientResponse response = registerClient(username, clientJson);
+        testInvalidRedirectUri(response.getEntity(String.class), false,
+                response.getStatus());
+
+        // localhost is not allowed
+        redirectUri = "http://localhost:1410";
+        clientJson.setRedirectURI(redirectUri);
+        response = registerClient(username, clientJson);
+        testInvalidRedirectUri(response.getEntity(String.class), false,
+                response.getStatus());
+        
+        // fragment is not allowed
+        redirectUri = "https://public.client.com/redirect.html#bar";
+        clientJson.setRedirectURI(redirectUri);
+        response = registerClient(username, clientJson);
+        testInvalidRedirectUri(response.getEntity(String.class), false,
+                response.getStatus());
+    }
+    
+    @Test
+    public void testRegisterClientInvalidURL ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        // invalid hostname
+        String url = "https://test.public.client";
+        OAuth2ClientJson clientJson =
+                createOAuth2ClientJson("OAuth2PublicClient",
+                        OAuth2ClientType.PUBLIC, "A public test client.");
+        clientJson.setUrl(url);
+        ClientResponse response = registerClient(username, clientJson);
+        testInvalidUrl(response.getEntity(String.class), response.getStatus());
+
+        // localhost is not allowed
+        url = "http://localhost:1410";
+        clientJson.setRedirectURI(url);
+        response = registerClient(username, clientJson);
+        testInvalidUrl(response.getEntity(String.class), response.getStatus());
+    }
+    
+    private void testInvalidUrl (String entity, 
+            int status) throws KustvaktException {
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
+                node.at("/error").asText());
+        assertEquals("Invalid URL",
+                node.at("/error_description").asText());
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), status);
+    }
 
     @Test
     public void testRegisterPublicClient () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        String redirectUri = "https://test.public.client.com/redirect";
+        String redirectUri = "https://public.client.com/redirect";
         OAuth2ClientJson clientJson =
                 createOAuth2ClientJson("OAuth2PublicClient",
                         OAuth2ClientType.PUBLIC, "A public test client.");
-        clientJson.setUrl("http://test.public.client.com");
+        // http and fragment are allowed
+        clientJson.setUrl("http://public.client.com/index.html#bar");
         clientJson.setRedirectURI(redirectUri);
 
         ClientResponse response = registerClient(username, clientJson);
@@ -538,9 +560,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
     private void requestAuthorizedClientList (String userAuthHeader)
             throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("super_client_id", superClientId);
-        form.add("super_client_secret", clientSecret);
+        MultivaluedMap<String, String> form = getSuperClientForm();
         form.add("authorized_only", "true");
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
@@ -672,30 +692,6 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 clientSecret, refreshToken);
     }
     
-    private JsonNode testListUserRegisteredClients (String username)
-            throws UniformInterfaceException, ClientHandlerException,
-            KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("super_client_id", superClientId);
-        form.add("super_client_secret", clientSecret);
-
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
-                .path("client").path("list")
-                .header(Attributes.AUTHORIZATION,
-                        HttpAuthorizationHandler
-                                .createBasicAuthorizationHeaderValue(username,
-                                        "password"))
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
-
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
-        String entity = response.getEntity(String.class);
-//        System.out.println(entity);
-        return JsonUtils.readTree(entity);
-    }
-
     private void testRevokeAllTokenViaSuperClient (String clientId,
             String userAuthHeader, String accessToken)
             throws KustvaktException {
@@ -704,10 +700,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         assertTrue(node.at("/matches").size() > 0);
 
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        MultivaluedMap<String, String> form = getSuperClientForm();
         form.add("client_id", clientId);
-        form.add("super_client_id", superClientId);
-        form.add("super_client_secret", clientSecret);
 
         response = resource().path(API_VERSION).path("oauth2").path("revoke")
                 .path("super").path("all")

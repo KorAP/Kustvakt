@@ -1,0 +1,2 @@
+--ALTER TABLE query 
+--ADD COLUMN created_date TIMESTAMP NOT NULL;
