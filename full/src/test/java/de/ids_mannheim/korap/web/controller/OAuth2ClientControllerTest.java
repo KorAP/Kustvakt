@@ -16,6 +16,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.entity.ContentType;
+import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -223,15 +224,75 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertEquals("invalid_request", node.at("/error").asText());
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
+    
+    @Test
+    public void testRegisterClientInvalidRedirectURI ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        // invalid hostname
+        String redirectUri = "https://test.public.client/redirect";
+        OAuth2ClientJson clientJson =
+                createOAuth2ClientJson("OAuth2PublicClient",
+                        OAuth2ClientType.PUBLIC, "A public test client.");
+        clientJson.setRedirectURI(redirectUri);
+        ClientResponse response = registerClient(username, clientJson);
+        testInvalidRedirectUri(response.getEntity(String.class), false,
+                response.getStatus());
+
+        // localhost is not allowed
+        redirectUri = "http://localhost:1410";
+        clientJson.setRedirectURI(redirectUri);
+        response = registerClient(username, clientJson);
+        testInvalidRedirectUri(response.getEntity(String.class), false,
+                response.getStatus());
+        
+        // fragment is not allowed
+        redirectUri = "https://public.client.com/redirect.html#bar";
+        clientJson.setRedirectURI(redirectUri);
+        response = registerClient(username, clientJson);
+        testInvalidRedirectUri(response.getEntity(String.class), false,
+                response.getStatus());
+    }
+    
+    @Test
+    public void testRegisterClientInvalidURL ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        // invalid hostname
+        String url = "https://test.public.client";
+        OAuth2ClientJson clientJson =
+                createOAuth2ClientJson("OAuth2PublicClient",
+                        OAuth2ClientType.PUBLIC, "A public test client.");
+        clientJson.setUrl(url);
+        ClientResponse response = registerClient(username, clientJson);
+        testInvalidUrl(response.getEntity(String.class), response.getStatus());
+
+        // localhost is not allowed
+        url = "http://localhost:1410";
+        clientJson.setRedirectURI(url);
+        response = registerClient(username, clientJson);
+        testInvalidUrl(response.getEntity(String.class), response.getStatus());
+    }
+    
+    private void testInvalidUrl (String entity, 
+            int status) throws KustvaktException {
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
+                node.at("/error").asText());
+        assertEquals("Invalid URL",
+                node.at("/error_description").asText());
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), status);
+    }
 
     @Test
     public void testRegisterPublicClient () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        String redirectUri = "https://test.public.client.com/redirect";
+        String redirectUri = "https://public.client.com/redirect";
         OAuth2ClientJson clientJson =
                 createOAuth2ClientJson("OAuth2PublicClient",
                         OAuth2ClientType.PUBLIC, "A public test client.");
-        clientJson.setUrl("http://test.public.client.com");
+        // http and fragment are allowed
+        clientJson.setUrl("http://public.client.com/index.html#bar");
         clientJson.setRedirectURI(redirectUri);
 
         ClientResponse response = registerClient(username, clientJson);
