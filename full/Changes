@@ -2,6 +2,7 @@
 
 2022-05-25
  - Added a new API: list plugins (e.g for marketplace)
+ - Added redirect URI validation in authorization request (addressed #374)
 
 
 # version 0.67.1
@@ -26,7 +27,7 @@
 
 2022-03-31
  - Updated query and user-group name pattern.
- 2022-04-08
+2022-04-08
  - Added redirect_uri to client info API.
 2022-04-11
  - Added registration_date, refresh_token_expiry, source and is_permitted

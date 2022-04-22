@@ -55,7 +55,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         MultivaluedMap<String, String> params =
                 getQueryParamsFromURI(redirectUri);
         assertNotNull(params.getFirst("code"));
-        assertEquals("thisIsMyState", params.getFirst("state"));
+        assertEquals(state, params.getFirst("state"));
         assertEquals("match_info search client_info", params.getFirst("scope"));
     }
 
@@ -67,23 +67,23 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     }
 
     @Test
-    public void testAuthorizePublicClientWithRedirectUri () throws KustvaktException {
+    public void testAuthorizeWithRedirectUri () throws KustvaktException {
         ClientResponse response =
                 requestAuthorizationCode("code", publicClientId2,
                         "https://public.com/redirect", "", "", userAuthHeader);
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
                 response.getStatus());
-        
+
         URI redirectUri = response.getLocation();
-        assertEquals(redirectUri.getScheme(), "https");
-        assertEquals(redirectUri.getHost(), "public.com");
-        assertEquals(redirectUri.getPath(), "/redirect");
+        assertEquals("https", redirectUri.getScheme());
+        assertEquals("public.com", redirectUri.getHost());
+        assertEquals("/redirect", redirectUri.getPath());
 
         String[] queryParts = redirectUri.getQuery().split("&");
         assertTrue(queryParts[0].startsWith("code="));
-        assertEquals(queryParts[1], "scope=match_info+search");
+        assertEquals("scope=match_info+search", queryParts[1]);
     }
-    
+
     @Test
     public void testAuthorizeWithoutScope () throws KustvaktException {
         ClientResponse response = requestAuthorizationCode("code",
@@ -124,7 +124,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
                 node.at("/error").asText());
         assertEquals("Redirect URI is required",
                 node.at("/error_description").asText());
-        assertEquals("thisIsMyState", node.at("/state").asText());
+        assertEquals(state, node.at("/state").asText());
     }
 
     @Test
@@ -159,29 +159,50 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     public void testAuthorizeInvalidClientId () throws KustvaktException {
         ClientResponse response = requestAuthorizationCode("code",
                 "unknown-client-id", "", "", "", userAuthHeader);
-//        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         String entity = response.getEntity(String.class);
-//        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuth2Error.INVALID_CLIENT, node.at("/error").asText());
         assertEquals("Unknown client with unknown-client-id.",
                 node.at("/error_description").asText());
     }
 
     @Test
-    public void testAuthorizeInvalidRedirectUri () throws KustvaktException {
+    public void testAuthorizeDifferentRedirectUri () throws KustvaktException {
         String redirectUri = "https://different.uri/redirect";
         ClientResponse response = requestAuthorizationCode("code",
                 confidentialClientId, redirectUri, "", state, userAuthHeader);
+        testInvalidRedirectUri(response.getEntity(String.class), true,
+                response.getStatus());
+    }
 
-        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    @Test
+    public void testAuthorizeWithRedirectUriLocalhost ()
+            throws KustvaktException {
+        ClientResponse response =
+                requestAuthorizationCode("code", publicClientId2,
+                        "http://localhost:1410", "", state, userAuthHeader);
+        testInvalidRedirectUri(response.getEntity(String.class), true,
+                response.getStatus());    }
 
-        String entity = response.getEntity(String.class);
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
-                node.at("/error").asText());
-        assertEquals("Invalid redirect URI",
-                node.at("/error_description").asText());
-        assertEquals("thisIsMyState", node.at("/state").asText());
+    @Test
+    public void testAuthorizeWithRedirectUriFragment ()
+            throws KustvaktException {
+        ClientResponse response = requestAuthorizationCode("code",
+                publicClientId2, "http://public.com/index.html#redirect", "",
+                state, userAuthHeader);
+        testInvalidRedirectUri(response.getEntity(String.class), true,
+                response.getStatus());
+    }
+
+    @Test
+    public void testAuthorizeInvalidRedirectUri () throws KustvaktException {
+        // host not allowed by Apache URI Validator
+        String redirectUri = "https://public.uri/redirect";
+        ClientResponse response = requestAuthorizationCode("code",
+                publicClientId2, redirectUri, "", state, userAuthHeader);
+        testInvalidRedirectUri(response.getEntity(String.class), true,
+                response.getStatus());
     }
 
     @Test
@@ -219,7 +240,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
                 node.at("/error").asText());
         assertEquals("Invalid redirect URI",
                 node.at("/error_description").asText());
-        assertEquals("thisIsMyState", node.at("/state").asText());
+        assertEquals(state, node.at("/state").asText());
 
         // without redirect URI in the request and no registered
         // redirect URI
@@ -232,7 +253,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
                 node.at("/error").asText());
         assertEquals("Redirect URI is required",
                 node.at("/error_description").asText());
-        assertEquals("thisIsMyState", node.at("/state").asText());
+        assertEquals(state, node.at("/state").asText());
     }
 
     @Test
@@ -245,8 +266,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
         assertEquals(
                 "https://third.party.com/confidential/redirect?"
-                + "error_description=read_address+is+an+invalid+scope&"
-                + "state=thisIsMyState&error=invalid_scope",
+                        + "error_description=read_address+is+an+invalid+scope&"
+                        + "state=thisIsMyState&error=invalid_scope",
                 response.getLocation().toString());
     }
 
@@ -267,8 +288,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     @Test
     public void testRequestTokenAuthorizationPublic ()
             throws KustvaktException {
-        String code =
-                requestAuthorizationCode(publicClientId, userAuthHeader);
+        String code = requestAuthorizationCode(publicClientId, userAuthHeader);
 
         ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
                 publicClientId, clientSecret, code);
@@ -318,7 +338,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         testRequestRefreshTokenInvalidClient(refreshToken);
         testRequestRefreshTokenInvalidRefreshToken(confidentialClientId);
 
-        testRequestRefreshToken(confidentialClientId, clientSecret, refreshToken);
+        testRequestRefreshToken(confidentialClientId, clientSecret,
+                refreshToken);
     }
 
     private void testRequestTokenWithUsedAuthorization (String code)
@@ -693,7 +714,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
-        
+
         String newRefreshToken = node.at("/refresh_token").asText();
         assertNotNull(newRefreshToken);
         assertEquals(TokenType.BEARER.toString(),
@@ -701,10 +722,10 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertNotNull(node.at("/expires_in").asText());
 
         assertTrue(!newRefreshToken.equals(refreshToken));
-        
+
         testRequestTokenWithRevokedRefreshToken(clientId, clientSecret,
                 refreshToken);
-        
+
         testRevokeToken(newRefreshToken, clientId, clientSecret,
                 REFRESH_TOKEN_TYPE);
         testRequestTokenWithRevokedRefreshToken(clientId, clientSecret,
@@ -757,10 +778,10 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.add("super_client_secret", clientSecret);
         form.add("token_type", tokenType);
 
-        if (clientId != null && !clientId.isEmpty()){
+        if (clientId != null && !clientId.isEmpty()) {
             form.add("client_id", clientId);
         }
-            
+
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("token").path("list")
                 .header(Attributes.AUTHORIZATION, userAuthHeader)
@@ -773,14 +794,15 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String entity = response.getEntity(String.class);
         return JsonUtils.readTree(entity);
     }
-    
+
     private JsonNode requestTokenList (String userAuthHeader, String tokenType)
             throws KustvaktException {
         return requestTokenList(userAuthHeader, tokenType, null);
     }
-    
+
     @Test
-    public void testListRefreshTokenConfidentialClient () throws KustvaktException {
+    public void testListRefreshTokenConfidentialClient ()
+            throws KustvaktException {
         String username = "gurgle";
         String password = "pwd";
         userAuthHeader = HttpAuthorizationHandler
@@ -841,9 +863,10 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(3, node.size());
 
         // list refresh tokens from client 1
-        node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE, confidentialClientId);
+        node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE,
+                confidentialClientId);
         assertEquals(2, node.size());
-        
+
         testRevokeToken(refreshToken1, superClientId, clientSecret,
                 REFRESH_TOKEN_TYPE);
         testRevokeToken(node.at("/0/token").asText(), confidentialClientId,
@@ -870,7 +893,6 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(0, node.size());
     }
 
-
     @Test
     public void testListTokenPublicClient () throws KustvaktException {
         String username = "nemo";
@@ -880,8 +902,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
         // access token 1
         String code = requestAuthorizationCode(publicClientId, userAuthHeader);
-        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(publicClientId, "",
-                code);
+        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
+                publicClientId, "", code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         String accessToken1 = node.at("/access_token").asText();
@@ -893,31 +915,30 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         node = JsonUtils.readTree(response.getEntity(String.class));
         String accessToken2 = node.at("/access_token").asText();
-        
+
         // list access tokens
         node = requestTokenList(userAuthHeader, ACCESS_TOKEN_TYPE);
         assertEquals(2, node.size());
-        
+
         // list refresh tokens
         node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(0, node.size());
-        
+
         testRevokeTokenViaSuperClient(accessToken1, userAuthHeader);
         node = requestTokenList(userAuthHeader, ACCESS_TOKEN_TYPE);
-//        System.out.println(node);
+        // System.out.println(node);
         assertEquals(1, node.size());
         assertEquals(accessToken2, node.at("/0/token").asText());
-        assertTrue(node.at("/0/scope").size()>0);
+        assertTrue(node.at("/0/scope").size() > 0);
         assertNotNull(node.at("/0/created_date").asText());
         assertNotNull(node.at("/0/expires_in").asLong());
         assertNotNull(node.at("/0/user_authentication_time").asText());
-        
+
         assertEquals(publicClientId, node.at("/0/client_id").asText());
         assertNotNull(node.at("/0/client_name").asText());
         assertNotNull(node.at("/0/client_description").asText());
         assertNotNull(node.at("/0/client_url").asText());
-        
-        
+
         testRevokeTokenViaSuperClient(accessToken2, userAuthHeader);
         node = requestTokenList(userAuthHeader, ACCESS_TOKEN_TYPE);
         assertEquals(0, node.size());
