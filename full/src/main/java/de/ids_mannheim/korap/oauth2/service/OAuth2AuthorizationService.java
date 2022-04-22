@@ -4,6 +4,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
+import org.apache.commons.validator.routines.UrlValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,8 @@ public class OAuth2AuthorizationService {
     protected OAuth2ScopeServiceImpl scopeService;
     @Autowired
     private AuthorizationDao authorizationDao;
+    @Autowired
+    private UrlValidator redirectURIValidator;
 
     @Autowired
     protected FullConfiguration config;
@@ -110,24 +113,24 @@ public class OAuth2AuthorizationService {
             throws KustvaktException {
 
         String registeredUri = client.getRedirectURI();
+        
         if (redirectUri != null && !redirectUri.isEmpty()) {
             // check if the redirect URI the same as that in DB
-            if (registeredUri != null && !registeredUri.isEmpty()
-                    && !redirectUri.equals(registeredUri)) {
+            if (!redirectURIValidator.isValid(redirectUri) ||
+                    (registeredUri != null && !registeredUri.isEmpty()
+                    && !redirectUri.equals(registeredUri))) {
                 throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
                         "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
             }
         }
-        else {
-            // redirect_uri is not required in client registration!
-            if (registeredUri != null && !registeredUri.isEmpty()) {
+        // redirect_uri is not required in client registration
+        else if (registeredUri != null && !registeredUri.isEmpty()) {
                 redirectUri = registeredUri;
-            }
-            else {
-                throw new KustvaktException(StatusCodes.MISSING_REDIRECT_URI,
-                        "Redirect URI is required",
-                        OAuth2Error.INVALID_REQUEST);
-            }
+        }
+        else {
+            throw new KustvaktException(StatusCodes.MISSING_REDIRECT_URI,
+                    "Redirect URI is required",
+                    OAuth2Error.INVALID_REQUEST);
         }
 
         return redirectUri;

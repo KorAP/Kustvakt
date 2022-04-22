@@ -143,7 +143,8 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
         int statusCode = e.getStatusCode();
         if (!clientId.isEmpty()
                 && statusCode != StatusCodes.CLIENT_NOT_FOUND
-                && statusCode != StatusCodes.AUTHORIZATION_FAILED) {
+                && statusCode != StatusCodes.AUTHORIZATION_FAILED
+                && statusCode != StatusCodes.INVALID_REDIRECT_URI) {
             String registeredUri = null;
             try {
                 OAuth2Client client = clientService.retrieveClient(clientId);

@@ -98,15 +98,15 @@ public class OAuth2ClientService {
         if (url != null && !url.isEmpty()) {
             if (!urlValidator.isValid(url)) {
                 throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
-                        url + " is invalid.", OAuth2Error.INVALID_REQUEST);
+                        "Invalid URL", OAuth2Error.INVALID_REQUEST);
             }
         }
 
         String redirectURI = clientJson.getRedirectURI();
         if (redirectURI != null && !redirectURI.isEmpty()
                 && !redirectURIValidator.isValid(redirectURI)) {
-            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
-                    redirectURI + " is invalid.", OAuth2Error.INVALID_REQUEST);
+            throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
+                   "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
         }
 
         // boolean isNative = isNativeClient(url, redirectURI);

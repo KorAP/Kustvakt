@@ -10,6 +10,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
+import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MultiValueMap;
@@ -354,5 +355,19 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
         String entity = response.getEntity(String.class);
         return JsonUtils.readTree(entity);
+    }
+    
+    protected void testInvalidRedirectUri (String entity, boolean includeState,
+            int status) throws KustvaktException {
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
+                node.at("/error").asText());
+        assertEquals("Invalid redirect URI",
+                node.at("/error_description").asText());
+        if (includeState) {
+            assertEquals(state, node.at("/state").asText());
+        }
+
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), status);
     }
 }
