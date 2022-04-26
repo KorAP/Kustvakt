@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.web.controller;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
@@ -35,6 +36,7 @@ public class OAuth2AdminController {
     @Autowired
     private OAuth2ResponseHandler responseHandler;
 
+    @GET
     @Path("token/clean")
     public Response cleanExpiredInvalidToken (
             @Context SecurityContext securityContext) {
