@@ -20,7 +20,9 @@
  - Added a new API: list plugins (e.g for marketplace)
 2022-04-22 
  - Added redirect URI validation in authorization request (addressed #374)
- 
+2022-04-26
+ - Made registration_date in oauth2_client optional to support database 
+   compatibility.
  
 # version 0.65.2
 

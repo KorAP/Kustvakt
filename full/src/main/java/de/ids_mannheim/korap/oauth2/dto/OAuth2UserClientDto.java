@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.oauth2.dto;
 
+import java.time.ZonedDateTime;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -44,7 +46,11 @@ public class OAuth2UserClientDto {
         this.setUrl(client.getUrl());
         this.setClientType(client.getType());
         this.setRedirect_uri(client.getRedirectURI());
-        this.setRegistrationDate(client.getRegistrationDate().toString());
+        
+        ZonedDateTime registrationDate = client.getRegistrationDate();
+        if (registrationDate!=null) {
+            this.setRegistrationDate(registrationDate.toString());
+        }
         this.setPermitted(client.isPermitted());
         
         String source = client.getSource();

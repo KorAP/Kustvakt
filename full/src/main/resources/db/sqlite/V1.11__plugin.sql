@@ -1,5 +1,5 @@
 ALTER TABLE oauth2_client 
-	ADD COLUMN registration_date TIMESTAMP NOT NULL;
+	ADD COLUMN registration_date TIMESTAMP;
 
 -- default 365 days in seconds
 ALTER TABLE oauth2_client 

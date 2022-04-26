@@ -573,8 +573,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         String entity = response.getEntity(String.class);
-        // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
+//        System.out.println(node.toPrettyString());
         assertEquals(2, node.size());
         assertEquals(confidentialClientId, node.at("/0/client_id").asText());
         assertEquals(publicClientId, node.at("/1/client_id").asText());
