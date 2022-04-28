@@ -33,6 +33,7 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
 /**
@@ -59,6 +60,8 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     public static String ACCESS_TOKEN_TYPE = "access_token";
     public static String REFRESH_TOKEN_TYPE = "refresh_token";
 
+    protected int defaultRefreshTokenExpiry = TimeUtils.convertTimeToSeconds("365D");
+    
     protected String clientURL = "http://example.client.com";
     protected String clientRedirectUri = "https://example.client.com/redirect";
 
@@ -274,6 +277,9 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         assertEquals(clientURL, clientInfo.at("/url").asText());
         assertEquals(clientRedirectUri,
                 clientInfo.at("/redirect_uri").asText());
+        // 31536000 seconds
+        assertEquals(TimeUtils.convertTimeToSeconds("365D"),
+                clientInfo.at("/refresh_token_expiry").asInt());
         assertNotNull(clientInfo.at("/description"));
         assertNotNull(clientInfo.at("/registration_date"));
         assertTrue(clientInfo.at("/permitted").asBoolean());

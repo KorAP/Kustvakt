@@ -16,7 +16,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * @author margaretha
  *
  */
-@JsonInclude(Include.NON_EMPTY)
+@JsonInclude(Include.NON_DEFAULT)
 public class OAuth2UserClientDto {
     @JsonProperty("client_id")
     private String clientId;
@@ -32,6 +32,8 @@ public class OAuth2UserClientDto {
     private String redirect_uri;
     @JsonProperty("registration_date")
     private String registrationDate;
+    @JsonProperty("refresh_token_expiry")
+    private int refreshTokenExpiry;
     
     private boolean permitted;
     private JsonNode source;
@@ -46,7 +48,9 @@ public class OAuth2UserClientDto {
         this.setRedirect_uri(client.getRedirectURI());
         this.setRegistrationDate(client.getRegistrationDate().toString());
         this.setPermitted(client.isPermitted());
-        
+        if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
+            this.setRefreshTokenExpiry(client.getRefreshTokenExpiry());
+        }
         String source = client.getSource();
         if (source!=null) {
             this.setSource(JsonUtils.readTree(client.getSource()));
@@ -121,5 +125,12 @@ public class OAuth2UserClientDto {
     }
     public void setRegistrationDate (String registrationDate) {
         this.registrationDate = registrationDate;
+    }
+    
+    public int getRefreshTokenExpiry () {
+        return refreshTokenExpiry;
+    }
+    public void setRefreshTokenExpiry (int refreshTokenExpiry) {
+        this.refreshTokenExpiry = refreshTokenExpiry;
     }
 }
