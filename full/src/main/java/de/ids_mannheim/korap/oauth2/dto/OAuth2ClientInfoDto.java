@@ -2,8 +2,8 @@ package de.ids_mannheim.korap.oauth2.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
@@ -29,6 +29,8 @@ public class OAuth2ClientInfoDto {
     private String registeredBy;
     @JsonProperty("registration_date")
     private String registrationDate;
+    @JsonProperty("refresh_token_expiry")
+    private int refreshTokenExpiry; // in seconds
     private OAuth2ClientType type;
     
     @JsonProperty("permitted")
@@ -52,6 +54,7 @@ public class OAuth2ClientInfoDto {
         if (client.isSuper()) {
             this.isSuper = "true";
         }
+        this.refreshTokenExpiry = client.getRefreshTokenExpiry();
     }
 
     public String getId () {
@@ -137,6 +140,13 @@ public class OAuth2ClientInfoDto {
     }
     public void setPermitted (boolean isPermitted) {
         this.isPermitted = isPermitted;
+    }
+    
+    public int getRefreshTokenExpiry () {
+        return refreshTokenExpiry;
+    }
+    public void setRefreshTokenExpiry (int refreshTokenExpiry) {
+        this.refreshTokenExpiry = refreshTokenExpiry;
     }
 
 }

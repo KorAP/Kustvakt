@@ -3,10 +3,10 @@ package de.ids_mannheim.korap.web.controller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.entity.ContentType;
 import org.junit.Test;
 
@@ -68,13 +68,16 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         JsonNode clientInfo = retrieveClientInfo(clientId, username);
         assertEquals(clientId, clientInfo.at("/id").asText());
         assertEquals("Plugin", clientInfo.at("/name").asText());
+
         assertEquals(OAuth2ClientType.CONFIDENTIAL.name(),
                 clientInfo.at("/type").asText());
+        assertNotNull(clientInfo.at("/description").asText());
+        assertNotNull(clientInfo.at("/source").asText());
+        assertFalse(clientInfo.at("/permitted").asBoolean());
         assertEquals(username, clientInfo.at("/registered_by").asText());
         assertNotNull(clientInfo.at("/registration_date"));
-
-        assertFalse(clientInfo.at("/permitted").asBoolean());
-        assertNotNull(clientInfo.at("/source"));
+        assertEquals(defaultRefreshTokenExpiry,
+                clientInfo.at("/refresh_token_expiry").asInt());
     }
 
     private void testListUserRegisteredPlugins (String username,
@@ -91,6 +94,8 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         assertFalse(node.at("/0/permitted").asBoolean());
         assertFalse(node.at("/0/registration_date").isMissingNode());
         assertFalse(node.at("/0/source").isMissingNode());
+        assertEquals(defaultRefreshTokenExpiry,
+                node.at("/0/refresh_token_expiry").asInt());
     }
 
     @Test
@@ -190,6 +195,9 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         assertFalse(node.at("/0/permitted").isMissingNode());
         assertFalse(node.at("/0/registration_date").isMissingNode());
         assertFalse(node.at("/0/source").isMissingNode());
+        assertFalse(node.at("/0/refresh_token_expiry").isMissingNode());
+        
+        assertTrue(node.at("/1/refresh_token_expiry").isMissingNode());
     }
 
     private JsonNode listPlugins (boolean permitted_only)
