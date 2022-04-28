@@ -20,7 +20,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
@@ -41,21 +40,18 @@ public class RefreshTokenDao {
     @PersistenceContext
     private EntityManager entityManager;
     @Autowired
-    private FullConfiguration config;
-    @Autowired
     private OAuth2ClientDao clientDao;
 
     public RefreshToken storeRefreshToken (String refreshToken, String userId,
-            ZonedDateTime userAuthenticationTime, String clientId,
+            ZonedDateTime userAuthenticationTime, OAuth2Client client,
             Set<AccessScope> scopes) throws KustvaktException {
         ParameterChecker.checkStringValue(refreshToken, "refresh_token");
         // ParameterChecker.checkStringValue(userId, "username");
-        ParameterChecker.checkStringValue(clientId, "client_id");
+        ParameterChecker.checkObjectValue(client, "client");
         ParameterChecker.checkObjectValue(scopes, "scopes");
 
         ZonedDateTime now =
                 ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
-        OAuth2Client client = clientDao.retrieveClientById(clientId);
 
         RefreshToken token = new RefreshToken();
         token.setToken(refreshToken);
@@ -63,7 +59,7 @@ public class RefreshTokenDao {
         token.setUserAuthenticationTime(userAuthenticationTime);
         token.setClient(client);
         token.setCreatedDate(now);
-        token.setExpiryDate(now.plusSeconds(config.getRefreshTokenExpiry()));
+        token.setExpiryDate(now.plusSeconds(client.getRefreshTokenExpiry()));
         token.setScopes(scopes);
 
         entityManager.persist(token);

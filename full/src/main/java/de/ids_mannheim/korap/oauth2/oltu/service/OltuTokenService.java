@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.oauth2.oltu.service;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -97,6 +99,20 @@ public class OltuTokenService extends OAuth2TokenService {
 
     }
 
+    private boolean isInternalClient (String clientIpAddress) {
+        try {
+            InetAddress ip = InetAddress.getByName(clientIpAddress);
+            if (ip.isSiteLocalAddress()) {
+                return true;
+            }
+        }
+        catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     /**
      * Revokes all access token associated with the given refresh
      * token, and creates a new access token and a new refresh
@@ -170,8 +186,7 @@ public class OltuTokenService extends OAuth2TokenService {
 
         return createsAccessTokenResponse(scopes, requestedScopes, clientId,
                 refreshToken.getUserId(),
-                refreshToken.getUserAuthenticationTime(),
-                clientService.isPublicClient(oAuth2Client));
+                refreshToken.getUserAuthenticationTime(), oAuth2Client);
 
         // without new refresh token
         // return createsAccessTokenResponse(scopes, requestedScopes,
@@ -209,8 +224,7 @@ public class OltuTokenService extends OAuth2TokenService {
         OAuth2Client oAuth2Client = clientService.retrieveClient(clientId);
         return createsAccessTokenResponse(scopes, authorization.getScopes(),
                 authorization.getClientId(), authorization.getUserId(),
-                authorization.getUserAuthenticationTime(),
-                clientService.isPublicClient(oAuth2Client));
+                authorization.getUserAuthenticationTime(), oAuth2Client);
     }
 
     /**
@@ -279,8 +293,7 @@ public class OltuTokenService extends OAuth2TokenService {
         }
         
         return createsAccessTokenResponse(scopes, accessScopes, clientId,
-                username, authenticationTime,
-                false);
+                username, authenticationTime, client);
     }
 
     /**
@@ -327,7 +340,7 @@ public class OltuTokenService extends OAuth2TokenService {
         Set<AccessScope> accessScopes =
                 scopeService.convertToAccessScope(scopes);
         return createsAccessTokenResponse(scopes, accessScopes, clientId, null,
-                authenticationTime,clientService.isPublicClient(oAuth2Client));
+                authenticationTime,oAuth2Client);
     }
 
     /**
@@ -358,18 +371,22 @@ public class OltuTokenService extends OAuth2TokenService {
      */
     private OAuthResponse createsAccessTokenResponse (Set<String> scopes,
             Set<AccessScope> accessScopes, String clientId, String userId,
-            ZonedDateTime authenticationTime, boolean isPublicClient)
+            ZonedDateTime authenticationTime, OAuth2Client client)
             throws OAuthSystemException, KustvaktException {
 
         String random = randomGenerator.createRandomCode();
         random += randomGenerator.createRandomCode();
-        if (isPublicClient){
+        
+        if (clientService.isPublicClient(client)){
+            // refresh token == null, getAccessTokenLongExpiry
             return createsAccessTokenResponse(scopes, accessScopes, clientId,
                     userId, authenticationTime);
             }
         else {
-            RefreshToken refreshToken = refreshDao.storeRefreshToken(random, userId,
-                    authenticationTime, clientId, accessScopes);
+            // refresh token != null, getAccessTokenExpiry
+            // default refresh token expiry: 365 days in seconds
+            RefreshToken refreshToken = refreshDao.storeRefreshToken(random,
+                    userId, authenticationTime, client, accessScopes);
             return createsAccessTokenResponse(scopes, accessScopes, clientId,
                     userId, authenticationTime, refreshToken);
         }
