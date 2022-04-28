@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c2cfcb5_e493a320",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/controller/OAuth2ControllerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-04-28T09:22:13Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this and the next error message be similar?",
+      "range": {
+        "startLine": 111,
+        "startChar": 21,
+        "endLine": 111,
+        "endChar": 52
+      },
+      "revId": "ffb895089f101a7ec5484052ca0253558f8feb6f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
