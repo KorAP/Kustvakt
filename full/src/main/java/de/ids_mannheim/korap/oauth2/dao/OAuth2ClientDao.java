@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.FullConfiguration;
-import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
@@ -49,8 +48,6 @@ public class OAuth2ClientDao {
     private EntityManager entityManager;
     @Autowired
     private FullConfiguration config;
-    @Autowired
-    private AdminDao adminDao;
 
     public void registerClient (String id, String secretHashcode, String name,
             OAuth2ClientType type, String url, String redirectURI,
@@ -81,9 +78,10 @@ public class OAuth2ClientDao {
         else {
             client.setPermitted(true);
         }
-        if (refreshTokenExpiry <= 0) {
+        if (refreshTokenExpiry <= 0 && type.equals(OAuth2ClientType.CONFIDENTIAL)) {
            refreshTokenExpiry = config.getRefreshTokenLongExpiry();
         }
+        client.setRefreshTokenExpiry(refreshTokenExpiry);
         entityManager.persist(client);
     }
 

@@ -111,25 +111,6 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     }
     
     @Test
-    public void testRegisteredPublicClient () throws KustvaktException {
-        String clientName = "OAuth2DoryClient";
-        OAuth2ClientJson json = createOAuth2ClientJson(clientName,
-                OAuth2ClientType.PUBLIC, "Dory's client.");
-        registerClient("dory", json);
-
-        JsonNode node = listUserRegisteredClients("dory");
-        assertEquals(1, node.size());
-        assertEquals(clientName, node.at("/0/client_name").asText());
-        assertEquals(OAuth2ClientType.PUBLIC.name(),
-                node.at("/0/client_type").asText());
-        assertTrue(node.at("/0/permitted").asBoolean());
-        assertFalse(node.at("/0/registration_date").isMissingNode());
-        
-        String clientId = node.at("/0/client_id").asText();
-        testDeregisterPublicClient(clientId, "dory");
-    }
-
-    @Test
     public void testRegisterConfidentialClient () throws KustvaktException {
         ClientResponse response = registerConfidentialClient(username);
         String entity = response.getEntity(String.class);
@@ -141,6 +122,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertNotNull(clientSecret);
         assertFalse(clientId.contains("a"));
 
+        testListConfidentialClient(username, clientId);
         testConfidentialClientInfo(clientId, username);
         testResetConfidentialClientSecret(clientId, clientSecret);
         deregisterConfidentialClient(username, clientId);
@@ -586,6 +568,47 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         assertFalse(node.at("/0/client_description").isMissingNode());
     }
 
+    @Test
+    public void testListPublicClient () throws KustvaktException {
+        String clientName = "OAuth2DoryClient";
+        OAuth2ClientJson json = createOAuth2ClientJson(clientName,
+                OAuth2ClientType.PUBLIC, "Dory's client.");
+        registerClient("dory", json);
+
+        JsonNode node = listUserRegisteredClients("dory");
+        assertEquals(1, node.size());
+        assertEquals(clientName, node.at("/0/client_name").asText());
+        assertEquals(OAuth2ClientType.PUBLIC.name(),
+                node.at("/0/client_type").asText());
+        assertTrue(node.at("/0/permitted").asBoolean());
+        assertFalse(node.at("/0/registration_date").isMissingNode());
+        assertTrue(node.at("/refresh_token_expiry").isMissingNode());
+        
+        String clientId = node.at("/0/client_id").asText();
+        testDeregisterPublicClient(clientId, "dory");
+    }
+    
+    private void testListConfidentialClient (String username, String clientId)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        JsonNode node = listUserRegisteredClients(username);
+        assertEquals(1, node.size());
+        assertEquals(clientId, node.at("/0/client_id").asText());
+        assertEquals("OAuth2ClientTest", node.at("/0/client_name").asText());
+        assertEquals(OAuth2ClientType.CONFIDENTIAL.name(),
+                node.at("/0/client_type").asText());
+        assertNotNull(node.at("/0/client_description"));
+        assertEquals(clientURL, node.at("/0/client_url").asText());
+        assertEquals(clientRedirectUri,
+                node.at("/0/client_redirect_uri").asText());
+        assertNotNull(node.at("/0/registration_date"));
+
+        assertEquals(defaultRefreshTokenExpiry,
+                node.at("/0/refresh_token_expiry").asInt());
+        assertTrue(node.at("/0/permitted").asBoolean());
+        assertTrue(node.at("/0/source").isMissingNode());
+    }
+    
     @Test
     public void testListUserClients () throws KustvaktException {
         String username = "pearl";

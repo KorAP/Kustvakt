@@ -23,6 +23,10 @@
 2022-04-26
  - Made registration_date in oauth2_client optional to support database 
    compatibility.
+2022-04-28
+ - Handled user-defined refresh token expiry (added in client info and 
+   list API response)
+ 
  
 # version 0.65.2
 

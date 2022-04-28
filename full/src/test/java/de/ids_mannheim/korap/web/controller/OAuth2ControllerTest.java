@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -317,7 +318,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         testRequestTokenWithUsedAuthorization(code);
 
         String refreshToken = node.at("/refresh_token").asText();
-
+        
+        testRefreshTokenExpiry(refreshToken);
         testRequestRefreshTokenInvalidScope(confidentialClientId, refreshToken);
         testRequestRefreshTokenInvalidClient(refreshToken);
         testRequestRefreshTokenInvalidRefreshToken(confidentialClientId);
@@ -430,11 +432,14 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
 
-        RefreshToken refreshToken = refreshTokenDao
-                .retrieveRefreshToken(node.at("/refresh_token").asText());
+        String refresh = node.at("/refresh_token").asText();
+        RefreshToken refreshToken =
+                refreshTokenDao.retrieveRefreshToken(refresh);
         Set<AccessScope> scopes = refreshToken.getScopes();
         assertEquals(1, scopes.size());
         assertEquals("[all]", scopes.toString());
+        
+        testRefreshTokenExpiry(refresh);
     }
 
     @Test
@@ -926,5 +931,12 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         testRevokeTokenViaSuperClient(accessToken2, userAuthHeader);
         node = requestTokenList(userAuthHeader, ACCESS_TOKEN_TYPE);
         assertEquals(0, node.size());
+    }
+    
+    private void testRefreshTokenExpiry (String refreshToken)
+            throws KustvaktException {
+        RefreshToken token = refreshTokenDao.retrieveRefreshToken(refreshToken);
+        ZonedDateTime expiry = token.getCreatedDate().plusYears(1);
+        assertTrue(expiry.equals(token.getExpiryDate()));
     }
 }
