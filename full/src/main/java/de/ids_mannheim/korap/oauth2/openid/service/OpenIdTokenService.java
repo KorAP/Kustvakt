@@ -185,7 +185,7 @@ public class OpenIdTokenService extends OAuth2TokenService {
         Set<AccessScope> scopes = scopeService.convertToAccessScope(scopeSet);
         de.ids_mannheim.korap.oauth2.entity.RefreshToken rt =
                 refreshDao.storeRefreshToken(refreshToken.getValue(), username,
-                        authenticationTime, clientId.getValue(), scopes);
+                        authenticationTime, client, scopes);
         tokenDao.storeAccessToken(accessToken.getValue(), rt, scopes, username,
                 clientIdStr, authenticationTime);
 
@@ -236,11 +236,14 @@ public class OpenIdTokenService extends OAuth2TokenService {
         AccessToken accessToken =
                 new BearerAccessToken(config.getAccessTokenExpiry(), scope);
         RefreshToken refreshToken = new RefreshToken();
+        OAuth2Client client =
+                clientService.retrieveClient(authorization.getClientId());
+        
         de.ids_mannheim.korap.oauth2.entity.RefreshToken rt =
                 refreshDao.storeRefreshToken(refreshToken.getValue(),
                         authorization.getUserId(),
                         authorization.getUserAuthenticationTime(),
-                        authorization.getClientId(), scopes);
+                        client, scopes);
 
         tokenDao.storeAccessToken(accessToken.getValue(), rt, scopes,
                 authorization.getUserId(), authorization.getClientId(),

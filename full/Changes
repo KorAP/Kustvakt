@@ -7,6 +7,9 @@
 2022-05-25
  - Added a new API: list plugins (e.g for marketplace)
  - Added redirect URI validation in authorization request (addressed #374)
+ - Handled user-defined refresh token expiry (added in client info and 
+   list API response)
+
 
 # version 0.67
 
@@ -35,8 +38,8 @@
  - Updated authorization error response. (Included error and error 
    description in the client redirect URI except for missing or 
    invalid client id or redirect URI.
-
-
+ 
+ 
 # version 0.65.2
 
 2022-03-03

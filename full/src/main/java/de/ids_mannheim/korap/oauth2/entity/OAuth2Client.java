@@ -38,9 +38,8 @@ public class OAuth2Client implements Comparable<OAuth2Client>{
     private String registeredBy;
     @Column(name = "registration_date", updatable = false)
     private ZonedDateTime registrationDate;
-    
     @Column(name = "refresh_token_expiry")
-    private int refresTokenExpiry;
+    private int refreshTokenExpiry;
     private String description;
     private String url;
 
@@ -160,5 +159,12 @@ public class OAuth2Client implements Comparable<OAuth2Client>{
     
     public void setPermitted (boolean isPermitted) {
         this.isPermitted = isPermitted;
+    }
+    
+    public int getRefreshTokenExpiry () {
+        return refreshTokenExpiry;
+    }
+    public void setRefreshTokenExpiry (int refreshTokenExpiry) {
+        this.refreshTokenExpiry = refreshTokenExpiry;
     }
 }
