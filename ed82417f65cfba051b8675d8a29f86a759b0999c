@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17892a77_7cf4f76e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-04-28T09:38:54Z",
+      "side": 1,
+      "message": "There is no test, but I guess that\u0027s okay for this simple change. I get this right that you only make that requirement weak for backwards compatibility? Wouldn\u0027t it be better to keep it strong and require database fixes?",
+      "revId": "ed82417f65cfba051b8675d8a29f86a759b0999c",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
