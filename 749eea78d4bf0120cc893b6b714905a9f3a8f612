@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12184080_26e818db",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-04-30T09:19:37Z",
+      "side": 1,
+      "message": "This should already work out of the box, as I\u0027ve extended .config/ldap.conf already with all new parameters.\n\nnext steps: \n\n* add parameter for switching to ldaps\n* add parameter to run local in-mmemory server\n",
+      "revId": "749eea78d4bf0120cc893b6b714905a9f3a8f612",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
