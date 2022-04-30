@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfff70da_59368953",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-04-30T11:39:22Z",
+      "side": 1,
+      "message": "Now with LDAPS support and test, which should also be possible against our LDAP server.",
+      "revId": "3d732da90025236dd9d36971d403a67f35cb3c3a",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
