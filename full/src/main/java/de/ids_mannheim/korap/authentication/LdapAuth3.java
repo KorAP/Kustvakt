@@ -13,15 +13,17 @@ import com.unboundid.util.ssl.TrustAllTrustManager;
 import com.unboundid.util.ssl.TrustStoreTrustManager;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.constant.TokenType;
+import de.ids_mannheim.korap.server.EmbeddedLdapServer;
 import org.apache.commons.text.StringSubstitutor;
 
 import javax.net.ssl.SSLSocketFactory;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
+
+import static de.ids_mannheim.korap.server.EmbeddedLdapServer.loadProp;
 
 
 /**
@@ -36,7 +38,6 @@ public class LdapAuth3 extends APIAuthentication {
     public static final int LDAP_AUTH_RCONNECT = 1; // cannot connect to LDAP Server
     public static final int LDAP_AUTH_RINTERR = 2; // internal error: cannot verify User+Pwd.
     public static final int LDAP_AUTH_RUNKNOWN = 3; // User Account or Pwd unknown;
-    public static final int MIN_UID_AND_PW_LENGTH = 2;
     final static Boolean DEBUGLOG = false;
 
     public LdapAuth3(FullConfiguration config) throws JOSEException {
@@ -58,42 +59,11 @@ public class LdapAuth3 extends APIAuthentication {
         }
     }
 
-    static HashMap<String, String> typeCastConvert(Properties prop) {
-        Map<String, String> step2 = (Map<String, String>) (Map) prop;
-        return new HashMap<>(step2);
-    }
-
-    static HashMap<String, String> loadProp(String sConfFile) throws IOException {
-        FileInputStream in;
-        Properties prop;
-
-        try {
-            in = new FileInputStream(sConfFile);
-        } catch (IOException ex) {
-            System.err.printf("Error: LDAP.loadProp: cannot load Property file '%s'!\n", sConfFile);
-            ex.printStackTrace();
-            return null;
-        }
-
-        if (DEBUGLOG) System.out.println("Debug: loaded: " + sConfFile);
-
-        prop = new Properties();
-
-        try {
-            prop.load(in);
-            return typeCastConvert(prop);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-        return new HashMap<>();
-    }
 
     public static int login(String sUserDN, String sUserPwd, String ldapConfigFilename) throws LDAPException {
 
-        if (sUserDN.length() < MIN_UID_AND_PW_LENGTH || sUserPwd.length() < MIN_UID_AND_PW_LENGTH) {
-            return LDAP_AUTH_RUNKNOWN;
-        }
+        sUserDN = Filter.encodeValue(sUserDN);
+        sUserPwd = Filter.encodeValue(sUserPwd);
 
         Map<String, String> ldapConfig;
         try {
@@ -111,6 +81,17 @@ public class LdapAuth3 extends APIAuthentication {
         final String ldapFilter = ldapConfig.getOrDefault("ldapFilter", "(&(|(&(mail=${username})(idsC2Password=${password}))(&(idsC2Profile=${username})(idsC2Password=${password})))(&(idsC2=TRUE)(|(idsStatus=1)(|(idsStatus=0)(xidsStatus=\00)))))");
         final String sPwd = ldapConfig.getOrDefault("pwd", "");
         final String trustStorePath = ldapConfig.getOrDefault("trustStore", null);
+        final Boolean useEmbeddedServer = Boolean.parseBoolean(ldapConfig.getOrDefault("useEmbeddedServer", "false"));
+
+        if (useEmbeddedServer && EmbeddedLdapServer.server == null) {
+            try {
+                EmbeddedLdapServer.start(ldapConfigFilename);
+            } catch (GeneralSecurityException e) {
+                throw new RuntimeException(e);
+            } catch (UnknownHostException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         Map<String, String> valuesMap = new HashMap<>();
         valuesMap.put("username", sUserDN);

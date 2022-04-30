@@ -118,6 +118,16 @@ public class LdapAuth3Test {
     }
 
     @Test
+    public void testPasswordWithAsterisk() throws LDAPException {
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("test", "top*ecret", TEST_LDAPS_PROPERTIES));
+    }
+
+    @Test
+    public void testFailingEscapedPW() throws LDAPException {
+        assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("testuser", "top*", TEST_LDAPS_TS_PROPERTIES));
+    }
+
+    @Test
     public void testFailingIllegalPW() throws LDAPException {
         assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("testuser", "*", TEST_LDAPS_TS_PROPERTIES));
     }
