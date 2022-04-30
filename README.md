@@ -66,9 +66,27 @@ Set krill.indexDir in the configuration file to the location of your Krill index
 
 ### Setting LDAP
 
-Set the location of the LDAP configuration file for Kustvakt full version. The file should contain an admin password to access an LDAP system. Without LDAP, user authentication functions and services cannot be used. Authentication mechanism can be extended by implementing other authentication methods e.g. using a database. 
+Set the location of the LDAP configuration file for Kustvakt full version. The file must contain all necessary information to access the LDAP system and to authenticate and authorize users (see example LDAP config below).
 
-	ldap.config = path-to-ldap-password
+```properties
+ldap.config = path-to-ldap-config
+```
+
+To authenticate and authorize users, the ldap filter expression specified in `ldapFilter` is used. Note that within this expression all occurrences of the placeholders `${username}` and `${password}` are replaced with the name and password the user has entered for logging in.
+
+###### Example ldap config file
+```properties
+ldapHost=ldap.example.org
+# use LDAP over SSL (LDAPS) if the server supports it
+ldapS=true
+ldapPort=636
+# to trust all certs, leave trustStore empty
+trustStore=truststore.jks
+ldapBase=dc=example,dc=org
+sLoginDN=cn=admin,dc=example,dc=org
+pwd=adminpassword
+ldapFilter=(&(&(uid=${username})(userPassword=${password}))(signedeula=TRUE))
+```
 
 ### Setting BasicAuthentication for Testing
 
