@@ -88,6 +88,38 @@ pwd=adminpassword
 ldapFilter=(&(&(uid=${username})(userPassword=${password}))(signedeula=TRUE))
 ```
 
+#### Using Kustvakt-full's embedded LDAP server
+
+For smaller projects, you can also use Kustvakt-full's embedded in-memory LDAP server, that uses [UnboundID LDAP SDK ](http://www.unboundid.com/products/ldap-sdk/) for this purpose. In order to do so, the following additional settings are required in your `ldap.conf`:
+
+```properties
+useEmbeddedServer=true
+ldifFile=path-to-users-directory.ldif
+# ldapPort=1234
+```
+
+Note that currently the embedded server ignores the `ldapHost` and `ldapS` settings, and only listens on the `localhost` interface. The `ldapPort` setting, on the other hand, is used.
+
+###### Example users.ldif
+
+```ldif
+dn: dc=example,dc=com
+dc: example
+ou: people
+objectClass: dcObject
+objectClass: organizationalUnit
+
+dn: ou=people,dc=example,dc=com
+ou: people
+objectClass: organizationalUnit
+
+dn: uid=user,ou=people,dc=example,dc=com
+cn: user
+uid: user
+mail: user@example.com
+userPassword: cGFzc3dvcmQ=
+```
+
 ### Setting BasicAuthentication for Testing
 
 For testing, you can use/activate BasicAuthentication, see Spring XML configuration file for testing at ```/full/src/test/resources/test-config.xml```. BasicAuthentication uses a dummy UserDao allowing all users to be authenticated users. You can implement UserDao by connecting it to a user table in a database and checking username and password for authentication. 
