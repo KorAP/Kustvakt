@@ -1,0 +1,55 @@
+dn: dc=example,dc=com
+dc: example
+ou: people
+objectClass: dcObject
+objectClass: organizationalUnit
+ou: PlainJoe Dot Org
+
+dn: ou=people,dc=example,dc=com
+ou: people
+objectClass: organizationalUnit
+
+dn: uid=testuser,ou=people,dc=example,dc=com
+cn: Peter Testuser
+sn: Testuser
+givenName: Peter
+mail: testuser@example.com
+userPassword: cGFzc3dvcmQ=
+displayName: Dr. Peter Testuser
+idsStatus: 0
+idsC2: TRUE
+idsC2Profile: testuser
+idsC2Password: topsecret
+idsC2News: TRUE
+title: Herr
+uid: testuser
+
+dn: uid=doe,ou=people,dc=example,dc=com
+cn: John Doe
+sn: doe
+givenName: John
+mail: doe@example.com
+userPassword:: MDl1cGM=
+displayName: Dr. John Doe
+idsStatus: 0
+idsC2: FALSE
+idsC2Profile: doe
+idsC2Password: topsecret
+idsC2News: TRUE
+title: Herr
+uid: doe
+
+dn: uid=berserker,ou=people,dc=example,dc=com
+cn: Bernd Berserker
+sn: berserker
+givenName: Joe
+mail: berserker@example.com
+userPassword:: MDl1cGM=
+displayName: berserk
+idsStatus: 2
+idsC2: TRUE
+idsC2Profile: doe
+idsC2Password: topsecret
+idsC2News: TRUE
+title: Herr
+uid: doe
