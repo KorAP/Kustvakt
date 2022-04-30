@@ -1,0 +1,27 @@
+dn: dc=example,dc=com
+dc: example
+ou: people
+objectClass: dcObject
+objectClass: organizationalUnit
+
+dn: ou=people,dc=example,dc=com
+ou: people
+objectClass: organizationalUnit
+
+dn: uid=user,ou=people,dc=example,dc=com
+cn: user
+uid: user
+mail: user@example.com
+userPassword: cGFzc3dvcmQ=
+
+dn: uid=user1,ou=people,dc=example,dc=com
+cn: user1
+uid: user1
+mail: user1@example.com
+userPassword: password1
+
+dn: uid=user2,ou=people,dc=example,dc=com
+cn: user2
+uid: user2
+mail: user2@example.com
+userPassword: password2
