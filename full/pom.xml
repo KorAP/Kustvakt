@@ -86,6 +86,7 @@
 					<include>**/*.info</include>
 					<include>**/*.properties</include>
 					<include>**/*.json</include>
+					<include>*.ldif</include>
 				</includes>
 			</testResource>
 		</testResources>
@@ -134,11 +135,16 @@
 					<argLine>-Xmx512m -XX:MaxPermSize=256m
 						-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager</argLine>
 					<excludes>
-						<exclude>de/ids_mannheim/korap/authentication/*.java</exclude>
+						<exclude>de/ids_mannheim/korap/authentication/APIAuthenticationTest.java</exclude>
+						<exclude>de/ids_mannheim/korap/authentication/AuthenticationFilterTest.java</exclude>
+						<exclude>de/ids_mannheim/korap/authentication/Kustvakt*.java</exclude>
+						<exclude>de/ids_mannheim/korap/authentication/LdapTest.java</exclude>
+						<exclude>de/ids_mannheim/korap/authentication/Random*.java</exclude>
 						<exclude>de/ids_mannheim/korap/web/controller/TokenExpiryTest.java</exclude>
 					</excludes>
 					<includes>
 						<include>de/ids_mannheim/korap/**/*.java</include>
+						<include>de/ids_mannheim/korap/authentication/LdapAuth3Test.java</include>
 					</includes>
 				</configuration>
 			</plugin>
@@ -284,5 +290,26 @@
 		    <version>5.13.2</version>
 		    <scope>test</scope>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.11.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.1</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>1.9</version>
+		</dependency>
+
 	</dependencies>
 </project>
