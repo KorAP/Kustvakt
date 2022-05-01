@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0338fff5_8244fb46",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-05-01T14:40:31Z",
+      "side": 1,
+      "message": "With this change we can connect to our ldap via ssl.\nI have updated ldap.conf on head-01 accordingly, so that it should work out of the box.",
+      "revId": "dc51114b9a99bcdd4e8ffcc81c5c8831f4bbec2f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
