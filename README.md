@@ -82,6 +82,8 @@ ldapS=true
 ldapPort=636
 # to trust all certs, leave trustStore empty
 trustStore=truststore.jks
+# add ssl cipher suites if required as csv, e.g. TLS_RSA_WITH_AES_256_GCM_SHA384
+additionalCipherSuites=
 ldapBase=dc=example,dc=org
 sLoginDN=cn=admin,dc=example,dc=org
 pwd=adminpassword
