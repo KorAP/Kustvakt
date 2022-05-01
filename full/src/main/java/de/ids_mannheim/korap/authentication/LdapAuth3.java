@@ -20,8 +20,7 @@ import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static de.ids_mannheim.korap.server.EmbeddedLdapServer.loadProp;
 
@@ -60,7 +59,6 @@ public class LdapAuth3 extends APIAuthentication {
         }
     }
 
-
     public static int login(String sUserDN, String sUserPwd, String ldapConfigFilename) throws LDAPException {
 
         if (sUserDN.length() < MIN_UID_AND_PW_LENGTH || sUserPwd.length() < MIN_UID_AND_PW_LENGTH) {
@@ -75,22 +73,22 @@ public class LdapAuth3 extends APIAuthentication {
             return LDAP_AUTH_RINTERR;
         }
 
-        final Boolean ldapS = Boolean.parseBoolean(ldapConfig.getOrDefault("ldapS", "false"));
+        assert ldapConfig != null;
+        final boolean ldapS = Boolean.parseBoolean(ldapConfig.getOrDefault("ldapS", "false"));
         final String ldapHost = ldapConfig.getOrDefault("ldapHost", "localhost");
         final int ldapPort = Integer.parseInt(ldapConfig.getOrDefault("ldapPort", (ldapS ? "636" : "389")));
         final String ldapBase = ldapConfig.getOrDefault("ldapBase", "dc=example,dc=com");
         final String sLoginDN = ldapConfig.getOrDefault("sLoginDN", "cn=admin,dc=example,dc=com");
         final String ldapFilter = ldapConfig.getOrDefault("ldapFilter", "(&(|(&(mail=${username})(idsC2Password=${password}))(&(idsC2Profile=${username})(idsC2Password=${password})))(&(idsC2=TRUE)(|(idsStatus=1)(|(idsStatus=0)(xidsStatus=\00)))))");
         final String sPwd = ldapConfig.getOrDefault("pwd", "");
-        final String trustStorePath = ldapConfig.getOrDefault("trustStore", null);
-        final Boolean useEmbeddedServer = Boolean.parseBoolean(ldapConfig.getOrDefault("useEmbeddedServer", "false"));
+        final String trustStorePath = ldapConfig.getOrDefault("trustStore", "");
+        final String additionalCipherSuites = ldapConfig.getOrDefault("additionalCipherSuites", "");
+        final boolean useEmbeddedServer = Boolean.parseBoolean(ldapConfig.getOrDefault("useEmbeddedServer", "false"));
 
         if (useEmbeddedServer && EmbeddedLdapServer.server == null) {
             try {
                 EmbeddedLdapServer.start(ldapConfigFilename);
-            } catch (GeneralSecurityException e) {
-                throw new RuntimeException(e);
-            } catch (UnknownHostException e) {
+            } catch (GeneralSecurityException | UnknownHostException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -110,7 +108,7 @@ public class LdapAuth3 extends APIAuthentication {
         // LDAP Connection:
         if (DEBUGLOG) System.out.println("LDAPS " + ldapS);
 
-        LDAPConnection lc = null;
+        LDAPConnection lc;
 
         if (ldapS) {
             try {
@@ -120,22 +118,26 @@ public class LdapAuth3 extends APIAuthentication {
                 } else {
                     sslUtil = new SSLUtil(new TrustAllTrustManager());
                 }
+                if (additionalCipherSuites != null && !additionalCipherSuites.isEmpty()) {
+                    addSSLCipherSuites(additionalCipherSuites);
+                }
                 SSLSocketFactory socketFactory = sslUtil.createSSLSocketFactory();
-                lc = new LDAPConnection(socketFactory, ldapHost, ldapPort);
+                lc = new LDAPConnection(socketFactory);
             } catch (GeneralSecurityException e) {
                 System.err.printf("Error: login: Connecting to LDAPS Server: failed: '%s'!\n", e);
-                return ldapTerminate(lc, LDAP_AUTH_RCONNECT);
+                return ldapTerminate(null, LDAP_AUTH_RCONNECT);
             }
         } else {
             lc = new LDAPConnection();
-            try {
-                lc.connect(ldapHost, ldapPort);
-                if (DEBUGLOG && ldapS) System.out.println("LDAPS Connection = OK\n");
-                if (DEBUGLOG && !ldapS) System.out.println("LDAP Connection = OK\n");
-            } catch (LDAPException e) {
-                System.err.printf("Error: login: Connecting to LDAP Server: failed: '%s'!\n", e);
-                return ldapTerminate(lc, LDAP_AUTH_RCONNECT);
-            }
+        }
+        try {
+            lc.connect(ldapHost, ldapPort);
+            if (DEBUGLOG && ldapS) System.out.println("LDAPS Connection = OK\n");
+            if (DEBUGLOG && !ldapS) System.out.println("LDAP Connection = OK\n");
+        } catch (LDAPException e) {
+            String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
+            System.err.printf("Error: login: Connecting to LDAP Server: failed: '%s'!\n", fullStackTrace);
+            return ldapTerminate(lc, LDAP_AUTH_RCONNECT);
         }
 
 
@@ -145,7 +147,7 @@ public class LdapAuth3 extends APIAuthentication {
             // bind to server:
             if (DEBUGLOG) System.out.printf("Binding with '%s' + '%s'...\n", sLoginDN, sPwd);
             lc.bind(sLoginDN, sPwd);
-            if (DEBUGLOG) System.out.printf("Binding: OK.\n");
+            if (DEBUGLOG) System.out.print("Binding: OK.\n");
         } catch (LDAPException e) {
             System.err.printf("Error: login: Binding failed: '%s'!\n", e);
             return ldapTerminate(lc, LDAP_AUTH_RINTERR);
@@ -179,9 +181,19 @@ public class LdapAuth3 extends APIAuthentication {
     public static int ldapTerminate(LDAPConnection lc, int ret) {
         if (DEBUGLOG) System.out.println("Terminating...");
 
-        lc.close(null);
+        if (lc != null) {
+            lc.close(null);
+        }
         if (DEBUGLOG) System.out.println("closing connection: done.\n");
         return ret;
+    }
+
+    private static void addSSLCipherSuites(String ciphersCsv) {
+        // add e.g. TLS_RSA_WITH_AES_256_GCM_SHA384
+        Set<String> ciphers = new HashSet<>();
+        ciphers.addAll(SSLUtil.getEnabledSSLCipherSuites());
+        ciphers.addAll(Arrays.asList(ciphersCsv.split(", *")));
+        SSLUtil.setEnabledSSLCipherSuites(ciphers);
     }
 
     @Override
