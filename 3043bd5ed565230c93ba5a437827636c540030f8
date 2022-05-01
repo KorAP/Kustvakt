@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "081f14e1_bed28547",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-05-01T14:43:16Z",
+      "side": 1,
+      "message": "Maybe rename .properties to .conf and return uid from login, but maybe later...",
+      "revId": "3043bd5ed565230c93ba5a437827636c540030f8",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
