@@ -116,4 +116,9 @@ public class LdapAuth3Test {
     public void testFailingSecureLoginWithTrustStoreAndUsernameAndWrongPW() throws LDAPException {
         assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("testuser", "topsecrets", TEST_LDAPS_TS_PROPERTIES));
     }
+
+    @Test
+    public void testGettingMailForUid() throws LDAPException {
+        assertEquals("testuser@example.com", LdapAuth3.getEMailFromUid("testuser", TEST_LDAP_PROPERTIES));
+    }
 }

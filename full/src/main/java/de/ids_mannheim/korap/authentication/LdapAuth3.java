@@ -59,12 +59,22 @@ public class LdapAuth3 extends APIAuthentication {
     }
 
     public static int login(String sUserDN, String sUserPwd, String ldapConfigFilename) throws LDAPException {
+        SearchResult srchRes = search(sUserDN, sUserPwd, ldapConfigFilename);
+
+        if (srchRes == null || srchRes.getEntryCount() == 0) {
+            if (DEBUGLOG) System.out.printf("Finding '%s': no entry found!\n", sUserDN);
+            return LDAP_AUTH_RUNKNOWN;
+        }
+        return LDAP_AUTH_ROK;
+    }
+
+    public static SearchResult search(String sUserDN, String sUserPwd, String ldapConfigFilename) throws LDAPException {
         Map<String, String> ldapConfig;
         try {
             ldapConfig = loadProp(ldapConfigFilename);
         } catch (IOException e) {
             System.out.println("Error: LDAPAuth.login: cannot load Property file!");
-            return LDAP_AUTH_RINTERR;
+            return null;
         }
 
         assert ldapConfig != null;
@@ -119,7 +129,8 @@ public class LdapAuth3 extends APIAuthentication {
                 lc = new LDAPConnection(socketFactory);
             } catch (GeneralSecurityException e) {
                 System.err.printf("Error: login: Connecting to LDAPS Server: failed: '%s'!\n", e);
-                return ldapTerminate(null, LDAP_AUTH_RCONNECT);
+                ldapTerminate(null, LDAP_AUTH_RCONNECT);
+                return null;
             }
         } else {
             lc = new LDAPConnection();
@@ -131,7 +142,8 @@ public class LdapAuth3 extends APIAuthentication {
         } catch (LDAPException e) {
             String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
             System.err.printf("Error: login: Connecting to LDAP Server: failed: '%s'!\n", fullStackTrace);
-            return ldapTerminate(lc, LDAP_AUTH_RCONNECT);
+            ldapTerminate(lc, LDAP_AUTH_RCONNECT);
+            return null;
         }
 
 
@@ -144,7 +156,8 @@ public class LdapAuth3 extends APIAuthentication {
             if (DEBUGLOG) System.out.print("Binding: OK.\n");
         } catch (LDAPException e) {
             System.err.printf("Error: login: Binding failed: '%s'!\n", e);
-            return ldapTerminate(lc, LDAP_AUTH_RINTERR);
+            ldapTerminate(lc, LDAP_AUTH_RINTERR);
+            return null;
         }
 
         if (DEBUGLOG) System.out.printf("Debug: isConnected=%d\n", lc.isConnected() ? 1 : 0);
@@ -161,15 +174,40 @@ public class LdapAuth3 extends APIAuthentication {
             if (DEBUGLOG) System.out.printf("Finding '%s': %d entries.\n", sUserDN, srchRes.getEntryCount());
         } catch (LDAPSearchException e) {
             System.err.printf("Error: login: Search for User failed: '%s'!\n", e);
-            return ldapTerminate(lc, LDAP_AUTH_RUNKNOWN);
+            ldapTerminate(lc, LDAP_AUTH_RUNKNOWN);
+            return null;
         }
 
         if (srchRes.getEntryCount() == 0) {
             if (DEBUGLOG) System.out.printf("Finding '%s': no entry found!\n", sUserDN);
-            return ldapTerminate(lc, LDAP_AUTH_RUNKNOWN);
+            return null;
         }
 
-        return ldapTerminate(lc, LDAP_AUTH_ROK); // OK.
+        ldapTerminate(lc, LDAP_AUTH_ROK);
+        return srchRes;
+    }
+
+    public static String getEMailFromUid(String sUserDN, String ldapConfigFilename) throws LDAPException {
+        String sUserPwd = "*";
+        Map<String, String> ldapConfig;
+        try {
+            ldapConfig = loadProp(ldapConfigFilename);
+        } catch (IOException e) {
+            System.out.println("Error: LDAPAuth.login: cannot load Property file!");
+            return null;
+        }
+        final String emailAttribute = ldapConfig.getOrDefault("emailAttribute", "mail");
+
+        SearchResult searchResult = search(sUserDN, sUserPwd, ldapConfigFilename);
+
+
+        for (SearchResultEntry entry : searchResult.getSearchEntries()) {
+            String mail = entry.getAttributeValue(emailAttribute);
+            if (mail != null) {
+                return mail;
+            }
+        }
+        return null;
     }
 
     public static int ldapTerminate(LDAPConnection lc, int ret) {
