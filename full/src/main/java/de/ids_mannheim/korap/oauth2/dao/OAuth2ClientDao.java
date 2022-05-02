@@ -104,7 +104,7 @@ public class OAuth2ClientDao {
         }
         catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.CLIENT_NOT_FOUND,
-                    "Unknown client with " + clientId + ".", "invalid_client");
+                    "Unknown client: " + clientId, "invalid_client");
         }
         catch (Exception e) {
             throw new KustvaktException(StatusCodes.CLIENT_NOT_FOUND,

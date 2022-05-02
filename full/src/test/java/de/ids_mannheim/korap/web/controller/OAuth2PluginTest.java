@@ -196,7 +196,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         assertFalse(node.at("/0/registration_date").isMissingNode());
         assertFalse(node.at("/0/source").isMissingNode());
         assertFalse(node.at("/0/refresh_token_expiry").isMissingNode());
-        
+
         assertTrue(node.at("/1/refresh_token_expiry").isMissingNode());
     }
 
@@ -222,4 +222,124 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         return JsonUtils.readTree(entity);
     }
 
+    @Test
+    public void testInstallConfidentialPlugin () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        MultivaluedMap<String, String> form = getSuperClientForm();
+        form.add("client_id", confidentialClientId2);
+        ClientResponse response = installPlugin(form);
+        
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(confidentialClientId2, node.at("/client_id").asText());
+        assertFalse(node.at("/name").isMissingNode());
+        assertFalse(node.at("/description").isMissingNode());
+        assertFalse(node.at("/url").isMissingNode());
+        assertFalse(node.at("/installed_date").isMissingNode());
+        
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+    
+    @Test
+    public void testInstallPublicPlugin () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        MultivaluedMap<String, String> form = getSuperClientForm();
+        form.add("client_id", publicClientId2);
+        ClientResponse response = installPlugin(form);
+        
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(publicClientId2, node.at("/client_id").asText());
+        assertFalse(node.at("/name").isMissingNode());
+        assertFalse(node.at("/description").isMissingNode());
+        assertFalse(node.at("/url").isMissingNode());
+        assertFalse(node.at("/installed_date").isMissingNode());
+        
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void testInstallPluginMissingClientId () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        MultivaluedMap<String, String> form = getSuperClientForm();
+        ClientResponse response = installPlugin(form);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.MISSING_PARAMETER, node.at("/errors/0/0").asInt());
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+    
+    @Test
+    public void testInstallPluginInvalidClientId () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        MultivaluedMap<String, String> form = getSuperClientForm();
+        form.add("client_id", "unknown");
+        ClientResponse response = installPlugin(form);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals("Unknown client: unknown",
+                node.at("/error_description").asText());
+        assertEquals("invalid_client", node.at("/error").asText());
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+    }
+    
+    @Test
+    public void testInstallPluginMissingSuperClientSecret () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("super_client_id", superClientId);
+        
+        ClientResponse response = installPlugin(form);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        
+        assertEquals("Missing parameter: super_client_secret",
+                node.at("/error_description").asText());
+        assertEquals("invalid_request", node.at("/error").asText());
+        
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+    
+    @Test
+    public void testInstallPluginMissingSuperClientId () throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        ClientResponse response = installPlugin(form);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        
+        assertEquals("Missing parameter: super_client_id",
+                node.at("/error_description").asText());
+        assertEquals("invalid_request", node.at("/error").asText());
+        
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+    
+    @Test
+    public void testInstallPluginUnauthorizedClient ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
+        form.add("super_client_id", confidentialClientId);
+        form.add("super_client_secret", clientSecret);
+        
+        ClientResponse response = installPlugin(form);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals("unauthorized_client", node.at("/error").asText());
+        
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+    }
+
+    private ClientResponse installPlugin (MultivaluedMap<String, String> form)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        return resource().path(API_VERSION).path("oauth2").path("client")
+                .path("install")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
+    }
 }

@@ -14,6 +14,7 @@ public enum OAuth2Scope {
     AUTHORIZE,
     
     LIST_USER_CLIENT,
+    INSTALL_USER_CLIENT,
     
     CLIENT_INFO,
     REGISTER_CLIENT,

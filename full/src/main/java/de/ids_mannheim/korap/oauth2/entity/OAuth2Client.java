@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import de.ids_mannheim.korap.entity.InstalledPlugin;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 
 /** Describe oauth2_client database table mapping.
@@ -52,6 +53,9 @@ public class OAuth2Client implements Comparable<OAuth2Client>{
     
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "client")
     private List<AccessToken> accessTokens;
+    
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "client")
+    private List<InstalledPlugin> installedPlugins;
     
     @Override
     public String toString () {
