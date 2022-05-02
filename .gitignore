@@ -8,13 +8,14 @@ logs
 cache_store
 *.iml
 dependency-reduced-pom.xml
-admin_token
+**/admin_token
 /sandbox
 /bin/
 *.sqlite
 *.bak
 /full/vc/
 /lite/krill_cache/
+**/ldap.conf
 
 # FB specific Kustvakt.conf
 src\main\resources\Kustvakt.conf
