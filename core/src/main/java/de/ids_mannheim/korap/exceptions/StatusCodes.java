@@ -148,6 +148,13 @@ public class StatusCodes {
     public static final int USER_REAUTHENTICATION_REQUIRED = 1815;
     
     /**
+     * 1850 Plugins
+     */
+
+    public static final int PLUGIN_NOT_PERMITTED = 1850;
+    
+    
+    /**
      * 1900 User account and logins
      */
 

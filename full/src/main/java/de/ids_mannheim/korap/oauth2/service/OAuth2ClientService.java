@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.dao.AdminDao;
+import de.ids_mannheim.korap.dto.InstalledPluginDto;
 import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
+import de.ids_mannheim.korap.entity.InstalledPlugin;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
@@ -25,6 +27,7 @@ import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
 import de.ids_mannheim.korap.oauth2.dao.AuthorizationDao;
 import de.ids_mannheim.korap.oauth2.dao.OAuth2ClientDao;
 import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
+import de.ids_mannheim.korap.oauth2.dao.InstalledPluginDao;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientInfoDto;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2UserClientDto;
@@ -62,6 +65,8 @@ public class OAuth2ClientService {
 //            new UrlValidator(new String[] { "http", "https" },
 //                    UrlValidator.NO_FRAGMENTS + UrlValidator.ALLOW_LOCAL_URLS);
 
+    @Autowired
+    private InstalledPluginDao pluginDao;
     @Autowired
     private OAuth2ClientDao clientDao;
     @Autowired
@@ -272,26 +277,35 @@ public class OAuth2ClientService {
 
     public OAuth2Client authenticateClient (String clientId,
             String clientSecret) throws KustvaktException {
-
+        return authenticateClient(clientId, clientSecret, false);
+    }
+    
+    public OAuth2Client authenticateClient (String clientId,
+            String clientSecret, boolean isSuper) throws KustvaktException {
+        String errorClient = "client";
+        if (isSuper) {
+            errorClient = "super_client";
+        }
+        
         if (clientId == null || clientId.isEmpty()) {
             throw new KustvaktException(
                     StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                    "Missing parameters: client id",
+                    "Missing parameter: "+errorClient+"_id",
                     OAuth2Error.INVALID_REQUEST);
         }
 
         OAuth2Client client = clientDao.retrieveClientById(clientId);
-        authenticateClient(client, clientSecret);
+        authenticateClient(client, clientSecret, errorClient);
         return client;
     }
 
-    public void authenticateClient (OAuth2Client client, String clientSecret)
-            throws KustvaktException {
+    public void authenticateClient (OAuth2Client client, String clientSecret,
+            String errorClient) throws KustvaktException {
         if (clientSecret == null || clientSecret.isEmpty()) {
             if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
                 throw new KustvaktException(
                         StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                        "Missing parameters: client_secret",
+                        "Missing parameter: "+errorClient+"_secret",
                         OAuth2Error.INVALID_REQUEST);
             }
         }
@@ -299,14 +313,14 @@ public class OAuth2ClientService {
             if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
                 throw new KustvaktException(
                         StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                        "Client secret was not registered",
+                        errorClient+"_secret was not registered",
                         OAuth2Error.INVALID_CLIENT);
             }
         }
         else if (!encryption.checkHash(clientSecret, client.getSecret())) {
             throw new KustvaktException(
                     StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                    "Invalid client credentials", OAuth2Error.INVALID_CLIENT);
+                    "Invalid "+errorClient+" credentials", OAuth2Error.INVALID_CLIENT);
         }
     }
 
@@ -315,7 +329,7 @@ public class OAuth2ClientService {
         if (clientId == null || clientId.isEmpty()) {
             throw new KustvaktException(
                     StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                    "Missing parameters: client id",
+                    "Missing parameter: client_id",
                     OAuth2Error.INVALID_REQUEST);
         }
 
@@ -376,6 +390,24 @@ public class OAuth2ClientService {
         Collections.sort(plugins);
         return createClientDtos(plugins);
     }
+    
+    public InstalledPluginDto installPlugin (String clientId,
+            String installedBy) throws KustvaktException {
+        if (clientId == null || clientId.isEmpty()) {
+            throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
+                    "Missing parameter: client_id");
+        }
+        OAuth2Client client = clientDao.retrieveClientById(clientId);
+        if (!client.isPermitted()) {
+            throw new KustvaktException(StatusCodes.PLUGIN_NOT_PERMITTED,
+                    "Plugin is not permitted");
+        }
+        InstalledPlugin plugin =
+                pluginDao.storeUserPlugin(client, installedBy);
+        
+        InstalledPluginDto dto = new InstalledPluginDto(plugin);
+        return dto;
+    }
 
     private List<OAuth2UserClientDto> createClientDtos (
             List<OAuth2Client> userClients) throws KustvaktException {
@@ -394,10 +426,10 @@ public class OAuth2ClientService {
 
     public void verifySuperClient (String clientId, String clientSecret)
             throws KustvaktException {
-        OAuth2Client client = authenticateClient(clientId, clientSecret);
+        OAuth2Client client = authenticateClient(clientId, clientSecret,true);
         if (!client.isSuper()) {
             throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
-                    "Only super client is allowed to list user registered clients.",
+                    "Only super client is allowed to use this service",
                     OAuth2Error.UNAUTHORIZED_CLIENT);
         }
     }
