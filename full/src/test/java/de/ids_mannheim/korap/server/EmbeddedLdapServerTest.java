@@ -42,4 +42,14 @@ public class EmbeddedLdapServerTest {
     public void unauthorizedUsersAreNotAllowed() throws LDAPException {
         assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("yuser", "password", EMBEDDED_LDAP_DEFAULT_CONF));
     }
+
+    @Test
+    public void gettingMailForUser() throws LDAPException {
+        assertEquals("user2@example.com", LdapAuth3.getEMailFromUid("user2", EMBEDDED_LDAP_DEFAULT_CONF));
+    }
+
+    @Test
+    public void gettingMailForUnknownUserIsNull() throws LDAPException {
+        assertEquals(null, LdapAuth3.getEMailFromUid("user1000", EMBEDDED_LDAP_DEFAULT_CONF));
+    }
 }
