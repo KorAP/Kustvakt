@@ -23,22 +23,8 @@ idsC2News: TRUE
 title: Herr
 uid: testuser
 
-dn: uid=doe,ou=people,dc=example,dc=com
-cn: John Doe
-sn: doe
-givenName: John
-mail: doe@example.com
-userPassword: cGFzc3dvcmQ=
-displayName: Dr. John Doe
-idsStatus: 0
-idsC2: FALSE
-idsC2Profile: doe
-idsC2Password: topsecret
-idsC2News: TRUE
-title: Herr
-uid: doe
 
-dn: uid=berserker,ou=people,dc=example,dc=com
+dn: uid=berserk,ou=people,dc=example,dc=com
 cn: Bernd Berserker
 sn: berserker
 givenName: Joe
@@ -52,3 +38,18 @@ idsC2Password: topsecret
 idsC2News: TRUE
 title: Herr
 uid: berserk
+
+dn: uid=testuser2,ou=people,dc=example,dc=com
+cn: Peter Testuser
+sn: Testuser2
+givenName: Peter
+mail: peter@example.org
+userPassword: cGFzc3dvcmQ=
+displayName: Dr. Peter Testuser
+idsStatus: 0
+idsC2: TRUE
+idsC2Profile: testuser2
+idsC2Password: topsecret
+idsC2News: TRUE
+title: Herr
+uid: testuser2

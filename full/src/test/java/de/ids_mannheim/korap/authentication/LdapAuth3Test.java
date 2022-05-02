@@ -122,4 +122,10 @@ public class LdapAuth3Test {
         assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("testuser", "*", TEST_LDAPS_TS_CONF));
     }
 
+    @Test
+    public void testGettingMailForUid() throws LDAPException {
+        assertEquals("testuser@example.com", LdapAuth3.getEMailFromUid("testuser", TEST_LDAP_CONF));
+        assertEquals("peter@example.org", LdapAuth3.getEMailFromUid("testuser2", TEST_LDAPS_CONF));
+        assertEquals(null, LdapAuth3.getEMailFromUid("non-exsting", TEST_LDAPS_CONF));
+    }
 }
