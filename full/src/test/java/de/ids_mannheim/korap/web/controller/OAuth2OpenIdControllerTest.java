@@ -325,7 +325,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
-        assertEquals("Missing parameters: client_secret",
+        assertEquals("Missing parameter: client_secret",
                 node.at("/error_description").asText());
     }
 

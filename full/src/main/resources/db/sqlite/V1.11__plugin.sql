@@ -11,12 +11,15 @@ ALTER TABLE oauth2_client
 ALTER TABLE oauth2_client 
 	ADD COLUMN is_permitted BOOLEAN DEFAULT FALSE;
 
---CREATE TABLE IF NOT EXISTS user_installed_client (
---	id INTEGER PRIMARY KEY AUTOINCREMENT,
---	installed_by VARCHAR(100) NOT NULL,
---	installed_date TIMESTAMP NOT NULL,
---	client_id VARCHAR(100) NOT NULL,
---	FOREIGN KEY (client_id)
---	   REFERENCES oauth2_client(id)
---	   ON DELETE CASCADE
---);
+CREATE TABLE IF NOT EXISTS installed_plugin (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	installed_by VARCHAR(100) NOT NULL,
+	installed_date TIMESTAMP NOT NULL,
+	client_id VARCHAR(100) NOT NULL,
+	FOREIGN KEY (client_id)
+	   REFERENCES oauth2_client(id)
+	   ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS unique_user_plugin 
+	on installed_plugin(installed_by,client_id);

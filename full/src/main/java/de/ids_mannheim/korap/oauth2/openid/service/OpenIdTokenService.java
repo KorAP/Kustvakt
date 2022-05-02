@@ -154,7 +154,7 @@ public class OpenIdTokenService extends OAuth2TokenService {
         if (clientAuthentication == null) {
             if (clientId == null) {
                 throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
-                        "Missing parameters: client_id",
+                        "Missing parameter: client_id",
                         OAuth2Error.INVALID_REQUEST);
             }
             else {
@@ -208,7 +208,7 @@ public class OpenIdTokenService extends OAuth2TokenService {
         if (clientAuthentication == null) {
             if (clientId == null) {
                 throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
-                        "Missing parameters: client_id",
+                        "Missing parameter: client_id",
                         OAuth2Error.INVALID_REQUEST);
             }
             else {

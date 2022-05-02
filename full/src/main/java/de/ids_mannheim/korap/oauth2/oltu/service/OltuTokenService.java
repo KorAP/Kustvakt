@@ -137,7 +137,7 @@ public class OltuTokenService extends OAuth2TokenService {
 
         if (refreshTokenStr == null || refreshTokenStr.isEmpty()) {
             throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
-                    "Missing parameters: refresh_token",
+                    "Missing parameter: refresh_token",
                     OAuth2Error.INVALID_REQUEST);
         }
 
@@ -301,7 +301,7 @@ public class OltuTokenService extends OAuth2TokenService {
         if (clientSecret == null || clientSecret.isEmpty()) {
             throw new KustvaktException(
                     StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                    "Missing parameters: client_secret",
+                    "Missing parameter: client_secret",
                     OAuth2Error.INVALID_REQUEST);
         }
 

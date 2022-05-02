@@ -148,7 +148,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_CLIENT, node.at("/error").asText());
-        assertEquals("Unknown client with unknown-client-id.",
+        assertEquals("Unknown client: unknown-client-id",
                 node.at("/error_description").asText());
     }
 
@@ -540,7 +540,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
                 node.at("/error").asText());
-        assertEquals("Missing parameters: client_secret",
+        assertEquals("Missing parameter: client_secret",
                 node.at("/error_description").asText());
     }
 

@@ -21,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import com.sun.jersey.spi.container.ResourceFilters;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
+import de.ids_mannheim.korap.dto.InstalledPluginDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientInfoDto;
@@ -250,6 +251,31 @@ public class OAuthClientController {
 
             clientService.verifySuperClient(superClientId, superClientSecret);
             return clientService.listPlugins(permittedOnly);
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+    }
+    
+    @POST
+    @Path("/install")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    public InstalledPluginDto installPlugin (
+            @Context SecurityContext context,
+            @FormParam("super_client_id") String superClientId,
+            @FormParam("super_client_secret") String superClientSecret,
+            @FormParam("client_id") String clientId) {
+
+        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+        String username = tokenContext.getUsername();
+
+        try {
+            scopeService.verifyScope(tokenContext,
+                    OAuth2Scope.INSTALL_USER_CLIENT);
+
+            clientService.verifySuperClient(superClientId, superClientSecret);
+            return clientService.installPlugin(clientId, username);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);

@@ -26,7 +26,8 @@
 2022-04-28
  - Handled user-defined refresh token expiry (added in client info and 
    list API response)
- 
+2022-05-02
+ - Added a new API: install plugin 
  
 # version 0.65.2
 
