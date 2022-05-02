@@ -16,14 +16,14 @@ import org.junit.Test;
 
 import java.security.GeneralSecurityException;
 
-import static de.ids_mannheim.korap.authentication.LdapAuth3.LDAP_AUTH_ROK;
 import static de.ids_mannheim.korap.authentication.LdapAuth3.LDAP_AUTH_RNAUTH;
+import static de.ids_mannheim.korap.authentication.LdapAuth3.LDAP_AUTH_ROK;
 import static org.junit.Assert.assertEquals;
 
 public class LdapAuth3Test {
-    public static final String TEST_LDAP_PROPERTIES = "src/test/resources/test-ldap.properties";
-    public static final String TEST_LDAPS_PROPERTIES = "src/test/resources/test-ldaps.properties";
-    public static final String TEST_LDAPS_TS_PROPERTIES = "src/test/resources/test-ldaps-with-truststore.properties";
+    public static final String TEST_LDAP_CONF = "src/test/resources/test-ldap.conf";
+    public static final String TEST_LDAPS_CONF = "src/test/resources/test-ldaps.conf";
+    public static final String TEST_LDAPS_TS_CONF = "src/test/resources/test-ldaps-with-truststore.conf";
     public static final String TEST_LDAP_USERS_LDIF = "src/test/resources/test-ldap-users.ldif";
     private static final String keyStorePath = "src/test/resources/keystore.p12";
     static InMemoryDirectoryServer server;
@@ -60,76 +60,76 @@ public class LdapAuth3Test {
 
     @Test
     public void testLoginWithUsername() throws LDAPException {
-        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("testuser", "topsecret", TEST_LDAP_PROPERTIES));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("testuser", "topsecret", TEST_LDAP_CONF));
     }
 
     @Test
     public void testLoginWithUid() throws LDAPException {
         final byte[] passwordBytes = StaticUtils.getBytes("password");
         String pw = Base64.encode(passwordBytes);
-        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("testuser", pw, TEST_LDAP_PROPERTIES));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("testuser", pw, TEST_LDAP_CONF));
     }
 
     @Test
     public void testLoginWithEmail() throws LDAPException {
         final byte[] passwordBytes = StaticUtils.getBytes("password");
         String pw = Base64.encode(passwordBytes);
-        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("testuser@example.com", pw, TEST_LDAP_PROPERTIES));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("testuser@example.com", pw, TEST_LDAP_CONF));
     }
 
     @Test
     public void testFailingLoginWithWrongEmail() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("notestuser@example.com", "topsecret", TEST_LDAP_PROPERTIES));
+        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("notestuser@example.com", "topsecret", TEST_LDAP_CONF));
     }
 
     @Test
     public void testFailingLoginWithEmailAndWrongPassword() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("testuser@example.com", "wrongpw", TEST_LDAP_PROPERTIES));
+        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("testuser@example.com", "wrongpw", TEST_LDAP_CONF));
     }
 
     @Test
     public void testFailingLoginWithUsernameAndWrongPassword() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("testuser", "wrongpw", TEST_LDAP_PROPERTIES));
+        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("testuser", "wrongpw", TEST_LDAP_CONF));
     }
 
     @Test
     public void testFailingLoginWithoutC2Attr() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("doe", "topsecret", TEST_LDAP_PROPERTIES));
+        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("doe", "topsecret", TEST_LDAP_CONF));
     }
 
     @Test
     public void testFailingLoginWithoutBadStatus() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("berserker", "topsecret", TEST_LDAP_PROPERTIES));
+        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("berserker", "topsecret", TEST_LDAP_CONF));
     }
 
     @Test
     public void testSecureLoginWithUsername() throws LDAPException {
-        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("testuser", "topsecret", TEST_LDAPS_PROPERTIES));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("testuser", "topsecret", TEST_LDAPS_CONF));
     }
 
     @Test
     public void testSecureLoginWithTrustStoreAndUsername() throws LDAPException {
-        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("testuser", "topsecret", TEST_LDAPS_TS_PROPERTIES));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("testuser", "topsecret", TEST_LDAPS_TS_CONF));
     }
 
     @Test
     public void testFailingSecureLoginWithTrustStoreAndUsernameAndWrongPW() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("testuser", "topsecrets", TEST_LDAPS_TS_PROPERTIES));
+        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("testuser", "topsecrets", TEST_LDAPS_TS_CONF));
     }
 
     @Test
     public void testPasswordWithAsterisk() throws LDAPException {
-        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("test", "top*ecret", TEST_LDAPS_PROPERTIES));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("test", "top*ecret", TEST_LDAPS_CONF));
     }
 
     @Test
     public void testFailingEscapedPW() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("testuser", "top*", TEST_LDAPS_TS_PROPERTIES));
+        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("testuser", "top*", TEST_LDAPS_TS_CONF));
     }
 
     @Test
     public void testFailingIllegalPW() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("testuser", "*", TEST_LDAPS_TS_PROPERTIES));
+        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("testuser", "*", TEST_LDAPS_TS_CONF));
     }
 
 }
