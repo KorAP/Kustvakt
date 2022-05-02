@@ -84,7 +84,7 @@
 				<filtering>true</filtering>
 				<includes>
 					<include>**/*.info</include>
-					<include>**/*.properties</include>
+					<include>**/*.conf</include>
 					<include>**/*.json</include>
 					<include>**/*.p12</include>
 					<include>**/*.jks</include>
