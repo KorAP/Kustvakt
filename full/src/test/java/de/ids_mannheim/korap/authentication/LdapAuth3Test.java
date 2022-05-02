@@ -21,9 +21,9 @@ import static de.ids_mannheim.korap.authentication.LdapAuth3.LDAP_AUTH_RUNKNOWN;
 import static org.junit.Assert.assertEquals;
 
 public class LdapAuth3Test {
-    public static final String TEST_LDAP_PROPERTIES = "src/test/resources/test-ldap.properties";
-    public static final String TEST_LDAPS_PROPERTIES = "src/test/resources/test-ldaps.properties";
-    public static final String TEST_LDAPS_TS_PROPERTIES = "src/test/resources/test-ldaps-with-truststore.properties";
+    public static final String TEST_LDAP_PROPERTIES = "src/test/resources/test-ldap.conf";
+    public static final String TEST_LDAPS_PROPERTIES = "src/test/resources/test-ldaps.conf";
+    public static final String TEST_LDAPS_TS_PROPERTIES = "src/test/resources/test-ldaps-with-truststore.conf";
     public static final String TEST_LDAP_USERS_LDIF = "src/test/resources/test-ldap-users.ldif";
     private static final String keyStorePath = "src/test/resources/keystore.p12";
     static InMemoryDirectoryServer server;
