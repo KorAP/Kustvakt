@@ -70,6 +70,30 @@
       },
       "revId": "dbc37e05b486b8cc245f1bdf9c81eb4058f49f39",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "273ac851_39d7f57d",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/authentication/LdapAuth3.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-05-03T10:12:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4c1169f2_5c5f69b1",
+      "range": {
+        "startLine": 120,
+        "startChar": 76,
+        "endLine": 120,
+        "endChar": 84
+      },
+      "revId": "dbc37e05b486b8cc245f1bdf9c81eb4058f49f39",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
