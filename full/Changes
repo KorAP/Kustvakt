@@ -6,7 +6,8 @@
  - Handled user-defined refresh token expiry (added in client info and 
    list API response)
  - Added a new API: install plugin 
-
+ - Handled redundant plugin installation
+ 
 
 # version 0.67.1
 

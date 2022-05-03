@@ -9,6 +9,7 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeServiceImpl;
@@ -35,7 +36,7 @@ public class OAuth2Authentication implements AuthenticationIface {
         AccessToken accessToken = accessDao.retrieveAccessToken(authToken);
         if (accessToken.isRevoked()) {
             throw new KustvaktException(StatusCodes.INVALID_ACCESS_TOKEN,
-                    "Access token is invalid");
+                    "Access token is invalid", OAuth2Error.INVALID_TOKEN);
         }
 
         String scopes = scopeService

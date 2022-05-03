@@ -50,7 +50,8 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         String clientSecret = node.at("/client_secret").asText();
         assertNotNull(clientId);
         assertNotNull(clientSecret);
-
+        
+        testInstallPluginNotPermitted(clientId);
         testRetrievePluginInfo(clientId);
 
         node = listPlugins(false);
@@ -177,7 +178,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-
+        
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
@@ -256,8 +257,35 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         assertFalse(node.at("/installed_date").isMissingNode());
         
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
+        testInstallPluginRedundant(form);
+    }
+    
+    private void testInstallPluginRedundant (
+            MultivaluedMap<String, String> form)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        ClientResponse response = installPlugin(form);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.PLUGIN_HAS_BEEN_INSTALLED,
+                node.at("/errors/0/0").asInt());
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
+    private void testInstallPluginNotPermitted (String clientId)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        MultivaluedMap<String, String> form = getSuperClientForm();
+        form.add("client_id", clientId);
+        ClientResponse response = installPlugin(form);
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.PLUGIN_NOT_PERMITTED,
+                node.at("/errors/0/0").asInt());
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+    
     @Test
     public void testInstallPluginMissingClientId () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
