@@ -46,6 +46,30 @@
       },
       "revId": "dbc37e05b486b8cc245f1bdf9c81eb4058f49f39",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c1169f2_5c5f69b1",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/authentication/LdapAuth3.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-03T10:07:13Z",
+      "side": 1,
+      "message": "That\u0027s right - I honestly don\u0027t understand most of the LDAP code, so this just sprang to my attention.",
+      "parentUuid": "75317a28_892d3f9d",
+      "range": {
+        "startLine": 120,
+        "startChar": 76,
+        "endLine": 120,
+        "endChar": 84
+      },
+      "revId": "dbc37e05b486b8cc245f1bdf9c81eb4058f49f39",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
