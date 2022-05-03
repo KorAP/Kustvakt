@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "757e7dfb_a53e1dbc",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/authentication/LdapAuth3.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-03T09:46:37Z",
+      "side": 1,
+      "message": "I would argue that logging passwords is always problematic by design.",
+      "range": {
+        "startLine": 120,
+        "startChar": 76,
+        "endLine": 120,
+        "endChar": 84
+      },
+      "revId": "dbc37e05b486b8cc245f1bdf9c81eb4058f49f39",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
