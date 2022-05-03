@@ -22,6 +22,30 @@
       },
       "revId": "dbc37e05b486b8cc245f1bdf9c81eb4058f49f39",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75317a28_892d3f9d",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/authentication/LdapAuth3.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-05-03T10:01:06Z",
+      "side": 1,
+      "message": "Thanks, absolutely! Note, however, that this is part of the original code and not part of the changes. Will fix...",
+      "parentUuid": "757e7dfb_a53e1dbc",
+      "range": {
+        "startLine": 120,
+        "startChar": 76,
+        "endLine": 120,
+        "endChar": 84
+      },
+      "revId": "dbc37e05b486b8cc245f1bdf9c81eb4058f49f39",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
