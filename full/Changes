@@ -28,6 +28,8 @@
    list API response)
 2022-05-02
  - Added a new API: install plugin 
+2022-05-03
+ - Handled redundant plugin installation 
  
 # version 0.65.2
 

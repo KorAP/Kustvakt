@@ -152,6 +152,7 @@ public class StatusCodes {
      */
 
     public static final int PLUGIN_NOT_PERMITTED = 1850;
+    public static final int PLUGIN_HAS_BEEN_INSTALLED = 1851;
     
     
     /**

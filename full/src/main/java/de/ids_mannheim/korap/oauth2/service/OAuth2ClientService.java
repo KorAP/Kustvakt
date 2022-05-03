@@ -25,9 +25,9 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
 import de.ids_mannheim.korap.oauth2.dao.AuthorizationDao;
+import de.ids_mannheim.korap.oauth2.dao.InstalledPluginDao;
 import de.ids_mannheim.korap.oauth2.dao.OAuth2ClientDao;
 import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
-import de.ids_mannheim.korap.oauth2.dao.InstalledPluginDao;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientInfoDto;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2UserClientDto;
@@ -400,13 +400,29 @@ public class OAuth2ClientService {
         OAuth2Client client = clientDao.retrieveClientById(clientId);
         if (!client.isPermitted()) {
             throw new KustvaktException(StatusCodes.PLUGIN_NOT_PERMITTED,
-                    "Plugin is not permitted");
+                    "Plugin is not permitted", clientId);
         }
+        
+        if (isPluginInstalled(clientId,installedBy)) {
+            throw new KustvaktException(StatusCodes.PLUGIN_HAS_BEEN_INSTALLED,
+                    "Plugin has been installed", clientId);
+        }
+        
         InstalledPlugin plugin =
                 pluginDao.storeUserPlugin(client, installedBy);
         
         InstalledPluginDto dto = new InstalledPluginDto(plugin);
         return dto;
+    }
+
+    private boolean isPluginInstalled (String clientId, String installedBy) {
+        try {
+            pluginDao.retrieveInstalledPlugin(clientId, installedBy);
+        }
+        catch (KustvaktException e) {
+            return false;
+        }
+        return true;
     }
 
     private List<OAuth2UserClientDto> createClientDtos (
@@ -433,6 +449,4 @@ public class OAuth2ClientService {
                     OAuth2Error.UNAUTHORIZED_CLIENT);
         }
     }
-
-    
 }
