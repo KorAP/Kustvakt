@@ -9,6 +9,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.http.entity.ContentType;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
@@ -20,16 +21,21 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.entity.InstalledPlugin;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
+import de.ids_mannheim.korap.oauth2.dao.InstalledPluginDao;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
 public class OAuth2PluginTest extends OAuth2TestBase {
 
     private String username = "plugin-user";
+    @Autowired
+    private InstalledPluginDao pluginDao;
+    
 
     @Test
     public void testRegisterPlugin () throws UniformInterfaceException,
@@ -233,12 +239,17 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(confidentialClientId2, node.at("/client_id").asText());
+        assertEquals(superClientId, node.at("/super_client_id").asText());
+        
         assertFalse(node.at("/name").isMissingNode());
         assertFalse(node.at("/description").isMissingNode());
         assertFalse(node.at("/url").isMissingNode());
         assertFalse(node.at("/installed_date").isMissingNode());
-        
+
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
+        testRetrieveInstalledPlugin(superClientId, confidentialClientId2,
+                username);
     }
     
     @Test
@@ -251,6 +262,8 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(publicClientId2, node.at("/client_id").asText());
+        assertEquals(superClientId, node.at("/super_client_id").asText());
+        
         assertFalse(node.at("/name").isMissingNode());
         assertFalse(node.at("/description").isMissingNode());
         assertFalse(node.at("/url").isMissingNode());
@@ -259,6 +272,9 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         
         testInstallPluginRedundant(form);
+        
+        testRetrieveInstalledPlugin(superClientId, publicClientId2,
+                username);
     }
     
     private void testInstallPluginRedundant (
@@ -329,17 +345,18 @@ public class OAuth2PluginTest extends OAuth2TestBase {
     }
     
     @Test
-    public void testInstallPluginMissingSuperClientId () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testInstallPluginMissingSuperClientId ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         ClientResponse response = installPlugin(form);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        
+
         assertEquals("Missing parameter: super_client_id",
                 node.at("/error_description").asText());
         assertEquals("invalid_request", node.at("/error").asText());
-        
+
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
     
@@ -369,5 +386,17 @@ public class OAuth2PluginTest extends OAuth2TestBase {
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).post(ClientResponse.class);
+    }
+    
+    private void testRetrieveInstalledPlugin (String superClientId,
+            String clientId, String installedBy) throws KustvaktException {
+        InstalledPlugin plugin = pluginDao
+                .retrieveInstalledPlugin(superClientId, clientId, installedBy);
+        assertEquals(clientId, plugin.getClient().getId());
+        assertEquals(superClientId, plugin.getSuperClient().getId());
+        assertEquals(installedBy, plugin.getInstalledBy());
+        
+        assertTrue(plugin.getId()>0);
+        assertTrue(plugin.getInstalledDate()!= null);
     }
 }

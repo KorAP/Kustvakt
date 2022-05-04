@@ -391,8 +391,8 @@ public class OAuth2ClientService {
         return createClientDtos(plugins);
     }
     
-    public InstalledPluginDto installPlugin (String clientId,
-            String installedBy) throws KustvaktException {
+    public InstalledPluginDto installPlugin (String superClientId,
+            String clientId, String installedBy) throws KustvaktException {
         if (clientId == null || clientId.isEmpty()) {
             throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
                     "Missing parameter: client_id");
@@ -403,21 +403,24 @@ public class OAuth2ClientService {
                     "Plugin is not permitted", clientId);
         }
         
-        if (isPluginInstalled(clientId,installedBy)) {
+        if (isPluginInstalled(superClientId,clientId,installedBy)) {
             throw new KustvaktException(StatusCodes.PLUGIN_HAS_BEEN_INSTALLED,
                     "Plugin has been installed", clientId);
         }
         
+        OAuth2Client superClient = clientDao.retrieveClientById(superClientId);
         InstalledPlugin plugin =
-                pluginDao.storeUserPlugin(client, installedBy);
+                pluginDao.storeUserPlugin(superClient, client, installedBy);
         
         InstalledPluginDto dto = new InstalledPluginDto(plugin);
         return dto;
     }
 
-    private boolean isPluginInstalled (String clientId, String installedBy) {
+    private boolean isPluginInstalled (String superClientId, String clientId,
+            String installedBy) {
         try {
-            pluginDao.retrieveInstalledPlugin(clientId, installedBy);
+            pluginDao.retrieveInstalledPlugin(superClientId, clientId,
+                    installedBy);
         }
         catch (KustvaktException e) {
             return false;

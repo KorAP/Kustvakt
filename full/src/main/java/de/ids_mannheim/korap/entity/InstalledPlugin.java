@@ -33,4 +33,9 @@ public class InstalledPlugin {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "client_id")
     private OAuth2Client client;
+    
+    // where a plugin is installed
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "super_client_id")
+    private OAuth2Client superClient;
 }
