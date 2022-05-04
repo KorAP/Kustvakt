@@ -30,7 +30,6 @@ import de.ids_mannheim.korap.oauth2.dao.OAuth2ClientDao;
 import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientInfoDto;
-import de.ids_mannheim.korap.oauth2.dto.OAuth2UserClientDto;
 import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
@@ -354,7 +353,7 @@ public class OAuth2ClientService {
         return clientDao.retrieveClientById(clientId);
     }
 
-    public List<OAuth2UserClientDto> listUserAuthorizedClients (String username)
+    public List<OAuth2ClientInfoDto> listUserAuthorizedClients (String username)
             throws KustvaktException {
         List<OAuth2Client> userClients =
                 clientDao.retrieveUserAuthorizedClients(username);
@@ -374,7 +373,7 @@ public class OAuth2ClientService {
         return createClientDtos(uniqueClients);
     }
     
-    public List<OAuth2UserClientDto> listUserRegisteredClients (String username)
+    public List<OAuth2ClientInfoDto> listUserRegisteredClients (String username)
             throws KustvaktException {
         List<OAuth2Client> userClients =
                 clientDao.retrieveUserRegisteredClients(username);
@@ -383,7 +382,7 @@ public class OAuth2ClientService {
     }
     
        
-    public List<OAuth2UserClientDto> listPlugins (boolean isPermitted)
+    public List<OAuth2ClientInfoDto> listPlugins (boolean isPermitted)
             throws KustvaktException {
 
         List<OAuth2Client> plugins = clientDao.retrievePlugins(isPermitted);
@@ -428,12 +427,12 @@ public class OAuth2ClientService {
         return true;
     }
 
-    private List<OAuth2UserClientDto> createClientDtos (
+    private List<OAuth2ClientInfoDto> createClientDtos (
             List<OAuth2Client> userClients) throws KustvaktException {
-        List<OAuth2UserClientDto> dtoList = new ArrayList<>(userClients.size());
+        List<OAuth2ClientInfoDto> dtoList = new ArrayList<>(userClients.size());
         for (OAuth2Client uc : userClients) {
             if (uc.isSuper()) continue;
-            OAuth2UserClientDto dto = new OAuth2UserClientDto(uc);
+            OAuth2ClientInfoDto dto = new OAuth2ClientInfoDto(uc);
             dtoList.add(dto);
         }
         return dtoList;
