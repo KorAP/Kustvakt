@@ -81,33 +81,33 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     public void testRetrieveClientInfo () throws KustvaktException {
         // public client
         JsonNode clientInfo = retrieveClientInfo(publicClientId, "system");
-        assertEquals(publicClientId, clientInfo.at("/id").asText());
+        assertEquals(publicClientId, clientInfo.at("/client_id").asText());
         assertEquals("public client plugin with redirect uri",
-                clientInfo.at("/name").asText());
-        assertNotNull(clientInfo.at("/description"));
-        assertNotNull(clientInfo.at("/url"));
-        assertEquals("PUBLIC", clientInfo.at("/type").asText());
+                clientInfo.at("/client_name").asText());
+        assertNotNull(clientInfo.at("/client_description"));
+        assertNotNull(clientInfo.at("/client_url"));
+        assertEquals("PUBLIC", clientInfo.at("/client_type").asText());
         assertEquals("system", clientInfo.at("/registered_by").asText());
 
         // confidential client
         clientInfo = retrieveClientInfo(confidentialClientId, "system");
-        assertEquals(confidentialClientId, clientInfo.at("/id").asText());
+        assertEquals(confidentialClientId, clientInfo.at("/client_id").asText());
         assertEquals("non super confidential client",
-                clientInfo.at("/name").asText());
-        assertNotNull(clientInfo.at("/url"));
+                clientInfo.at("/client_name").asText());
+        assertNotNull(clientInfo.at("/client_url"));
         assertNotNull(clientInfo.at("/redirect_uri"));
-        assertEquals(false, clientInfo.at("/is_super").asBoolean());
-        assertEquals("CONFIDENTIAL", clientInfo.at("/type").asText());
+        assertEquals(false, clientInfo.at("/super").asBoolean());
+        assertEquals("CONFIDENTIAL", clientInfo.at("/client_type").asText());
 
         // super client
         clientInfo = retrieveClientInfo(superClientId, "system");
-        assertEquals(superClientId, clientInfo.at("/id").asText());
+        assertEquals(superClientId, clientInfo.at("/client_id").asText());
         assertEquals("super confidential client",
-                clientInfo.at("/name").asText());
-        assertNotNull(clientInfo.at("/url"));
+                clientInfo.at("/client_name").asText());
+        assertNotNull(clientInfo.at("/client_url"));
         assertNotNull(clientInfo.at("/redirect_uri"));
-        assertEquals("CONFIDENTIAL", clientInfo.at("/type").asText());
-        assertTrue(clientInfo.at("/is_super").asBoolean());
+        assertEquals("CONFIDENTIAL", clientInfo.at("/client_type").asText());
+        assertTrue(clientInfo.at("/super").asBoolean());
     }
     
     @Test

@@ -9,7 +9,9 @@
  - Added a new API: install plugin 
  - Handled redundant plugin installation
  - Handled super client id in plugin installation
-
+ - Deprecated UserClientDto and uses ClientinfoDto instead
+ 
+ 
 # version 0.67.1
 
 2022-05-12

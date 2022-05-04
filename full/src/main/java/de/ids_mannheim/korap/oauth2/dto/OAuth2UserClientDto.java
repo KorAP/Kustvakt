@@ -11,11 +11,14 @@ import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
- * Lists OAuth2 clients of a user
+ * Please use {@link OAuth2ClientInfoDto} instead. 
+ * 
+ * This class is not used anymore to describe OAuth2 clients of a user.
  * 
  * @author margaretha
  *
  */
+@Deprecated
 @JsonInclude(Include.NON_DEFAULT)
 public class OAuth2UserClientDto {
     @JsonProperty("client_id")

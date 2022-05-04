@@ -28,6 +28,7 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.InstalledPluginDao;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
 public class OAuth2PluginTest extends OAuth2TestBase {
@@ -42,12 +43,15 @@ public class OAuth2PluginTest extends OAuth2TestBase {
             ClientHandlerException, KustvaktException {
         JsonNode source = JsonUtils.readTree("{ \"plugin\" : \"source\"}");
 
+        int refreshTokenExpiry = TimeUtils.convertTimeToSeconds("90D");
+        
         String clientName = "Plugin";
         OAuth2ClientJson json = new OAuth2ClientJson();
         json.setName(clientName);
         json.setType(OAuth2ClientType.CONFIDENTIAL);
         json.setDescription("This is a plugin test client.");
         json.setSource(source);
+        json.setRefreshTokenExpiry(refreshTokenExpiry);
 
         ClientResponse response = registerClient(username, json);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -58,37 +62,38 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         assertNotNull(clientSecret);
         
         testInstallPluginNotPermitted(clientId);
-        testRetrievePluginInfo(clientId);
+        testRetrievePluginInfo(clientId,refreshTokenExpiry);
 
         node = listPlugins(false);
         assertEquals(3, node.size());
         node = listPlugins(true); // permitted only
         assertEquals(2, node.size());
 
-        testListUserRegisteredPlugins(username, clientId, clientName);
+        testListUserRegisteredPlugins(username, clientId, clientName,
+                refreshTokenExpiry);
         deregisterConfidentialClient(username, clientId);
     }
 
-    private void testRetrievePluginInfo (String clientId)
+    private void testRetrievePluginInfo (String clientId, int refreshTokenExpiry)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         JsonNode clientInfo = retrieveClientInfo(clientId, username);
-        assertEquals(clientId, clientInfo.at("/id").asText());
-        assertEquals("Plugin", clientInfo.at("/name").asText());
+        assertEquals(clientId, clientInfo.at("/client_id").asText());
+        assertEquals("Plugin", clientInfo.at("/client_name").asText());
 
         assertEquals(OAuth2ClientType.CONFIDENTIAL.name(),
-                clientInfo.at("/type").asText());
-        assertNotNull(clientInfo.at("/description").asText());
+                clientInfo.at("/client_type").asText());
+        assertNotNull(clientInfo.at("/client_description").asText());
         assertNotNull(clientInfo.at("/source").asText());
         assertFalse(clientInfo.at("/permitted").asBoolean());
         assertEquals(username, clientInfo.at("/registered_by").asText());
         assertNotNull(clientInfo.at("/registration_date"));
-        assertEquals(defaultRefreshTokenExpiry,
+        assertEquals(refreshTokenExpiry,
                 clientInfo.at("/refresh_token_expiry").asInt());
     }
 
     private void testListUserRegisteredPlugins (String username,
-            String clientId, String clientName)
+            String clientId, String clientName, int refreshTokenExpiry)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
 
@@ -101,7 +106,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         assertFalse(node.at("/0/permitted").asBoolean());
         assertFalse(node.at("/0/registration_date").isMissingNode());
         assertFalse(node.at("/0/source").isMissingNode());
-        assertEquals(defaultRefreshTokenExpiry,
+        assertEquals(refreshTokenExpiry,
                 node.at("/0/refresh_token_expiry").asInt());
     }
 
@@ -204,7 +209,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         assertFalse(node.at("/0/source").isMissingNode());
         assertFalse(node.at("/0/refresh_token_expiry").isMissingNode());
 
-        assertTrue(node.at("/1/refresh_token_expiry").isMissingNode());
+//        assertTrue(node.at("/1/refresh_token_expiry").isMissingNode());
     }
 
     private JsonNode listPlugins (boolean permitted_only)
