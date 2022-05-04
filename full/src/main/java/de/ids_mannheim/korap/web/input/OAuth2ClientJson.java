@@ -31,6 +31,7 @@ public class OAuth2ClientJson {
     @JsonProperty("redirect_uri")
     private String redirectURI;
     // Default 365 days
+    @JsonProperty("refresh_token_expiry")
     private int refreshTokenExpiry; // in seconds
     
     // plugins
