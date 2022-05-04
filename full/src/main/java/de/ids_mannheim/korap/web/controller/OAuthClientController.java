@@ -275,7 +275,7 @@ public class OAuthClientController {
                     OAuth2Scope.INSTALL_USER_CLIENT);
 
             clientService.verifySuperClient(superClientId, superClientSecret);
-            return clientService.installPlugin(clientId, username);
+            return clientService.installPlugin(superClientId,clientId, username);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);

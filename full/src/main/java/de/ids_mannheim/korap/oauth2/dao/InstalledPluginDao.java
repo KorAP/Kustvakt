@@ -31,8 +31,8 @@ public class InstalledPluginDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public InstalledPlugin storeUserPlugin (OAuth2Client client,
-            String installedBy) throws KustvaktException {
+    public InstalledPlugin storeUserPlugin (OAuth2Client superClient,
+            OAuth2Client client, String installedBy) throws KustvaktException {
         ParameterChecker.checkStringValue(installedBy, "installed_by");
 
         InstalledPlugin p = new InstalledPlugin();
@@ -40,12 +40,14 @@ public class InstalledPluginDao {
         p.setInstalledDate(
                 ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE)));
         p.setClient(client);
+        p.setSuperClient(superClient);
         entityManager.persist(p);
         return p;
     }
 
-    public InstalledPlugin retrieveInstalledPlugin (String clientId,
-            String installedBy) throws KustvaktException {
+    public InstalledPlugin retrieveInstalledPlugin (String superClientId,
+            String clientId, String installedBy) throws KustvaktException {
+        ParameterChecker.checkStringValue(superClientId, "super_client_id");
         ParameterChecker.checkStringValue(clientId, "client_id");
         ParameterChecker.checkStringValue(installedBy, "installedBy");
 
@@ -56,11 +58,15 @@ public class InstalledPluginDao {
         Root<InstalledPlugin> root = query.from(InstalledPlugin.class);
         Join<InstalledPlugin, OAuth2Client> client =
                 root.join(InstalledPlugin_.client);
+        Join<InstalledPlugin, OAuth2Client> superClient =
+                root.join(InstalledPlugin_.superClient);
         query.select(root);
         query.where(builder.and(
                 builder.equal(root.get(InstalledPlugin_.INSTALLED_BY),
                         installedBy),
-                builder.equal(client.get(OAuth2Client_.id), clientId)));
+                builder.equal(client.get(OAuth2Client_.id), clientId),
+                builder.equal(superClient.get(OAuth2Client_.id),
+                        superClientId)));
 
         Query q = entityManager.createQuery(query);
         try {

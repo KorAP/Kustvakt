@@ -13,7 +13,10 @@ import lombok.Setter;
 @Getter
 @JsonInclude(Include.NON_EMPTY)
 public class InstalledPluginDto {
-    private String client_id; // oauth2 client id
+    @JsonProperty("client_id")
+    private String clientId; // oauth2 client id
+    @JsonProperty("super_client_id")
+    private String superClientId;
     private String name;
     private String description;
     private String url;
@@ -22,7 +25,8 @@ public class InstalledPluginDto {
     
     public InstalledPluginDto (InstalledPlugin plugin) {
         OAuth2Client client = plugin.getClient();
-        setClient_id(client.getId());
+        setClientId(client.getId());
+        setSuperClientId(plugin.getSuperClient().getId());
         setInstalledDate(plugin.getInstalledDate().toString());
         setName(client.getName());
         setDescription(client.getDescription());

@@ -8,7 +8,7 @@
  - Added installed_plugins table
  - Added a new API: install plugin 
  - Handled redundant plugin installation
- 
+ - Handled super client id in plugin installation
 
 # version 0.67.1
 
@@ -47,7 +47,7 @@
  - Updated authorization error response. (Included error and error 
    description in the client redirect URI except for missing or 
    invalid client id or redirect URI.
- 
+
  
 # version 0.65.2
 
