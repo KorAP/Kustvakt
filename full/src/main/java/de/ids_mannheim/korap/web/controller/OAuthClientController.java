@@ -25,7 +25,6 @@ import de.ids_mannheim.korap.dto.InstalledPluginDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientInfoDto;
-import de.ids_mannheim.korap.oauth2.dto.OAuth2UserClientDto;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ClientService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
@@ -207,7 +206,7 @@ public class OAuthClientController {
     @Path("/list")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public List<OAuth2UserClientDto> listUserClients (
+    public List<OAuth2ClientInfoDto> listUserClients (
             @Context SecurityContext context,
             @FormParam("super_client_id") String superClientId,
             @FormParam("super_client_secret") String superClientSecret,
@@ -237,7 +236,7 @@ public class OAuthClientController {
     @Path("/plugins")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public List<OAuth2UserClientDto> listPlugins (
+    public List<OAuth2ClientInfoDto> listPlugins (
             @Context SecurityContext context,
             @FormParam("super_client_id") String superClientId,
             @FormParam("super_client_secret") String superClientSecret,

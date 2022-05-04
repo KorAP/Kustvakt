@@ -254,16 +254,16 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         JsonNode clientInfo = retrieveClientInfo(clientId, username);
-        assertEquals(clientId, clientInfo.at("/id").asText());
-        assertEquals("OAuth2ClientTest", clientInfo.at("/name").asText());
+        assertEquals(clientId, clientInfo.at("/client_id").asText());
+        assertEquals("OAuth2ClientTest", clientInfo.at("/client_name").asText());
         assertEquals(OAuth2ClientType.CONFIDENTIAL.name(),
-                clientInfo.at("/type").asText());
+                clientInfo.at("/client_type").asText());
         assertEquals(username, clientInfo.at("/registered_by").asText());
-        assertEquals(clientURL, clientInfo.at("/url").asText());
+        assertEquals(clientURL, clientInfo.at("/client_url").asText());
         assertEquals(clientRedirectUri,
-                clientInfo.at("/redirect_uri").asText());
+                clientInfo.at("/client_redirect_uri").asText());
         // 31536000 seconds
-        assertEquals(TimeUtils.convertTimeToSeconds("365D"),
+        assertEquals(defaultRefreshTokenExpiry,
                 clientInfo.at("/refresh_token_expiry").asInt());
         assertNotNull(clientInfo.at("/description"));
         assertNotNull(clientInfo.at("/registration_date"));

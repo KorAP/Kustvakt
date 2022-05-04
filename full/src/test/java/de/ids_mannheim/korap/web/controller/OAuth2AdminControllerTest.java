@@ -146,7 +146,7 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
             String accessToken) throws KustvaktException {
 
         JsonNode node = retrieveClientInfo(clientId, "admin");
-        assertTrue(node.at("/is_super").asBoolean());
+        assertTrue(node.at("/super").asBoolean());
 
         // list vc
         ClientResponse response = resource().path(API_VERSION).path("vc")
