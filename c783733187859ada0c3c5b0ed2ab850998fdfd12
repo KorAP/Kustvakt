@@ -16,6 +16,24 @@
       "message": "This login version seems to me oversimplyfied for the purpose of the IDS:\n\na) the filter does not allow for login with the IDS-wide account (account\u003duid for all IDS-services).\nb) in the 2 cases where a user logs in with a registered account which is locked (idsC2 \u003d\u003d false or idsStatus \u003e 1),\n   it would be nice to tell the user why he is rejected. Otherwise he will try to register once again.\n\nSeems to be an error in the filter:\n\nthe first expression should be: \u0026(mail\u003d${username})(userPassword\u003d${password})\n\nmeans: use account\u003dmail together with the ids-wide password.",
       "revId": "c783733187859ada0c3c5b0ed2ab850998fdfd12",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0c78f36_f3c0be1c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-05-05T17:51:15Z",
+      "side": 1,
+      "message": "Thanks! @a) yes, this is indeed not a filter considered to work for our ldap, but a just a similar one (look at kustvakt.conf on head-01 for the real one). Should we disclose it here? Probably this default filter should suite the embedded ldap server, introduced in a later commit.\n\n@b) Yes, that would be nicer, but I think that\u0027s an issue that should mainly be fixed on the user management side and not for every client. I think a compromise would be to introduce a new fail message with \"… or account is blocked\"",
+      "parentUuid": "04937da3_1b69bc43",
+      "revId": "c783733187859ada0c3c5b0ed2ab850998fdfd12",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
