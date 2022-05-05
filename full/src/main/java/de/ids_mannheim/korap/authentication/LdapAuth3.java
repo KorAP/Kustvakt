@@ -15,12 +15,9 @@ import de.ids_mannheim.korap.server.EmbeddedLdapServer;
 import org.apache.commons.text.StringSubstitutor;
 
 import javax.net.ssl.SSLSocketFactory;
-import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.*;
-
-import static de.ids_mannheim.korap.server.EmbeddedLdapServer.loadProp;
 
 
 /**
@@ -72,76 +69,62 @@ public class LdapAuth3 extends APIAuthentication {
         }
     }
 
-    public static int login(String sUserDN, String sUserPwd, String ldapConfigFilename) throws LDAPException {
+    public static int login(String login, String password, String ldapConfigFilename) throws LDAPException {
+        LDAPConfig ldapConfig = new LDAPConfig(ldapConfigFilename);
 
-        sUserDN = Filter.encodeValue(sUserDN);
-        sUserPwd = Filter.encodeValue(sUserPwd);
+        login = Filter.encodeValue(login);
+        password = Filter.encodeValue(password);
 
-        SearchResult srchRes = search(sUserDN, sUserPwd, ldapConfigFilename);
+        if (ldapConfig.useEmbeddedServer) {
+            try {
+                EmbeddedLdapServer.startIfNotRunning(ldapConfig);
+            } catch (GeneralSecurityException | UnknownHostException | LDAPException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        SearchResult srchRes = search(login, password, ldapConfig);
 
         if (srchRes == null || srchRes.getEntryCount() == 0) {
-            if (DEBUGLOG) System.out.printf("Finding '%s': no entry found!\n", sUserDN);
+            if (DEBUGLOG) System.out.printf("Finding '%s': no entry found!\n", login);
             return LDAP_AUTH_RNAUTH;
         }
         return LDAP_AUTH_ROK;
     }
 
-    public static SearchResult search(String sUserDN, String sUserPwd, String ldapConfigFilename) throws LDAPException {
-        Map<String, String> ldapConfig;
-        try {
-            ldapConfig = loadProp(ldapConfigFilename);
-        } catch (IOException e) {
-            System.out.println("Error: LDAPAuth.login: cannot load Property file!");
-            return null;
-        }
-
-        assert ldapConfig != null;
-        final boolean ldapS = Boolean.parseBoolean(ldapConfig.getOrDefault("ldapS", "false"));
-        final String ldapHost = ldapConfig.getOrDefault("ldapHost", "localhost");
-        final int ldapPort = Integer.parseInt(ldapConfig.getOrDefault("ldapPort", (ldapS ? "636" : "389")));
-        final String ldapBase = ldapConfig.getOrDefault("ldapBase", "dc=example,dc=com");
-        final String sLoginDN = ldapConfig.getOrDefault("sLoginDN", "cn=admin,dc=example,dc=com");
-        final String ldapFilter = ldapConfig.getOrDefault("ldapFilter", "(&(|(&(mail=${username})(idsC2Password=${password}))(&(idsC2Profile=${username})(idsC2Password=${password})))(&(idsC2=TRUE)(|(idsStatus=1)(|(idsStatus=0)(xidsStatus=\00)))))");
-        final String sPwd = ldapConfig.getOrDefault("pwd", "");
-        final String trustStorePath = ldapConfig.getOrDefault("trustStore", "");
-        final String additionalCipherSuites = ldapConfig.getOrDefault("additionalCipherSuites", "");
-        final boolean useEmbeddedServer = Boolean.parseBoolean(ldapConfig.getOrDefault("useEmbeddedServer", "false"));
-
-        if (useEmbeddedServer && EmbeddedLdapServer.server == null) {
-            try {
-                EmbeddedLdapServer.start(ldapConfigFilename);
-            } catch (GeneralSecurityException | UnknownHostException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
+    public static SearchResult search(String login, String password, LDAPConfig ldapConfig) throws LDAPException {
         Map<String, String> valuesMap = new HashMap<>();
-        valuesMap.put("username", sUserDN);
-        valuesMap.put("password", sUserPwd);
+        valuesMap.put("login", login);
+        valuesMap.put("password", password);
         StringSubstitutor sub = new StringSubstitutor(valuesMap);
-        String ldapFilterInstance = sub.replace(ldapFilter);
+        String searchFilterInstance = sub.replace(ldapConfig.searchFilter);
+
+        valuesMap.clear();
+        valuesMap.put("login", login);
+        sub = new StringSubstitutor(valuesMap);
+        String insensitiveSearchFilter = sub.replace(ldapConfig.searchFilter);
 
         if (DEBUGLOG) {
             //System.out.printf("LDAP Version      = %d.\n", LDAPConnection.LDAP_V3);
-            System.out.printf("LDAP Host & Port  = '%s':%d.\n", ldapHost, ldapPort);
-            System.out.printf("Login User = '%s'\n", sUserDN);
+            System.out.printf("LDAP Host & Port  = '%s':%d.\n", ldapConfig.host, ldapConfig.port);
+            System.out.printf("Login User = '%s'\n", login);
         }
 
         // LDAP Connection:
-        if (DEBUGLOG) System.out.println("LDAPS " + ldapS);
+        if (DEBUGLOG) System.out.println("LDAPS " + ldapConfig.useSSL);
 
         LDAPConnection lc;
 
-        if (ldapS) {
+        if (ldapConfig.useSSL) {
             try {
                 SSLUtil sslUtil;
-                if (trustStorePath != null && !trustStorePath.isEmpty()) {
-                    sslUtil = new SSLUtil(new TrustStoreTrustManager(trustStorePath));
+                if (ldapConfig.trustStorePath != null && !ldapConfig.trustStorePath.isEmpty()) {
+                    sslUtil = new SSLUtil(new TrustStoreTrustManager(ldapConfig.trustStorePath));
                 } else {
                     sslUtil = new SSLUtil(new TrustAllTrustManager());
                 }
-                if (additionalCipherSuites != null && !additionalCipherSuites.isEmpty()) {
-                    addSSLCipherSuites(additionalCipherSuites);
+                if (ldapConfig.additionalCipherSuites != null && !ldapConfig.additionalCipherSuites.isEmpty()) {
+                    addSSLCipherSuites(ldapConfig.additionalCipherSuites);
                 }
                 SSLSocketFactory socketFactory = sslUtil.createSSLSocketFactory();
                 lc = new LDAPConnection(socketFactory);
@@ -154,9 +137,9 @@ public class LdapAuth3 extends APIAuthentication {
             lc = new LDAPConnection();
         }
         try {
-            lc.connect(ldapHost, ldapPort);
-            if (DEBUGLOG && ldapS) System.out.println("LDAPS Connection = OK\n");
-            if (DEBUGLOG && !ldapS) System.out.println("LDAP Connection = OK\n");
+            lc.connect(ldapConfig.host, ldapConfig.port);
+            if (DEBUGLOG && ldapConfig.useSSL) System.out.println("LDAPS Connection = OK\n");
+            if (DEBUGLOG && !ldapConfig.useSSL) System.out.println("LDAP Connection = OK\n");
         } catch (LDAPException e) {
             String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
             System.err.printf("Error: login: Connecting to LDAP Server: failed: '%s'!\n", fullStackTrace);
@@ -169,8 +152,8 @@ public class LdapAuth3 extends APIAuthentication {
 
         try {
             // bind to server:
-            if (DEBUGLOG) System.out.printf("Binding with '%s' ...\n", sLoginDN);
-            lc.bind(sLoginDN, sPwd);
+            if (DEBUGLOG) System.out.printf("Binding with '%s' ...\n", ldapConfig.sLoginDN);
+            lc.bind(ldapConfig.sLoginDN, ldapConfig.sPwd);
             if (DEBUGLOG) System.out.print("Binding: OK.\n");
         } catch (LDAPException e) {
             System.err.printf("Error: login: Binding failed: '%s'!\n", e);
@@ -180,16 +163,16 @@ public class LdapAuth3 extends APIAuthentication {
 
         if (DEBUGLOG) System.out.printf("Debug: isConnected=%d\n", lc.isConnected() ? 1 : 0);
 
-        if (DEBUGLOG) System.out.printf("Finding user '%s'...\n", sUserDN);
+        if (DEBUGLOG) System.out.printf("Finding user '%s'...\n", login);
 
         SearchResult srchRes;
         try {
             // SCOPE_SUB = Scope Subtree.
-            if (DEBUGLOG) System.out.printf("Finding Filter: '%s'.\n", ldapFilterInstance);
+            if (DEBUGLOG) System.out.printf("Finding Filter: '%s'.\n", insensitiveSearchFilter);
 
-            srchRes = lc.search(ldapBase, SearchScope.SUB, ldapFilterInstance);
+            srchRes = lc.search(ldapConfig.searchBase, SearchScope.SUB, searchFilterInstance);
 
-            if (DEBUGLOG) System.out.printf("Finding '%s': %d entries.\n", sUserDN, srchRes.getEntryCount());
+            if (DEBUGLOG) System.out.printf("Finding '%s': %d entries.\n", login, srchRes.getEntryCount());
         } catch (LDAPSearchException e) {
             System.err.printf("Error: login: Search for User failed: '%s'!\n", e);
             ldapTerminate(lc);
@@ -197,7 +180,7 @@ public class LdapAuth3 extends APIAuthentication {
         }
 
         if (srchRes.getEntryCount() == 0) {
-            if (DEBUGLOG) System.out.printf("Finding '%s': no entry found!\n", sUserDN);
+            if (DEBUGLOG) System.out.printf("Finding '%s': no entry found!\n", login);
             return null;
         }
 
@@ -207,16 +190,10 @@ public class LdapAuth3 extends APIAuthentication {
 
     public static String getEmail(String sUserDN, String ldapConfigFilename) throws LDAPException {
         String sUserPwd = "*";
-        Map<String, String> ldapConfig;
-        try {
-            ldapConfig = loadProp(ldapConfigFilename);
-        } catch (IOException e) {
-            System.out.println("Error: LDAPAuth.login: cannot load Property file!");
-            return null;
-        }
-        final String emailAttribute = ldapConfig.getOrDefault("emailAttribute", "mail");
+        LDAPConfig ldapConfig = new LDAPConfig(ldapConfigFilename);
+        final String emailAttribute = ldapConfig.emailAttribute;
 
-        SearchResult searchResult = search(sUserDN, sUserPwd, ldapConfigFilename);
+        SearchResult searchResult = search(sUserDN, sUserPwd, ldapConfig);
 
         if (searchResult == null) {
             return null;

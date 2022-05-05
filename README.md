@@ -72,22 +72,22 @@ Set the location of the LDAP configuration file for Kustvakt full version. The f
 ldap.config = path-to-ldap-config
 ```
 
-To authenticate and authorize users, the ldap filter expression specified in `ldapFilter` is used. Note that within this expression all occurrences of the placeholders `${username}` and `${password}` are replaced with the name and password the user has entered for logging in.
+To authenticate and authorize users, the ldap filter expression specified in `searchFilter` is used. Note that within this expression all occurrences of the placeholders `${login}` and `${password}` are replaced with the name and password the user has entered for logging in.
 
 ###### Example ldap config file
 ```properties
-ldapHost=ldap.example.org
+host=ldap.example.org
 # use LDAP over SSL (LDAPS) if the server supports it
-ldapS=true
-ldapPort=636
+useSSL=true
+port=636
 # to trust all certs, leave trustStore empty
 trustStore=truststore.jks
 # add ssl cipher suites if required as csv, e.g. TLS_RSA_WITH_AES_256_GCM_SHA384
 additionalCipherSuites=
-ldapBase=dc=example,dc=org
+searchBase=dc=example,dc=org
 sLoginDN=cn=admin,dc=example,dc=org
 pwd=adminpassword
-ldapFilter=(&(&(uid=${username})(userPassword=${password}))(signedeula=TRUE))
+searchFilter=(&(&(uid=${login})(userPassword=${password}))(signedeula=TRUE))
 ```
 
 #### Using Kustvakt-full's embedded LDAP server
