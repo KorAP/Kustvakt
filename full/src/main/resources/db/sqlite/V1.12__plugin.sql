@@ -1,16 +1,3 @@
-ALTER TABLE oauth2_client 
-	ADD COLUMN registration_date TIMESTAMP;
-
--- default 365 days in seconds
-ALTER TABLE oauth2_client 
-	ADD COLUMN refresh_token_expiry INTEGER DEFAULT 31536000;
-	
-ALTER TABLE oauth2_client 
-	ADD COLUMN source BLOB DEFAULT NULL;
-
-ALTER TABLE oauth2_client 
-	ADD COLUMN is_permitted BOOLEAN DEFAULT FALSE;
-
 CREATE TABLE IF NOT EXISTS installed_plugin (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	installed_by VARCHAR(100) NOT NULL,
