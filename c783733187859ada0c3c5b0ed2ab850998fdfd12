@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04937da3_1b69bc43",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 28
+      },
+      "writtenOn": "2022-05-05T16:35:01Z",
+      "side": 1,
+      "message": "This login version seems to me oversimplyfied for the purpose of the IDS:\n\na) the filter does not allow for login with the IDS-wide account (account\u003duid for all IDS-services).\nb) in the 2 cases where a user logs in with a registered account which is locked (idsC2 \u003d\u003d false or idsStatus \u003e 1),\n   it would be nice to tell the user why he is rejected. Otherwise he will try to register once again.\n\nSeems to be an error in the filter:\n\nthe first expression should be: \u0026(mail\u003d${username})(userPassword\u003d${password})\n\nmeans: use account\u003dmail together with the ids-wide password.",
+      "revId": "c783733187859ada0c3c5b0ed2ab850998fdfd12",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
