@@ -138,4 +138,11 @@ public class LdapAuth3Test {
         assertEquals("peter@example.org", LdapAuth3.getEMailFromUid("testuser2", TEST_LDAPS_CONF));
         assertEquals(null, LdapAuth3.getEMailFromUid("non-exsting", TEST_LDAPS_CONF));
     }
+
+    @Test
+    public void canLoadLdapConfig() {
+        LDAPConfig ldapConfig = new LDAPConfig(TEST_LDAPS_CONF);
+        assertEquals(3269, ldapConfig.ldapPort);
+        assertEquals("localhost", ldapConfig.ldapHost);
+    }
 }
