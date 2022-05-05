@@ -34,6 +34,24 @@
       "parentUuid": "17892a77_7cf4f76e",
       "revId": "ed82417f65cfba051b8675d8a29f86a759b0999c",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "50404c54_9620795c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-05T09:56:47Z",
+      "side": 1,
+      "message": "But that can be done directly in the migration and would eventually be simpler, right?",
+      "parentUuid": "80339d27_6bbd2a81",
+      "revId": "ed82417f65cfba051b8675d8a29f86a759b0999c",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
