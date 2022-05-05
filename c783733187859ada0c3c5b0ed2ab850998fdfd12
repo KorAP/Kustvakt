@@ -34,6 +34,24 @@
       "parentUuid": "04937da3_1b69bc43",
       "revId": "c783733187859ada0c3c5b0ed2ab850998fdfd12",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f968d03_d2aef3bc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-05-05T18:02:58Z",
+      "side": 1,
+      "message": "The filter that is actually tested against more closely resembles ours:\n\nhttps://korap.ids-mannheim.de/gerrit/c/KorAP/Kustvakt/+/5687/13/full/src/test/resources/test-ldap.properties#6\n\nPlease provide a failing test that should pass. If you meant that one.",
+      "parentUuid": "a0c78f36_f3c0be1c",
+      "revId": "c783733187859ada0c3c5b0ed2ab850998fdfd12",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
