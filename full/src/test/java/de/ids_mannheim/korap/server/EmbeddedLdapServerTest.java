@@ -7,6 +7,9 @@ import de.ids_mannheim.korap.authentication.LdapAuth3;
 import org.junit.AfterClass;
 import org.junit.Test;
 
+import java.net.UnknownHostException;
+import java.security.GeneralSecurityException;
+
 import static de.ids_mannheim.korap.authentication.LdapAuth3.LDAP_AUTH_RNAUTH;
 import static de.ids_mannheim.korap.authentication.LdapAuth3.LDAP_AUTH_ROK;
 import static org.junit.Assert.assertEquals;
@@ -44,12 +47,14 @@ public class EmbeddedLdapServerTest {
     }
 
     @Test
-    public void gettingMailForUser() throws LDAPException {
+    public void gettingMailForUser() throws LDAPException, UnknownHostException, GeneralSecurityException {
+        EmbeddedLdapServer.startIfNotRunning(EMBEDDED_LDAP_DEFAULT_CONF);
         assertEquals("user2@example.com", LdapAuth3.getEmail("user2", EMBEDDED_LDAP_DEFAULT_CONF));
     }
 
     @Test
-    public void gettingMailForUnknownUserIsNull() throws LDAPException {
+    public void gettingMailForUnknownUserIsNull() throws LDAPException, UnknownHostException, GeneralSecurityException {
+        EmbeddedLdapServer.startIfNotRunning(EMBEDDED_LDAP_DEFAULT_CONF);
         assertEquals(null, LdapAuth3.getEmail("user1000", EMBEDDED_LDAP_DEFAULT_CONF));
     }
 }
