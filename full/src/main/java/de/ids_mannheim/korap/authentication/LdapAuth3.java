@@ -60,17 +60,19 @@ public class LdapAuth3 extends APIAuthentication {
 
         sUserDN = Filter.encodeValue(sUserDN);
         sUserPwd = Filter.encodeValue(sUserPwd);
+        LDAPConfig ldapConfig = new LDAPConfig(ldapConfigFilename);
 
-        SearchResult srchRes = search(sUserDN, sUserPwd, new LDAPConfig(ldapConfigFilename));
+        SearchResult srchRes = search(sUserDN, sUserPwd, ldapConfig, !ldapConfig.ldapFilter.contains("${password}"));
 
         if (srchRes == null || srchRes.getEntryCount() == 0) {
             if (DEBUGLOG) System.out.printf("Finding '%s': no entry found!\n", sUserDN);
             return LDAP_AUTH_RUNKNOWN;
         }
+
         return LDAP_AUTH_ROK;
     }
 
-    public static SearchResult search(String sUserDN, String sUserPwd, LDAPConfig ldapConfig) throws LDAPException {
+    public static SearchResult search(String sUserDN, String sUserPwd, LDAPConfig ldapConfig, boolean bindWithFoundDN) throws LDAPException {
         Map<String, String> valuesMap = new HashMap<>();
         valuesMap.put("username", sUserDN);
         valuesMap.put("password", sUserPwd);
@@ -147,14 +149,30 @@ public class LdapAuth3 extends APIAuthentication {
 
             if (DEBUGLOG) System.out.printf("Finding '%s': %d entries.\n", sUserDN, srchRes.getEntryCount());
         } catch (LDAPSearchException e) {
-            System.err.printf("Error: login: Search for User failed: '%s'!\n", e);
+            System.err.printf("Error: Search for User failed: '%s'!\n", e);
             ldapTerminate(lc);
             return null;
         }
 
-        if (srchRes.getEntryCount() == 0) {
+        if (srchRes == null || srchRes.getEntryCount() == 0) {
             if (DEBUGLOG) System.out.printf("Finding '%s': no entry found!\n", sUserDN);
+            ldapTerminate(lc);
             return null;
+        }
+
+        if (bindWithFoundDN) {
+            String matchedDN = srchRes.getSearchEntries().get(0).getDN();
+            if (DEBUGLOG) System.out.printf("Requested bind for found user %s' failed.\n", matchedDN);
+            try {
+                // bind to server:
+                if (DEBUGLOG) System.out.printf("Binding with '%s' ...\n", matchedDN);
+                lc.bind(matchedDN, sUserPwd);
+                if (DEBUGLOG) System.out.print("Binding: OK.\n");
+            } catch (LDAPException e) {
+                System.err.printf("Error: login: Binding failed: '%s'!\n", e);
+                ldapTerminate(lc);
+                return null;
+            }
         }
 
         ldapTerminate(lc);
@@ -166,7 +184,7 @@ public class LdapAuth3 extends APIAuthentication {
         LDAPConfig ldapConfig = new LDAPConfig(ldapConfigFilename);
         final String emailAttribute = ldapConfig.emailAttribute;
 
-        SearchResult searchResult = search(sUserDN, sUserPwd, ldapConfig);
+        SearchResult searchResult = search(sUserDN, sUserPwd, ldapConfig, false);
 
         if (searchResult == null) {
             return null;
@@ -249,8 +267,7 @@ public class LdapAuth3 extends APIAuthentication {
 
         private String getConfigOrThrow(Map<String, String> ldapConfig, String attribute) throws LdapConfigurationException {
             String value = ldapConfig.get(attribute);
-            if (value != null)
-                return value;
+            if (value != null) return value;
             else throw new LdapConfigurationException(attribute + " is not set");
         }
 
