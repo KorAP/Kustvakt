@@ -10,7 +10,7 @@
  - Handled redundant plugin installation
  - Handled super client id in plugin installation
  - Deprecated UserClientDto and uses ClientinfoDto instead
- 
+ - Updated redirect URI error message for coherence
  
 # version 0.67.1
 

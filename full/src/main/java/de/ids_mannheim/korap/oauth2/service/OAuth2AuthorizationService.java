@@ -129,7 +129,7 @@ public class OAuth2AuthorizationService {
         }
         else {
             throw new KustvaktException(StatusCodes.MISSING_REDIRECT_URI,
-                    "Redirect URI is required",
+                    "Missing parameter: redirect URI",
                     OAuth2Error.INVALID_REQUEST);
         }
 
