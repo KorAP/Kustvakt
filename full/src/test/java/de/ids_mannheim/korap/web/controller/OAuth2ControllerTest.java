@@ -123,7 +123,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
                 node.at("/error").asText());
-        assertEquals("Redirect URI is required",
+        assertEquals("Missing parameter: redirect URI",
                 node.at("/error_description").asText());
         assertEquals(state, node.at("/state").asText());
     }
@@ -236,7 +236,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         node = JsonUtils.readTree(response.getEntity(String.class));
         assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
                 node.at("/error").asText());
-        assertEquals("Redirect URI is required",
+        assertEquals("Missing parameter: redirect URI",
                 node.at("/error_description").asText());
         assertEquals(state, node.at("/state").asText());
     }

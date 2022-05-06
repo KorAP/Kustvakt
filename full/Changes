@@ -33,9 +33,10 @@
 2022-05-04
  - Added super client id to install plugin table 
  - Deprecated UserClientDto and uses ClientinfoDto instead
-2022-05-05 
+2022-05-05
  - Updated SQL scripts for migration
-
+2022-05-06
+ - Updated redirect URI error message for coherence.
  
 # version 0.65.2
 

@@ -39,7 +39,7 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
     @Autowired
     private OAuth2ClientService clientService;
 
-    /**e.description("Redirect URI is required");
+    /**
      * Authorization code request does not require client
      * authentication, but only checks if the client id exists.
      * 
@@ -181,7 +181,7 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
             }
             else {
                 return new KustvaktException(StatusCodes.MISSING_REDIRECT_URI,
-                        "Redirect URI is required", OAuth2Error.INVALID_REQUEST);
+                        "Missing parameter: redirect URI", OAuth2Error.INVALID_REQUEST);
             }
         }
 
