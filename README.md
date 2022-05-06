@@ -72,7 +72,9 @@ Set the location of the LDAP configuration file for Kustvakt full version. The f
 ldap.config = path-to-ldap-config
 ```
 
-To authenticate and authorize users, the ldap filter expression specified in `ldapFilter` is used. Note that within this expression all occurrences of the placeholders `${username}` and `${password}` are replaced with the name and password the user has entered for logging in.
+To find, authenticate and authorize users, the ldap filter expression specified in `ldapFilter` is used. Within this expression all occurrences of the placeholders `${username}` and `${password}` are replaced with the name and password the user has entered for logging in.
+
+If `ldapFilter` does not contain any occurrence of `${password}` the user DN found via the filter expression will be authenticated via a regular LDAP bind operation, using the entered password. In this case, depending on the LDAP server, also hashed passwords are supported.
 
 ###### Example ldap config file
 ```properties
@@ -102,6 +104,16 @@ ldifFile=path-to-users-directory.ldif
 
 Note that currently the embedded server ignores the `ldapHost` and `ldapS` settings, and only listens on the `localhost` interface. The `ldapPort` setting, on the other hand, is used.
 
+The embedded server currently supports the following password encodings:
+
+* clear passwords – prefix `{CLEAR}` or empty
+* hex – prefix `{HEX}`
+* base64 – prefix  `{BASE64}`
+* SHA1 – prefix `{SHA}`
+* SHA-256 – prefix `{SHA256}`
+
+Note that none of these are safe against brute force attacks.
+
 ###### Example users.ldif
 
 ```ldif
@@ -120,6 +132,12 @@ cn: user
 uid: user
 mail: user@example.com
 userPassword: cGFzc3dvcmQ=
+
+dn: uid=user3,ou=people,dc=example,dc=com
+cn: user3
+uid: user3
+mail: user3@example.com
+userPassword: {SHA}ERnP037iRzV+A0oI2ETuol9v0g8=
 ```
 
 ### Setting BasicAuthentication for Testing
