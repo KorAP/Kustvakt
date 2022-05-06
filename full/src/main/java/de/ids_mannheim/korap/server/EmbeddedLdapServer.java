@@ -1,9 +1,8 @@
 package de.ids_mannheim.korap.server;
 
-import com.unboundid.ldap.listener.InMemoryDirectoryServer;
-import com.unboundid.ldap.listener.InMemoryDirectoryServerConfig;
-import com.unboundid.ldap.listener.InMemoryListenerConfig;
+import com.unboundid.ldap.listener.*;
 import com.unboundid.ldap.sdk.LDAPException;
+import com.unboundid.util.CryptoHelper;
 import com.unboundid.util.ssl.SSLUtil;
 import com.unboundid.util.ssl.TrustAllTrustManager;
 
@@ -12,6 +11,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -34,6 +34,18 @@ public class EmbeddedLdapServer {
         final String ldif = ldapConfig.getOrDefault("ldifFile", "");
 
         InMemoryDirectoryServerConfig config = new InMemoryDirectoryServerConfig(ldapBase);
+        final MessageDigest sha1Digest = CryptoHelper.getMessageDigest("SHA1");
+        final MessageDigest sha256Digest = CryptoHelper.getMessageDigest("SHA-256");
+        config.setPasswordEncoders(
+                new ClearInMemoryPasswordEncoder("{CLEAR}", null),
+                new ClearInMemoryPasswordEncoder("{HEX}",
+                        HexPasswordEncoderOutputFormatter.getLowercaseInstance()),
+                new ClearInMemoryPasswordEncoder("{BASE64}",
+                        Base64PasswordEncoderOutputFormatter.getInstance()),
+                new UnsaltedMessageDigestInMemoryPasswordEncoder("{SHA}",
+                        Base64PasswordEncoderOutputFormatter.getInstance(), sha1Digest),
+                new UnsaltedMessageDigestInMemoryPasswordEncoder("{SHA256}",
+                        Base64PasswordEncoderOutputFormatter.getInstance(), sha256Digest));
         config.addAdditionalBindCredentials(sLoginDN, sPwd);
         config.setSchema(null);
 
