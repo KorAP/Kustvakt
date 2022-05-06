@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "efd950d6_391dbb6c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-05-06T09:58:50Z",
+      "side": 1,
+      "message": "Changes to redirect URI error response are implemented in https://korap.ids-mannheim.de/gerrit/c/KorAP/Kustvakt/+/5700",
+      "revId": "ffb895089f101a7ec5484052ca0253558f8feb6f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2c2cfcb5_e493a320",
@@ -38,6 +55,30 @@
       "side": 1,
       "message": "Do you mean about the redirect URI?\nIt is a bit different. Since redirect URI is not necessarily required in an authorization request, maybe the message would be misleading... but the other message isn\u0027t better either.\n\nI will update it in another commit since it is easier than rebasing all the following commits.",
       "parentUuid": "2c2cfcb5_e493a320",
+      "range": {
+        "startLine": 111,
+        "startChar": 21,
+        "endLine": 111,
+        "endChar": 52
+      },
+      "revId": "ffb895089f101a7ec5484052ca0253558f8feb6f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f593f5b_93502520",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/controller/OAuth2ControllerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-05-06T09:58:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "15c5033b_f07f2145",
       "range": {
         "startLine": 111,
         "startChar": 21,
