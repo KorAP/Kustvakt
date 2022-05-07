@@ -114,30 +114,21 @@ The embedded server currently supports the following password encodings:
 
 Note that none of these are safe against brute force attacks.
 
-###### Example users.ldif
+##### Try out the embedded LDAP server
 
-```ldif
-dn: dc=example,dc=com
-dc: example
-ou: people
-objectClass: dcObject
-objectClass: organizationalUnit
+You can try Kustvakt-full with embedded LDAP server using the  example configuration provided in [embedded-ldap-example.conf](full/src/main/resources/embedded-ldap-example.conf) and users defined in [example-users.ldif](full/src/main/resources/example-users.ldif) like this:
 
-dn: ou=people,dc=example,dc=com
-ou: people
-objectClass: organizationalUnit
+```bash
+cp src/main/resources/kustvakt.conf .
+java -jar target/Kustvakt-full-*.jar
+```
 
-dn: uid=user,ou=people,dc=example,dc=com
-cn: user
-uid: user
-mail: user@example.com
-userPassword: cGFzc3dvcmQ=
+The [example-users.ldif](full/src/main/resources/example-users.ldif) defines the following login:password combinations: user:password, user1:password1, …, user4:password4, with differently encoded passwords.
 
-dn: uid=user3,ou=people,dc=example,dc=com
-cn: user3
-uid: user3
-mail: user3@example.com
-userPassword: {SHA}ERnP037iRzV+A0oI2ETuol9v0g8=
+To try it out together with KorAP's web user interface [Kalamar](https://github.com/KorAP/Kalamar). Add `"Auth"` to the loaded plugins in `kalamar.conf`:
+
+```perl
+plugins => ["Auth"],
 ```
 
 ### Setting BasicAuthentication for Testing
