@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 public class EmbeddedLdapServerTest {
 
     public static final String TEST_EMBEDDED_LDAP_CONF = "src/test/resources/test-embedded-ldap.conf";
+    public static final String EMBEDDED_LDAP_EXAMPLE_CONF = "src/main/resources/embedded-ldap-example.conf";
 
     @AfterClass
     public static void shutdownEmbeddedLdapServer() {
@@ -86,5 +87,23 @@ public class EmbeddedLdapServerTest {
         assertEquals(null, LdapAuth3.getEMailFromUid("user1000", TEST_EMBEDDED_LDAP_CONF));
     }
 
+    @Test
+    public void embeddedLdapExampleConfWorks() throws LDAPException {
+        EmbeddedLdapServer.stop();
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("user", "password", EMBEDDED_LDAP_EXAMPLE_CONF));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("user@example.com", "password", EMBEDDED_LDAP_EXAMPLE_CONF));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("user1", "password1", EMBEDDED_LDAP_EXAMPLE_CONF));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("user1@example.com", "password1", EMBEDDED_LDAP_EXAMPLE_CONF));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("user2", "password2", EMBEDDED_LDAP_EXAMPLE_CONF));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("user2@example.com", "password2", EMBEDDED_LDAP_EXAMPLE_CONF));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("user3", "password3", EMBEDDED_LDAP_EXAMPLE_CONF));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("user3@example.com", "password3", EMBEDDED_LDAP_EXAMPLE_CONF));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("user4", "password4", EMBEDDED_LDAP_EXAMPLE_CONF));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("user4@example.com", "password4", EMBEDDED_LDAP_EXAMPLE_CONF));
 
+        assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("user", "wrong_password", EMBEDDED_LDAP_EXAMPLE_CONF));
+        assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("user1", "password2", EMBEDDED_LDAP_EXAMPLE_CONF));
+        assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("user1", "*", EMBEDDED_LDAP_EXAMPLE_CONF));
+
+    }
 }
