@@ -19,6 +19,8 @@ import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
+import static de.ids_mannheim.korap.server.EmbeddedLdapServer.stop;
+
 
 /**
  * LDAP Login
@@ -68,6 +70,7 @@ public class LdapAuth3 extends APIAuthentication {
         }
 
         SearchResult srchRes = search(sUserDN, sUserPwd, ldapConfig, !ldapConfig.ldapFilter.contains("${password}"));
+        stop();
 
         if (srchRes == null || srchRes.getEntryCount() == 0) {
             if (DEBUGLOG) System.out.printf("Finding '%s': no entry found!\n", sUserDN);

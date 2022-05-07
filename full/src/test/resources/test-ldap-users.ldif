@@ -15,10 +15,10 @@ givenName: Peter
 mail: testuser@example.com
 userPassword: cGFzc3dvcmQ=
 displayName: Dr. Peter Testuser
-idsC2: TRUE
-idsC2Profile: testuser
-idsC2Password: topsecret
-idsC2News: TRUE
+extra: TRUE
+extraProfile: testuser
+extraPassword: topsecret
+extraNews: TRUE
 title: Herr
 uid: testuser
 
@@ -29,10 +29,10 @@ givenName: Peter
 mail: test@example.com
 userPassword: top*ecret
 displayName: Dr. Peter Test
-idsC2: TRUE
+extra: TRUE
 idsStatus: 1
-idsC2Profile: test
-idsC2Password: top*ecret
+extraProfile: test
+extraPassword: top*ecret
 uid: test
 
 dn: uid=doe,ou=people,dc=example,dc=com
@@ -43,10 +43,10 @@ mail: doe@example.com
 userPassword: cGFzc3dvcmQ=
 displayName: Dr. John Doe
 idsStatus: 0
-idsC2: FALSE
-idsC2Profile: doe
-idsC2Password: topsecret
-idsC2News: TRUE
+extra: FALSE
+extraProfile: doe
+extraPassword: topsecret
+extraNews: TRUE
 title: Herr
 uid: doe
 
@@ -58,10 +58,10 @@ mail: berserker@example.com
 userPassword: cGFzc3dvcmQ=
 displayName: berserk
 idsStatus: 2
-idsC2: TRUE
-idsC2Profile: doe
-idsC2Password: topsecret
-idsC2News: TRUE
+extra: TRUE
+extraProfile: doe
+extraPassword: topsecret
+extraNews: TRUE
 title: Herr
 uid: berserk
 
@@ -73,9 +73,17 @@ mail: peter@example.org
 userPassword: cGFzc3dvcmQ=
 displayName: Dr. Peter Testuser
 idsStatus: 0
-idsC2: TRUE
-idsC2Profile: testuser2
-idsC2Password: topsecret
-idsC2News: TRUE
+extra: TRUE
+extraProfile: testuser2
+extraPassword: topsecret
+extraNews: TRUE
 title: Herr
 uid: testuser2
+
+dn: uid=uid,ou=people,dc=example,dc=com
+mail: mail@example.org
+userPassword: userPassword
+extra: TRUE
+extraProfile: extraProfile
+extraPassword: extraPassword
+uid: uid
