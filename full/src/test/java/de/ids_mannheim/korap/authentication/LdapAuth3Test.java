@@ -78,6 +78,16 @@ public class LdapAuth3Test {
     }
 
     @Test
+    public void testAllLoginPwCombinations() throws LDAPException {
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("uid", "userPassword", TEST_LDAP_CONF));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("uid", "extraPassword", TEST_LDAP_CONF));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("mail@example.org", "userPassword", TEST_LDAP_CONF));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("mail@example.org", "extraPassword", TEST_LDAP_CONF));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("extraProfile", "userPassword", TEST_LDAP_CONF));
+        assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("extraProfile", "extraPassword", TEST_LDAP_CONF));
+    }
+
+    @Test
     public void testFailingLoginWithWrongEmail() throws LDAPException {
         assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("notestuser@example.com", "topsecret", TEST_LDAP_CONF));
     }
