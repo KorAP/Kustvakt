@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "652e9583_29e5b51e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-05-08T13:57:49Z",
+      "side": 1,
+      "message": "@a) unused misleading default is removed, test for all login+pw combinations added in https://korap.ids-mannheim.de/gerrit/c/KorAP/Kustvakt/+/5706\n\n@b) comprise for now: new error message added that mentions the latter cause of failed login",
+      "revId": "e35a97a00ed81d3bdf6954f0813a414620c24fc2",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
