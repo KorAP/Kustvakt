@@ -76,7 +76,8 @@ To find, authenticate and authorize users, the ldap filter expression specified 
 
 If `searchFilter` does not contain any occurrence of `${password}` the user DN found via the filter expression will be authenticated via a regular LDAP bind operation, using the entered password. In this case, depending on the LDAP server, also hashed passwords are supported.
 
-###### Example ldap config file
+###### Example ldap.conf
+
 ```properties
 host=ldap.example.org
 # use LDAP over SSL (LDAPS) if the server supports it
@@ -87,57 +88,44 @@ trustStore=truststore.jks
 # add ssl cipher suites if required as csv, e.g. TLS_RSA_WITH_AES_256_GCM_SHA384
 additionalCipherSuites=
 searchBase=dc=example,dc=org
+# DN of a user with full read access
 sLoginDN=cn=admin,dc=example,dc=org
 pwd=adminpassword
-searchFilter=(&(&(uid=${login})(userPassword=${password}))(signedeula=TRUE))
+# search for user with uid or email matching login, and signed EULA
+searchFilter=(&(|(uid=${login})(mail=${login}))(signedeula=TRUE))
 ```
 
 #### Using Kustvakt-full's embedded LDAP server
 
-For smaller projects, you can also use Kustvakt-full's embedded in-memory LDAP server, that uses [UnboundID LDAP SDK ](http://www.unboundid.com/products/ldap-sdk/) for this purpose. In order to do so, the following additional settings are required in your `ldap.conf`:
+Instead of you own LDAP server, you can also use Kustvakt-full's embedded in-memory LDAP server which uses [UnboundID LDAP SDK](http://www.unboundid.com/products/ldap-sdk/) for this purpose. In order to do so, the following additional settings are required in your `ldap.conf`:
 
 ```properties
 useEmbeddedServer=true
 ldifFile=path-to-users-directory.ldif
-# ldapPort=1234
+# port=1234
 ```
 
-Note that currently the embedded server ignores the `ldapHost` and `ldapS` settings, and only listens on the `localhost` interface. The `ldapPort` setting, on the other hand, is used.
+Note that currently the embedded server ignores the `host` and `useSSL` settings, and only listens on the `localhost` interface. The `port` setting, on the other hand, is used.
 
-The embedded server currently supports the following password encodings:
-
-* clear passwords – prefix `{CLEAR}` or empty
-* hex – prefix `{HEX}`
-* base64 – prefix  `{BASE64}`
-* SHA1 – prefix `{SHA}`
-* SHA-256 – prefix `{SHA256}`
+The embedded server currently supports the following password encodings: clear passwords (prefix `{CLEAR}` or empty), `{HEX}`,  `{BASE64}`, `{SHA}`, `{SHA256}`.
 
 Note that none of these are safe against brute force attacks.
 
-###### Example users.ldif
+##### Try out the embedded LDAP server
 
-```ldif
-dn: dc=example,dc=com
-dc: example
-ou: people
-objectClass: dcObject
-objectClass: organizationalUnit
+You can try Kustvakt-full with embedded LDAP server using the  example configuration provided in [embedded-ldap-example.conf](./full/src/main/resources/embedded-ldap-example.conf) and users defined in [example-users.ldif](./full/src/main/resources/example-users.ldif) like this:
 
-dn: ou=people,dc=example,dc=com
-ou: people
-objectClass: organizationalUnit
+```bash
+cp src/main/resources/kustvakt.conf .
+java -jar target/Kustvakt-full-*.jar
+```
 
-dn: uid=user,ou=people,dc=example,dc=com
-cn: user
-uid: user
-mail: user@example.com
-userPassword: cGFzc3dvcmQ=
+The [example-users.ldif](./full/src/main/resources/example-users.ldif) defines the following login:password combinations: user:password, user1:password1, …, user4:password4, with differently encoded passwords.
 
-dn: uid=user3,ou=people,dc=example,dc=com
-cn: user3
-uid: user3
-mail: user3@example.com
-userPassword: {SHA}ERnP037iRzV+A0oI2ETuol9v0g8=
+To try it out together with KorAP's web user interface [Kalamar](https://github.com/KorAP/Kalamar). Add `"Auth"` to the loaded plugins in `kalamar.conf`:
+
+```perl
+plugins => ["Auth"],
 ```
 
 ### Setting BasicAuthentication for Testing
