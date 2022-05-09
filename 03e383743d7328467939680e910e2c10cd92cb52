@@ -16,6 +16,24 @@
       "message": "Are there limits regarding the accepted time frame?",
       "revId": "03e383743d7328467939680e910e2c10cd92cb52",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f50b6690_38346d05",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-05-09T07:18:02Z",
+      "side": 1,
+      "message": "good point. Not yet. Should we set 1 year as maximal?",
+      "parentUuid": "209ad99a_e6816fdb",
+      "revId": "03e383743d7328467939680e910e2c10cd92cb52",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
