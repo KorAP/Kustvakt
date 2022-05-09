@@ -76,6 +76,8 @@ To find, authenticate and authorize users, the ldap filter expression specified 
 
 If `searchFilter` does not contain any occurrence of `${password}` the user DN found via the filter expression will be authenticated via a regular LDAP bind operation, using the entered password. In this case, depending on the LDAP server, also hashed passwords are supported.
 
+Optionally, the two filters `authFilter` and `userNotBlockedFilter` can be specified, in addition. The first should be used to check whether a known user has also signed the necessary EULA, for example, and the second to check that the known user is not blocked. This will be reflected in the error messages for failed logins.
+
 ###### Example ldap.conf
 
 ```properties

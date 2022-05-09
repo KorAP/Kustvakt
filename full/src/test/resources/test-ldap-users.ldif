@@ -15,11 +15,9 @@ givenName: Peter
 mail: testuser@example.com
 userPassword: cGFzc3dvcmQ=
 displayName: Dr. Peter Testuser
-extra: TRUE
-extraProfile: testuser
-extraPassword: topsecret
-extraNews: TRUE
-title: Herr
+registered: TRUE
+extraProfile: testuser123
+extraPassword: password
 uid: testuser
 
 dn: uid=test,ou=people,dc=example,dc=com
@@ -29,41 +27,28 @@ givenName: Peter
 mail: test@example.com
 userPassword: top*ecret
 displayName: Dr. Peter Test
-extra: TRUE
-idsStatus: 1
+registered: TRUE
+userStatus: 1
 extraProfile: test
 extraPassword: top*ecret
 uid: test
 
-dn: uid=doe,ou=people,dc=example,dc=com
-cn: John Doe
-sn: doe
-givenName: John
-mail: doe@example.com
+dn: uid=not_registered_user,ou=people,dc=example,dc=com
+mail: not_registered_user@example.com
 userPassword: cGFzc3dvcmQ=
-displayName: Dr. John Doe
-idsStatus: 0
-extra: FALSE
-extraProfile: doe
+userStatus: 0
+registered: FALSE
+extraProfile: not_registered_user
 extraPassword: topsecret
-extraNews: TRUE
-title: Herr
-uid: doe
+uid: not_registered_user
 
-dn: uid=berserk,ou=people,dc=example,dc=com
-cn: Bernd Berserker
-sn: berserker
-givenName: Joe
-mail: berserker@example.com
+dn: uid=nameOfBlockedUser,ou=people,dc=example,dc=com
+mail: nameOfBlockedUser@example.com
 userPassword: cGFzc3dvcmQ=
-displayName: berserk
-idsStatus: 2
-extra: TRUE
-extraProfile: doe
+userStatus: 2
+registered: TRUE
 extraPassword: topsecret
-extraNews: TRUE
-title: Herr
-uid: berserk
+uid: nameOfBlockedUser
 
 dn: uid=testuser2,ou=people,dc=example,dc=com
 cn: Peter Testuser
@@ -72,8 +57,8 @@ givenName: Peter
 mail: peter@example.org
 userPassword: cGFzc3dvcmQ=
 displayName: Dr. Peter Testuser
-idsStatus: 0
-extra: TRUE
+userStatus: 0
+registered: TRUE
 extraProfile: testuser2
 extraPassword: topsecret
 extraNews: TRUE
@@ -83,7 +68,7 @@ uid: testuser2
 dn: uid=uid,ou=people,dc=example,dc=com
 mail: mail@example.org
 userPassword: userPassword
-extra: TRUE
+registered: TRUE
 extraProfile: extraProfile
 extraPassword: extraPassword
 uid: uid
