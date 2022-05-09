@@ -18,8 +18,6 @@ displayName: Dr. Peter Testuser
 extra: TRUE
 extraProfile: testuser
 extraPassword: topsecret
-extraNews: TRUE
-title: Herr
 uid: testuser
 
 dn: uid=test,ou=people,dc=example,dc=com
@@ -52,17 +50,13 @@ uid: doe
 
 dn: uid=berserk,ou=people,dc=example,dc=com
 cn: Bernd Berserker
-sn: berserker
 givenName: Joe
 mail: berserker@example.com
 userPassword: cGFzc3dvcmQ=
 displayName: berserk
 idsStatus: 2
 extra: TRUE
-extraProfile: doe
 extraPassword: topsecret
-extraNews: TRUE
-title: Herr
 uid: berserk
 
 dn: uid=testuser2,ou=people,dc=example,dc=com

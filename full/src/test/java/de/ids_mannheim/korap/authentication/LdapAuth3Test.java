@@ -16,8 +16,7 @@ import org.junit.Test;
 
 import java.security.GeneralSecurityException;
 
-import static de.ids_mannheim.korap.authentication.LdapAuth3.LDAP_AUTH_RNAUTH;
-import static de.ids_mannheim.korap.authentication.LdapAuth3.LDAP_AUTH_ROK;
+import static de.ids_mannheim.korap.authentication.LdapAuth3.*;
 import static org.junit.Assert.assertEquals;
 
 public class LdapAuth3Test {
@@ -89,27 +88,27 @@ public class LdapAuth3Test {
 
     @Test
     public void testFailingLoginWithWrongEmail() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("notestuser@example.com", "topsecret", TEST_LDAP_CONF));
+        assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("notestuser@example.com", "topsecret", TEST_LDAP_CONF));
     }
 
     @Test
     public void testFailingLoginWithEmailAndWrongPassword() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("testuser@example.com", "wrongpw", TEST_LDAP_CONF));
+        assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("testuser@example.com", "wrongpw", TEST_LDAP_CONF));
     }
 
     @Test
     public void testFailingLoginWithUsernameAndWrongPassword() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("testuser", "wrongpw", TEST_LDAP_CONF));
+        assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("testuser", "wrongpw", TEST_LDAP_CONF));
     }
 
     @Test
     public void testFailingLoginWithoutC2Attr() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("doe", "topsecret", TEST_LDAP_CONF));
+        assertEquals(LDAP_AUTH_RNOTREG, LdapAuth3.login("doe", "topsecret", TEST_LDAP_CONF));
     }
 
     @Test
     public void testFailingLoginWithoutBadStatus() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("berserker", "topsecret", TEST_LDAP_CONF));
+        assertEquals(LDAP_AUTH_RNOTREG, LdapAuth3.login("berserk", "topsecret", TEST_LDAP_CONF));
     }
 
     @Test
@@ -124,7 +123,7 @@ public class LdapAuth3Test {
 
     @Test
     public void testFailingSecureLoginWithTrustStoreAndUsernameAndWrongPW() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("testuser", "topsecrets", TEST_LDAPS_TS_CONF));
+        assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("testuser", "topsecrets", TEST_LDAPS_TS_CONF));
     }
 
     @Test
@@ -134,12 +133,12 @@ public class LdapAuth3Test {
 
     @Test
     public void testFailingEscapedPW() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("testuser", "top*", TEST_LDAPS_TS_CONF));
+        assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("testuser", "top*", TEST_LDAPS_TS_CONF));
     }
 
     @Test
     public void testFailingIllegalPW() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("testuser", "*", TEST_LDAPS_TS_CONF));
+        assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("testuser", "*", TEST_LDAPS_TS_CONF));
     }
 
     @Test

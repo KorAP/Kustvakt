@@ -14,8 +14,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 
-import static de.ids_mannheim.korap.authentication.LdapAuth3.LDAP_AUTH_RNAUTH;
 import static de.ids_mannheim.korap.authentication.LdapAuth3.LDAP_AUTH_ROK;
+import static de.ids_mannheim.korap.authentication.LdapAuth3.LDAP_AUTH_RUNKNOWN;
 import static org.junit.Assert.assertEquals;
 
 public class EmbeddedLdapServerTest {
@@ -49,7 +49,7 @@ public class EmbeddedLdapServerTest {
 
     @Test
     public void asteriskPasswordsFail() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("user1", "*", TEST_EMBEDDED_LDAP_CONF));
+        assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("user1", "*", TEST_EMBEDDED_LDAP_CONF));
     }
 
     @Test
@@ -66,12 +66,12 @@ public class EmbeddedLdapServerTest {
 
     @Test
     public void loginWithUnEncodedPBKDF2PasswordFails() throws LDAPException, NoSuchAlgorithmException, InvalidKeySpecException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("user5", "password5", TEST_EMBEDDED_LDAP_CONF));
+        assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("user5", "password5", TEST_EMBEDDED_LDAP_CONF));
     }
 
     @Test
     public void unauthorizedUsersAreNotAllowed() throws LDAPException {
-        assertEquals(LDAP_AUTH_RNAUTH, LdapAuth3.login("yuser", "password", TEST_EMBEDDED_LDAP_CONF));
+        assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("yuser", "password", TEST_EMBEDDED_LDAP_CONF));
     }
 
     @Test

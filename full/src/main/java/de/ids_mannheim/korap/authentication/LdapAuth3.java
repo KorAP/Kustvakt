@@ -6,6 +6,7 @@ package de.ids_mannheim.korap.authentication;
 
 import com.nimbusds.jose.JOSEException;
 import com.unboundid.ldap.sdk.*;
+import com.unboundid.util.NotNull;
 import com.unboundid.util.ssl.SSLUtil;
 import com.unboundid.util.ssl.TrustAllTrustManager;
 import com.unboundid.util.ssl.TrustStoreTrustManager;
@@ -31,14 +32,14 @@ public class LdapAuth3 extends APIAuthentication {
     public static final int LDAP_AUTH_ROK = 0;
     public static final int LDAP_AUTH_RCONNECT = 1; // cannot connect to LDAP Server
     public static final int LDAP_AUTH_RINTERR = 2; // internal error: cannot verify User+Pwd.
-    /* cannot be distinguished, currently
     public static final int LDAP_AUTH_RUNKNOWN = 3; // User Account or Pwd unknown;
+    /* cannot be distinguished, currently
     public static final int LDAP_AUTH_RLOCKED = 4; // User Account locked;
-    public static final int LDAP_AUTH_RNOTREG = 5; // User known, but has not registered to KorAP/C2 Service yet;
      */
+    public static final int LDAP_AUTH_RNOTREG = 5; // User known, but has not registered to KorAP/C2 Service yet;
     public static final int LDAP_AUTH_RNOEMAIL = 6; // cannot obtain email for sUserDN
     public static final int LDAP_AUTH_RNAUTH = 7; // User Account or Pwd unknown, or not authorized
-    final static Boolean DEBUGLOG = false;        // log debug output.
+    final static Boolean DEBUGLOG = true;        // log debug output.
 
     public LdapAuth3(FullConfiguration config) throws JOSEException {
         super(config);
@@ -52,14 +53,14 @@ public class LdapAuth3 extends APIAuthentication {
                 return "LDAP Authentication: connecting to LDAP Server failed!";
             case LDAP_AUTH_RINTERR:
                 return "LDAP Authentication failed due to an internal error!";
-/* cannot be distinguished, currently
             case LDAP_AUTH_RUNKNOWN:
                 return "LDAP Authentication failed due to unknown user or password!";
+/* cannot be distinguished, currently
             case LDAP_AUTH_RLOCKED:
                 return "LDAP Authentication: known user is locked!";
+*/
             case LDAP_AUTH_RNOTREG:
                 return "LDAP Authentication: known user has not registered yet!";
-*/
             case LDAP_AUTH_RNOEMAIL:
                 return "LDAP Authentication: known user, but cannot obtain email!";
             case LDAP_AUTH_RNAUTH:
@@ -83,16 +84,19 @@ public class LdapAuth3 extends APIAuthentication {
             }
         }
 
-        SearchResult srchRes = search(login, password, ldapConfig, !ldapConfig.searchFilter.contains("${password}"));
+        LdapAuth3Result ldapAuth3Result = search(login, password, ldapConfig, !ldapConfig.searchFilter.contains("${password}"));
+        SearchResult srchRes = ldapAuth3Result.getSearchResultValue();
 
-        if (srchRes == null || srchRes.getEntryCount() == 0) {
+        if (ldapAuth3Result.getErrorCode() != 0 || srchRes == null || srchRes.getEntryCount() == 0) {
             if (DEBUGLOG) System.out.printf("Finding '%s': no entry found!\n", login);
-            return LDAP_AUTH_RNAUTH;
+            return ldapAuth3Result.getErrorCode();
         }
 
         return LDAP_AUTH_ROK;
     }
-    public static SearchResult search(String login, String password, LDAPConfig ldapConfig, boolean bindWithFoundDN) throws LDAPException {
+
+    @NotNull
+    public static LdapAuth3Result search(String login, String password, LDAPConfig ldapConfig, boolean bindWithFoundDN) throws LDAPException {
         Map<String, String> valuesMap = new HashMap<>();
         valuesMap.put("login", login);
         valuesMap.put("password", password);
@@ -131,7 +135,7 @@ public class LdapAuth3 extends APIAuthentication {
             } catch (GeneralSecurityException e) {
                 System.err.printf("Error: login: Connecting to LDAPS Server: failed: '%s'!\n", e);
                 ldapTerminate(null);
-                return null;
+                return new LdapAuth3Result(null, LDAP_AUTH_RCONNECT);
             }
         } else {
             lc = new LDAPConnection();
@@ -144,7 +148,7 @@ public class LdapAuth3 extends APIAuthentication {
             String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
             System.err.printf("Error: login: Connecting to LDAP Server: failed: '%s'!\n", fullStackTrace);
             ldapTerminate(lc);
-            return null;
+            return new LdapAuth3Result(null, LDAP_AUTH_RCONNECT);
         }
 
 
@@ -158,31 +162,29 @@ public class LdapAuth3 extends APIAuthentication {
         } catch (LDAPException e) {
             System.err.printf("Error: login: Binding failed: '%s'!\n", e);
             ldapTerminate(lc);
-            return null;
+            return new LdapAuth3Result(null, LDAP_AUTH_RINTERR);
         }
 
         if (DEBUGLOG) System.out.printf("Debug: isConnected=%d\n", lc.isConnected() ? 1 : 0);
 
         if (DEBUGLOG) System.out.printf("Finding user '%s'...\n", login);
 
-        SearchResult srchRes;
+        SearchResult srchRes = null;
         try {
             // SCOPE_SUB = Scope Subtree.
-            if (DEBUGLOG) System.out.printf("Finding Filter: '%s'.\n", insensitiveSearchFilter);
+            if (DEBUGLOG) System.out.printf("Searching with searchFilter: '%s'.\n", insensitiveSearchFilter);
 
             srchRes = lc.search(ldapConfig.searchBase, SearchScope.SUB, searchFilterInstance);
 
-            if (DEBUGLOG) System.out.printf("Finding '%s': %d entries.\n", login, srchRes.getEntryCount());
+            if (DEBUGLOG) System.out.printf("Found '%s': %d entries.\n", login, srchRes.getEntryCount());
         } catch (LDAPSearchException e) {
             System.err.printf("Error: Search for User failed: '%s'!\n", e);
-            ldapTerminate(lc);
-            return null;
         }
 
         if (srchRes == null || srchRes.getEntryCount() == 0) {
             if (DEBUGLOG) System.out.printf("Finding '%s': no entry found!\n", login);
             ldapTerminate(lc);
-            return null;
+            return new LdapAuth3Result(null, LDAP_AUTH_RUNKNOWN);
         }
 
         if (bindWithFoundDN) {
@@ -191,17 +193,40 @@ public class LdapAuth3 extends APIAuthentication {
             try {
                 // bind to server:
                 if (DEBUGLOG) System.out.printf("Binding with '%s' ...\n", matchedDN);
-                lc.bind(matchedDN, password);
+                BindResult bindResult = lc.bind(matchedDN, password);
                 if (DEBUGLOG) System.out.print("Binding: OK.\n");
+                if (!bindResult.getResultCode().equals(ResultCode.SUCCESS)) {
+                    ldapTerminate(lc);
+                    return new LdapAuth3Result(null, LDAP_AUTH_RUNKNOWN);
+                }
             } catch (LDAPException e) {
                 System.err.printf("Error: login: Binding failed: '%s'!\n", e);
                 ldapTerminate(lc);
-                return null;
+                return new LdapAuth3Result(null, LDAP_AUTH_RUNKNOWN);
+            }
+        }
+
+        if (ldapConfig.authFilter != null && !ldapConfig.authFilter.isEmpty()) {
+            srchRes = null;
+            try {
+                searchFilterInstance = "(&" + searchFilterInstance + ldapConfig.authFilter + ")";
+                insensitiveSearchFilter = "(&" + insensitiveSearchFilter + ldapConfig.authFilter + ")";
+                if (DEBUGLOG) System.out.printf("Searching with authFilter: '%s'.\n", insensitiveSearchFilter);
+
+                srchRes = lc.search(ldapConfig.searchBase, SearchScope.SUB, searchFilterInstance);
+
+                if (DEBUGLOG) System.out.printf("Found '%s': %d entries.\n", login, srchRes.getEntryCount());
+            } catch (LDAPSearchException e) {
+                System.err.printf("Error: Search for User failed: '%s'!\n", e);
+            }
+            if (srchRes == null || srchRes.getEntryCount() == 0) {
+                ldapTerminate(lc);
+                return new LdapAuth3Result(null, LDAP_AUTH_RNOTREG);
             }
         }
 
         ldapTerminate(lc);
-        return srchRes;
+        return new LdapAuth3Result(srchRes, LDAP_AUTH_ROK);
     }
 
     public static String getEmail(String sUserDN, String ldapConfigFilename) throws LDAPException {
@@ -209,7 +234,7 @@ public class LdapAuth3 extends APIAuthentication {
         LDAPConfig ldapConfig = new LDAPConfig(ldapConfigFilename);
         final String emailAttribute = ldapConfig.emailAttribute;
 
-        SearchResult searchResult = search(sUserDN, sUserPwd, ldapConfig, false);
+        SearchResult searchResult = search(sUserDN, sUserPwd, ldapConfig, false).getSearchResultValue();
 
         if (searchResult == null) {
             return null;
@@ -246,4 +271,26 @@ public class LdapAuth3 extends APIAuthentication {
         return TokenType.API;
     }
 
+    public static class LdapAuth3Result {
+        int errorCode;
+        Object value;
+
+
+        public LdapAuth3Result(Object value, int errorCode) {
+            this.errorCode = errorCode;
+            this.value = value;
+        }
+
+        public int getErrorCode() {
+            return errorCode;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public SearchResult getSearchResultValue() {
+            return (SearchResult) value;
+        }
+    }
 }

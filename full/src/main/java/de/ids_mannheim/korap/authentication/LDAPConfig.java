@@ -19,6 +19,7 @@ public class LDAPConfig {
     public final boolean useEmbeddedServer;
     public final String emailAttribute;
     public final String ldif;
+    public final String authFilter;
 
     public LDAPConfig(String ldapConfigFilename) throws LdapConfigurationException {
         Map<String, String> ldapConfig = null;
@@ -34,14 +35,13 @@ public class LDAPConfig {
         searchBase = getConfigOrThrow(ldapConfig, "searchBase");
         sLoginDN = getConfigOrThrow(ldapConfig, "sLoginDN");
         searchFilter = getConfigOrThrow(ldapConfig, "searchFilter");
+        authFilter = ldapConfig.getOrDefault("authFilter", null);
         sPwd = ldapConfig.getOrDefault("pwd", "");
         trustStorePath = ldapConfig.getOrDefault("trustStore", "");
         additionalCipherSuites = ldapConfig.getOrDefault("additionalCipherSuites", "");
         useEmbeddedServer = Boolean.parseBoolean(ldapConfig.getOrDefault("useEmbeddedServer", "false"));
         emailAttribute = ldapConfig.getOrDefault("emailAttribute", "mail");
         ldif = ldapConfig.getOrDefault("ldifFile", null);
-
-
     }
 
     static HashMap<String, String> typeCastConvert(Properties prop) {
