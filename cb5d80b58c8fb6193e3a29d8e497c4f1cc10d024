@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b51d6d44_fd9db356",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-10T15:34:45Z",
+      "side": 1,
+      "message": "I would expect the migration in a different version.",
+      "revId": "cb5d80b58c8fb6193e3a29d8e497c4f1cc10d024",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c53224d_23baf5bb",
+        "filename": "full/src/main/resources/db/sqlite/V1.11__plugin.sql",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-10T15:34:45Z",
+      "side": 1,
+      "message": "Is that usefull? I thought the super client would be just more informative.",
+      "range": {
+        "startLine": 23,
+        "startChar": 1,
+        "endLine": 25,
+        "endChar": 21
+      },
+      "revId": "cb5d80b58c8fb6193e3a29d8e497c4f1cc10d024",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
