@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94a3b808_fccd4dfa",
+        "filename": "full/src/main/resources/db/test/V3.5__insert_oauth2_clients.sql",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-10T15:17:34Z",
+      "side": 1,
+      "message": "The use of period symbols is not coherent.",
+      "range": {
+        "startLine": 32,
+        "startChar": 46,
+        "endLine": 32,
+        "endChar": 60
+      },
+      "revId": "137e34f55c0281da6ac9611d14c17412b548ffb7",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80909ba9_3d93a0de",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/controller/OAuth2PluginTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-10T15:17:34Z",
+      "side": 1,
+      "message": "This should be removed.",
+      "range": {
+        "startLine": 202,
+        "startChar": 8,
+        "endLine": 202,
+        "endChar": 50
+      },
+      "revId": "137e34f55c0281da6ac9611d14c17412b548ffb7",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
