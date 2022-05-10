@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a537fff5_8e72417a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-10T14:38:14Z",
+      "side": 1,
+      "message": "[ERROR] Failures: \n[ERROR]   OAuth2ControllerTest.testAuthorizeInvalidResponseType:239 expected:\u003c[Missing parameter: redirect URI]\u003e but was:\u003c[Redirect URI is required]\u003e\n",
+      "revId": "72aa729c9408f30ba6acef133c8e8d6780548f4e",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
