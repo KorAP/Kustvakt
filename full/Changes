@@ -16,8 +16,21 @@
  - Updated authorization error response. (Included error and error 
    description in the client redirect URI except for missing or 
    invalid client id or redirect URI.
+2022-05-08
+ - Commonize & simplify LDAP and LDAPS auth (kupietz)
+ - Automatically start embedded LDAP server if configured (kupietz)
+ - Allow configuring additional ssl cipher suites for ldaps connections (kupietz)
+ - Rename ldap .properties to .conf (kupietz)
+ - Bring back function to get email attribute for/from user ID (kupietz)
+ - LdapAuth3: factor out configuration class (kupietz)
+ - Embedded LDAP server LdapAuth3: support hashed passwords (sha1, sha-256)
+ - Embedded LDAP server: Improve README.md and examples (kupietz)
+ - LdapAuth3: Test all combinations of 3 alternative login names and 2 pws (kupietz)
+2022-05-09 
+ - Re-introduce additional filters for authorisation and user status (kupietz)
+2022-05-11
+ - Changed the SQL script updating oauth2_client table
  
-
 # version 0.65.2
 
 2022-03-03
