@@ -1,3 +1,8 @@
+# version 0.67
+
+2022-05-09
+ - LDAP authentication and authorization is now configurable and supports SSL (LDAPS) connections.
+ - An embedded LDAP server can now be started automatically if configured accordingly.
 2022-05-11
  - Changed the SQL script updating oauth2_client table
 
