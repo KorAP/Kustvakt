@@ -88,6 +88,24 @@
       "parentUuid": "502ac6e3_f17a3dc5",
       "revId": "c783733187859ada0c3c5b0ed2ab850998fdfd12",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f70f443d_42247f64",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 28
+      },
+      "writtenOn": "2022-05-11T10:35:37Z",
+      "side": 1,
+      "message": "I looked at rev. 5711 and found the handling with the additional filters OK.",
+      "parentUuid": "5aeacfd7_95f75e31",
+      "revId": "c783733187859ada0c3c5b0ed2ab850998fdfd12",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
