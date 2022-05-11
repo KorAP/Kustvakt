@@ -145,7 +145,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
                 "unknown-client-id", "", "", "", userAuthHeader);
 //        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         String entity = response.getEntity(String.class);
-        System.out.println(entity);
+//        System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals("Unknown client with unknown-client-id.",
                 node.at("/error_description").asText());
