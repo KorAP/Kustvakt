@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86425b56_d6a542ac",
+        "filename": "full/src/main/resources/korap-users.ldif",
+        "patchSetId": 12
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-11T08:27:11Z",
+      "side": 1,
+      "message": "Shouldn\u0027t `full/src/main/resources/korap-users.ldif` be in `test/ressources`?",
+      "range": {
+        "startLine": 1,
+        "startChar": 7,
+        "endLine": 1,
+        "endChar": 14
+      },
+      "revId": "5d6bfc298a88b9d7b125f8e40fb6c23569dd12a3",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
