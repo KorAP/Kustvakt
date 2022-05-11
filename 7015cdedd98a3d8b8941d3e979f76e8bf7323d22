@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c607b83_8260f6ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-11T08:55:11Z",
+      "side": 1,
+      "message": "Fails for me:\n\n[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.10.1:testCompile (default-testCompile) on project Kustvakt-full: Compilation failure: Compilation failure: \n[ERROR] /home/ndiewald/Repositories/korap-git/Kustvakt/full/src/test/java/de/ids_mannheim/korap/server/EmbeddedLdapServerTest.java:[11,1] cannot find symbol\n[ERROR]   symbol:   static LDAP_AUTH_RUNKNOWN\n[ERROR]   location: class\n[ERROR] /home/ndiewald/Repositories/korap-git/Kustvakt/full/src/test/java/de/ids_mannheim/korap/server/EmbeddedLdapServerTest.java:[36,22] cannot find symbol\n[ERROR]   symbol:   variable LDAP_AUTH_RUNKNOWN\n[ERROR]   location: class de.ids_mannheim.korap.server.EmbeddedLdapServerTest\n[ERROR] /home/ndiewald/Repositories/korap-git/Kustvakt/full/src/test/java/de/ids_mannheim/korap/server/EmbeddedLdapServerTest.java:[41,22] cannot find symbol\n[ERROR]   symbol:   variable LDAP_AUTH_RUNKNOWN\n[ERROR]   location: class de.ids_mannheim.korap.server.EmbeddedLdapServerTest\n[ERROR] -\u003e [Help 1]\n[ERROR] \n[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.\n[ERROR] Re-run Maven using the -X switch to enable full debug logging.\n[ERROR] \n[ERROR] For more information about the errors and possible solutions, please read the following articles:\n[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException\n",
+      "revId": "7015cdedd98a3d8b8941d3e979f76e8bf7323d22",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
