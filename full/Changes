@@ -1,3 +1,6 @@
+2022-05-11
+ - Changed the SQL script updating oauth2_client table
+
 # version 0.66
 
 2022-03-31
@@ -16,7 +19,6 @@
  - Updated authorization error response. (Included error and error 
    description in the client redirect URI except for missing or 
    invalid client id or redirect URI.
- 
 
 # version 0.65.2
 

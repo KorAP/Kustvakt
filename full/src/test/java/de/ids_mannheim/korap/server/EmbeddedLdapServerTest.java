@@ -60,7 +60,7 @@ public class EmbeddedLdapServerTest {
         byte[] hash = f.generateSecret(spec).getEncoded();
 
         final String pbkdf2sha256Password = "{PBKDF2-SHA256}" + Base64.encode(hash);
-        System.out.println(pbkdf2sha256Password);
+//        System.out.println(pbkdf2sha256Password);
         assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("user5", pbkdf2sha256Password, TEST_EMBEDDED_LDAP_CONF));
     }
 
