@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "051a14b7_38cd6b15",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-11T10:42:13Z",
+      "side": 1,
+      "message": "I really don\u0027t understand how you deal with flyway. Changing existing version pints should constantly break updating existing databases.",
+      "revId": "729ce6452ee4c90db46b32d4ee6595c2b3c10b4b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
