@@ -53,7 +53,7 @@ public class LdapAuth3Test {
     }
 
     @AfterClass
-    public static void ShutDownDirectoryServer() {
+    public static void shutDownDirectoryServer() {
         server.shutDown(true);
     }
 

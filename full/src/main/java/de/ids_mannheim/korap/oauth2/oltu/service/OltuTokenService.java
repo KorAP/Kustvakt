@@ -21,7 +21,11 @@ import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.unboundid.ldap.sdk.LDAPException;
+
+import de.ids_mannheim.korap.authentication.LdapAuth3;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.constant.AuthenticationMethod;
 import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -262,6 +266,18 @@ public class OltuTokenService extends OAuth2TokenService {
 
         Set<AccessScope> accessScopes =
                 scopeService.convertToAccessScope(scopes);
+        
+        if (config.getOAuth2passwordAuthentication()
+                .equals(AuthenticationMethod.LDAP)) {
+            try {
+                username = LdapAuth3.getEmail(username, config.getLdapConfig());
+            }
+            catch (LDAPException e) {
+                throw new KustvaktException(StatusCodes.LDAP_BASE_ERRCODE,
+                        e.getExceptionMessage());
+            }
+        }
+        
         return createsAccessTokenResponse(scopes, accessScopes, clientId,
                 username, authenticationTime,
                 false);

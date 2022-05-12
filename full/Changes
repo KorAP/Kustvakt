@@ -30,6 +30,8 @@
  - Re-introduce additional filters for authorisation and user status (kupietz)
 2022-05-11
  - Changed the SQL script updating oauth2_client table
+2022-05-12
+ - Implemented mapping of LDAP username to email .
  
 # version 0.65.2
 
