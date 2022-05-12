@@ -50,7 +50,7 @@ public class OAuth2AuthorizationRequest extends OAuthAuthzRequest {
         // validators.put(ResponseType.TOKEN.toString(),
         // TokenValidator.class);
         final String requestTypeValue = getParam(OAuth.OAUTH_RESPONSE_TYPE);
-        if (!requestTypeValue.isEmpty()) {
+        if (requestTypeValue!=null && !requestTypeValue.isEmpty()) {
             if (requestTypeValue.equals(ResponseType.CODE.toString())) {
                 
             }
@@ -63,6 +63,11 @@ public class OAuth2AuthorizationRequest extends OAuthAuthzRequest {
                 throw OAuthUtils.handleOAuthProblemException(
                         "Invalid response_type parameter value");
             }
+        }
+        else {
+            throw OAuthProblemException
+                    .error(OAuthError.TokenResponse.INVALID_REQUEST)
+                    .description("Missing parameters: response_type");
         }
         
         return OAuthUtils.instantiateClass(validators.get("code"));
