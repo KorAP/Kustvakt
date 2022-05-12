@@ -16,6 +16,24 @@
       "message": "I really don\u0027t understand how you deal with flyway. Changing existing version pints should constantly break updating existing databases.",
       "revId": "729ce6452ee4c90db46b32d4ee6595c2b3c10b4b",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67d47633_98ae2773",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-05-12T09:59:36Z",
+      "side": 1,
+      "message": "Yes, but the main database still has the version before it was changed. I think it is fine to still change the scripts as long as it doesn\u0027t crash the main database. It is just easier that way....",
+      "parentUuid": "051a14b7_38cd6b15",
+      "revId": "729ce6452ee4c90db46b32d4ee6595c2b3c10b4b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
