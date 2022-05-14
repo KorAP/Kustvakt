@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d26487ec_38ee60fd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-05-14T14:09:16Z",
+      "side": 1,
+      "message": "To check tests for each change individually and automatically, e.g.:\n\ngit rebase -i -x \"mvn -f full/pom.xml test -Dtest\u003dEmbeddedLdapServerTest,LdapAuth3Test\" 9d59959a^",
+      "revId": "9d59959ae999536f94895dc398bb827040027bf4",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
