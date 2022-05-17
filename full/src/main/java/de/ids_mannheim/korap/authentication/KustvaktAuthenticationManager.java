@@ -438,9 +438,9 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		User unknown = null;
 		// just to make sure that the plain password does not appear anywhere in
 		// the logs!
-
-		System.out.printf("Debug: authenticateIdM: entering for '%s'...\n", username);
-
+		if (DEBUG){
+            jlog.debug("Debug: authenticateIdM: entering for '%s'...\n", username);
+		}
 		/**
 		 * wozu Apache Validatoren für User/Passwort für IdM/LDAP? siehe
 		 * validation.properties. Abgeschaltet 21.04.17/FB try {
