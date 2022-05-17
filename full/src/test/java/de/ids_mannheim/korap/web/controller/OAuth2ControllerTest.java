@@ -128,7 +128,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     }
 
     @Test
-    public void testAuthorizeMissingResponseType () throws KustvaktException {
+    public void testAuthorizeMissingResponseType() throws KustvaktException {
         ClientResponse response = requestAuthorizationCode("",
                 confidentialClientId, "", "", "", userAuthHeader);
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
@@ -137,6 +137,22 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals("https://third.party.com/confidential/redirect?"
                 + "error_description=Missing+parameters%3A+response_type&"
                 + "error=invalid_request", response.getLocation().toString());
+    }
+    
+    @Test
+    public void testAuthorizeMissingResponseTypeWithoutClientId () throws KustvaktException {
+        ClientResponse response = requestAuthorizationCode("",
+                "", "", "", "", userAuthHeader);
+        
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
+                response.getStatus());
+        String entity = response.getEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        
+        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
+                node.at("/error").asText());
+        assertEquals("Missing parameters: response_type client_id",
+                node.at("/error_description").asText());
     }
 
     @Test
