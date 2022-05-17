@@ -50,7 +50,7 @@ public class OAuth2AuthorizationRequest extends OAuthAuthzRequest {
         // validators.put(ResponseType.TOKEN.toString(),
         // TokenValidator.class);
         final String requestTypeValue = getParam(OAuth.OAUTH_RESPONSE_TYPE);
-        if (!requestTypeValue.isEmpty()) {
+        if (requestTypeValue!=null && !requestTypeValue.isEmpty()) {
             if (requestTypeValue.equals(ResponseType.CODE.toString())) {
                 
             }

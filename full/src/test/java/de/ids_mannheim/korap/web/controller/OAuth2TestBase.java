@@ -20,6 +20,7 @@ import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
@@ -68,13 +69,26 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
             String clientId, String redirectUri, String scope, String state,
             String authHeader) throws KustvaktException {
 
-        return resource().path(API_VERSION).path("oauth2").path("authorize")
-                .queryParam("response_type", responseType)
-                .queryParam("client_id", clientId)
-                .queryParam("redirect_uri", redirectUri)
-                .queryParam("scope", scope)
-                .queryParam("state", state)
-                .header(Attributes.AUTHORIZATION, authHeader)
+        WebResource request =
+                resource().path(API_VERSION).path("oauth2").path("authorize");
+        
+        if (!responseType.isEmpty()) {
+            request = request.queryParam("response_type", responseType);
+        }
+        if (!clientId.isEmpty()) {
+            request = request.queryParam("client_id", clientId);
+        }
+        if (!redirectUri.isEmpty()) {
+            request = request.queryParam("redirect_uri", redirectUri);
+        }
+        if (!scope.isEmpty()) {
+            request = request.queryParam("scope", scope);
+        }
+        if (!state.isEmpty()) {
+            request = request.queryParam("state", state);
+        }
+        
+        return request.header(Attributes.AUTHORIZATION, authHeader)
                 .get(ClientResponse.class);
     }
 
