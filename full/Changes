@@ -7,6 +7,7 @@
  - Changed the SQL script updating oauth2_client table
  2022-05-12
  - Implemented mapping of LDAP username to email
+ - Handled null parameters in authorization requests
   
 
 # version 0.66
