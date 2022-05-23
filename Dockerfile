@@ -44,6 +44,26 @@ RUN cd lite && \
 RUN sed 's!\(krill\.indexDir\s*=\).\+!\1\/kustvakt\/index!' lite/src/main/resources/kustvakt-lite.conf \
     > built/kustvakt-lite.conf
 
+# Package full
+RUN cd full && \
+    mvn clean package && \
+    find target/Kustvakt-full-*.jar -exec mv {} ../built/Kustvakt-full.jar ';'
+
+RUN cat full/src/main/resources/kustvakt.conf | \
+    sed 's!\(krill\.indexDir\s*=\).\+!\1\/kustvakt\/index!' | \
+    sed 's!\(ldap\.config\s*=\).\+!\1\/kustvakt\/ldap\/ldap\.conf!' | \
+    sed 's!\(oauth2\.initial\.super\.client\s*=\).\+!\1\/true!' | \
+    sed '$ a oauth2.initial.super.client = true' \
+    > built/kustvakt.conf
+
+RUN sed  's!\(ldifFile\s*=\).\+!\1\/kustvakt\/ldap\/ldap.ldif!' \
+    full/src/main/resources/embedded-ldap-example.conf \
+    > built/ldap.conf
+
+RUN cat full/src/main/resources/example-users.ldif \
+    > built/ldap.ldif
+
+# Cleanup
 RUN rm -r core && \
     rm -r full && \
     rm -r lite && \
@@ -54,7 +74,7 @@ RUN apk del git \
 
 RUN cd ${M2_HOME} && rm -r .m2
 
-FROM openjdk:8-alpine
+FROM openjdk:8-alpine AS kustvakt-lite
 
 RUN addgroup -S korap && \
     adduser -S kustvakt -G korap && \
@@ -63,7 +83,7 @@ RUN addgroup -S korap && \
 
 WORKDIR /kustvakt
 
-COPY --from=builder /kustvakt/built/* /kustvakt/
+COPY --from=builder /kustvakt/built/Kustvakt-lite.* /kustvakt/
 
 USER kustvakt
 
@@ -73,6 +93,29 @@ ENTRYPOINT [ "java", "-jar" ]
 
 CMD [ "Kustvakt-lite.jar" ]
 
-# TODO:
-#   - support lite build
-#   - support full build
+
+FROM openjdk:8-alpine AS kustvakt-full
+
+RUN addgroup -S korap && \
+    adduser -S kustvakt -G korap && \
+    mkdir kustvakt && \
+    chown -R kustvakt.korap /kustvakt
+
+WORKDIR /kustvakt
+
+RUN mkdir ./ldap
+
+COPY --from=builder /kustvakt/built/Kustvakt-full.jar /kustvakt/
+COPY --from=builder /kustvakt/built/kustvakt.conf /kustvakt/
+COPY --from=builder /kustvakt/built/ldap.* /kustvakt/ldap/
+
+USER kustvakt
+
+EXPOSE 8089
+
+ENTRYPOINT [ "java", "-jar" ]
+
+CMD [ "Kustvakt-full.jar" ]
+
+# docker build -f Dockerfile -t korap/kustvakt:{nr}-full --target kustvakt-full .
+# docker build -f Dockerfile -t korap/kustvakt:{nr} --target kustvakt-lite .
