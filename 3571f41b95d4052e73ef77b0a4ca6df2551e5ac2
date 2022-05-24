@@ -16,6 +16,24 @@
       "message": "To build Kustvakt-full:\n\n$ docker build -f Dockerfile -t korap/kustvakt:0.67-full --target kustvakt-full .\n\nTo run Kustvakt-full:\n\n$ docker run --rm --name kustvakt --net host -v sample-index:/kustvakt/index korap/kustvakt:0.67-full\n\nTo run Kalamar with authentication, write a config file `kalamar.production.conf`:\n\n{\n  Kalamar \u003d\u003e {\n    api_path \u003d\u003e \u0027http://localhost:8089/api/\u0027,\n    plugins \u003d\u003e [\u0027Auth\u0027]\n  }\n}\n\nAnd run this mounted:\n\n$ docker run --rm --name kalamar --net host --mount type\u003dbind,readonly\u003dtrue,source\u003d\"${PWD}/kalamar.production.conf\",target\u003d/kalamar/kalamar.production.conf korap/kalamar\n\nIt\u0027s now possible to log in using the example ldap server. Unfortunately it isn\u0027t possible to search as no client_id or client_secret is defined. Eliza?",
       "revId": "3571f41b95d4052e73ef77b0a4ca6df2551e5ac2",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c9dfefd_95993d20",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-05-24T07:27:48Z",
+      "side": 1,
+      "message": "yes, when a new empty database is produced then a super-client should at least be registered first.",
+      "parentUuid": "a6a1948b_809975a5",
+      "revId": "3571f41b95d4052e73ef77b0a4ca6df2551e5ac2",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
