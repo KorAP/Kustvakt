@@ -52,6 +52,24 @@
       "parentUuid": "7c9dfefd_95993d20",
       "revId": "3571f41b95d4052e73ef77b0a4ca6df2551e5ac2",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6315ec83_216e1b96",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-24T09:55:36Z",
+      "side": 1,
+      "message": "Hm - that\u0027s interesting because the password login flow seems to work, even without a client id and secret - just searching fails.\n\nTo provide a client_id and client_secret, maybe a file just containing \"client_id:client_secret\" at the root of Kustvakt can be enough to have this. Kalamar could use that file then, too. (At least I think so - Docker compose is a bit different than Docker.)",
+      "parentUuid": "24602db7_c613e236",
+      "revId": "3571f41b95d4052e73ef77b0a4ca6df2551e5ac2",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
