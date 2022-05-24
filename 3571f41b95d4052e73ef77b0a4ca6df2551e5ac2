@@ -34,6 +34,24 @@
       "parentUuid": "a6a1948b_809975a5",
       "revId": "3571f41b95d4052e73ef77b0a4ca6df2551e5ac2",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24602db7_c613e236",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-05-24T08:00:15Z",
+      "side": 1,
+      "message": "Just some clarification.\n\nOur login workflow is currently as follows:\n\nFor initial user authentication, only password grant works \n\nhttps://github.com/KorAP/Kustvakt/wiki/Service:-OAuth2-Token#password-grant-specific-parameters\n\nwhich is only allowed with super clients.\n\n\nFor authorization code grant, the access token from password grant is needed in OAuth2 authorization request.",
+      "parentUuid": "7c9dfefd_95993d20",
+      "revId": "3571f41b95d4052e73ef77b0a4ca6df2551e5ac2",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
