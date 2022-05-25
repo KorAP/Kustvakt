@@ -5,6 +5,7 @@
  - Added redirect URI validation in authorization request (addressed #374)
  - Handled user-defined refresh token expiry (added in client info and 
    list API response)
+ - Added installed_plugins table
 
 
 # version 0.67.1
