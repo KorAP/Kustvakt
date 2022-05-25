@@ -39,6 +39,30 @@
       },
       "revId": "cb5d80b58c8fb6193e3a29d8e497c4f1cc10d024",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d416b5b_2b558434",
+        "filename": "full/src/main/resources/db/sqlite/V1.11__plugin.sql",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-05-25T13:41:28Z",
+      "side": 1,
+      "message": "There is no use case yet. I bind it just in case we need to info about super client id, e.g. name and description because it is more readable/understandable than id. Besides, it is just lazily fetch.\n\nThe SQL is removed from this commit btw, and added in earlier commit 5838.",
+      "parentUuid": "8c53224d_23baf5bb",
+      "range": {
+        "startLine": 23,
+        "startChar": 1,
+        "endLine": 25,
+        "endChar": 21
+      },
+      "revId": "cb5d80b58c8fb6193e3a29d8e497c4f1cc10d024",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
