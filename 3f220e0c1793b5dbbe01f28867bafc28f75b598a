@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2387ef6b_854298bc",
+        "filename": "full/src/main/resources/db/sqlite/V1.11__plugin.sql",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-05-25T13:43:52Z",
+      "side": 1,
+      "message": "Fixed in 5838",
+      "parentUuid": "70fdfc8f_2832ebf0",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 45
+      },
+      "revId": "3f220e0c1793b5dbbe01f28867bafc28f75b598a",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "73314049_e8be511f",
         "filename": "full/src/test/java/de/ids_mannheim/korap/web/controller/OAuth2PluginTest.java",
         "patchSetId": 1
@@ -37,6 +61,30 @@
       "writtenOn": "2022-05-11T08:08:28Z",
       "side": 1,
       "message": "I thought we wouldn\u0027t allow public clients as plugins for the moment?",
+      "range": {
+        "startLine": 244,
+        "startChar": 16,
+        "endLine": 244,
+        "endChar": 40
+      },
+      "revId": "3f220e0c1793b5dbbe01f28867bafc28f75b598a",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1fc841f_4d8a3e54",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/controller/OAuth2PluginTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-05-25T13:43:52Z",
+      "side": 1,
+      "message": "Ah right. It is allowed in Kustvakt at the moment. I can prohibit it though.",
+      "parentUuid": "73314049_e8be511f",
       "range": {
         "startLine": 244,
         "startChar": 16,
