@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f986d134_5995fb82",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-05-25T13:23:03Z",
+      "side": 1,
+      "message": "The test suite is broken due to abandoned commits and changes on SQL scripts, but it is fixed in 5695.",
+      "revId": "d5527326ac46b450110ac4ecea062a48a26eed8c",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
