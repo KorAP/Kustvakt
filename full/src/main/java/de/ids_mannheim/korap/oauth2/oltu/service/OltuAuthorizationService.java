@@ -108,7 +108,7 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
 
     public OAuthProblemException checkRedirectUri (OAuthProblemException e,
             String clientId, String redirectUri) {
-        if (!clientId.isEmpty()) {
+        if (clientId !=null && !clientId.isEmpty()) {
             String registeredUri = null;
             try {
                 OAuth2Client client = clientService.retrieveClient(clientId);
