@@ -5,7 +5,8 @@
  - Handled null parameters in authorization requests
 2022-05-25
  - Fixed null client_id
-
+ - Updated ldap.config path in the kustvakt-test.conf
+ 
 # version 0.67
 
 2022-05-09
