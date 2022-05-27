@@ -237,6 +237,54 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     }
     
     @Test
+    public void testRegisterPublicClientWithRefreshTokenExpiry ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        OAuth2ClientJson clientJson =
+                createOAuth2ClientJson("OAuth2PublicClient",
+                        OAuth2ClientType.PUBLIC, "A public test client.");
+        clientJson.setRefreshTokenExpiry(31535000);
+        ClientResponse response = registerClient(username, clientJson);
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        assertEquals("invalid_request", node.at("/error").asText());
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+    
+    @Test
+    public void testRegisterConfidentialClientWithRefreshTokenExpiry ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        int expiry = 31535000;
+        OAuth2ClientJson clientJson =
+                createOAuth2ClientJson("OAuth2 Confidential Client",
+                        OAuth2ClientType.CONFIDENTIAL, "A confidential client.");
+        clientJson.setRefreshTokenExpiry(expiry);
+        ClientResponse response = registerClient(username, clientJson);
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        String clientId = node.at("/client_id").asText();
+        JsonNode clientInfo = retrieveClientInfo(clientId, username);
+        assertEquals(expiry, clientInfo.at("/refresh_token_expiry").asInt());
+    }
+    
+    @Test
+    public void testRegisterConfidentialClientWithInvalidRefreshTokenExpiry ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        int expiry = 31537000;
+        OAuth2ClientJson clientJson = createOAuth2ClientJson(
+                "OAuth2 Confidential Client", OAuth2ClientType.CONFIDENTIAL,
+                "A confidential client.");
+        clientJson.setRefreshTokenExpiry(expiry);
+        ClientResponse response = registerClient(username, clientJson);
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        assertEquals(
+                "Maximum refresh token expiry is 31536000 seconds (1 year)",
+                node.at("/error_description").asText());
+        assertEquals("invalid_request", node.at("/error").asText());
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+    
+    @Test
     public void testRegisterClientInvalidURL ()
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
