@@ -30,6 +30,8 @@ public class StatusCodes {
     public static final int NO_RESOURCE_FOUND = 114;
     public static final int DEPRECATED_PARAMETER = 115;
     public static final int CACHING_VC = 116;
+    public static final int NETWORK_ENDPOINT_NOT_AVAILABLE = 117;
+    public static final int SEARCH_NETWORK_ENDPOINT_FAILED = 118;
     
     /**
      * 200 status codes general JSON serialization error

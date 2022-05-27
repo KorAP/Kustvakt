@@ -92,6 +92,7 @@ public class KustvaktConfiguration {
 
     // deprec?!
     private final BACKENDS DEFAULT_ENGINE = BACKENDS.LUCENE;
+    private String networkEndpointURL;
     
     // license patterns
     protected Pattern publicLicensePattern;
@@ -203,6 +204,10 @@ public class KustvaktConfiguration {
                 properties.getProperty("security.tokenTTL", "72H"));
         shortTokenTTL = TimeUtils.convertTimeToSeconds(
                 properties.getProperty("security.shortTokenTTL", "3H"));
+        
+        // network endpoint
+        networkEndpointURL =
+                properties.getProperty("network.endpoint.url", "");
     }
     
     @Deprecated
@@ -265,7 +270,7 @@ public class KustvaktConfiguration {
     }
 
     public enum BACKENDS {
-        NEO4J, LUCENE
+        NEO4J, LUCENE, NETWORK
     }
 
 }

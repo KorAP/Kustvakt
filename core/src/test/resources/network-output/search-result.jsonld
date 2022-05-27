@@ -1,0 +1,130 @@
+{
+    "@context": "http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",
+    "meta": {
+        "count": 2,
+        "startIndex": 0,
+        "timeout": 10000,
+        "context": {
+            "left": [
+                "token",
+                6
+            ],
+            "right": [
+                "token",
+                6
+            ]
+        },
+        "fields": [
+            "ID",
+            "UID",
+            "textSigle",
+            "corpusID",
+            "author",
+            "title",
+            "subTitle",
+            "textClass",
+            "pubPlace",
+            "pubDate",
+            "availability",
+            "layerInfos",
+            "docSigle",
+            "corpusSigle"
+        ],
+        "version": "0.60.4",
+        "benchmark": "1.503497374 s",
+        "totalResults": 67249248,
+        "serialQuery": "tokens:s:der",
+        "itemsPerPage": 2
+    },
+    "query": {
+        "@type": "koral:token",
+        "wrap": {
+            "@type": "koral:term",
+            "match": "match:eq",
+            "layer": "orth",
+            "key": "der",
+            "foundry": "opennlp",
+            "rewrites": [
+                {
+                    "@type": "koral:rewrite",
+                    "src": "Kustvakt",
+                    "operation": "operation:injection",
+                    "scope": "foundry"
+                }
+            ]
+        }
+    },
+    "collection": {
+        "@type": "koral:doc",
+        "match": "match:eq",
+        "type": "type:regex",
+        "value": "CC-BY.*",
+        "key": "availability",
+        "rewrites": [
+            {
+                "@type": "koral:rewrite",
+                "src": "Kustvakt",
+                "operation": "operation:insertion",
+                "scope": "availability(FREE)"
+            }
+        ]
+    },
+    "matches": [
+        {
+            "@context": "http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",
+            "meta": {},
+            "hasSnippet": true,
+            "hasTokens": false,
+            "matchID": "match-WUD17/B96/48580-p40-41",
+            "textClass": "staat-gesellschaft biographien-interviews fiktion vermischtes",
+            "textSigle": "WUD17/B96/48580",
+            "author": "Andy king50, u.a.",
+            "docSigle": "WUD17/B96",
+            "layerInfos": "corenlp/c=spans corenlp/p=tokens corenlp/s=spans dereko/s=spans malt/d=rels marmot/m=tokens marmot/p=tokens opennlp/p=tokens opennlp/s=spans tt/l=tokens tt/p=tokens",
+            "pubPlace": "URL:http://de.wikipedia.org",
+            "availability": "CC-BY-SA",
+            "title": "Benutzer Diskussion:Brettspieler",
+            "pubDate": "2017-07-01",
+            "corpusSigle": "WUD17",
+            "context": {
+                "left": [
+                    "token",
+                    6
+                ],
+                "right": [
+                    "token",
+                    6
+                ]
+            },
+            "snippet": "<span class=\"context-left\"><span class=\"more\"><\/span>konstruktiv mitarbeiten kannst, erfährst du auf <\/span><span class=\"match\"><mark>der<\/mark><\/span><span class=\"context-right\"> Seite  Starthilfe . Grüße,  19:05, 6. Nov.<span class=\"more\"><\/span><\/span>"
+        },
+        {
+            "@context": "http://korap.ids-mannheim.de/ns/KoralQuery/v0.3/context.jsonld",
+            "meta": {},
+            "hasSnippet": true,
+            "hasTokens": false,
+            "matchID": "match-WUD17/B96/50115-p40-41",
+            "textClass": "staat-gesellschaft biographien-interviews fiktion vermischtes",
+            "textSigle": "WUD17/B96/50115",
+            "author": "Doc.Heintz, u.a.",
+            "docSigle": "WUD17/B96",
+            "layerInfos": "corenlp/c=spans corenlp/p=tokens corenlp/s=spans dereko/s=spans malt/d=rels marmot/m=tokens marmot/p=tokens opennlp/p=tokens opennlp/s=spans tt/l=tokens tt/p=tokens",
+            "pubPlace": "URL:http://de.wikipedia.org",
+            "availability": "CC-BY-SA",
+            "title": "Benutzer Diskussion:Blkviz",
+            "pubDate": "2017-07-01",
+            "corpusSigle": "WUD17",
+            "context": {
+                "left": [
+                    "token",
+                    6
+                ],
+                "right": [
+                    "token",
+                    6
+                ]
+            },
+            "snippet": "<span class=\"context-left\"><span class=\"more\"><\/span>konstruktiv mitarbeiten kannst, erfährst du auf <\/span><span class=\"match\"><mark>der<\/mark><\/span><span class=\"context-right\"> Seite  Starthilfe . Grüße,  20:11, 7.<span class=\"more\"><\/span><\/span>"
+        }
+    ]
+}

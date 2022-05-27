@@ -128,10 +128,12 @@
 		<property name="dataSource" ref="sqliteDataSource" />
 	</bean>
 
-	<!-- Krill -->
+	<!-- Search Engine -->
 	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">
 		<constructor-arg value="${krill.indexDir}" />
 	</bean>
+	<bean id="search_network" class="de.ids_mannheim.korap.web.SearchNetworkEndpoint"/>
+	
 
 	<!-- Filters -->
 	<!-- <bean id="APIVersionFilter" class="de.ids_mannheim.korap.web.APIVersionFilter" 
