@@ -37,8 +37,9 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
     private ClientAndServer mockServer;
     private MockServerClient mockClient;
 
+    private int port = 6070;
     private String pipeJson, pipeWithParamJson;
-    private String glemmUri = "http://localhost:1080/glemm";
+    private String glemmUri = "http://localhost:"+port+"/glemm";
 
     public LiteSearchPipeTest () throws IOException{
         pipeJson = IOUtils.toString(
@@ -54,7 +55,7 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
 
     @Before
     public void startMockServer () {
-        mockServer = startClientAndServer(1080);
+        mockServer = startClientAndServer(port);
         mockClient = new MockServerClient("localhost", mockServer.getPort());
     }
 
@@ -74,7 +75,7 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
                                 "application/json; charset=utf-8"))
                         .withBody("{test}").withStatusCode(200));
 
-        URL url = new URL("http://localhost:1080/test");
+        URL url = new URL("http://localhost:"+port+"/test");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type",
@@ -226,7 +227,7 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
                 .when(request().withMethod("POST").withPath("/non-json-pipe"))
                 .respond(response().withStatusCode(415));
 
-        String pipeUri = "http://localhost:1080/non-json-pipe";
+        String pipeUri = "http://localhost:"+port+"/non-json-pipe";
 
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
@@ -280,7 +281,7 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
                         .withHeaders(new Header("Content-Type",
                                 "application/json; charset=utf-8")));
 
-        String pipeUri = "http://localhost:1080/invalid-response";
+        String pipeUri = "http://localhost:"+port+"/invalid-response";
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("pipes", pipeUri).get(ClientResponse.class);
@@ -304,7 +305,7 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
                                 new Header("Accept", "application/json")))
                 .respond(response().withBody("blah").withStatusCode(200));
 
-        String pipeUri = "http://localhost:1080/plain-text";
+        String pipeUri = "http://localhost:"+port+"/plain-text";
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("pipes", pipeUri).get(ClientResponse.class);

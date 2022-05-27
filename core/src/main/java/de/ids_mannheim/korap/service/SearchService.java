@@ -40,6 +40,7 @@ import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.ClientsHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
+import de.ids_mannheim.korap.web.SearchNetworkEndpoint;
 
 @Service
 public class SearchService extends BasicService{
@@ -50,8 +51,6 @@ public class SearchService extends BasicService{
 
     @Autowired
     private KustvaktConfiguration config;
-//    @Autowired
-//    private VCLoader vcLoader;
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -60,6 +59,8 @@ public class SearchService extends BasicService{
 
     @Autowired
     private SearchKrill searchKrill;
+    @Autowired
+    private SearchNetworkEndpoint searchNetwork;
 
     private ClientsHandler graphDBhandler;
 
@@ -148,7 +149,6 @@ public class SearchService extends BasicService{
             pipeArray = pipes.split(",");
         }
         
-        KustvaktConfiguration.BACKENDS eng = this.config.chooseBackend(engine);
         User user = createUser(username, headers);
         CorpusAccess corpusAccess = user.getCorpusAccess();
         
@@ -195,9 +195,13 @@ public class SearchService extends BasicService{
             jlog.debug("the serialized query " + query);
         }
 
+        KustvaktConfiguration.BACKENDS searchEngine = this.config.chooseBackend(engine);
         String result;
-        if (eng.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
+        if (searchEngine.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
             result = searchNeo4J(query, pageLength, meta, false);
+        }
+        else if (searchEngine.equals(KustvaktConfiguration.BACKENDS.NETWORK)) {
+            result = searchNetwork.search(query);
         }
         else {
             result = searchKrill.search(query);

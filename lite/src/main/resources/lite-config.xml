@@ -137,10 +137,12 @@
 	<bean id="annotationParser" class="de.ids_mannheim.korap.annotation.AnnotationParser"
 		scope="singleton" />
 
-	<!-- Krill -->
+	<!-- Search Engine -->
 	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">
 		<constructor-arg value="${krill.indexDir}" />
 	</bean>
+	<bean id="search_network" class="de.ids_mannheim.korap.web.SearchNetworkEndpoint"/>
+	
 
 	<!-- Filters -->
 	<!-- <bean id="APIVersionFilter" class="de.ids_mannheim.korap.web.APIVersionFilter"
