@@ -52,6 +52,24 @@
       "parentUuid": "f50b6690_38346d05",
       "revId": "03e383743d7328467939680e910e2c10cd92cb52",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdbaebe4_d9b43fe8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-05-27T06:42:54Z",
+      "side": 1,
+      "message": "Implemented in https://korap.ids-mannheim.de/gerrit/c/KorAP/Kustvakt/+/5848",
+      "parentUuid": "b8809772_8fb8d0da",
+      "revId": "03e383743d7328467939680e910e2c10cd92cb52",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
