@@ -147,6 +147,8 @@ public class StatusCodes {
     public static final int ID_TOKEN_SIGNING_FAILED = 1814;
     public static final int USER_REAUTHENTICATION_REQUIRED = 1815;
     
+    public static final int INVALID_REFRESH_TOKEN_EXPIRY = 1816;
+    
     /**
      * 1850 Plugins
      */

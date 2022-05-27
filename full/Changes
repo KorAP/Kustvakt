@@ -11,6 +11,9 @@
  - Handled super client id in plugin installation
  - Deprecated UserClientDto and uses ClientinfoDto instead
  - Updated redirect URI error message for coherence
+2022-05-27
+ - Added maximum limit to custom refresh token expiry
+ 
  
 # version 0.67.1
 

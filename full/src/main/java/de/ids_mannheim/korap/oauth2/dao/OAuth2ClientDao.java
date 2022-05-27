@@ -78,9 +78,20 @@ public class OAuth2ClientDao {
         else {
             client.setPermitted(true);
         }
-        if (refreshTokenExpiry <= 0 && type.equals(OAuth2ClientType.CONFIDENTIAL)) {
-           refreshTokenExpiry = config.getRefreshTokenLongExpiry();
+        if (refreshTokenExpiry <= 0) {
+            if (type.equals(OAuth2ClientType.CONFIDENTIAL)){
+                refreshTokenExpiry = config.getRefreshTokenLongExpiry();
+            }
         }
+        else if (type.equals(OAuth2ClientType.PUBLIC)){
+            throw new KustvaktException(StatusCodes.INVALID_REFRESH_TOKEN_EXPIRY,
+                    "Custom refresh token expiry is only applicable for confidential clients");
+        }
+        else if (refreshTokenExpiry > 31536000 ){
+            throw new KustvaktException(StatusCodes.INVALID_REFRESH_TOKEN_EXPIRY,
+                    "Maximum refresh token expiry is 31536000 seconds (1 year)");
+        }
+        
         client.setRefreshTokenExpiry(refreshTokenExpiry);
         entityManager.persist(client);
     }
