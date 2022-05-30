@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c617b1f_009649c0",
+        "filename": "full/initial_super_client.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-30T16:14:00Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be in ressources?",
+      "range": {
+        "startLine": 1,
+        "startChar": 1,
+        "endLine": 5,
+        "endChar": 1
+      },
+      "revId": "b85c8717ab5bc9e6a0bfeb99dcc17fa8045bc92f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35e345ec_b89269bf",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/oauth2/service/OAuth2InitClientService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-30T16:14:00Z",
+      "side": 1,
+      "message": "I would guess that\u0027s probably the usual case - so better log on creation with info level.",
+      "range": {
+        "startLine": 57,
+        "startChar": 11,
+        "endLine": 58,
+        "endChar": 102
+      },
+      "revId": "b85c8717ab5bc9e6a0bfeb99dcc17fa8045bc92f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f953d121_37984e2d",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/InitialSuperClientTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-30T16:14:00Z",
+      "side": 1,
+      "message": "This fails on the second run of the test with:\n\u003e [ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 1.133 s \u003c\u003c\u003c FAILURE! - in de.ids_mannheim.korap.web.InitialSuperClientTest\n\u003e [ERROR] testCreatingInitialSuperClient(de.ids_mannheim.korap.web.InitialSuperClientTest)  Time elapsed: 1.025 s  \u003c\u003c\u003c ERROR!\n\u003e de.ids_mannheim.korap.exceptions.KustvaktException: Unknown client with 9LrT4dRr6tp7bRbp69dG4P.\n\u003e \tat de.ids_mannheim.korap.web.InitialSuperClientTest.testCreatingInitialSuperClient(InitialSuperClientTest.java:48)\n\nI assume there is another test that creates the file that does not remove it.",
+      "revId": "b85c8717ab5bc9e6a0bfeb99dcc17fa8045bc92f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
