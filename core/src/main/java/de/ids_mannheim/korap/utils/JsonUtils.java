@@ -78,7 +78,7 @@ public class JsonUtils {
     }
 
 
-    public static void writeFile (String path, String content)
+    public static void writeFile (String path, Object content)
             throws IOException {
         mapper.writeValue(new File(path), content);
     }
