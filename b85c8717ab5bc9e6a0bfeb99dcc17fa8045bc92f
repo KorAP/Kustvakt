@@ -97,6 +97,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "49a6e85a_ba27066f",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/oauth2/service/OAuth2InitClientService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-31T09:12:27Z",
+      "side": 1,
+      "message": "No - log info when the file does not exist and super client is registered.",
+      "parentUuid": "59fbca48_4c5762e7",
+      "range": {
+        "startLine": 57,
+        "startChar": 11,
+        "endLine": 58,
+        "endChar": 102
+      },
+      "revId": "b85c8717ab5bc9e6a0bfeb99dcc17fa8045bc92f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f953d121_37984e2d",
         "filename": "full/src/test/java/de/ids_mannheim/korap/web/InitialSuperClientTest.java",
         "patchSetId": 1
@@ -126,6 +150,24 @@
       "side": 1,
       "message": "It is problematic yesterday because I cannot delete the test super client info file before the server start, so I just removed it after the test. \n\nThis is still problematic if e.g. the test suite is broken and left the file.",
       "parentUuid": "f953d121_37984e2d",
+      "revId": "b85c8717ab5bc9e6a0bfeb99dcc17fa8045bc92f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "578bce45_376ff816",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/InitialSuperClientTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-31T09:12:27Z",
+      "side": 1,
+      "message": "I don\u0027t think anything went wrong. The test suite runs fine, but then the file is left. I think another unrelated test creates the file.",
+      "parentUuid": "1a775306_c46f22db",
       "revId": "b85c8717ab5bc9e6a0bfeb99dcc17fa8045bc92f",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
