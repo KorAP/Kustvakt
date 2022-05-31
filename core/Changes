@@ -3,6 +3,7 @@
  - Added OAuth2 scopes: INSTALL_USER_CLIENT, UNINSTALL_USER_CLIENT
  - Added status codes
  - Implemented searching option using a network endpoint
+ - Updated JsonUtils
 
 # version 0.67.1
 

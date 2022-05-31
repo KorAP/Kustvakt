@@ -92,6 +92,8 @@ public class FullConfiguration extends KustvaktConfiguration {
     private String rsaKeyId;
 
     private String namedVCPath;
+    
+    private boolean createInitialSuperClient;
 
     public FullConfiguration (Properties properties) throws Exception {
         super(properties);
@@ -127,7 +129,6 @@ public class FullConfiguration extends KustvaktConfiguration {
         config.setMaxBytesLocalDisk(properties.getProperty("cache.max.bytes.local.disk", "2G"));
         jlog.info("max local heap:"+config.getMaxBytesLocalHeapAsString());
         jlog.info("max local disk:"+config.getMaxBytesLocalDiskAsString());
-
     }
 
     private void setSecurityConfiguration (Properties properties) {
@@ -247,6 +248,8 @@ public class FullConfiguration extends KustvaktConfiguration {
                         "oauth2.password.authentication", "TEST")));
         setNativeClientHost(properties.getProperty("oauth2.native.client.host",
                 "korap.ids-mannheim.de"));
+        setCreateInitialSuperClient(Boolean.valueOf(
+                properties.getProperty("oauth2.initial.super.client", "false")));
 
         setMaxAuthenticationAttempts(Integer
                 .parseInt(properties.getProperty("oauth2.max.attempts", "1")));
@@ -674,4 +677,14 @@ public class FullConfiguration extends KustvaktConfiguration {
     public void setRefreshTokenLongExpiry (int refreshTokenLongExpiry) {
         this.refreshTokenLongExpiry = refreshTokenLongExpiry;
     }
+
+    public boolean createInitialSuperClient () {
+        return createInitialSuperClient;
+    }
+    
+    public void setCreateInitialSuperClient (boolean initialSuperClient) {
+        this.createInitialSuperClient = initialSuperClient;
+    }
+    
+    
 }

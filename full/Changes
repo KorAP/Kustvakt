@@ -19,7 +19,7 @@
    service paths under /plugins.
 2022-06-03 
  - Implemented searching option using a network endpoint
-
+ - Implemented initial super client registration for user authentication.
  
 # version 0.67.1
 
