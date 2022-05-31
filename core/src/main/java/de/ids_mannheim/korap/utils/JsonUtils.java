@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -46,8 +47,7 @@ public class JsonUtils {
                     "Failed deserializing json object: " + json, json, e);
         }
     }
-
-
+    
     public static ObjectNode createObjectNode () {
         return mapper.createObjectNode();
     }
@@ -71,6 +71,10 @@ public class JsonUtils {
         return mapper.readValue(json, cl);
     }
 
+    public static <T> T read (InputStream is, Class<T> cl) throws IOException {
+        return mapper.readValue(is, cl);
+    }
+
 
     public static <T> T readFile (String path, Class<T> clazz)
             throws IOException {
@@ -78,7 +82,7 @@ public class JsonUtils {
     }
 
 
-    public static void writeFile (String path, String content)
+    public static void writeFile (String path, Object content)
             throws IOException {
         mapper.writeValue(new File(path), content);
     }
