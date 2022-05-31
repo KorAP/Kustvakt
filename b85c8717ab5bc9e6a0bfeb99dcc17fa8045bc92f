@@ -162,6 +162,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e8be2c34_73bb663b",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/oauth2/service/OAuth2InitClientService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-31T16:39:55Z",
+      "side": 1,
+      "message": "The information, that the file exists, is not really necessary, but it\u0027s fine like it is now.",
+      "parentUuid": "554896b7_d6d02b18",
+      "range": {
+        "startLine": 57,
+        "startChar": 11,
+        "endLine": 58,
+        "endChar": 102
+      },
+      "revId": "b85c8717ab5bc9e6a0bfeb99dcc17fa8045bc92f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f953d121_37984e2d",
         "filename": "full/src/test/java/de/ids_mannheim/korap/web/InitialSuperClientTest.java",
         "patchSetId": 1
@@ -227,6 +251,24 @@
       "side": 1,
       "message": "Yes you are right since the server is restarted multiple times. I don\u0027t know how to fix this though....",
       "parentUuid": "578bce45_376ff816",
+      "revId": "b85c8717ab5bc9e6a0bfeb99dcc17fa8045bc92f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c03135b_6bfab80f",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/InitialSuperClientTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-05-31T16:39:55Z",
+      "side": 1,
+      "message": "After testing with junit, you are right. But ... probably the correct fix is to enter the initial client to the database after initit, if the file exists, right?",
+      "parentUuid": "627c2e00_c35243b3",
       "revId": "b85c8717ab5bc9e6a0bfeb99dcc17fa8045bc92f",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
