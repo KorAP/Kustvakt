@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b05e595e_c4feb01b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-05-31T09:49:43Z",
+      "side": 1,
+      "message": "I have moved the json file to src and enable searching from classpath.",
+      "revId": "b85c8717ab5bc9e6a0bfeb99dcc17fa8045bc92f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3c617b1f_009649c0",
@@ -121,6 +138,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "554896b7_d6d02b18",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/oauth2/service/OAuth2InitClientService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-05-31T09:49:43Z",
+      "side": 1,
+      "message": "I am not sure what you mean. I have added another log info.",
+      "parentUuid": "49a6e85a_ba27066f",
+      "range": {
+        "startLine": 57,
+        "startChar": 11,
+        "endLine": 58,
+        "endChar": 102
+      },
+      "revId": "b85c8717ab5bc9e6a0bfeb99dcc17fa8045bc92f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f953d121_37984e2d",
         "filename": "full/src/test/java/de/ids_mannheim/korap/web/InitialSuperClientTest.java",
         "patchSetId": 1
@@ -168,6 +209,24 @@
       "side": 1,
       "message": "I don\u0027t think anything went wrong. The test suite runs fine, but then the file is left. I think another unrelated test creates the file.",
       "parentUuid": "1a775306_c46f22db",
+      "revId": "b85c8717ab5bc9e6a0bfeb99dcc17fa8045bc92f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "627c2e00_c35243b3",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/InitialSuperClientTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-05-31T09:49:43Z",
+      "side": 1,
+      "message": "Yes you are right since the server is restarted multiple times. I don\u0027t know how to fix this though....",
+      "parentUuid": "578bce45_376ff816",
       "revId": "b85c8717ab5bc9e6a0bfeb99dcc17fa8045bc92f",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
