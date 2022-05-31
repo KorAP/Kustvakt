@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+           http://www.springframework.org/schema/tx
+           http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-4.0.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<context:component-scan base-package="de.ids_mannheim.korap" />
+	<context:annotation-config />
+
+	<bean id="props"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<array>
+				<value>classpath:kustvakt.conf</value>
+				<value>file:./kustvakt.conf</value>
+			</array>
+		</property>
+	</bean>
+
+	<bean id="placeholders"
+		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<array>
+				<value>classpath:properties/basic-jdbc.properties</value>
+				<value>file:./basic-jdbc.properties</value>
+				<value>classpath:properties/mail.properties</value>
+				<value>file:./mail.properties</value>
+				<value>classpath:hibernate.properties</value>
+
+				<value>classpath:kustvakt.conf</value>
+				<value>file:./kustvakt.conf</value>
+			</array>
+		</property>
+	</bean>
+
+	<bean id='cacheManager' class='org.springframework.cache.ehcache.EhCacheCacheManager'
+		p:cacheManager-ref='ehcache' />
+
+	<bean id='ehcache'
+		class='org.springframework.cache.ehcache.EhCacheManagerFactoryBean'
+		p:configLocation='classpath:ehcache.xml' p:shared='true' />
+
+	<!--class="org.apache.commons.dbcp2.BasicDataSource" -->
+	<!-- org.springframework.jdbc.datasource.SingleConnectionDataSource -->
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
+		lazy-init="true">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<!-- relevant for single connection datasource and sqlite -->
+		<!-- <property name="suppressClose"> <value>true</value> </property> -->
+		<!--<property name="initialSize" value="2"/> -->
+		<property name="maxTotal" value="4" />
+		<property name="maxIdle" value="2" />
+		<property name="minIdle" value="1" />
+		<property name="maxWaitMillis" value="15000" />
+		<!--<property name="poolPreparedStatements" value="true"/> -->
+	</bean>
+
+	<bean id="sqliteDataSource"
+		class="org.springframework.jdbc.datasource.SingleConnectionDataSource"
+		lazy-init="true">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="connectionProperties">
+			<props>
+				<prop key="date_string_format">yyyy-MM-dd HH:mm:ss</prop>
+			</props>
+		</property>
+
+		<!-- relevant for single connection datasource and sqlite -->
+		<property name="suppressClose">
+			<value>true</value>
+		</property>
+		<!--<property name="initialSize" value="2"/> -->
+		<!--<property name="poolPreparedStatements" value="true"/> -->
+	</bean>
+
+	<!-- to configure database for sqlite, mysql, etc. migrations -->
+	<bean id="flywayConfig" class="org.flywaydb.core.api.configuration.ClassicConfiguration">
+		<property name="baselineOnMigrate" value="true" />
+		<!-- <property name="validateOnMigrate" value="false" /> -->
+		<!-- <property name="cleanOnValidationError" value="true" /> -->
+		<property name="locations" value="#{'${jdbc.schemaPath}'.split(',')}"/>
+		<!-- <property name="dataSource" ref="dataSource" /> -->
+		<property name="dataSource" ref="sqliteDataSource" />
+		<property name="outOfOrder" value="true"/>
+	</bean>
+	
+	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
+		<constructor-arg ref="flywayConfig"/>
+	</bean>
+
+
+	<bean id="kustvakt_db" class="de.ids_mannheim.korap.handlers.JDBCClient">
+		<constructor-arg index="0" ref="dataSource" />
+		<!-- deprecated property -->
+		<property name="database" value="${jdbc.database}" />
+	</bean>
+
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+		depends-on="flyway">
+		<!-- <property name="dataSource" ref="dataSource" /> -->
+		<property name="dataSource" ref="sqliteDataSource" />
+
+		<property name="packagesToScan">
+			<array>
+				<value>de.ids_mannheim.korap.entity</value>
+				<value>de.ids_mannheim.korap.oauth2.entity</value>
+			</array>
+		</property>
+		<property name="jpaVendorAdapter">
+			<bean id="jpaVendorAdapter"
+				class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="databasePlatform" value="${hibernate.dialect}" />
+			</bean>
+		</property>
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.cache.use_query_cache">${hibernate.cache.use_query_cache}</prop>
+				<prop key="hibernate.cache.use_second_level_cache">${hibernate.cache.use_second_level_cache}
+				</prop>
+				<prop key="hibernate.cache.provider_class">${hibernate.cache.provider}</prop>
+				<prop key="hibernate.cache.region.factory_class">${hibernate.cache.region.factory}</prop>
+				<prop key="hibernate.jdbc.time_zone">${hibernate.jdbc.time_zone}</prop>
+				<!-- <prop key="net.sf.ehcache.configurationResourceName">classpath:ehcache.xml</prop> -->
+			</props>
+		</property>
+	</bean>
+
+	<tx:annotation-driven proxy-target-class="true"
+		transaction-manager="transactionManager" />
+
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+
+	<bean id="transactionTemplate"
+		class="org.springframework.transaction.support.TransactionTemplate">
+		<constructor-arg ref="transactionManager" />
+	</bean>
+
+	<!-- Data access objects -->
+	<bean id="adminDao" class="de.ids_mannheim.korap.dao.AdminDaoImpl" />
+	<bean id="authorizationDao" class="de.ids_mannheim.korap.oauth2.dao.CachedAuthorizationDaoImpl" />
+
+	<!-- Services -->
+	<bean id="scopeService" class="de.ids_mannheim.korap.oauth2.service.OAuth2ScopeServiceImpl" />
+	
+	<!-- props are injected from default-config.xml -->
+	<bean id="kustvakt_config" class="de.ids_mannheim.korap.config.FullConfiguration">
+		<constructor-arg name="properties" ref="props" />
+	</bean>
+
+	<bean id="initializator" class="de.ids_mannheim.de.init.Initializator"
+		init-method="init">
+	</bean>
+	
+	<!-- Krill -->
+	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">
+		<constructor-arg value="${krill.indexDir}" />
+	</bean>
+
+    <!-- Validator -->
+	<bean id="validator" class="de.ids_mannheim.korap.validator.ApacheValidator"/>
+	
+	<!-- URLValidator -->
+	<bean id="redirectURIValidator" class="org.apache.commons.validator.routines.UrlValidator">
+		<constructor-arg value="http,https" index="0" />
+		<constructor-arg index="1" type="long">
+			<util:constant
+				static-field="org.apache.commons.validator.routines.UrlValidator.NO_FRAGMENTS" />
+		</constructor-arg>
+	</bean>
+	<bean id="urlValidator" class="org.apache.commons.validator.routines.UrlValidator">
+		<constructor-arg value="http,https" />
+	</bean>
+	
+	<!-- Rewrite -->
+	<bean id="foundryRewrite" class="de.ids_mannheim.korap.rewrite.FoundryRewrite"/>
+	<bean id="collectionRewrite" class="de.ids_mannheim.korap.rewrite.CollectionRewrite"/>
+	<bean id="virtualCorpusRewrite" class="de.ids_mannheim.korap.rewrite.VirtualCorpusRewrite"/>
+ 	<bean id="queryReferenceRewrite" class="de.ids_mannheim.korap.rewrite.QueryReferenceRewrite"/>
+	
+	<util:list id="rewriteTasks"
+		value-type="de.ids_mannheim.korap.rewrite.RewriteTask">
+		<ref bean="foundryRewrite" />
+		<ref bean="collectionRewrite" />
+		<ref bean="virtualCorpusRewrite" />
+    <ref bean="queryReferenceRewrite" />
+	</util:list>
+	
+	<bean id="rewriteHandler" class="de.ids_mannheim.korap.rewrite.RewriteHandler">
+		<constructor-arg ref="rewriteTasks"/>
+	</bean>
+
+	<bean id="kustvakt_auditing" class="de.ids_mannheim.korap.handlers.JDBCAuditing">
+		<constructor-arg ref="kustvakt_db" />
+	</bean>
+
+	<bean id="kustvaktResponseHandler" class="de.ids_mannheim.korap.web.KustvaktResponseHandler">
+		<constructor-arg index="0" name="iface" ref="kustvakt_auditing" />
+	</bean>
+
+	<!-- OAuth -->
+	<bean id="oauth2ResponseHandler" class="de.ids_mannheim.korap.web.OAuth2ResponseHandler">
+		<constructor-arg index="0" name="iface" ref="kustvakt_auditing" />
+	</bean>
+
+	<bean id="mdGenerator" class="org.apache.oltu.oauth2.as.issuer.MD5Generator">
+	</bean>
+	<bean id="oauthIssuer" class="org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl">
+		<constructor-arg index="0" ref="mdGenerator" />
+	</bean>
+
+	<bean id="kustvakt_userdb" class="de.ids_mannheim.korap.handlers.EntityDao">
+		<constructor-arg ref="kustvakt_db" />
+	</bean>
+
+	<bean name="kustvakt_encryption" class="de.ids_mannheim.korap.encryption.KustvaktEncryption">
+		<constructor-arg ref="kustvakt_config" />
+	</bean>
+
+	<!-- authentication providers to use -->
+	<!-- <bean id="api_auth" class="de.ids_mannheim.korap.authentication.APIAuthentication"> 
+		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration" 
+		ref="kustvakt_config" /> </bean> -->
+
+	<bean id="ldap_auth" class="de.ids_mannheim.korap.authentication.LdapAuth3">
+		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
+			ref="kustvakt_config" />
+	</bean>
+
+	<bean id="basic_auth"
+		class="de.ids_mannheim.korap.authentication.BasicAuthentication" />
+
+
+	<bean id="session_auth"
+		class="de.ids_mannheim.korap.authentication.SessionAuthentication">
+		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
+			ref="kustvakt_config" />
+		<constructor-arg type="de.ids_mannheim.korap.interfaces.EncryptionIface"
+			ref="kustvakt_encryption" />
+	</bean>
+
+	<bean id="oauth2_auth"
+		class="de.ids_mannheim.korap.authentication.OAuth2Authentication" />
+	
+	<util:list id="kustvakt_authproviders"
+		value-type="de.ids_mannheim.korap.interfaces.AuthenticationIface">
+		<ref bean="basic_auth" />
+		<ref bean="ldap_auth" />
+		<!-- 
+		<ref bean="session_auth" />
+		<ref bean="api_auth" />
+		 -->
+		<ref bean="oauth2_auth" />
+	</util:list>
+
+
+	<bean id="userdata_details" class="de.ids_mannheim.korap.handlers.UserDetailsDao">
+		<constructor-arg ref="kustvakt_db" />
+	</bean>
+
+	<bean id="userdata_settings" class="de.ids_mannheim.korap.handlers.UserSettingsDao">
+		<constructor-arg ref="kustvakt_db" />
+	</bean>
+
+	<util:list id="kustvakt_userdata"
+		value-type="de.ids_mannheim.korap.interfaces.db.UserdataDbIface">
+		<ref bean="userdata_details" />
+		<ref bean="userdata_settings" />
+	</util:list>
+
+	<!-- specify type for constructor argument -->
+	<bean id="authenticationManager"
+		class="de.ids_mannheim.korap.authentication.KustvaktAuthenticationManager">
+		<constructor-arg type="de.ids_mannheim.korap.interfaces.EntityHandlerIface"
+			ref="kustvakt_userdb" />
+		<constructor-arg type="de.ids_mannheim.korap.interfaces.EncryptionIface"
+			ref="kustvakt_encryption" />
+		<constructor-arg ref="kustvakt_config" />
+		<constructor-arg type="de.ids_mannheim.korap.interfaces.db.AuditingIface"
+			ref="kustvakt_auditing" />
+		<constructor-arg ref="kustvakt_userdata" />
+		<!-- inject authentication providers to use -->
+		<property name="providers" ref="kustvakt_authproviders" />
+	</bean>
+	
+	<!-- todo: if db interfaces not loaded via spring, does transaction even 
+		work then? -->
+	<!-- the transactional advice (i.e. what 'happens'; see the <aop:advisor/> 
+		bean below) -->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<!-- the transactional semantics... -->
+		<tx:attributes>
+			<!-- all methods starting with 'get' are read-only -->
+			<tx:method name="get*" read-only="true" rollback-for="KorAPException" />
+			<!-- other methods use the default transaction settings (see below) -->
+			<tx:method name="*" rollback-for="KorAPException" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- ensure that the above transactional advice runs for any execution of 
+		an operation defined by the service interface -->
+	<aop:config>
+		<aop:pointcut id="service"
+			expression="execution(* de.ids_mannheim.korap.interfaces.db.*.*(..))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="service" />
+	</aop:config>
+
+	<!-- similarly, don't forget the PlatformTransactionManager -->
+	<bean id="txManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<!-- <property name="dataSource" ref="dataSource" /> -->
+		<property name="dataSource" ref="sqliteDataSource" />
+	</bean>
+
+	<!-- mail -->
+	<bean id="authenticator" class="de.ids_mannheim.korap.service.MailAuthenticator">
+		<constructor-arg index="0" value="${mail.username}" />
+		<constructor-arg index="1" value="${mail.password}" />
+	</bean>
+	<bean id="smtpSession" class="javax.mail.Session" factory-method="getInstance">
+		<constructor-arg index="0">
+			<props>
+				<prop key="mail.smtp.submitter">${mail.username}</prop>
+				<prop key="mail.smtp.auth">${mail.auth}</prop>
+				<prop key="mail.smtp.host">${mail.host}</prop>
+				<prop key="mail.smtp.port">${mail.port}</prop>
+				<prop key="mail.smtp.starttls.enable">${mail.starttls.enable}</prop>
+				<prop key="mail.smtp.connectiontimeout">${mail.connectiontimeout}</prop>
+			</props>
+		</constructor-arg>
+		<constructor-arg index="1" ref="authenticator" />
+	</bean>
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="username" value="${mail.username}" />
+		<property name="password" value="${mail.password}" />
+		<property name="session" ref="smtpSession" />
+	</bean>
+	<bean id="velocityEngine" class="org.apache.velocity.app.VelocityEngine">
+		<constructor-arg index="0">
+			<props>
+				<prop key="resource.loader">class</prop>
+				<prop key="class.resource.loader.class">org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
+				</prop>
+			</props>
+		</constructor-arg>
+	</bean>
+</beans>
