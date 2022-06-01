@@ -138,17 +138,6 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
                 node.at("/errors/0/1").asText());
     }
 
-    private void testSearchWithOAuth2Token (String accessToken)
-            throws KustvaktException, IOException {
-        ClientResponse response = searchWithAccessToken(accessToken);
-        String entity = response.getEntity(String.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
-                response.getStatus());
-        JsonNode node = JsonUtils.readTree(entity);
-        assertNotNull(node);
-        assertEquals(25, node.at("/matches").size());
-    }
-
     @Test
     public void testSearchWithUnknownToken ()
             throws KustvaktException, IOException {
@@ -202,20 +191,6 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         String accessToken = node.at("/access_token").asText();
         testRevokeTokenViaSuperClient(accessToken, userAuthHeader);
         testSearchWithRevokedAccessToken(accessToken);
-    }
-
-    private void testSearchWithRevokedAccessToken (String accessToken)
-            throws KustvaktException {
-        ClientResponse response = searchWithAccessToken(accessToken);
-        String entity = response.getEntity(String.class);
-        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
-                response.getStatus());
-
-        JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
-                node.at("/errors/0/0").asInt());
-        assertEquals("Access token is invalid",
-                node.at("/errors/0/1").asText());
     }
 
     @Test

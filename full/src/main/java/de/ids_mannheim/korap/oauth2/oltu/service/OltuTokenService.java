@@ -481,7 +481,7 @@ public class OltuTokenService extends OAuth2TokenService {
         return revokeRefreshToken(refreshToken);
     }
 
-    private boolean revokeRefreshToken (RefreshToken refreshToken)
+    public boolean revokeRefreshToken (RefreshToken refreshToken)
             throws KustvaktException {
         if (refreshToken != null){
             refreshToken.setRevoked(true);
@@ -511,6 +511,11 @@ public class OltuTokenService extends OAuth2TokenService {
         }
 
         String clientId = revokeTokenRequest.getClientId();
+        revokeAllClientTokensForUser(clientId, username);
+    }
+    
+    public void revokeAllClientTokensForUser (String clientId, String username)
+            throws KustvaktException {
         OAuth2Client client = clientService.retrieveClient(clientId);
         if (clientService.isPublicClient(client)) {
             List<AccessToken> accessTokens =

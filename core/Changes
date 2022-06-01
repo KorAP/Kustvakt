@@ -1,6 +1,6 @@
 # version 0.68
 
- - Added OAuth2 scope: INSTALL_USER_CLIENT
+ - Added OAuth2 scopes: INSTALL_USER_CLIENT, UNINSTALL_USER_CLIENT
  - Added status codes
  
 

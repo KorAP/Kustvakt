@@ -34,6 +34,7 @@ import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
+import de.ids_mannheim.korap.oauth2.oltu.service.OltuTokenService;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
@@ -64,6 +65,8 @@ public class OAuth2ClientService {
 //            new UrlValidator(new String[] { "http", "https" },
 //                    UrlValidator.NO_FRAGMENTS + UrlValidator.ALLOW_LOCAL_URLS);
 
+    @Autowired
+    private OltuTokenService tokenService;
     @Autowired
     private InstalledPluginDao pluginDao;
     @Autowired
@@ -390,12 +393,24 @@ public class OAuth2ClientService {
         return createClientDtos(plugins);
     }
     
+    public List<InstalledPluginDto> listInstalledPlugins (String superClientId,
+            String username) throws KustvaktException {
+
+        List<InstalledPlugin> plugins =
+                pluginDao.retrieveInstalledPlugins(superClientId, username);
+        Collections.sort(plugins); // by client name
+        
+        List<InstalledPluginDto> list = new ArrayList<InstalledPluginDto>(plugins.size());
+        for (InstalledPlugin p : plugins) {
+            list.add(new InstalledPluginDto(p));
+        }
+        
+        return list;
+    }
+    
     public InstalledPluginDto installPlugin (String superClientId,
             String clientId, String installedBy) throws KustvaktException {
-        if (clientId == null || clientId.isEmpty()) {
-            throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
-                    "Missing parameter: client_id");
-        }
+        
         OAuth2Client client = clientDao.retrieveClientById(clientId);
         if (!client.isPermitted()) {
             throw new KustvaktException(StatusCodes.PLUGIN_NOT_PERMITTED,
@@ -413,6 +428,12 @@ public class OAuth2ClientService {
         
         InstalledPluginDto dto = new InstalledPluginDto(plugin);
         return dto;
+    }
+    
+    public void uninstallPlugin (String superClientId,
+            String clientId, String username) throws KustvaktException {
+        pluginDao.uninstallPlugin(superClientId, clientId, username);
+        tokenService.revokeAllClientTokensForUser(clientId, username);
     }
 
     private boolean isPluginInstalled (String superClientId, String clientId,

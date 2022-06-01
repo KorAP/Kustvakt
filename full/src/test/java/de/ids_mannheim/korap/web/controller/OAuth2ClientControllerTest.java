@@ -125,7 +125,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         testListConfidentialClient(username, clientId);
         testConfidentialClientInfo(clientId, username);
         testResetConfidentialClientSecret(clientId, clientSecret);
-        deregisterConfidentialClient(username, clientId);
+        deregisterClient(username, clientId);
     }
     
     @Test
@@ -265,7 +265,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         JsonNode clientInfo = retrieveClientInfo(clientId, username);
         assertEquals(expiry, clientInfo.at("/refresh_token_expiry").asInt());
         
-        deregisterConfidentialClient(username, clientId);
+        deregisterClient(username, clientId);
     }
     
     @Test

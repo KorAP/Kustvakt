@@ -138,7 +138,7 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         updateClientPriviledge(clientId, false);
         testAccessTokenAfterDegradingSuperClient(clientId, accessToken);
 
-        deregisterConfidentialClient(username, clientId);
+        deregisterClient(username, clientId);
     }
 
     // old access tokens retain their scopes

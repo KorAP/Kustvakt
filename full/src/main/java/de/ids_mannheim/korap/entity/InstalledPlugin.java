@@ -20,7 +20,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Table(name = "installed_plugin")
-public class InstalledPlugin {
+public class InstalledPlugin implements Comparable<InstalledPlugin>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,4 +38,9 @@ public class InstalledPlugin {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "super_client_id")
     private OAuth2Client superClient;
+
+    @Override
+    public int compareTo (InstalledPlugin o) {
+        return this.client.compareTo(o.client);
+    }
 }

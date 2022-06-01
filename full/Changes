@@ -13,6 +13,10 @@
  - Updated redirect URI error message for coherence
 2022-05-27
  - Added maximum limit to custom refresh token expiry
+2022-06-01
+ - Added new APIs: list user-installed plugins and uninstall plugin.
+ - Moved install and list plugin APIs to PluginController and updated their
+   service paths under /plugins.
  
  
 # version 0.67.1

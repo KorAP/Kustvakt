@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.net.URI;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -29,6 +30,7 @@ import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
@@ -287,7 +289,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
     }
 
-    protected void deregisterConfidentialClient (String username,
+    protected void deregisterClient (String username,
             String clientId) throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
 
@@ -322,6 +324,32 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
     }
+    
+    protected void testSearchWithOAuth2Token (String accessToken)
+            throws KustvaktException, IOException {
+        ClientResponse response = searchWithAccessToken(accessToken);
+        String entity = response.getEntity(String.class);
+        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                response.getStatus());
+        JsonNode node = JsonUtils.readTree(entity);
+        assertNotNull(node);
+        assertEquals(25, node.at("/matches").size());
+    }
+    
+    protected void testSearchWithRevokedAccessToken (String accessToken)
+            throws KustvaktException {
+        ClientResponse response = searchWithAccessToken(accessToken);
+        String entity = response.getEntity(String.class);
+        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
+                response.getStatus());
+
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Access token is invalid",
+                node.at("/errors/0/1").asText());
+    }
+
 
     protected void testRevokeTokenViaSuperClient (String token,
             String userAuthHeader) {

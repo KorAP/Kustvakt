@@ -5,6 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.http.entity.ContentType;
@@ -36,7 +38,6 @@ public class OAuth2PluginTest extends OAuth2TestBase {
     private String username = "plugin-user";
     @Autowired
     private InstalledPluginDao pluginDao;
-    
 
     @Test
     public void testRegisterPlugin () throws UniformInterfaceException,
@@ -44,7 +45,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         JsonNode source = JsonUtils.readTree("{ \"plugin\" : \"source\"}");
 
         int refreshTokenExpiry = TimeUtils.convertTimeToSeconds("90D");
-        
+
         String clientName = "Plugin";
         OAuth2ClientJson json = new OAuth2ClientJson();
         json.setName(clientName);
@@ -60,9 +61,9 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         String clientSecret = node.at("/client_secret").asText();
         assertNotNull(clientId);
         assertNotNull(clientSecret);
-        
+
         testInstallPluginNotPermitted(clientId);
-        testRetrievePluginInfo(clientId,refreshTokenExpiry);
+        testRetrievePluginInfo(clientId, refreshTokenExpiry);
 
         node = listPlugins(false);
         assertEquals(3, node.size());
@@ -71,12 +72,32 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
         testListUserRegisteredPlugins(username, clientId, clientName,
                 refreshTokenExpiry);
-        deregisterConfidentialClient(username, clientId);
+        deregisterClient(username, clientId);
     }
 
-    private void testRetrievePluginInfo (String clientId, int refreshTokenExpiry)
-            throws UniformInterfaceException, ClientHandlerException,
-            KustvaktException {
+    @Test
+    public void testRegisterPublicPlugin () throws KustvaktException {
+        JsonNode source = JsonUtils.readTree("{ \"plugin\" : \"source\"}");
+        String clientName = "Public Plugin";
+        OAuth2ClientJson json = new OAuth2ClientJson();
+        json.setName(clientName);
+        json.setType(OAuth2ClientType.PUBLIC);
+        json.setDescription("This is a public plugin.");
+        json.setSource(source);
+
+        ClientResponse response = registerClient(username, json);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+
+        String clientId = node.at("/client_id").asText(); 
+        assertTrue(node.at("/client_secret").isMissingNode());
+        
+        deregisterClient(username, clientId);
+    }
+
+    private void testRetrievePluginInfo (String clientId,
+            int refreshTokenExpiry) throws UniformInterfaceException,
+            ClientHandlerException, KustvaktException {
         JsonNode clientInfo = retrieveClientInfo(clientId, username);
         assertEquals(clientId, clientInfo.at("/client_id").asText());
         assertEquals("Plugin", clientInfo.at("/client_name").asText());
@@ -136,8 +157,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("super_client_id", confidentialClientId);
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
-                .path("client").path("plugins")
+        ClientResponse response = resource().path(API_VERSION).path("plugins")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
@@ -157,8 +177,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
             MultivaluedMap<String, String> form)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
-                .path("client").path("plugins")
+        ClientResponse response = resource().path(API_VERSION).path("plugins")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
@@ -180,8 +199,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
-                .path("client").path("plugins")
+        ClientResponse response = resource().path(API_VERSION).path("plugins")
                 .header(Attributes.AUTHORIZATION, "Bearer blahblah")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
@@ -189,7 +207,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        
+
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
@@ -209,7 +227,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         assertFalse(node.at("/0/source").isMissingNode());
         assertFalse(node.at("/0/refresh_token_expiry").isMissingNode());
 
-//        assertTrue(node.at("/1/refresh_token_expiry").isMissingNode());
+        // assertTrue(node.at("/1/refresh_token_expiry").isMissingNode());
     }
 
     private JsonNode listPlugins (boolean permitted_only)
@@ -220,8 +238,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         if (permitted_only) {
             form.add("permitted_only", Boolean.toString(permitted_only));
         }
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
-                .path("client").path("plugins")
+        ClientResponse response = resource().path(API_VERSION).path("plugins")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
@@ -234,54 +251,57 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         return JsonUtils.readTree(entity);
     }
 
-    @Test
-    public void testInstallConfidentialPlugin () throws UniformInterfaceException,
+    private void testInstallConfidentialPlugin (String superClientId,
+            String clientId, String username) throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         MultivaluedMap<String, String> form = getSuperClientForm();
-        form.add("client_id", confidentialClientId2);
+        form.add("client_id", clientId);
         ClientResponse response = installPlugin(form);
-        
+
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(confidentialClientId2, node.at("/client_id").asText());
+        assertEquals(clientId, node.at("/client_id").asText());
         assertEquals(superClientId, node.at("/super_client_id").asText());
-        
+
         assertFalse(node.at("/name").isMissingNode());
         assertFalse(node.at("/description").isMissingNode());
         assertFalse(node.at("/url").isMissingNode());
         assertFalse(node.at("/installed_date").isMissingNode());
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        
-        testRetrieveInstalledPlugin(superClientId, confidentialClientId2,
-                username);
+
+        testRetrieveInstalledPlugin(superClientId, clientId, username);
     }
-    
+
     @Test
     public void testInstallPublicPlugin () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         MultivaluedMap<String, String> form = getSuperClientForm();
         form.add("client_id", publicClientId2);
         ClientResponse response = installPlugin(form);
-        
+
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(publicClientId2, node.at("/client_id").asText());
         assertEquals(superClientId, node.at("/super_client_id").asText());
-        
+
         assertFalse(node.at("/name").isMissingNode());
         assertFalse(node.at("/description").isMissingNode());
         assertFalse(node.at("/url").isMissingNode());
         assertFalse(node.at("/installed_date").isMissingNode());
-        
+
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        
+
         testInstallPluginRedundant(form);
-        
-        testRetrieveInstalledPlugin(superClientId, publicClientId2,
-                username);
+
+        testRetrieveInstalledPlugin(superClientId, publicClientId2, username);
+
+        response = uninstallPlugin(publicClientId2, username);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        node = retrieveUserInstalledPlugin(getSuperClientForm());
+        assertTrue(node.isEmpty());
     }
-    
+
     private void testInstallPluginRedundant (
             MultivaluedMap<String, String> form)
             throws UniformInterfaceException, ClientHandlerException,
@@ -306,21 +326,24 @@ public class OAuth2PluginTest extends OAuth2TestBase {
                 node.at("/errors/0/0").asInt());
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
-    
+
     @Test
-    public void testInstallPluginMissingClientId () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testInstallPluginMissingClientId ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
         MultivaluedMap<String, String> form = getSuperClientForm();
         ClientResponse response = installPlugin(form);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.MISSING_PARAMETER, node.at("/errors/0/0").asInt());
+        assertEquals(StatusCodes.INVALID_ARGUMENT,
+                node.at("/errors/0/0").asInt());
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
-    
+
     @Test
-    public void testInstallPluginInvalidClientId () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testInstallPluginInvalidClientId ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
         MultivaluedMap<String, String> form = getSuperClientForm();
         form.add("client_id", "unknown");
         ClientResponse response = installPlugin(form);
@@ -331,24 +354,25 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         assertEquals("invalid_client", node.at("/error").asText());
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     }
-    
+
     @Test
-    public void testInstallPluginMissingSuperClientSecret () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testInstallPluginMissingSuperClientSecret ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("super_client_id", superClientId);
-        
+
         ClientResponse response = installPlugin(form);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        
+
         assertEquals("Missing parameter: super_client_secret",
                 node.at("/error_description").asText());
         assertEquals("invalid_request", node.at("/error").asText());
-        
+
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
-    
+
     @Test
     public void testInstallPluginMissingSuperClientId ()
             throws UniformInterfaceException, ClientHandlerException,
@@ -364,7 +388,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
-    
+
     @Test
     public void testInstallPluginUnauthorizedClient ()
             throws UniformInterfaceException, ClientHandlerException,
@@ -372,27 +396,41 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         MultivaluedMap<String, String> form = new MultivaluedMapImpl();
         form.add("super_client_id", confidentialClientId);
         form.add("super_client_secret", clientSecret);
-        
+
         ClientResponse response = installPlugin(form);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals("unauthorized_client", node.at("/error").asText());
-        
+
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     }
 
     private ClientResponse installPlugin (MultivaluedMap<String, String> form)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        return resource().path(API_VERSION).path("oauth2").path("client")
-                .path("install")
+        return resource().path(API_VERSION).path("plugins").path("install")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).post(ClientResponse.class);
     }
-    
+
+    private ClientResponse uninstallPlugin (String clientId, String username)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+
+        MultivaluedMap<String, String> form = getSuperClientForm();
+        form.add("client_id", clientId);
+
+        return resource().path(API_VERSION).path("plugins").path("uninstall")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
+    }
+
     private void testRetrieveInstalledPlugin (String superClientId,
             String clientId, String installedBy) throws KustvaktException {
         InstalledPlugin plugin = pluginDao
@@ -400,8 +438,86 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         assertEquals(clientId, plugin.getClient().getId());
         assertEquals(superClientId, plugin.getSuperClient().getId());
         assertEquals(installedBy, plugin.getInstalledBy());
+
+        assertTrue(plugin.getId() > 0);
+        assertTrue(plugin.getInstalledDate() != null);
+    }
+
+    @Test
+    public void testListUserInstalledPlugins ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException, IOException {
+
+        testInstallConfidentialPlugin(superClientId, confidentialClientId,
+                username);
         
-        assertTrue(plugin.getId()>0);
-        assertTrue(plugin.getInstalledDate()!= null);
+        JsonNode node = testRequestAccessToken(confidentialClientId);
+        String accessToken = node.at("/access_token").asText(); 
+        String refreshToken = node.at("/refresh_token").asText();
+        testSearchWithOAuth2Token(accessToken);
+        
+        testInstallConfidentialPlugin(superClientId, confidentialClientId2,
+                username);
+
+        node = retrieveUserInstalledPlugin(getSuperClientForm());
+        assertEquals(2, node.size());
+
+        ClientResponse response =
+                uninstallPlugin(confidentialClientId, username);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        node = retrieveUserInstalledPlugin(getSuperClientForm());
+        assertEquals(1, node.size());
+
+        testRequestTokenWithRevokedRefreshToken(confidentialClientId,
+                clientSecret, refreshToken);
+        testSearchWithRevokedAccessToken(accessToken);
+        
+        response = uninstallPlugin(confidentialClientId2, username);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        node = retrieveUserInstalledPlugin(getSuperClientForm());
+        assertEquals(0, node.size());
+
+        testUninstallNotInstalledPlugin();
+    }
+    
+    private JsonNode testRequestAccessToken (String clientId) throws KustvaktException {
+        String userAuthHeader = HttpAuthorizationHandler
+                .createBasicAuthorizationHeaderValue(username, "password");
+        String code = requestAuthorizationCode(clientId, userAuthHeader);
+        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
+                clientId, clientSecret, code);
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        return node;
+    }
+
+    private void testUninstallNotInstalledPlugin ()
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        ClientResponse response =
+                uninstallPlugin(confidentialClientId2, username);
+        assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
+        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                node.at("/errors/0/0").asInt());
+
+    }
+
+    private JsonNode retrieveUserInstalledPlugin (
+            MultivaluedMap<String, String> form)
+            throws UniformInterfaceException, ClientHandlerException,
+            KustvaktException {
+        ClientResponse response = resource().path(API_VERSION).path("plugins")
+                .path("installed")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .entity(form).post(ClientResponse.class);
+
+        String entity = response.getEntity(String.class);
+        return JsonUtils.readTree(entity);
+
     }
 }
