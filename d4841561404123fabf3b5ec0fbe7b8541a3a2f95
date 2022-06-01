@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e0669d7_2ecbffd9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-06-01T11:25:46Z",
+      "side": 1,
+      "message": "I have updated the plugin un-installation workflow in Patch 2 so that all user access and refresh tokens for the plugin are removed. ",
+      "revId": "d4841561404123fabf3b5ec0fbe7b8541a3a2f95",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
