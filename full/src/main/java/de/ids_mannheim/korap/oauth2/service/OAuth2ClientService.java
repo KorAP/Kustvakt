@@ -390,12 +390,24 @@ public class OAuth2ClientService {
         return createClientDtos(plugins);
     }
     
+    public List<InstalledPluginDto> listInstalledPlugins (String superClientId,
+            String username) throws KustvaktException {
+
+        List<InstalledPlugin> plugins =
+                pluginDao.retrieveInstalledPlugins(superClientId, username);
+        Collections.sort(plugins); // by client name
+        
+        List<InstalledPluginDto> list = new ArrayList<InstalledPluginDto>(plugins.size());
+        for (InstalledPlugin p : plugins) {
+            list.add(new InstalledPluginDto(p));
+        }
+        
+        return list;
+    }
+    
     public InstalledPluginDto installPlugin (String superClientId,
             String clientId, String installedBy) throws KustvaktException {
-        if (clientId == null || clientId.isEmpty()) {
-            throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
-                    "Missing parameter: client_id");
-        }
+        
         OAuth2Client client = clientDao.retrieveClientById(clientId);
         if (!client.isPermitted()) {
             throw new KustvaktException(StatusCodes.PLUGIN_NOT_PERMITTED,
@@ -413,6 +425,11 @@ public class OAuth2ClientService {
         
         InstalledPluginDto dto = new InstalledPluginDto(plugin);
         return dto;
+    }
+    
+    public void uninstallPlugin (String superClientId,
+            String clientId, String username) throws KustvaktException {
+        pluginDao.uninstallPlugin(superClientId, clientId, username);
     }
 
     private boolean isPluginInstalled (String superClientId, String clientId,

@@ -20,6 +20,8 @@ public class InstalledPluginDto {
     private String name;
     private String description;
     private String url;
+    @JsonProperty("redirect_uri")
+    private String redirectUri;
     @JsonProperty("installed_date")
     private String installedDate;
     
@@ -31,5 +33,6 @@ public class InstalledPluginDto {
         setName(client.getName());
         setDescription(client.getDescription());
         setUrl(client.getUrl());
+        setRedirectUri(client.getRedirectURI());
     }
 }

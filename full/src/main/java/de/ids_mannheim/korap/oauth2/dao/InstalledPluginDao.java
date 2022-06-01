@@ -2,14 +2,15 @@ package de.ids_mannheim.korap.oauth2.dao;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Repository;
@@ -56,17 +57,15 @@ public class InstalledPluginDao {
                 builder.createQuery(InstalledPlugin.class);
 
         Root<InstalledPlugin> root = query.from(InstalledPlugin.class);
-        Join<InstalledPlugin, OAuth2Client> client =
-                root.join(InstalledPlugin_.client);
-        Join<InstalledPlugin, OAuth2Client> superClient =
-                root.join(InstalledPlugin_.superClient);
         query.select(root);
         query.where(builder.and(
                 builder.equal(root.get(InstalledPlugin_.INSTALLED_BY),
                         installedBy),
-                builder.equal(client.get(OAuth2Client_.id), clientId),
-                builder.equal(superClient.get(OAuth2Client_.id),
-                        superClientId)));
+                builder.equal(
+                        root.get(InstalledPlugin_.client).get(OAuth2Client_.id),
+                        clientId),
+                builder.equal(root.get(InstalledPlugin_.superClient)
+                        .get(OAuth2Client_.id), superClientId)));
 
         Query q = entityManager.createQuery(query);
         try {
@@ -76,4 +75,38 @@ public class InstalledPluginDao {
             throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND);
         }
     }
+
+    public List<InstalledPlugin> retrieveInstalledPlugins (String superClientId,
+            String installedBy) throws KustvaktException {
+        ParameterChecker.checkStringValue(superClientId, "super_client_id");
+        ParameterChecker.checkStringValue(installedBy, "installedBy");
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<InstalledPlugin> query =
+                builder.createQuery(InstalledPlugin.class);
+
+        Root<InstalledPlugin> root = query.from(InstalledPlugin.class);
+        query.select(root);
+        query.where(builder.and(
+                builder.equal(root.get(InstalledPlugin_.INSTALLED_BY),
+                        installedBy),
+                builder.equal(root.get(InstalledPlugin_.superClient)
+                        .get(OAuth2Client_.id), superClientId)));
+
+        TypedQuery<InstalledPlugin> q = entityManager.createQuery(query);
+        try {
+            return q.getResultList();
+        }
+        catch (NoResultException e) {
+            throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND);
+        }
+    }
+
+    public void uninstallPlugin (String superClientId, String clientId,
+            String username) throws KustvaktException {
+        InstalledPlugin plugin =
+                retrieveInstalledPlugin(superClientId, clientId, username);
+        entityManager.remove(plugin);
+    }
+
 }
