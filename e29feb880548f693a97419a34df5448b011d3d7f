@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2963e1b4_409e72fe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-06-03T11:24:41Z",
+      "side": 1,
+      "message": "@Helge could you review this? It is not very important, just a fix based on our discussion regarding running Kustvakt.jar using external spring config and testing basic authentication.",
+      "revId": "e29feb880548f693a97419a34df5448b011d3d7f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
