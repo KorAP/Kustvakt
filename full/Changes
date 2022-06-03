@@ -20,6 +20,9 @@
 2022-06-03 
  - Implemented searching option using a network endpoint
  - Implemented initial super client registration for user authentication.
+ - Fixed admin clean token API and restrict plugins to confidential only.
+ 
+ 
  
 # version 0.67.1
 
