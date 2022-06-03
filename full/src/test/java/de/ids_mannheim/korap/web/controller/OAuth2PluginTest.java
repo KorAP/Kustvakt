@@ -86,13 +86,18 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         json.setSource(source);
 
         ClientResponse response = registerClient(username, json);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
 
-        String clientId = node.at("/client_id").asText(); 
-        assertTrue(node.at("/client_secret").isMissingNode());
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        System.out.println(node.toPrettyString()); 
+        assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
+        assertFalse(node.at("/error_description").isMissingNode());
         
-        deregisterClient(username, clientId);
+//        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+//        String clientId = node.at("/client_id").asText(); 
+//        assertTrue(node.at("/client_secret").isMissingNode());
+//        
+//        deregisterClient(username, clientId);
     }
 
     private void testRetrievePluginInfo (String clientId,

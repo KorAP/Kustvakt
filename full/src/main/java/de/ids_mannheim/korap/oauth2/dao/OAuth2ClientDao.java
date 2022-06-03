@@ -72,8 +72,14 @@ public class OAuth2ClientDao {
         client.setRegisteredBy(registeredBy);
         client.setRegistrationDate(ZonedDateTime.now());
         client.setDescription(description);
-        if (source !=null && !source.isNull()) {
-            client.setSource(source.toString());
+        if (source != null && !source.isNull()) {
+            if (type.equals(OAuth2ClientType.CONFIDENTIAL)) {
+                client.setSource(source.toString());
+            }
+            else {
+                throw new KustvaktException(StatusCodes.NOT_SUPPORTED,
+                        "Only confidential plugins are supported.");
+            }
         }
         else {
             client.setPermitted(true);
