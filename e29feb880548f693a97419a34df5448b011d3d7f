@@ -16,6 +16,23 @@
       "message": "@Helge could you review this? It is not very important, just a fix based on our discussion regarding running Kustvakt.jar using external spring config and testing basic authentication.",
       "revId": "e29feb880548f693a97419a34df5448b011d3d7f",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce575b79_76b2d795",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-06-03T11:26:55Z",
+      "side": 1,
+      "message": "How to run with the config:\n\njava -jar Kustvakt-*.jar --spring-config basic-config-sqlite.xml\n\nTesting:\n\nrun API requests using authorization header in the following format:\n\nBasic [base64 username and password]",
+      "revId": "e29feb880548f693a97419a34df5448b011d3d7f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
