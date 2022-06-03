@@ -48,6 +48,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "77921c93_d259d466",
+        "filename": "full/src/main/resources/db/sqlite/V1.11__plugin.sql",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-06-03T09:30:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2387ef6b_854298bc",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 45
+      },
+      "revId": "3f220e0c1793b5dbbe01f28867bafc28f75b598a",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "73314049_e8be511f",
