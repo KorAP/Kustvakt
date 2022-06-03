@@ -184,6 +184,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b19af0f_7ef30b9c",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/oauth2/service/OAuth2InitClientService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-06-03T11:49:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8be2c34_73bb663b",
+      "range": {
+        "startLine": 57,
+        "startChar": 11,
+        "endLine": 58,
+        "endChar": 102
+      },
+      "revId": "b85c8717ab5bc9e6a0bfeb99dcc17fa8045bc92f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f953d121_37984e2d",
@@ -269,6 +293,24 @@
       "side": 1,
       "message": "After testing with junit, you are right. But ... probably the correct fix is to enter the initial client to the database after initit, if the file exists, right?",
       "parentUuid": "627c2e00_c35243b3",
+      "revId": "b85c8717ab5bc9e6a0bfeb99dcc17fa8045bc92f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2325f158_25991fdc",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/InitialSuperClientTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-06-03T11:49:07Z",
+      "side": 1,
+      "message": "Fixed in Patch 3.",
+      "parentUuid": "8c03135b_6bfab80f",
       "revId": "b85c8717ab5bc9e6a0bfeb99dcc17fa8045bc92f",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
