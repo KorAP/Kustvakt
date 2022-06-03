@@ -65,6 +65,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b18b8c8_36a04ea0",
+        "filename": "full/initial_super_client.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-06-03T13:06:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ac56d7c0_4abbf19b",
+      "range": {
+        "startLine": 1,
+        "startChar": 1,
+        "endLine": 5,
+        "endChar": 1
+      },
+      "revId": "b85c8717ab5bc9e6a0bfeb99dcc17fa8045bc92f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35e345ec_b89269bf",
