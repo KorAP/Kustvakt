@@ -93,6 +93,30 @@
       },
       "revId": "3f220e0c1793b5dbbe01f28867bafc28f75b598a",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "956b51eb_80dcc440",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/controller/OAuth2PluginTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2022-06-03T09:30:33Z",
+      "side": 1,
+      "message": "The restriction will be added in another commit.",
+      "parentUuid": "b1fc841f_4d8a3e54",
+      "range": {
+        "startLine": 244,
+        "startChar": 16,
+        "endLine": 244,
+        "endChar": 40
+      },
+      "revId": "3f220e0c1793b5dbbe01f28867bafc28f75b598a",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
