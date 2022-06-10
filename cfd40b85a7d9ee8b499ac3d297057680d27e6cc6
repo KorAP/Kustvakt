@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58acd699_18c6a642",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-06-10T14:26:35Z",
+      "side": 1,
+      "message": "Hm ... this still fails ...\n\nRunning docker with:\n\n$ docker run --rm --name kustvakt --net host -v sample-index:/kustvakt/index:z --mount type\u003dbind,readonly\u003dtrue,source\u003d\"${PWD}/super_client_info\",target\u003d/client/super_client_info korap/kustvakt:0.68-full\n\nKalamar config is:\n\n```\nuse Mojo::File qw\u0027path\u0027;\nuse Mojo::JSON \u0027decode_json\u0027;\nmy $client \u003d decode_json(path(\u0027/kalamar/super_client_info\u0027)-\u003eslurp);\n\n{\n  Kalamar \u003d\u003e {\n    api_path \u003d\u003e \u0027http://localhost:8089/api/\u0027,\n    plugins \u003d\u003e [\u0027Auth\u0027]\n  },\n  \u0027Kalamar-Auth\u0027 \u003d\u003e {\n    client_id \u003d\u003e $client-\u003e{client_id},\n    client_secret \u003d\u003e $client-\u003e{client_secret},\n    oauth2 \u003d\u003e 1\n  }\n}\n```\n\nRunning Kalamar with\n\n$ docker run --rm --name kalamar --net host --mount type\u003dbind,readonly\u003dtrue,source\u003d\"${PWD}/kalamar.production.conf\",target\u003d/kalamar/kalamar.production.conf --mount type\u003dbind,readonly\u003dtrue,source\u003d\"${PWD}/super_client_info\",target\u003d/kalamar/super_client_info korap/kalamar\n\nStill returns \"unknown client\" and returns 104 for searching ...",
+      "revId": "cfd40b85a7d9ee8b499ac3d297057680d27e6cc6",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
