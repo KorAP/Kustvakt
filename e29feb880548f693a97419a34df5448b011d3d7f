@@ -50,6 +50,23 @@
       "message": "Fails for me with (a.o.):\n ERROR: Caught exception while allowing TestExecutionListener [org.springframework.test.context.support.DependencyInjectionTestExecutionListener@6a7ea7c] to prepare test instance [de.ids_mannheim.korap.service.VirtualCorpusServiceTest@3ee200ae]\njava.lang.IllegalStateException: Failed to load ApplicationContext\n\tat org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:132) ~[spring-test-5.3.20.jar:5.3.20]\n\tat \n\t....\n\t\tat org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:126) ~[surefire-booter-2.22.2.jar:2.22.2]\n\tat org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:418) ~[surefire-booter-2.22.2.jar:2.22.2]\nCaused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name \u0027flyway\u0027 defined in class path resource [test-config.xml]: Invocation of init method failed; nested exception is org.flywaydb.core.internal.command.DbMigrate$FlywayMigrateException: Migration V3.5__insert_oauth2_clients.sql failed\n------------------------------------------------\nSQL State  : null\nError Code : 1\nMessage    : [SQLITE_ERROR] SQL error or missing database (10 values for 11 columns)\nLocation   : db/test/V3.5__insert_oauth2_clients.sql (/home/ndiewald/Repositories/korap-git/Kustvakt/full/target/classes/db/test/V3.5__insert_oauth2_clients.sql)\nLine       : 45\nStatement  : INSERT INTO oauth2_client(id,name,secret,type,super,\n  redirect_uri, registered_by, description, url, registration_date, \n  is_permitted) \nVALUES (\"nW5qM63Rb2a7KdT9L\",\"test public client\",null,\n  \"PUBLIC\", 0, \"https://korap.ids-mannheim.de/public/redirect\",\n  \"system\", \"http://korap.ids-mannheim.de/public\", \n  CURRENT_TIMESTAMP, 1)\n",
       "revId": "e29feb880548f693a97419a34df5448b011d3d7f",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3ec56b5_af81db54",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-06-10T10:29:03Z",
+      "side": 1,
+      "message": "I don\u0027t know the purpose 9of this commit, but as it fails and Eliza is no longer available, I would abandon it. It seems to be relevant to @Helge though.",
+      "revId": "e29feb880548f693a97419a34df5448b011d3d7f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
