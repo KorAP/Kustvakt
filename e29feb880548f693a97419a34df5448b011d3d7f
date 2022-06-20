@@ -67,6 +67,24 @@
       "message": "I don\u0027t know the purpose 9of this commit, but as it fails and Eliza is no longer available, I would abandon it. It seems to be relevant to @Helge though.",
       "revId": "e29feb880548f693a97419a34df5448b011d3d7f",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4705908b_72769dc2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33
+      },
+      "writtenOn": "2022-06-20T07:05:59Z",
+      "side": 1,
+      "message": "I would prefer not to abandon it.",
+      "parentUuid": "c3ec56b5_af81db54",
+      "revId": "e29feb880548f693a97419a34df5448b011d3d7f",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
