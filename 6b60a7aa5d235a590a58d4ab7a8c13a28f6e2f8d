@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c25560a5_08a40db3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-09-07T12:21:01Z",
+      "side": 1,
+      "message": "The rules were wrong (an unnecessary `.org` at the end) and so the libraries were updated.",
+      "revId": "6b60a7aa5d235a590a58d4ab7a8c13a28f6e2f8d",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
