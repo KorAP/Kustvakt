@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44de8ccd_f05271f8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-09-08T10:09:23Z",
+      "side": 1,
+      "message": "sqlite dialect is deprecated for hibernate \u003e\u003d 6 and I don\u0027t really understand hiw hibernate wants to go on with SQLite support. It seems they want to break it on purpose, that\u0027s why it\u0027s pinned and probably why Eliza pinned it earlier.",
+      "revId": "3a6f6715fcd8ad05aeb544ff1f53604590daf55d",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
