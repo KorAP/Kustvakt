@@ -23,16 +23,28 @@ updates:
       - dependency-name: "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider"
         versions:
           - ">= 2.13.0"
+      - dependency-name: "org.hibernate:hibernate-*"
+        versions:
+          - ">= 6.0.0"
+      - dependency-name: "com.github.gwenn:sqlite-dialect"
+        versions:
+          - "> 0.1.0"
     open-pull-requests-limit: 50
 
   - package-ecosystem: "maven" # See documentation for possible values
     directory: "/lite" # Location of package manifests
     schedule:
       interval: "daily"
+    - dependency-name: "org.hibernate:hibernate-*"
+        versions:
+          - ">= 6.0.0"
     open-pull-requests-limit: 50
 
   - package-ecosystem: "maven" # See documentation for possible values
     directory: "/full" # Location of package manifests
     schedule:
       interval: "daily"
+    - dependency-name: "org.hibernate:hibernate-*"
+      versions:
+        - ">= 6.0.0"
     open-pull-requests-limit: 50
