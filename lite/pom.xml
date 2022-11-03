@@ -5,10 +5,10 @@
 	<artifactId>Kustvakt-lite</artifactId>
 	<version>0.68</version>
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring-framework.version>5.1.1.RELEASE</spring-framework.version>
-		<jersey.version>1.19.4</jersey.version>
+		<jersey.version>2.37</jersey.version>
 	</properties>
 
 	<build>
@@ -161,14 +161,14 @@
       	</dependency>
 		<!-- Jersey test framework -->
 		<dependency>
-			<groupId>com.sun.jersey.jersey-test-framework</groupId>
+			<groupId>org.glassfish.jersey.test-framework</groupId>
 			<artifactId>jersey-test-framework-core</artifactId>
 			<version>${jersey.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.sun.jersey.jersey-test-framework</groupId>
-			<artifactId>jersey-test-framework-grizzly</artifactId>
+			<groupId>org.glassfish.jersey.test-framework.providers</groupId>
+			<artifactId>jersey-test-framework-provider-grizzly2</artifactId>
 			<version>${jersey.version}</version>
 			<scope>test</scope>
 		</dependency>
