@@ -2,6 +2,8 @@ package de.ids_mannheim.korap.web.filter;
 
 import java.security.Principal;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
@@ -23,6 +25,7 @@ import de.ids_mannheim.korap.utils.TimeUtils;
  * Created by hanl on 7/15/14.
  */
 @Component
+@Priority(Priorities.AUTHENTICATION)
 public class DemoUserFilter implements ContainerRequestFilter {
 
     @Context

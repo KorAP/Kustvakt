@@ -15,6 +15,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 
@@ -39,6 +41,7 @@ import net.minidev.json.JSONArray;
  * @date 13/05/2014
  */
 @Component
+@Priority(Priorities.AUTHORIZATION)
 public class PiwikFilter implements ContainerRequestFilter {
 
     private WebTarget service;

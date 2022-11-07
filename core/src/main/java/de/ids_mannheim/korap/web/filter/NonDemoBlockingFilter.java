@@ -3,6 +3,8 @@ package de.ids_mannheim.korap.web.filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 
@@ -21,6 +23,7 @@ import de.ids_mannheim.korap.web.KustvaktResponseHandler;
  *       anonymous access should be allowed!
  */
 @Component
+@Priority(Priorities.AUTHORIZATION)
 public class NonDemoBlockingFilter
         implements ContainerRequestFilter {
 

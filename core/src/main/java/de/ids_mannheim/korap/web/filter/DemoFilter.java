@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.web.filter;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.SecurityContext;
@@ -16,6 +18,7 @@ import de.ids_mannheim.korap.security.context.TokenContext;
  * @author hanl
  * @date 08/02/2016
  */
+@Priority(Priorities.AUTHENTICATION)
 public class DemoFilter implements ContainerRequestFilter {
 
     @Override

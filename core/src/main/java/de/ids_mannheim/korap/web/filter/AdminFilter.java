@@ -1,6 +1,8 @@
 package de.ids_mannheim.korap.web.filter;
 
+import javax.annotation.Priority;
 import javax.servlet.ServletContext;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
@@ -20,6 +22,7 @@ import de.ids_mannheim.korap.web.KustvaktResponseHandler;
  * @see {@link AuthenticationFilter}
  */
 @Component
+@Priority(Priorities.AUTHENTICATION)
 public class AdminFilter extends AuthenticationFilter {
 
     private @Context ServletContext servletContext;

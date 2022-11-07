@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.glassfish.jersey.server.ContainerRequest;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 
@@ -28,6 +30,7 @@ import de.ids_mannheim.korap.web.KustvaktResponseHandler;
  * @last update 12/2017
  */
 @Component
+@Priority(Priorities.AUTHENTICATION)
 public class AuthenticationFilter
         implements ContainerRequestFilter {
 

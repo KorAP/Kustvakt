@@ -2,6 +2,7 @@ package de.ids_mannheim.korap.web.filter;
 
 import java.util.List;
 
+import javax.annotation.Priority;
 import javax.ws.rs.core.PathSegment;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
  *
  */
 @Component
+@Priority(Integer.MIN_VALUE)
 public class APIVersionFilter
         implements ContainerRequestFilter {
 
