@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.logging.log4j.LogManager;
@@ -120,18 +121,22 @@ public class PiwikFilter implements ContainerRequestFilter {
     public void filter (ContainerRequestContext request) {
         if (ENABLED) {
             try {
-                TokenContext context = (TokenContext) request
-                        .getUserPrincipal();
-                if (context.getUsername() != null){
-                    // since this is cached, not very expensive!
-                    User user = authenticationManager.getUser(context.getUsername());
-                    Userdata data = authenticationManager
-                            .getUserData(user, UserSettingProcessor.class);
-                    if ((Boolean) data.get(Attributes.COLLECT_AUDITING_DATA))
-                        customVars.put("username", context.getUsername());
+                TokenContext context;
+                SecurityContext securityContext = request.getSecurityContext();
+                if (securityContext != null) {
+                    context = (TokenContext) securityContext.getUserPrincipal();
+
+                    if (context.getUsername() != null){
+                        // since this is cached, not very expensive!
+                        User user = authenticationManager.getUser(context.getUsername());
+                        Userdata data = authenticationManager
+                                .getUserData(user, UserSettingProcessor.class);
+                        if ((Boolean) data.get(Attributes.COLLECT_AUDITING_DATA))
+                            customVars.put("username", context.getUsername());
+                    }
                 }
             }
-            catch (KustvaktException | UnsupportedOperationException e) {
+            catch (KustvaktException e) {
                 //do nothing
             }
             send(request);

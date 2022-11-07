@@ -26,10 +26,7 @@ public class DemoFilter implements ContainerRequestFilter {
         String authentication =
                 request.getHeaderValue(ContainerRequest.AUTHORIZATION);
         if (authentication == null || authentication.isEmpty()) {
-            try {
-                request.getUserPrincipal();
-            }
-            catch (UnsupportedOperationException e) {
+            if (request.getSecurityContext() == null) {
                 request.setSecurityContext(createContext());
             }
         }

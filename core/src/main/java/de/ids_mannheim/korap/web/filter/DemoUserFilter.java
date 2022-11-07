@@ -7,6 +7,7 @@ import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,11 +45,9 @@ public class DemoUserFilter implements ContainerRequestFilter {
         // means that this is the public service
         if (authentication == null || authentication.isEmpty()) {
             Principal pr = null;
-            try {
-                pr = request.getUserPrincipal();
-            }
-            catch (UnsupportedOperationException e) {
-                // do nothing
+            SecurityContext securityContext = request.getSecurityContext();
+            if (securityContext != null) {
+                pr = securityContext.getUserPrincipal();
             }
             if (pr == null)
                 request.setSecurityContext(new KustvaktContext(

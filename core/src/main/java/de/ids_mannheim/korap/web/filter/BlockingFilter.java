@@ -7,6 +7,7 @@ import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.SecurityContext;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -31,12 +32,13 @@ public class BlockingFilter implements ContainerRequestFilter {
     public void filter (ContainerRequestContext request) {
         TokenContext context;
 
-        try {
-            context = (TokenContext) request.getUserPrincipal();
+        SecurityContext securityContext = request.getSecurityContext();
+        if (securityContext != null) {
+            context = (TokenContext) securityContext.getUserPrincipal();
         }
-        catch (UnsupportedOperationException e) {
+        else {
             throw kustvaktResponseHandler.throwit(new KustvaktException(
-                    StatusCodes.UNSUPPORTED_OPERATION, e.getMessage(), e));
+                    StatusCodes.UNSUPPORTED_OPERATION));
         }
 
         if (context == null || context.isDemo()) {
