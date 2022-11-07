@@ -8,7 +8,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.Provider;
 
@@ -17,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
@@ -72,16 +70,6 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
 
     private void send (ContainerRequest request) {
         Random random = new SecureRandom();
-        MultivaluedMap<String, String> params = new MultivaluedMapImpl();
-        params.add("idsite", "2");
-        params.add("rec", "1");
-        if (!customVars.isEmpty())
-            params.add("_cvar", translateCustomData());
-        params.add("cip", request.getHeaderValue("Host"));
-        params.add("cookie", "false");
-        params.add("r", String.valueOf(random.nextDouble()));
-        params.add("action_name", request.getRequestUri().toASCIIString());
-
         Locale l = null;
         if (request.getAcceptableLanguages() != null)
             l = request.getAcceptableLanguages().get(0);
@@ -96,7 +84,7 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
                     .queryParam("r", String.valueOf(random.nextDouble()))
                     .queryParam("action_name",
                             request.getRequestUri().toASCIIString())
-                    .queryParams(params).accept("text/html")
+                    .accept("text/html")
                     .header("Host", request.getHeaderValue("Host"))
                     .header("User-Agent", request.getHeaderValue("User-Agent"))
                     .acceptLanguage(l).method("GET");

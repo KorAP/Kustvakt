@@ -1,7 +1,6 @@
 package de.ids_mannheim.korap.web;
 
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 
@@ -10,6 +9,8 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MultivaluedMap;
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author hanl
@@ -29,10 +30,8 @@ public class ClientsHandler {
 
     public String getResponse (String path, String key, Object value)
             throws KustvaktException {
-        MultivaluedMap map = new MultivaluedMapImpl();
-        map.add(key, value);
         try {
-            return service.path(path).queryParams(map).get(String.class);
+            return service.path(path).queryParam(key, value).get(String.class);
         }
         catch (UniformInterfaceException e) {
             throw new KustvaktException(StatusCodes.REQUEST_INVALID);
@@ -40,13 +39,16 @@ public class ClientsHandler {
     }
 
 
-    public String getResponse (MultivaluedMap map, String ... paths)
+    public String getResponse (MultivaluedMap<String, String> map, String ... paths)
             throws KustvaktException {
         try {
             WebTarget resource = service;
             for (String p : paths)
                 resource = resource.path(p);
-            resource = resource.queryParams(map);
+            for (Map.Entry<String, List<String>> e : map.entrySet()) {
+                for (String value : e.getValue())
+                    resource = resource.queryParam(e.getKey(), value);
+            }
             return resource.get(String.class);
         }
         catch (UniformInterfaceException e) {
