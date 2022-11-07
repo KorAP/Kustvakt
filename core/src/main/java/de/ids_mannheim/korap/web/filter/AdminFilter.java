@@ -14,6 +14,7 @@ import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.security.context.TokenContext;
+import de.ids_mannheim.korap.utils.JerseyUtils;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 
 /**
@@ -37,7 +38,7 @@ public class AdminFilter extends AuthenticationFilter {
         String username = "guest";
         
         // legacy support for kustvakt core
-        String adminToken = superRequest.getFormParameters().getFirst("token");
+        String adminToken = JerseyUtils.getFormParameters(context).asMap().getFirst("token");
         if (adminToken != null && !adminToken.isEmpty()) {
             // startswith token=
             // adminToken = adminToken.substring(6);
