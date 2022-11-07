@@ -110,7 +110,7 @@ public class AuthenticationFilter
                     "Context is not valid: "
                             + "missing username, password or authentication scheme.");
         }
-        else if (context.isSecureRequired() && !request.isSecure()) {
+        else if (context.isSecureRequired() && !request.getSecurityContext().isSecure()) {
             throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
                     "Request is not secure.");
         }
