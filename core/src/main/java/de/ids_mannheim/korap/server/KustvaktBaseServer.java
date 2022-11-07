@@ -22,6 +22,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.springframework.web.context.ContextLoaderListener;
 
+import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
@@ -111,7 +112,7 @@ public abstract class KustvaktBaseServer {
 
         ServletHolder servletHolder = new ServletHolder(new ServletContainer());
         servletHolder.setInitParameter(
-                "com.sun.jersey.config.property.packages", rootPackages);
+                ServerProperties.PROVIDER_PACKAGES, rootPackages);
         servletHolder.setInitOrder(1);
         contextHandler.addServlet(servletHolder, config.getBaseURL());
 
