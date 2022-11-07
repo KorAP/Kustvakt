@@ -29,7 +29,7 @@ public class APIVersionFilter
     private KustvaktConfiguration config;
 
     public void filter (ContainerRequestContext request) {
-        List<PathSegment> pathSegments = request.getPathSegments();
+        List<PathSegment> pathSegments = request.getUriInfo().getPathSegments();
         String version = pathSegments.get(0).getPath();
 
         if (!config.getSupportedVersions().contains(version)) {
