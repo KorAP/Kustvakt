@@ -16,10 +16,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ResourceFilter;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -43,7 +41,7 @@ import net.minidev.json.JSONArray;
  */
 @Component
 @Provider
-public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
+public class PiwikFilter implements ContainerRequestFilter {
 
     private WebTarget service;
     //    private static final String SERVICE = "http://localhost:8888";
@@ -68,7 +66,7 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
     }
 
 
-    private void send (ContainerRequest request) {
+    private void send (ContainerRequestContext request) {
         Random random = new SecureRandom();
         Locale l = null;
         if (request.getAcceptableLanguages() != null)
@@ -118,7 +116,7 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
 
 
     @Override
-    public ContainerRequest filter (ContainerRequest request) {
+    public void filter (ContainerRequestContext request) {
         if (ENABLED) {
             try {
                 TokenContext context = (TokenContext) request
@@ -137,18 +135,5 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
             }
             send(request);
         }
-        return request;
-    }
-
-
-    @Override
-    public ContainerRequestFilter getRequestFilter () {
-        return this;
-    }
-
-
-    @Override
-    public ContainerResponseFilter getResponseFilter () {
-        return null;
     }
 }

@@ -4,11 +4,10 @@ import javax.ws.rs.ext.Provider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.glassfish.jersey.server.ContainerRequest;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ResourceFilter;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 
 import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.authentication.http.AuthorizationData;
@@ -33,7 +32,7 @@ import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 @Component
 @Provider
 public class AuthenticationFilter
-        implements ContainerRequestFilter, ResourceFilter {
+        implements ContainerRequestFilter {
 
     @Autowired
     private HttpAuthorizationHandler authorizationHandler;
@@ -45,7 +44,7 @@ public class AuthenticationFilter
     private KustvaktResponseHandler kustvaktResponseHandler;
 
     @Override
-    public ContainerRequest filter (ContainerRequest request) {
+    public void filter (ContainerRequestContext request) {
         String host = request.getHeaderValue(ContainerRequest.HOST);
         String ua = request.getHeaderValue(ContainerRequest.USER_AGENT);
 
@@ -97,11 +96,10 @@ public class AuthenticationFilter
                 throw kustvaktResponseHandler.throwit(e);
             }
         }
-        return request;
     }
 
 
-    private void checkContext (TokenContext context, ContainerRequest request)
+    private void checkContext (TokenContext context, ContainerRequestContext request)
             throws KustvaktException {
         if (context == null) {
             throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
@@ -120,17 +118,5 @@ public class AuthenticationFilter
             throw new KustvaktException(StatusCodes.EXPIRED,
                     "Access token is expired");
         }
-    }
-
-
-    @Override
-    public ContainerRequestFilter getRequestFilter () {
-        return this;
-    }
-
-
-    @Override
-    public ContainerResponseFilter getResponseFilter () {
-        return null;
     }
 }

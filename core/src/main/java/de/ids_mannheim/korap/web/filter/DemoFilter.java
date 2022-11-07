@@ -1,12 +1,11 @@
 package de.ids_mannheim.korap.web.filter;
 
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ResourceFilter;
+import org.glassfish.jersey.server.ContainerRequest;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.constant.TokenType;
@@ -19,10 +18,10 @@ import de.ids_mannheim.korap.security.context.TokenContext;
  * @date 08/02/2016
  */
 @Provider
-public class DemoFilter implements ContainerRequestFilter, ResourceFilter {
+public class DemoFilter implements ContainerRequestFilter {
 
     @Override
-    public ContainerRequest filter (ContainerRequest request) {
+    public void filter (ContainerRequestContext request) {
         String authentication =
                 request.getHeaderValue(ContainerRequest.AUTHORIZATION);
         if (authentication == null || authentication.isEmpty()) {
@@ -33,7 +32,6 @@ public class DemoFilter implements ContainerRequestFilter, ResourceFilter {
                 request.setSecurityContext(createContext());
             }
         }
-        return request;
     }
 
 
@@ -51,17 +49,5 @@ public class DemoFilter implements ContainerRequestFilter, ResourceFilter {
         context.setTokenType(TokenType.BASIC);
         context.setUsername("demo");
         return new KustvaktContext(context);
-    }
-
-
-    @Override
-    public ContainerRequestFilter getRequestFilter () {
-        return this;
-    }
-
-
-    @Override
-    public ContainerResponseFilter getResponseFilter () {
-        return null;
     }
 }

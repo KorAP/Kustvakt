@@ -5,10 +5,8 @@ import javax.ws.rs.ext.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ResourceFilter;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -24,13 +22,13 @@ import de.ids_mannheim.korap.web.KustvaktResponseHandler;
  */
 @Component
 @Provider
-public class BlockingFilter implements ContainerRequestFilter, ResourceFilter {
+public class BlockingFilter implements ContainerRequestFilter {
 
     @Autowired
     private KustvaktResponseHandler kustvaktResponseHandler;
 
     @Override
-    public ContainerRequest filter (ContainerRequest request) {
+    public void filter (ContainerRequestContext request) {
         TokenContext context;
 
         try {
@@ -46,20 +44,5 @@ public class BlockingFilter implements ContainerRequestFilter, ResourceFilter {
                     StatusCodes.AUTHORIZATION_FAILED,
                     "Unauthorized operation for user: guest", "guest"));
         }
-
-
-        return request;
-    }
-
-
-    @Override
-    public ContainerRequestFilter getRequestFilter () {
-        return this;
-    }
-
-
-    @Override
-    public ContainerResponseFilter getResponseFilter () {
-        return null;
     }
 }

@@ -2,6 +2,8 @@ package de.ids_mannheim.korap.web.filter;
 
 import java.security.Principal;
 
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Provider;
@@ -9,10 +11,7 @@ import javax.ws.rs.ext.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ResourceFilter;
+import org.glassfish.jersey.server.ContainerRequest;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.TokenType;
@@ -26,7 +25,7 @@ import de.ids_mannheim.korap.utils.TimeUtils;
  */
 @Provider
 @Component
-public class DemoUserFilter implements ContainerRequestFilter, ResourceFilter {
+public class DemoUserFilter implements ContainerRequestFilter {
 
     @Context
     UriInfo info;
@@ -35,7 +34,7 @@ public class DemoUserFilter implements ContainerRequestFilter, ResourceFilter {
 
 
     @Override
-    public ContainerRequest filter (ContainerRequest request) {
+    public void filter (ContainerRequestContext request) {
         String host = request.getHeaderValue(ContainerRequest.HOST);
         String ua = request.getHeaderValue(ContainerRequest.USER_AGENT);
         String authentication = request
@@ -53,9 +52,7 @@ public class DemoUserFilter implements ContainerRequestFilter, ResourceFilter {
             if (pr == null)
                 request.setSecurityContext(new KustvaktContext(
                         createShorterToken(host, ua)));
-
         }
-        return request;
     }
 
 
@@ -70,17 +67,5 @@ public class DemoUserFilter implements ContainerRequestFilter, ResourceFilter {
                         .getShortTokenTTL()).getMillis());
         c.setTokenType(TokenType.BASIC);
         return c;
-    }
-
-
-    @Override
-    public ContainerRequestFilter getRequestFilter () {
-        return this;
-    }
-
-
-    @Override
-    public ContainerResponseFilter getResponseFilter () {
-        return null;
     }
 }

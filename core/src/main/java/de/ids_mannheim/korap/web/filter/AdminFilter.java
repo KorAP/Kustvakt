@@ -1,16 +1,13 @@
 package de.ids_mannheim.korap.web.filter;
 
 import javax.servlet.ServletContext;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
 
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -34,8 +31,8 @@ public class AdminFilter extends AuthenticationFilter {
     private KustvaktResponseHandler kustvaktResponseHandler;
 
     @Override
-    public ContainerRequest filter (ContainerRequest request) {
-        ContainerRequest superRequest = super.filter(request);
+    public void filter (ContainerRequestContext context) {
+        super.filter(context);
         String username = "guest";
         
         // legacy support for kustvakt core
@@ -45,34 +42,22 @@ public class AdminFilter extends AuthenticationFilter {
             // adminToken = adminToken.substring(6);
             if (adminToken
                     .equals(servletContext.getInitParameter("adminToken"))) {
-                return superRequest;
+                return;
             }
         }
 
-        SecurityContext securityContext = superRequest.getSecurityContext();
+        SecurityContext securityContext = context.getSecurityContext();
         TokenContext tokenContext = (TokenContext) securityContext
                 .getUserPrincipal();
         
         if (tokenContext != null) {
             username = tokenContext.getUsername();
             if (adminDao.isAdmin(username)) {
-                return superRequest;
+                return;
             }
         }
         throw kustvaktResponseHandler.throwit(new KustvaktException(
                 StatusCodes.AUTHORIZATION_FAILED,
                 "Unauthorized operation for user: " + username, username));
-    }
-
-
-    @Override
-    public ContainerRequestFilter getRequestFilter () {
-        return this;
-    }
-
-
-    @Override
-    public ContainerResponseFilter getResponseFilter () {
-        return null;
     }
 }
