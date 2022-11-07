@@ -1,14 +1,13 @@
 package de.ids_mannheim.korap.web;
 
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MultivaluedMap;
 import java.net.URI;
 
@@ -19,13 +18,12 @@ import java.net.URI;
 // use for Piotr Ps. rest api connection
 public class ClientsHandler {
 
-    private WebResource service;
+    private WebTarget service;
 
 
     public ClientsHandler (URI address) {
-        ClientConfig config = new DefaultClientConfig();
-        Client client = Client.create(config);
-        this.service = client.resource(address);
+        Client client = ClientBuilder.newClient();
+        this.service = client.target(address);
     }
 
 
@@ -45,7 +43,7 @@ public class ClientsHandler {
     public String getResponse (MultivaluedMap map, String ... paths)
             throws KustvaktException {
         try {
-            WebResource resource = service;
+            WebTarget resource = service;
             for (String p : paths)
                 resource = resource.path(p);
             resource = resource.queryParams(map);

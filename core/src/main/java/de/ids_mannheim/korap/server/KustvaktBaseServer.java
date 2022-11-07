@@ -22,7 +22,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.springframework.web.context.ContextLoaderListener;
 
-import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
+import org.glassfish.jersey.servlet.ServletContainer;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
@@ -109,7 +109,7 @@ public abstract class KustvaktBaseServer {
         contextHandler.addEventListener(listener);
         contextHandler.setInitParameter("adminToken", adminToken);
 
-        ServletHolder servletHolder = new ServletHolder(new SpringServlet());
+        ServletHolder servletHolder = new ServletHolder(new ServletContainer());
         servletHolder.setInitParameter(
                 "com.sun.jersey.config.property.packages", rootPackages);
         servletHolder.setInitOrder(1);

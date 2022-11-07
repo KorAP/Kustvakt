@@ -17,16 +17,18 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.logging.LoggingFeature;
 
 import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.config.Attributes;
@@ -45,7 +47,7 @@ import net.minidev.json.JSONArray;
 @Provider
 public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
 
-    private WebResource service;
+    private WebTarget service;
     //    private static final String SERVICE = "http://localhost:8888";
     private static final String SERVICE = "http://10.0.10.13";
     private static Logger jlog = LogManager.getLogger(PiwikFilter.class);
@@ -58,12 +60,12 @@ public class PiwikFilter implements ContainerRequestFilter, ResourceFilter {
     public PiwikFilter () {
 //        controller = BeansFactory.getKustvaktContext()
 //                .getAuthenticationManager();
-        ClientConfig config = new DefaultClientConfig();
-        Client client = Client.create(config);
+        ClientConfig clientConfig = new ClientConfig();
         if (jlog.isDebugEnabled())
-            client.addFilter(new LoggingFilter());
+            clientConfig.register(LoggingFeature.class);
+        Client client = ClientBuilder.newClient(clientConfig);
         UriBuilder b = UriBuilder.fromUri(SERVICE);
-        service = client.resource(b.build());
+        service = client.target(b.build());
         this.customVars = new HashMap<>();
     }
 
