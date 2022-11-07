@@ -35,6 +35,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
             Map<String, Object> map) throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
                 .path("~" + username).path("setting")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .type(MediaType.APPLICATION_JSON).entity(map)
@@ -51,6 +52,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path(API_VERSION)
                 .path("~" + username).path("setting")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .type(MediaType.APPLICATION_JSON).entity(json)
@@ -109,6 +111,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path(API_VERSION)
                 .path("~" + username).path("setting")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username2, "pass"))
                 .type(MediaType.APPLICATION_JSON).entity(json)
@@ -125,6 +128,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
     public void testGetDifferentUsername () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
                 .path("~" + username).path("setting")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username2, "pass"))
                 .get(ClientResponse.class);
@@ -141,6 +145,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
         String username = "tralala";
         ClientResponse response = resource().path(API_VERSION)
                 .path("~" + username).path("setting")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .get(ClientResponse.class);
@@ -163,6 +168,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
         String username = "tralala";
         ClientResponse response = resource().path(API_VERSION)
                 .path("~" + username).path("setting")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .delete(ClientResponse.class);
@@ -174,6 +180,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
     public void testDeleteKeyDifferentUsername () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
                 .path("~" + username).path("setting").path("pos-foundry")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username2, "pass"))
                 .delete(ClientResponse.class);
@@ -188,6 +195,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
     private void testDeleteSetting (String username) throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
                 .path("~" + username).path("setting")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .delete(ClientResponse.class);
@@ -196,6 +204,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
 
         response = resource().path(API_VERSION).path("~" + username)
                 .path("setting")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -216,6 +225,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
             throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
                 .path("~" + username).path("setting").path("lemma-foundry")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .delete(ClientResponse.class);
@@ -228,6 +238,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path(API_VERSION)
                 .path("~" + username).path("setting").path("pos-foundry")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .delete(ClientResponse.class);
@@ -254,6 +265,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
             throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
                 .path("~" + username).path("setting")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")

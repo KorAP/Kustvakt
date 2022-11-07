@@ -500,6 +500,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
         ClientResponse response =
                 resource().path(API_VERSION).path("oauth2").path("token")
+                        .request()
                         .header(HttpHeaders.AUTHORIZATION,
                                 "Basic ZkNCYlFrQXlZekk0TnpVeE1nOnNlY3JldA==")
                         .header(HttpHeaders.CONTENT_TYPE,
@@ -531,6 +532,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
         ClientResponse response =
                 resource().path(API_VERSION).path("oauth2").path("token")
+                        .request()
                         .header(HttpHeaders.AUTHORIZATION,
                                 "Basic ZkNCYlFrQXlZekk0TnpVeE1nOnNlY3JldA==")
                         .header(HttpHeaders.CONTENT_TYPE,
@@ -663,6 +665,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
         ClientResponse response =
                 resource().path(API_VERSION).path("oauth2").path("token")
+                        .request()
                         .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                         .header(HttpHeaders.CONTENT_TYPE,
                                 ContentType.APPLICATION_FORM_URLENCODED)
@@ -689,6 +692,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
         ClientResponse response =
                 resource().path(API_VERSION).path("oauth2").path("token")
+                        .request()
                         .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                         .header(HttpHeaders.CONTENT_TYPE,
                                 ContentType.APPLICATION_FORM_URLENCODED)
@@ -709,6 +713,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
         ClientResponse response =
                 resource().path(API_VERSION).path("oauth2").path("token")
+                        .request()
                         .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                         .header(HttpHeaders.CONTENT_TYPE,
                                 ContentType.APPLICATION_FORM_URLENCODED)
@@ -746,6 +751,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
         ClientResponse response =
                 resource().path(API_VERSION).path("oauth2").path("token")
+                        .request()
                         .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                         .header(HttpHeaders.CONTENT_TYPE,
                                 ContentType.APPLICATION_FORM_URLENCODED)
@@ -766,6 +772,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
         ClientResponse response =
                 resource().path(API_VERSION).path("oauth2").path("token")
+                        .request()
                         .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                         .header(HttpHeaders.CONTENT_TYPE,
                                 ContentType.APPLICATION_FORM_URLENCODED)
@@ -789,6 +796,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("token").path("list")
+                .request()
                 .header(Attributes.AUTHORIZATION, userAuthHeader)
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)

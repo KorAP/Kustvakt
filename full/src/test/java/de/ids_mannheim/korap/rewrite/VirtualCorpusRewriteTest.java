@@ -45,6 +45,7 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo named-vc1")
+                .request()
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
@@ -70,6 +71,7 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"system/named-vc1\"")
+                .request()
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
@@ -90,6 +92,7 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"system-vc\"")
+                .request()
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
@@ -115,6 +118,7 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"system/system-vc\"")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("user", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -140,6 +144,7 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "Fisch").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"dory/dory-vc\"")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .get(ClientResponse.class);

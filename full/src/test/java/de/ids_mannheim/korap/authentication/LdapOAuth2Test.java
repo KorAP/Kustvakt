@@ -128,6 +128,7 @@ public class LdapOAuth2Test extends OAuth2TestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("client").path("register")
+                .request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
@@ -152,6 +153,7 @@ public class LdapOAuth2Test extends OAuth2TestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("client").path("register")
+                .request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).post(ClientResponse.class);
@@ -173,6 +175,7 @@ public class LdapOAuth2Test extends OAuth2TestBase {
                 .queryParam("response_type", "code")
                 .queryParam("client_id", clientId)
                 .queryParam("client_secret", clientSecret)
+                .request()
                 .header(Attributes.AUTHORIZATION, authHeader)
                 .get(ClientResponse.class);
         

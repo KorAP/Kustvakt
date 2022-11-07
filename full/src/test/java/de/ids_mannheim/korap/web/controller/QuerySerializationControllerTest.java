@@ -36,6 +36,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
 
                 .path("corpus/WPD13/query").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp").queryParam("context", "base/s:s")
+                .request()
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -54,6 +55,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("corpus/ZUW19/query")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("context", "base/s:s")
+                .request()
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
@@ -72,6 +74,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
 
                 .path("corpus/BRZ10/query").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp").queryParam("context", "base/s:s")
+                .request()
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
@@ -90,6 +93,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
 
                 .path("corpus/BRZ10/query").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp")
+                .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
@@ -117,6 +121,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
                         "creationDate since 1775 & corpusSigle=GOE")
                 .queryParam("name", "Weimarer Werke")
                 .queryParam("description", "Goethe-Werke in Weimar (seit 1775)")
+                .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
@@ -136,6 +141,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
         response = resource().path(API_VERSION)
 
                 .path("collection")
+                .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
@@ -163,6 +169,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
                 .path("collection").path(id).path("query")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("context", "base/s:s")
+                .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
@@ -202,6 +209,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
 
                 .path("collection/GOE-VC/query").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp").queryParam("context", "base/s:s")
+                .request()
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -231,6 +239,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
                 .queryParam("count", "20").queryParam("page", "5")
                 .queryParam("cutoff", "true").queryParam("q", "[pos=ADJA]")
                 .queryParam("ql", "poliqarp")
+                .request()
                 .method("GET", ClientResponse.class);
         assertEquals(response.getStatus(),
                 ClientResponse.Status.OK.getStatusCode());
@@ -259,6 +268,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
                 .queryParam("count", "20").queryParam("page", "5")
                 .queryParam("offset", "2").queryParam("cutoff", "true")
                 .queryParam("q", "[pos=ADJA]").queryParam("ql", "poliqarp")
+                .request()
                 .method("GET", ClientResponse.class);
         assertEquals(response.getStatus(),
                 ClientResponse.Status.OK.getStatusCode());

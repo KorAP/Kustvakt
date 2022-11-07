@@ -26,6 +26,7 @@ public class QueryRewriteTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
             .queryParam("q", "[orth=der]{%23examplequery} Baum")
             .queryParam("ql", "poliqarp")
+            .request()
             .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
@@ -41,6 +42,7 @@ public class QueryRewriteTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
             .queryParam("q", "[orth=der]{%23system-q} Baum")
             .queryParam("ql", "poliqarp")
+            .request()
             .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
@@ -56,6 +58,7 @@ public class QueryRewriteTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
             .queryParam("q", "[orth=der]{%23dory/dory-q} Baum")
             .queryParam("ql", "poliqarp")
+            .request()
             .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                     .createBasicAuthorizationHeaderValue("dory", "pass"))
             .get(ClientResponse.class);

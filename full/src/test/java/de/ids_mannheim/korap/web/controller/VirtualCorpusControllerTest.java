@@ -59,6 +59,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -75,6 +76,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~" + username)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -90,6 +92,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
             throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~" + vcCreator).path(vcName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -102,6 +105,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
             throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("access").queryParam("groupName", groupName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -129,7 +133,9 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
             ClientHandlerException, KustvaktException {
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
-                .path("~system").path("system-vc").get(ClientResponse.class);
+                .path("~system").path("system-vc")
+                .request()
+                .get(ClientResponse.class);
         JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
         assertEquals("system-vc", node.at("/name").asText());
         assertEquals(ResourceType.SYSTEM.displayName(),
@@ -157,6 +163,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~dory").path("dory-vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -189,6 +196,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~dory").path("group-vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -217,6 +225,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("list").path("system-admin")
                 .queryParam("status", "HIDDEN")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -259,6 +268,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~dory")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("pearl", "pass"))
@@ -279,6 +289,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     public void testListAvailableVCByGuest () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
+                .request()
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -295,6 +306,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     private void testListSystemVC () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~system")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("pearl", "pass"))
                 .get(ClientResponse.class);
@@ -315,6 +327,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -346,6 +359,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path(vcName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -389,6 +403,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@"+groupName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -415,6 +430,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
+                .request()
                 .header(Attributes.AUTHORIZATION,
                         AuthenticationScheme.API.displayName() + " "
                                 + authToken)
@@ -447,6 +463,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
+                .request()
                 .header(Attributes.AUTHORIZATION,
                         AuthenticationScheme.API.displayName() + " "
                                 + authToken)
@@ -474,6 +491,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         String vcName = "new_system_vc";
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~system").path(vcName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -493,6 +511,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -518,6 +537,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new $vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -539,6 +559,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("ne")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -560,6 +581,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(json).put(ClientResponse.class);
 
@@ -583,6 +605,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -602,6 +625,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     public void testCreateVCWithoutEntity () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -624,6 +648,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -647,6 +672,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+testUser).path("new_vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -667,6 +693,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     public void testDeleteVCUnauthorized () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~dory").path("dory-vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -693,6 +720,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~dory").path("dory-vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -710,6 +738,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         response = resource().path(API_VERSION).path("vc").path("~dory")
                 .path("dory-vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -735,6 +764,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~dory").path("dory-vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -753,6 +783,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("koralQuery").path("~" + username).path(vcName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -770,6 +801,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~dory").path("dory-vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -801,6 +833,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         String json = "{\"type\": \"PUBLISHED\"}";
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~dory").path(vcName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -827,6 +860,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         response = resource().path(API_VERSION).path("vc").path("~dory")
                 .path("group-vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -859,7 +893,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     // ClientResponse response =
     // resource().path(API_VERSION).path("vc")
     // .path("access")
-    // .header(Attributes.AUTHORIZATION,
+    // .request().header(Attributes.AUTHORIZATION,
     // HttpAuthorizationHandler
     // .createBasicAuthorizationHeaderValue(
     // testUser, "pass"))
@@ -878,6 +912,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     public void testlistAccessByGroup () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("access").queryParam("groupName", "dory-group")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -945,6 +980,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         return resource().path(API_VERSION).path("vc").path("~"+vcCreator)
                 .path(vcName).path("share").path("@"+groupName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(vcCreator, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -997,6 +1033,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~marlin").path("marlin-vc").path("share")
                 .path("@marlin group")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -1018,6 +1055,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         // nemo is not VCA in marlin group
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~nemo").path("nemo-vc").path("share").path("@marlin-group")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("nemo", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -1037,6 +1075,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("access").path(accessId)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -1050,6 +1089,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("access").path(accessId)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")

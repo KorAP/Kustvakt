@@ -28,7 +28,9 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
     @Test
     public void testGetPublicVirtualCollectionInfo () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
-                .path("collection").get(ClientResponse.class);
+                .path("collection")
+                .request()
+                .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String entity = response.getEntity(String.class);
@@ -43,6 +45,7 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
             throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
                 .path("collection")
+                .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
@@ -61,7 +64,9 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
     @Test
     public void testGetVirtualCollectionInfoById () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
-                .path("collection").path("GOE-VC").get(ClientResponse.class);
+                .path("collection").path("GOE-VC")
+                .request()
+                .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
@@ -77,7 +82,9 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
     public void testGetVirtualCollectionInfoByIdUnauthorized ()
             throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
-                .path("collection").path("WPD15-VC").get(ClientResponse.class);
+                .path("collection").path("WPD15-VC")
+                .request()
+                .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
@@ -93,7 +100,9 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
     @Test
     public void testGetPublicCorporaInfo () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").get(ClientResponse.class);
+                .path("corpus")
+                .request()
+                .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
@@ -107,7 +116,9 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
     @Test
     public void testGetCorpusInfoById () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").path("WPD13").get(ClientResponse.class);
+                .path("corpus").path("WPD13")
+                .request()
+                .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -123,7 +134,9 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
     @Test
     public void testGetCorpusInfoById2 () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").path("GOE").get(ClientResponse.class);
+                .path("corpus").path("GOE")
+                .request()
+                .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
@@ -137,7 +150,9 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
     @Test
     public void testGetPublicFoundriesInfo () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
-                .path("foundry").get(ClientResponse.class);
+                .path("foundry")
+                .request()
+                .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
@@ -151,7 +166,9 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
     @Test
     public void testGetFoundryInfoById () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
-                .path("foundry").path("tt").get(ClientResponse.class);
+                .path("foundry").path("tt")
+                .request()
+                .get(ClientResponse.class);
         String ent = response.getEntity(String.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -165,7 +182,9 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
     @Test
     public void testGetUnexistingCorpusInfo () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").path("ZUW19").get(ClientResponse.class);
+                .path("corpus").path("ZUW19")
+                .request()
+                .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
@@ -185,7 +204,9 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
     @Test
     public void testGetUnauthorizedCorpusInfo () throws KustvaktException {
         ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").path("BRZ10").get(ClientResponse.class);
+                .path("corpus").path("BRZ10")
+                .request()
+                .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);

@@ -26,6 +26,7 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
                 .queryParam("cq", "textType=Abhandlung & corpusSigle=GOE")
+                .request()
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -51,6 +52,7 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
                 .path("statistics")
                 .queryParam("cq", "textType=Abhandlung & corpusSigle=GOE")
                 .queryParam("corpusQuery", "textType=Autobiographie & corpusSigle=GOE")
+                .request()
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -69,6 +71,7 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", "textType=Autobiographie & corpusSigle=GOE")
+                .request()
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -90,6 +93,7 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
         ClientResponse response = resource().path(API_VERSION)
             .path("statistics")
             .queryParam("corpusQuery", "")
+            .request()
             .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -102,6 +106,7 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
 
         response = resource().path(API_VERSION)
                 .path("statistics")
+                .request()
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -118,6 +123,7 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
             throws IOException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .post(ClientResponse.class,"{ \"collection\" : {\"@type\": "
                         + "\"koral:doc\", \"key\": \"availability\", \"match\": "
@@ -145,6 +151,7 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
             throws IOException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .post(ClientResponse.class,"{}");
 
@@ -163,6 +170,7 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
             throws IOException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .post(ClientResponse.class,"{ \"collection\" : }");
 
@@ -180,7 +188,9 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
     public void testGetStatisticsWithoutKoralQuery ()
             throws IOException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
-                .path("statistics").post(ClientResponse.class);
+                .path("statistics")
+                .request()
+                .post(ClientResponse.class);
         
         String ent = response.getEntity(String.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),

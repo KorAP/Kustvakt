@@ -36,6 +36,7 @@ public class AuthenticationControllerTest extends FastJerseyTest {
                 credentials[0], credentials[1]);
         ClientResponse response = resource().path("auth")
                 .path("sessionToken").header(Attributes.AUTHORIZATION, auth)
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -53,6 +54,7 @@ public class AuthenticationControllerTest extends FastJerseyTest {
 
         response = resource().path("user")
                 .path("info").header(Attributes.AUTHORIZATION, token_type + " "+ token)
+                .request()
                 .get(ClientResponse.class);
         en = response.getEntity(String.class);
 
@@ -60,7 +62,9 @@ public class AuthenticationControllerTest extends FastJerseyTest {
                 response.getStatus());
         
         response = resource().path("auth")
-                .path("logout").header(Attributes.AUTHORIZATION, token_type + " "+ token)
+                .path("logout")
+                .request()
+                .header(Attributes.AUTHORIZATION, token_type + " "+ token)
                 .get(ClientResponse.class);
         
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -73,6 +77,7 @@ public class AuthenticationControllerTest extends FastJerseyTest {
                 credentials[0], credentials[1]);
         ClientResponse response = resource().path("auth")
                 .path("sessionToken").header(Attributes.AUTHORIZATION, auth)
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -92,7 +97,9 @@ public class AuthenticationControllerTest extends FastJerseyTest {
                 break;
         }
         response = resource().path("user")
-                .path("info").header(Attributes.AUTHORIZATION, token_type + " "+ token)
+                .path("info")
+                .request()
+                .header(Attributes.AUTHORIZATION, token_type + " "+ token)
                 .get(ClientResponse.class);
         en = response.getEntity(String.class);
         node = JsonUtils.readTree(en);

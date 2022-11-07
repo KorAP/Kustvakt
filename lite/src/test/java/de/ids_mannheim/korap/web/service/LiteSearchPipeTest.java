@@ -113,7 +113,9 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
 
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("pipes", glemmUri).get(ClientResponse.class);
+                .queryParam("pipes", glemmUri)
+                .request()
+                .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -152,7 +154,9 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
 
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("pipes", glemmUri).get(ClientResponse.class);
+                .queryParam("pipes", glemmUri)
+                .request()
+                .get(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -177,6 +181,7 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("pipes", glemmUri + "," + glemmUri2)
+                .request()
                 .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -194,7 +199,9 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
                 resource().getURI().toString() + API_VERSION + "/test/tralala";
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("pipes", url).get(ClientResponse.class);
+                .queryParam("pipes", url)
+                .request()
+                .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -209,7 +216,9 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
     public void testSearchWithUnknownHost () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("pipes", "http://glemm").get(ClientResponse.class);
+                .queryParam("pipes", "http://glemm")
+                .request()
+                .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -231,7 +240,9 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
 
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("pipes", pipeUri).get(ClientResponse.class);
+                .queryParam("pipes", pipeUri)
+                .request()
+                .get(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -250,6 +261,7 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("pipes", url + "," + "http://glemm")
+                .request()
                 .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -284,7 +296,9 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
         String pipeUri = "http://localhost:"+port+"/invalid-response";
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("pipes", pipeUri).get(ClientResponse.class);
+                .queryParam("pipes", pipeUri)
+                .request()
+                .get(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
@@ -308,7 +322,9 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
         String pipeUri = "http://localhost:"+port+"/plain-text";
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("pipes", pipeUri).get(ClientResponse.class);
+                .queryParam("pipes", pipeUri)
+                .request()
+                .get(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
@@ -337,6 +353,7 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("pipes", "http://unknown" + "," + glemmUri)
+                .request()
                 .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -350,6 +367,7 @@ public class LiteSearchPipeTest extends LiteJerseyTest {
         response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("pipes", glemmUri + ",http://unknown")
+                .request()
                 .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),

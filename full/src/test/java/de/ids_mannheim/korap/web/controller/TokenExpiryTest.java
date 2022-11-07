@@ -42,6 +42,7 @@ public class TokenExpiryTest extends SpringJerseyTest {
         form.add("password", "password");
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).post(ClientResponse.class);
@@ -66,6 +67,7 @@ public class TokenExpiryTest extends SpringJerseyTest {
             throws KustvaktException, IOException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "Wasser").queryParam("ql", "poliqarp")
+                .request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + token)
                 .get(ClientResponse.class);
 
@@ -93,6 +95,7 @@ public class TokenExpiryTest extends SpringJerseyTest {
 
         ClientResponse response =
                 resource().path(API_VERSION).path("oauth2").path("openid").path("authorize")
+                        .request()
                         .header(Attributes.AUTHORIZATION, "Bearer " + token)
                         .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                         .header(HttpHeaders.CONTENT_TYPE,

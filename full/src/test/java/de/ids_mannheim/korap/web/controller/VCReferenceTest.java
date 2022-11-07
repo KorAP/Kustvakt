@@ -86,6 +86,7 @@ public class VCReferenceTest extends SpringJerseyTest {
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq",
                         "textSigle=\"GOE/AGF/00000\" | textSigle=\"GOE/AGA/01784\"")
+                .request()
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
@@ -100,6 +101,7 @@ public class VCReferenceTest extends SpringJerseyTest {
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq",
                         "textSigle!=\"GOE/AGI/04846\" & textSigle!=\"GOE/AGA/01784\"")
+                .request()
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
@@ -113,6 +115,7 @@ public class VCReferenceTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"system/named-vc1\"")
+                .request()
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
@@ -124,6 +127,7 @@ public class VCReferenceTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo named-vc2")
+                .request()
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
@@ -135,6 +139,7 @@ public class VCReferenceTest extends SpringJerseyTest {
         String corpusQuery = "availability = /CC-BY.*/ & referTo named-vc1";
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics").queryParam("corpusQuery", corpusQuery)
+                .request()
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
@@ -150,6 +155,7 @@ public class VCReferenceTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"username/vc1\"")
+                .request()
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
@@ -164,6 +170,7 @@ public class VCReferenceTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"dory/dory-vc\"")
+                .request()
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
@@ -178,6 +185,7 @@ public class VCReferenceTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"marlin/published-vc\"")
+                .request()
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
@@ -203,6 +211,7 @@ public class VCReferenceTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"marlin/published-vc\"")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("squirt", "pass"))
                 .get(ClientResponse.class);
@@ -215,6 +224,7 @@ public class VCReferenceTest extends SpringJerseyTest {
         response = resource().path(API_VERSION).path("group")
                 .path("list").path("system-admin")
                 .queryParam("status", "HIDDEN")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")

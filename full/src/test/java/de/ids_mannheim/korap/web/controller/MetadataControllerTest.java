@@ -23,7 +23,9 @@ public class MetadataControllerTest extends SpringJerseyTest {
     public void testRetrieveMetadataWithField () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGA").path("01784")
-                .queryParam("fields", "author").get(ClientResponse.class);
+                .queryParam("fields", "author")
+                .request()
+                .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -38,7 +40,9 @@ public class MetadataControllerTest extends SpringJerseyTest {
     public void testRetrieveMetadataWithMultipleFields () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGA").path("01784")
-                .queryParam("fields", "author,title").get(ClientResponse.class);
+                .queryParam("fields", "author,title")
+                .request()
+                .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -54,6 +58,7 @@ public class MetadataControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGA").path("01784")
+                .request()
                 .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -72,6 +77,7 @@ public class MetadataControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGI").path("04846")
+                .request()
                 .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
@@ -91,6 +97,7 @@ public class MetadataControllerTest extends SpringJerseyTest {
     public void testMetadataWithAuthentication () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGI").path("04846")
+                .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
@@ -106,6 +113,7 @@ public class MetadataControllerTest extends SpringJerseyTest {
     public void testMetadataAvailabilityAll () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGI").path("00000")
+                .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
@@ -124,6 +132,7 @@ public class MetadataControllerTest extends SpringJerseyTest {
             throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGD").path("00000")
+                .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",

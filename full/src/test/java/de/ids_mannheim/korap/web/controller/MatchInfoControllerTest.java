@@ -25,6 +25,7 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGA").path("01784").path("p36-100")
                 .path("matchInfo").queryParam("foundry", "*")
+                .request()
                 .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -48,6 +49,7 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGI").path("04846").path("p36875-36876")
                 .path("matchInfo").queryParam("foundry", "*")
+                .request()
                 .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
@@ -69,6 +71,7 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGI").path("04846").path("p36875-36876")
                 .path("matchInfo").queryParam("foundry", "*")
+                .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
@@ -99,6 +102,7 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
     public void testAvailabilityAll () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGD").path("00000").path("p75-76")
+                .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
@@ -114,6 +118,7 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
     public void testAvailabilityAllUnauthorized () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGD").path("00000").path("p75-76")
+                .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",

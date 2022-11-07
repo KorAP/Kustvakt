@@ -31,6 +31,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", corpusQuery)
+                .request()
                 .get(ClientResponse.class);
 
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
@@ -51,6 +52,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
                 .queryParam("cq", "textType=Abhandlung & corpusSigle=GOE")
+                .request()
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -70,6 +72,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
                 .path("statistics")
                 .queryParam("cq", "textType=Abhandlung & corpusSigle=GOE")
                 .queryParam("corpusQuery", "textType=Autobiographie & corpusSigle=GOE")
+                .request()
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -90,6 +93,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", corpusQuery)
+                .request()
                 .get(ClientResponse.class);
 
         assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
@@ -112,6 +116,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", "creationDate since 1810")
+                .request()
                 .get(ClientResponse.class);
         String ent = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
@@ -129,6 +134,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", "creationDate geq 1810")
+                .request()
                 .get(ClientResponse.class);
 
         assert ClientResponse.Status.BAD_REQUEST.getStatusCode() == response
@@ -149,6 +155,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", "creationDate >= 1810")
+                .request()
                 .get(ClientResponse.class);
 
         String ent = response.getEntity(String.class);
@@ -168,6 +175,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
             throws IOException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
+                .request()
                 .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -186,6 +194,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
             throws IOException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .post(ClientResponse.class,"{ \"collection\" : {\"@type\": "
                         + "\"koral:doc\", \"key\": \"availability\", \"match\": "
@@ -213,6 +222,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
             throws IOException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .post(ClientResponse.class,"{}");
 
@@ -231,6 +241,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
             throws IOException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
                 .path("statistics")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 .post(ClientResponse.class,"{ \"collection\" : }");
 
@@ -248,7 +259,9 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     public void testGetStatisticsWithoutKoralQuery ()
             throws IOException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
-                .path("statistics").post(ClientResponse.class);
+                .path("statistics")
+                .request()
+                .post(ClientResponse.class);
         
         String ent = response.getEntity(String.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),

@@ -101,7 +101,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
             request = request.queryParam("state", state);
         }
         
-        return request.header(Attributes.AUTHORIZATION, authHeader)
+        return request.request().header(Attributes.AUTHORIZATION, authHeader)
                 .get(ClientResponse.class);
     }
 
@@ -135,6 +135,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     protected ClientResponse requestToken (MultivaluedMap<String, String> form)
             throws KustvaktException {
         return resource().path(API_VERSION).path("oauth2").path("token")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
@@ -153,6 +154,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         form.add("code", code);
 
         return resource().path(API_VERSION).path("oauth2").path("token")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).post(ClientResponse.class);
@@ -172,6 +174,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         }
 
         return resource().path(API_VERSION).path("oauth2").path("token")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).post(ClientResponse.class);
@@ -187,7 +190,9 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         form.add("code", code);
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
-                .path("token").header(Attributes.AUTHORIZATION, authHeader)
+                .path("token")
+                .request()
+                .header(Attributes.AUTHORIZATION, authHeader)
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).post(ClientResponse.class);
@@ -228,6 +233,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
         ClientResponse response =
                 resource().path(API_VERSION).path("oauth2").path("token")
+                        .request()
                         .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                         .header(HttpHeaders.CONTENT_TYPE,
                                 ContentType.APPLICATION_FORM_URLENCODED)
@@ -245,6 +251,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
             ClientHandlerException, KustvaktException {
         return resource().path(API_VERSION).path("oauth2").path("client")
                 .path("register")
+                .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(username,
@@ -295,6 +302,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("client").path("deregister").path(clientId)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .delete(ClientResponse.class);
@@ -307,6 +315,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("client").path(clientId)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .get(ClientResponse.class);
@@ -320,6 +329,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     protected ClientResponse searchWithAccessToken (String accessToken) {
         return resource().path(API_VERSION).path("search")
                 .queryParam("q", "Wasser").queryParam("ql", "poliqarp")
+                .request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
@@ -360,6 +370,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("revoke").path("super")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .header(Attributes.AUTHORIZATION, userAuthHeader).entity(form)
@@ -381,6 +392,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
         ClientResponse response =
                 resource().path(API_VERSION).path("oauth2").path("revoke")
+                        .request()
                         .header(HttpHeaders.CONTENT_TYPE,
                                 ContentType.APPLICATION_FORM_URLENCODED)
                         .entity(form).post(ClientResponse.class);
@@ -394,6 +406,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("client").path("list")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pwd"))
                 .header(HttpHeaders.CONTENT_TYPE,

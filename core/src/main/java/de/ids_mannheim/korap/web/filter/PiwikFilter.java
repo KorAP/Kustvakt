@@ -84,6 +84,7 @@ public class PiwikFilter implements ContainerRequestFilter {
                     .queryParam("r", String.valueOf(random.nextDouble()))
                     .queryParam("action_name",
                             request.getUriInfo().getRequestUri().toASCIIString())
+                    .request()
                     .accept("text/html")
                     .header("Host", request.getHeaderString("Host"))
                     .header("User-Agent", request.getHeaderString("User-Agent"))

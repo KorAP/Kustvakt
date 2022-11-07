@@ -25,6 +25,7 @@ public abstract class VirtualCorpusTestBase extends SpringJerseyTest{
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+vcCreator).path(vcName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -43,6 +44,7 @@ public abstract class VirtualCorpusTestBase extends SpringJerseyTest{
 
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("~"+vcCreator).path(vcName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")

@@ -39,6 +39,7 @@ public class VirtualCorpusFieldTest extends VirtualCorpusTestBase {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("field").path("~" + username).path(vcName)
                 .queryParam("fieldName", field)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -56,6 +57,7 @@ public class VirtualCorpusFieldTest extends VirtualCorpusTestBase {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("field").path("~" + username).path(vcName)
                 .queryParam("fieldName", field)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -140,6 +142,7 @@ public class VirtualCorpusFieldTest extends VirtualCorpusTestBase {
         ClientResponse response = resource().path(API_VERSION).path("vc")
                 .path("field").path("~system").path("named-vc3")
                 .queryParam("fieldName", "textSigle")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)

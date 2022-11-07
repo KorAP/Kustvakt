@@ -21,7 +21,9 @@ public class AnnotationControllerTest extends SpringJerseyTest {
     @Test
     public void testAnnotationLayers () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION)
-                .path("annotation").path("layers").get(ClientResponse.class);
+                .path("annotation").path("layers")
+                .request()
+                .get(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
         JsonNode n = JsonUtils.readTree(entity);
@@ -41,6 +43,7 @@ public class AnnotationControllerTest extends SpringJerseyTest {
                 resource().path(API_VERSION).path("annotation")
                         .path("description").type(MediaType.APPLICATION_JSON)
                         .entity("{\"codes\":[\"opennlp/*\"], \"language\":\"en\"}")
+                        .request()
                         .post(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
@@ -68,6 +71,7 @@ public class AnnotationControllerTest extends SpringJerseyTest {
                 resource().path(API_VERSION).path("annotation")
                         .path("description").type(MediaType.APPLICATION_JSON)
                         .entity("{\"codes\":[\"mate/m\"], \"language\":\"en\"}")
+                        .request()
                         .post(ClientResponse.class);
 
         String entity = response.getEntity(String.class);

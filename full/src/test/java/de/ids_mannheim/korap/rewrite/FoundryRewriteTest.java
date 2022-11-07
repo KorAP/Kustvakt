@@ -51,6 +51,7 @@ public class FoundryRewriteTest extends SpringJerseyTest {
         String pathUsername = "~" + username;
         ClientResponse response = resource().path(API_VERSION)
                 .path(pathUsername).path("setting")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .type(MediaType.APPLICATION_JSON).entity(json)
@@ -61,6 +62,7 @@ public class FoundryRewriteTest extends SpringJerseyTest {
         // search
         response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[pos=ADJA]").queryParam("ql", "poliqarp")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);

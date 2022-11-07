@@ -140,6 +140,7 @@ public class AvailabilityTest extends SpringJerseyTest {
     private ClientResponse searchQuery (String collectionQuery) {
         return resource().path(API_VERSION).path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("cq", collectionQuery)
+                .request()
                 .get(ClientResponse.class);
     }
 
@@ -149,6 +150,7 @@ public class AvailabilityTest extends SpringJerseyTest {
             KustvaktException {
         return resource().path(API_VERSION).path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("cq", collectionQuery)
+                .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",

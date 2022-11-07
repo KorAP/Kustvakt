@@ -33,6 +33,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .path("~" + queryCreator).path(qName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .get(ClientResponse.class);
@@ -59,6 +60,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .path("~"+qCreator).path(qName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -79,6 +81,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         String qName = "new_query";
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .path("~" + testUser).path(qName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -103,6 +106,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         String qName = "publish_query";
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .path("~" + testUser).path(qName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -127,6 +131,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         String qName = "marlin-query";
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .path("~marlin").path(qName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(adminUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -150,6 +155,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         String qName = "system-query";
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .path("~system").path(qName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(adminUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -172,6 +178,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .path("~"+testUser).path("system-query")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -196,6 +203,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         String qName = "new_query";
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .path("~" + testUser).path(qName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -217,6 +225,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         String qName = "new_query";
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .path("~" + testUser).path(qName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -240,6 +249,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         String qName = "new_query";
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .path("~" + testUser).path(qName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -262,6 +272,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         String qName = "new_query";
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .path("~" + testUser).path(qName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -280,6 +291,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
             throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .path("~" + qCreator).path(qName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .delete(ClientResponse.class);
@@ -291,6 +303,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
     public void testDeleteQueryUnauthorized () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .path("~dory").path("dory-q")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .delete(ClientResponse.class);
@@ -308,6 +321,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
     private void testDeleteSystemQueryUnauthorized (String qName) throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .path("~system").path(qName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .delete(ClientResponse.class);
@@ -326,6 +340,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
     public void testDeleteNonExistingQuery () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .path("~dory").path("non-existing-query")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .delete(ClientResponse.class);
@@ -372,6 +387,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
             KustvaktException {
 
         ClientResponse response = resource().path(API_VERSION).path("query")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")

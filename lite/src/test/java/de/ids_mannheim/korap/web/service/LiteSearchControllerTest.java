@@ -47,6 +47,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("context", "sentence").queryParam("count", "13")
+                .request()
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -66,6 +67,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("query")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "corpusSigle=WPD | corpusSigle=GOE")
+                .request()
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -75,6 +77,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         assertNotNull(node);
 
         response = resource().path(API_VERSION).path("search")
+                .request()
                 .post(ClientResponse.class, query);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -87,6 +90,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     @Test
     public void testApiWelcomeMessage () {
         ClientResponse response = resource().path(API_VERSION).path("")
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -103,6 +107,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("context", "sentence").queryParam("count", "13")
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -120,7 +125,9 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das").queryParam("ql", "poliqarp")
                 .queryParam("cq", "corpusSigle=WPD | corpusSigle=GOE")
-                .queryParam("count", "13").get(ClientResponse.class);
+                .queryParam("count", "13")
+                .request()
+                .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
         String query = response.getEntity(String.class);
@@ -139,6 +146,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("context", "sentence").queryParam("count", "13")
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -157,6 +165,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         s.setQuery("[orth=das]", "poliqarp");
 
         ClientResponse response = resource().path(API_VERSION).path("search")
+                .request()
                 .post(ClientResponse.class, s.toJSON());
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -173,6 +182,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("fields", "author,docSigle")
                 .queryParam("context", "sentence").queryParam("count", "13")
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -190,6 +200,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         ClientResponse response = resource().path(API_VERSION)
                 .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42/matchInfo")
                 .queryParam("foundry", "*").queryParam("spans", "false")
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -207,6 +218,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         ClientResponse response = resource().path(API_VERSION)
                 .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42/matchInfo")
                 .queryParam("foundry", "xy").queryParam("spans", "false")
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -228,6 +240,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
                 .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42")
                 .queryParam("foundry", "-").queryParam("spans", "false")
                 .queryParam("expand","false")
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -248,7 +261,9 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         ClientResponse response = resource().path(API_VERSION)
                 .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42/matchInfo")
                 .queryParam("foundry", "xy").queryParam("spans", "false")
-                .queryParam("hls", "true").get(ClientResponse.class);
+                .queryParam("hls", "true")
+                .request()
+                .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
@@ -275,7 +290,9 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         ClientResponse response = resource().path(API_VERSION)
 
                 .path("corpus/GOE/AGA/01784/p36-46/matchInfo")
-                .queryParam("foundry", "*").get(ClientResponse.class);
+                .queryParam("foundry", "*")
+                .request()
+                .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
         String ent = response.getEntity(String.class);
@@ -294,6 +311,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
                 .queryParam("fields", "author, docSigle")
                 .queryParam("context", "sentence").queryParam("count", "13")
                 .queryParam("cq", "textClass=Politik & corpus=WPD")
+                .request()
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -310,6 +328,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
                 .queryParam("fields", "author, docSigle")
                 .queryParam("context", "sentence").queryParam("count", "13")
                 .queryParam("cq", "textClass=Politik & corpus=WPD")
+                .request()
                 .get(ClientResponse.class);
         // String version =
         // LucenePackage.get().getImplementationVersion();;
@@ -330,6 +349,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     public void testMetaFields () throws KustvaktException {
         ClientResponse response =
                 resource().path(API_VERSION).path("/corpus/GOE/AGA/01784")
+                        .request()
                         .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -385,6 +405,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     public void testSearchWithoutVersion () throws KustvaktException {
         ClientResponse response = resource().path("api").path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .request()
                 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         assertEquals(HttpStatus.PERMANENT_REDIRECT_308, response.getStatus());
         URI location = response.getLocation();
@@ -395,7 +416,9 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     public void testSearchWrongVersion () throws KustvaktException {
         ClientResponse response = resource().path("api").path("v0.2")
                 .path("search").queryParam("q", "[orth=der]")
-                .queryParam("ql", "poliqarp").accept(MediaType.APPLICATION_JSON)
+                .queryParam("ql", "poliqarp")
+                .accept(MediaType.APPLICATION_JSON)
+                .request()
                 .get(ClientResponse.class);
         assertEquals(HttpStatus.PERMANENT_REDIRECT_308, response.getStatus());
         URI location = response.getLocation();
@@ -406,6 +429,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     public void testSearchWithIP () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "Wasser").queryParam("ql", "poliqarp")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
 
@@ -420,6 +444,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     public void testSearchWithAuthorizationHeader () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "Wasser").queryParam("ql", "poliqarp")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("test", "pwd"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -437,6 +462,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("access-rewrite-disabled", "true")
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -452,6 +478,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("fields", "author,title")
                 .queryParam("access-rewrite-disabled", "true")
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -472,6 +499,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("fields", "author,title,snippet")
                 .queryParam("access-rewrite-disabled", "true")
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -491,6 +519,7 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .queryParam("page", "0")
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
@@ -509,7 +538,9 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         m.add("token", "secret");
 
         ClientResponse response = resource().path(API_VERSION).path("index")
-                .path("close").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .path("close")
+                .request()
+                .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .post(ClientResponse.class, m);
 
         assertEquals(HttpStatus.OK_200, response.getStatus());

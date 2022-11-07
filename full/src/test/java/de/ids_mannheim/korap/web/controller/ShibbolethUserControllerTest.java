@@ -53,6 +53,7 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 	public void loginHTTP() throws KustvaktException {
 		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
 		ClientResponse response = resource().path("user").path("info")
+				.request()
 				.header(Attributes.AUTHORIZATION, enc).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 	}
@@ -64,6 +65,7 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 		String en = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
 		/* lauffähige Version von Hanl: */
 		ClientResponse response = resource().path("auth").path("apiToken")
+				.request()
 				.header(Attributes.AUTHORIZATION, en).get(ClientResponse.class);
 		/**/
 		/*
@@ -93,6 +95,7 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 
 		String en = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
 		ClientResponse response = resource().path("auth").path("apiToken")
+				.request()
 				.header(Attributes.AUTHORIZATION, en).get(ClientResponse.class);
 
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
@@ -112,6 +115,7 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 		}
 
 		response = resource().path("user").path("info")
+				.request()
 				.header(Attributes.AUTHORIZATION, "api_token " + token).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
@@ -121,6 +125,7 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 	public void testGetUserDetails() throws KustvaktException {
 		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
 		ClientResponse response = resource().path("user").path("details")
+				.request()
 				.header(Attributes.AUTHORIZATION, enc).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 	}
@@ -132,11 +137,13 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 		m.put("test", "[100, \"error message\", true, \"another message\"]");
 
 		ClientResponse response = resource().path("user").path("details")
+				.request()
 				.header(Attributes.AUTHORIZATION, enc).header("Content-Type", MediaType.APPLICATION_JSON)
 				.post(ClientResponse.class, m);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
 		response = resource().path("user").path("details").queryParam("pointer", "test")
+				.request()
 				.header(Attributes.AUTHORIZATION, enc).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 		String ent = response.getEntity(String.class);
@@ -150,11 +157,14 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 		m.put("test", "test value 1");
 
 		ClientResponse response = resource().path("user").path("details")
+				.request()
 				.header(Attributes.AUTHORIZATION, enc).header("Content-Type", MediaType.APPLICATION_JSON)
 				.post(ClientResponse.class, m);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
-		response = resource().path("user").path("details").header(Attributes.AUTHORIZATION, enc)
+		response = resource().path("user").path("details")
+				.request()
+               .header(Attributes.AUTHORIZATION, enc)
 				.get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 		String ent = response.getEntity(String.class);
@@ -169,7 +179,10 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 	public void testGetUserDetailsPointer() throws KustvaktException {
 		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
 		ClientResponse response = resource().path("user").path("details")
-				.queryParam("pointer", "email").header(Attributes.AUTHORIZATION, enc).get(ClientResponse.class);
+				.queryParam("pointer", "email")
+				.request()
+				.header(Attributes.AUTHORIZATION, enc)
+				.get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 		String ent = response.getEntity(String.class);
 		assertEquals("test@ids-mannheim.de", ent);
@@ -181,6 +194,7 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 
 		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("userservicetest", "servicepass");
 		ClientResponse response = resource().path("user").path("details")
+				.request()
 				.header(Attributes.AUTHORIZATION, enc).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 		String entity = response.getEntity(String.class);
@@ -194,6 +208,7 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 	public void testGetUserSettings() throws KustvaktException {
 		String enc = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(credentials[0], credentials[1]);
 		ClientResponse response = resource().path("user").path("settings")
+				.request()
 				.header(Attributes.AUTHORIZATION, enc).get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 	}
@@ -207,11 +222,14 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 		m.put("email", "newtest@ids-mannheim.de");
 
 		ClientResponse response = resource().path("user").path("details")
+				.request()
 				.header(Attributes.AUTHORIZATION, enc).header("Content-Type", MediaType.APPLICATION_JSON)
 				.post(ClientResponse.class, m);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
-		response = resource().path("user").path("details").header(Attributes.AUTHORIZATION, enc)
+		response = resource().path("user").path("details")
+				.request()
+				.header(Attributes.AUTHORIZATION, enc)
 				.get(ClientResponse.class);
 
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
@@ -227,7 +245,9 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 		m.put("lastName", "user");
 		m.put("email", "test@ids-mannheim.de");
 
-		response = resource().path("user").path("details").header(Attributes.AUTHORIZATION, enc)
+		response = resource().path("user").path("details")
+				.request()
+				.header(Attributes.AUTHORIZATION, enc)
 				.header("Content-Type", MediaType.APPLICATION_JSON).post(ClientResponse.class, m);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 	}
@@ -241,6 +261,7 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 		m.putSingle("pageLength", "200");
 
 		ClientResponse response = resource().path("user").path("settings")
+				.request()
 				.header(Attributes.AUTHORIZATION, enc).header("Content-Type", "application/x-www-form-urlencodeBase64d")
 				.get(ClientResponse.class);
 
@@ -254,11 +275,15 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
-		response = resource().path("user").path("settings").header(Attributes.AUTHORIZATION, enc)
-				.header("Content-Type", "application/x-www-form-urlencodeBase64d").post(ClientResponse.class, m);
+		response = resource().path("user").path("settings")
+				.request()
+				.header(Attributes.AUTHORIZATION, enc)
+				.header("Content-Type", "application/x-www-form-urlencodeBase64d")
+				.post(ClientResponse.class, m);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
 		response = resource().path("user").path("settings").header(Attributes.AUTHORIZATION, enc)
+				.request()
 				.header("Content-Type", "application/x-www-form-urlencodeBase64d").get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
@@ -280,6 +305,7 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 		m.put("setting_1", "value_1");
 
 		ClientResponse response = resource().path("user").path("settings")
+				.request()
 				.header(Attributes.AUTHORIZATION, enc).header("Content-Type", MediaType.APPLICATION_JSON)
 				.get(ClientResponse.class);
 
@@ -293,11 +319,16 @@ public class ShibbolethUserControllerTest extends FastJerseyTest {
 
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
-		response = resource().path("user").path("settings").header(Attributes.AUTHORIZATION, enc)
-				.header("Content-Type", MediaType.APPLICATION_JSON).post(ClientResponse.class, m);
+		response = resource().path("user").path("settings")
+				.request()
+				.header(Attributes.AUTHORIZATION, enc)
+				.header("Content-Type", MediaType.APPLICATION_JSON)
+				.post(ClientResponse.class, m);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 
-		response = resource().path("user").path("settings").header(Attributes.AUTHORIZATION, enc)
+		response = resource().path("user").path("settings")
+				.request()
+				.header(Attributes.AUTHORIZATION, enc)
 				.get(ClientResponse.class);
 		assertEquals(ClientResponse.Status.OK.getStatusCode(), response.getStatus());
 

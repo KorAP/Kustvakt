@@ -24,6 +24,7 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("access-rewrite-disabled", "true")
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -41,6 +42,7 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("access-rewrite-disabled", "true")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -60,6 +62,7 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("fields", "author,title")
                 .queryParam("access-rewrite-disabled", "true")
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -83,6 +86,7 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("fields", "author,title,snippet")
                 .queryParam("access-rewrite-disabled", "true")
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -111,6 +115,7 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
         s.setMeta(meta);
         
         ClientResponse response = resource().path(API_VERSION).path("search")
+                .request()
                 .post(ClientResponse.class, s.toJSON());
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -130,6 +135,7 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo system-vc")
                 .queryParam("access-rewrite-disabled", "true")
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -164,6 +170,7 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"dory/dory-vc\"")
                 .queryParam("access-rewrite-disabled", "true")
+                .request()
                 .get(ClientResponse.class);
 
         String entity = response.getEntity(String.class);

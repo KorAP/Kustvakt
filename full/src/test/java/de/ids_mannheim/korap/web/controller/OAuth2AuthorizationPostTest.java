@@ -39,6 +39,7 @@ public class OAuth2AuthorizationPostTest extends OAuth2TestBase {
             throws KustvaktException {
 
         return resource().path(API_VERSION).path("oauth2").path("authorize")
+                .request()
                 .header(Attributes.AUTHORIZATION, authHeader)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,

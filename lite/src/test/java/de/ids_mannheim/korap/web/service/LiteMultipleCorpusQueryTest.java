@@ -23,6 +23,7 @@ public class LiteMultipleCorpusQueryTest extends LiteJerseyTest {
                 .queryParam("q", "das").queryParam("ql", "poliqarp")
                 .queryParam("cq", "pubPlace=München")
                 .queryParam("cq", "textSigle=\"GOE/AGA/01784\"")
+                .request()
                 .get(ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -47,6 +48,7 @@ public class LiteMultipleCorpusQueryTest extends LiteJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("statistics")
                 .queryParam("cq", "textType=Abhandlung")
                 .queryParam("cq", "corpusSigle=GOE")
+                .request()
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -67,6 +69,7 @@ public class LiteMultipleCorpusQueryTest extends LiteJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("statistics")
                 .queryParam("corpusQuery", "textType=Autobiographie")
                 .queryParam("corpusQuery", "corpusSigle=GOE")
+                .request()
                 .method("GET", ClientResponse.class);
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());

@@ -24,6 +24,7 @@ public class ApiVersionTest extends SpringJerseyTest {
     public void testSearchWithoutVersion () throws KustvaktException {
         ClientResponse response = resource().path("api").path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .request()
                 .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
         assertEquals(HttpStatus.PERMANENT_REDIRECT_308, response.getStatus());
         URI location = response.getLocation();
@@ -34,7 +35,9 @@ public class ApiVersionTest extends SpringJerseyTest {
     public void testSearchWrongVersion () throws KustvaktException {
         ClientResponse response = resource().path("api").path("v0.2")
                 .path("search").queryParam("q", "[orth=der]")
-                .queryParam("ql", "poliqarp").accept(MediaType.APPLICATION_JSON)
+                .queryParam("ql", "poliqarp")
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
                 .get(ClientResponse.class);
         assertEquals(HttpStatus.PERMANENT_REDIRECT_308, response.getStatus());
         URI location = response.getLocation();

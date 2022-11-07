@@ -46,6 +46,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -60,6 +61,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     private void deleteGroupByName (String groupName) throws KustvaktException{
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@"+groupName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -72,6 +74,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     @Test
     public void testListDoryGroups () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -92,6 +95,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     @Test
     public void testListNemoGroups () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("nemo", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -112,6 +116,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     @Test
     public void testListMarlinGroups () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -125,6 +130,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     @Test
     public void testListGroupGuest () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get(ClientResponse.class);
         String entity = response.getEntity(String.class);
@@ -167,6 +173,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@"+groupName).type(MediaType.APPLICATION_FORM_URLENCODED)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(form)
@@ -180,6 +187,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@"+groupName).type(MediaType.APPLICATION_FORM_URLENCODED)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -278,6 +286,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         // delete darla from group
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@"+groupName).path("~darla")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -285,6 +294,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         // check group member
         response = resource().path(API_VERSION).path("group")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -301,6 +311,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         // nemo is a group member
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@"+groupName).path("~darla")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("nemo", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -322,6 +333,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         // dory delete pearl
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@dory-group").path("~pearl")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -339,6 +351,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
             ClientHandlerException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@dory-group").path("~pearl")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -361,6 +374,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         // delete group
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@"+groupName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -374,6 +388,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         response = resource().path(API_VERSION).path("group").path("list")
                 .path("system-admin").queryParam("username", username)
                 .queryParam("status", "DELETED")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(admin, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -398,6 +413,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         // dory is a group admin in marlin-group
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@marlin-group")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -418,6 +434,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
             ClientHandlerException, KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@deleted-group")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -440,6 +457,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         // dory is a group admin in marlin-group
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@marlin-group").path("~marlin")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -463,6 +481,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@"+groupName).path("invite")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
@@ -472,6 +491,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         // list group
         response = resource().path(API_VERSION).path("group")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -497,6 +517,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@dory-group").path("invite")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
@@ -523,6 +544,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@dory-group").path("invite")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
@@ -550,6 +572,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@dory-group").path("invite")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
@@ -578,6 +601,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@dory-group").path("invite")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
@@ -607,6 +631,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@deleted-group").path("invite")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
@@ -627,6 +652,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testSubscribePendingMember () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@dory-group").path("subscribe")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
@@ -666,6 +692,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testSubscribeDeletedMember () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@dory-group").path("subscribe")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("pearl", "pass"))
@@ -684,6 +711,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testSubscribeMissingGroupName() throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("subscribe")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("bruce", "pass"))
@@ -696,6 +724,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testSubscribeNonExistentMember () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@dory-group").path("subscribe")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("bruce", "pass"))
@@ -715,6 +744,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testSubscribeToNonExistentGroup () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@non-existent").path("subscribe")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("pearl", "pass"))
@@ -734,6 +764,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@"+groupName).path("subscribe")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("nemo", "pass"))
@@ -753,6 +784,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@"+groupName).path("unsubscribe")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
@@ -768,6 +800,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
             throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@"+groupName)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(admin, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -794,6 +827,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         // pearl unsubscribes from dory-group
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@dory-group").path("unsubscribe")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("pearl", "pass"))
@@ -820,6 +854,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@dory-group").path("unsubscribe")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
@@ -839,6 +874,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testUnsubscribeMissingGroupName () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("unsubscribe")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
@@ -851,6 +887,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testUnsubscribeNonExistentMember () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@dory-group").path("unsubscribe")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("bruce", "pass"))
@@ -871,6 +908,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     public void testUnsubscribeToNonExistentGroup () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@tralala-group").path("unsubscribe")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("pearl", "pass"))
@@ -893,6 +931,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@"+groupName).path("unsubscribe")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("nemo", "pass"))
@@ -917,6 +956,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@marlin-group").path("role").path("add")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
                 .entity(form).post(ClientResponse.class);
@@ -938,6 +978,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@marlin-group").path("role").path("delete")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
                 .entity(form).post(ClientResponse.class);
@@ -960,6 +1001,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@marlin-group").path("role").path("edit")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
                 .post(ClientResponse.class, form);
@@ -984,6 +1026,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         ClientResponse response = resource().path(API_VERSION).path("group")
                 .path("@marlin-group").path("role").path("edit")
                 .type(MediaType.APPLICATION_FORM_URLENCODED)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("marlin", "pass"))
                 .entity(form).post(ClientResponse.class);

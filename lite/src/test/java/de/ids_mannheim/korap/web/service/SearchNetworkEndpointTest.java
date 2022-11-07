@@ -77,7 +77,9 @@ public class SearchNetworkEndpointTest extends LiteJerseyTest {
 
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("engine", "network").get(ClientResponse.class);
+                .queryParam("engine", "network")
+                .request()
+                .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
                 response.getStatus());
@@ -95,7 +97,9 @@ public class SearchNetworkEndpointTest extends LiteJerseyTest {
         config.setNetworkEndpointURL("http://localhost:1040/search");
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("engine", "network").get(ClientResponse.class);
+                .queryParam("engine", "network")
+                .request()
+                .get(ClientResponse.class);
         
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -111,7 +115,9 @@ public class SearchNetworkEndpointTest extends LiteJerseyTest {
         
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("engine", "network").get(ClientResponse.class);
+                .queryParam("engine", "network")
+                .request()
+                .get(ClientResponse.class);
 
         String entity = response.getEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);

@@ -19,6 +19,7 @@ public class AuthenticationFilterTest extends SpringJerseyTest {
             throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
+                .request()
                 .header(Attributes.AUTHORIZATION, "Blah blah")
                 .get(ClientResponse.class);
 

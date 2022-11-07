@@ -162,6 +162,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         form.add("super_client_id", confidentialClientId);
 
         ClientResponse response = resource().path(API_VERSION).path("plugins")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
@@ -182,6 +183,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("plugins")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
@@ -204,6 +206,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
             KustvaktException {
 
         ClientResponse response = resource().path(API_VERSION).path("plugins")
+                .request()
                 .header(Attributes.AUTHORIZATION, "Bearer blahblah")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
@@ -243,6 +246,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
             form.add("permitted_only", Boolean.toString(permitted_only));
         }
         ClientResponse response = resource().path(API_VERSION).path("plugins")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
@@ -413,6 +417,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         return resource().path(API_VERSION).path("plugins").path("install")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
@@ -428,6 +433,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         form.add("client_id", clientId);
 
         return resource().path(API_VERSION).path("plugins").path("uninstall")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
@@ -514,6 +520,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("plugins")
                 .path("installed")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,

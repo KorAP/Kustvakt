@@ -360,6 +360,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         response = resource().path(API_VERSION).path("oauth2").path("client")
                 .path("register")
+                .request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .entity(clientJson).post(ClientResponse.class);
@@ -384,6 +385,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("client").path("register")
+                .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(username,
@@ -503,6 +505,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("client").path("deregister").path(clientId)
+                .request()
                 .delete(ClientResponse.class);
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -519,6 +522,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("client").path("deregister")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .delete(ClientResponse.class);
@@ -533,6 +537,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("client").path("deregister").path(clientId)
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .delete(ClientResponse.class);
@@ -548,6 +553,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("client").path("reset")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
@@ -571,6 +577,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("client").path("reset")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
@@ -596,6 +603,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("client").path("list")
+                .request()
                 .header(Attributes.AUTHORIZATION, userAuthHeader)
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
@@ -777,6 +785,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         response = resource().path(API_VERSION).path("oauth2").path("revoke")
                 .path("super").path("all")
+                .request()
                 .header(Attributes.AUTHORIZATION, userAuthHeader)
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)

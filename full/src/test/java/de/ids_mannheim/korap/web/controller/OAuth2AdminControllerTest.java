@@ -49,6 +49,7 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
             KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("oauth2")
                 .path("admin").path("client").path("privilege")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
@@ -85,7 +86,9 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         assertTrue(accessTokensBefore > 0);
 
         resource().path(API_VERSION).path("oauth2").path("admin").path("token")
-                .path("clean").header(Attributes.AUTHORIZATION, adminAuthHeader)
+                .path("clean")
+                .request()
+                .header(Attributes.AUTHORIZATION, adminAuthHeader)
                 .get(ClientResponse.class);
 
         assertEquals(0, refreshDao.retrieveInvalidRefreshTokens().size());
@@ -110,7 +113,9 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         assertEquals(accessTokensAfter, accessTokensBefore + 1);
 
         resource().path(API_VERSION).path("oauth2").path("admin").path("token")
-                .path("clean").header(Attributes.AUTHORIZATION, adminAuthHeader)
+                .path("clean")
+                .request()
+                .header(Attributes.AUTHORIZATION, adminAuthHeader)
                 .get(ClientResponse.class);
 
         assertEquals(0, accessDao.retrieveInvalidAccessTokens().size());
@@ -150,6 +155,7 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
 
         // list vc
         ClientResponse response = resource().path(API_VERSION).path("vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .get(ClientResponse.class);
 

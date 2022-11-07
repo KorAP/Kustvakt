@@ -53,6 +53,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
 
         // test list user group
         response = resource().path(API_VERSION).path("group")
+                .request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .get(ClientResponse.class);
 
@@ -83,6 +84,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
 
         // test list vc using the token
         response = resource().path(API_VERSION).path("vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + token)
                 .get(ClientResponse.class);
 
@@ -108,6 +110,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
     private void testScopeNotAuthorized (String accessToken)
             throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("vc")
+                .request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .get(ClientResponse.class);
 
@@ -125,6 +128,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
             throws KustvaktException {
         ClientResponse response =
                 resource().path(API_VERSION).path("vc").path("access")
+                        .request()
                         .header(Attributes.AUTHORIZATION,
                                 "Bearer " + accessToken)
                         .get(ClientResponse.class);
@@ -170,6 +174,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         form.add("client_secret", "secret");
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2").path("revoke")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .entity(form).post(ClientResponse.class);
@@ -211,6 +216,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         form.add("refresh_token", refreshToken);
 
         ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)

@@ -27,6 +27,7 @@ public class InfoControllerTest extends SpringJerseyTest {
     @Test
     public void testInfo () throws KustvaktException {
         ClientResponse response = resource().path(API_VERSION).path("info")
+                .request()
                 .get(ClientResponse.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());

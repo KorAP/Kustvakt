@@ -31,7 +31,7 @@ public class ClientsHandler {
     public String getResponse (String path, String key, Object value)
             throws KustvaktException {
         try {
-            return service.path(path).queryParam(key, value).get(String.class);
+            return service.path(path).queryParam(key, value).request().get(String.class);
         }
         catch (UniformInterfaceException e) {
             throw new KustvaktException(StatusCodes.REQUEST_INVALID);
@@ -49,7 +49,7 @@ public class ClientsHandler {
                 for (String value : e.getValue())
                     resource = resource.queryParam(e.getKey(), value);
             }
-            return resource.get(String.class);
+            return resource.request().get(String.class);
         }
         catch (UniformInterfaceException e) {
             throw new KustvaktException(StatusCodes.REQUEST_INVALID);

@@ -62,6 +62,7 @@ public class IndexControllerTest extends SpringJerseyTest {
 
         ClientResponse response = resource().path(API_VERSION).path("index")
                 .path("close").type(MediaType.APPLICATION_FORM_URLENCODED)
+                .request()
                 .post(ClientResponse.class, m);
 
         assertEquals(HttpStatus.SC_OK, response.getStatus());
@@ -74,12 +75,14 @@ public class IndexControllerTest extends SpringJerseyTest {
 
         response = resource().path(API_VERSION).path("vc").path("~system")
                 .path("named-vc1")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
                 .delete(ClientResponse.class);
 
         response = resource().path(API_VERSION).path("vc").path("~system")
                 .path("named-vc1")
+                .request()
                 .get(ClientResponse.class);
         
         String entity = response.getEntity(String.class);

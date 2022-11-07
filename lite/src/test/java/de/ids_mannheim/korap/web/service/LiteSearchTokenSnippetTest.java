@@ -22,6 +22,7 @@ public class LiteSearchTokenSnippetTest extends LiteJerseyTest{
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("show-tokens", "true")
                 .queryParam("context", "sentence").queryParam("count", "13")
+                .request()
                 .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -42,6 +43,7 @@ public class LiteSearchTokenSnippetTest extends LiteJerseyTest{
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("show-tokens", "false")
                 .queryParam("context", "sentence").queryParam("count", "13")
+                .request()
                 .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
@@ -61,6 +63,7 @@ public class LiteSearchTokenSnippetTest extends LiteJerseyTest{
                 .queryParam("access-rewrite-disabled", "true")
                 .queryParam("show-tokens", "true")
                 .queryParam("context", "sentence").queryParam("count", "13")
+                .request()
                 .get(ClientResponse.class);
 
         assertEquals(ClientResponse.Status.OK.getStatusCode(),
