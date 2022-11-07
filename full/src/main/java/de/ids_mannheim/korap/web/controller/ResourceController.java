@@ -10,7 +10,7 @@ import javax.ws.rs.core.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import com.sun.jersey.spi.container.ResourceFilters;
+import de.ids_mannheim.korap.web.utils.ResourceFilters;
 
 import de.ids_mannheim.korap.dto.ResourceDto;
 import de.ids_mannheim.korap.service.ResourceService;

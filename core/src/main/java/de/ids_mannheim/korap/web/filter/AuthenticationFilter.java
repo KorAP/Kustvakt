@@ -1,7 +1,5 @@
 package de.ids_mannheim.korap.web.filter;
 
-import javax.ws.rs.ext.Provider;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.glassfish.jersey.server.ContainerRequest;
@@ -30,7 +28,6 @@ import de.ids_mannheim.korap.web.KustvaktResponseHandler;
  * @last update 12/2017
  */
 @Component
-@Provider
 public class AuthenticationFilter
         implements ContainerRequestFilter {
 

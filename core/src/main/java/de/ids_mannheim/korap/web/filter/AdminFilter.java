@@ -4,7 +4,6 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.ext.Provider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,7 +20,6 @@ import de.ids_mannheim.korap.web.KustvaktResponseHandler;
  * @see {@link AuthenticationFilter}
  */
 @Component
-@Provider
 public class AdminFilter extends AuthenticationFilter {
 
     private @Context ServletContext servletContext;

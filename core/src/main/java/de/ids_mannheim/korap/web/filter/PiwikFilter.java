@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Random;
 
 import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.ext.Provider;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,7 +39,6 @@ import net.minidev.json.JSONArray;
  * @date 13/05/2014
  */
 @Component
-@Provider
 public class PiwikFilter implements ContainerRequestFilter {
 
     private WebTarget service;

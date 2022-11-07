@@ -6,7 +6,6 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.Provider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,7 +22,6 @@ import de.ids_mannheim.korap.utils.TimeUtils;
 /**
  * Created by hanl on 7/15/14.
  */
-@Provider
 @Component
 public class DemoUserFilter implements ContainerRequestFilter {
 

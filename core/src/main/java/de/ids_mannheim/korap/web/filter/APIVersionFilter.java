@@ -3,7 +3,6 @@ package de.ids_mannheim.korap.web.filter;
 import java.util.List;
 
 import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.ext.Provider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,7 +20,6 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
  *
  */
 @Component
-@Provider
 public class APIVersionFilter
         implements ContainerRequestFilter {
 

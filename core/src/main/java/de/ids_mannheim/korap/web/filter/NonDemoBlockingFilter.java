@@ -1,7 +1,5 @@
 package de.ids_mannheim.korap.web.filter;
 
-import javax.ws.rs.ext.Provider;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +21,6 @@ import de.ids_mannheim.korap.web.KustvaktResponseHandler;
  *       anonymous access should be allowed!
  */
 @Component
-@Provider
 public class NonDemoBlockingFilter
         implements ContainerRequestFilter {
 
