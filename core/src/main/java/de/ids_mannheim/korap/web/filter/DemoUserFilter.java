@@ -37,10 +37,10 @@ public class DemoUserFilter implements ContainerRequestFilter {
 
     @Override
     public void filter (ContainerRequestContext request) {
-        String host = request.getHeaderValue(ContainerRequest.HOST);
-        String ua = request.getHeaderValue(ContainerRequest.USER_AGENT);
+        String host = request.getHeaderString(ContainerRequest.HOST);
+        String ua = request.getHeaderString(ContainerRequest.USER_AGENT);
         String authentication = request
-                .getHeaderValue(ContainerRequest.AUTHORIZATION);
+                .getHeaderString(ContainerRequest.AUTHORIZATION);
 
         // means that this is the public service
         if (authentication == null || authentication.isEmpty()) {

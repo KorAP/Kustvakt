@@ -45,11 +45,11 @@ public class AuthenticationFilter
 
     @Override
     public void filter (ContainerRequestContext request) {
-        String host = request.getHeaderValue(ContainerRequest.HOST);
-        String ua = request.getHeaderValue(ContainerRequest.USER_AGENT);
+        String host = request.getHeaderString(ContainerRequest.HOST);
+        String ua = request.getHeaderString(ContainerRequest.USER_AGENT);
 
         String authorization =
-                request.getHeaderValue(ContainerRequest.AUTHORIZATION);
+                request.getHeaderString(ContainerRequest.AUTHORIZATION);
 
         if (authorization != null && !authorization.isEmpty()) {
             TokenContext context = null;

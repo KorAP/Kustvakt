@@ -24,7 +24,7 @@ public class DemoFilter implements ContainerRequestFilter {
     @Override
     public void filter (ContainerRequestContext request) {
         String authentication =
-                request.getHeaderValue(ContainerRequest.AUTHORIZATION);
+                request.getHeaderString(ContainerRequest.AUTHORIZATION);
         if (authentication == null || authentication.isEmpty()) {
             if (request.getSecurityContext() == null) {
                 request.setSecurityContext(createContext());

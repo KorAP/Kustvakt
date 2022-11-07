@@ -79,14 +79,14 @@ public class PiwikFilter implements ContainerRequestFilter {
                     .queryParam("rec", "1")
                     //todo check for empty container
                     .queryParam("_cvar", translateCustomData())
-                    .queryParam("cip", request.getHeaderValue("Host"))
+                    .queryParam("cip", request.getHeaderString("Host"))
                     .queryParam("cookie", "false")
                     .queryParam("r", String.valueOf(random.nextDouble()))
                     .queryParam("action_name",
                             request.getUriInfo().getRequestUri().toASCIIString())
                     .accept("text/html")
-                    .header("Host", request.getHeaderValue("Host"))
-                    .header("User-Agent", request.getHeaderValue("User-Agent"))
+                    .header("Host", request.getHeaderString("Host"))
+                    .header("User-Agent", request.getHeaderString("User-Agent"))
                     .acceptLanguage(l).method("GET");
         }
         catch (Exception e) {
