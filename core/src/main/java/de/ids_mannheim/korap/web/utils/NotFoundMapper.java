@@ -4,6 +4,10 @@ import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ResourceContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -14,8 +18,6 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.sun.jersey.api.NotFoundException;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 
@@ -38,9 +40,15 @@ public class NotFoundMapper implements ExceptionMapper<NotFoundException> {
     @Autowired
     private KustvaktConfiguration config;
 
+    @Context
+    private ResourceContext resourceContext;
+
     @Override
     public Response toResponse (NotFoundException exception) {
-        URI notFoundUri = exception.getNotFoundUri();
+        ContainerRequestContext requestContext =
+                resourceContext.getResource(ContainerRequestContext.class);
+
+    	URI notFoundUri = requestContext.getUriInfo().getRequestUri();
 
         String path = notFoundUri.getPath();
         String baseUrl = config.getBaseURL();
