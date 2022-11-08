@@ -24,8 +24,9 @@ public class QueryRewriteTest extends SpringJerseyTest {
             throws KustvaktException, Exception {
 
         Response response = target().path(API_VERSION).path("search")
-            .queryParam("q", "[orth=der]{%23examplequery} Baum")
+            .queryParam("q", "{q}")
             .queryParam("ql", "poliqarp")
+            .resolveTemplate("q", "[orth=der]{#examplequery} Baum")
             .request()
             .get();
 
@@ -40,8 +41,9 @@ public class QueryRewriteTest extends SpringJerseyTest {
             throws KustvaktException, Exception {
 
         Response response = target().path(API_VERSION).path("search")
-            .queryParam("q", "[orth=der]{%23system-q} Baum")
+            .queryParam("q", "{q}")
             .queryParam("ql", "poliqarp")
+            .resolveTemplate("q", "[orth=der]{#system-q} Baum")
             .request()
             .get();
 
@@ -56,8 +58,9 @@ public class QueryRewriteTest extends SpringJerseyTest {
 
         // Added in the database migration sql for tests
         Response response = target().path(API_VERSION).path("search")
-            .queryParam("q", "[orth=der]{%23dory/dory-q} Baum")
+            .queryParam("q", "{q}")
             .queryParam("ql", "poliqarp")
+            .resolveTemplate("q", "[orth=der]{#dory/dory-q} Baum")
             .request()
             .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                     .createBasicAuthorizationHeaderValue("dory", "pass"))
