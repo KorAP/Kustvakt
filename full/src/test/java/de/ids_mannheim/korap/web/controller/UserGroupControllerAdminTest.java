@@ -2,18 +2,17 @@ package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Form;
 
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.client.Entity;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -35,32 +34,32 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     private JsonNode listGroup (String username)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("group")
+        Response response = target().path(API_VERSION).path("group")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         return node;
     }
 
     @Test
     public void testListDoryGroups () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("group")
+        Response response = target().path(API_VERSION).path("group")
                 .path("list").path("system-admin")
                 .queryParam("username", "dory")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(adminUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(3, node.size());
@@ -68,17 +67,17 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
 
     @Test
     public void testListDoryActiveGroups () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("group")
+        Response response = target().path(API_VERSION).path("group")
                 .path("list").path("system-admin")
                 .queryParam("username", "dory").queryParam("status", "ACTIVE")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(adminUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.size());
@@ -88,31 +87,31 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     @Test
     public void testListWithoutUsername () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("group")
+        Response response = target().path(API_VERSION).path("group")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(adminUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         assertEquals("[]", entity);
     }
 
     @Test
     public void testListByStatusAll () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("group")
+        Response response = target().path(API_VERSION).path("group")
                 .path("list").path("system-admin")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(adminUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         boolean containsHiddenStatus = false;
@@ -127,17 +126,17 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     @Test
     public void testListByStatusHidden () throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("group")
+        Response response = target().path(API_VERSION).path("group")
                 .path("list").path("system-admin")
                 .queryParam("status", "HIDDEN")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(adminUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(1, node.size());
         assertEquals(3, node.at("/0/id").asInt());
@@ -149,16 +148,15 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
 
         String groupName = "admin-test-group";
 
-        ClientResponse response = resource().path(API_VERSION).path("group")
+        Response response = target().path(API_VERSION).path("group")
                 .path("@" + groupName)
-                .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(testUser,
                                         "password"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .put(ClientResponse.class);
+                .put(Entity.form(new Form()));
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
@@ -179,7 +177,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
             KustvaktException {
 
         // accept invitation
-        ClientResponse response = resource().path(API_VERSION).path("group")
+        Response response = target().path(API_VERSION).path("group")
                 .path("@" + groupName).path("subscribe")
                 .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
@@ -187,7 +185,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(
                                         memberUsername, "pass"))
-                .post(ClientResponse.class);
+                .post(Entity.form(new Form()));
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
@@ -198,21 +196,20 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     private void testAddMemberRoles (String groupName, String memberUsername)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        MultivaluedMap<String, String> map = new MultivaluedMapImpl();
-        map.add("memberUsername", memberUsername);
-        map.add("roleId", "1"); // USER_GROUP_ADMIN
-        map.add("roleId", "2"); // USER_GROUP_MEMBER
+        Form form = new Form();
+        form.param("memberUsername", memberUsername);
+        form.param("roleId", "1"); // USER_GROUP_ADMIN
+        form.param("roleId", "2"); // USER_GROUP_MEMBER
 
-        ClientResponse response = resource().path(API_VERSION).path("group")
+        Response response = target().path(API_VERSION).path("group")
                 .path("@" + groupName).path("role").path("add")
-                .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(adminUser,
                                         "password"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(map)
-                .post(ClientResponse.class);
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .post(Entity.form(form));
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
@@ -232,20 +229,19 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     private void testDeleteMemberRoles (String groupName, String memberUsername)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        MultivaluedMap<String, String> map = new MultivaluedMapImpl();
-        map.add("memberUsername", memberUsername);
-        map.add("roleId", "1"); // USER_GROUP_ADMIN
+        Form form = new Form();
+        form.param("memberUsername", memberUsername);
+        form.param("roleId", "1"); // USER_GROUP_ADMIN
 
-        ClientResponse response = resource().path(API_VERSION).path("group")
+        Response response = target().path(API_VERSION).path("group")
                 .path("@" + groupName).path("role").path("delete")
-                .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue(adminUser,
                                         "password"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").entity(map)
-                .post(ClientResponse.class);
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .post(Entity.form(form));
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
@@ -263,17 +259,17 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     private JsonNode retrieveGroup (String groupName)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("group")
+        Response response = target().path(API_VERSION).path("group")
                 .path("@" + groupName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(adminUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         return node;
     }
@@ -282,13 +278,13 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         // delete group
-        ClientResponse response = resource().path(API_VERSION).path("group")
+        Response response = target().path(API_VERSION).path("group")
                 .path("@" + groupName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(adminUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .delete(ClientResponse.class);
+                .delete();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
@@ -301,13 +297,13 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
         // delete marlin from group
-        ClientResponse response = resource().path(API_VERSION).path("group")
+        Response response = target().path(API_VERSION).path("group")
                 .path("@" + groupName).path("~marlin")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(adminUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .delete(ClientResponse.class);
+                .delete();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
@@ -323,17 +319,16 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     private void testInviteMember (String groupName)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("members", "marlin,nemo,darla");
+        Form form = new Form();
+        form.param("members", "marlin,nemo,darla");
 
-        ClientResponse response = resource().path(API_VERSION).path("group")
+        Response response = target().path(API_VERSION).path("group")
                 .path("@" + groupName).path("invite")
-                .type(MediaType.APPLICATION_FORM_URLENCODED)
                 .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(adminUser, "pass"))
-                .entity(form).post(ClientResponse.class);
+                .post(Entity.form(form));
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 

@@ -6,8 +6,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientResponse.Status;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
@@ -26,13 +26,13 @@ public class InfoControllerTest extends SpringJerseyTest {
 
     @Test
     public void testInfo () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("info")
+        Response response = target().path(API_VERSION).path("info")
                 .request()
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(config.getCurrentVersion(),
                 node.at("/latest_api_version").asText());

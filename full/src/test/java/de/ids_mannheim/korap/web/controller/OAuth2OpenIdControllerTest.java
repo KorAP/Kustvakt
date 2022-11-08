@@ -10,8 +10,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
 import java.util.Date;
 
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.message.types.TokenType;
@@ -31,9 +31,9 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.GrantType;
 import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.client.Entity;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -52,9 +52,9 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
             "https://korap.ids-mannheim.de/confidential/redirect";
     private String username = "dory";
 
-    private ClientResponse sendAuthorizationRequest (
-            MultivaluedMap<String, String> form) throws KustvaktException {
-        return resource().path(API_VERSION).path("oauth2").path("openid").path("authorize")
+    private Response sendAuthorizationRequest (
+            Form form) throws KustvaktException {
+        return target().path(API_VERSION).path("oauth2").path("openid").path("authorize")
                 .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
@@ -63,17 +63,17 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+                .post(Entity.form(form));
     }
 
-    private ClientResponse sendTokenRequest (
-            MultivaluedMap<String, String> form) throws KustvaktException {
-        return resource().path(API_VERSION).path("oauth2").path("openid").path("token")
+    private Response sendTokenRequest (
+            Form form) throws KustvaktException {
+        return target().path(API_VERSION).path("oauth2").path("openid").path("token")
                 .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+                .post(Entity.form(form));
     }
 
     @Test
@@ -81,20 +81,20 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
 
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("response_type", "code");
-        form.add("client_id", "fCBbQkAyYzI4NzUxMg");
+        Form form = new Form();
+        form.param("response_type", "code");
+        form.param("client_id", "fCBbQkAyYzI4NzUxMg");
 
         testRequestAuthorizationCodeWithoutOpenID(form, redirectUri);
-        form.add("scope", "openid");
+        form.param("scope", "openid");
 
         testRequestAuthorizationCodeMissingRedirectUri(form);
         testRequestAuthorizationCodeInvalidRedirectUri(form);
-        form.add("redirect_uri", redirectUri);
+        form.param("redirect_uri", redirectUri);
 
-        form.add("state", "thisIsMyState");
+        form.param("state", "thisIsMyState");
 
-        ClientResponse response = sendAuthorizationRequest(form);
+        Response response = sendAuthorizationRequest(form);
         URI location = response.getLocation();
         assertEquals(redirectUri, location.getScheme() + "://"
                 + location.getHost() + location.getPath());
@@ -106,9 +106,9 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
     }
 
     private void testRequestAuthorizationCodeWithoutOpenID (
-            MultivaluedMap<String, String> form, String redirectUri)
+            Form form, String redirectUri)
             throws KustvaktException {
-        ClientResponse response = sendAuthorizationRequest(form);
+        Response response = sendAuthorizationRequest(form);
         URI location = response.getLocation();
         // System.out.println(location.toString());
         assertEquals(redirectUri, location.getScheme() + "://"
@@ -116,9 +116,9 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
     }
 
     private void testRequestAuthorizationCodeMissingRedirectUri (
-            MultivaluedMap<String, String> form) throws KustvaktException {
-        ClientResponse response = sendAuthorizationRequest(form);
-        String entity = response.getEntity(String.class);
+            Form form) throws KustvaktException {
+        Response response = sendAuthorizationRequest(form);
+        String entity = response.readEntity(String.class);
 
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
@@ -127,25 +127,25 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
     }
 
     private void testRequestAuthorizationCodeInvalidRedirectUri (
-            MultivaluedMap<String, String> form) throws KustvaktException {
-        form.add("redirect_uri", "blah");
-        ClientResponse response = sendAuthorizationRequest(form);
-        String entity = response.getEntity(String.class);
+            Form form) throws KustvaktException {
+        form.param("redirect_uri", "blah");
+        Response response = sendAuthorizationRequest(form);
+        String entity = response.readEntity(String.class);
 
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
         assertEquals("Invalid redirect URI",
                 node.at("/error_description").asText());
 
-        form.remove("redirect_uri");
+        form.asMap().remove("redirect_uri");
     }
 
     @Test
     public void testRequestAuthorizationCodeMissingClientID ()
             throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("scope", "openid");
-        form.add("redirect_uri", redirectUri);
+        Form form = new Form();
+        form.param("scope", "openid");
+        form.param("redirect_uri", redirectUri);
 
         // error response is represented in JSON because redirect URI
         // cannot be verified without client id
@@ -154,8 +154,8 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         // before redirect_uri. see
         // com.nimbusds.oauth2.sdk.AuthorizationRequest
 
-        ClientResponse response = sendAuthorizationRequest(form);
-        String entity = response.getEntity(String.class);
+        Response response = sendAuthorizationRequest(form);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
         assertEquals("Invalid request: Missing client_id parameter",
@@ -166,17 +166,17 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
     @Test
     public void testRequestAuthorizationCodeMissingResponseType ()
             throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("scope", "openid");
-        form.add("redirect_uri", redirectUri);
-        form.add("client_id", "blah");
+        Form form = new Form();
+        form.param("scope", "openid");
+        form.param("redirect_uri", redirectUri);
+        form.param("client_id", "blah");
 
         // client_id has not been verified yet
         // MUST NOT automatically redirect the user-agent to the
         // invalid redirection URI.
 
-        ClientResponse response = sendAuthorizationRequest(form);
-        String entity = response.getEntity(String.class);
+        Response response = sendAuthorizationRequest(form);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
         assertEquals("Invalid request: Missing response_type parameter",
@@ -184,13 +184,13 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
     }
 
     private void testRequestAuthorizationCodeUnsupportedResponseType (
-            MultivaluedMap<String, String> form, String type)
+            Form form, String type)
             throws KustvaktException {
 
-        ClientResponse response = sendAuthorizationRequest(form);
+        Response response = sendAuthorizationRequest(form);
         URI location = response.getLocation();
         assertEquals(MediaType.APPLICATION_FORM_URLENCODED,
-                response.getType().toString());
+                response.getMediaType().toString());
 
         MultiValueMap<String, String> params =
                 UriComponentsBuilder.fromUri(location).build().getQueryParams();
@@ -212,17 +212,17 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
     @Test
     public void testRequestAuthorizationCodeUnsupportedImplicitFlow ()
             throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("scope", "openid");
-        form.add("redirect_uri", redirectUri);
-        form.add("response_type", "id_token");
-        form.add("client_id", "fCBbQkAyYzI4NzUxMg");
-        form.add("nonce", "nonce");
+        Form form = new Form();
+        form.param("scope", "openid");
+        form.param("redirect_uri", redirectUri);
+        form.param("response_type", "id_token");
+        form.param("client_id", "fCBbQkAyYzI4NzUxMg");
+        form.param("nonce", "nonce");
 
         testRequestAuthorizationCodeUnsupportedResponseType(form, "id_token");
 
-        form.remove("response_type");
-        form.add("response_type", "id_token token");
+        form.asMap().remove("response_type");
+        form.param("response_type", "id_token token");
         testRequestAuthorizationCodeUnsupportedResponseType(form, "id_token");
     }
 
@@ -242,16 +242,16 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
     @Test
     public void testRequestAuthorizationCodeUnsupportedHybridFlow ()
             throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("scope", "openid");
-        form.add("redirect_uri", redirectUri);
-        form.add("response_type", "code id_token");
-        form.add("client_id", "fCBbQkAyYzI4NzUxMg");
-        form.add("nonce", "nonce");
+        Form form = new Form();
+        form.param("scope", "openid");
+        form.param("redirect_uri", redirectUri);
+        form.param("response_type", "code id_token");
+        form.param("client_id", "fCBbQkAyYzI4NzUxMg");
+        form.param("nonce", "nonce");
         testRequestAuthorizationCodeUnsupportedResponseType(form, "id_token");
 
-        form.remove("response_type");
-        form.add("response_type", "code token");
+        form.asMap().remove("response_type");
+        form.param("response_type", "code token");
         testRequestAuthorizationCodeUnsupportedResponseType(form, "token");
     }
 
@@ -261,33 +261,33 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
             NoSuchAlgorithmException, JOSEException {
         String client_id = "fCBbQkAyYzI4NzUxMg";
         String nonce = "thisIsMyNonce";
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("response_type", "code");
-        form.add("client_id", client_id);
-        form.add("redirect_uri", redirectUri);
-        form.add("scope", "openid");
-        form.add("state", "thisIsMyState");
-        form.add("nonce", nonce);
+        Form form = new Form();
+        form.param("response_type", "code");
+        form.param("client_id", client_id);
+        form.param("redirect_uri", redirectUri);
+        form.param("scope", "openid");
+        form.param("state", "thisIsMyState");
+        form.param("nonce", nonce);
 
-        ClientResponse response = sendAuthorizationRequest(form);
+        Response response = sendAuthorizationRequest(form);
         URI location = response.getLocation();
         MultiValueMap<String, String> params =
                 UriComponentsBuilder.fromUri(location).build().getQueryParams();
         assertEquals("thisIsMyState", params.getFirst("state"));
         String code = params.getFirst("code");
 
-        MultivaluedMap<String, String> tokenForm = new MultivaluedMapImpl();
+        Form tokenForm = new Form();
         testRequestAccessTokenMissingGrant(tokenForm);
-        tokenForm.add("grant_type", "authorization_code");
-        tokenForm.add("code", code);
+        tokenForm.param("grant_type", "authorization_code");
+        tokenForm.param("code", code);
         testRequestAccessTokenMissingClientId(tokenForm);
-        tokenForm.add("client_id", client_id);
+        tokenForm.param("client_id", client_id);
         testRequestAccessTokenMissingClientSecret(tokenForm);
-        tokenForm.add("client_secret", "secret");
-        tokenForm.add("redirect_uri", redirectUri);
+        tokenForm.param("client_secret", "secret");
+        tokenForm.param("redirect_uri", redirectUri);
 
-        ClientResponse tokenResponse = sendTokenRequest(tokenForm);
-        String entity = tokenResponse.getEntity(String.class);
+        Response tokenResponse = sendTokenRequest(tokenForm);
+        String entity = tokenResponse.readEntity(String.class);
 
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
@@ -302,9 +302,9 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
     }
 
     private void testRequestAccessTokenMissingGrant (
-            MultivaluedMap<String, String> tokenForm) throws KustvaktException {
-        ClientResponse response = sendTokenRequest(tokenForm);
-        String entity = response.getEntity(String.class);
+            Form tokenForm) throws KustvaktException {
+        Response response = sendTokenRequest(tokenForm);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
         assertEquals("Invalid request: Missing grant_type parameter",
@@ -312,9 +312,9 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
     }
 
     private void testRequestAccessTokenMissingClientId (
-            MultivaluedMap<String, String> tokenForm) throws KustvaktException {
-        ClientResponse response = sendTokenRequest(tokenForm);
-        String entity = response.getEntity(String.class);
+            Form tokenForm) throws KustvaktException {
+        Response response = sendTokenRequest(tokenForm);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
         assertEquals("Invalid request: Missing required client_id "
@@ -322,9 +322,9 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
     }
 
     private void testRequestAccessTokenMissingClientSecret (
-            MultivaluedMap<String, String> tokenForm) throws KustvaktException {
-        ClientResponse response = sendTokenRequest(tokenForm);
-        String entity = response.getEntity(String.class);
+            Form tokenForm) throws KustvaktException {
+        Response response = sendTokenRequest(tokenForm);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
         assertEquals("Missing parameter: client_secret",
@@ -357,20 +357,20 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
             NoSuchAlgorithmException, JOSEException {
         // public client
         String client_id = "8bIDtZnH6NvRkW2Fq";
-        MultivaluedMap<String, String> tokenForm = new MultivaluedMapImpl();
+        Form tokenForm = new Form();
         testRequestAccessTokenMissingGrant(tokenForm);
 
-        tokenForm.add("grant_type", GrantType.PASSWORD.toString());
+        tokenForm.param("grant_type", GrantType.PASSWORD.toString());
         testRequestAccessTokenMissingUsername(tokenForm);
 
-        tokenForm.add("username", username);
+        tokenForm.param("username", username);
         testRequestAccessTokenMissingPassword(tokenForm);
 
-        tokenForm.add("password", "pass");
-        tokenForm.add("client_id", client_id);
+        tokenForm.param("password", "pass");
+        tokenForm.param("client_id", client_id);
 
-        ClientResponse tokenResponse = sendTokenRequest(tokenForm);
-        String entity = tokenResponse.getEntity(String.class);
+        Response tokenResponse = sendTokenRequest(tokenForm);
+        String entity = tokenResponse.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(OAuth2Error.UNAUTHORIZED_CLIENT,
@@ -380,9 +380,9 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
     }
 
     private void testRequestAccessTokenMissingUsername (
-            MultivaluedMap<String, String> tokenForm) throws KustvaktException {
-        ClientResponse response = sendTokenRequest(tokenForm);
-        String entity = response.getEntity(String.class);
+            Form tokenForm) throws KustvaktException {
+        Response response = sendTokenRequest(tokenForm);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
         assertEquals("Invalid request: Missing or empty username parameter",
@@ -390,9 +390,9 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
     }
 
     private void testRequestAccessTokenMissingPassword (
-            MultivaluedMap<String, String> tokenForm) throws KustvaktException {
-        ClientResponse response = sendTokenRequest(tokenForm);
-        String entity = response.getEntity(String.class);
+            Form tokenForm) throws KustvaktException {
+        Response response = sendTokenRequest(tokenForm);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
         assertEquals("Invalid request: Missing or empty password parameter",
@@ -401,11 +401,11 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
 
     @Test
     public void testPublicKeyAPI () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("openid")
+        Response response = target().path(API_VERSION).path("oauth2").path("openid")
                 .path("jwks")
                 .request()
-                .get(ClientResponse.class);
-        String entity = response.getEntity(String.class);
+                .get();
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(1, node.at("/keys").size());
         node = node.at("/keys/0");
@@ -417,11 +417,11 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
 
     @Test
     public void testOpenIDConfiguration () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("openid")
+        Response response = target().path(API_VERSION).path("oauth2").path("openid")
                 .path("config")
                 .request()
-                .get(ClientResponse.class);
-        String entity = response.getEntity(String.class);
+                .get();
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/issuer"));
         assertNotNull(node.at("/authorization_endpoint"));

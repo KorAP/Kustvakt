@@ -7,7 +7,9 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.net.URI;
 
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
@@ -18,8 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -44,27 +45,27 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
 
     @Test
     public void testScopeWithSuperClient () throws KustvaktException {
-        ClientResponse response =
+        Response response =
                 requestTokenWithDoryPassword(superClientId, clientSecret);
 
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals("all", node.at("/scope").asText());
         String accessToken = node.at("/access_token").asText();
 
         // test list user group
-        response = resource().path(API_VERSION).path("group")
+        response = target().path(API_VERSION).path("group")
                 .request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        node = JsonUtils.readTree(response.getEntity(String.class));
+        node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(2, node.size());
     }
 
     @Test
     public void testCustomScope () throws KustvaktException {
-        ClientResponse response =
+        Response response =
                 requestAuthorizationCode("code", confidentialClientId, "",
                         OAuth2Scope.VC_INFO.toString(), "", userAuthHeader);
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
@@ -76,31 +77,31 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         
         response = requestTokenWithAuthorizationCodeAndForm(
                 confidentialClientId, clientSecret, code);
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
 
         String token = node.at("/access_token").asText();
         assertTrue(node.at("/scope").asText()
                 .contains(OAuth2Scope.VC_INFO.toString()));
 
         // test list vc using the token
-        response = resource().path(API_VERSION).path("vc")
+        response = target().path(API_VERSION).path("vc")
                 .request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + token)
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        node = JsonUtils.readTree(response.getEntity(String.class));
+        node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(4, node.size());
     }
 
     @Test
     public void testDefaultScope () throws KustvaktException, IOException {
         String code = requestAuthorizationCode(confidentialClientId, userAuthHeader);
-        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
+        Response response = requestTokenWithAuthorizationCodeAndForm(
                 confidentialClientId, clientSecret, code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         String accessToken = node.at("/access_token").asText();
         testScopeNotAuthorized(accessToken);
         testScopeNotAuthorize2(accessToken);
@@ -109,14 +110,14 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
 
     private void testScopeNotAuthorized (String accessToken)
             throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc")
+        Response response = target().path(API_VERSION).path("vc")
                 .request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
-                .get(ClientResponse.class);
+                .get();
 
-        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
@@ -126,14 +127,14 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
 
     private void testScopeNotAuthorize2 (String accessToken)
             throws KustvaktException {
-        ClientResponse response =
-                resource().path(API_VERSION).path("vc").path("access")
+        Response response =
+                target().path(API_VERSION).path("vc").path("access")
                         .request()
                         .header(Attributes.AUTHORIZATION,
                                 "Bearer " + accessToken)
-                        .get(ClientResponse.class);
-        String entity = response.getEntity(String.class);
-        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
+                        .get();
+        String entity = response.readEntity(String.class);
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(),
                 response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
@@ -145,13 +146,13 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
     @Test
     public void testSearchWithUnknownToken ()
             throws KustvaktException, IOException {
-        ClientResponse response =
+        Response response =
                 searchWithAccessToken("ljsa8tKNRSczJhk20öhq92zG8z350");
 
-        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(),
                 response.getStatus());
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
@@ -168,16 +169,16 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
                 confidentialClientId, code, clientAuthHeader);
 
         String accessToken = node.at("/access_token").asText();
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("token", accessToken);
-        form.add("client_id", confidentialClientId);
-        form.add("client_secret", "secret");
+        Form form = new Form();
+        form.param("token", accessToken);
+        form.param("client_id", confidentialClientId);
+        form.param("client_secret", "secret");
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("revoke")
+        Response response = target().path(API_VERSION).path("oauth2").path("revoke")
                 .request()
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+                .post(Entity.form(form));
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
@@ -189,10 +190,10 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
             throws KustvaktException {
         String code = requestAuthorizationCode(publicClientId,
                 userAuthHeader);
-        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
+        Response response = requestTokenWithAuthorizationCodeAndForm(
                 publicClientId, "", code);
         
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         String accessToken = node.at("/access_token").asText();
         testRevokeTokenViaSuperClient(accessToken, userAuthHeader);
         testSearchWithRevokedAccessToken(accessToken);
@@ -209,20 +210,20 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         String accessToken = node.at("/access_token").asText();
         String refreshToken = node.at("/refresh_token").asText();
 
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("grant_type", GrantType.REFRESH_TOKEN.toString());
-        form.add("client_id", confidentialClientId);
-        form.add("client_secret", "secret");
-        form.add("refresh_token", refreshToken);
+        Form form = new Form();
+        form.param("grant_type", GrantType.REFRESH_TOKEN.toString());
+        form.param("client_id", confidentialClientId);
+        form.param("client_secret", "secret");
+        form.param("refresh_token", refreshToken);
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
+        Response response = target().path(API_VERSION).path("oauth2").path("token")
                 .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+                .post(Entity.form(form));
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         node = JsonUtils.readTree(entity);
@@ -241,12 +242,12 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
                 confidentialClientId, code, clientAuthHeader);
         String userAuthToken = node.at("/access_token").asText();
 
-        ClientResponse response = requestAuthorizationCode("code",
+        Response response = requestAuthorizationCode("code",
                 confidentialClientId, "", "", "", "Bearer " + userAuthToken);
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
-        node = JsonUtils.readTree(response.getEntity(String.class));
+        node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
         assertEquals("Scope authorize is not authorized",
@@ -256,9 +257,9 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
     @Test
     public void testRequestAuthorizationWithBearerToken ()
             throws KustvaktException {
-        ClientResponse response =
+        Response response =
                 requestTokenWithDoryPassword(superClientId, clientSecret);
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         
         JsonNode node = JsonUtils.readTree(entity);
         String userAuthToken = node.at("/access_token").asText();

@@ -7,7 +7,9 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientResponse;
+
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.config.LiteJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -18,16 +20,16 @@ public class LiteSearchTokenSnippetTest extends LiteJerseyTest{
 
     @Test
     public void testSearchWithTokens () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("show-tokens", "true")
                 .queryParam("context", "sentence").queryParam("count", "13")
                 .request()
-                .get(ClientResponse.class);
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
 
         assertTrue(node.at("/matches/0/hasSnippet").asBoolean());
@@ -39,16 +41,16 @@ public class LiteSearchTokenSnippetTest extends LiteJerseyTest{
     
     @Test
     public void testSearchWithoutTokens () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("show-tokens", "false")
                 .queryParam("context", "sentence").queryParam("count", "13")
                 .request()
-                .get(ClientResponse.class);
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
 
         assertTrue(node.at("/matches/0/hasSnippet").asBoolean());
@@ -58,17 +60,17 @@ public class LiteSearchTokenSnippetTest extends LiteJerseyTest{
     
     @Test
     public void testSearchPublicMetadataWithTokens () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("access-rewrite-disabled", "true")
                 .queryParam("show-tokens", "true")
                 .queryParam("context", "sentence").queryParam("count", "13")
                 .request()
-                .get(ClientResponse.class);
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
 
         assertFalse(node.at("/matches/0/hasSnippet").asBoolean());

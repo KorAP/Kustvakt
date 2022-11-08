@@ -9,8 +9,9 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -137,18 +138,18 @@ public class AvailabilityTest extends SpringJerseyTest {
 
 
 
-    private ClientResponse searchQuery (String collectionQuery) {
-        return resource().path(API_VERSION).path("search").queryParam("q", "[orth=das]")
+    private Response searchQuery (String collectionQuery) {
+        return target().path(API_VERSION).path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("cq", collectionQuery)
                 .request()
-                .get(ClientResponse.class);
+                .get();
     }
 
 
-    private ClientResponse searchQueryWithIP (String collectionQuery, String ip)
+    private Response searchQueryWithIP (String collectionQuery, String ip)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        return resource().path(API_VERSION).path("search").queryParam("q", "[orth=das]")
+        return target().path(API_VERSION).path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("cq", collectionQuery)
                 .request()
                 .header(Attributes.AUTHORIZATION,
@@ -156,60 +157,60 @@ public class AvailabilityTest extends SpringJerseyTest {
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, ip)
-                .get(ClientResponse.class);
+                .get();
     }
 
 
     @Test
     public void testAvailabilityFreeAuthorized () throws KustvaktException {
-        ClientResponse response = searchQuery("availability = CC-BY-SA");
+        Response response = searchQuery("availability = CC-BY-SA");
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndFree(response.getEntity(String.class));
+        checkAndFree(response.readEntity(String.class));
     }
 
 
     @Test
     public void testAvailabilityRegexFreeAuthorized ()
             throws KustvaktException {
-        ClientResponse response = searchQuery("availability = /.*BY.*/");
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        Response response = searchQuery("availability = /.*BY.*/");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndFree(response.getEntity(String.class));
+        checkAndFree(response.readEntity(String.class));
     }
 
 
     @Test
     public void testAvailabilityFreeUnauthorized () throws KustvaktException {
-        ClientResponse response = searchQuery("availability = ACA-NC");
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        Response response = searchQuery("availability = ACA-NC");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndFree(response.getEntity(String.class));
+        checkAndFree(response.readEntity(String.class));
     }
 
 
     @Test
     public void testAvailabilityRegexFreeUnauthorized ()
             throws KustvaktException {
-        ClientResponse response = searchQuery("availability = /ACA.*/");
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        Response response = searchQuery("availability = /ACA.*/");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndFree(response.getEntity(String.class));
+        checkAndFree(response.readEntity(String.class));
     }
 
     @Test
     public void testAvailabilityRegexNoRewrite () throws KustvaktException {
-        ClientResponse response = searchQuery(
+        Response response = searchQuery(
                 "availability = /CC-BY.*/ & availability = /ACA.*/");
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        String json = response.getEntity(String.class);
+        String json = response.readEntity(String.class);
 
         JsonNode node = JsonUtils.readTree(json);
         assertEquals("operation:and",
@@ -232,11 +233,11 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testAvailabilityRegexFreeUnauthorized3 ()
             throws KustvaktException {
-        ClientResponse response = searchQuery("availability = /.*NC.*/");
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        Response response = searchQuery("availability = /.*NC.*/");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        // System.out.println(response.getEntity(String.class));
-        checkAndFree(response.getEntity(String.class));
+        // System.out.println(response.readEntity(String.class));
+        checkAndFree(response.readEntity(String.class));
     }
 
 
@@ -244,186 +245,186 @@ public class AvailabilityTest extends SpringJerseyTest {
     @Test
     public void testNegationAvailabilityFreeUnauthorized ()
             throws KustvaktException {
-        ClientResponse response = searchQuery("availability != /CC-BY.*/");
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        Response response = searchQuery("availability != /CC-BY.*/");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndFree(response.getEntity(String.class));
+        checkAndFree(response.readEntity(String.class));
     }
 
     @Test
     public void testNegationAvailabilityFreeUnauthorized2 ()
             throws KustvaktException {
-        ClientResponse response = searchQuery("availability != /.*BY.*/");
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        Response response = searchQuery("availability != /.*BY.*/");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndFree(response.getEntity(String.class));
+        checkAndFree(response.readEntity(String.class));
     }
 
     @Test
     public void testNegationAvailabilityWithOperationOrUnauthorized ()
             throws KustvaktException {
-        ClientResponse response = searchQuery(
+        Response response = searchQuery(
                 "availability = /CC-BY.*/ | availability != /CC-BY.*/");
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        checkAndFree(response.getEntity(String.class));
+        checkAndFree(response.readEntity(String.class));
     }
 
     @Test
     public void testComplexNegationAvailabilityFreeUnauthorized ()
             throws KustvaktException {
-        ClientResponse response =
+        Response response =
                 searchQuery("textClass=politik & availability != /CC-BY.*/");
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndFree(response.getEntity(String.class));
+        checkAndFree(response.readEntity(String.class));
     }
 
 
     @Test
     public void testComplexAvailabilityFreeUnauthorized ()
             throws KustvaktException {
-        ClientResponse response =
+        Response response =
                 searchQuery("textClass=politik & availability=ACA-NC");
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndFree(response.getEntity(String.class));
+        checkAndFree(response.readEntity(String.class));
     }
 
 
     @Test
     public void testComplexAvailabilityFreeUnauthorized3 ()
             throws KustvaktException {
-        ClientResponse response =
+        Response response =
                 searchQuery("textClass=politik & availability=/.*NC.*/");
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndFree(response.getEntity(String.class));
+        checkAndFree(response.readEntity(String.class));
     }
 
 
     @Test
     public void testAvailabilityPublicAuthorized () throws KustvaktException {
-        ClientResponse response =
+        Response response =
                 searchQueryWithIP("availability=ACA-NC", "149.27.0.32");
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndPublic(response.getEntity(String.class));
+        checkAndPublic(response.readEntity(String.class));
     }
 
 
     @Test
     public void testAvailabilityPublicUnauthorized () throws KustvaktException {
-        ClientResponse response =
+        Response response =
                 searchQueryWithIP("availability=QAO-NC-LOC:ids", "149.27.0.32");
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndPublic(response.getEntity(String.class));
+        checkAndPublic(response.readEntity(String.class));
     }
 
 
     @Test
     public void testAvailabilityRegexPublicAuthorized ()
             throws KustvaktException {
-        ClientResponse response =
+        Response response =
                 searchQueryWithIP("availability= /ACA.*/", "149.27.0.32");
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndPublicWithACA(response.getEntity(String.class));
+        checkAndPublicWithACA(response.readEntity(String.class));
     }
 
 
     @Test
     public void testNegationAvailabilityPublicUnauthorized ()
             throws KustvaktException {
-        ClientResponse response =
+        Response response =
                 searchQueryWithIP("availability != ACA-NC", "149.27.0.32");
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndPublic(response.getEntity(String.class));
+        checkAndPublic(response.readEntity(String.class));
     }
 
 
     @Test
     public void testNegationAvailabilityRegexPublicUnauthorized ()
             throws KustvaktException {
-        ClientResponse response =
+        Response response =
                 searchQueryWithIP("availability != /ACA.*/", "149.27.0.32");
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndPublic(response.getEntity(String.class));
+        checkAndPublic(response.readEntity(String.class));
     }
 
 
     @Test
     public void testComplexAvailabilityPublicUnauthorized ()
             throws KustvaktException {
-        ClientResponse response = searchQueryWithIP(
+        Response response = searchQueryWithIP(
                 "textClass=politik & availability=QAO-NC-LOC:ids",
                 "149.27.0.32");
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndPublic(response.getEntity(String.class));
+        checkAndPublic(response.readEntity(String.class));
     }
 
 
     @Test
     public void testNegationComplexAvailabilityPublicUnauthorized ()
             throws KustvaktException {
-        ClientResponse response = searchQueryWithIP(
+        Response response = searchQueryWithIP(
                 "textClass=politik & availability!=QAO-NC-LOC:ids",
                 "149.27.0.32");
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndPublic(response.getEntity(String.class));
+        checkAndPublic(response.readEntity(String.class));
     }
 
     @Test
     public void testAvailabilityRegexAllAuthorized () throws KustvaktException {
-        ClientResponse response =
+        Response response =
                 searchQueryWithIP("availability= /ACA.*/", "10.27.0.32");
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndAllWithACA(response.getEntity(String.class));
+        checkAndAllWithACA(response.readEntity(String.class));
     }
 
     @Test
     public void testAvailabilityOr () throws KustvaktException {
-        ClientResponse response =
+        Response response =
                 searchQuery("availability=/CC-BY.*/ | availability=/ACA.*/");
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndFree(response.getEntity(String.class));
+        checkAndFree(response.readEntity(String.class));
     }
 
     @Test
     public void testRedundancyOrPub () throws KustvaktException {
-        ClientResponse response = searchQueryWithIP(
+        Response response = searchQueryWithIP(
                 "availability=/CC-BY.*/ | availability=/ACA.*/ | availability=/QAO-NC/",
                 "149.27.0.32");
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        String json = response.getEntity(String.class);
+        String json = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(json);
         assertTrue(node.at("/collection/rewrites").isMissingNode());
         assertEquals("operation:or", node.at("/collection/operation").asText());
@@ -431,33 +432,33 @@ public class AvailabilityTest extends SpringJerseyTest {
 
     @Test
     public void testAvailabilityOrCorpusSigle () throws KustvaktException {
-        ClientResponse response =
+        Response response =
                 searchQuery("availability=/CC-BY.*/ | corpusSigle=GOE");
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndFree(response.getEntity(String.class));
+        checkAndFree(response.readEntity(String.class));
     }
 
     @Test
     public void testOrWithoutAvailability () throws KustvaktException {
-        ClientResponse response =
+        Response response =
                 searchQuery("corpusSigle=GOE | textClass=politik");
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndFree(response.getEntity(String.class));
+        checkAndFree(response.readEntity(String.class));
     }
 
     @Test
     public void testWithoutAvailability () throws KustvaktException {
-        ClientResponse response = searchQuery("corpusSigle=GOE");
+        Response response = searchQuery("corpusSigle=GOE");
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        checkAndFree(response.getEntity(String.class));
+        checkAndFree(response.readEntity(String.class));
     }
 }

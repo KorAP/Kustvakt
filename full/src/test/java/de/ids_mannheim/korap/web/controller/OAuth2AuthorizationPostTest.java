@@ -5,6 +5,9 @@ import static org.junit.Assert.assertNotNull;
 
 import java.net.URI;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.http.entity.ContentType;
@@ -15,10 +18,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientResponse.Status;
-import com.sun.jersey.api.uri.UriComponent;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import org.glassfish.jersey.uri.UriComponent;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -34,27 +36,27 @@ public class OAuth2AuthorizationPostTest extends OAuth2TestBase {
                 .createBasicAuthorizationHeaderValue("dory", "password");
     }
     
-    private ClientResponse requestAuthorizationCode (
-            MultivaluedMap<String, String> form, String authHeader)
+    private Response requestAuthorizationCode (
+            Form form, String authHeader)
             throws KustvaktException {
 
-        return resource().path(API_VERSION).path("oauth2").path("authorize")
+        return target().path(API_VERSION).path("oauth2").path("authorize")
                 .request()
                 .header(Attributes.AUTHORIZATION, authHeader)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+                .post(Entity.form(form));
     }
     
     @Test
     public void testAuthorizeConfidentialClient () throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("response_type", "code");
-        form.add("client_id", confidentialClientId);
-        form.add("state", "thisIsMyState");
+        Form form = new Form();
+        form.param("response_type", "code");
+        form.param("client_id", confidentialClientId);
+        form.param("state", "thisIsMyState");
 
-        ClientResponse response =
+        Response response =
                 requestAuthorizationCode(form, userAuthHeader);
 
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
@@ -70,12 +72,12 @@ public class OAuth2AuthorizationPostTest extends OAuth2TestBase {
     public void testRequestTokenAuthorizationConfidential ()
             throws KustvaktException {
 
-        MultivaluedMap<String, String> authForm = new MultivaluedMapImpl();
-        authForm.add("response_type", "code");
-        authForm.add("client_id", confidentialClientId);
-        authForm.add("scope", "search");
+        Form authForm = new Form();
+        authForm.param("response_type", "code");
+        authForm.param("client_id", confidentialClientId);
+        authForm.param("scope", "search");
 
-        ClientResponse response =
+        Response response =
                 requestAuthorizationCode(authForm, userAuthHeader);
         URI redirectUri = response.getLocation();
         MultivaluedMap<String, String> params =
@@ -87,7 +89,7 @@ public class OAuth2AuthorizationPostTest extends OAuth2TestBase {
 
         response = requestTokenWithAuthorizationCodeAndForm(
                 confidentialClientId, clientSecret, code);
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());

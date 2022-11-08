@@ -6,14 +6,14 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.client.Entity;
 
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientResponse.Status;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -31,15 +31,14 @@ public class UserSettingControllerTest extends SpringJerseyTest {
     private String username = "UserSetting_Test";
     private String username2 = "UserSetting.Test2";
 
-    public ClientResponse sendPutRequest (String username,
+    public Response sendPutRequest (String username,
             Map<String, Object> map) throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("~" + username).path("setting")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
-                .type(MediaType.APPLICATION_JSON).entity(map)
-                .put(ClientResponse.class);
+                .put(Entity.json(map));
 
         return response;
     }
@@ -50,13 +49,12 @@ public class UserSettingControllerTest extends SpringJerseyTest {
                 "{\"pos-foundry\":\"opennlp\",\"metadata\":[\"author\", \"title\","
                         + "\"textSigle\", \"availability\"],\"resultPerPage\":25}";
 
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("~" + username).path("setting")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
-                .type(MediaType.APPLICATION_JSON).entity(json)
-                .put(ClientResponse.class);
+                .put(Entity.json(json));
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
@@ -79,7 +77,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
         map.put("resultPerPage", 25);
         map.put("metadata", "author title textSigle availability");
 
-        ClientResponse response = sendPutRequest(username2, map);
+        Response response = sendPutRequest(username2, map);
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
         testRetrieveSettings(username2, "opennlp", 25,
@@ -94,10 +92,10 @@ public class UserSettingControllerTest extends SpringJerseyTest {
         Map<String, Object> map = new HashMap<>();
         map.put("key/", "invalidKey");
 
-        ClientResponse response = sendPutRequest(username2, map);
+        Response response = sendPutRequest(username2, map);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
         assertEquals("key/", node.at("/errors/0/2").asText());
@@ -109,16 +107,15 @@ public class UserSettingControllerTest extends SpringJerseyTest {
                 "{\"pos-foundry\":\"opennlp\",\"metadata\":\"author title "
                         + "textSigle availability\",\"resultPerPage\":25}";
 
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("~" + username).path("setting")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username2, "pass"))
-                .type(MediaType.APPLICATION_JSON).entity(json)
-                .put(ClientResponse.class);
+                .put(Entity.json(json));
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
@@ -126,15 +123,15 @@ public class UserSettingControllerTest extends SpringJerseyTest {
 
     @Test
     public void testGetDifferentUsername () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("~" + username).path("setting")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username2, "pass"))
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
@@ -143,16 +140,16 @@ public class UserSettingControllerTest extends SpringJerseyTest {
     @Test
     public void testGetSettingNotExist () throws KustvaktException {
         String username = "tralala";
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("~" + username).path("setting")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(StatusCodes.NO_RESOURCE_FOUND,
@@ -166,52 +163,52 @@ public class UserSettingControllerTest extends SpringJerseyTest {
     @Test
     public void testDeleteSettingNotExist () throws KustvaktException {
         String username = "tralala";
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("~" + username).path("setting")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
-                .delete(ClientResponse.class);
+                .delete();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
     @Test
     public void testDeleteKeyDifferentUsername () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("~" + username).path("setting").path("pos-foundry")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username2, "pass"))
-                .delete(ClientResponse.class);
+                .delete();
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT,
                 node.at("/errors/0/0").asInt());
     }
 
     private void testDeleteSetting (String username) throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("~" + username).path("setting")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
-                .delete(ClientResponse.class);
+                .delete();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        response = resource().path(API_VERSION).path("~" + username)
+        response = target().path(API_VERSION).path("~" + username)
                 .path("setting")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.NO_RESOURCE_FOUND,
                 node.at("/errors/0/0").asInt());
@@ -223,12 +220,12 @@ public class UserSettingControllerTest extends SpringJerseyTest {
     // the purpose of the request has been achieved.
     private void testDeleteKeyNotExist (String username)
             throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("~" + username).path("setting").path("lemma-foundry")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
-                .delete(ClientResponse.class);
+                .delete();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
@@ -236,12 +233,12 @@ public class UserSettingControllerTest extends SpringJerseyTest {
     private void testDeleteKey (String username, int numOfResult,
             String metadata, boolean isMetadataArray) throws KustvaktException {
 
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("~" + username).path("setting").path("pos-foundry")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
-                .delete(ClientResponse.class);
+                .delete();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         testRetrieveSettings(username, null, numOfResult, metadata,
@@ -254,7 +251,7 @@ public class UserSettingControllerTest extends SpringJerseyTest {
         map.put("resultPerPage", 15);
         map.put("metadata", "author title");
 
-        ClientResponse response = sendPutRequest(username, map);
+        Response response = sendPutRequest(username, map);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         testRetrieveSettings(username, "malt", 15, "author title", false);
@@ -263,15 +260,15 @@ public class UserSettingControllerTest extends SpringJerseyTest {
     private void testRetrieveSettings (String username, String posFoundry,
             int numOfResult, String metadata, boolean isMetadataArray)
             throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("~" + username).path("setting")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
 
         JsonNode node = JsonUtils.readTree(entity);
         if (posFoundry == null) {

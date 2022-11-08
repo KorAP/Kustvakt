@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.entity.ContentType;
@@ -22,11 +23,12 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
-import com.sun.jersey.spi.container.ContainerRequest;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.client.Entity;
+
+import org.glassfish.jersey.server.ContainerRequest;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -51,11 +53,11 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 .createBasicAuthorizationHeaderValue("dory", "password");
     }
 
-    private void checkWWWAuthenticateHeader (ClientResponse response) {
-        Set<Entry<String, List<String>>> headers =
+    private void checkWWWAuthenticateHeader (Response response) {
+        Set<Entry<String, List<Object>>> headers =
                 response.getHeaders().entrySet();
 
-        for (Entry<String, List<String>> header : headers) {
+        for (Entry<String, List<Object>> header : headers) {
             if (header.getKey().equals(ContainerRequest.WWW_AUTHENTICATE)) {
                 assertEquals("Basic realm=\"Kustvakt\"",
                         header.getValue().get(0));
@@ -112,8 +114,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     
     @Test
     public void testRegisterConfidentialClient () throws KustvaktException {
-        ClientResponse response = registerConfidentialClient(username);
-        String entity = response.getEntity(String.class);
+        Response response = registerConfidentialClient(username);
+        String entity = response.readEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
         String clientId = node.at("/client_id").asText();
@@ -135,8 +137,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         OAuth2ClientJson clientJson =
                 createOAuth2ClientJson("R", OAuth2ClientType.PUBLIC, null);
 
-        ClientResponse response = registerClient(username, clientJson);
-        String entity = response.getEntity(String.class);
+        Response response = registerClient(username, clientJson);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals("client_name must contain at least 3 characters",
                 node.at("/error_description").asText());
@@ -150,8 +152,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         OAuth2ClientJson clientJson =
                 createOAuth2ClientJson("", OAuth2ClientType.PUBLIC, null);
 
-        ClientResponse response = registerClient(username, clientJson);
-        String entity = response.getEntity(String.class);
+        Response response = registerClient(username, clientJson);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals("client_name must contain at least 3 characters",
                 node.at("/error_description").asText());
@@ -166,8 +168,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         OAuth2ClientJson clientJson =
                 createOAuth2ClientJson(null, OAuth2ClientType.PUBLIC, null);
 
-        ClientResponse response = registerClient(username, clientJson);
-        String entity = response.getEntity(String.class);
+        Response response = registerClient(username, clientJson);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals("client_name is null",
                 node.at("/error_description").asText());
@@ -182,8 +184,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         OAuth2ClientJson clientJson = createOAuth2ClientJson("R client",
                 OAuth2ClientType.PUBLIC, null);
 
-        ClientResponse response = registerClient(username, clientJson);
-        String entity = response.getEntity(String.class);
+        Response response = registerClient(username, clientJson);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals("client_description is null",
                 node.at("/error_description").asText());
@@ -198,8 +200,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         OAuth2ClientJson clientJson =
                 createOAuth2ClientJson("R client", null, null);
 
-        ClientResponse response = registerClient(username, clientJson);
-        String entity = response.getEntity(String.class);
+        Response response = registerClient(username, clientJson);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals("client_type is null",
                 node.at("/error_description").asText());
@@ -217,22 +219,22 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 createOAuth2ClientJson("OAuth2PublicClient",
                         OAuth2ClientType.PUBLIC, "A public test client.");
         clientJson.setRedirectURI(redirectUri);
-        ClientResponse response = registerClient(username, clientJson);
-        testInvalidRedirectUri(response.getEntity(String.class), false,
+        Response response = registerClient(username, clientJson);
+        testInvalidRedirectUri(response.readEntity(String.class), false,
                 response.getStatus());
 
         // localhost is not allowed
         redirectUri = "http://localhost:1410";
         clientJson.setRedirectURI(redirectUri);
         response = registerClient(username, clientJson);
-        testInvalidRedirectUri(response.getEntity(String.class), false,
+        testInvalidRedirectUri(response.readEntity(String.class), false,
                 response.getStatus());
         
         // fragment is not allowed
         redirectUri = "https://public.client.com/redirect.html#bar";
         clientJson.setRedirectURI(redirectUri);
         response = registerClient(username, clientJson);
-        testInvalidRedirectUri(response.getEntity(String.class), false,
+        testInvalidRedirectUri(response.readEntity(String.class), false,
                 response.getStatus());
     }
     
@@ -244,8 +246,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 createOAuth2ClientJson("OAuth2PublicClient",
                         OAuth2ClientType.PUBLIC, "A public test client.");
         clientJson.setRefreshTokenExpiry(31535000);
-        ClientResponse response = registerClient(username, clientJson);
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        Response response = registerClient(username, clientJson);
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals("invalid_request", node.at("/error").asText());
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
@@ -259,8 +261,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 createOAuth2ClientJson("OAuth2 Confidential Client",
                         OAuth2ClientType.CONFIDENTIAL, "A confidential client.");
         clientJson.setRefreshTokenExpiry(expiry);
-        ClientResponse response = registerClient(username, clientJson);
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        Response response = registerClient(username, clientJson);
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         String clientId = node.at("/client_id").asText();
         JsonNode clientInfo = retrieveClientInfo(clientId, username);
         assertEquals(expiry, clientInfo.at("/refresh_token_expiry").asInt());
@@ -276,8 +278,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 "OAuth2 Confidential Client", OAuth2ClientType.CONFIDENTIAL,
                 "A confidential client.");
         clientJson.setRefreshTokenExpiry(31537000);
-        ClientResponse response = registerClient(username, clientJson);
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        Response response = registerClient(username, clientJson);
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(
                 "Maximum refresh token expiry is 31536000 seconds (1 year)",
                 node.at("/error_description").asText());
@@ -295,14 +297,14 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 createOAuth2ClientJson("OAuth2PublicClient",
                         OAuth2ClientType.PUBLIC, "A public test client.");
         clientJson.setUrl(url);
-        ClientResponse response = registerClient(username, clientJson);
-        testInvalidUrl(response.getEntity(String.class), response.getStatus());
+        Response response = registerClient(username, clientJson);
+        testInvalidUrl(response.readEntity(String.class), response.getStatus());
 
         // localhost is not allowed
         url = "http://localhost:1410";
         clientJson.setRedirectURI(url);
         response = registerClient(username, clientJson);
-        testInvalidUrl(response.getEntity(String.class), response.getStatus());
+        testInvalidUrl(response.readEntity(String.class), response.getStatus());
     }
     
     private void testInvalidUrl (String entity, 
@@ -326,9 +328,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         clientJson.setUrl("http://public.client.com/index.html#bar");
         clientJson.setRedirectURI(redirectUri);
 
-        ClientResponse response = registerClient(username, clientJson);
+        Response response = registerClient(username, clientJson);
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
         String clientId = node.at("/client_id").asText();
@@ -347,25 +349,25 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         String userAuthHeader = HttpAuthorizationHandler
                 .createBasicAuthorizationHeaderValue("dory", "password");
         String code = requestAuthorizationCode(clientId, userAuthHeader);
-        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
+        Response response = requestTokenWithAuthorizationCodeAndForm(
                 clientId, clientSecret, code);
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
 
         assertEquals("match_info search", node.at("/scope").asText());
 
         String accessToken = node.at("/access_token").asText();
 
         OAuth2ClientJson clientJson = createOAuth2ClientJson("R client",
-                OAuth2ClientType.PUBLIC, null);
+                        OAuth2ClientType.PUBLIC, null);
 
-        response = resource().path(API_VERSION).path("oauth2").path("client")
+        response = target().path(API_VERSION).path("oauth2").path("client")
                 .path("register")
                 .request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .entity(clientJson).post(ClientResponse.class);
+                .post(Entity.json(clientJson));
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
@@ -383,7 +385,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 .getResourceAsStream("json/oauth2_public_client.json");
         String json = IOUtils.toString(is, Charset.defaultCharset());
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+        Response response = target().path(API_VERSION).path("oauth2")
                 .path("client").path("register")
                 .request()
                 .header(Attributes.AUTHORIZATION,
@@ -391,9 +393,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                                 .createBasicAuthorizationHeaderValue(username,
                                         "password"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .entity(json).post(ClientResponse.class);
+                .post(Entity.json(json));
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
         String clientId = node.at("/client_id").asText();
@@ -411,9 +413,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 "OAuth2DesktopClient", OAuth2ClientType.PUBLIC,
                 "This is a desktop test client.");
 
-        ClientResponse response = registerClient(username, clientJson);
+        Response response = registerClient(username, clientJson);
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
         String clientId = node.at("/client_id").asText();
@@ -435,9 +437,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 createOAuth2ClientJson("OAuth2DesktopClient1",
                         OAuth2ClientType.PUBLIC, "A desktop test client.");
 
-        ClientResponse response = registerClient(username, clientJson);
+        Response response = registerClient(username, clientJson);
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
         String clientId1 = node.at("/client_id").asText();
@@ -450,7 +452,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         response = registerClient(username, clientJson);
 
-        entity = response.getEntity(String.class);
+        entity = response.readEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         node = JsonUtils.readTree(entity);
         String clientId2 = node.at("/client_id").asText();
@@ -472,9 +474,9 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         String code = requestAuthorizationCode(clientId, redirectUri, userAuthHeader);
         
-        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
+        Response response = requestTokenWithAuthorizationCodeAndForm(
                 clientId, clientSecret, code, redirectUri);
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         String accessToken = node.at("/access_token").asText();
 
         response = searchWithAccessToken(accessToken);
@@ -486,13 +488,13 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         response = requestTokenWithAuthorizationCodeAndForm(clientId,
                 clientSecret, code, redirectUri);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-        node = JsonUtils.readTree(response.getEntity(String.class));
+        node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(OAuth2Error.INVALID_CLIENT.toString(),
                 node.at("/error").asText());
 
         response = searchWithAccessToken(accessToken);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-        node = JsonUtils.readTree(response.getEntity(String.class));
+        node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
         assertEquals("Access token is invalid",
@@ -503,14 +505,14 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
             String clientId) throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+        Response response = target().path(API_VERSION).path("oauth2")
                 .path("client").path("deregister").path(clientId)
                 .request()
-                .delete(ClientResponse.class);
+                .delete();
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
@@ -520,12 +522,12 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+        Response response = target().path(API_VERSION).path("oauth2")
                 .path("client").path("deregister")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
-                .delete(ClientResponse.class);
+                .delete();
 
         assertEquals(Status.METHOD_NOT_ALLOWED.getStatusCode(),
                 response.getStatus());
@@ -535,12 +537,12 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+        Response response = target().path(API_VERSION).path("oauth2")
                 .path("client").path("deregister").path(clientId)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
-                .delete(ClientResponse.class);
+                .delete();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
@@ -548,19 +550,19 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     private void testResetPublicClientSecret (String clientId)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("client_id", clientId);
+        Form form = new Form();
+        form.param("client_id", clientId);
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+        Response response = target().path(API_VERSION).path("oauth2")
                 .path("client").path("reset")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+                .post(Entity.form(form));
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
@@ -571,20 +573,20 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     private String testResetConfidentialClientSecret (String clientId,
             String clientSecret) throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("client_id", clientId);
-        form.add("client_secret", clientSecret);
+        Form form = new Form();
+        form.param("client_id", clientId);
+        form.param("client_secret", clientSecret);
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+        Response response = target().path(API_VERSION).path("oauth2")
                 .path("client").path("reset")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+                .post(Entity.form(form));
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
@@ -598,20 +600,20 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
     private void requestAuthorizedClientList (String userAuthHeader)
             throws KustvaktException {
-        MultivaluedMap<String, String> form = getSuperClientForm();
-        form.add("authorized_only", "true");
+        Form form = getSuperClientForm();
+        form.param("authorized_only", "true");
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+        Response response = target().path(API_VERSION).path("oauth2")
                 .path("client").path("list")
                 .request()
                 .header(Attributes.AUTHORIZATION, userAuthHeader)
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+                .post(Entity.form(form));
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.size());
@@ -674,7 +676,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 .createBasicAuthorizationHeaderValue(username, password);
 
         // super client
-        ClientResponse response = requestTokenWithPassword(superClientId,
+        Response response = requestTokenWithPassword(superClientId,
                 clientSecret, username, password);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
@@ -684,7 +686,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         String accessToken = node.at("/access_token").asText();
 
         // client 2
@@ -704,7 +706,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 accessToken);
 
         // revoke client 2
-        node = JsonUtils.readTree(response.getEntity(String.class));
+        node = JsonUtils.readTree(response.readEntity(String.class));
         accessToken = node.at("/access_token").asText();
         refreshToken = node.at("/refresh_token").asText();
         testRevokeAllTokenViaSuperClient(confidentialClientId, userAuthHeader,
@@ -718,7 +720,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         // client 2
         String code =
                 requestAuthorizationCode(confidentialClientId, userAuthHeader);
-        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
+        Response response = requestTokenWithAuthorizationCodeAndForm(
                 confidentialClientId, clientSecret, code);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -730,7 +732,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
             String userAuthHeader) throws KustvaktException {
         // client 1
         String code = requestAuthorizationCode(publicClientId, userAuthHeader);
-        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
+        Response response = requestTokenWithAuthorizationCodeAndForm(
                 publicClientId, "", code);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -746,10 +748,10 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
         // client 1
         String code = requestAuthorizationCode(publicClientId, aaaAuthHeader);
-        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
+        Response response = requestTokenWithAuthorizationCodeAndForm(
                 publicClientId, "", code);
 
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         String accessToken1 = node.at("/access_token").asText();
 
         // client 2
@@ -757,7 +759,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         response = requestTokenWithAuthorizationCodeAndForm(
                 confidentialClientId, clientSecret, code);
 
-        node = JsonUtils.readTree(response.getEntity(String.class));
+        node = JsonUtils.readTree(response.readEntity(String.class));
         String accessToken2 = node.at("/access_token").asText();
         String refreshToken = node.at("/refresh_token").asText();
 
@@ -776,26 +778,26 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
             String userAuthHeader, String accessToken)
             throws KustvaktException {
         // check token before revoking
-        ClientResponse response = searchWithAccessToken(accessToken);
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        Response response = searchWithAccessToken(accessToken);
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertTrue(node.at("/matches").size() > 0);
 
-        MultivaluedMap<String, String> form = getSuperClientForm();
-        form.add("client_id", clientId);
+        Form form = getSuperClientForm();
+        form.param("client_id", clientId);
 
-        response = resource().path(API_VERSION).path("oauth2").path("revoke")
+        response = target().path(API_VERSION).path("oauth2").path("revoke")
                 .path("super").path("all")
                 .request()
                 .header(Attributes.AUTHORIZATION, userAuthHeader)
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+                .post(Entity.form(form));
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        assertEquals("SUCCESS", response.getEntity(String.class));
+        assertEquals("SUCCESS", response.readEntity(String.class));
 
         response = searchWithAccessToken(accessToken);
-        node = JsonUtils.readTree(response.getEntity(String.class));
+        node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
         assertEquals("Access token is invalid",

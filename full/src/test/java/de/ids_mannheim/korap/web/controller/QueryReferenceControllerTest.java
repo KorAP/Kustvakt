@@ -8,9 +8,10 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.client.Entity;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -31,13 +32,13 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
             String queryCreator, String username, ResourceType resourceType,
             CorpusAccess access) throws KustvaktException {
         
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .path("~" + queryCreator).path(qName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
-                .get(ClientResponse.class);
-        String entity = response.getEntity(String.class);
+                .get();
+        String entity = response.readEntity(String.class);
         // System.out.println(entity);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         
@@ -58,13 +59,13 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
         String json = "{\"query\": \"Sonne\""
                 + ",\"queryLanguage\": \"poliqarp\"}";
         
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .path("~"+qCreator).path(qName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .entity(json).put(ClientResponse.class);
+                .put(Entity.json(json));
         
         assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
         
@@ -79,13 +80,13 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 + ",\"query\": \"der\"}";
 
         String qName = "new_query";
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .path("~" + testUser).path(qName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .put(ClientResponse.class, json);
+                .put(Entity.json(json));
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
@@ -104,13 +105,13 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 + ",\"query\": \"Regen\"}";
 
         String qName = "publish_query";
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .path("~" + testUser).path(qName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .put(ClientResponse.class, json);
+                .put(Entity.json(json));
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
@@ -129,13 +130,13 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 + ",\"query\": \"Sommer\"}";
 
         String qName = "marlin-query";
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .path("~marlin").path(qName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(adminUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .entity(json).put(ClientResponse.class);
+                .put(Entity.json(json));
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         
@@ -153,13 +154,13 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 + ",\"query\": \"Sommer\"}";
 
         String qName = "system-query";
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .path("~system").path(qName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(adminUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .entity(json).put(ClientResponse.class);
+                .put(Entity.json(json));
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         
@@ -176,17 +177,17 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 + ",\"queryLanguage\": \"poliqarp\"" 
                 + ",\"query\": \"Sommer\"}";
 
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .path("~"+testUser).path("system-query")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .entity(json).put(ClientResponse.class);
+                .put(Entity.json(json));
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
@@ -201,13 +202,13 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 + ",\"query\": \"Sohn\"}";
 
         String qName = "new_query";
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .path("~" + testUser).path(qName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .put(ClientResponse.class, json);
+                .put(Entity.json(json));
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
@@ -223,17 +224,17 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 + ",\"query\": \"Sohn\"}";
 
         String qName = "new_query";
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .path("~" + testUser).path(qName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .put(ClientResponse.class, json);
+                .put(Entity.json(json));
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT, node.at("/errors/0/0").asInt());
         assertEquals("queryLanguage is null", node.at("/errors/0/1").asText());
@@ -247,17 +248,17 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 + ",\"queryLanguage\": \"poliqarp\"}";
 
         String qName = "new_query";
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .path("~" + testUser).path(qName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .put(ClientResponse.class, json);
+                .put(Entity.json(json));
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT, node.at("/errors/0/0").asInt());
         assertEquals("query is null", node.at("/errors/0/1").asText());
@@ -270,17 +271,17 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
                 + ",\"queryLanguage\": \"poliqarp\"}";
 
         String qName = "new_query";
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .path("~" + testUser).path(qName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .put(ClientResponse.class, json);
+                .put(Entity.json(json));
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT, node.at("/errors/0/0").asInt());
         assertEquals("type is null", node.at("/errors/0/1").asText());
@@ -289,26 +290,26 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
     
     private void testDeleteQueryByName (String qName, String qCreator, String username)
             throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .path("~" + qCreator).path(qName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
-                .delete(ClientResponse.class);
+                .delete();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
     
     @Test
     public void testDeleteQueryUnauthorized () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .path("~dory").path("dory-q")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
-                .delete(ClientResponse.class);
+                .delete();
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -319,14 +320,14 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
     }
     
     private void testDeleteSystemQueryUnauthorized (String qName) throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .path("~system").path(qName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
-                .delete(ClientResponse.class);
+                .delete();
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -338,16 +339,16 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
     
     @Test
     public void testDeleteNonExistingQuery () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .path("~dory").path("non-existing-query")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
-                .delete(ClientResponse.class);
+                .delete();
 
         assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
         
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         
         assertEquals(StatusCodes.NO_RESOURCE_FOUND,
@@ -386,16 +387,16 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
 
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         return node;

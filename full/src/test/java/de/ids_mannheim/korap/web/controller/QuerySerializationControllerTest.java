@@ -12,11 +12,14 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Response.Status;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -32,15 +35,15 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
     @Test
     public void testQuerySerializationFilteredPublic ()
             throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
 
                 .path("corpus/WPD13/query").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp").queryParam("context", "base/s:s")
                 .request()
-                .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("corpusSigle", node.at("/collection/key").asText());
@@ -52,14 +55,14 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
     @Test
     public void testQuerySerializationUnexistingResource ()
             throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("corpus/ZUW19/query")
+        Response response = target().path(API_VERSION).path("corpus/ZUW19/query")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("context", "base/s:s")
                 .request()
-                .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+                .method("GET");
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(101, node.at("/errors/0/0").asInt());
         assertEquals("[Cannot found public Corpus with ids: [ZUW19]]",
@@ -70,15 +73,15 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
     @Test
     public void testQuerySerializationWithNonPublicCorpus ()
             throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
 
                 .path("corpus/BRZ10/query").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp").queryParam("context", "base/s:s")
                 .request()
-                .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+                .method("GET");
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(101, node.at("/errors/0/0").asInt());
         assertEquals("[Cannot found public Corpus with ids: [BRZ10]]",
@@ -89,7 +92,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
     @Test
     public void testQuerySerializationWithAuthentication ()
             throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
 
                 .path("corpus/BRZ10/query").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp")
@@ -98,10 +101,10 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
-                .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("koral:doc", node.at("/collection/@type").asText());
@@ -114,7 +117,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
     public void testQuerySerializationWithNewCollection ()
             throws KustvaktException {
         // Add Virtual Collection
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
 
                 .path("virtualcollection").queryParam("filter", "false")
                 .queryParam("query",
@@ -126,19 +129,19 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
-                .post(ClientResponse.class);
+                .post(Entity.json(""));
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertTrue(node.isObject());
         assertEquals("Weimarer Werke", node.path("name").asText());
 
         // Get virtual collections
-        response = resource().path(API_VERSION)
+        response = target().path(API_VERSION)
 
                 .path("collection")
                 .request()
@@ -146,10 +149,10 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        ent = response.getEntity(String.class);
+        ent = response.readEntity(String.class);
         node = JsonUtils.readTree(ent);
         assertNotNull(node);
 
@@ -164,7 +167,7 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
         assertFalse(id.isEmpty());
 
         // query serialization service
-        response = resource().path(API_VERSION)
+        response = target().path(API_VERSION)
 
                 .path("collection").path(id).path("query")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
@@ -174,10 +177,10 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
-                .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        ent = response.getEntity(String.class);
+        ent = response.readEntity(String.class);
         node = JsonUtils.readTree(ent);
         assertNotNull(node);
 //        System.out.println("NODE " + ent);
@@ -205,15 +208,15 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
     @Test
     public void testQuerySerializationOfVirtualCollection ()
             throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
 
                 .path("collection/GOE-VC/query").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp").queryParam("context", "base/s:s")
                 .request()
-                .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("koral:doc",
@@ -233,18 +236,18 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
 
     @Test
     public void testMetaQuerySerialization () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
 
                 .path("query").queryParam("context", "sentence")
                 .queryParam("count", "20").queryParam("page", "5")
                 .queryParam("cutoff", "true").queryParam("q", "[pos=ADJA]")
                 .queryParam("ql", "poliqarp")
                 .request()
-                .method("GET", ClientResponse.class);
+                .method("GET");
         assertEquals(response.getStatus(),
-                ClientResponse.Status.OK.getStatusCode());
+                Status.OK.getStatusCode());
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
 
         assertEquals("sentence", node.at("/meta/context").asText());
@@ -262,18 +265,18 @@ public class QuerySerializationControllerTest extends FastJerseyTest {
     @Test
     public void testMetaQuerySerializationWithOffset ()
             throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
 
                 .path("query").queryParam("context", "sentence")
                 .queryParam("count", "20").queryParam("page", "5")
                 .queryParam("offset", "2").queryParam("cutoff", "true")
                 .queryParam("q", "[pos=ADJA]").queryParam("ql", "poliqarp")
                 .request()
-                .method("GET", ClientResponse.class);
+                .method("GET");
         assertEquals(response.getStatus(),
-                ClientResponse.Status.OK.getStatusCode());
+                Status.OK.getStatusCode());
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
 
         assertEquals("sentence", node.at("/meta/context").asText());

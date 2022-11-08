@@ -7,8 +7,10 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
+
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.config.LiteJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -19,15 +21,15 @@ public class LiteMultipleCorpusQueryTest extends LiteJerseyTest {
 
     @Test
     public void testSearchGet () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "das").queryParam("ql", "poliqarp")
                 .queryParam("cq", "pubPlace=München")
                 .queryParam("cq", "textSigle=\"GOE/AGA/01784\"")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         node = node.at("/collection");
         assertEquals("koral:docGroup", node.at("/@type").asText());
@@ -45,14 +47,14 @@ public class LiteMultipleCorpusQueryTest extends LiteJerseyTest {
     public void testStatisticsWithMultipleCq ()
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("statistics")
+        Response response = target().path(API_VERSION).path("statistics")
                 .queryParam("cq", "textType=Abhandlung")
                 .queryParam("cq", "corpusSigle=GOE")
                 .request()
-                .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.at("/documents").asInt());
         assertEquals(138180, node.at("/tokens").asInt());
@@ -66,14 +68,14 @@ public class LiteMultipleCorpusQueryTest extends LiteJerseyTest {
     public void testStatisticsWithMultipleCorpusQuery ()
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("statistics")
+        Response response = target().path(API_VERSION).path("statistics")
                 .queryParam("corpusQuery", "textType=Autobiographie")
                 .queryParam("corpusQuery", "corpusSigle=GOE")
                 .request()
-                .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(9, node.at("/documents").asInt());
         assertEquals(527662, node.at("/tokens").asInt());

@@ -6,7 +6,9 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import org.junit.Ignore;
@@ -14,7 +16,7 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -36,15 +38,15 @@ public class SearchControllerTest extends SpringJerseyTest {
     private KustvaktConfiguration config;
 
     private JsonNode requestSearchWithFields(String fields) throws KustvaktException{
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("fields", fields)
                 .queryParam("context", "sentence").queryParam("count", "13")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String query = response.getEntity(String.class);
+        String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         return node;
     }
@@ -59,17 +61,17 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     public void testApiWelcomeMessage () {
-        ClientResponse response = resource().path(API_VERSION).path("")
+        Response response = target().path(API_VERSION).path("")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
         assertEquals(
             "Wes8Bd4h1OypPqbWF5njeQ==",
             response.getHeaders().getFirst("X-Index-Revision")
             );
 
-        String message = response.getEntity(String.class);
+        String message = response.readEntity(String.class);
         assertEquals(message, config.getApiWelcomeMessage());
     }
 
@@ -91,13 +93,13 @@ public class SearchControllerTest extends SpringJerseyTest {
     
     @Test
     public void testSearchQueryPublicCorpora () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .request()
-                .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .accept(MediaType.APPLICATION_JSON).get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("koral:doc", node.at("/collection/@type").asText());
@@ -111,17 +113,17 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     public void testSearchQueryFailure () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der").queryParam("ql", "poliqarp")
                 .queryParam("cq", "corpusSigle=WPD | corpusSigle=GOE")
                 .queryParam("count", "13")
                 .request()
                 .accept(MediaType.APPLICATION_JSON)
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+                .get();
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals(302, node.at("/errors/0/0").asInt());
@@ -133,15 +135,15 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     public void testSearchQueryWithMeta () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cutoff", "true").queryParam("count", "5")
                 .queryParam("page", "1").queryParam("context", "40-t,30-t")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertTrue(node.at("/meta/cutOff").asBoolean());
@@ -155,14 +157,14 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     public void testSearchQueryFreeExtern () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
@@ -177,14 +179,14 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     public void testSearchQueryFreeIntern () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "172.27.0.32")
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
@@ -199,7 +201,7 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     public void testSearchQueryExternAuthorized () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .request()
                 .header(Attributes.AUTHORIZATION,
@@ -207,10 +209,10 @@ public class SearchControllerTest extends SpringJerseyTest {
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         // System.out.println(entity);
         assertNotNull(node);
@@ -231,7 +233,7 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     public void testSearchQueryInternAuthorized () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .request()
                 .header(Attributes.AUTHORIZATION,
@@ -239,10 +241,10 @@ public class SearchControllerTest extends SpringJerseyTest {
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "172.27.0.32")
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
@@ -268,7 +270,7 @@ public class SearchControllerTest extends SpringJerseyTest {
     @Test
     public void testSearchQueryWithCollectionQueryAuthorizedWithoutIP ()
             throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "textClass=politik & corpusSigle=BRZ10")
                 .request()
@@ -276,11 +278,11 @@ public class SearchControllerTest extends SpringJerseyTest {
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertNotNull(node);
         assertEquals("operation:insertion",
                 node.at("/collection/rewrites/0/operation").asText());
@@ -300,17 +302,17 @@ public class SearchControllerTest extends SpringJerseyTest {
     @Test
     @Ignore
     public void testSearchQueryAuthorizedWithoutIP () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
         assertNotEquals(0, node.path("matches").size());
@@ -325,14 +327,14 @@ public class SearchControllerTest extends SpringJerseyTest {
     
     @Test
     public void testSearchWithInvalidPage () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .queryParam("page", "0")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+                .get();
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT, node.at("/errors/0/0").asInt());
         assertEquals("page must start from 1",node.at("/errors/0/1").asText());
@@ -340,14 +342,14 @@ public class SearchControllerTest extends SpringJerseyTest {
 
     @Test
     public void testSearchSentenceMeta () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("context", "sentence")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("base/s:s", node.at("/meta/context").asText());
@@ -361,12 +363,12 @@ public class SearchControllerTest extends SpringJerseyTest {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("(der) or (das)", "CQL");
 
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .request()
-                .post(ClientResponse.class, s.toJSON());
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .post(Entity.json(s.toJSON()));
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
 
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
@@ -378,12 +380,12 @@ public class SearchControllerTest extends SpringJerseyTest {
     @Test
     @Ignore
     public void testSearchRawQuery () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .request()
-                .post(ClientResponse.class, createJsonQuery());
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .post(Entity.json(createJsonQuery()));
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
 
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
@@ -397,17 +399,17 @@ public class SearchControllerTest extends SpringJerseyTest {
     @Test
     @Ignore
     public void testSearchPostAll () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "10.27.0.32")
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
-                .post(ClientResponse.class, createJsonQuery());
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .post(Entity.json(createJsonQuery()));
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
 
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
@@ -421,17 +423,17 @@ public class SearchControllerTest extends SpringJerseyTest {
     @Test
     @Ignore
     public void testSearchPostPublic () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
-                .post(ClientResponse.class, createJsonQuery());
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .post(Entity.json(createJsonQuery()));
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
 
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);

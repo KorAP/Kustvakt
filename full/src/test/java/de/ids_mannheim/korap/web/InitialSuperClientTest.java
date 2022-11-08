@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -54,10 +54,10 @@ public class InitialSuperClientTest extends OAuth2TestBase {
 
     private void testLogin (String superClientId, String superClientSecret)
             throws KustvaktException {
-        ClientResponse response = requestTokenWithPassword(superClientId,
+        Response response = requestTokenWithPassword(superClientId,
                 superClientSecret, "username", "password");
 
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         assertTrue(!node.at("/access_token").isMissingNode());

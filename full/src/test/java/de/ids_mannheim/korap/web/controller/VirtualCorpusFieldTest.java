@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.cache.VirtualCorpusCache;
@@ -36,17 +36,17 @@ public class VirtualCorpusFieldTest extends VirtualCorpusTestBase {
     private JsonNode testRetrieveField (String username, String vcName,
             String field) throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc")
+        Response response = target().path(API_VERSION).path("vc")
                 .path("field").path("~" + username).path(vcName)
                 .queryParam("fieldName", field)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         return node;
     }
@@ -54,17 +54,17 @@ public class VirtualCorpusFieldTest extends VirtualCorpusTestBase {
     private void testRetrieveProhibitedField (String username, String vcName,
             String field) throws UniformInterfaceException,
             ClientHandlerException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("vc")
+        Response response = target().path(API_VERSION).path("vc")
                 .path("field").path("~" + username).path(vcName)
                 .queryParam("fieldName", field)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.NOT_ALLOWED, node.at("/errors/0/0").asInt());
     }
@@ -139,17 +139,17 @@ public class VirtualCorpusFieldTest extends VirtualCorpusTestBase {
     public void testRetrieveFieldUnauthorized () throws KustvaktException, IOException, QueryException {
         vcLoader.loadVCToCache("named-vc3", "/vc/named-vc3.jsonld");
         
-        ClientResponse response = resource().path(API_VERSION).path("vc")
+        Response response = target().path(API_VERSION).path("vc")
                 .path("field").path("~system").path("named-vc3")
                 .queryParam("fieldName", "textSigle")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED, node.at("/errors/0/0").asInt());
         assertEquals("Unauthorized operation for user: dory", node.at("/errors/0/1").asText());

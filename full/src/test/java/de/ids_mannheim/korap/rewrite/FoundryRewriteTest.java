@@ -5,14 +5,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientResponse.Status;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -49,27 +50,26 @@ public class FoundryRewriteTest extends SpringJerseyTest {
         String json = "{\"pos-foundry\":\"opennlp\"}";
         String username = "foundryRewriteTest";
         String pathUsername = "~" + username;
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path(pathUsername).path("setting")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
-                .type(MediaType.APPLICATION_JSON).entity(json)
-                .put(ClientResponse.class);
+                .put(Entity.json(json));
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
         // search
-        response = resource().path(API_VERSION).path("search")
+        response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[pos=ADJA]").queryParam("ql", "poliqarp")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
-                .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+                .accept(MediaType.APPLICATION_JSON).get();
         
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals("opennlp", node.at("/query/wrap/foundry").asText());
         assertEquals("foundry",

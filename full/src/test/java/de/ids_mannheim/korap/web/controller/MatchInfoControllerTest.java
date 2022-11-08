@@ -8,7 +8,8 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -22,15 +23,15 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
     @Test
     public void testGetMatchInfoPublicCorpus () throws KustvaktException {
 
-        ClientResponse response = resource().path(API_VERSION).path("corpus")
+        Response response = target().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGA").path("01784").path("p36-100")
                 .path("matchInfo").queryParam("foundry", "*")
                 .request()
-                .get(ClientResponse.class);
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertNotNull(node);
@@ -46,15 +47,15 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
     @Test
     public void testGetMatchInfoNotAllowed () throws KustvaktException {
 
-        ClientResponse response = resource().path(API_VERSION).path("corpus")
+        Response response = target().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGI").path("04846").path("p36875-36876")
                 .path("matchInfo").queryParam("foundry", "*")
                 .request()
-                .get(ClientResponse.class);
+                .get();
 
-        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
@@ -68,7 +69,7 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
 
     @Test
     public void testGetMatchInfoWithAuthentication () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("corpus")
+        Response response = target().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGI").path("04846").path("p36875-36876")
                 .path("matchInfo").queryParam("foundry", "*")
                 .request()
@@ -77,10 +78,10 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "172.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
-        String entity = response.getEntity(String.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        String entity = response.readEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
@@ -100,7 +101,7 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
 
     @Test
     public void testAvailabilityAll () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("corpus")
+        Response response = target().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGD").path("00000").path("p75-76")
                 .request()
                 .header(Attributes.AUTHORIZATION,
@@ -108,15 +109,15 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "10.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
     }
 
     @Test
     public void testAvailabilityAllUnauthorized () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("corpus")
+        Response response = target().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGD").path("00000").path("p75-76")
                 .request()
                 .header(Attributes.AUTHORIZATION,
@@ -124,9 +125,9 @@ public class MatchInfoControllerTest extends SpringJerseyTest {
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "170.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
         assertEquals(

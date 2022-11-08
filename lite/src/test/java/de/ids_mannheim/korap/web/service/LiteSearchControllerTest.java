@@ -10,8 +10,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Iterator;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Ignore;
@@ -20,8 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -44,14 +45,14 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     @Ignore   
     @Test
     public void testGetJSONQuery () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("context", "sentence").queryParam("count", "13")
                 .request()
-                .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String query = response.getEntity(String.class);
+        String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
         assertEquals("orth", node.at("/query/wrap/layer").asText());
@@ -64,37 +65,37 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     @Ignore
     @Test
     public void testbuildAndPostQuery () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "corpusSigle=WPD | corpusSigle=GOE")
                 .request()
-                .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        String query = response.getEntity(String.class);
+        String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
 
-        response = resource().path(API_VERSION).path("search")
+        response = target().path(API_VERSION).path("search")
                 .request()
-                .post(ClientResponse.class, query);
+                .post(Entity.json(query));
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String matches = response.getEntity(String.class);
+        String matches = response.readEntity(String.class);
         JsonNode match_node = JsonUtils.readTree(matches);
         assertNotEquals(0, match_node.path("matches").size());
     }
 
     @Test
     public void testApiWelcomeMessage () {
-        ClientResponse response = resource().path(API_VERSION).path("")
+        Response response = target().path(API_VERSION).path("")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String message = response.getEntity(String.class);
+        String message = response.readEntity(String.class);
         assertEquals(
             "Wes8Bd4h1OypPqbWF5njeQ==",
             response.getHeaders().getFirst("X-Index-Revision")
@@ -104,14 +105,14 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
 
     @Test
     public void testQueryGet () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("context", "sentence").queryParam("count", "13")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String query = response.getEntity(String.class);
+        String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
         assertEquals("orth", node.at("/query/wrap/layer").asText());
@@ -122,15 +123,15 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
 
     @Test
     public void testQueryFailure () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das").queryParam("ql", "poliqarp")
                 .queryParam("cq", "corpusSigle=WPD | corpusSigle=GOE")
                 .queryParam("count", "13")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+                .get();
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
-        String query = response.getEntity(String.class);
+        String query = response.readEntity(String.class);
 
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
@@ -143,14 +144,14 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
 
     @Test
     public void testFoundryRewrite () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("context", "sentence").queryParam("count", "13")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String query = response.getEntity(String.class);
+        String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
         assertEquals("orth", node.at("/query/wrap/layer").asText());
@@ -164,12 +165,12 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[orth=das]", "poliqarp");
 
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .request()
-                .post(ClientResponse.class, s.toJSON());
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .post(Entity.json(s.toJSON()));
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String query = response.getEntity(String.class);
+        String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
         assertEquals("orth", node.at("/query/wrap/layer").asText());
@@ -178,15 +179,15 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
 
     @Test
     public void testParameterField () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("fields", "author,docSigle")
                 .queryParam("context", "sentence").queryParam("count", "13")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String query = response.getEntity(String.class);
+        String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
         assertEquals("orth", node.at("/query/wrap/layer").asText());
@@ -197,14 +198,14 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
 
     @Test
     public void testMatchInfoGetWithoutSpans () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42/matchInfo")
                 .queryParam("foundry", "*").queryParam("spans", "false")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
@@ -215,14 +216,14 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
 
     @Test
     public void testMatchInfoGetWithoutHighlights () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42/matchInfo")
                 .queryParam("foundry", "xy").queryParam("spans", "false")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals(
@@ -236,15 +237,15 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
 
     @Test
     public void testMatchInfoWithoutExtension () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42")
                 .queryParam("foundry", "-").queryParam("spans", "false")
                 .queryParam("expand","false")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
@@ -258,15 +259,15 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     
     @Test
     public void testMatchInfoGetWithHighlights () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("corpus/GOE/AGA/01784/p36-46(5)37-45(2)38-42/matchInfo")
                 .queryParam("foundry", "xy").queryParam("spans", "false")
                 .queryParam("hls", "true")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
@@ -287,15 +288,15 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
 
     @Test
     public void testMatchInfoGet2 () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
 
                 .path("corpus/GOE/AGA/01784/p36-46/matchInfo")
                 .queryParam("foundry", "*")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertEquals("GOE/AGA/01784", node.at("/textSigle").asText());
@@ -306,16 +307,16 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     @Ignore
     @Test
     public void testCollectionQueryParameter () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("query")
+        Response response = target().path(API_VERSION).path("query")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("fields", "author, docSigle")
                 .queryParam("context", "sentence").queryParam("count", "13")
                 .queryParam("cq", "textClass=Politik & corpus=WPD")
                 .request()
-                .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String query = response.getEntity(String.class);
+        String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertNotNull(node);
         assertEquals("orth", node.at("/query/wrap/layer").asText());
@@ -323,20 +324,20 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
                 node.at("/collection/operands/0/value").asText());
         assertEquals("WPD", node.at("/collection/operands/1/value").asText());
 
-        response = resource().path(API_VERSION).path("search")
+        response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("fields", "author, docSigle")
                 .queryParam("context", "sentence").queryParam("count", "13")
                 .queryParam("cq", "textClass=Politik & corpus=WPD")
                 .request()
-                .get(ClientResponse.class);
+                .get();
         // String version =
         // LucenePackage.get().getImplementationVersion();;
         // System.out.println("VERSION "+ version);
         // System.out.println("RESPONSE "+ response);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        query = response.getEntity(String.class);
+        query = response.readEntity(String.class);
         node = JsonUtils.readTree(query);
         assertNotNull(node);
         assertEquals("orth", node.at("/query/wrap/layer").asText());
@@ -347,13 +348,13 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
 
     @Test
     public void testMetaFields () throws KustvaktException {
-        ClientResponse response =
-                resource().path(API_VERSION).path("/corpus/GOE/AGA/01784")
+        Response response =
+                target().path(API_VERSION).path("/corpus/GOE/AGA/01784")
                         .request()
-                        .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                        .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String resp = response.getEntity(String.class);
+        String resp = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(resp);
         // System.err.println(node.toString());
 
@@ -403,10 +404,10 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
 
     @Test
     public void testSearchWithoutVersion () throws KustvaktException {
-        ClientResponse response = resource().path("api").path("search")
+        Response response = target().path("api").path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .request()
-                .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+                .accept(MediaType.APPLICATION_JSON).get();
         assertEquals(HttpStatus.PERMANENT_REDIRECT_308, response.getStatus());
         URI location = response.getLocation();
         assertEquals("/api/v1.0/search", location.getPath());
@@ -414,12 +415,12 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
 
     @Test
     public void testSearchWrongVersion () throws KustvaktException {
-        ClientResponse response = resource().path("api").path("v0.2")
+        Response response = target().path("api").path("v0.2")
                 .path("search").queryParam("q", "[orth=der]")
                 .queryParam("ql", "poliqarp")
-                .accept(MediaType.APPLICATION_JSON)
                 .request()
-                .get(ClientResponse.class);
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
         assertEquals(HttpStatus.PERMANENT_REDIRECT_308, response.getStatus());
         URI location = response.getLocation();
         assertEquals("/api/v1.0/search", location.getPath());
@@ -427,46 +428,46 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
 
     @Test
     public void testSearchWithIP () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "Wasser").queryParam("ql", "poliqarp")
                 .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertTrue(node.at("/collection").isMissingNode());
     }
 
     @Test
     public void testSearchWithAuthorizationHeader () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "Wasser").queryParam("ql", "poliqarp")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("test", "pwd"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertTrue(node.at("/collection").isMissingNode());
     }
     
     @Test
     public void testSearchPublicMetadata () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
                 .queryParam("access-rewrite-disabled", "true")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String query = response.getEntity(String.class);
+        String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
 
         assertTrue(node.at("/matches/0/snippet").isMissingNode());
@@ -474,15 +475,15 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     
     @Test
     public void testSearchPublicMetadataWithCustomFields () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("fields", "author,title")
                 .queryParam("access-rewrite-disabled", "true")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         
         assertTrue(node.at("/matches/0/snippet").isMissingNode());
@@ -495,15 +496,15 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     
     @Test
     public void testSearchPublicMetadataWithNonPublicField () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("fields", "author,title,snippet")
                 .queryParam("access-rewrite-disabled", "true")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(StatusCodes.NON_PUBLIC_FIELD_IGNORED,
@@ -516,14 +517,14 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     
     @Test
     public void testSearchWithInvalidPage () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .queryParam("page", "0")
                 .request()
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+                .get();
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ARGUMENT, node.at("/errors/0/0").asInt());
         assertEquals("page must start from 1",node.at("/errors/0/1").asText());
@@ -534,14 +535,13 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
         searchKrill.getStatistics(null);
         assertEquals(true, searchKrill.getIndex().isReaderOpen());
 
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("token", "secret");
+        Form form = new Form();
+        form.param("token", "secret");
 
-        ClientResponse response = resource().path(API_VERSION).path("index")
+        Response response = target().path(API_VERSION).path("index")
                 .path("close")
                 .request()
-                .type(MediaType.APPLICATION_FORM_URLENCODED)
-                .post(ClientResponse.class, m);
+                .post(Entity.form(form));
 
         assertEquals(HttpStatus.OK_200, response.getStatus());
         assertEquals(false, searchKrill.getIndex().isReaderOpen());

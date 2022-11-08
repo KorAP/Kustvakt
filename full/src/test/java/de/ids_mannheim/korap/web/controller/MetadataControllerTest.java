@@ -8,7 +8,8 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -21,15 +22,15 @@ public class MetadataControllerTest extends SpringJerseyTest {
 
     @Test
     public void testRetrieveMetadataWithField () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("corpus")
+        Response response = target().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGA").path("01784")
                 .queryParam("fields", "author")
                 .request()
-                .get(ClientResponse.class);
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals("author", node.at("/document/fields/0/key").asText());
@@ -38,15 +39,15 @@ public class MetadataControllerTest extends SpringJerseyTest {
 
     @Test
     public void testRetrieveMetadataWithMultipleFields () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("corpus")
+        Response response = target().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGA").path("01784")
                 .queryParam("fields", "author,title")
                 .request()
-                .get(ClientResponse.class);
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals("author", node.at("/document/fields/0/key").asText());
@@ -56,14 +57,14 @@ public class MetadataControllerTest extends SpringJerseyTest {
     @Test
     public void testFreeMetadata () throws KustvaktException {
 
-        ClientResponse response = resource().path(API_VERSION).path("corpus")
+        Response response = target().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGA").path("01784")
                 .request()
-                .get(ClientResponse.class);
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertTrue(!node.at("/document").isMissingNode());
@@ -75,14 +76,14 @@ public class MetadataControllerTest extends SpringJerseyTest {
     @Ignore
     public void testMetadataUnauthorized () throws KustvaktException {
 
-        ClientResponse response = resource().path(API_VERSION).path("corpus")
+        Response response = target().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGI").path("04846")
                 .request()
-                .get(ClientResponse.class);
+                .get();
 
-        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
@@ -95,7 +96,7 @@ public class MetadataControllerTest extends SpringJerseyTest {
 
     @Test
     public void testMetadataWithAuthentication () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("corpus")
+        Response response = target().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGI").path("04846")
                 .request()
                 .header(Attributes.AUTHORIZATION,
@@ -103,15 +104,15 @@ public class MetadataControllerTest extends SpringJerseyTest {
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "172.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
     }
 
     @Test
     public void testMetadataAvailabilityAll () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("corpus")
+        Response response = target().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGI").path("00000")
                 .request()
                 .header(Attributes.AUTHORIZATION,
@@ -119,9 +120,9 @@ public class MetadataControllerTest extends SpringJerseyTest {
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "10.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
     }
 
@@ -130,7 +131,7 @@ public class MetadataControllerTest extends SpringJerseyTest {
     @Ignore
     public void testMetadataAvailabilityAllUnauthorized ()
             throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("corpus")
+        Response response = target().path(API_VERSION).path("corpus")
                 .path("GOE").path("AGD").path("00000")
                 .request()
                 .header(Attributes.AUTHORIZATION,
@@ -138,9 +139,9 @@ public class MetadataControllerTest extends SpringJerseyTest {
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "170.27.0.32")
-                .get(ClientResponse.class);
+                .get();
         
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
         assertEquals(

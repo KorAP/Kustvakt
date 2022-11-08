@@ -3,7 +3,8 @@ package de.ids_mannheim.korap.web.controller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.http.entity.ContentType;
 import org.junit.Test;
@@ -12,10 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.ClientResponse.Status;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -43,18 +44,18 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
                 .createBasicAuthorizationHeaderValue("dory", "password");
     }
 
-    private ClientResponse updateClientPrivilege (String username,
-            MultivaluedMap<String, String> form)
+    private Response updateClientPrivilege (String username,
+            Form form)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+        Response response = target().path(API_VERSION).path("oauth2")
                 .path("admin").path("client").path("privilege")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+                .post(Entity.form(form));
 
         return response;
     }
@@ -62,12 +63,12 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
     private void updateClientPriviledge (String clientId, boolean isSuper)
             throws UniformInterfaceException, ClientHandlerException,
             KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("client_id", clientId);
-        form.add("super", Boolean.toString(isSuper));
+        Form form = new Form();
+        form.param("client_id", clientId);
+        form.param("super", Boolean.toString(isSuper));
 
-        ClientResponse response = updateClientPrivilege(username, form);
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        Response response = updateClientPrivilege(username, form);
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
@@ -85,11 +86,11 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         int accessTokensBefore = accessDao.retrieveInvalidAccessTokens().size();
         assertTrue(accessTokensBefore > 0);
 
-        resource().path(API_VERSION).path("oauth2").path("admin").path("token")
+        target().path(API_VERSION).path("oauth2").path("admin").path("token")
                 .path("clean")
                 .request()
                 .header(Attributes.AUTHORIZATION, adminAuthHeader)
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(0, refreshDao.retrieveInvalidRefreshTokens().size());
         assertEquals(0, accessDao.retrieveInvalidAccessTokens().size());
@@ -101,9 +102,9 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         int accessTokensBefore = accessDao.retrieveInvalidAccessTokens().size();
         String code = requestAuthorizationCode(publicClientId, userAuthHeader);
 
-        ClientResponse response = requestTokenWithAuthorizationCodeAndForm(
+        Response response = requestTokenWithAuthorizationCodeAndForm(
                 publicClientId, clientSecret, code);
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         String accessToken = node.at("/access_token").asText();
@@ -112,11 +113,11 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         int accessTokensAfter = accessDao.retrieveInvalidAccessTokens().size();
         assertEquals(accessTokensAfter, accessTokensBefore + 1);
 
-        resource().path(API_VERSION).path("oauth2").path("admin").path("token")
+        target().path(API_VERSION).path("oauth2").path("admin").path("token")
                 .path("clean")
                 .request()
                 .header(Attributes.AUTHORIZATION, adminAuthHeader)
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(0, accessDao.retrieveInvalidAccessTokens().size());
     }
@@ -124,8 +125,8 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
     @Test
     public void testUpdateClientPrivilege () throws KustvaktException {
         // register a client
-        ClientResponse response = registerConfidentialClient(username);
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        Response response = registerConfidentialClient(username);
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         String clientId = node.at("/client_id").asText();
         String clientSecret = node.at("/client_secret").asText();
 
@@ -154,14 +155,14 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         assertTrue(node.at("/super").asBoolean());
 
         // list vc
-        ClientResponse response = resource().path(API_VERSION).path("vc")
+        Response response = target().path(API_VERSION).path("vc")
                 .request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
-                .get(ClientResponse.class);
+                .get();
 
-        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
@@ -178,11 +179,11 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         JsonNode node = retrieveClientInfo(clientId, username);
         assertTrue(node.at("/isSuper").isMissingNode());
 
-        ClientResponse response = searchWithAccessToken(accessToken);
-        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
+        Response response = searchWithAccessToken(accessToken);
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(),
                 response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());

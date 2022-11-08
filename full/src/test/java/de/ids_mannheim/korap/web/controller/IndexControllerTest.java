@@ -10,16 +10,16 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -57,13 +57,13 @@ public class IndexControllerTest extends SpringJerseyTest {
         searchKrill.getStatistics(null);
         assertEquals(true, searchKrill.getIndex().isReaderOpen());
 
-        MultivaluedMap<String, String> m = new MultivaluedMapImpl();
-        m.add("token", "secret");
+        Form form = new Form();
+        form.param("token", "secret");
 
-        ClientResponse response = resource().path(API_VERSION).path("index")
-                .path("close").type(MediaType.APPLICATION_FORM_URLENCODED)
+        Response response = target().path(API_VERSION).path("index")
+                .path("close")
                 .request()
-                .post(ClientResponse.class, m);
+                .post(Entity.form(form));
 
         assertEquals(HttpStatus.SC_OK, response.getStatus());
         assertEquals(false, searchKrill.getIndex().isReaderOpen());
@@ -73,19 +73,19 @@ public class IndexControllerTest extends SpringJerseyTest {
         
         Thread.sleep(200);
 
-        response = resource().path(API_VERSION).path("vc").path("~system")
+        response = target().path(API_VERSION).path("vc").path("~system")
                 .path("named-vc1")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
-                .delete(ClientResponse.class);
+                .delete();
 
-        response = resource().path(API_VERSION).path("vc").path("~system")
+        response = target().path(API_VERSION).path("vc").path("~system")
                 .path("named-vc1")
                 .request()
-                .get(ClientResponse.class);
+                .get();
         
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.NO_RESOURCE_FOUND,node.at("/errors/0/0").asInt());
     }

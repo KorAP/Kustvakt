@@ -19,7 +19,8 @@ import org.mockserver.model.Header;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.config.LiteJerseyTest;
@@ -75,16 +76,16 @@ public class SearchNetworkEndpointTest extends LiteJerseyTest {
                                 "application/json; charset=utf-8"))
                         .withBody(searchResult).withStatusCode(200));
 
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("engine", "network")
                 .request()
-                .get(ClientResponse.class);
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(2, node.at("/matches").size());
@@ -95,17 +96,17 @@ public class SearchNetworkEndpointTest extends LiteJerseyTest {
     public void testSearchWithUnknownURL ()
             throws IOException, KustvaktException {
         config.setNetworkEndpointURL("http://localhost:1040/search");
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("engine", "network")
                 .request()
-                .get(ClientResponse.class);
+                .get();
         
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.SEARCH_NETWORK_ENDPOINT_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
     }
     
@@ -113,17 +114,17 @@ public class SearchNetworkEndpointTest extends LiteJerseyTest {
     public void testSearchWithUnknownHost () throws KustvaktException {
         config.setNetworkEndpointURL("http://search.com");
         
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("engine", "network")
                 .request()
-                .get(ClientResponse.class);
+                .get();
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.SEARCH_NETWORK_ENDPOINT_FAILED,
                 node.at("/errors/0/0").asInt());
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
     }
 }

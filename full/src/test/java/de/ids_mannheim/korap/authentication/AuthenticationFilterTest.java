@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
@@ -17,13 +17,13 @@ public class AuthenticationFilterTest extends SpringJerseyTest {
     @Test
     public void testAuthenticationWithUnknownScheme ()
             throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .request()
                 .header(Attributes.AUTHORIZATION, "Blah blah")
-                .get(ClientResponse.class);
+                .get();
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode n = JsonUtils.readTree(entity);
 
         assertEquals("2001", n.at("/errors/0/0").asText());
