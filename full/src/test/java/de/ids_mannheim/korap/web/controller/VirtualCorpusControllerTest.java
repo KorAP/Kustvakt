@@ -17,8 +17,7 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response.Status;
@@ -58,7 +57,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     private JsonNode testListVC (String username)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .request()
@@ -74,7 +73,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     private JsonNode testListOwnerVC (String username)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("~" + username)
@@ -118,8 +117,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testRetrieveSystemVCInfo () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testRetrieveSystemVCInfo () throws
+            ProcessingException, KustvaktException {
 
         JsonNode node = testSearchVC(testUser, "system", "system-vc");
         assertEquals("system-vc", node.at("/name").asText());
@@ -131,8 +130,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testRetrieveSystemVCGuest () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testRetrieveSystemVCGuest () throws
+            ProcessingException, KustvaktException {
 
         Response response = target().path(API_VERSION).path("vc")
                 .path("~system").path("system-vc")
@@ -150,7 +149,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
     @Test
     public void testRetrieveOwnerPrivateVCInfo ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
 
         JsonNode node = testSearchVC("dory", "dory", "dory-vc");
@@ -161,7 +160,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
     @Test
     public void testRetrievePrivateVCInfoUnauthorized ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("~dory").path("dory-vc")
@@ -182,8 +181,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testRetrieveProjectVCInfo () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testRetrieveProjectVCInfo () throws
+            ProcessingException, KustvaktException {
 
         JsonNode node = testSearchVC("nemo", "dory", "group-vc");
         assertEquals("group-vc", node.at("/name").asText());
@@ -193,7 +192,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
     @Test
     public void testRetrieveProjectVCInfoByNonActiveMember ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
 
         Response response = target().path(API_VERSION).path("vc")
@@ -215,8 +214,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testRetrievePublishedVCInfo () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testRetrievePublishedVCInfo () throws
+            ProcessingException, KustvaktException {
 
         JsonNode node = testSearchVC("gill", "marlin", "published-vc");
         assertEquals("published-vc", node.at("/name").asText());
@@ -242,31 +241,31 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testListAvailableVCNemo () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testListAvailableVCNemo () throws
+            ProcessingException, KustvaktException {
         JsonNode node = testListVC("nemo");
         assertEquals(3, node.size());
 
     }
 
     @Test
-    public void testListAvailableVCPearl () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testListAvailableVCPearl () throws
+            ProcessingException, KustvaktException {
         JsonNode node = testListVC("pearl");
         assertEquals(2, node.size());
 
     }
 
     @Test
-    public void testListAvailableVCDory () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testListAvailableVCDory () throws
+            ProcessingException, KustvaktException {
         JsonNode node = testListVC("dory");
         assertEquals(4, node.size());
     }
 
     @Test
     public void testListAvailableVCByOtherUser ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("~dory")
@@ -288,8 +287,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testListAvailableVCByGuest () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testListAvailableVCByGuest () throws
+            ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .request()
                 .get();
@@ -401,7 +400,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     private JsonNode testCheckHiddenGroup (String groupName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("group")
                 .path("@"+groupName)
@@ -755,8 +754,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testEditCorpusQuery () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testEditCorpusQuery () throws
+            ProcessingException, KustvaktException {
         JsonNode node = testRetrieveKoralQuery("dory", "dory-vc");
         assertEquals("koral:docGroup", node.at("/collection/@type").asText());
         assertEquals("operation:and", node.at("/collection/operation").asText());
@@ -781,7 +780,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
     
     private JsonNode testRetrieveKoralQuery (String username, String vcName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("koralQuery").path("~" + username).path(vcName)
@@ -931,8 +930,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testCreateDeleteAccess () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testCreateDeleteAccess () throws
+            ProcessingException, KustvaktException {
 
         String vcName = "marlin-vc";
         String groupName = "marlin-group";
@@ -977,8 +976,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     private Response testShareVCByCreator (String vcCreator,
-            String vcName, String groupName) throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+            String vcName, String groupName) throws
+            ProcessingException, KustvaktException {
 
         return target().path(API_VERSION).path("vc").path("~"+vcCreator)
                 .path(vcName).path("share").path("@"+groupName)
@@ -990,8 +989,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     private void testShareVCNonUniqueAccess (String vcCreator, String vcName,
-            String groupName) throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+            String groupName) throws
+            ProcessingException, KustvaktException {
         Response response =
                 testShareVCByCreator(vcCreator, vcName, groupName);
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
@@ -1006,8 +1005,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testShareUnknownVC () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testShareUnknownVC () throws
+            ProcessingException, KustvaktException {
         Response response = testShareVCByCreator("marlin",
                 "non-existing-vc", "marlin group");
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
@@ -1017,8 +1016,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testShareUnknownGroup () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testShareUnknownGroup () throws
+            ProcessingException, KustvaktException {
         Response response = testShareVCByCreator("marlin", "marlin-vc",
                 "non-existing-group");
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
@@ -1028,8 +1027,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testShareVCByVCAAdmin () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testShareVCByVCAAdmin () throws
+            ProcessingException, KustvaktException {
 
         // dory is VCA in marlin group
         Response response = target().path(API_VERSION).path("vc")
@@ -1051,8 +1050,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testShareVCByNonVCAAdmin () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testShareVCByNonVCAAdmin () throws
+            ProcessingException, KustvaktException {
 
         // nemo is not VCA in marlin group
         Response response = target().path(API_VERSION).path("vc")
@@ -1073,7 +1072,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     private Response testDeleteAccess (String username, String accessId)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("access").path(accessId)
@@ -1087,7 +1086,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     private void testDeleteAccessUnauthorized (String accessId)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("access").path(accessId)
@@ -1108,8 +1107,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testDeleteNonExistingAccess () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testDeleteNonExistingAccess () throws
+            ProcessingException, KustvaktException {
         Response response = testDeleteAccess("dory", "100");
         assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
 

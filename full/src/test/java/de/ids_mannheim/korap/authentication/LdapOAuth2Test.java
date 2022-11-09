@@ -20,8 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.client.Entity;
 import com.unboundid.ldap.sdk.LDAPException;
@@ -120,7 +119,7 @@ public class LdapOAuth2Test extends OAuth2TestBase {
     }
     
     private void testRegisterPublicClient (String accessToken)
-            throws ClientHandlerException, UniformInterfaceException,
+            throws ProcessingException,
             KustvaktException {
         OAuth2ClientJson json = new OAuth2ClientJson();
         json.setName("LDAP test client");
@@ -144,7 +143,7 @@ public class LdapOAuth2Test extends OAuth2TestBase {
     }
     
     private JsonNode testRegisterConfidentialClient (String accessToken)
-            throws ClientHandlerException, UniformInterfaceException,
+            throws ProcessingException,
             KustvaktException {
         OAuth2ClientJson json = new OAuth2ClientJson();
         json.setName("LDAP test client");

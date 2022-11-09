@@ -6,8 +6,7 @@ import org.apache.http.entity.ContentType;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.client.Entity;
@@ -22,7 +21,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public abstract class VirtualCorpusTestBase extends SpringJerseyTest{
     
     protected JsonNode testSearchVC (String username, String vcCreator, String vcName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("~"+vcCreator).path(vcName)

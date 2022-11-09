@@ -1,9 +1,9 @@
 package de.ids_mannheim.korap.web;
 
-import com.sun.jersey.api.client.UniformInterfaceException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -33,7 +33,7 @@ public class ClientsHandler {
         try {
             return service.path(path).queryParam(key, value).request().get(String.class);
         }
-        catch (UniformInterfaceException e) {
+        catch (WebApplicationException e) {
             throw new KustvaktException(StatusCodes.REQUEST_INVALID);
         }
     }
@@ -51,7 +51,7 @@ public class ClientsHandler {
             }
             return resource.request().get(String.class);
         }
-        catch (UniformInterfaceException e) {
+        catch (WebApplicationException e) {
             throw new KustvaktException(StatusCodes.REQUEST_INVALID);
         }
     }

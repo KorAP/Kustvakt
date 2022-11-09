@@ -12,8 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response.Status;
@@ -46,7 +45,7 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
 
     private Response updateClientPrivilege (String username,
             Form form)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("oauth2")
                 .path("admin").path("client").path("privilege")
@@ -61,7 +60,7 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
     }
     
     private void updateClientPriviledge (String clientId, boolean isSuper)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = new Form();
         form.param("client_id", clientId);

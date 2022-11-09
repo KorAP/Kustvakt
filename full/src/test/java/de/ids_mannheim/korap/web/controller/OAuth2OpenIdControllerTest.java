@@ -30,8 +30,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.GrantType;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.client.Entity;
 
@@ -78,7 +77,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
 
     @Test
     public void testRequestAuthorizationCode ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
 
         Form form = new Form();

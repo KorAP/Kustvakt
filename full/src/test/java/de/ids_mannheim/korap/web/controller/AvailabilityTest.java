@@ -8,8 +8,7 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -147,7 +146,7 @@ public class AvailabilityTest extends SpringJerseyTest {
 
 
     private Response searchQueryWithIP (String collectionQuery, String ip)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         return target().path(API_VERSION).path("search").queryParam("q", "[orth=das]")
                 .queryParam("ql", "poliqarp").queryParam("cq", collectionQuery)

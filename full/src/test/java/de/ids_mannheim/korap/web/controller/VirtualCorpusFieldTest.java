@@ -10,8 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -34,8 +33,8 @@ public class VirtualCorpusFieldTest extends VirtualCorpusTestBase {
     private QueryDao dao;
 
     private JsonNode testRetrieveField (String username, String vcName,
-            String field) throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+            String field) throws
+            ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("field").path("~" + username).path(vcName)
                 .queryParam("fieldName", field)
@@ -52,8 +51,8 @@ public class VirtualCorpusFieldTest extends VirtualCorpusTestBase {
     }
 
     private void testRetrieveProhibitedField (String username, String vcName,
-            String field) throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+            String field) throws
+            ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("field").path("~" + username).path(vcName)
                 .queryParam("fieldName", field)
@@ -103,8 +102,8 @@ public class VirtualCorpusFieldTest extends VirtualCorpusTestBase {
         deleteVcFromDB("named-vc1");
     }
 
-    private void testRetrieveUnknownTokens () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    private void testRetrieveUnknownTokens () throws
+            ProcessingException, KustvaktException {
         JsonNode n = testRetrieveField("system", "named-vc1", "unknown");
         assertEquals("unknown", n.at("/corpus/key").asText());
         assertEquals(0, n.at("/corpus/value").size());

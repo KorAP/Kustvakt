@@ -9,8 +9,7 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.client.Entity;
@@ -31,8 +30,8 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     private String username = "VirtualCorpusControllerAdminTest";
 
     @Test
-    public void testSearchPrivateVC () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testSearchPrivateVC () throws
+            ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("~dory").path("dory-vc")
                 .request()
@@ -51,8 +50,8 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testSearchProjectVC () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testSearchProjectVC () throws
+            ProcessingException, KustvaktException {
 
         Response response = target().path(API_VERSION).path("vc")
                 .path("~dory").path("group-vc")
@@ -72,8 +71,8 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testListDoryVC () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testListDoryVC () throws
+            ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .queryParam("username", "dory")
                 .request()
@@ -89,8 +88,8 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         assertEquals(4, node.size());
     }
 
-    private JsonNode testListSystemVC () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    private JsonNode testListSystemVC () throws
+            ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("list").path("system-admin").queryParam("type", "SYSTEM")
                 .queryParam("createdBy", "system")
@@ -129,7 +128,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     }
 
     private void testDeleteSystemVC (String vcCreator, String vcName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("~system").path(vcName)
@@ -146,8 +145,8 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testPrivateVC () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testPrivateVC () throws
+            ProcessingException, KustvaktException {
         String json = "{\"type\": \"PRIVATE\""
                 + ",\"queryType\": \"VIRTUAL_CORPUS\""
                 + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
@@ -172,7 +171,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     }
 
     private JsonNode testListUserVC (String username)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("list").path("system-admin")
@@ -190,7 +189,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     }
 
     private void testEditPrivateVC (String vcCreator, String vcName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
 
         String json = "{\"description\": \"edited vc\"}";
@@ -211,7 +210,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     }
 
     private void testDeletePrivateVC (String vcCreator, String vcName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("~"+vcCreator).path(vcName)
@@ -269,8 +268,8 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testVCSharing () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testVCSharing () throws
+            ProcessingException, KustvaktException {
         String vcCreator = "marlin";
         String vcName = "marlin-vc";
         String groupName = "marlin-group";
@@ -285,8 +284,8 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     }
 
     private void testCreateVCAccess (String vcCreator, String vcName,
-            String groupName) throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+            String groupName) throws
+            ProcessingException, KustvaktException {
         Response response;
         // share VC
         response = target().path(API_VERSION).path("vc").path("~"+vcCreator)
@@ -302,7 +301,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     }
 
     private void testDeleteVCAccess (String accessId)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
 
         Response response = target().path(API_VERSION).path("vc")

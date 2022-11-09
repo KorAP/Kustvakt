@@ -6,8 +6,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -44,7 +43,7 @@ public class MultipleCorpusQueryTest extends SpringJerseyTest {
 
     @Test
     public void testStatisticsWithMultipleCq ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION)
                 .path("statistics").queryParam("cq", "textType=Abhandlung")
@@ -65,7 +64,7 @@ public class MultipleCorpusQueryTest extends SpringJerseyTest {
 
     @Test
     public void testStatisticsWithMultipleCorpusQuery ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response =
                 target().path(API_VERSION).path("statistics")

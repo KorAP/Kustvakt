@@ -22,8 +22,7 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.client.Entity;
@@ -132,7 +131,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     
     @Test
     public void testRegisterClientNameTooShort ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         OAuth2ClientJson clientJson =
                 createOAuth2ClientJson("R", OAuth2ClientType.PUBLIC, null);
@@ -147,8 +146,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     }
 
     @Test
-    public void testRegisterClientEmptyName () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testRegisterClientEmptyName ()
+            throws ProcessingException, KustvaktException {
         OAuth2ClientJson clientJson =
                 createOAuth2ClientJson("", OAuth2ClientType.PUBLIC, null);
 
@@ -163,7 +162,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
     @Test
     public void testRegisterClientMissingName ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         OAuth2ClientJson clientJson =
                 createOAuth2ClientJson(null, OAuth2ClientType.PUBLIC, null);
@@ -179,7 +178,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
     @Test
     public void testRegisterClientMissingDescription ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         OAuth2ClientJson clientJson = createOAuth2ClientJson("R client",
                 OAuth2ClientType.PUBLIC, null);
@@ -195,7 +194,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
     @Test
     public void testRegisterClientMissingType ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         OAuth2ClientJson clientJson =
                 createOAuth2ClientJson("R client", null, null);
@@ -211,7 +210,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     
     @Test
     public void testRegisterClientInvalidRedirectURI ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         // invalid hostname
         String redirectUri = "https://test.public.client/redirect";
@@ -240,7 +239,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     
     @Test
     public void testRegisterPublicClientWithRefreshTokenExpiry ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         OAuth2ClientJson clientJson =
                 createOAuth2ClientJson("OAuth2PublicClient",
@@ -254,7 +253,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     
     @Test
     public void testRegisterConfidentialClientWithRefreshTokenExpiry ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         int expiry = 31535000;
         OAuth2ClientJson clientJson =
@@ -272,7 +271,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     
     @Test
     public void testRegisterConfidentialClientWithInvalidRefreshTokenExpiry ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         OAuth2ClientJson clientJson = createOAuth2ClientJson(
                 "OAuth2 Confidential Client", OAuth2ClientType.CONFIDENTIAL,
@@ -289,7 +288,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     
     @Test
     public void testRegisterClientInvalidURL ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         // invalid hostname
         String url = "https://test.public.client";
@@ -318,8 +317,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     }
 
     @Test
-    public void testRegisterPublicClient () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testRegisterPublicClient ()
+            throws ProcessingException, KustvaktException {
         String redirectUri = "https://public.client.com/redirect";
         OAuth2ClientJson clientJson =
                 createOAuth2ClientJson("OAuth2PublicClient",
@@ -343,7 +342,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     }
 
     private void testRegisterClientUnauthorizedScope (String clientId)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
 
         String userAuthHeader = HttpAuthorizationHandler
@@ -378,7 +377,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
     @Test
     public void testRegisterClientUsingPlainJson ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException, IOException {
 
         InputStream is = getClass().getClassLoader()
@@ -407,8 +406,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     }
 
     @Test
-    public void testRegisterDesktopApp () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testRegisterDesktopApp ()
+            throws ProcessingException, KustvaktException {
         OAuth2ClientJson clientJson = createOAuth2ClientJson(
                 "OAuth2DesktopClient", OAuth2ClientType.PUBLIC,
                 "This is a desktop test client.");
@@ -429,7 +428,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
     @Test
     public void testRegisterMultipleDesktopApps ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
 
         // First client
@@ -502,8 +501,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     }
 
     private void testDeregisterPublicClientMissingUserAuthentication (
-            String clientId) throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+            String clientId) throws
+            ProcessingException, KustvaktException {
 
         Response response = target().path(API_VERSION).path("oauth2")
                 .path("client").path("deregister").path(clientId)
@@ -519,7 +518,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     }
 
     private void testDeregisterPublicClientMissingId ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
 
         Response response = target().path(API_VERSION).path("oauth2")
@@ -534,7 +533,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     }
 
     private void testDeregisterPublicClient (String clientId, String username)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
 
         Response response = target().path(API_VERSION).path("oauth2")
@@ -548,7 +547,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     }
 
     private void testResetPublicClientSecret (String clientId)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = new Form();
         form.param("client_id", clientId);
@@ -571,8 +570,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     }
 
     private String testResetConfidentialClientSecret (String clientId,
-            String clientSecret) throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+            String clientSecret) throws
+            ProcessingException, KustvaktException {
         Form form = new Form();
         form.param("client_id", clientId);
         form.param("client_secret", clientSecret);
@@ -648,7 +647,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
     }
     
     private void testListConfidentialClient (String username, String clientId)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         JsonNode node = listUserRegisteredClients(username);
         assertEquals(1, node.size());

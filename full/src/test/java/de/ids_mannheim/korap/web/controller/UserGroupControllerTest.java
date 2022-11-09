@@ -11,8 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.client.Entity;
@@ -42,7 +41,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     private String admin = "admin";
 
     private JsonNode retrieveUserGroups (String username)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("group")
                 .request()
@@ -144,8 +143,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
     
     @Test
-    public void testCreateGroupEmptyDescription () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testCreateGroupEmptyDescription () throws
+            ProcessingException, KustvaktException {
         String groupName = "empty_group";
         Response response = testCreateUserGroup(groupName,"");
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
@@ -155,8 +154,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
     
     @Test
-    public void testCreateGroupMissingDescription () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testCreateGroupMissingDescription () throws
+            ProcessingException, KustvaktException {
         String groupName = "missing-desc-group";
 
         Response response = testCreateGroupWithoutDescription(groupName);
@@ -165,7 +164,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
     
     private Response testCreateUserGroup (String groupName, String description)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = new Form();
         form.param("description", description);
@@ -182,7 +181,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
     
     private Response testCreateGroupWithoutDescription (String groupName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("group")
                 .path("@"+groupName)
@@ -196,8 +195,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
     
     @Test
-    public void testCreateGroupInvalidName () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testCreateGroupInvalidName () throws
+            ProcessingException, KustvaktException {
         String groupName = "invalid-group-name$"; 
 
         Response response = testCreateGroupWithoutDescription(groupName);
@@ -211,8 +210,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
     
     @Test
-    public void testCreateGroupNameTooShort () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testCreateGroupNameTooShort () throws
+            ProcessingException, KustvaktException {
         String groupName = "a"; 
 
         Response response = testCreateGroupWithoutDescription(groupName);
@@ -226,8 +225,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
     
     @Test
-    public void testUserGroup () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testUserGroup () throws
+            ProcessingException, KustvaktException {
 
         String groupName = "new-user-group";
         String description= "This is new-user-group.";
@@ -268,7 +267,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     private void testUpdateUserGroup (String groupName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         String description = "Description is updated.";
         Response response = testCreateUserGroup(groupName, description);
@@ -280,7 +279,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     private void testDeleteMember (String groupName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         // delete darla from group
         Response response = target().path(API_VERSION).path("group")
@@ -305,7 +304,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     private void testDeleteMemberUnauthorized (String groupName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         // nemo is a group member
         Response response = target().path(API_VERSION).path("group")
@@ -327,8 +326,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     // EM: same as cancel invitation
-    private void testDeletePendingMember () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    private void testDeletePendingMember () throws
+            ProcessingException, KustvaktException {
         // dory delete pearl
         Response response = target().path(API_VERSION).path("group")
                 .path("@dory-group").path("~pearl")
@@ -346,8 +345,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testDeleteDeletedMember () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testDeleteDeletedMember () throws
+            ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("group")
                 .path("@dory-group").path("~pearl")
                 .request()
@@ -368,7 +367,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     private void testDeleteGroup (String groupName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         // delete group
         Response response = target().path(API_VERSION).path("group")
@@ -407,8 +406,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testDeleteGroupUnauthorized () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testDeleteGroupUnauthorized () throws
+            ProcessingException, KustvaktException {
         // dory is a group admin in marlin-group
         Response response = target().path(API_VERSION).path("group")
                 .path("@marlin-group")
@@ -429,8 +428,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testDeleteDeletedGroup () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testDeleteDeletedGroup () throws
+            ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("group")
                 .path("@deleted-group")
                 .request()
@@ -450,8 +449,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testDeleteGroupOwner () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testDeleteGroupOwner () throws
+            ProcessingException, KustvaktException {
         // delete marlin from marlin-group
         // dory is a group admin in marlin-group
         Response response = target().path(API_VERSION).path("group")
@@ -472,7 +471,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     private void testInviteMember (String groupName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = new Form();
         form.param("members", "darla");
@@ -507,8 +506,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         assertEquals(0, node.at("/members/1/roles").size());
     }
 
-    private void testInviteDeletedMember () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    private void testInviteDeletedMember () throws
+            ProcessingException, KustvaktException {
         Form form = new Form();
         form.param("members", "marlin");
         
@@ -532,8 +531,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testInviteDeletedMember2 () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testInviteDeletedMember2 () throws
+            ProcessingException, KustvaktException {
         // pearl has status deleted in dory-group
         Form form = new Form();
         form.param("members", "pearl");
@@ -559,8 +558,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testInvitePendingMember () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testInvitePendingMember () throws
+            ProcessingException, KustvaktException {
         // marlin has status PENDING in dory-group
         Form form = new Form();
         form.param("members", "marlin");
@@ -587,8 +586,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testInviteActiveMember () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testInviteActiveMember () throws
+            ProcessingException, KustvaktException {
         // nemo has status active in dory-group
         Form form = new Form();
         form.param("members", "nemo");
@@ -617,7 +616,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
     @Test
     public void testInviteMemberToDeletedGroup ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = new Form();
         form.param("members", "nemo");
@@ -753,7 +752,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     private void testSubscribeToDeletedGroup (String groupName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("group")
                 .path("@"+groupName).path("subscribe")
@@ -773,7 +772,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     private void testUnsubscribeActiveMember (String groupName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("group")
                 .path("@"+groupName).path("unsubscribe")
@@ -815,7 +814,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
     @Test
     public void testUnsubscribeDeletedMember ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         // pearl unsubscribes from dory-group
         Response response = target().path(API_VERSION).path("group")
@@ -839,7 +838,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
     @Test
     public void testUnsubscribePendingMember ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
 
         JsonNode node = retrieveUserGroups("marlin");
@@ -919,7 +918,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     private void testUnsubscribeToDeletedGroup (String groupName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
 
         Response response = target().path(API_VERSION).path("group")
@@ -940,8 +939,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testAddSameMemberRole () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testAddSameMemberRole () throws
+            ProcessingException, KustvaktException {
         Form form = new Form();
         form.param("memberUsername", "dory");
         form.param("roleId", "1");
@@ -961,8 +960,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testDeleteAddMemberRole () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testDeleteAddMemberRole () throws
+            ProcessingException, KustvaktException {
         Form form = new Form();
         form.param("memberUsername", "dory");
         form.param("roleId", "1");
@@ -984,8 +983,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testEditMemberRoleEmpty () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testEditMemberRoleEmpty () throws
+            ProcessingException, KustvaktException {
         Form form = new Form();
         form.param("memberUsername", "dory");
         
@@ -1006,7 +1005,7 @@ public class UserGroupControllerTest extends SpringJerseyTest {
     }
 
     private void testEditMemberRole ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = new Form();
         form.param("memberUsername", "dory");

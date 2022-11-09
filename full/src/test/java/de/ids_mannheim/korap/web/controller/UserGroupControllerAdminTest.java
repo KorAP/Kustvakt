@@ -8,8 +8,7 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.client.Entity;
@@ -32,7 +31,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     private String testUser = "UserGroupControllerAdminTest";
 
     private JsonNode listGroup (String username)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("group")
                 .request()
@@ -85,8 +84,8 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
 
     // same as list user-groups of the admin
     @Test
-    public void testListWithoutUsername () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testListWithoutUsername () throws
+            ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("group")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -100,8 +99,8 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testListByStatusAll () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testListByStatusAll () throws
+            ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("group")
                 .path("list").path("system-admin")
                 .request()
@@ -124,8 +123,8 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testListByStatusHidden () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testListByStatusHidden () throws
+            ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("group")
                 .path("list").path("system-admin")
                 .queryParam("status", "HIDDEN")
@@ -143,8 +142,8 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testUserGroup () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testUserGroup () throws
+            ProcessingException, KustvaktException {
 
         String groupName = "admin-test-group";
 
@@ -173,7 +172,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     }
 
     private void testMemberRole (String memberUsername, String groupName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
 
         // accept invitation
@@ -194,7 +193,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     }
 
     private void testAddMemberRoles (String groupName, String memberUsername)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = new Form();
         form.param("memberUsername", memberUsername);
@@ -227,7 +226,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     }
 
     private void testDeleteMemberRoles (String groupName, String memberUsername)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = new Form();
         form.param("memberUsername", memberUsername);
@@ -257,7 +256,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     }
 
     private JsonNode retrieveGroup (String groupName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("group")
                 .path("@" + groupName)
@@ -275,7 +274,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     }
 
     private void testDeleteGroup (String groupName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         // delete group
         Response response = target().path(API_VERSION).path("group")
@@ -294,7 +293,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     }
 
     private void testDeleteMember (String groupName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         // delete marlin from group
         Response response = target().path(API_VERSION).path("group")
@@ -317,7 +316,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     }
 
     private void testInviteMember (String groupName)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = new Form();
         form.param("members", "marlin,nemo,darla");

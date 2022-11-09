@@ -21,8 +21,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -250,8 +249,8 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     }
 
     protected Response registerClient (String username,
-            OAuth2ClientJson json) throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+            OAuth2ClientJson json) throws
+            ProcessingException, KustvaktException {
         return target().path(API_VERSION).path("oauth2").path("client")
                 .path("register")
                 .request()
@@ -278,7 +277,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     }
 
     protected void testConfidentialClientInfo (String clientId, String username)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         JsonNode clientInfo = retrieveClientInfo(clientId, username);
         assertEquals(clientId, clientInfo.at("/client_id").asText());
@@ -300,8 +299,8 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     }
 
     protected void deregisterClient (String username,
-            String clientId) throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+            String clientId) throws
+            ProcessingException, KustvaktException {
 
         Response response = target().path(API_VERSION).path("oauth2")
                 .path("client").path("deregister").path(clientId)
@@ -314,7 +313,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     }
 
     protected JsonNode retrieveClientInfo (String clientId, String username)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("oauth2")
                 .path("client").path(clientId)
@@ -405,7 +404,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     }
 
     protected JsonNode listUserRegisteredClients (String username)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = getSuperClientForm();
         Response response = target().path(API_VERSION).path("oauth2")

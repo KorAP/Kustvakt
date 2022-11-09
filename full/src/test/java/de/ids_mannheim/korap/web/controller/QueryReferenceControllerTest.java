@@ -7,8 +7,7 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.client.Entity;
@@ -54,7 +53,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
     
     private void testUpdateQuery (String qName, String qCreator,
             String username, ResourceType type)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         String json = "{\"query\": \"Sonne\""
                 + ",\"queryLanguage\": \"poliqarp\"}";
@@ -360,15 +359,15 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testListAvailableQueryForDory () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testListAvailableQueryForDory () throws
+            ProcessingException, KustvaktException {
         JsonNode node = testListAvailableQuery("dory");
         assertEquals(2, node.size());
     }
 
     @Test
     public void testListAvailableQueryForPearl ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         
         JsonNode node = testListAvailableQuery("pearl");
@@ -384,7 +383,7 @@ public class QueryReferenceControllerTest extends SpringJerseyTest {
     }
 
     private JsonNode testListAvailableQuery (String username)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
 
         Response response = target().path(API_VERSION).path("query")

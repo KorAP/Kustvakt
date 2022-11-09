@@ -16,8 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.client.Entity;
@@ -41,8 +40,8 @@ public class OAuth2PluginTest extends OAuth2TestBase {
     private InstalledPluginDao pluginDao;
 
     @Test
-    public void testRegisterPlugin () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testRegisterPlugin () throws
+            ProcessingException, KustvaktException {
         JsonNode source = JsonUtils.readTree("{ \"plugin\" : \"source\"}");
 
         int refreshTokenExpiry = TimeUtils.convertTimeToSeconds("90D");
@@ -101,8 +100,8 @@ public class OAuth2PluginTest extends OAuth2TestBase {
     }
 
     private void testRetrievePluginInfo (String clientId,
-            int refreshTokenExpiry) throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+            int refreshTokenExpiry) throws
+            ProcessingException, KustvaktException {
         JsonNode clientInfo = retrieveClientInfo(clientId, username);
         assertEquals(clientId, clientInfo.at("/client_id").asText());
         assertEquals("Plugin", clientInfo.at("/client_name").asText());
@@ -120,7 +119,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
     private void testListUserRegisteredPlugins (String username,
             String clientId, String clientName, int refreshTokenExpiry)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
 
         JsonNode node = listUserRegisteredClients(username);
@@ -138,7 +137,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
     @Test
     public void testListPluginsUnauthorizedPublic ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = new Form();
         form.param("super_client_id", publicClientId);
@@ -147,7 +146,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
     @Test
     public void testListPluginsUnauthorizedConfidential ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = new Form();
         form.param("super_client_id", confidentialClientId2);
@@ -157,7 +156,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
     @Test
     public void testListPluginsMissingClientSecret ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = new Form();
         form.param("super_client_id", confidentialClientId);
@@ -181,7 +180,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
     private void testListPluginsClientUnauthorized (
             Form form)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("plugins")
                 .request()
@@ -203,7 +202,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
     @Test
     public void testListPluginsUserUnauthorized ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
 
         Form form = getSuperClientForm();
@@ -223,8 +222,8 @@ public class OAuth2PluginTest extends OAuth2TestBase {
     }
 
     @Test
-    public void testListAllPlugins () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testListAllPlugins () throws
+            ProcessingException, KustvaktException {
         JsonNode node = listPlugins(false);
         assertEquals(2, node.size());
         assertFalse(node.at("/0/client_id").isMissingNode());
@@ -240,7 +239,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
     }
 
     private JsonNode listPlugins (boolean permitted_only)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
 
         Form form = getSuperClientForm();
@@ -262,8 +261,8 @@ public class OAuth2PluginTest extends OAuth2TestBase {
     }
 
     private void testInstallConfidentialPlugin (String superClientId,
-            String clientId, String username) throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+            String clientId, String username) throws
+            ProcessingException, KustvaktException {
         Form form = getSuperClientForm();
         form.param("client_id", clientId);
         Response response = installPlugin(form);
@@ -284,8 +283,8 @@ public class OAuth2PluginTest extends OAuth2TestBase {
     }
 
     @Test
-    public void testInstallPublicPlugin () throws UniformInterfaceException,
-            ClientHandlerException, KustvaktException {
+    public void testInstallPublicPlugin () throws
+            ProcessingException, KustvaktException {
         Form form = getSuperClientForm();
         form.param("client_id", publicClientId2);
         Response response = installPlugin(form);
@@ -314,7 +313,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
     private void testInstallPluginRedundant (
             Form form)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = installPlugin(form);
         String entity = response.readEntity(String.class);
@@ -325,7 +324,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
     }
 
     private void testInstallPluginNotPermitted (String clientId)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = getSuperClientForm();
         form.param("client_id", clientId);
@@ -339,7 +338,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
     @Test
     public void testInstallPluginMissingClientId ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = getSuperClientForm();
         Response response = installPlugin(form);
@@ -352,7 +351,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
     @Test
     public void testInstallPluginInvalidClientId ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = getSuperClientForm();
         form.param("client_id", "unknown");
@@ -367,7 +366,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
     @Test
     public void testInstallPluginMissingSuperClientSecret ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = new Form();
         form.param("super_client_id", superClientId);
@@ -385,7 +384,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
     @Test
     public void testInstallPluginMissingSuperClientId ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = new Form();
         Response response = installPlugin(form);
@@ -401,7 +400,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
     @Test
     public void testInstallPluginUnauthorizedClient ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Form form = new Form();
         form.param("super_client_id", confidentialClientId);
@@ -416,7 +415,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
     }
 
     private Response installPlugin (Form form)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         return target().path(API_VERSION).path("plugins").path("install")
                 .request()
@@ -428,7 +427,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
     }
 
     private Response uninstallPlugin (String clientId, String username)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
 
         Form form = getSuperClientForm();
@@ -457,7 +456,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
     @Test
     public void testListUserInstalledPlugins ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException, IOException {
 
         testInstallConfidentialPlugin(superClientId, confidentialClientId,
@@ -505,7 +504,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
     }
 
     private void testUninstallNotInstalledPlugin ()
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response =
                 uninstallPlugin(confidentialClientId2, username);
@@ -518,7 +517,7 @@ public class OAuth2PluginTest extends OAuth2TestBase {
 
     private JsonNode retrieveUserInstalledPlugin (
             Form form)
-            throws UniformInterfaceException, ClientHandlerException,
+            throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("plugins")
                 .path("installed")
