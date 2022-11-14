@@ -10,7 +10,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -34,12 +35,14 @@ public class AuthenticationControllerTest extends FastJerseyTest {
     public void testSessionToken() throws KustvaktException {
         String auth = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue( 
                 credentials[0], credentials[1]);
-        ClientResponse response = resource().path("auth")
-                .path("sessionToken").header(Attributes.AUTHORIZATION, auth)
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        Response response = target().path("auth")
+                .path("sessionToken")
+                .request()
+                .header(Attributes.AUTHORIZATION, auth)
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String en = response.getEntity(String.class);
+        String en = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(en);
         assertNotNull(node);
 
@@ -51,19 +54,23 @@ public class AuthenticationControllerTest extends FastJerseyTest {
         assertNotEquals("", token_type);
         assertFalse(TimeUtils.isExpired(ex.getMillis()));
 
-        response = resource().path("user")
-                .path("info").header(Attributes.AUTHORIZATION, token_type + " "+ token)
-                .get(ClientResponse.class);
-        en = response.getEntity(String.class);
+        response = target().path("user")
+                .path("info")
+                .request()
+                .header(Attributes.AUTHORIZATION, token_type + " "+ token)
+                .get();
+        en = response.readEntity(String.class);
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
         
-        response = resource().path("auth")
-                .path("logout").header(Attributes.AUTHORIZATION, token_type + " "+ token)
-                .get(ClientResponse.class);
+        response = target().path("auth")
+                .path("logout")
+                .request()
+                .header(Attributes.AUTHORIZATION, token_type + " "+ token)
+                .get();
         
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
     }
 
@@ -71,12 +78,14 @@ public class AuthenticationControllerTest extends FastJerseyTest {
     public void testSessionTokenExpire() throws KustvaktException {
         String auth = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
                 credentials[0], credentials[1]);
-        ClientResponse response = resource().path("auth")
-                .path("sessionToken").header(Attributes.AUTHORIZATION, auth)
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        Response response = target().path("auth")
+                .path("sessionToken")
+                .request()
+                .header(Attributes.AUTHORIZATION, auth)
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String en = response.getEntity(String.class);
+        String en = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(en);
         assertNotNull(node);
 
@@ -91,15 +100,17 @@ public class AuthenticationControllerTest extends FastJerseyTest {
             if (TimeUtils.isExpired(ex.getMillis()))
                 break;
         }
-        response = resource().path("user")
-                .path("info").header(Attributes.AUTHORIZATION, token_type + " "+ token)
-                .get(ClientResponse.class);
-        en = response.getEntity(String.class);
+        response = target().path("user")
+                .path("info")
+                .request()
+                .header(Attributes.AUTHORIZATION, token_type + " "+ token)
+                .get();
+        en = response.readEntity(String.class);
         node = JsonUtils.readTree(en);
         assertNotNull(node);
 
         assertEquals(StatusCodes.BAD_CREDENTIALS, node.at("/errors/0/0").asInt());
-        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(),
                 response.getStatus());
     }
 

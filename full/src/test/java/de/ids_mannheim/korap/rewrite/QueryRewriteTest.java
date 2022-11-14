@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -23,12 +23,14 @@ public class QueryRewriteTest extends SpringJerseyTest {
     public void testRewriteRefNotFound ()
             throws KustvaktException, Exception {
 
-        ClientResponse response = resource().path(API_VERSION).path("search")
-            .queryParam("q", "[orth=der]{%23examplequery} Baum")
+        Response response = target().path(API_VERSION).path("search")
+            .queryParam("q", "{q}")
             .queryParam("ql", "poliqarp")
-            .get(ClientResponse.class);
+            .resolveTemplate("q", "[orth=der]{#examplequery} Baum")
+            .request()
+            .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals("Query system/examplequery is not found.",
                 node.at("/errors/0/1").asText());
@@ -38,12 +40,14 @@ public class QueryRewriteTest extends SpringJerseyTest {
     public void testRewriteSystemQuery ()
             throws KustvaktException, Exception {
 
-        ClientResponse response = resource().path(API_VERSION).path("search")
-            .queryParam("q", "[orth=der]{%23system-q} Baum")
+        Response response = target().path(API_VERSION).path("search")
+            .queryParam("q", "{q}")
             .queryParam("ql", "poliqarp")
-            .get(ClientResponse.class);
+            .resolveTemplate("q", "[orth=der]{#system-q} Baum")
+            .request()
+            .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
 //        System.out.println(ent);
         JsonNode node = JsonUtils.readTree(ent);
     }
@@ -53,14 +57,16 @@ public class QueryRewriteTest extends SpringJerseyTest {
             throws KustvaktException, Exception {
 
         // Added in the database migration sql for tests
-        ClientResponse response = resource().path(API_VERSION).path("search")
-            .queryParam("q", "[orth=der]{%23dory/dory-q} Baum")
+        Response response = target().path(API_VERSION).path("search")
+            .queryParam("q", "{q}")
             .queryParam("ql", "poliqarp")
+            .resolveTemplate("q", "[orth=der]{#dory/dory-q} Baum")
+            .request()
             .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                     .createBasicAuthorizationHeaderValue("dory", "pass"))
-            .get(ClientResponse.class);
+            .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals("koral:token", node.at("/query/operands/1/@type").asText());
         assertEquals("@type(koral:queryRef)",

@@ -2,17 +2,15 @@ package de.ids_mannheim.korap.web.filter;
 
 import java.util.List;
 
+import javax.annotation.Priority;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.ext.Provider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.sun.jersey.api.NotFoundException;
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ResourceFilter;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 
@@ -23,36 +21,24 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
  *
  */
 @Component
-@Provider
+@Priority(Integer.MIN_VALUE)
 public class APIVersionFilter
-        implements ContainerRequestFilter, ResourceFilter {
+        implements ContainerRequestFilter {
 
     @Autowired
     private KustvaktConfiguration config;
 
-    @Override
-    public ContainerRequestFilter getRequestFilter () {
-        return this;
-    }
-
-    @Override
-    public ContainerResponseFilter getResponseFilter () {
-        return null;
-    }
-
-    @Override
-    public ContainerRequest filter (ContainerRequest request) {
-        List<PathSegment> pathSegments = request.getPathSegments();
+    public void filter (ContainerRequestContext request) {
+        List<PathSegment> pathSegments = request.getUriInfo().getPathSegments();
         String version = pathSegments.get(0).getPath();
 
         if (!config.getSupportedVersions().contains(version)) {
-            throw new NotFoundException(request.getRequestUri());
+            throw new NotFoundException();
             // throw kustvaktResponseHandler.throwit(
             // new
             // KustvaktException(StatusCodes.UNSUPPORTED_API_VERSION,
             // "API " + version + " is unsupported.", version));
         }
-        return request;
     }
 
 }

@@ -5,13 +5,15 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -28,19 +30,20 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     public void testGetStatisticsNoResource ()
             throws IOException, KustvaktException {
         String corpusQuery = "corpusSigle=WPD15";
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", corpusQuery)
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
+        assert Status.OK.getStatusCode() == response.getStatus();
 
         assertEquals(
             "Wes8Bd4h1OypPqbWF5njeQ==",
             response.getHeaders().getFirst("X-Index-Revision")
             );
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(node.get("documents").asInt(),0);
         assertEquals(node.get("tokens").asInt(),0);
@@ -48,13 +51,14 @@ public class StatisticsControllerTest extends SpringJerseyTest {
 
     @Test
     public void testStatisticsWithCq () throws KustvaktException{
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics")
                 .queryParam("cq", "textType=Abhandlung & corpusSigle=GOE")
-                .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .request()
+                .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String query = response.getEntity(String.class);
+        String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertEquals(2, node.at("/documents").asInt());
         assertEquals(138180, node.at("/tokens").asInt());
@@ -66,14 +70,15 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     
     @Test
     public void testStatisticsWithCqAndCorpusQuery () throws KustvaktException{
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics")
                 .queryParam("cq", "textType=Abhandlung & corpusSigle=GOE")
                 .queryParam("corpusQuery", "textType=Autobiographie & corpusSigle=GOE")
-                .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .request()
+                .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String query = response.getEntity(String.class);
+        String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertEquals(2, node.at("/documents").asInt());
         assertEquals(138180, node.at("/tokens").asInt());
@@ -87,14 +92,15 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     public void testGetStatisticsWithcorpusQuery1 ()
             throws IOException, KustvaktException {
         String corpusQuery = "corpusSigle=GOE";
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", corpusQuery)
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
+        assert Status.OK.getStatusCode() == response.getStatus();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(node.get("documents").asInt(),11);
         assertEquals(node.get("tokens").asInt(),665842);
@@ -109,13 +115,14 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     @Test
     public void testGetStatisticsWithcorpusQuery2 ()
             throws IOException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", "creationDate since 1810")
-                .get(ClientResponse.class);
-        String ent = response.getEntity(String.class);
+                .request()
+                .get();
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assert ClientResponse.Status.OK.getStatusCode() == response.getStatus();
+        assert Status.OK.getStatusCode() == response.getStatus();
         assertEquals(node.get("documents").asInt(),7);
         assertEquals(node.get("tokens").asInt(),279402);
         assertEquals(node.get("sentences").asInt(), 11047);
@@ -126,14 +133,15 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     @Test
     public void testGetStatisticsWithWrongcorpusQuery ()
             throws IOException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", "creationDate geq 1810")
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        assert ClientResponse.Status.BAD_REQUEST.getStatusCode() == response
+        assert Status.BAD_REQUEST.getStatusCode() == response
                 .getStatus();
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(node.at("/errors/0/0").asInt(), 302);
         assertEquals(node.at("/errors/0/1").asText(),
@@ -146,13 +154,14 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     @Test
     public void testGetStatisticsWithWrongcorpusQuery2 ()
             throws IOException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", "creationDate >= 1810")
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        String ent = response.getEntity(String.class);
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        String ent = response.readEntity(String.class);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
         
         JsonNode node = JsonUtils.readTree(ent);
@@ -166,13 +175,14 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     @Test
     public void testGetStatisticsWithoutcorpusQuery ()
             throws IOException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics")
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
 					 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
 
 		JsonNode node = JsonUtils.readTree(ent);
 		assertEquals(11, node.at("/documents").asInt());
@@ -184,22 +194,23 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     @Test
     public void testGetStatisticsWithKoralQuery ()
             throws IOException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .post(ClientResponse.class,"{ \"collection\" : {\"@type\": "
+                .post(Entity.json("{ \"collection\" : {\"@type\": "
                         + "\"koral:doc\", \"key\": \"availability\", \"match\": "
                         + "\"match:eq\", \"type\": \"type:regex\", \"value\": "
-                        + "\"CC-BY.*\"} }");
+                        + "\"CC-BY.*\"} }"));
 
         assertEquals(
             "Wes8Bd4h1OypPqbWF5njeQ==",
             response.getHeaders().getFirst("X-Index-Revision")
             );
         
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                      response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(2, node.at("/documents").asInt());
@@ -211,14 +222,15 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     @Test
     public void testGetStatisticsWithEmptyCollection ()
             throws IOException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .post(ClientResponse.class,"{}");
+                .post(Entity.json("{}"));
 
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                      response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(node.at("/errors/0/0").asInt(),
                 de.ids_mannheim.korap.util.StatusCodes.MISSING_COLLECTION);
@@ -229,14 +241,15 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     @Test
     public void testGetStatisticsWithIncorrectJson ()
             throws IOException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .post(ClientResponse.class,"{ \"collection\" : }");
+                .post(Entity.json("{ \"collection\" : }"));
 
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                      response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(StatusCodes.DESERIALIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
@@ -247,11 +260,13 @@ public class StatisticsControllerTest extends SpringJerseyTest {
     @Test
     public void testGetStatisticsWithoutKoralQuery ()
             throws IOException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
-                .path("statistics").post(ClientResponse.class);
+        Response response = target().path(API_VERSION)
+                .path("statistics")
+                .request()
+                .post(Entity.json(""));
         
-        String ent = response.getEntity(String.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        String ent = response.readEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
         
         JsonNode node = JsonUtils.readTree(ent);

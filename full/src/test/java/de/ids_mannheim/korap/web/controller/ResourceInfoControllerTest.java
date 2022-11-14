@@ -5,11 +5,13 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -27,11 +29,13 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
     @Test
     public void testGetPublicVirtualCollectionInfo () throws KustvaktException {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("collection").get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        Response response = target().path(getAPIVersion())
+                .path("collection")
+                .request()
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node);
         assertEquals(1, node.size());
@@ -41,17 +45,18 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
     @Test
     public void testGetVirtualCollectionInfoWithAuthentication ()
             throws KustvaktException {
-        ClientResponse response = resource().path(getAPIVersion())
+        Response response = target().path(getAPIVersion())
                 .path("collection")
+                .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
                                 .createBasicAuthorizationHeaderValue("kustvakt",
                                         "kustvakt2015"))
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertNotNull(node);
         assertTrue(node.isArray());
         assertEquals(3, node.size());
@@ -60,11 +65,13 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
     @Test
     public void testGetVirtualCollectionInfoById () throws KustvaktException {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("collection").path("GOE-VC").get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        Response response = target().path(getAPIVersion())
+                .path("collection").path("GOE-VC")
+                .request()
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.size());
@@ -76,11 +83,13 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
     @Test
     public void testGetVirtualCollectionInfoByIdUnauthorized ()
             throws KustvaktException {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("collection").path("WPD15-VC").get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        Response response = target().path(getAPIVersion())
+                .path("collection").path("WPD15-VC")
+                .request()
+                .get();
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.size());
@@ -92,11 +101,13 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
     @Test
     public void testGetPublicCorporaInfo () throws KustvaktException {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        Response response = target().path(getAPIVersion())
+                .path("corpus")
+                .request()
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertTrue(node.isArray());
@@ -106,12 +117,14 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
     @Test
     public void testGetCorpusInfoById () throws KustvaktException {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").path("WPD13").get(ClientResponse.class);
+        Response response = target().path(getAPIVersion())
+                .path("corpus").path("WPD13")
+                .request()
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         // System.out.println(ent);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
@@ -122,11 +135,13 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
     @Test
     public void testGetCorpusInfoById2 () throws KustvaktException {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").path("GOE").get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        Response response = target().path(getAPIVersion())
+                .path("corpus").path("GOE")
+                .request()
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertTrue(node.isObject());
@@ -136,11 +151,13 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
     @Test
     public void testGetPublicFoundriesInfo () throws KustvaktException {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("foundry").get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        Response response = target().path(getAPIVersion())
+                .path("foundry")
+                .request()
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertTrue(node.isArray());
@@ -150,10 +167,12 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
     @Test
     public void testGetFoundryInfoById () throws KustvaktException {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("foundry").path("tt").get(ClientResponse.class);
-        String ent = response.getEntity(String.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        Response response = target().path(getAPIVersion())
+                .path("foundry").path("tt")
+                .request()
+                .get();
+        String ent = response.readEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
         JsonNode node = JsonUtils.readTree(ent);
@@ -164,11 +183,13 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
     @Test
     public void testGetUnexistingCorpusInfo () throws KustvaktException {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").path("ZUW19").get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        Response response = target().path(getAPIVersion())
+                .path("corpus").path("ZUW19")
+                .request()
+                .get();
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.size());
@@ -184,11 +205,13 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
     // exception instead?
     @Test
     public void testGetUnauthorizedCorpusInfo () throws KustvaktException {
-        ClientResponse response = resource().path(getAPIVersion())
-                .path("corpus").path("BRZ10").get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        Response response = target().path(getAPIVersion())
+                .path("corpus").path("BRZ10")
+                .request()
+                .get();
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.size());

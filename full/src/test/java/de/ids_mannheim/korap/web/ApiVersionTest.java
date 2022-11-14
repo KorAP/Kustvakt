@@ -9,7 +9,7 @@ import javax.ws.rs.core.MediaType;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -22,9 +22,10 @@ public class ApiVersionTest extends SpringJerseyTest {
 
     @Test
     public void testSearchWithoutVersion () throws KustvaktException {
-        ClientResponse response = resource().path("api").path("search")
+        Response response = target().path("api").path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+                .request()
+                .accept(MediaType.APPLICATION_JSON).get();
         assertEquals(HttpStatus.PERMANENT_REDIRECT_308, response.getStatus());
         URI location = response.getLocation();
         assertEquals("/api/"+API_VERSION+"/search", location.getPath());
@@ -32,10 +33,12 @@ public class ApiVersionTest extends SpringJerseyTest {
 
     @Test
     public void testSearchWrongVersion () throws KustvaktException {
-        ClientResponse response = resource().path("api").path("v0.2")
+        Response response = target().path("api").path("v0.2")
                 .path("search").queryParam("q", "[orth=der]")
-                .queryParam("ql", "poliqarp").accept(MediaType.APPLICATION_JSON)
-                .get(ClientResponse.class);
+                .queryParam("ql", "poliqarp")
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .get();
         assertEquals(HttpStatus.PERMANENT_REDIRECT_308, response.getStatus());
         URI location = response.getLocation();
         assertEquals("/api/"+API_VERSION+"/search", location.getPath());

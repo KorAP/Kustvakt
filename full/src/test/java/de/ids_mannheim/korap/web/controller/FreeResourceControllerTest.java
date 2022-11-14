@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -17,10 +17,12 @@ public class FreeResourceControllerTest extends SpringJerseyTest {
     
     @Test
     public void testResource () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
-                .path("resource").get(ClientResponse.class);
+        Response response = target().path(API_VERSION)
+                .path("resource")
+                .request()
+                .get();
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode n = JsonUtils.readTree(entity).get(0);
         assertEquals("WPD17",n.at("/resourceId").asText());
         assertEquals("Deutsche Wikipedia Artikel 2017", n.at("/titles/de").asText());

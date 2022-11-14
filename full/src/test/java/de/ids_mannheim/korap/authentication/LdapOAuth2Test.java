@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.net.URI;
 import java.security.GeneralSecurityException;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
@@ -19,9 +20,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.client.Entity;
 import com.unboundid.ldap.sdk.LDAPException;
 
 import de.ids_mannheim.korap.config.Attributes;
@@ -79,12 +80,12 @@ public class LdapOAuth2Test extends OAuth2TestBase {
     public void testRequestTokenPasswordUnknownUser ()
             throws KustvaktException {
 
-        ClientResponse response = requestTokenWithPassword(superClientId,
+        Response response = requestTokenWithPassword(superClientId,
                 clientSecret, "unknown", "password");
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(2023, node.at("/errors/0/0").asInt());
@@ -95,9 +96,9 @@ public class LdapOAuth2Test extends OAuth2TestBase {
 
     @Test
     public void testMapUsernameToEmail () throws KustvaktException {
-        ClientResponse response = requestTokenWithPassword(superClientId,
+        Response response = requestTokenWithPassword(superClientId,
                 clientSecret, "testUser", "password");
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         
@@ -118,7 +119,7 @@ public class LdapOAuth2Test extends OAuth2TestBase {
     }
     
     private void testRegisterPublicClient (String accessToken)
-            throws ClientHandlerException, UniformInterfaceException,
+            throws ProcessingException,
             KustvaktException {
         OAuth2ClientJson json = new OAuth2ClientJson();
         json.setName("LDAP test client");
@@ -126,13 +127,14 @@ public class LdapOAuth2Test extends OAuth2TestBase {
         json.setDescription(
                 "Test registering a public client with LDAP authentication");
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+        Response response = target().path(API_VERSION).path("oauth2")
                 .path("client").path("register")
+                .request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .entity(json).post(ClientResponse.class);
+                .post(Entity.json(json));
 
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         String clientId = node.at("/client_id").asText();
@@ -141,7 +143,7 @@ public class LdapOAuth2Test extends OAuth2TestBase {
     }
     
     private JsonNode testRegisterConfidentialClient (String accessToken)
-            throws ClientHandlerException, UniformInterfaceException,
+            throws ProcessingException,
             KustvaktException {
         OAuth2ClientJson json = new OAuth2ClientJson();
         json.setName("LDAP test client");
@@ -150,13 +152,14 @@ public class LdapOAuth2Test extends OAuth2TestBase {
         json.setDescription(
                 "Test registering a confidential client with LDAP authentication");
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+        Response response = target().path(API_VERSION).path("oauth2")
                 .path("client").path("register")
+                .request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .entity(json).post(ClientResponse.class);
+                .post(Entity.json(json));
 
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         String clientId = node.at("/client_id").asText();
@@ -168,13 +171,14 @@ public class LdapOAuth2Test extends OAuth2TestBase {
     private void testRequestTokenWithAuthorization (String clientId,
             String clientSecret, String accessToken) throws KustvaktException {
         String authHeader = "Bearer " + accessToken;
-        ClientResponse response = resource().path(API_VERSION).path("oauth2")
+        Response response = target().path(API_VERSION).path("oauth2")
                 .path("authorize")
                 .queryParam("response_type", "code")
                 .queryParam("client_id", clientId)
                 .queryParam("client_secret", clientSecret)
+                .request()
                 .header(Attributes.AUTHORIZATION, authHeader)
-                .get(ClientResponse.class);
+                .get();
         
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
                 response.getStatus());
@@ -185,7 +189,7 @@ public class LdapOAuth2Test extends OAuth2TestBase {
         String code = params.getFirst("code");
 
         response = requestTokenWithAuthorizationCodeAndForm(clientId, clientSecret, code);
-        JsonNode node = JsonUtils.readTree(response.getEntity(String.class));
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
 
         String at = node.at("/access_token").asText();
         AccessToken accessTokenObj = accessDao.retrieveAccessToken(at);

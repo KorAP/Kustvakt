@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 
@@ -24,7 +25,6 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 //import de.ids_mannheim.de.init.VCLoader;
 import de.ids_mannheim.korap.authentication.AuthenticationManager;
@@ -375,7 +375,7 @@ public class SearchService extends BasicService{
                     "raw not supported!");
         }
 
-        MultivaluedMap<String, String> map = new MultivaluedMapImpl();
+        MultivaluedMap<String, String> map = new MultivaluedHashMap<String, String>();
         map.add("q", query);
         map.add("count", String.valueOf(pageLength));
         map.add("lctxs", String.valueOf(meta.getSpanContext().getLeftSize()));

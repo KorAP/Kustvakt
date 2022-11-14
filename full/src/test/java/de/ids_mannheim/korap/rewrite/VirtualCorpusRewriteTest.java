@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.cache.VirtualCorpusCache;
@@ -42,12 +42,13 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         vcLoader.loadVCToCache("named-vc1", "/vc/named-vc1.jsonld");
         assertTrue(VirtualCorpusCache.contains("named-vc1"));
 
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo named-vc1")
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/collection");
 
@@ -67,12 +68,13 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
     private void testRefCachedVCWithUsername ()
             throws KustvaktException, IOException, QueryException {
 
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"system/named-vc1\"")
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/collection");
         assertEquals("koral:docGroup", node.at("/@type").asText());
@@ -87,12 +89,13 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
     @Test
     public void testRewriteFreeAndSystemVCRef ()
             throws KustvaktException, Exception {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"system-vc\"")
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/collection");
 
@@ -112,15 +115,16 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
 
     @Test
     public void testRewritePubAndSystemVCRef () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"system/system-vc\"")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("user", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/collection");
         assertEquals("koral:docGroup", node.at("/@type").asText());
@@ -137,14 +141,15 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
     public void testRewriteWithDoryVCRef ()
             throws KustvaktException, IOException, QueryException {
 
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "Fisch").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"dory/dory-vc\"")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("dory", "pass"))
-                .get(ClientResponse.class);
+                .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/collection");
         assertEquals("koral:docGroup", node.at("/@type").asText());

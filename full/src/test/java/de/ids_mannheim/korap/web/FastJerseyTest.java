@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.web;
 import java.net.URI;
 import java.util.concurrent.ThreadLocalRandom;
 
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.UriBuilder;
 
 import org.junit.After;
@@ -10,17 +11,16 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.springframework.web.context.ContextLoaderListener;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.core.DefaultResourceConfig;
-import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
-import com.sun.jersey.test.framework.AppDescriptor;
-import com.sun.jersey.test.framework.LowLevelAppDescriptor;
-import com.sun.jersey.test.framework.WebAppDescriptor;
-import com.sun.jersey.test.framework.spi.container.TestContainer;
-import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
-import com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory;
-import com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletContainer;
+import org.glassfish.jersey.test.DeploymentContext;
+import org.glassfish.jersey.test.ServletDeploymentContext;
+import org.glassfish.jersey.test.spi.TestContainer;
+import org.glassfish.jersey.test.spi.TestContainerFactory;
+import org.glassfish.jersey.test.grizzly.GrizzlyTestContainerFactory;
+import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 
 import de.ids_mannheim.korap.config.BeanConfigTest;
 
@@ -33,14 +33,14 @@ public abstract class FastJerseyTest extends BeanConfigTest{
 
     public final static String API_VERSION = "v0.1";
 
-    private static DefaultResourceConfig resourceConfig =
-            new DefaultResourceConfig();
+    private static ResourceConfig resourceConfig =
+            new ResourceConfig();
 
     private static TestContainerFactory testContainerFactory;
 
     protected static TestContainer testContainer;
 
-    protected static Client client;
+    protected static javax.ws.rs.client.Client client;
 
     protected static int PORT = 8089; // FB, was: 9000;
     protected static int PORT_IT = 1;
@@ -58,18 +58,18 @@ public abstract class FastJerseyTest extends BeanConfigTest{
 
     @BeforeClass
     public static void cleanStaticVariables () {
-        resourceConfig = new DefaultResourceConfig();
+        resourceConfig = new ResourceConfig();
     }
 
 
     protected static void initServer (int port, String[] classPackages) {
-        AppDescriptor ad;
+        DeploymentContext dc;
         if (classPackages == null)
-            ad = new LowLevelAppDescriptor.Builder(resourceConfig).build();
+            dc = DeploymentContext.builder(resourceConfig).build();
         else
-            ad = new WebAppDescriptor.Builder(classPackages)
-                    .servletClass(SpringServlet.class)
-                    .contextListenerClass(ContextLoaderListener.class)
+            dc = ServletDeploymentContext
+                    .forServlet(new ServletContainer(resourceConfig.packages(classPackages)))
+                    .addListener(ContextLoaderListener.class)
                     .contextParam("contextConfigLocation", "classpath:test-config.xml")
                     .build();
 
@@ -82,10 +82,10 @@ public abstract class FastJerseyTest extends BeanConfigTest{
         }
 
         testContainer = tcf.create(
-                UriBuilder.fromUri(containerURI).port(port).build(), ad);
-        client = testContainer.getClient();
+                UriBuilder.fromUri(containerURI).port(port).build(), dc);
+        client = testContainer.getClientConfig().getClient();
         if (client == null) {
-            client = Client.create(ad.getClientConfig());
+            client = ClientBuilder.newClient(testContainer.getClientConfig());
         }
     }
 
@@ -108,8 +108,8 @@ public abstract class FastJerseyTest extends BeanConfigTest{
     }
 
 
-    public WebResource resource () {
-        return client.resource(getBaseUri());
+    public WebTarget target () {
+        return client.target(getBaseUri());
     }
     
 //    protected TestHelper helper () {

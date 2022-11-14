@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientResponse.Status;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.cache.VirtualCorpusCache;
@@ -82,13 +82,14 @@ public class VCReferenceTest extends SpringJerseyTest {
     }
     
     private int testSearchWithoutRef_VC1 () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq",
                         "textSigle=\"GOE/AGF/00000\" | textSigle=\"GOE/AGA/01784\"")
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         int size = node.at("/matches").size();
         assertTrue(size > 0);
@@ -96,13 +97,14 @@ public class VCReferenceTest extends SpringJerseyTest {
     }
 
     private int testSearchWithoutRef_VC2 () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq",
                         "textSigle!=\"GOE/AGI/04846\" & textSigle!=\"GOE/AGA/01784\"")
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         int size = node.at("/matches").size();
         assertTrue(size > 0);
@@ -110,34 +112,37 @@ public class VCReferenceTest extends SpringJerseyTest {
     }
 
     private JsonNode testSearchWithRef_VC1 () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"system/named-vc1\"")
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         return JsonUtils.readTree(ent);
     }
 
     private JsonNode testSearchWithRef_VC2 () throws KustvaktException {
         
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo named-vc2")
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         return JsonUtils.readTree(ent);
     }
 
     @Test
     public void testStatisticsWithRef () throws KustvaktException {
         String corpusQuery = "availability = /CC-BY.*/ & referTo named-vc1";
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics").queryParam("corpusQuery", corpusQuery)
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(2, node.at("/documents").asInt());
         
@@ -147,12 +152,13 @@ public class VCReferenceTest extends SpringJerseyTest {
 
     @Test
     public void testRefVcNotExist () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"username/vc1\"")
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(StatusCodes.NO_RESOURCE_FOUND,
                 node.at("/errors/0/0").asInt());
@@ -161,12 +167,13 @@ public class VCReferenceTest extends SpringJerseyTest {
 
     @Test
     public void testRefNotAuthorized() throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"dory/dory-vc\"")
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
@@ -175,12 +182,13 @@ public class VCReferenceTest extends SpringJerseyTest {
     
     @Test
     public void testSearchWithRefPublishedVcGuest () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"marlin/published-vc\"")
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertTrue(node.at("/matches").size() > 0);
         
@@ -200,28 +208,30 @@ public class VCReferenceTest extends SpringJerseyTest {
     
     @Test
     public void testSearchWithRefPublishedVc () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"marlin/published-vc\"")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("squirt", "pass"))
-                .get(ClientResponse.class);
+                .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertTrue(node.at("/matches").size() > 0);
         
         // check dory in the hidden group of the vc
-        response = resource().path(API_VERSION).path("group")
+        response = target().path(API_VERSION).path("group")
                 .path("list").path("system-admin")
                 .queryParam("status", "HIDDEN")
+                .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
+                .get();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         node = JsonUtils.readTree(entity);
         assertEquals(3, node.at("/0/id").asInt());
         

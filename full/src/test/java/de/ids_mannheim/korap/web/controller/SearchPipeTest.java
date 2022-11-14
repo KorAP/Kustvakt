@@ -16,6 +16,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -25,7 +27,7 @@ import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -111,14 +113,16 @@ public class SearchPipeTest extends SpringJerseyTest {
                                 "application/json; charset=utf-8"))
                         .withBody(pipeJson).withStatusCode(200));
 
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("pipes", glemmUri).get(ClientResponse.class);
+                .queryParam("pipes", glemmUri)
+                .request()
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
 
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.at("/query/wrap/key").size());
@@ -157,11 +161,13 @@ public class SearchPipeTest extends SpringJerseyTest {
 
         glemmUri = URLEncoder.encode(glemmUri, "utf-8");
 
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("pipes", glemmUri).get(ClientResponse.class);
+                .queryParam("pipes", glemmUri)
+                .request()
+                .get();
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.at("/query/wrap/key").size());
     }
@@ -181,15 +187,16 @@ public class SearchPipeTest extends SpringJerseyTest {
                         .withBody(pipeWithParamJson).withStatusCode(200));
 
         String glemmUri2 = glemmUri + "?param=blah";
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("pipes", glemmUri + "," + glemmUri2)
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(3, node.at("/query/wrap/key").size());
     }
@@ -198,14 +205,16 @@ public class SearchPipeTest extends SpringJerseyTest {
     public void testSearchWithUnknownURL ()
             throws IOException, KustvaktException {
         String url =
-                resource().getURI().toString() + API_VERSION + "/test/tralala";
-        ClientResponse response = resource().path(API_VERSION).path("search")
+                target().getUri().toString() + API_VERSION + "/test/tralala";
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("pipes", url).get(ClientResponse.class);
+                .queryParam("pipes", url)
+                .request()
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
 
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.PIPE_FAILED, node.at("/warnings/0/0").asInt());
@@ -214,14 +223,16 @@ public class SearchPipeTest extends SpringJerseyTest {
 
     @Test
     public void testSearchWithUnknownHost () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("pipes", "http://glemm").get(ClientResponse.class);
+                .queryParam("pipes", "http://glemm")
+                .request()
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(StatusCodes.PIPE_FAILED, node.at("/warnings/0/0").asInt());
@@ -236,12 +247,14 @@ public class SearchPipeTest extends SpringJerseyTest {
 
         String pipeUri = "http://localhost:"+port+"/non-json-pipe";
 
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("pipes", pipeUri).get(ClientResponse.class);
+                .queryParam("pipes", pipeUri)
+                .request()
+                .get();
 
-        String entity = response.getEntity(String.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        String entity = response.readEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
@@ -253,16 +266,17 @@ public class SearchPipeTest extends SpringJerseyTest {
     @Test
     public void testSearchWithMultiplePipeWarnings () throws KustvaktException {
         String url =
-                resource().getURI().toString() + API_VERSION + "/test/tralala";
-        ClientResponse response = resource().path(API_VERSION).path("search")
+                target().getUri().toString() + API_VERSION + "/test/tralala";
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("pipes", url + "," + "http://glemm")
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(2, node.at("/warnings").size());
@@ -289,12 +303,14 @@ public class SearchPipeTest extends SpringJerseyTest {
                                 "application/json; charset=utf-8")));
 
         String pipeUri = "http://localhost:"+port+"/invalid-response";
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("pipes", pipeUri).get(ClientResponse.class);
+                .queryParam("pipes", pipeUri)
+                .request()
+                .get();
 
-        String entity = response.getEntity(String.class);
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        String entity = response.readEntity(String.class);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
@@ -313,12 +329,14 @@ public class SearchPipeTest extends SpringJerseyTest {
                 .respond(response().withBody("blah").withStatusCode(200));
 
         String pipeUri = "http://localhost:"+port+"/plain-text";
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
-                .queryParam("pipes", pipeUri).get(ClientResponse.class);
+                .queryParam("pipes", pipeUri)
+                .request()
+                .get();
 
-        String entity = response.getEntity(String.class);
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        String entity = response.readEntity(String.class);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                 response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
@@ -341,28 +359,30 @@ public class SearchPipeTest extends SpringJerseyTest {
                                 "application/json; charset=utf-8"))
                         .withBody(pipeJson).withStatusCode(200));
 
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("pipes", "http://unknown" + "," + glemmUri)
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.at("/query/wrap/key").size());
         assertTrue(node.at("/warnings").isMissingNode());
 
-        response = resource().path(API_VERSION).path("search")
+        response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("pipes", glemmUri + ",http://unknown")
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
-        entity = response.getEntity(String.class);
+        entity = response.readEntity(String.class);
         node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.PIPE_FAILED, node.at("/warnings/0/0").asInt());
     }

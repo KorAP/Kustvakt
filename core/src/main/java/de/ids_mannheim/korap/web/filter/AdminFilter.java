@@ -1,21 +1,20 @@
 package de.ids_mannheim.korap.web.filter;
 
+import javax.annotation.Priority;
 import javax.servlet.ServletContext;
+import javax.ws.rs.Priorities;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.ext.Provider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
 
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.security.context.TokenContext;
+import de.ids_mannheim.korap.utils.JerseyUtils;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 
 /**
@@ -24,7 +23,7 @@ import de.ids_mannheim.korap.web.KustvaktResponseHandler;
  * @see {@link AuthenticationFilter}
  */
 @Component
-@Provider
+@Priority(Priorities.AUTHENTICATION)
 public class AdminFilter extends AuthenticationFilter {
 
     private @Context ServletContext servletContext;
@@ -34,45 +33,33 @@ public class AdminFilter extends AuthenticationFilter {
     private KustvaktResponseHandler kustvaktResponseHandler;
 
     @Override
-    public ContainerRequest filter (ContainerRequest request) {
-        ContainerRequest superRequest = super.filter(request);
+    public void filter (ContainerRequestContext context) {
+        super.filter(context);
         String username = "guest";
         
         // legacy support for kustvakt core
-        String adminToken = superRequest.getFormParameters().getFirst("token");
+        String adminToken = JerseyUtils.getFormParameters(context).asMap().getFirst("token");
         if (adminToken != null && !adminToken.isEmpty()) {
             // startswith token=
             // adminToken = adminToken.substring(6);
             if (adminToken
                     .equals(servletContext.getInitParameter("adminToken"))) {
-                return superRequest;
+                return;
             }
         }
 
-        SecurityContext securityContext = superRequest.getSecurityContext();
+        SecurityContext securityContext = context.getSecurityContext();
         TokenContext tokenContext = (TokenContext) securityContext
                 .getUserPrincipal();
         
         if (tokenContext != null) {
             username = tokenContext.getUsername();
             if (adminDao.isAdmin(username)) {
-                return superRequest;
+                return;
             }
         }
         throw kustvaktResponseHandler.throwit(new KustvaktException(
                 StatusCodes.AUTHORIZATION_FAILED,
                 "Unauthorized operation for user: " + username, username));
-    }
-
-
-    @Override
-    public ContainerRequestFilter getRequestFilter () {
-        return this;
-    }
-
-
-    @Override
-    public ContainerResponseFilter getResponseFilter () {
-        return null;
     }
 }

@@ -1,14 +1,13 @@
 package de.ids_mannheim.korap.web.filter;
 
-import javax.ws.rs.ext.Provider;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.glassfish.jersey.server.ContainerRequest;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ResourceFilter;
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 
 import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.authentication.http.AuthorizationData;
@@ -31,9 +30,9 @@ import de.ids_mannheim.korap.web.KustvaktResponseHandler;
  * @last update 12/2017
  */
 @Component
-@Provider
+@Priority(Priorities.AUTHENTICATION)
 public class AuthenticationFilter
-        implements ContainerRequestFilter, ResourceFilter {
+        implements ContainerRequestFilter {
 
     @Autowired
     private HttpAuthorizationHandler authorizationHandler;
@@ -45,12 +44,12 @@ public class AuthenticationFilter
     private KustvaktResponseHandler kustvaktResponseHandler;
 
     @Override
-    public ContainerRequest filter (ContainerRequest request) {
-        String host = request.getHeaderValue(ContainerRequest.HOST);
-        String ua = request.getHeaderValue(ContainerRequest.USER_AGENT);
+    public void filter (ContainerRequestContext request) {
+        String host = request.getHeaderString(ContainerRequest.HOST);
+        String ua = request.getHeaderString(ContainerRequest.USER_AGENT);
 
         String authorization =
-                request.getHeaderValue(ContainerRequest.AUTHORIZATION);
+                request.getHeaderString(ContainerRequest.AUTHORIZATION);
 
         if (authorization != null && !authorization.isEmpty()) {
             TokenContext context = null;
@@ -97,11 +96,10 @@ public class AuthenticationFilter
                 throw kustvaktResponseHandler.throwit(e);
             }
         }
-        return request;
     }
 
 
-    private void checkContext (TokenContext context, ContainerRequest request)
+    private void checkContext (TokenContext context, ContainerRequestContext request)
             throws KustvaktException {
         if (context == null) {
             throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
@@ -112,7 +110,7 @@ public class AuthenticationFilter
                     "Context is not valid: "
                             + "missing username, password or authentication scheme.");
         }
-        else if (context.isSecureRequired() && !request.isSecure()) {
+        else if (context.isSecureRequired() && !request.getSecurityContext().isSecure()) {
             throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
                     "Request is not secure.");
         }
@@ -120,17 +118,5 @@ public class AuthenticationFilter
             throw new KustvaktException(StatusCodes.EXPIRED,
                     "Access token is expired");
         }
-    }
-
-
-    @Override
-    public ContainerRequestFilter getRequestFilter () {
-        return this;
-    }
-
-
-    @Override
-    public ContainerResponseFilter getResponseFilter () {
-        return null;
     }
 }

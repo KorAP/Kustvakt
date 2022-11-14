@@ -1,14 +1,13 @@
 package de.ids_mannheim.korap.web.filter;
 
-import javax.ws.rs.ext.Provider;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ResourceFilter;
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.SecurityContext;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -25,22 +24,23 @@ import de.ids_mannheim.korap.web.KustvaktResponseHandler;
  *       anonymous access should be allowed!
  */
 @Component
-@Provider
+@Priority(Priorities.AUTHORIZATION)
 public class NonDemoBlockingFilter
-        implements ContainerRequestFilter, ResourceFilter {
+        implements ContainerRequestFilter {
 
     @Autowired
     private KustvaktResponseHandler kustvaktResponseHandler;
 
     @Override
-    public ContainerRequest filter (ContainerRequest request) {
+    public void filter (ContainerRequestContext request) {
         TokenContext context;
-        try {
-            context = (TokenContext) request.getUserPrincipal();
+        SecurityContext securityContext = request.getSecurityContext();
+        if (securityContext != null) {
+            context = (TokenContext) securityContext.getUserPrincipal();
         }
-        catch (UnsupportedOperationException e) {
+        else {
             throw kustvaktResponseHandler.throwit(new KustvaktException(
-                    StatusCodes.UNSUPPORTED_OPERATION, e.getMessage(), e));
+                    StatusCodes.UNSUPPORTED_OPERATION));
         }
 
         if (context == null || context.isDemo()) {
@@ -48,18 +48,5 @@ public class NonDemoBlockingFilter
                     new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                             "Operation is not permitted for guest users"));
         }
-        return request;
-    }
-
-
-    @Override
-    public ContainerRequestFilter getRequestFilter () {
-        return this;
-    }
-
-
-    @Override
-    public ContainerResponseFilter getResponseFilter () {
-        return null;
     }
 }

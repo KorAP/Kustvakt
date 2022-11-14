@@ -5,14 +5,15 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.jersey.api.client.ClientResponse;
 
 import de.ids_mannheim.korap.config.LiteJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -23,11 +24,12 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
 
     @Test
     public void testStatisticsWithCq () throws KustvaktException{
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics")
                 .queryParam("cq", "textType=Abhandlung & corpusSigle=GOE")
-                .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .request()
+                .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
 
         assertEquals(
@@ -35,7 +37,7 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
             response.getHeaders().getFirst("X-Index-Revision")
             );
         
-        String query = response.getEntity(String.class);
+        String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertEquals(2, node.at("/documents").asInt());
         assertEquals(138180, node.at("/tokens").asInt());
@@ -47,14 +49,15 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
     
     @Test
     public void testStatisticsWithCqAndCorpusQuery () throws KustvaktException{
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics")
                 .queryParam("cq", "textType=Abhandlung & corpusSigle=GOE")
                 .queryParam("corpusQuery", "textType=Autobiographie & corpusSigle=GOE")
-                .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .request()
+                .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String query = response.getEntity(String.class);
+        String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertEquals(2, node.at("/documents").asInt());
         assertEquals(138180, node.at("/tokens").asInt());
@@ -66,13 +69,14 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
     
     @Test
     public void testStatisticsWithCorpusQuery () throws KustvaktException{
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics")
                 .queryParam("corpusQuery", "textType=Autobiographie & corpusSigle=GOE")
-                .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .request()
+                .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String query = response.getEntity(String.class);
+        String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertEquals(9, node.at("/documents").asInt());
         assertEquals(527662, node.at("/tokens").asInt());
@@ -87,25 +91,27 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
 
     @Test
     public void testEmptyStatistics () throws KustvaktException{
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
             .path("statistics")
             .queryParam("corpusQuery", "")
-            .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+            .request()
+            .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String query = response.getEntity(String.class);
+        String query = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(query);
         assertEquals(11, node.at("/documents").asInt());
         assertEquals(665842, node.at("/tokens").asInt());
         assertEquals(25074, node.at("/sentences").asInt());
         assertEquals(772, node.at("/paragraphs").asInt());
 
-        response = resource().path(API_VERSION)
+        response = target().path(API_VERSION)
                 .path("statistics")
-                .method("GET", ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .request()
+                .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        query = response.getEntity(String.class);
+        query = response.readEntity(String.class);
         node = JsonUtils.readTree(query);
         assertEquals(11, node.at("/documents").asInt());
         assertEquals(665842, node.at("/tokens").asInt());
@@ -116,21 +122,22 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
     @Test
     public void testGetStatisticsWithKoralQuery ()
             throws IOException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .post(ClientResponse.class,"{ \"collection\" : {\"@type\": "
+                .post(Entity.json("{ \"collection\" : {\"@type\": "
                         + "\"koral:doc\", \"key\": \"availability\", \"match\": "
                         + "\"match:eq\", \"type\": \"type:regex\", \"value\": "
-                        + "\"CC-BY.*\"} }");
+                        + "\"CC-BY.*\"} }"));
 
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        assertEquals(Status.OK.getStatusCode(),
                      response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
 
         assertEquals(
             "Wes8Bd4h1OypPqbWF5njeQ==",
-            response.getMetadata().getFirst("X-Index-Revision")
+            response.getHeaders().getFirst("X-Index-Revision")
             );
         
         JsonNode node = JsonUtils.readTree(ent);
@@ -143,14 +150,15 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
     @Test
     public void testGetStatisticsWithEmptyCollection ()
             throws IOException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .post(ClientResponse.class,"{}");
+                .post(Entity.json("{}"));
 
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                      response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(node.at("/errors/0/0").asInt(),
                 de.ids_mannheim.korap.util.StatusCodes.MISSING_COLLECTION);
@@ -161,14 +169,15 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
     @Test
     public void testGetStatisticsWithIncorrectJson ()
             throws IOException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
+        Response response = target().path(API_VERSION)
                 .path("statistics")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
-                .post(ClientResponse.class,"{ \"collection\" : }");
+                .post(Entity.json("{ \"collection\" : }"));
 
-        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(),
+        assertEquals(Status.BAD_REQUEST.getStatusCode(),
                      response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(StatusCodes.DESERIALIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
@@ -179,11 +188,13 @@ public class LiteStatisticControllerTest extends LiteJerseyTest{
     @Test
     public void testGetStatisticsWithoutKoralQuery ()
             throws IOException, KustvaktException {
-        ClientResponse response = resource().path(API_VERSION)
-                .path("statistics").post(ClientResponse.class);
+        Response response = target().path(API_VERSION)
+                .path("statistics")
+                .request()
+                .post(Entity.json(""));
         
-        String ent = response.getEntity(String.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        String ent = response.readEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
         
         JsonNode node = JsonUtils.readTree(ent);

@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.entity.ContentType;
@@ -12,8 +14,7 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
+import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
@@ -34,19 +35,20 @@ public class TokenExpiryTest extends SpringJerseyTest {
     @Test
     public void requestToken ()
             throws KustvaktException, InterruptedException, IOException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("grant_type", "password");
-        form.add("client_id", "fCBbQkAyYzI4NzUxMg");
-        form.add("client_secret", "secret");
-        form.add("username", "dory");
-        form.add("password", "password");
+        Form form = new Form();
+        form.param("grant_type", "password");
+        form.param("client_id", "fCBbQkAyYzI4NzUxMg");
+        form.param("client_secret", "secret");
+        form.param("username", "dory");
+        form.param("password", "password");
 
-        ClientResponse response = resource().path(API_VERSION).path("oauth2").path("token")
+        Response response = target().path(API_VERSION).path("oauth2").path("token")
+                .request()
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
-                .entity(form).post(ClientResponse.class);
+                .post(Entity.form(form));
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         String token = node.at("/access_token").asText();
 
@@ -64,14 +66,15 @@ public class TokenExpiryTest extends SpringJerseyTest {
     // does not work.
     private void testSearchWithExpiredToken (String token)
             throws KustvaktException, IOException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "Wasser").queryParam("ql", "poliqarp")
+                .request()
                 .header(Attributes.AUTHORIZATION, "Bearer " + token)
-                .get(ClientResponse.class);
+                .get();
 
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
 
-        assertEquals(ClientResponse.Status.UNAUTHORIZED.getStatusCode(),
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(),
                 response.getStatus());
 
         JsonNode node = JsonUtils.readTree(ent);
@@ -83,24 +86,25 @@ public class TokenExpiryTest extends SpringJerseyTest {
     // cannot be tested dynamically
     private void testRequestAuthorizationCodeAuthenticationTooOld (String token)
             throws KustvaktException {
-        MultivaluedMap<String, String> form = new MultivaluedMapImpl();
-        form.add("response_type", "code");
-        form.add("client_id", "fCBbQkAyYzI4NzUxMg");
-        form.add("redirect_uri",
+        Form form = new Form();
+        form.param("response_type", "code");
+        form.param("client_id", "fCBbQkAyYzI4NzUxMg");
+        form.param("redirect_uri",
                 "https://korap.ids-mannheim.de/confidential/redirect");
-        form.add("scope", "openid");
-        form.add("max_age", "1");
+        form.param("scope", "openid");
+        form.param("max_age", "1");
 
-        ClientResponse response =
-                resource().path(API_VERSION).path("oauth2").path("openid").path("authorize")
+        Response response =
+                target().path(API_VERSION).path("oauth2").path("openid").path("authorize")
+                        .request()
                         .header(Attributes.AUTHORIZATION, "Bearer " + token)
                         .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                         .header(HttpHeaders.CONTENT_TYPE,
                                 ContentType.APPLICATION_FORM_URLENCODED)
-                        .entity(form).post(ClientResponse.class);
+                        .post(Entity.form(form));
 
         assertEquals(HttpStatus.SC_UNAUTHORIZED, response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.USER_REAUTHENTICATION_REQUIRED,
                 node.at("/errors/0/0").asInt());

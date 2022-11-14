@@ -1,12 +1,12 @@
 package de.ids_mannheim.korap.web.filter;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.ext.Provider;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ResourceFilter;
+import org.glassfish.jersey.server.ContainerRequest;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.constant.TokenType;
@@ -18,22 +18,18 @@ import de.ids_mannheim.korap.security.context.TokenContext;
  * @author hanl
  * @date 08/02/2016
  */
-@Provider
-public class DemoFilter implements ContainerRequestFilter, ResourceFilter {
+@Priority(Priorities.AUTHENTICATION)
+public class DemoFilter implements ContainerRequestFilter {
 
     @Override
-    public ContainerRequest filter (ContainerRequest request) {
+    public void filter (ContainerRequestContext request) {
         String authentication =
-                request.getHeaderValue(ContainerRequest.AUTHORIZATION);
+                request.getHeaderString(ContainerRequest.AUTHORIZATION);
         if (authentication == null || authentication.isEmpty()) {
-            try {
-                request.getUserPrincipal();
-            }
-            catch (UnsupportedOperationException e) {
+            if (request.getSecurityContext() == null) {
                 request.setSecurityContext(createContext());
             }
         }
-        return request;
     }
 
 
@@ -51,17 +47,5 @@ public class DemoFilter implements ContainerRequestFilter, ResourceFilter {
         context.setTokenType(TokenType.BASIC);
         context.setUsername("demo");
         return new KustvaktContext(context);
-    }
-
-
-    @Override
-    public ContainerRequestFilter getRequestFilter () {
-        return this;
-    }
-
-
-    @Override
-    public ContainerResponseFilter getResponseFilter () {
-        return null;
     }
 }

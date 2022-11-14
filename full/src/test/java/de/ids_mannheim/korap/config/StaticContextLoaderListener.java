@@ -1,5 +1,7 @@
 package de.ids_mannheim.korap.config;
 
+import javax.servlet.ServletContextEvent;
+
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -14,9 +16,31 @@ public class StaticContextLoaderListener extends ContextLoaderListener {
 
     public static WebApplicationContext applicationContext;
 
+    private ClassLoader contextClassLoader;
+
     public StaticContextLoaderListener () {
         super(applicationContext);
     }
 
+	@Override
+	public void contextInitialized(ServletContextEvent event) {
+        contextClassLoader = Thread.currentThread().getContextClassLoader();
+        super.contextInitialized(event);
+	}
 
+	@Override
+	public void contextDestroyed(ServletContextEvent event) {
+        // Perform the destruction with the same contextual ClassLoader that was present
+        // during initialization.
+        // This a workaround for a bug in org.glassfish.grizzly.servlet.WebappContext
+        // that causes a memory leak in org.springframework.web.context.ContextLoader.
+        // This logic should be moved to WebappContext.contextDestroyed(). Until this
+        // is fixed in Grizzly; This is a good solution.
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(contextClassLoader);
+
+        super.contextDestroyed(event);
+
+        Thread.currentThread().setContextClassLoader(loader);
+	}
 }

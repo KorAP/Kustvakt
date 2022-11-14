@@ -2,17 +2,18 @@ package de.ids_mannheim.korap.web.filter;
 
 import java.security.Principal;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.Provider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ResourceFilter;
+import org.glassfish.jersey.server.ContainerRequest;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.TokenType;
@@ -24,9 +25,9 @@ import de.ids_mannheim.korap.utils.TimeUtils;
 /**
  * Created by hanl on 7/15/14.
  */
-@Provider
 @Component
-public class DemoUserFilter implements ContainerRequestFilter, ResourceFilter {
+@Priority(Priorities.AUTHENTICATION)
+public class DemoUserFilter implements ContainerRequestFilter {
 
     @Context
     UriInfo info;
@@ -35,27 +36,23 @@ public class DemoUserFilter implements ContainerRequestFilter, ResourceFilter {
 
 
     @Override
-    public ContainerRequest filter (ContainerRequest request) {
-        String host = request.getHeaderValue(ContainerRequest.HOST);
-        String ua = request.getHeaderValue(ContainerRequest.USER_AGENT);
+    public void filter (ContainerRequestContext request) {
+        String host = request.getHeaderString(ContainerRequest.HOST);
+        String ua = request.getHeaderString(ContainerRequest.USER_AGENT);
         String authentication = request
-                .getHeaderValue(ContainerRequest.AUTHORIZATION);
+                .getHeaderString(ContainerRequest.AUTHORIZATION);
 
         // means that this is the public service
         if (authentication == null || authentication.isEmpty()) {
             Principal pr = null;
-            try {
-                pr = request.getUserPrincipal();
-            }
-            catch (UnsupportedOperationException e) {
-                // do nothing
+            SecurityContext securityContext = request.getSecurityContext();
+            if (securityContext != null) {
+                pr = securityContext.getUserPrincipal();
             }
             if (pr == null)
                 request.setSecurityContext(new KustvaktContext(
                         createShorterToken(host, ua)));
-
         }
-        return request;
     }
 
 
@@ -70,17 +67,5 @@ public class DemoUserFilter implements ContainerRequestFilter, ResourceFilter {
                         .getShortTokenTTL()).getMillis());
         c.setTokenType(TokenType.BASIC);
         return c;
-    }
-
-
-    @Override
-    public ContainerRequestFilter getRequestFilter () {
-        return this;
-    }
-
-
-    @Override
-    public ContainerResponseFilter getResponseFilter () {
-        return null;
     }
 }

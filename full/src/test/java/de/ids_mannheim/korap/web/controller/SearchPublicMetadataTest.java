@@ -3,12 +3,15 @@ package de.ids_mannheim.korap.web.controller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Response.Status;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import com.sun.jersey.api.client.ClientResponse;
+import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -21,13 +24,14 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
 
     @Test
     public void testSearchPublicMetadata () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("access-rewrite-disabled", "true")
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .request()
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         
         assertEquals("availability(ALL)",
@@ -38,14 +42,15 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
 
     @Test
     public void testSearchPublicMetadataExtern () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("access-rewrite-disabled", "true")
+                .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         
         assertEquals("availability(ALL)",
@@ -56,14 +61,15 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
     
     @Test
     public void testSearchPublicMetadataWithCustomFields () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("fields", "author,title")
                 .queryParam("access-rewrite-disabled", "true")
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .request()
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals("availability(ALL)",
@@ -79,14 +85,15 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
     
     @Test
     public void testSearchPublicMetadataWithNonPublicField () throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("fields", "author,title,snippet")
                 .queryParam("access-rewrite-disabled", "true")
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .request()
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(StatusCodes.NON_PUBLIC_FIELD_IGNORED,
@@ -110,11 +117,12 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
         meta.addEntry("snippets", "true");
         s.setMeta(meta);
         
-        ClientResponse response = resource().path(API_VERSION).path("search")
-                .post(ClientResponse.class, s.toJSON());
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+        Response response = target().path(API_VERSION).path("search")
+                .request()
+                .post(Entity.json(s.toJSON()));
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String ent = response.getEntity(String.class);
+        String ent = response.readEntity(String.class);
 
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals("availability(ALL)",
@@ -126,14 +134,15 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
     public void testSearchPublicMetadataWithSystemVC ()
             throws KustvaktException {
 
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo system-vc")
                 .queryParam("access-rewrite-disabled", "true")
-                .get(ClientResponse.class);
-        assertEquals(ClientResponse.Status.OK.getStatusCode(),
+                .request()
+                .get();
+        assertEquals(Status.OK.getStatusCode(),
                 response.getStatus());
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals("operation:and",
@@ -160,13 +169,14 @@ public class SearchPublicMetadataTest extends SpringJerseyTest {
     @Test
     public void testSearchPublicMetadataWithPrivateVC ()
             throws KustvaktException {
-        ClientResponse response = resource().path(API_VERSION).path("search")
+        Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "Sonne").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"dory/dory-vc\"")
                 .queryParam("access-rewrite-disabled", "true")
-                .get(ClientResponse.class);
+                .request()
+                .get();
 
-        String entity = response.getEntity(String.class);
+        String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
 
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
