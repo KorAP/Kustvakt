@@ -26,7 +26,7 @@ Web-services including their usage examples are described in the [wiki](https://
 # Setup
 
 
-Prerequisites: Jdk 1.8, Git, Maven 3
+Prerequisites: Jdk 11, Git, Maven 3
 
 Clone the latest version of Kustvakt
 <pre>
