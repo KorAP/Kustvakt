@@ -10,7 +10,7 @@ updates:
     schedule:
       interval: "daily"
     ignore:
-      # Jetty >= 10 requires JDK 11
+      # Jetty >= 10 has API changes
       - dependency-name: "org.eclipse.jetty:jetty-server"
         versions:
           - ">= 10.0.0"
@@ -29,22 +29,33 @@ updates:
       - dependency-name: "com.github.gwenn:sqlite-dialect"
         versions:
           - "> 0.1.0"
+      - dependency-name: "org.glassfish.jersey.*"
+        versions:
+          - ">=3"
     open-pull-requests-limit: 50
 
   - package-ecosystem: "maven" # See documentation for possible values
     directory: "/lite" # Location of package manifests
     schedule:
       interval: "daily"
+    ignore:
     - dependency-name: "org.hibernate:hibernate-*"
-        versions:
+      versions:
           - ">= 6.0.0"
+    - dependency-name: "org.glassfish.jersey.*"
+      versions:
+        - ">=3"
     open-pull-requests-limit: 50
 
   - package-ecosystem: "maven" # See documentation for possible values
     directory: "/full" # Location of package manifests
     schedule:
       interval: "daily"
+    ignore:
     - dependency-name: "org.hibernate:hibernate-*"
       versions:
         - ">= 6.0.0"
+    - dependency-name: "org.glassfish.jersey.*"
+      versions:
+        - ">=3"
     open-pull-requests-limit: 50
