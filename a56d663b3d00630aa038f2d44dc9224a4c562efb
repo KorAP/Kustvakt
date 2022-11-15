@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "acbac19e_dd0e0f13",
+        "filename": ".github/dependabot.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-11-15T13:25:18Z",
+      "side": 1,
+      "message": "This is an update to Jersey 3?",
+      "range": {
+        "startLine": 34,
+        "startChar": 12,
+        "endLine": 34,
+        "endChar": 16
+      },
+      "revId": "a56d663b3d00630aa038f2d44dc9224a4c562efb",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
