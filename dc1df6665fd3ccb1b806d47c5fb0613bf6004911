@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf62d4b8_a8654814",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-11-16T06:51:32Z",
+      "side": 1,
+      "message": "Koral and Krill must be updated first",
+      "revId": "dc1df6665fd3ccb1b806d47c5fb0613bf6004911",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
