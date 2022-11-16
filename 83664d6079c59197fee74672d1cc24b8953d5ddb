@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c31a491_130dadf6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-11-16T17:48:09Z",
+      "side": 1,
+      "message": "Ah, b17cc08a0d45020e5690a6e9c3210d13c5179e41 already bumped the Krill version to 0.61",
+      "revId": "83664d6079c59197fee74672d1cc24b8953d5ddb",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
