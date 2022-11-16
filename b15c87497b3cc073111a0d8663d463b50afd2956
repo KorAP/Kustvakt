@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b4e832b_d71fd4e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-11-16T06:52:52Z",
+      "side": 1,
+      "message": "Koral update must be merged first and not to forget Krill",
+      "revId": "b15c87497b3cc073111a0d8663d463b50afd2956",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
