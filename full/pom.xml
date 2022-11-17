@@ -133,7 +133,7 @@
 					<reuseForks>true</reuseForks>
 					<forkCount>1</forkCount>
 					<threadCount>10</threadCount>
-					<argLine>-Xmx512m -XX:MaxPermSize=256m
+					<argLine>-Xmx512m
 						-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager</argLine>
 					<excludes>
 						<exclude>de/ids_mannheim/korap/authentication/APIAuthenticationTest.java</exclude>
