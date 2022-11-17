@@ -70,11 +70,11 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.22.2</version>
 				<configuration>
-                    <useSystemClassLoader>false</useSystemClassLoader>
+					<useSystemClassLoader>false</useSystemClassLoader>
 					<reuseForks>true</reuseForks>
 					<forkCount>1</forkCount>
 					<threadCount>5</threadCount>
-					<argLine>-Xmx512m -XX:MaxPermSize=256m
+					<argLine>-Xmx512m
 						-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager</argLine>
 				</configuration>
 			</plugin>
