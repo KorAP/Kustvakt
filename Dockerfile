@@ -1,5 +1,5 @@
 # Use alpine linux as base image
-FROM openjdk:8-alpine as builder
+FROM openjdk:19-alpine as builder
 
 # Copy repository respecting .dockerignore
 COPY . /kustvakt
@@ -33,8 +33,7 @@ RUN mkdir built && \
 RUN rm -r Krill
 
 # Install Kustvakt core
-RUN cd core && \
-    mvn clean install
+RUN mvn -f core/pom.xml clean install
 
 # Package lite
 RUN cd lite && \
@@ -54,7 +53,7 @@ RUN apk del git \
 
 RUN cd ${M2_HOME} && rm -r .m2
 
-FROM openjdk:8-alpine
+FROM openjdk:19-alpine
 
 RUN addgroup -S korap && \
     adduser -S kustvakt -G korap && \
