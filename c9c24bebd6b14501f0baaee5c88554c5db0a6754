@@ -16,6 +16,24 @@
       "message": "(tested only the build, but not if it works)",
       "revId": "c9c24bebd6b14501f0baaee5c88554c5db0a6754",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29c7f0e2_46c16010",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-11-18T13:57:21Z",
+      "side": 1,
+      "message": "Tested and I can confirm it works! Very nice!",
+      "parentUuid": "4df22a99_dac85207",
+      "revId": "c9c24bebd6b14501f0baaee5c88554c5db0a6754",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
