@@ -39,6 +39,30 @@
       },
       "revId": "1e9415bb4bcce0561191b70d0b99e40997e600ce",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbf0f170_3f87ff41",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/controller/VirtualCorpusControllerTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-11-21T08:47:37Z",
+      "side": 1,
+      "message": "Thanks!",
+      "parentUuid": "76292bb1_9e885761",
+      "range": {
+        "startLine": 53,
+        "startChar": 55,
+        "endLine": 53,
+        "endChar": 61
+      },
+      "revId": "1e9415bb4bcce0561191b70d0b99e40997e600ce",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
