@@ -69,6 +69,24 @@
       "parentUuid": "d14563cc_e63b5b58",
       "revId": "a222823d1a13fb6227258613cf9d603630c0d03b",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff27b664_083f01d0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-11-21T22:50:38Z",
+      "side": 1,
+      "message": "But you have the super_client_info file in the local working directory, in which you start the docker?",
+      "parentUuid": "4328d7c8_adc01925",
+      "revId": "a222823d1a13fb6227258613cf9d603630c0d03b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
