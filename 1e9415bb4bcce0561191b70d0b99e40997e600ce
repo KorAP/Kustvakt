@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd2a0a9d_1ba81588",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-11-21T07:49:05Z",
+      "side": 1,
+      "message": "Fixes docker build of Kustvakt-full with I34620f8f2b7cf5d7aed9f6ecf046fc221e46961f",
+      "revId": "1e9415bb4bcce0561191b70d0b99e40997e600ce",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
