@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ed3d83e_7bdf9601",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-11-21T07:51:18Z",
+      "side": 1,
+      "message": "Build error fixed in https://korap.ids-mannheim.de/gerrit/c/KorAP/Kustvakt/+/6307",
+      "revId": "94b172ef1ab8283e28eee477292a4d40acc5494b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
