@@ -16,6 +16,24 @@
       "message": "```\ndocker build -f Dockerfile -t korap/kustvakt:0.69-full --target kustvakt-full .\n```\nnow fails in Kustvakt-full test with `expected:\u003c[Api] realm\u003d\"Kustvakt\"\u003e but was:\u003c[Basic] realm\u003d\"Kustvakt\"\u003e`(see below). Can we ignore this?\n\n```\n[ERROR] Failures: \n[ERROR]   VirtualCorpusControllerTest.testCreateSystemVCUnauthorized:530-\u003echeckWWWAuthenticateHeader:49 expected:\u003c[Api] realm\u003d\"Kustvakt\"\u003e but was:\u003c[Basic] realm\u003d\"Kustvakt\"\u003e\n[ERROR]   VirtualCorpusControllerTest.testCreateVCUnauthorized:598-\u003echeckWWWAuthenticateHeader:49 expected:\u003c[Api] realm\u003d\"Kustvakt\"\u003e but was:\u003c[Basic] realm\u003d\"Kustvakt\"\u003e\n[ERROR]   VirtualCorpusControllerTest.testCreateVCWithExpiredToken:483-\u003echeckWWWAuthenticateHeader:49 expected:\u003c[Api] realm\u003d\"Kustvakt\"\u003e but was:\u003c[Basic] realm\u003d\"Kustvakt\"\u003e\n[ERROR]   VirtualCorpusControllerTest.testCreateVCWithInvalidToken:451-\u003echeckWWWAuthenticateHeader:49 expected:\u003c[Api] realm\u003d\"Kustvakt\"\u003e but was:\u003c[Basic] realm\u003d\"Kustvakt\"\u003e\n[ERROR]   VirtualCorpusControllerTest.testDeleteVCUnauthorized:713-\u003echeckWWWAuthenticateHeader:49 expected:\u003c[Api] realm\u003d\"Kustvakt\"\u003e but was:\u003c[Basic] realm\u003d\"Kustvakt\"\u003e\n[ERROR]   VirtualCorpusControllerTest.testEditVCNotOwner:820-\u003echeckWWWAuthenticateHeader:49 expected:\u003c[Api] realm\u003d\"Kustvakt\"\u003e but was:\u003c[Basic] realm\u003d\"Kustvakt\"\u003e\n[ERROR]   VirtualCorpusControllerTest.testListAvailableVCByGuest:304-\u003echeckWWWAuthenticateHeader:49 expected:\u003c[Api] realm\u003d\"Kustvakt\"\u003e but was:\u003c[Basic] realm\u003d\"Kustvakt\"\u003e\n[ERROR]   VirtualCorpusControllerTest.testListAvailableVCByOtherUser:286-\u003echeckWWWAuthenticateHeader:49 expected:\u003c[Api] realm\u003d\"Kustvakt\"\u003e but was:\u003c[Basic] realm\u003d\"Kustvakt\"\u003e\n[ERROR]   VirtualCorpusControllerTest.testRetrievePrivateVCInfoUnauthorized:180-\u003echeckWWWAuthenticateHeader:49 expected:\u003c[Api] realm\u003d\"Kustvakt\"\u003e but was:\u003c[Basic] realm\u003d\"Kustvakt\"\u003e\n[ERROR]   VirtualCorpusControllerTest.testRetrieveProjectVCInfoByNonActiveMember:213-\u003echeckWWWAuthenticateHeader:49 expected:\u003c[Api] realm\u003d\"Kustvakt\"\u003e but was:\u003c[Basic] realm\u003d\"Kustvakt\"\u003e\n[INFO]\n[ERROR] Tests run: 466, Failures: 10, Errors: 0, Skipped: 14\n[INFO] \n[INFO] ------------------------------------------------------------------------\n[INFO] BUILD FAILURE\n[INFO] ------------------------------------------------------------------------\n\n```",
       "revId": "fca48ab666c79cffa054306ff11d617d3001f86b",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fefcd75_de744369",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-11-21T06:52:05Z",
+      "side": 1,
+      "message": "Ah, it seams that only the order of the header values has changed: \n```\nERROR]   VirtualCorpusControllerTest.testCreateSystemVCUnauthorized:530-\u003echeckWWWAuthenticateHeader:53 expected:\u003c[Basic] realm\u003d\"Kustvakt\"\u003e but was:\u003c[Api] realm\u003d\"Kustvakt\"\u003e\n[\n```\n\nThe question is, if anywhere else the order matters.",
+      "parentUuid": "049f6921_543da0ac",
+      "revId": "fca48ab666c79cffa054306ff11d617d3001f86b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
