@@ -51,6 +51,24 @@
       "parentUuid": "a0e18570_dc68ac0a",
       "revId": "a222823d1a13fb6227258613cf9d603630c0d03b",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4328d7c8_adc01925",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-11-21T15:54:39Z",
+      "side": 1,
+      "message": "That was just an attempt, if it can write another file if I mount client as a folder, but thanks for the reminder to revert this!",
+      "parentUuid": "d14563cc_e63b5b58",
+      "revId": "a222823d1a13fb6227258613cf9d603630c0d03b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
