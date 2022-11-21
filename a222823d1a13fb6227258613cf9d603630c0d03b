@@ -16,6 +16,23 @@
       "message": "It works now (at least with the sample ldap DB) with slightly modified command:\n\nsuper_client_info:\n\n  {\"client_id\":\"my-example-client\",\"client_secret\":\"abcde12345-s3cr3t\"}\n  \nkalamar.production.conf:\n\nuse Mojo::File qw\u0027path\u0027;\nuse Mojo::JSON \u0027decode_json\u0027;\nmy $client \u003d decode_json(path(\u0027/kalamar/super_client_info\u0027)-\u003eslurp);\n\n  {\n    Kalamar \u003d\u003e {\n      api_path \u003d\u003e \u0027http://localhost:8089/api/\u0027,\n      plugins \u003d\u003e [\u0027Auth\u0027]\n    },\n    \u0027Kalamar-Auth\u0027 \u003d\u003e {\n      client_id \u003d\u003e $client-\u003e{client_id},\n      client_secret \u003d\u003e $client-\u003e{client_secret},\n      oauth2 \u003d\u003e 1\n    }\n  }\n\nRunninng kustvakt-full:\n\n  docker run --rm --name kustvakt --net host -v \"${PWD}/sample-index:/kustvakt/index:z\" --mount type\u003dbind,readonly\u003dtrue,source\u003d\"${PWD}/super_client_info\",target\u003d/kustvakt/client/super_client_info korap/kustvakt:0.69-full\n  \nRunning Kalamar:\n\n  docker run --rm --name kalamar --net host --mount type\u003dbind,readonly\u003dtrue,source\u003d\"${PWD}/kalamar.production.conf\",target\u003d/kalamar/kalamar.production.conf --mount type\u003dbind,readonly\u003dtrue,source\u003d\"${PWD}/super_client_info\",target\u003d/kalamar/super_client_info korap/kalamar\n  \nLogin with e.g. \"user1:password1\" now is fine!",
       "revId": "a222823d1a13fb6227258613cf9d603630c0d03b",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0e18570_dc68ac0a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-11-21T15:40:44Z",
+      "side": 1,
+      "message": "I\u0027m still getting the error message below, when I run the images as you say, but that\u0027s probably Fedora ...\n\n```\naused by: java.io.FileNotFoundException: client/super_client_infox (Permission denied)\n\tat java.base/java.io.FileOutputStream.open0(Native Method)\n\tat java.base/java.io.FileOutputStream.open(FileOutputStream.java:293)\n\tat java.base/java.io.FileOutputStream.\u003cinit\u003e(FileOutputStream.java:235)\n\tat java.base/java.io.FileOutputStream.\u003cinit\u003e(FileOutputStream.java:184)\n\tat com.fasterxml.jackson.core.TokenStreamFactory._fileOutputStream(TokenStreamFactory.java:278)\n\tat com.fasterxml.jackson.core.JsonFactory.createGenerator(JsonFactory.java:1369)\n\tat com.fasterxml.jackson.databind.ObjectMapper.createGenerator(ObjectMapper.java:1230)\n\tat com.fasterxml.jackson.databind.ObjectMapper.writeValue(ObjectMapper.java:3811)\n\tat de.ids_mannheim.korap.utils.JsonUtils.writeFile(JsonUtils.java:87)\n\tat de.ids_mannheim.korap.oauth2.service.OAuth2InitClientService.createInitialSuperClient(OAuth2InitClientService.java:60)\n\tat de.ids_mannheim.de.init.Initializator.init(Initializator.java:44)\n```",
+      "revId": "a222823d1a13fb6227258613cf9d603630c0d03b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
