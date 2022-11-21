@@ -33,6 +33,24 @@
       "message": "I\u0027m still getting the error message below, when I run the images as you say, but that\u0027s probably Fedora ...\n\n```\naused by: java.io.FileNotFoundException: client/super_client_infox (Permission denied)\n\tat java.base/java.io.FileOutputStream.open0(Native Method)\n\tat java.base/java.io.FileOutputStream.open(FileOutputStream.java:293)\n\tat java.base/java.io.FileOutputStream.\u003cinit\u003e(FileOutputStream.java:235)\n\tat java.base/java.io.FileOutputStream.\u003cinit\u003e(FileOutputStream.java:184)\n\tat com.fasterxml.jackson.core.TokenStreamFactory._fileOutputStream(TokenStreamFactory.java:278)\n\tat com.fasterxml.jackson.core.JsonFactory.createGenerator(JsonFactory.java:1369)\n\tat com.fasterxml.jackson.databind.ObjectMapper.createGenerator(ObjectMapper.java:1230)\n\tat com.fasterxml.jackson.databind.ObjectMapper.writeValue(ObjectMapper.java:3811)\n\tat de.ids_mannheim.korap.utils.JsonUtils.writeFile(JsonUtils.java:87)\n\tat de.ids_mannheim.korap.oauth2.service.OAuth2InitClientService.createInitialSuperClient(OAuth2InitClientService.java:60)\n\tat de.ids_mannheim.de.init.Initializator.init(Initializator.java:44)\n```",
       "revId": "a222823d1a13fb6227258613cf9d603630c0d03b",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d14563cc_e63b5b58",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-11-21T15:48:33Z",
+      "side": 1,
+      "message": "Where does \"client/super_client_infox\" come from? Is this \"x\" an error?",
+      "parentUuid": "a0e18570_dc68ac0a",
+      "revId": "a222823d1a13fb6227258613cf9d603630c0d03b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
