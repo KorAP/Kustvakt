@@ -16,6 +16,29 @@
       "message": "Fixes docker build of Kustvakt-full with I34620f8f2b7cf5d7aed9f6ecf046fc221e46961f",
       "revId": "1e9415bb4bcce0561191b70d0b99e40997e600ce",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76292bb1_9e885761",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/controller/VirtualCorpusControllerTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-11-21T07:58:28Z",
+      "side": 1,
+      "message": "The Bearer is now checked twice?",
+      "range": {
+        "startLine": 53,
+        "startChar": 55,
+        "endLine": 53,
+        "endChar": 61
+      },
+      "revId": "1e9415bb4bcce0561191b70d0b99e40997e600ce",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
