@@ -123,6 +123,24 @@
       "parentUuid": "6494ca93_017da3e4",
       "revId": "a222823d1a13fb6227258613cf9d603630c0d03b",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1fdd56af_a54661ff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-11-22T06:13:13Z",
+      "side": 1,
+      "message": "Damn, you are right, that the file is not written, I overlooked the `!` in `!f.exists()`. But as you can see with the `cat` it\u0027s definitely mounted. I\u0027ll try it again with your `/kustvakt` mount point change later....",
+      "parentUuid": "eacddfcd_21c05ea6",
+      "revId": "a222823d1a13fb6227258613cf9d603630c0d03b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
