@@ -105,6 +105,24 @@
       "parentUuid": "ff27b664_083f01d0",
       "revId": "a222823d1a13fb6227258613cf9d603630c0d03b",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eacddfcd_21c05ea6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2022-11-22T06:07:20Z",
+      "side": 1,
+      "message": "Well - the file does not need to be written, it just has to be mounted readonly and it seems, that doesn\u0027t happen. So I guess the file is not there, when you inspect the container?",
+      "parentUuid": "6494ca93_017da3e4",
+      "revId": "a222823d1a13fb6227258613cf9d603630c0d03b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
