@@ -87,6 +87,24 @@
       "parentUuid": "4328d7c8_adc01925",
       "revId": "a222823d1a13fb6227258613cf9d603630c0d03b",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6494ca93_017da3e4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2022-11-22T05:41:06Z",
+      "side": 1,
+      "message": "Yes :) As I said, the file is there and can be read by kustvakt. It also can be written, but not by kustvakt. There seems to be something wrong with `de.ids_mannheim.korap.utils.JsonUtils.writeFile`.\n\nI can read and write the file via the shell:\n```\n$ docker exec -it kustvakt echo \"HUHU\" \u003e\u003e client/super_client_info \u0026\u0026 cat client/super_client_info\n{\"client_id\":\"FdGFGmPrfGJMFFhmGGH67L\",\"client_secret\":\"oTU79VDj7m3LJj4a--rWug\"}\nHUHU\n```\n\nLet\u0027s merge this. I can fix the write problem next weekend.",
+      "parentUuid": "ff27b664_083f01d0",
+      "revId": "a222823d1a13fb6227258613cf9d603630c0d03b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
