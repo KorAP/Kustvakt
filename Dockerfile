@@ -82,7 +82,9 @@ RUN addgroup -S korap && \
 
 WORKDIR /kustvakt
 
-COPY --from=builder /kustvakt/built/Kustvakt-lite.* /kustvakt/
+COPY --from=builder /kustvakt/built/Kustvakt-lite.jar /kustvakt/
+COPY --from=builder /kustvakt/built/kustvakt-lite.conf /kustvakt/
+COPY --from=builder /kustvakt/built/Krill-Indexer.jar /kustvakt/
 
 USER kustvakt
 
@@ -108,6 +110,7 @@ RUN mkdir ./ldap \
 COPY --from=builder /kustvakt/built/Kustvakt-full.jar /kustvakt/
 COPY --from=builder /kustvakt/built/kustvakt.conf /kustvakt/
 COPY --from=builder /kustvakt/built/ldap.* /kustvakt/ldap/
+COPY --from=builder /kustvakt/built/Krill-Indexer.jar /kustvakt/
 
 USER kustvakt
 
