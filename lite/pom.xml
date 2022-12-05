@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ids_mannheim.korap</groupId>
 	<artifactId>Kustvakt-lite</artifactId>
-	<version>0.69</version>
+	<version>0.69.1</version>
 	<properties>
 		<java.version>11</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
