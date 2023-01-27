@@ -7,26 +7,24 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.net.URI;
 
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
+import org.glassfish.jersey.uri.UriComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-
-import org.glassfish.jersey.uri.UriComponent;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -315,12 +313,18 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     protected JsonNode retrieveClientInfo (String clientId, String username)
             throws ProcessingException,
             KustvaktException {
+        Form form = new Form();
+        form.param("super_client_id", superClientId);
+        form.param("super_client_secret", clientSecret);
+        
         Response response = target().path(API_VERSION).path("oauth2")
                 .path("client").path(clientId)
                 .request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .get();
+//                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+//                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(form));
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
