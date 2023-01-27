@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3f18a3b_f4ef6019",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-01-27T16:26:12Z",
+      "side": 1,
+      "message": "I am wondering if superClientID and superClientSecret should be \u0027x-\u0027-Prepended Header infos, so the API could still be GET.",
+      "revId": "3c47376bb1f96a2d2a234027070ea562fa38a30b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
