@@ -1,6 +1,10 @@
 # version 0.69.2
 
+- Upgrade version for E2E-simplified Docker images (diewald)
+
 # version 0.69.1
+
+- Upgrade version for docker including indexer (diewald)
 
 # version 0.69
 
