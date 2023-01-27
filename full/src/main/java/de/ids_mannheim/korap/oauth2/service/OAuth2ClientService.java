@@ -338,17 +338,17 @@ public class OAuth2ClientService {
         return clientDao.retrieveClientById(clientId);
     }
 
-    public OAuth2ClientInfoDto retrieveClientInfo (String username,
-            String clientId) throws KustvaktException {
+    public OAuth2ClientInfoDto retrieveClientInfo (String clientId)
+            throws KustvaktException {
         OAuth2Client client = clientDao.retrieveClientById(clientId);
-        if (adminDao.isAdmin(username)
-                || username.equals(client.getRegisteredBy())) {
+//        if (adminDao.isAdmin(username)
+//                || username.equals(client.getRegisteredBy())) {
             return new OAuth2ClientInfoDto(client);
-        }
-        else {
-            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: " + username, username);
-        }
+//        }
+//        else {
+//            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+//                    "Unauthorized operation for user: " + username, username);
+//        }
     }
 
     public OAuth2Client retrieveClient (String clientId)
