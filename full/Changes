@@ -1,11 +1,22 @@
 # version 0.69.2
 
+- Upgrade version for E2E-simplified Docker images (diewald)
+- Updated client info API (replace user authorization requirement with super 
+  client authentication)
+
+
+
 # version 0.69.1
+
+- Upgrade version for docker including indexer (diewald)
+
 
 # version 0.69
 
  - Migrated to Java 11 and Jersey 2
  - Updated dependencies
+ - Use LDAP authentication in Kustvakt-full oauth2 example config (kupietz)
+
 
 # version 0.68
 

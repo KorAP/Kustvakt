@@ -18,10 +18,7 @@ import javax.ws.rs.core.SecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import de.ids_mannheim.korap.web.utils.ResourceFilters;
-
 import de.ids_mannheim.korap.constant.OAuth2Scope;
-import de.ids_mannheim.korap.dto.InstalledPluginDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientInfoDto;
@@ -33,6 +30,7 @@ import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
+import de.ids_mannheim.korap.web.utils.ResourceFilters;
 
 /**
  * Defines controllers for OAuth2 clients, namely applications
@@ -165,18 +163,18 @@ public class OAuthClientController {
     }
 
 
-    @GET
+    @POST
     @Path("{client_id}")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @ResourceFilters({ APIVersionFilter.class})
     public OAuth2ClientInfoDto retrieveClientInfo (
-            @Context SecurityContext securityContext,
-            @PathParam("client_id") String clientId) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+            @PathParam("client_id") String clientId,
+            @FormParam("super_client_id") String superClientId,
+            @FormParam("super_client_secret") String superClientSecret) {
         try {
-            scopeService.verifyScope(context, OAuth2Scope.CLIENT_INFO);
-            return clientService.retrieveClientInfo(context.getUsername(),
-                    clientId);
+            clientService.verifySuperClient(superClientId, superClientSecret);
+            return clientService.retrieveClientInfo(clientId);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);

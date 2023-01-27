@@ -315,12 +315,18 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     protected JsonNode retrieveClientInfo (String clientId, String username)
             throws ProcessingException,
             KustvaktException {
+        Form form = new Form();
+        form.param("super_client_id", superClientId);
+        form.param("super_client_secret", clientSecret);
+        
         Response response = target().path(API_VERSION).path("oauth2")
                 .path("client").path(clientId)
                 .request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
-                .get();
+//                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+//                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(form));
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
