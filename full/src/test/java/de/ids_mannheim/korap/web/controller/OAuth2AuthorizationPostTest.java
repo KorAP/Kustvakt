@@ -7,20 +7,19 @@ import java.net.URI;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.message.types.TokenType;
+import org.glassfish.jersey.uri.UriComponent;
 import org.junit.Test;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import org.glassfish.jersey.uri.UriComponent;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -55,6 +54,7 @@ public class OAuth2AuthorizationPostTest extends OAuth2TestBase {
         form.param("response_type", "code");
         form.param("client_id", confidentialClientId);
         form.param("state", "thisIsMyState");
+        form.param("scope", "search");
 
         Response response =
                 requestAuthorizationCode(form, userAuthHeader);

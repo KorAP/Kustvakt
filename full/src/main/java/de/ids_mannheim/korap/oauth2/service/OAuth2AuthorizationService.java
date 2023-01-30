@@ -66,7 +66,8 @@ public class OAuth2AuthorizationService {
             throws KustvaktException {
 
         if (scopeSet == null || scopeSet.isEmpty()) {
-            scopeSet = config.getDefaultAccessScopes();
+            throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
+                    "scope is required", OAuth2Error.INVALID_SCOPE);
         }
         Set<AccessScope> scopes = scopeService.convertToAccessScope(scopeSet);
 

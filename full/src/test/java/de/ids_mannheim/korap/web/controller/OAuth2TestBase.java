@@ -111,7 +111,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
             String authHeader) throws KustvaktException {
 
         Response response = requestAuthorizationCode("code", clientId, "",
-                "", "", authHeader);
+                "search match_info", "", authHeader);
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
                 response.getStatus());
         URI redirectUri = response.getLocation();
@@ -124,7 +124,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     protected String requestAuthorizationCode (String clientId,
             String redirect_uri, String authHeader) throws KustvaktException {
         Response response = requestAuthorizationCode("code", clientId,
-                redirect_uri, "", "", authHeader);
+                redirect_uri, "search", "", authHeader);
         assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
                 response.getStatus());
         URI redirectUri = response.getLocation();

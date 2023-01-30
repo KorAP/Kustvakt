@@ -243,7 +243,7 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         String userAuthToken = node.at("/access_token").asText();
 
         Response response = requestAuthorizationCode("code",
-                confidentialClientId, "", "", "", "Bearer " + userAuthToken);
+                confidentialClientId, "", "search", "", "Bearer " + userAuthToken);
 
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
