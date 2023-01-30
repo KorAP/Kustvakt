@@ -5,7 +5,9 @@ import static org.junit.Assert.assertEquals;
 import java.net.URI;
 import java.security.GeneralSecurityException;
 
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
@@ -20,9 +22,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.client.Entity;
 import com.unboundid.ldap.sdk.LDAPException;
 
 import de.ids_mannheim.korap.config.Attributes;
@@ -176,6 +175,7 @@ public class LdapOAuth2Test extends OAuth2TestBase {
                 .queryParam("response_type", "code")
                 .queryParam("client_id", clientId)
                 .queryParam("client_secret", clientSecret)
+                .queryParam("scope", "search match_info")
                 .request()
                 .header(Attributes.AUTHORIZATION, authHeader)
                 .get();
