@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.net.URI;
 
 import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
@@ -18,6 +20,8 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.uri.UriComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MultiValueMap;
@@ -82,9 +86,13 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
             String clientId, String redirectUri, String scope, String state,
             String authHeader) throws KustvaktException {
 
-        WebTarget request =
-                target().path(API_VERSION).path("oauth2").path("authorize");
+        ClientConfig clientConfig = new ClientConfig();
+        clientConfig.property(ClientProperties.FOLLOW_REDIRECTS, false);
+        Client client = ClientBuilder.newClient(clientConfig);
         
+        WebTarget request = client.target(getBaseUri()).path(API_VERSION)
+                .path("oauth2").path("authorize");
+
         if (!responseType.isEmpty()) {
             request = request.queryParam("response_type", responseType);
         }

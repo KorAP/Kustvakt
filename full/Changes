@@ -7,6 +7,8 @@
   client authentication)
 2023-01-30
 - Made scope param required in authorization request (solved #508)
+2023-01-31
+- Allowed OAuth2 clients to use localhost as redirect URIs.
 
 
 # version 0.69.1
