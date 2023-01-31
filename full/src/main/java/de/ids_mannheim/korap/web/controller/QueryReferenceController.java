@@ -50,6 +50,7 @@ import de.ids_mannheim.korap.web.input.QueryJson;
 @Path("{version}/query")
 @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
         BlockingFilter.class, PiwikFilter.class })
+@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class QueryReferenceController {
 
     @Autowired
@@ -120,7 +121,6 @@ public class QueryReferenceController {
      */
     @GET
     @Path("~{createdBy}/{qName}")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
         DemoUserFilter.class, PiwikFilter.class })
     public QueryDto retrieveQueryByName (

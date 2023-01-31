@@ -58,6 +58,7 @@ import de.ids_mannheim.korap.web.utils.ResourceFilters;
 @Path("{version}/oauth2/client")
 @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
         BlockingFilter.class })
+@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class OAuthClientController {
 
     @Autowired
@@ -92,7 +93,6 @@ public class OAuthClientController {
     @POST
     @Path("register")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public OAuth2ClientDto registerClient (
             @Context SecurityContext securityContext,
             OAuth2ClientJson clientJson) {
@@ -147,7 +147,6 @@ public class OAuthClientController {
     @POST
     @Path("reset")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public OAuth2ClientDto resetClientSecret (
             @Context SecurityContext securityContext,
             @FormParam("client_id") String clientId) {
@@ -165,9 +164,6 @@ public class OAuthClientController {
 
     @POST
     @Path("{client_id}")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    @ResourceFilters({ APIVersionFilter.class})
     public OAuth2ClientInfoDto retrieveClientInfo (
             @PathParam("client_id") String clientId,
             @FormParam("super_client_id") String superClientId,
@@ -203,7 +199,6 @@ public class OAuthClientController {
     @POST
     @Path("/list")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<OAuth2ClientInfoDto> listUserClients (
             @Context SecurityContext context,
             @FormParam("super_client_id") String superClientId,
