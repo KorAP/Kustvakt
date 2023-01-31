@@ -217,7 +217,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                         OAuth2ClientType.PUBLIC, "A public test client.");
         clientJson.setRedirectURI(redirectUri);
         Response response = registerClient(username, clientJson);
-        testInvalidRedirectUri(response.readEntity(String.class), false,
+        testInvalidRedirectUri(response.readEntity(String.class), 
+                response.getHeaderString("Content-Type"),false,
                 response.getStatus());
 
         // localhost is not allowed
@@ -231,7 +232,8 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
         redirectUri = "https://public.client.com/redirect.html#bar";
         clientJson.setRedirectURI(redirectUri);
         response = registerClient(username, clientJson);
-        testInvalidRedirectUri(response.readEntity(String.class), false,
+        testInvalidRedirectUri(response.readEntity(String.class), 
+                response.getHeaderString("Content-Type"),false,
                 response.getStatus());
     }
     

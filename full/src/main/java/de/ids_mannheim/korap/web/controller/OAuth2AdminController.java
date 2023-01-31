@@ -5,6 +5,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -27,6 +28,7 @@ import de.ids_mannheim.korap.web.filter.AdminFilter;
 @Controller
 @Path("{version}/oauth2/admin")
 @ResourceFilters({ APIVersionFilter.class, AdminFilter.class })
+@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class OAuth2AdminController {
 
     @Autowired

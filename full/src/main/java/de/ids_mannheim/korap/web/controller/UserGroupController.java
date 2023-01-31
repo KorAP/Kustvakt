@@ -52,6 +52,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 @Path("{version}/group")
 @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
         BlockingFilter.class, PiwikFilter.class })
+@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class UserGroupController {
 
     @Autowired
@@ -74,7 +75,6 @@ public class UserGroupController {
      * 
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<UserGroupDto> listUserGroups (
             @Context SecurityContext securityContext) {
         TokenContext context =
@@ -104,7 +104,6 @@ public class UserGroupController {
      */
     @GET
     @Path("list/system-admin")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<UserGroupDto> getUserGroupBySystemAdmin (
             @Context SecurityContext securityContext,
             @QueryParam("username") String username,
@@ -132,7 +131,6 @@ public class UserGroupController {
      */
     @GET
     @Path("@{groupName}")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public UserGroupDto retrieveUserGroup (
             @Context SecurityContext securityContext,
             @PathParam("groupName") String groupName) {
