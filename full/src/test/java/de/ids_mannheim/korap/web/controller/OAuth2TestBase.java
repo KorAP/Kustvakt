@@ -422,8 +422,8 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         return JsonUtils.readTree(entity);
     }
     
-    protected void testInvalidRedirectUri (String entity, boolean includeState,
-            int status) throws KustvaktException {
+    protected void testInvalidRedirectUri (String entity, String contentType,
+            boolean includeState, int status) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
                 node.at("/error").asText());
@@ -433,6 +433,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
             assertEquals(state, node.at("/state").asText());
         }
 
+        assertEquals("application/json;charset=utf-8", contentType);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), status);
     }
 }

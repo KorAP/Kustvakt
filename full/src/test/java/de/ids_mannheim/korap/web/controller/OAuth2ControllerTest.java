@@ -10,8 +10,8 @@ import java.util.Set;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
@@ -22,7 +22,6 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -175,7 +174,9 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String redirectUri = "https://different.uri/redirect";
         Response response = requestAuthorizationCode("code",
                 confidentialClientId, redirectUri, "", state, userAuthHeader);
-        testInvalidRedirectUri(response.readEntity(String.class), true,
+        
+        testInvalidRedirectUri(response.readEntity(String.class), 
+                response.getHeaderString("Content-Type"),true,
                 response.getStatus());
     }
 
@@ -185,7 +186,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         Response response =
                 requestAuthorizationCode("code", publicClientId2,
                         "http://localhost:1410", "", state, userAuthHeader);
-        testInvalidRedirectUri(response.readEntity(String.class), true,
+        testInvalidRedirectUri(response.readEntity(String.class), 
+                response.getHeaderString("Content-Type"),true,
                 response.getStatus());    }
 
     @Test
@@ -194,7 +196,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         Response response = requestAuthorizationCode("code",
                 publicClientId2, "http://public.com/index.html#redirect", "",
                 state, userAuthHeader);
-        testInvalidRedirectUri(response.readEntity(String.class), true,
+        testInvalidRedirectUri(response.readEntity(String.class), 
+                response.getHeaderString("Content-Type"),true,
                 response.getStatus());
     }
 
@@ -204,7 +207,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String redirectUri = "https://public.uri/redirect";
         Response response = requestAuthorizationCode("code",
                 publicClientId2, redirectUri, "", state, userAuthHeader);
-        testInvalidRedirectUri(response.readEntity(String.class), true,
+        testInvalidRedirectUri(response.readEntity(String.class), 
+                response.getHeaderString("Content-Type"),true,
                 response.getStatus());
     }
 

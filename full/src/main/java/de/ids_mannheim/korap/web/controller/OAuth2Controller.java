@@ -62,6 +62,7 @@ import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 @Controller
 @Path("{version}/oauth2")
 @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class, BlockingFilter.class })
+@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class OAuth2Controller {
 
     @Autowired
@@ -238,7 +239,6 @@ public class OAuth2Controller {
     @Path("token")
     @ResourceFilters({APIVersionFilter.class})
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response requestAccessToken (@Context HttpServletRequest request,
             @FormParam("grant_type") String grantType,
             MultivaluedMap<String, String> form) {
@@ -391,7 +391,6 @@ public class OAuth2Controller {
     @POST
     @Path("token/list")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<OAuth2TokenDto> listUserToken (
             @Context SecurityContext context,
             @FormParam("super_client_id") String superClientId,

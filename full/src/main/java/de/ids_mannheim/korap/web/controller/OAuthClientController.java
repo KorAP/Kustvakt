@@ -18,10 +18,7 @@ import javax.ws.rs.core.SecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import de.ids_mannheim.korap.web.utils.ResourceFilters;
-
 import de.ids_mannheim.korap.constant.OAuth2Scope;
-import de.ids_mannheim.korap.dto.InstalledPluginDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientDto;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2ClientInfoDto;
@@ -33,6 +30,7 @@ import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
+import de.ids_mannheim.korap.web.utils.ResourceFilters;
 
 /**
  * Defines controllers for OAuth2 clients, namely applications
@@ -60,6 +58,7 @@ import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 @Path("{version}/oauth2/client")
 @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
         BlockingFilter.class })
+@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class OAuthClientController {
 
     @Autowired
@@ -94,7 +93,6 @@ public class OAuthClientController {
     @POST
     @Path("register")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public OAuth2ClientDto registerClient (
             @Context SecurityContext securityContext,
             OAuth2ClientJson clientJson) {
@@ -149,7 +147,6 @@ public class OAuthClientController {
     @POST
     @Path("reset")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public OAuth2ClientDto resetClientSecret (
             @Context SecurityContext securityContext,
             @FormParam("client_id") String clientId) {
@@ -167,7 +164,6 @@ public class OAuthClientController {
 
     @GET
     @Path("{client_id}")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public OAuth2ClientInfoDto retrieveClientInfo (
             @Context SecurityContext securityContext,
             @PathParam("client_id") String clientId) {
@@ -205,7 +201,6 @@ public class OAuthClientController {
     @POST
     @Path("/list")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<OAuth2ClientInfoDto> listUserClients (
             @Context SecurityContext context,
             @FormParam("super_client_id") String superClientId,
