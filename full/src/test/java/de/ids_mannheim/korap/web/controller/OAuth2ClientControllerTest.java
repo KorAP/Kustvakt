@@ -12,22 +12,20 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.error.OAuthError;
+import org.glassfish.jersey.server.ContainerRequest;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.client.Entity;
-
-import org.glassfish.jersey.server.ContainerRequest;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -223,11 +221,11 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
                 response.getStatus());
 
         // localhost is not allowed
-        redirectUri = "http://localhost:1410";
-        clientJson.setRedirectURI(redirectUri);
-        response = registerClient(username, clientJson);
-        testInvalidRedirectUri(response.readEntity(String.class), false,
-                response.getStatus());
+//        redirectUri = "http://localhost:1410";
+//        clientJson.setRedirectURI(redirectUri);
+//        response = registerClient(username, clientJson);
+//        testInvalidRedirectUri(response.readEntity(String.class), false,
+//                response.getStatus());
         
         // fragment is not allowed
         redirectUri = "https://public.client.com/redirect.html#bar";

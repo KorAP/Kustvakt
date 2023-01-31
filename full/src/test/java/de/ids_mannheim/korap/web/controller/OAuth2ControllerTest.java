@@ -182,11 +182,18 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     @Test
     public void testAuthorizeWithRedirectUriLocalhost ()
             throws KustvaktException {
-        Response response =
-                requestAuthorizationCode("code", publicClientId2,
-                        "http://localhost:1410", "search", state, userAuthHeader);
-        testInvalidRedirectUri(response.readEntity(String.class), true,
-                response.getStatus());    }
+        Response response = requestAuthorizationCode("code", publicClientId2,
+                "http://localhost:1410", "search", state, userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
+                response.getStatus());
+
+        URI redirectUri = response.getLocation();
+        MultivaluedMap<String, String> params =
+                getQueryParamsFromURI(redirectUri);
+        assertNotNull(params.getFirst("code"));
+        assertEquals(state, params.getFirst("state"));
+        assertEquals("search", params.getFirst("scope"));
+    }
 
     @Test
     public void testAuthorizeWithRedirectUriFragment ()
