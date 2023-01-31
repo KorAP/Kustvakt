@@ -63,6 +63,7 @@ import de.ids_mannheim.korap.web.input.QueryJson;
 @Path("{version}/vc")
 @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
         BlockingFilter.class, PiwikFilter.class })
+@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class VirtualCorpusController {
 
     @Autowired
@@ -135,7 +136,6 @@ public class VirtualCorpusController {
      */
     @GET
     @Path("~{createdBy}/{vcName}")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
         DemoUserFilter.class, PiwikFilter.class })
     public QueryDto retrieveVCByName (
@@ -156,7 +156,6 @@ public class VirtualCorpusController {
 
     @GET
     @Path("/koralQuery/~{createdBy}/{vcName}")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public JsonNode retrieveVCKoralQuery (
             @Context SecurityContext securityContext,
             @PathParam("createdBy") String createdBy,
@@ -175,7 +174,6 @@ public class VirtualCorpusController {
     
     @GET
     @Path("/field/~{createdBy}/{vcName}")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public JsonNode retrieveVCField (
             @Context SecurityContext securityContext,
             @PathParam("createdBy") String createdBy,
@@ -209,7 +207,6 @@ public class VirtualCorpusController {
      * @return a list of virtual corpora
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<QueryDto> listAvailableVC (
             @Context SecurityContext securityContext,
             @QueryParam("username") String username) {
@@ -246,7 +243,6 @@ public class VirtualCorpusController {
      */
     @GET
     @Path("~{createdBy}")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<QueryDto> listUserOrSystemVC (
             @PathParam("createdBy") String createdBy,
             @Context SecurityContext securityContext) {
@@ -284,7 +280,6 @@ public class VirtualCorpusController {
      */
     @GET
     @Path("list/system-admin")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<QueryDto> listVCByType (
             @Context SecurityContext securityContext,
             @QueryParam("createdBy") String createdBy,
@@ -406,7 +401,6 @@ public class VirtualCorpusController {
      */
     @GET
     @Path("access")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<QueryAccessDto> listVCAccesses (
             @Context SecurityContext securityContext,
             @QueryParam("groupName") String groupName) {

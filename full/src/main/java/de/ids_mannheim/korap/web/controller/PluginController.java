@@ -33,6 +33,7 @@ import de.ids_mannheim.korap.web.filter.BlockingFilter;
 @Path("{version}/plugins")
 @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
         BlockingFilter.class })
+@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class PluginController {
 
     @Autowired
@@ -44,7 +45,6 @@ public class PluginController {
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<OAuth2ClientInfoDto> listPlugins (
             @Context SecurityContext context,
             @FormParam("super_client_id") String superClientId,
@@ -68,7 +68,6 @@ public class PluginController {
     @POST
     @Path("/install")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public InstalledPluginDto installPlugin (
             @Context SecurityContext context,
             @FormParam("super_client_id") String superClientId,
@@ -93,7 +92,6 @@ public class PluginController {
     @POST
     @Path("/installed")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public List<InstalledPluginDto> listInstalledPlugins (
             @Context SecurityContext context,
             @FormParam("super_client_id") String superClientId,

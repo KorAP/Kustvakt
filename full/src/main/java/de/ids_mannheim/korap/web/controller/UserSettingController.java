@@ -44,6 +44,7 @@ import de.ids_mannheim.korap.web.filter.PiwikFilter;
 @Path("{version}/{username: ~[a-zA-Z0-9_.]+}/setting")
 @ResourceFilters({ AuthenticationFilter.class, APIVersionFilter.class,
         PiwikFilter.class })
+@Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class UserSettingController {
 
     @Autowired
@@ -102,7 +103,6 @@ public class UserSettingController {
     @GET
     @ResourceFilters({ AuthenticationFilter.class, PiwikFilter.class,
             BlockingFilter.class })
-    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response retrieveDefaultSetting (@Context SecurityContext context,
             @PathParam("username") String username) {
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();

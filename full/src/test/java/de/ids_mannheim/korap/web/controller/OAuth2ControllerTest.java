@@ -174,8 +174,10 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     public void testAuthorizeDifferentRedirectUri () throws KustvaktException {
         String redirectUri = "https://different.uri/redirect";
         Response response = requestAuthorizationCode("code",
-                confidentialClientId, redirectUri, "search", state, userAuthHeader);
-        testInvalidRedirectUri(response.readEntity(String.class), true,
+                confidentialClientId, redirectUri, "", state, userAuthHeader);
+        
+        testInvalidRedirectUri(response.readEntity(String.class), 
+                response.getHeaderString("Content-Type"),true,
                 response.getStatus());
     }
 
@@ -201,7 +203,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         Response response = requestAuthorizationCode("code",
                 publicClientId2, "http://public.com/index.html#redirect", "search",
                 state, userAuthHeader);
-        testInvalidRedirectUri(response.readEntity(String.class), true,
+        testInvalidRedirectUri(response.readEntity(String.class), 
+                response.getHeaderString("Content-Type"),true,
                 response.getStatus());
     }
 
@@ -210,8 +213,9 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         // host not allowed by Apache URI Validator
         String redirectUri = "https://public.uri/redirect";
         Response response = requestAuthorizationCode("code",
-                publicClientId2, redirectUri, "search", state, userAuthHeader);
-        testInvalidRedirectUri(response.readEntity(String.class), true,
+                publicClientId2, redirectUri, "", state, userAuthHeader);
+        testInvalidRedirectUri(response.readEntity(String.class), 
+                response.getHeaderString("Content-Type"),true,
                 response.getStatus());
     }
 
