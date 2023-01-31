@@ -209,10 +209,14 @@
 	<!-- URLValidator -->
 	<bean id="redirectURIValidator" class="org.apache.commons.validator.routines.UrlValidator">
 		<constructor-arg value="http,https" index="0" />
-		<constructor-arg index="1" type="long">
+		<constructor-arg index="1" type="long" 
+		value="#{T(org.apache.commons.validator.routines.UrlValidator).ALLOW_LOCAL_URLS + 
+		T(org.apache.commons.validator.routines.UrlValidator).NO_FRAGMENTS}"/>
+		
+		<!-- <constructor-arg index="1" type="long">
 			<util:constant
 				static-field="org.apache.commons.validator.routines.UrlValidator.NO_FRAGMENTS" />
-		</constructor-arg>
+		</constructor-arg> -->
 	</bean>
 	<bean id="urlValidator" class="org.apache.commons.validator.routines.UrlValidator">
 		<constructor-arg value="http,https" />
