@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "498dad3b_d13a318b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-02-01T09:32:56Z",
+      "side": 1,
+      "message": "[INFO] Results:\n[INFO] \n[ERROR] Failures: \n[ERROR]   OAuth2AdminControllerTest.testCleanExpiredTokens:83\n[ERROR]   OAuth2AdminControllerTest.testUpdateClientPrivilege:141-\u003etestAccessTokenAfterUpgradingClient:153-\u003eOAuth2TestBase.retrieveClientInfo:329 expected:\u003c200\u003e but was:\u003c401\u003e\n[ERROR]   OAuth2ClientControllerTest.testRegisterConfidentialClient:124-\u003etestListConfidentialClient:654 expected:\u003c1\u003e but was:\u003c2\u003e\n[ERROR]   OAuth2ClientControllerTest.testRegisterConfidentialClientWithRefreshTokenExpiry:267-\u003eOAuth2TestBase.retrieveClientInfo:329 expected:\u003c200\u003e but was:\u003c401\u003e\n[ERROR]   OAuth2ClientControllerTest.testRetrieveClientInfo:82-\u003eOAuth2TestBase.retrieveClientInfo:329 expected:\u003c200\u003e but was:\u003c401\u003e\n[ERROR]   OAuth2PluginTest.testListAllPlugins:228 expected:\u003c2\u003e but was:\u003c3\u003e\n[ERROR]   OAuth2PluginTest.testRegisterPlugin:66-\u003etestRetrievePluginInfo:105-\u003eOAuth2TestBase.retrieveClientInfo:329 expected:\u003c200\u003e but was:\u003c401\u003e\n[INFO] \n[ERROR] Tests run: 466, Failures: 7, Errors: 0, Skipped: 14",
+      "revId": "2ef0173236b4e5585f389281507bc1eb9355c9f7",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
