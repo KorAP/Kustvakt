@@ -3,8 +3,11 @@ package de.ids_mannheim.korap.web.controller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
 import org.junit.Test;
@@ -12,10 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Response.Status;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -59,25 +58,37 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         return response;
     }
     
-    private void updateClientPriviledge (String clientId, boolean isSuper)
+    private Response updateClientPrivilegeWithAdminToken (String clientId)
             throws ProcessingException,
             KustvaktException {
+        
         Form form = new Form();
         form.param("client_id", clientId);
-        form.param("super", Boolean.toString(isSuper));
+        form.param("super", Boolean.toString(false));
+        form.param("token", "secret"); //adminToken
+        
+        Response response = target().path(API_VERSION).path("oauth2")
+                .path("admin").path("client").path("privilege")
+                .request()
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(form));
 
+        return response;
+    }
+    
+    
+    private void testUpdateClientPriviledgeUnauthorized (Form form)
+            throws ProcessingException, KustvaktException {
         Response response = updateClientPrivilege(username, form);
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         assertEquals(StatusCodes.AUTHORIZATION_FAILED,
                 node.at("/errors/0/0").asInt());
-
-        response = updateClientPrivilege("admin", form);
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
     @Test
-    public void testCleanExpiredTokens () {
+    public void testCleanExpiredTokensUsingAdminToken () {
         int refreshTokensBefore =
                 refreshDao.retrieveInvalidRefreshTokens().size();
         assertTrue(refreshTokensBefore > 0);
@@ -85,11 +96,13 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         int accessTokensBefore = accessDao.retrieveInvalidAccessTokens().size();
         assertTrue(accessTokensBefore > 0);
 
+        Form form = new Form();
+        form.param("token", "secret");
+        
         target().path(API_VERSION).path("oauth2").path("admin").path("token")
                 .path("clean")
                 .request()
-                .header(Attributes.AUTHORIZATION, adminAuthHeader)
-                .get();
+                .post(Entity.form(form));
 
         assertEquals(0, refreshDao.retrieveInvalidRefreshTokens().size());
         assertEquals(0, accessDao.retrieveInvalidAccessTokens().size());
@@ -116,7 +129,7 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
                 .path("clean")
                 .request()
                 .header(Attributes.AUTHORIZATION, adminAuthHeader)
-                .get();
+                .post(null);
 
         assertEquals(0, accessDao.retrieveInvalidAccessTokens().size());
     }
@@ -137,10 +150,22 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
                 clientAuthHeader);
         String accessToken = node.at("/access_token").asText();
 
-        updateClientPriviledge(clientId, true);
+        //update client priviledge to super client
+        Form form = new Form();
+        form.param("client_id", clientId);
+        form.param("super", Boolean.toString(true));
+        
+        testUpdateClientPriviledgeUnauthorized(form);
+        
+        response = updateClientPrivilege("admin", form);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
         testAccessTokenAfterUpgradingClient(clientId, accessToken);
 
-        updateClientPriviledge(clientId, false);
+        // degrade a super client to a common client
+        
+        updateClientPrivilegeWithAdminToken(clientId);
+        
         testAccessTokenAfterDegradingSuperClient(clientId, accessToken);
 
         deregisterClient(username, clientId);

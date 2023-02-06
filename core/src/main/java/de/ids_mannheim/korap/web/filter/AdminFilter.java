@@ -18,6 +18,9 @@ import de.ids_mannheim.korap.utils.JerseyUtils;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 
 /**
+ * Verifies admin credentials or token before allowing access to
+ * administrative services
+ * 
  * @author hanl, margaretha
  * 
  * @see {@link AuthenticationFilter}
@@ -29,6 +32,7 @@ public class AdminFilter extends AuthenticationFilter {
     private @Context ServletContext servletContext;
     @Autowired
     private AdminDao adminDao;
+
     @Autowired
     private KustvaktResponseHandler kustvaktResponseHandler;
 
@@ -36,28 +40,37 @@ public class AdminFilter extends AuthenticationFilter {
     public void filter (ContainerRequestContext context) {
         super.filter(context);
         String username = "guest";
-        
-        // legacy support for kustvakt core
-        String adminToken = JerseyUtils.getFormParameters(context).asMap().getFirst("token");
+        String adminToken = JerseyUtils.getFormParameters(context).asMap()
+                .getFirst("token");
+        if (!checkAdminToken(adminToken)) {
+            SecurityContext securityContext = context.getSecurityContext();
+            TokenContext tokenContext = (TokenContext) securityContext
+                    .getUserPrincipal();
+            checkAdminCredentials(tokenContext, username);
+        }
+    }
+
+
+    private boolean checkAdminToken (String adminToken) {
         if (adminToken != null && !adminToken.isEmpty()) {
-            // startswith token=
-            // adminToken = adminToken.substring(6);
             if (adminToken
                     .equals(servletContext.getInitParameter("adminToken"))) {
-                return;
+                return true;
             }
         }
+        return false;
+    }
 
-        SecurityContext securityContext = context.getSecurityContext();
-        TokenContext tokenContext = (TokenContext) securityContext
-                .getUserPrincipal();
-        
+
+    private void checkAdminCredentials (TokenContext tokenContext,
+            String username) {
         if (tokenContext != null) {
             username = tokenContext.getUsername();
             if (adminDao.isAdmin(username)) {
                 return;
             }
         }
+
         throw kustvaktResponseHandler.throwit(new KustvaktException(
                 StatusCodes.AUTHORIZATION_FAILED,
                 "Unauthorized operation for user: " + username, username));

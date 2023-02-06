@@ -11,6 +11,8 @@
 - Allowed OAuth2 clients to use localhost as redirect URIs.
 2023-02-03
 - Fixed content-type in error responses by changing it to application/json
+2023-02-06
+- Allow admin access using admin token for the clean token API
 
 # version 0.69.1
 
