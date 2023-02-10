@@ -13,18 +13,20 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.entity.ContentType;
+import org.glassfish.jersey.server.ContainerRequest;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.client.Entity;
-import org.glassfish.jersey.server.ContainerRequest;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -221,15 +223,16 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals(ResourceType.PUBLISHED.displayName(),
                 node.at("/type").asText());
 
+        Form f = new Form();
+        f.param("status", "HIDDEN");
         // check gill in the hidden group of the vc
         Response response = target().path(API_VERSION).path("group")
-                .path("list").path("system-admin")
-                .queryParam("status", "HIDDEN")
+                .path("admin").path("list")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get();
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(f));
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);

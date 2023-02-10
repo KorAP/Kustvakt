@@ -10,10 +10,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 
+import org.glassfish.jersey.server.ContainerRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import org.glassfish.jersey.server.ContainerRequest;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.TokenType;
@@ -62,9 +61,8 @@ public class DemoUserFilter implements ContainerRequestFilter {
         c.setUsername(demo.getUsername());
         c.setHostAddress(host);
         c.setUserAgent(agent);
-        c.setExpirationTime(TimeUtils.plusSeconds(
-                config
-                        .getShortTokenTTL()).getMillis());
+        c.setExpirationTime(
+                TimeUtils.plusSeconds(config.getShortTokenTTL()).getMillis());
         c.setTokenType(TokenType.BASIC);
         return c;
     }

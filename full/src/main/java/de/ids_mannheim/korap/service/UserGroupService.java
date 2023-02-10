@@ -144,33 +144,22 @@ public class UserGroupService {
     }
 
     public List<UserGroupDto> retrieveUserGroupByStatus (String username,
-            String contextUsername, UserGroupStatus status)
-            throws KustvaktException {
+            UserGroupStatus status) throws KustvaktException {
 
-        boolean isAdmin = adminDao.isAdmin(contextUsername);
+        List<UserGroup> userGroups =
+                userGroupDao.retrieveGroupByStatus(username, status);
+        Collections.sort(userGroups);
+        ArrayList<UserGroupDto> dtos = new ArrayList<>(userGroups.size());
 
-        if (isAdmin) {
-            List<UserGroup> userGroups =
-                    userGroupDao.retrieveGroupByStatus(username, status);
-            Collections.sort(userGroups);
-            ArrayList<UserGroupDto> dtos = new ArrayList<>(userGroups.size());
-
-            List<UserGroupMember> members;
-            UserGroupDto groupDto;
-            for (UserGroup group : userGroups) {
-                members = groupMemberDao.retrieveMemberByGroupId(group.getId(),
-                        true);
-                groupDto = converter.createUserGroupDto(group, members, null,
-                        null);
-                dtos.add(groupDto);
-            }
-            return dtos;
+        List<UserGroupMember> members;
+        UserGroupDto groupDto;
+        for (UserGroup group : userGroups) {
+            members =
+                    groupMemberDao.retrieveMemberByGroupId(group.getId(), true);
+            groupDto = converter.createUserGroupDto(group, members, null, null);
+            dtos.add(groupDto);
         }
-        else {
-            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: " + contextUsername,
-                    contextUsername);
-        }
+        return dtos;
     }
 
     public List<UserGroupMember> retrieveQueryAccessAdmins (UserGroup userGroup)

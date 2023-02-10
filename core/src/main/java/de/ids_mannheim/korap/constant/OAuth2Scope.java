@@ -8,6 +8,7 @@ package de.ids_mannheim.korap.constant;
 public enum OAuth2Scope {
     
     ALL, 
+    @Deprecated
     ADMIN,
     
     OPENID, 

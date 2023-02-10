@@ -12,6 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
+
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -220,15 +224,17 @@ public class VCReferenceTest extends SpringJerseyTest {
         JsonNode node = JsonUtils.readTree(ent);
         assertTrue(node.at("/matches").size() > 0);
         
+        Form f = new Form();
+        f.param("status", "HIDDEN");
+        
         // check dory in the hidden group of the vc
         response = target().path(API_VERSION).path("group")
-                .path("list").path("system-admin")
-                .queryParam("status", "HIDDEN")
+                .path("admin").path("list")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get();
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(f));
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);

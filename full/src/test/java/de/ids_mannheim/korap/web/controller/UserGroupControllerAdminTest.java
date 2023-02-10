@@ -3,6 +3,7 @@ package de.ids_mannheim.korap.web.controller;
 import static org.junit.Assert.assertEquals;
 
 import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
 
 import org.junit.Test;
 
@@ -19,6 +20,8 @@ import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import de.ids_mannheim.korap.constant.PredefinedRole;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.service.UserGroupService;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
@@ -27,8 +30,8 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  */
 public class UserGroupControllerAdminTest extends SpringJerseyTest {
 
-    private String adminUser = "admin";
-    private String testUser = "UserGroupControllerAdminTest";
+    private String sysAdminUser = "admin";
+    private String testUser = "group-admin";
 
     private JsonNode listGroup (String username)
             throws ProcessingException,
@@ -47,33 +50,81 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testListDoryGroups () throws KustvaktException {
+    public void testListUserGroupsUsingAdminToken () throws KustvaktException {
+        Form f = new Form();
+        f.param("username", "dory");
+        f.param("token", "secret");
+        
         Response response = target().path(API_VERSION).path("group")
-                .path("list").path("system-admin")
-                .queryParam("username", "dory")
+                .path("admin").path("list")
                 .request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(adminUser, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get();
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(f));
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
-        // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(3, node.size());
     }
+    
+    
+    /**
+     * Cannot use admin token
+     * see
+     * {@link UserGroupService#retrieveUserGroupByStatus(String, 
+     * String, de.ids_mannheim.korap.constant.UserGroupStatus)}
+     * 
+     * @throws KustvaktException
+     */
+//    @Test
+//    public void testListUserGroupsWithAdminToken () throws KustvaktException {
+//        Response response = target().path(API_VERSION).path("group")
+//                .path("list").path("system-admin")
+//                .queryParam("username", "dory")
+//                .queryParam("token", "secret")
+//                .request()
+//                .get();
+//
+//        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+//        String entity = response.readEntity(String.class);
+//        JsonNode node = JsonUtils.readTree(entity);
+//        assertEquals(3, node.size());
+//    }
+    
+    
+    @Test
+    public void testListUserGroupsUnauthorized () throws KustvaktException {
+        Form f = new Form();
+        f.param("username", "dory");
+        
+        Response response = target().path(API_VERSION).path("group")
+                .path("admin").path("list")
+                .request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(testUser, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(f));
+
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED, node.at("/errors/0/0").asInt());
+    }
 
     @Test
-    public void testListDoryActiveGroups () throws KustvaktException {
+    public void testListUserGroupsWithStatus () throws KustvaktException {
+        Form f = new Form();
+        f.param("username", "dory");
+        f.param("status", "ACTIVE");
+        
         Response response = target().path(API_VERSION).path("group")
-                .path("list").path("system-admin")
+                .path("admin").path("list")
                 .queryParam("username", "dory").queryParam("status", "ACTIVE")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(adminUser, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get();
+                        .createBasicAuthorizationHeaderValue(sysAdminUser, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(f));
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
@@ -89,7 +140,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         Response response = target().path(API_VERSION).path("group")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(adminUser, "pass"))
+                        .createBasicAuthorizationHeaderValue(sysAdminUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get();
 
@@ -102,12 +153,12 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     public void testListByStatusAll () throws
             ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("group")
-                .path("list").path("system-admin")
+                .path("admin").path("list")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(adminUser, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get();
+                        .createBasicAuthorizationHeaderValue(sysAdminUser, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED)
+                .post(null);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
@@ -125,14 +176,18 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     @Test
     public void testListByStatusHidden () throws
             ProcessingException, KustvaktException {
+        Form f = new Form();
+        f.param("status", "HIDDEN");
+        
         Response response = target().path(API_VERSION).path("group")
-                .path("list").path("system-admin")
+                .path("admin").path("list")
                 .queryParam("status", "HIDDEN")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(adminUser, "pass"))
+                        .createBasicAuthorizationHeaderValue(sysAdminUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get();
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(f));
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
@@ -142,7 +197,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testUserGroup () throws
+    public void testUserGroupAdmin () throws
             ProcessingException, KustvaktException {
 
         String groupName = "admin-test-group";
@@ -205,7 +260,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
                 .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
-                                .createBasicAuthorizationHeaderValue(adminUser,
+                                .createBasicAuthorizationHeaderValue(sysAdminUser,
                                         "password"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .post(Entity.form(form));
@@ -237,7 +292,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
                 .request()
                 .header(Attributes.AUTHORIZATION,
                         HttpAuthorizationHandler
-                                .createBasicAuthorizationHeaderValue(adminUser,
+                                .createBasicAuthorizationHeaderValue(sysAdminUser,
                                         "password"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .post(Entity.form(form));
@@ -262,7 +317,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
                 .path("@" + groupName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(adminUser, "pass"))
+                        .createBasicAuthorizationHeaderValue(sysAdminUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .get();
 
@@ -281,7 +336,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
                 .path("@" + groupName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(adminUser, "pass"))
+                        .createBasicAuthorizationHeaderValue(sysAdminUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .delete();
 
@@ -300,7 +355,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
                 .path("@" + groupName).path("~marlin")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(adminUser, "pass"))
+                        .createBasicAuthorizationHeaderValue(sysAdminUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .delete();
 
@@ -326,7 +381,7 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
                 .request()
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(adminUser, "pass"))
+                        .createBasicAuthorizationHeaderValue(sysAdminUser, "pass"))
                 .post(Entity.form(form));
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());

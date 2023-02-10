@@ -21,11 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import de.ids_mannheim.korap.web.utils.ResourceFilters;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.constant.QueryType;
-import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.dto.QueryAccessDto;
 import de.ids_mannheim.korap.dto.QueryDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -35,11 +33,13 @@ import de.ids_mannheim.korap.service.QueryService;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
+import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
 import de.ids_mannheim.korap.web.input.QueryJson;
+import de.ids_mannheim.korap.web.utils.ResourceFilters;
 
 /**
  * VirtualCorpusController defines web APIs related to virtual corpus
@@ -81,8 +81,8 @@ public class VirtualCorpusController {
      * VC name cannot be updated.
      * 
      * The VC creator must be the same as the authenticated username,
-     * except for admins. Admins can create or update system VC as
-     * well as VC for any users.
+     * except for system admins. System admins can create or update 
+     * system VC and any VC for any users.
      * 
      * 
      * @param securityContext
@@ -126,6 +126,8 @@ public class VirtualCorpusController {
     /**
      * Returns the virtual corpus with the given name and creator.
      * This web-service is also available for guests.
+     * 
+     * System admin can retrieve private or project vc of any users.
      * 
      * @param securityContext
      * @param createdBy
@@ -172,8 +174,19 @@ public class VirtualCorpusController {
         }
     }
     
+    /** Retrieves field values of a virtual corpus, e.g. corpus sigle.
+     * 
+     * This service is restricted to system admin only.
+     * 
+     * @param securityContext
+     * @param createdBy
+     * @param vcName
+     * @param fieldName
+     * @return
+     */
     @GET
     @Path("/field/~{createdBy}/{vcName}")
+    @ResourceFilters({ APIVersionFilter.class, AdminFilter.class })
     public JsonNode retrieveVCField (
             @Context SecurityContext securityContext,
             @PathParam("createdBy") String createdBy,
@@ -182,7 +195,6 @@ public class VirtualCorpusController {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            scopeService.verifyScope(context, OAuth2Scope.ADMIN);
             return service.retrieveFieldValues(context.getUsername(), vcName,
                     createdBy, QueryType.VIRTUAL_CORPUS, fieldName);
         }
@@ -263,40 +275,7 @@ public class VirtualCorpusController {
         }
     }
     
-    /**
-     * Lists virtual corpora by creator and type. This is a controller
-     * for system admin requiring valid system admin authentication.
-     * 
-     * If type is not specified, retrieves virtual corpora of all
-     * types. If createdBy is not specified, retrieves virtual corpora
-     * of all users.
-     * 
-     * @param securityContext
-     * @param createdBy
-     *            username of virtual corpus creator (optional)
-     * @param type
-     *            {@link ResourceType}
-     * @return a list of virtual corpora
-     */
-    @GET
-    @Path("list/system-admin")
-    public List<QueryDto> listVCByType (
-            @Context SecurityContext securityContext,
-            @QueryParam("createdBy") String createdBy,
-            @QueryParam("type") ResourceType type) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
-        try {
-            scopeService.verifyScope(context, OAuth2Scope.ADMIN);
-            return service.listQueryByType(context.getUsername(), createdBy, type,
-                    QueryType.VIRTUAL_CORPUS);
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
-    }
-
-
+   
     /**
      * Only the VC owner and system admins can delete VC. VCA admins
      * can delete VC-accesses e.g. of project VC, but not the VC
