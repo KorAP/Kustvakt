@@ -134,21 +134,14 @@ public class QueryService {
         return createQueryDtos(list, queryType);
     }
 
-    public List<QueryDto> listQueryByType (String username, String createdBy,
-            ResourceType type, QueryType queryType) throws KustvaktException {
+    public List<QueryDto> listQueryByType (String createdBy, ResourceType type,
+            QueryType queryType) throws KustvaktException {
 
-        boolean isAdmin = adminDao.isAdmin(username);
+        List<QueryDO> virtualCorpora =
+                queryDao.retrieveQueryByType(type, createdBy, queryType);
+        Collections.sort(virtualCorpora);
+        return createQueryDtos(virtualCorpora, queryType);
 
-        if (isAdmin) {
-            List<QueryDO> virtualCorpora =
-                    queryDao.retrieveQueryByType(type, createdBy, queryType);
-            Collections.sort(virtualCorpora);
-            return createQueryDtos(virtualCorpora, queryType);
-        }
-        else {
-            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: " + username, username);
-        }
     }
 
     private ArrayList<QueryDto> createQueryDtos (List<QueryDO> queryList,
@@ -631,10 +624,10 @@ public class QueryService {
         
         ParameterChecker.checkStringValue(fieldName, "fieldName");
         
-        if (!adminDao.isAdmin(username)) {
-            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: " + username, username);
-        }
+//        if (!adminDao.isAdmin(username)) {
+//            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+//                    "Unauthorized operation for user: " + username, username);
+//        }
         
         if (fieldName.equals("tokens") || fieldName.equals("base")) {
             throw new KustvaktException(StatusCodes.NOT_ALLOWED,

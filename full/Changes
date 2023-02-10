@@ -12,6 +12,9 @@
 2023-02-03
 - Fixed content-type in error responses by changing it to application/json
 
+2023-02-10
+- Use admin filter instead of OAuth2 ADMIN scope  
+
 # version 0.69.1
 
 - Upgrade version for docker including indexer (diewald)

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Set;
 
 import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -380,17 +381,19 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
+        Form f = new Form();
+        f.param("username", username);
+        f.param("status", "DELETED");
         // EM: this is so complicated because the group retrieval are not allowed 
         // for delete groups
         // check group
-        response = target().path(API_VERSION).path("group").path("list")
-                .path("system-admin").queryParam("username", username)
-                .queryParam("status", "DELETED")
+        response = target().path(API_VERSION).path("group")
+                .path("admin").path("list")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(admin, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get();
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(f));
         
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);

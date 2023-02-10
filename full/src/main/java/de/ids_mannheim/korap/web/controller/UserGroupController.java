@@ -11,7 +11,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -20,8 +19,6 @@ import javax.ws.rs.core.SecurityContext;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-
-import de.ids_mannheim.korap.web.utils.ResourceFilters;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
@@ -32,9 +29,11 @@ import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.UserGroupService;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
+import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
+import de.ids_mannheim.korap.web.utils.ResourceFilters;
 
 /**
  * UserGroupController defines web APIs related to user groups,
@@ -88,38 +87,7 @@ public class UserGroupController {
         }
     }
 
-    /**
-     * Lists user-groups for system-admin purposes. If username is
-     * specified, lists user-groups of the given user, otherwise list
-     * user-groups of all users. If status specified, list only
-     * user-groups with the given status, otherwise list user-groups
-     * regardless of their status.
-     * 
-     * @param securityContext
-     * @param username
-     *            a username
-     * @param status
-     *            {@link UserGroupStatus}
-     * @return a list of user-groups
-     */
-    @GET
-    @Path("list/system-admin")
-    public List<UserGroupDto> getUserGroupBySystemAdmin (
-            @Context SecurityContext securityContext,
-            @QueryParam("username") String username,
-            @QueryParam("status") UserGroupStatus status) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
-        try {
-            scopeService.verifyScope(context, OAuth2Scope.ADMIN);
-            return service.retrieveUserGroupByStatus(username,
-                    context.getUsername(), status);
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
-    }
-
+    
     /**
      * Retrieves a specific user-group. Only system admins are
      * allowed.
@@ -131,13 +99,13 @@ public class UserGroupController {
      */
     @GET
     @Path("@{groupName}")
+    @ResourceFilters({ APIVersionFilter.class, AdminFilter.class })
     public UserGroupDto retrieveUserGroup (
             @Context SecurityContext securityContext,
             @PathParam("groupName") String groupName) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
         try {
-            scopeService.verifyScope(context, OAuth2Scope.ADMIN);
             return service.searchByName(context.getUsername(), groupName);
         }
         catch (KustvaktException e) {

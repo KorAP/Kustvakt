@@ -2,22 +2,24 @@ package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
 
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.client.Entity;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
@@ -27,10 +29,23 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
 
     private String admin = "admin";
-    private String username = "VirtualCorpusControllerAdminTest";
+    private String testUser = "VirtualCorpusControllerAdminTest";
 
+    
+    private void testResponseUnauthorized (Response response) throws KustvaktException {
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Unauthorized operation for user: " + testUser,
+                node.at("/errors/0/1").asText());
+    }
+    
     @Test
-    public void testSearchPrivateVC () throws
+    public void testRetrievePrivateVC () throws
             ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("~dory").path("dory-vc")
@@ -48,9 +63,21 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         assertEquals(1, node.at("/id").asInt());
         assertEquals("dory-vc", node.at("/name").asText());
     }
+    
+    @Test
+    public void testRetrievePrivateVCUnauthorized ()
+            throws ProcessingException, KustvaktException {
+        Response response = target().path(API_VERSION).path("vc").path("~dory")
+                .path("dory-vc").request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(testUser, "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").get();
+
+        testResponseUnauthorized(response);
+    }
 
     @Test
-    public void testSearchProjectVC () throws
+    public void testRetrieveProjectVC () throws
             ProcessingException, KustvaktException {
 
         Response response = target().path(API_VERSION).path("vc")
@@ -70,8 +97,23 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
                 node.at("/type").asText());
     }
 
+    
     @Test
-    public void testListDoryVC () throws
+    public void testRetrieveProjectVCUnauthorized () throws
+            ProcessingException, KustvaktException {
+
+        Response response = target().path(API_VERSION).path("vc")
+                .path("~dory").path("group-vc")
+                .request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(testUser, "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .get();
+        testResponseUnauthorized(response);
+    }
+
+    @Test
+    public void testListUserVC () throws
             ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .queryParam("username", "dory")
@@ -87,17 +129,40 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(4, node.size());
     }
-
-    private JsonNode testListSystemVC () throws
-            ProcessingException, KustvaktException {
+    
+    private JsonNode testAdminListVC (String username)
+            throws ProcessingException,
+            KustvaktException {
+        Form f = new Form();
+        f.param("createdBy", username);
+        
         Response response = target().path(API_VERSION).path("vc")
-                .path("list").path("system-admin").queryParam("type", "SYSTEM")
-                .queryParam("createdBy", "system")
+                .path("admin").path("list")
                 .request()
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(admin, "pass"))
-                .get();
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(f));
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        String entity = response.readEntity(String.class);
+        return JsonUtils.readTree(entity);
+    }
+
+    private JsonNode testAdminListVC_UsingAdminToken (String username, ResourceType type)
+            throws ProcessingException, KustvaktException {
+        Form f = new Form();
+        f.param("createdBy", username);
+        f.param("type", type.toString());
+        f.param("token", "secret");
+        
+        Response response = target().path(API_VERSION).path("vc").path("admin")
+                .path("list").request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(admin, "pass"))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(f));
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
@@ -121,7 +186,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
-        JsonNode node = testListSystemVC();
+        JsonNode node = testAdminListVC_UsingAdminToken("system",ResourceType.SYSTEM);
         assertEquals(2, node.size());
 
         testDeleteSystemVC(admin, "new-system-vc");
@@ -140,12 +205,12 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        JsonNode node = testListSystemVC();
+        JsonNode node = testAdminListVC_UsingAdminToken("system",ResourceType.SYSTEM);
         assertEquals(1, node.size());
     }
 
     @Test
-    public void testPrivateVC () throws
+    public void testCreatePrivateVC () throws
             ProcessingException, KustvaktException {
         String json = "{\"type\": \"PRIVATE\""
                 + ",\"queryType\": \"VIRTUAL_CORPUS\""
@@ -153,41 +218,24 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
 
         String vcName = "new-vc";
         Response response = target().path(API_VERSION).path("vc")
-                .path("~"+username).path(vcName)
+                .path("~"+testUser).path(vcName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                        .createBasicAuthorizationHeaderValue(admin, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .put(Entity.json(json));
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
 
-        JsonNode node = testListUserVC(username);
+        JsonNode node = testAdminListVC(testUser);
         assertEquals(1, node.size());
 
-        testEditPrivateVC(username, vcName);
-        testDeletePrivateVC(username, vcName);
+        testEditPrivateVC(testUser, vcName);
+        testDeletePrivateVC(testUser, vcName);
     }
 
-    private JsonNode testListUserVC (String username)
-            throws ProcessingException,
-            KustvaktException {
-        Response response = target().path(API_VERSION).path("vc")
-                .path("list").path("system-admin")
-                .queryParam("createdBy", username)
-                .request()
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(admin, "pass"))
-                .get();
-
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
-        String entity = response.readEntity(String.class);
-        return JsonUtils.readTree(entity);
-    }
-
+    
     private void testEditPrivateVC (String vcCreator, String vcName)
             throws ProcessingException,
             KustvaktException {
@@ -205,7 +253,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
 
         assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
-        JsonNode node = testListUserVC(username);
+        JsonNode node = testAdminListVC(testUser);
         assertEquals("edited vc", node.at("/0/description").asText());
     }
 
@@ -222,7 +270,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
-        JsonNode node = testListUserVC(vcCreator);
+        JsonNode node = testAdminListVC(vcCreator);
         assertEquals(0, node.size());
     }
 
@@ -274,13 +322,22 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         String vcName = "marlin-vc";
         String groupName = "marlin-group";
 
+        JsonNode node2 = testAdminListVC_UsingAdminToken(vcCreator,ResourceType.PROJECT);
+        assertEquals(0, node2.size());
+        
         testCreateVCAccess(vcCreator, vcName, groupName);
         JsonNode node = testlistAccessByGroup(groupName);
 
         String accessId = node.at("/accessId").asText();
         testDeleteVCAccess(accessId);
 
+        node2 = testAdminListVC_UsingAdminToken(vcCreator,ResourceType.PROJECT);
+        assertEquals(1, node2.size());
+        
         testEditVCType(admin, vcCreator, vcName, ResourceType.PRIVATE);
+        
+        node2 = testAdminListVC_UsingAdminToken(vcCreator,ResourceType.PROJECT);
+        assertEquals(0, node2.size());
     }
 
     private void testCreateVCAccess (String vcCreator, String vcName,
@@ -308,7 +365,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
                 .path("access").path(accessId)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue("dory", "pass"))
+                        .createBasicAuthorizationHeaderValue(admin, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .delete();
 
