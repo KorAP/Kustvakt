@@ -7,8 +7,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
 import org.junit.Test;
@@ -16,10 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.client.Entity;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -488,9 +487,25 @@ public class OAuth2PluginTest extends OAuth2TestBase {
         node = retrieveUserInstalledPlugin(getSuperClientForm());
         assertEquals(0, node.size());
 
+        testReinstallUninstalledPlugin();
+        
         testUninstallNotInstalledPlugin();
     }
     
+    private void testReinstallUninstalledPlugin ()
+            throws ProcessingException, KustvaktException {
+        testInstallConfidentialPlugin(superClientId, confidentialClientId2,
+                username);
+        JsonNode node = retrieveUserInstalledPlugin(getSuperClientForm());
+        assertEquals(1, node.size());
+        
+        Response response = uninstallPlugin(confidentialClientId2, username);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
+        node = retrieveUserInstalledPlugin(getSuperClientForm());
+        assertEquals(0, node.size());
+    }
+
     private JsonNode testRequestAccessToken (String clientId) throws KustvaktException {
         String userAuthHeader = HttpAuthorizationHandler
                 .createBasicAuthorizationHeaderValue(username, "password");

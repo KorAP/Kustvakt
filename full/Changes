@@ -14,7 +14,11 @@
 2023-02-06
 - Allow admin access using admin token for the clean token API
 2023-02-10
+<<<<<<< Upstream, based on master
 - Use admin filter instead of OAuth2 ADMIN scope  
+=======
+- Added a plugin test.
+>>>>>>> 6bd726f Added a plugin test.
 
 
 # version 0.69.1
