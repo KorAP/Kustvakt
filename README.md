@@ -55,7 +55,7 @@ mvn clean package
 </pre>
 The jar file is located in the ```target/``` folder.
 
-## Customizing Kustvakt configuration
+# Customizing Kustvakt configuration
 
 Copy the default Kustvakt configuration file (e.g. ```full/src/main/resources/kustvakt.conf``` or ```lite/src/main/resources/kustvakt-lite.conf```), to the same  folder as the Kustvakt jar files  (```/target```). Please do not change the name of the configuration file.
 
@@ -64,88 +64,6 @@ Copy the default Kustvakt configuration file (e.g. ```full/src/main/resources/ku
 Set krill.indexDir in the configuration file to the location of your Krill index (relative path to the jar). In Kustvakt's root directory, there is a sample index, e.g.
 <pre>krill.indexDir = ../../sample-index</pre>
 
-### Setting LDAP
-
-Set the location of the LDAP configuration file for Kustvakt full version. The file must contain all necessary information to access the LDAP system and to authenticate and authorize users (see example LDAP config below).
-
-```properties
-ldap.config = path-to-ldap-config
-```
-
-To find, authenticate and authorize users, the ldap filter expression specified in `searchFilter` is used. Within this expression all occurrences of the placeholders `${login}` and `${password}` are replaced with the name and password the user has entered for logging in.
-
-If `searchFilter` does not contain any occurrence of `${password}` the user DN found via the filter expression will be authenticated via a regular LDAP bind operation, using the entered password. In this case, depending on the LDAP server, also hashed passwords are supported.
-
-Optionally, the two filters `authFilter` and `userNotBlockedFilter` can be specified, in addition. The first should be used to check whether a known user has also signed the necessary EULA, for example, and the second to check that the known user is not blocked. This will be reflected in the error messages for failed logins.
-
-###### Example ldap.conf
-
-```properties
-host=ldap.example.org
-# use LDAP over SSL (LDAPS) if the server supports it
-useSSL=true
-port=636
-# to trust all certs, leave trustStore empty
-trustStore=truststore.jks
-# add ssl cipher suites if required as csv, e.g. TLS_RSA_WITH_AES_256_GCM_SHA384
-additionalCipherSuites=
-searchBase=dc=example,dc=org
-# DN of a user with full read access
-sLoginDN=cn=admin,dc=example,dc=org
-pwd=adminpassword
-# search for user with uid or email matching login, and signed EULA
-searchFilter=(&(|(uid=${login})(mail=${login}))(signedeula=TRUE))
-```
-
-#### Using Kustvakt-full's embedded LDAP server
-
-Instead of you own LDAP server, you can also use Kustvakt-full's embedded in-memory LDAP server which uses [UnboundID LDAP SDK](https://github.com/pingidentity/ldapsdk) for this purpose. In order to do so, the following additional settings are required in your `ldap.conf`:
-
-```properties
-useEmbeddedServer=true
-ldifFile=path-to-users-directory.ldif
-# port=1234
-```
-
-Note that currently the embedded server ignores the `host` and `useSSL` settings, and only listens on the `localhost` interface. The `port` setting, on the other hand, is used.
-
-The embedded server currently supports the following password encodings: clear passwords (prefix `{CLEAR}` or empty), `{HEX}`,  `{BASE64}`, `{SHA}`, `{SHA256}`.
-
-Note that none of these are safe against brute force attacks.
-
-##### Try out the embedded LDAP server
-
-You can try Kustvakt-full with embedded LDAP server using the  example configuration provided in [embedded-ldap-example.conf](./full/src/main/resources/embedded-ldap-example.conf) and users defined in [example-users.ldif](./full/src/main/resources/example-users.ldif) like this:
-
-```shell
-$ cp src/main/resources/kustvakt.conf .
-$ java -jar target/Kustvakt-full-*.jar
-```
-
-The [example-users.ldif](./full/src/main/resources/example-users.ldif) defines the following login:password combinations: user:password, user1:password1, …, user4:password4, with differently encoded passwords.
-
-To try it out together with KorAP's web user interface [Kalamar](https://github.com/KorAP/Kalamar), add `"Auth"` to the loaded plugins in `kalamar.conf`:
-
-```perl
-plugins => ["Auth"],
-```
-
-### Setting BasicAuthentication for Testing
-
-For testing, you can use/activate BasicAuthentication, see Spring XML configuration file for testing at ```/full/src/test/resources/test-config.xml```. BasicAuthentication uses a dummy UserDao allowing all users to be authenticated users. You can implement UserDao by connecting it to a user table in a database and checking username and password for authentication. 
-
-	<bean id="basic_auth"
-		class="de.ids_mannheim.korap.authentication.BasicAuthentication" />
-		
-	<util:list id="kustvakt_authproviders"
-		value-type="de.ids_mannheim.korap.interfaces.AuthenticationIface">
-		<ref bean="basic_auth" />
-		...
-	</util:list>
-
-
-
-## Optional Custom Configuration
 
 ### Changing Kustvakt Server Port and Host
 
@@ -171,7 +89,7 @@ missing a foundry.
 # Running Kustvakt Server
 Requires ```kustvakt.conf``` or ```kustvakt-lite.conf``` in the same folder as the jar file. Otherwise assuming sample-index located in the parent directory of the jar file.
 
-Kustvakt full version requires an LDAP configuration file containing an admin password to access an LDAP system. You can still run Kustvakt full version without an LDAP system, but user authentication functions and services cannot be used. Only services for guest/demo user would be available.
+Kustvakt full version requires [LDAP configuration](https://github.com/KorAP/Kustvakt/wiki/LDAP-Setting). Kustvakt full version can be run without an LDAP system, but user authentication functions and services cannot be used. Only services for guest/demo user would be available.
 
 <pre>
 java -jar target/Kustvakt-[lite/full]-[version].jar    
@@ -205,7 +123,7 @@ curl -H "Content-Type: application/x-www-form-urlencoded"
 
 # Advanced Setup
 
-Advanced setup such as setting database properties and configuring mail settings for email notifications, are described in the [wiki](https://github.com/KorAP/Kustvakt/wiki).
+Advanced setup such as LDAP configurations, setting a test environment, database properties and mail configurations for email notifications, are described in the [wiki](https://github.com/KorAP/Kustvakt/wiki).
 
 # License
 
