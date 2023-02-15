@@ -1,8 +1,6 @@
 package de.ids_mannheim.korap.web.controller;
 
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator; // 07.02.17/FB
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -17,17 +15,14 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.glassfish.jersey.server.ContainerRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-
-import org.glassfish.jersey.server.ContainerRequest;
-import de.ids_mannheim.korap.web.utils.ResourceFilters;
 
 import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.authentication.http.AuthorizationData;
@@ -43,13 +38,13 @@ import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.ServiceInfo;
-import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
+import de.ids_mannheim.korap.web.utils.ResourceFilters;
 
 // import com.sun.xml.internal.messaging.saaj.util.Base64;
 
@@ -76,7 +71,7 @@ public class AuthenticationController {
     @Autowired
     private HttpAuthorizationHandler authorizationHandler;
 
-    private static Boolean DEBUG_LOG = false;
+    private static Boolean DEBUG_LOG = true;
 
     //todo: bootstrap function to transmit certain default configuration settings and examples (example user queries,
     // default usersettings, etc.)
@@ -172,6 +167,7 @@ public class AuthenticationController {
 //    }
 
 
+    @Deprecated
     @GET
     @Path("apiToken")
     //@ResourceFilters({HeaderFilter.class})
@@ -183,116 +179,143 @@ public class AuthenticationController {
             @QueryParam("scope") String scopes,
             //   @Context WebServiceContext wsContext, // FB
             @Context SecurityContext secCtx) {
-
-        List<String> auth =
-                headers.getRequestHeader(ContainerRequest.AUTHORIZATION);
-        if (auth == null || auth.isEmpty()) {
-            throw kustvaktResponseHandler
-                    .throwit(new KustvaktException(StatusCodes.MISSING_PARAMETER,
-                            "Authorization header is missing.",
-                            "Authorization header"));
-        }
         
-        AuthorizationData authorizationData;
-        try {
-            authorizationData = authorizationHandler.
-                    parseAuthorizationHeaderValue(auth.get(0));
-            if (authorizationData.getAuthenticationScheme().equals(AuthenticationScheme.BASIC)){
-                authorizationData = authorizationHandler.parseBasicToken(authorizationData);
-            }
-            else {
-                // EM: throw exception that auth scheme is not supported?
-            }
-           
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
-
         if (DEBUG_LOG == true) {
-            System.out.printf("Debug: AuthService.requestAPIToken...:\n");
-            System.out.printf("Debug: auth.size=%d\n", auth.size());
-            System.out.printf("auth.get(0)='%s'\n", auth.get(0));
-            /* hide password etc. - FB
-             if( auth.size() > 0 )
-            	{
-            	Iterator it = auth.iterator();
-            	while( it.hasNext() )
-            		System.out.printf(" header '%s'\n",  it.next());
-            	}
-            if( values.length > 0 )
-            	{
-            	for(int i=0; i< values.length; i++)
-            		{
-            		System.out.printf(" values[%d]='%s'\n",  i, values[i]);
-            		}
-            	}
-             */
-            MultivaluedMap<String, String> headerMap =
-                    headers.getRequestHeaders();
-            if (headerMap != null && headerMap.size() > 0) {
-                Iterator<String> it = headerMap.keySet().iterator();
-                while (it.hasNext()) {
-                    String key = (String) it.next();
-                    List<String> vals = headerMap.get(key);
-//                    System.out.printf("Debug: requestAPIToken: '%s' = '%s'\n",
-//                            key, vals);
-                }
-
-            }
-//            System.out.printf("Debug: requestAPIToken: isSecure = %s.\n",
-//                    secCtx.isSecure() ? "yes" : "no");
-        } // DEBUG_LOG        
-
-        if (authorizationData.getUsername() == null || 
-                authorizationData.getUsername().isEmpty() || 
-                authorizationData.getPassword()== null || 
-                authorizationData.getPassword().isEmpty())
-            // is actual an invalid request
-            throw kustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
-
-        Map<String, Object> attr = new HashMap<>();
-        if (scopes != null && !scopes.isEmpty())
-            attr.put(Attributes.SCOPE, scopes);
-        attr.put(Attributes.HOST, host);
-        attr.put(Attributes.USER_AGENT, agent);
-
-        TokenContext context;
-        try {
-            // User user = controller.authenticate(0, values[0], values[1], attr); Implementation by Hanl
-            User user = controller.authenticate(AuthenticationMethod.LDAP,
-                    authorizationData.getUsername(), authorizationData.getPassword(), attr); // Implementation with IdM/LDAP
-            // Userdata data = this.controller.getUserData(user, UserDetails.class); // Implem. by Hanl
-            // todo: is this necessary?
-            //            attr.putAll(data.fields());
+            String warning = "Access to API token (JWT) web service";
             
-            // EM: add authentication time
-            Date authenticationTime = TimeUtils.getNow().toDate();
-            attr.put(Attributes.AUTHENTICATION_TIME, authenticationTime);
-            // -- EM
-            
-            controller.setAccessAndLocation(user, headers);
-            if (DEBUG_LOG == true) System.out.printf(
-                    "Debug: /apiToken/: location=%s, access='%s'.\n",
-                    user.locationtoString(), user.accesstoString());
-            attr.put(Attributes.LOCATION, user.getLocation());
-            attr.put(Attributes.CORPUS_ACCESS, user.getCorpusAccess());
-            context = controller.createTokenContext(user, attr,
-                  TokenType.API);
-//            context = controller.createTokenContext(user, attr,
-//                    Attributes.API_AUTHENTICATION);
+            List<String> auth =
+                  headers.getRequestHeader(ContainerRequest.AUTHORIZATION);
+          if (auth != null && !auth.isEmpty()) {
+              try {
+                  AuthorizationData authorizationData = authorizationHandler
+                          .parseAuthorizationHeaderValue(auth.get(0));
+                  if (authorizationData.getAuthenticationScheme()
+                          .equals(AuthenticationScheme.BASIC)) {
+                      authorizationData = authorizationHandler
+                              .parseBasicToken(authorizationData);
+                      jlog.warn(warning + " with username:"+authorizationData.getUsername());
+                  }
+              }
+              catch (KustvaktException e) {}
+          }
+          else {
+              jlog.warn(warning);
+          }
         }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
-
-        try {
-            return Response.ok(context.toJson()).build();
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
+        throw kustvaktResponseHandler.throwit(new KustvaktException(
+                StatusCodes.DEPRECATED,
+                "API token is no longer supported. Please use OAuth2 procedure instead."));
     }
+
+//        List<String> auth =
+//                headers.getRequestHeader(ContainerRequest.AUTHORIZATION);
+//        if (auth == null || auth.isEmpty()) {
+//            throw kustvaktResponseHandler
+//                    .throwit(new KustvaktException(StatusCodes.MISSING_PARAMETER,
+//                            "Authorization header is missing.",
+//                            "Authorization header"));
+//        }
+//        
+//        AuthorizationData authorizationData;
+//        try {
+//            authorizationData = authorizationHandler.
+//                    parseAuthorizationHeaderValue(auth.get(0));
+//            if (authorizationData.getAuthenticationScheme().equals(AuthenticationScheme.BASIC)){
+//                authorizationData = authorizationHandler.parseBasicToken(authorizationData);
+//            }
+//            else {
+//                // EM: throw exception that auth scheme is not supported?
+//            }
+//           
+//        }
+//        catch (KustvaktException e) {
+//            throw kustvaktResponseHandler.throwit(e);
+//        }
+//
+//        if (DEBUG_LOG == true) {
+//            System.out.printf("Debug: AuthService.requestAPIToken...:\n");
+//            System.out.printf("Debug: auth.size=%d\n", auth.size());
+//            System.out.printf("auth.get(0)='%s'\n", auth.get(0));
+//            /* hide password etc. - FB
+//             if( auth.size() > 0 )
+//            	{
+//            	Iterator it = auth.iterator();
+//            	while( it.hasNext() )
+//            		System.out.printf(" header '%s'\n",  it.next());
+//            	}
+//            if( values.length > 0 )
+//            	{
+//            	for(int i=0; i< values.length; i++)
+//            		{
+//            		System.out.printf(" values[%d]='%s'\n",  i, values[i]);
+//            		}
+//            	}
+//             */
+//            MultivaluedMap<String, String> headerMap =
+//                    headers.getRequestHeaders();
+//            if (headerMap != null && headerMap.size() > 0) {
+//                Iterator<String> it = headerMap.keySet().iterator();
+//                while (it.hasNext()) {
+//                    String key = (String) it.next();
+//                    List<String> vals = headerMap.get(key);
+////                    System.out.printf("Debug: requestAPIToken: '%s' = '%s'\n",
+////                            key, vals);
+//                }
+//
+//            }
+////            System.out.printf("Debug: requestAPIToken: isSecure = %s.\n",
+////                    secCtx.isSecure() ? "yes" : "no");
+//        } // DEBUG_LOG        
+//
+//        if (authorizationData.getUsername() == null || 
+//                authorizationData.getUsername().isEmpty() || 
+//                authorizationData.getPassword()== null || 
+//                authorizationData.getPassword().isEmpty())
+//            // is actual an invalid request
+//            throw kustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
+//
+//        Map<String, Object> attr = new HashMap<>();
+//        if (scopes != null && !scopes.isEmpty())
+//            attr.put(Attributes.SCOPE, scopes);
+//        attr.put(Attributes.HOST, host);
+//        attr.put(Attributes.USER_AGENT, agent);
+//
+//        TokenContext context;
+//        try {
+//            // User user = controller.authenticate(0, values[0], values[1], attr); Implementation by Hanl
+//            User user = controller.authenticate(AuthenticationMethod.LDAP,
+//                    authorizationData.getUsername(), authorizationData.getPassword(), attr); // Implementation with IdM/LDAP
+//            // Userdata data = this.controller.getUserData(user, UserDetails.class); // Implem. by Hanl
+//            // todo: is this necessary?
+//            //            attr.putAll(data.fields());
+//            
+//            // EM: add authentication time
+//            Date authenticationTime = TimeUtils.getNow().toDate();
+//            attr.put(Attributes.AUTHENTICATION_TIME, authenticationTime);
+//            // -- EM
+//            
+//            controller.setAccessAndLocation(user, headers);
+//            if (DEBUG_LOG == true) System.out.printf(
+//                    "Debug: /apiToken/: location=%s, access='%s'.\n",
+//                    user.locationtoString(), user.accesstoString());
+//            attr.put(Attributes.LOCATION, user.getLocation());
+//            attr.put(Attributes.CORPUS_ACCESS, user.getCorpusAccess());
+//            context = controller.createTokenContext(user, attr,
+//                  TokenType.API);
+////            context = controller.createTokenContext(user, attr,
+////                    Attributes.API_AUTHENTICATION);
+//        }
+//        catch (KustvaktException e) {
+//            throw kustvaktResponseHandler.throwit(e);
+//        }
+//
+//        try {
+//            return Response.ok(context.toJson()).build();
+//        }
+//        catch (KustvaktException e) {
+//            throw kustvaktResponseHandler.throwit(e);
+//        }
+//    }
 
 
     // todo:

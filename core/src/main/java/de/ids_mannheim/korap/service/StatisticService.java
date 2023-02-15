@@ -42,7 +42,7 @@ public class StatisticService extends BasicService {
 
         if (isDeprecated) {
             Notifications n = new Notifications();
-            n.addWarning(StatusCodes.DEPRECATED_PARAMETER,
+            n.addWarning(StatusCodes.DEPRECATED,
                     "Parameter corpusQuery is deprecated in favor of cq.");
             ObjectNode warning = (ObjectNode) n.toJsonNode();
             ObjectNode node = (ObjectNode) JsonUtils.readTree(stats);

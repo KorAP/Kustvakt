@@ -19,6 +19,8 @@
 2023-02-15
 - Moved user-group retrieval API to UserGroupAdminController 
   and changed the service path URL of UserGroupAdminController. 
+- Deprecate API token (JWT) web-service
+
 
 # version 0.69.1
 

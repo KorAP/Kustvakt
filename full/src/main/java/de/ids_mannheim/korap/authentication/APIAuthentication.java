@@ -29,6 +29,7 @@ import net.sf.ehcache.Element;
  * 
  * Created by hanl on 5/23/14.
  */
+@Deprecated
 public class APIAuthentication implements AuthenticationIface {
 
     private static Logger jlog = LogManager.getLogger(APIAuthentication.class);

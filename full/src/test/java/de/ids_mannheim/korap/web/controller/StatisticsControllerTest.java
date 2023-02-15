@@ -105,7 +105,7 @@ public class StatisticsControllerTest extends SpringJerseyTest {
         assertEquals(node.get("documents").asInt(),11);
         assertEquals(node.get("tokens").asInt(),665842);
         
-        assertEquals(StatusCodes.DEPRECATED_PARAMETER,
+        assertEquals(StatusCodes.DEPRECATED,
                 node.at("/warnings/0/0").asInt());
         assertEquals("Parameter corpusQuery is deprecated in favor of cq.",
                 node.at("/warnings/0/1").asText());
