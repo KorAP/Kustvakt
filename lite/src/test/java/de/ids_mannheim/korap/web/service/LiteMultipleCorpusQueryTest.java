@@ -81,7 +81,7 @@ public class LiteMultipleCorpusQueryTest extends LiteJerseyTest {
         assertEquals(19387, node.at("/sentences").asInt());
         assertEquals(514, node.at("/paragraphs").asInt());
 
-        assertEquals(StatusCodes.DEPRECATED_PARAMETER,
+        assertEquals(StatusCodes.DEPRECATED,
                 node.at("/warnings/0/0").asInt());
         assertEquals("Parameter corpusQuery is deprecated in favor of cq.",
                 node.at("/warnings/0/1").asText());
