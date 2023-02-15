@@ -226,8 +226,8 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         Form f = new Form();
         f.param("status", "HIDDEN");
         // check gill in the hidden group of the vc
-        Response response = target().path(API_VERSION).path("group")
-                .path("admin").path("list")
+        Response response = target().path(API_VERSION)
+                .path("admin").path("group").path("list")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
@@ -404,13 +404,13 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     private JsonNode testCheckHiddenGroup (String groupName)
             throws ProcessingException,
             KustvaktException {
-        Response response = target().path(API_VERSION).path("group")
-                .path("@"+groupName)
+        Response response = target().path(API_VERSION)
+                .path("admin").path("group").path("@"+groupName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get();
+                .post(null);
 
         String entity = response.readEntity(String.class);
         return JsonUtils.readTree(entity);

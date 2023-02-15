@@ -6,6 +6,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -22,7 +23,7 @@ import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 
 @Controller
-@Path("{version}/group/admin")
+@Path("{version}/admin/group")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 @ResourceFilters({ APIVersionFilter.class, AdminFilter.class })
 public class UserGroupAdminController {
@@ -59,6 +60,28 @@ public class UserGroupAdminController {
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
+    }
+    
+    /**
+     * Retrieves a specific user-group. Only system admins are
+     * allowed.
+     * 
+     * @param securityContext
+     * @param groupName
+     *            group name
+     * @return a user-group
+     */
+    @POST
+    @Path("@{groupName}")
+    public UserGroupDto retrieveUserGroup (
+            @PathParam("groupName") String groupName) {
+        try {
+            return service.searchByName(groupName);
+        }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+
     }
 
 }

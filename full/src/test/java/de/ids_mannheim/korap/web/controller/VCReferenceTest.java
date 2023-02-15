@@ -228,8 +228,8 @@ public class VCReferenceTest extends SpringJerseyTest {
         f.param("status", "HIDDEN");
         
         // check dory in the hidden group of the vc
-        response = target().path(API_VERSION).path("group")
-                .path("admin").path("list")
+        response = target().path(API_VERSION)
+                .path("admin").path("group").path("list")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("admin", "pass"))

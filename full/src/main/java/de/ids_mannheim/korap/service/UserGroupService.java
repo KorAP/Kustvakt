@@ -551,20 +551,12 @@ public class UserGroupService {
         groupMemberDao.deleteMember(member, deletedBy, isSoftDelete);
     }
 
-    public UserGroupDto searchByName (String username, String groupName)
+    public UserGroupDto searchByName (String groupName)
             throws KustvaktException {
-        if (adminDao.isAdmin(username)) {
-            UserGroup userGroup =
-                    userGroupDao.retrieveGroupByName(groupName, true);
-            UserGroupDto groupDto = converter.createUserGroupDto(userGroup,
-                    userGroup.getMembers(), null, null);
-            return groupDto;
-        }
-        else {
-            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: " + username, username);
-        }
-
+        UserGroup userGroup = userGroupDao.retrieveGroupByName(groupName, true);
+        UserGroupDto groupDto = converter.createUserGroupDto(userGroup,
+                userGroup.getMembers(), null, null);
+        return groupDto;
     }
 
     public void editMemberRoles (String username, String groupName,

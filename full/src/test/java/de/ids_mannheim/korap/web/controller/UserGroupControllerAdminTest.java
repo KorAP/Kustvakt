@@ -55,8 +55,8 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         f.param("username", "dory");
         f.param("token", "secret");
         
-        Response response = target().path(API_VERSION).path("group")
-                .path("admin").path("list")
+        Response response = target().path(API_VERSION)
+                .path("admin").path("group").path("list")
                 .request()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED)
                 .post(Entity.form(f));
@@ -97,8 +97,8 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         Form f = new Form();
         f.param("username", "dory");
         
-        Response response = target().path(API_VERSION).path("group")
-                .path("admin").path("list")
+        Response response = target().path(API_VERSION)
+                .path("admin").path("group").path("list")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(testUser, "pass"))
@@ -117,8 +117,8 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         f.param("username", "dory");
         f.param("status", "ACTIVE");
         
-        Response response = target().path(API_VERSION).path("group")
-                .path("admin").path("list")
+        Response response = target().path(API_VERSION)
+                .path("admin").path("group").path("list")
                 .queryParam("username", "dory").queryParam("status", "ACTIVE")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -152,8 +152,8 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     @Test
     public void testListByStatusAll () throws
             ProcessingException, KustvaktException {
-        Response response = target().path(API_VERSION).path("group")
-                .path("admin").path("list")
+        Response response = target().path(API_VERSION)
+                .path("admin").path("group").path("list")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(sysAdminUser, "pass"))
@@ -179,8 +179,8 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
         Form f = new Form();
         f.param("status", "HIDDEN");
         
-        Response response = target().path(API_VERSION).path("group")
-                .path("admin").path("list")
+        Response response = target().path(API_VERSION)
+                .path("admin").path("group").path("list")
                 .queryParam("status", "HIDDEN")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
@@ -313,13 +313,14 @@ public class UserGroupControllerAdminTest extends SpringJerseyTest {
     private JsonNode retrieveGroup (String groupName)
             throws ProcessingException,
             KustvaktException {
-        Response response = target().path(API_VERSION).path("group")
-                .path("@" + groupName)
-                .request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(sysAdminUser, "pass"))
+        Response response = target().path(API_VERSION).path("admin")
+                .path("group").path("@" + groupName).request()
+                .header(Attributes.AUTHORIZATION,
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue(
+                                        sysAdminUser, "pass"))
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get();
+                .post(null);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 

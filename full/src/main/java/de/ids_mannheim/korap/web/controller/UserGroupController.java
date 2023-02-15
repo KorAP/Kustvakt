@@ -29,7 +29,6 @@ import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.UserGroupService;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
-import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
@@ -85,33 +84,6 @@ public class UserGroupController {
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
-    }
-
-    
-    /**
-     * Retrieves a specific user-group. Only system admins are
-     * allowed.
-     * 
-     * @param securityContext
-     * @param groupName
-     *            group name
-     * @return a user-group
-     */
-    @GET
-    @Path("@{groupName}")
-    @ResourceFilters({ APIVersionFilter.class, AdminFilter.class })
-    public UserGroupDto retrieveUserGroup (
-            @Context SecurityContext securityContext,
-            @PathParam("groupName") String groupName) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
-        try {
-            return service.searchByName(context.getUsername(), groupName);
-        }
-        catch (KustvaktException e) {
-            throw kustvaktResponseHandler.throwit(e);
-        }
-
     }
 
     /**

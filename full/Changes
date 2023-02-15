@@ -16,7 +16,9 @@
 2023-02-10
 - Use admin filter instead of OAuth2 ADMIN scope  
 - Added a plugin test.
-
+2023-02-15
+- Moved user-group retrieval API to UserGroupAdminController 
+  and changed the service path URL of UserGroupAdminController. 
 
 # version 0.69.1
 

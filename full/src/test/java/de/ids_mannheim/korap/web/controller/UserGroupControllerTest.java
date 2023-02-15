@@ -387,8 +387,8 @@ public class UserGroupControllerTest extends SpringJerseyTest {
         // EM: this is so complicated because the group retrieval are not allowed 
         // for delete groups
         // check group
-        response = target().path(API_VERSION).path("group")
-                .path("admin").path("list")
+        response = target().path(API_VERSION)
+                .path("admin").path("group").path("list")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(admin, "pass"))
@@ -793,13 +793,12 @@ public class UserGroupControllerTest extends SpringJerseyTest {
 
     private void checkGroupMemberRole (String groupName, String deletedMemberName)
             throws KustvaktException {
-        Response response = target().path(API_VERSION).path("group")
-                .path("@"+groupName)
+        Response response = target().path(API_VERSION)
+                .path("admin").path("group").path("@"+groupName)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(admin, "pass"))
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .get();
+                .post(null);
         String entity = response.readEntity(String.class);
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
