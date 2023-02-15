@@ -18,15 +18,11 @@ Kustvakt acts as a middleware in KorAP binding other components, such as [Koral]
   
 Recent changes on the project are described in the change logs (Changes files).
   
-# Web-services
-
-Web-services including their usage examples are described in the [wiki](https://github.com/KorAP/Kustvakt/wiki).
-
 
 # Setup
 
 
-Prerequisites: Jdk 11, Git, Maven 3
+#### Prerequisites: Jdk 11, Git, Maven 3
 
 Clone the latest version of Kustvakt
 <pre>
@@ -54,6 +50,75 @@ cd ../lite
 mvn clean package
 </pre>
 The jar file is located in the ```target/``` folder.
+
+
+# Running Kustvakt Server
+
+<pre>
+java -jar target/Kustvakt-full-[version].jar    
+</pre>
+
+will run Kustvakt full version with the example [kustvakt.conf](https://github.com/KorAP/Kustvakt/blob/master/full/src/main/resources/kustvakt.conf) configuration file included. See [Customizing kustvakt configuration](https://github.com/KorAP/Kustvakt/edit/master/README.md#customizing-kustvakt-configuration).
+
+Kustvakt full version requires a Krill index and [LDAP configuration](https://github.com/KorAP/Kustvakt/wiki/LDAP-Setting). By default, Kustvakt uses the [sample-index](https://github.com/KorAP/Kustvakt/tree/master/sample-index) located in the parent directory of the jar file and [the embedded LDAP server](https://github.com/KorAP/Kustvakt/blob/master/full/src/main/resources/embedded-ldap-example.conf) example.
+
+### Running a custom Spring XML configuration
+
+To run Kustvakt with a custom Spring XML configuration file, it must be included in the classpath. For instance:
+```custom-spring-config.xml``` is located in ```config``` folder. 
+The ```config``` folder must be included in the classpath with ```-cp``` command.
+
+<pre>
+cd target/
+java -cp Kustvakt-full-[version].jar:config de.ids_mannheim.korap.server.KustvaktServer 
+--spring-config custom-spring-config.xml
+</pre>
+
+### Generating an OAuth2 super client
+
+An OAuth2 super client is required to be able to use web services that require user authentication. Kustvakt can generate a super client automatically. See  [Setting Initial Super Client for User Authentication](https://github.com/KorAP/Kustvakt/wiki/Setting-Initial-Super-Client-for-User-Authentication). 
+
+
+# Web-services
+
+All web-services including their usage examples are described in the [wiki](https://github.com/KorAP/Kustvakt/wiki).
+
+Some request examples:
+
+* search
+
+```
+curl 'http://localhost:8089/api/v1.0/search?q=Wasser&ql=poliqarp'
+```
+
+* search public metadata
+
+```
+curl 'http://localhost:8089/api/v1.0/search?q=Wasser&ql=poliqarp&fields=textSigle,title,availablility&access-rewrite-disabled=true'
+```
+
+* match info
+
+```
+curl 'http://localhost:8089/api/v1.0/corpus/GOE/AGA/01784/p4145-4146?foundry=opennlp'
+```
+
+
+
+# Shutting down Kustvakt Server
+
+Kustvakt server can be shut down by sending a POST request with a shutdown token. When Kustvakt server is started, a shutdown token is automatically generated and written to a ```shutdownToken``` file with the following format:
+
+<pre>
+token=[shutdown-token]
+</pre>
+
+A shutdown request can be sent as follows.
+
+<pre>
+curl -H "Content-Type: application/x-www-form-urlencoded" 
+"http://localhost:8089/shutdown" -d @shutdownToken  
+</pre>
 
 # Customizing Kustvakt configuration
 
@@ -86,42 +151,8 @@ missing a foundry.
 	default.foundry.surface = base
 
 
-# Running Kustvakt Server
-Requires ```kustvakt.conf``` or ```kustvakt-lite.conf``` in the same folder as the jar file. Otherwise assuming sample-index located in the parent directory of the jar file.
 
-Kustvakt full version requires [LDAP configuration](https://github.com/KorAP/Kustvakt/wiki/LDAP-Setting). Kustvakt full version can be run without an LDAP system, but user authentication functions and services cannot be used. Only services for guest/demo user would be available.
-
-<pre>
-java -jar target/Kustvakt-[lite/full]-[version].jar    
-</pre>
-
-To run Kustvakt with a custom spring XML configuration file, it must be included in the classpath. For instance:
-```custom-spring-config.xml``` is located in ```config``` folder. 
-The ```config``` folder must be included in the classpath with ```-cp``` command.
-
-<pre>
-cd target/
-java -cp Kustvakt-full-[version].jar:config de.ids_mannheim.korap.server.KustvaktServer 
---spring-config custom-spring-config.xml
-</pre>
-
-
-# Shutting down Kustvakt Server
-
-Kustvakt server can be shut down by sending a POST request with a shutdown token. When Kustvakt server is started, a shutdown token is automatically generated and written to a ```shutdownToken``` file with the following format:
-
-<pre>
-token=[shutdown-token]
-</pre>
-
-A shutdown request can be sent as follows.
-
-<pre>
-curl -H "Content-Type: application/x-www-form-urlencoded" 
-"http://localhost:8089/shutdown" -d @shutdownToken  
-</pre>
-
-# Advanced Setup
+### Advanced Setup
 
 Advanced setup such as LDAP configurations, setting a test environment, database properties and mail configurations for email notifications, are described in the [wiki](https://github.com/KorAP/Kustvakt/wiki).
 
