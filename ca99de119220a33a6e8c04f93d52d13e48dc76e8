@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0494286_24612bef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2023-02-18T10:21:48Z",
+      "side": 1,
+      "message": "Just a failed squas, works with lite, too: https://github.com/morckx/Kustvakt/actions/runs/4210687007/jobs/7308539754#step:9:8505\n\n(please remnind me to drop the full/lite division ;) )",
+      "revId": "ca99de119220a33a6e8c04f93d52d13e48dc76e8",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
