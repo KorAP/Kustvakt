@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3eb07f40_4b24d96a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2023-02-18T10:02:51Z",
+      "side": 1,
+      "message": "working with -full: see https://github.com/morckx/Kustvakt/actions/runs/4210489637/jobs/7308218591#step:10:2241t\nbus not with -lite:\nhttps://github.com/morckx/Kustvakt/actions/runs/4210489637/jobs/7308218591#step:9:8441",
+      "revId": "e698607551c10a0ef293dcf980f635b0336cf1b7",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
