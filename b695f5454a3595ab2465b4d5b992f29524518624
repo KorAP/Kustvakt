@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b3ff5b9_e256bf35",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-02-20T07:46:01Z",
+      "side": 1,
+      "message": "Had to remove all configurations established for testing the marketplace first, but now it works fine.",
+      "revId": "b695f5454a3595ab2465b4d5b992f29524518624",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
