@@ -16,6 +16,23 @@
       "message": "Had to remove all configurations established for testing the marketplace first, but now it works fine.",
       "revId": "b695f5454a3595ab2465b4d5b992f29524518624",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56032026_16ce8f4c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-02-20T08:57:24Z",
+      "side": 1,
+      "message": "Works fine for me. Thank you!",
+      "revId": "b695f5454a3595ab2465b4d5b992f29524518624",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
