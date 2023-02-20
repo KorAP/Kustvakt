@@ -21,6 +21,7 @@
   and changed the service path URL of UserGroupAdminController. 
 2023-02-20
 - Deprecate API token (JWT) web-service
+- Fixed Slf4J binding
 
 
 
