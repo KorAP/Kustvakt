@@ -3,8 +3,10 @@ package de.ids_mannheim.korap.server;
 import com.unboundid.ldap.listener.*;
 import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.util.CryptoHelper;
+import com.unboundid.util.ssl.KeyStoreKeyManager;
 import com.unboundid.util.ssl.SSLUtil;
 import com.unboundid.util.ssl.TrustAllTrustManager;
+import com.unboundid.util.ssl.TrustStoreTrustManager;
 import de.ids_mannheim.korap.authentication.LDAPConfig;
 
 import java.net.InetAddress;
@@ -29,10 +31,20 @@ public class EmbeddedLdapServer {
 
         final SSLUtil clientSslUtil = new SSLUtil(new TrustAllTrustManager());
 
-        config.setListenerConfigs(InMemoryListenerConfig.createLDAPConfig("LDAP", // Listener name
-                InetAddress.getByName("localhost"), // Listen address. (null = listen on all interfaces)
-                ldapConfig.port, // Listen port (0 = automatically choose an available port)
-                clientSslUtil.createSSLSocketFactory()));
+        if (ldapConfig.useSSL) {
+            // As explained here (by Neil Wilson from the UnboundId team):
+            // http://stackoverflow.com/questions/19713967/adding-an-ssl-listener-to-unboundid
+            final SSLUtil serverSSLUtil = new SSLUtil(new KeyStoreKeyManager(ldapConfig.keyStorePath, ldapConfig.keyStorePassword.toCharArray(), "JKS", "localhost"), new TrustStoreTrustManager(ldapConfig.trustStorePath));
+
+            config.setListenerConfigs(InMemoryListenerConfig.createLDAPSConfig("LDAPS",
+                    (ldapConfig.listenHost != null ? InetAddress.getByName(ldapConfig.listenHost) : null),
+                    ldapConfig.port, serverSSLUtil.createSSLServerSocketFactory(), clientSslUtil.createSSLSocketFactory()));
+        } else {
+            config.setListenerConfigs(InMemoryListenerConfig.createLDAPConfig("LDAP", // Listener name
+                    (ldapConfig.listenHost != null ? InetAddress.getByName(ldapConfig.listenHost) : null),
+                    ldapConfig.port, // Listen port (0 = automatically choose an available port)
+                    clientSslUtil.createSSLSocketFactory()));
+        }
         server = new InMemoryDirectoryServer(config);
 
         server.importFromLDIF(true, ldapConfig.ldif);

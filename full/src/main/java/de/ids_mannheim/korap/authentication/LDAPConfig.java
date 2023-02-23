@@ -9,12 +9,15 @@ import java.util.Properties;
 public class LDAPConfig {
     public final boolean useSSL;
     public final String host;
+    public final String listenHost;
     public final int port;
     public final String searchBase;
     public final String sLoginDN;
     public final String searchFilter;
     public final String sPwd;
     public final String trustStorePath;
+    public final String keyStorePath;
+    public final String keyStorePassword;
     public final String additionalCipherSuites;
     public final boolean useEmbeddedServer;
     public final String emailAttribute;
@@ -32,6 +35,7 @@ public class LDAPConfig {
 
         useSSL = Boolean.parseBoolean(ldapConfig.getOrDefault("useSSL", "false"));
         host = ldapConfig.getOrDefault("host", "localhost");
+        listenHost = ldapConfig.getOrDefault("host", null);
         port = Integer.parseInt(ldapConfig.getOrDefault("port", (useSSL ? "636" : "389")));
         searchBase = getConfigOrThrow(ldapConfig, "searchBase");
         sLoginDN = getConfigOrThrow(ldapConfig, "sLoginDN");
@@ -40,6 +44,8 @@ public class LDAPConfig {
         userNotBlockedFilter = ldapConfig.getOrDefault("userNotBlockedFilter", null);
         sPwd = ldapConfig.getOrDefault("pwd", "");
         trustStorePath = ldapConfig.getOrDefault("trustStore", "");
+        keyStorePath = ldapConfig.getOrDefault("keyStore", "");
+        keyStorePassword = ldapConfig.getOrDefault("keyStorePassword", "");
         additionalCipherSuites = ldapConfig.getOrDefault("additionalCipherSuites", "");
         useEmbeddedServer = Boolean.parseBoolean(ldapConfig.getOrDefault("useEmbeddedServer", "false"));
         emailAttribute = ldapConfig.getOrDefault("emailAttribute", "mail");
