@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0708bd7c_7f3d5528",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2023-02-23T07:12:19Z",
+      "side": 1,
+      "message": "Possibly needed for the ICC launch if we don\u0027t setup an openldap server\n\nMISSING:\n* tests\n* logging",
+      "revId": "4fe7d58504aae0aa3016454d4dc6424fce265464",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
