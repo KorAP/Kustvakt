@@ -108,6 +108,11 @@ public class OAuth2ScopeServiceImpl implements OAuth2ScopeService {
     @Override
     public void verifyScope (TokenContext context, OAuth2Scope requiredScope)
             throws KustvaktException {
+        if (context == null) {
+            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                    "Authentication required. Please log in!");
+        }
+        
         if (!adminDao.isAdmin(context.getUsername())
                 && context.getTokenType().equals(TokenType.BEARER)) {
             Map<String, Object> parameters = context.getParameters();
