@@ -10,7 +10,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.version>5.3.25</spring.version>
 		<jersey.version>2.39</jersey.version>
-		<jetty.version>9.4.50.v20221201</jetty.version>
+		<jetty.version>9.4.51.v20230217</jetty.version>
 		<hibernate.version>5.6.15.Final</hibernate.version>
 		<flyway.version>9.15.1</flyway.version>
 		<log4j.version>2.19.0</log4j.version>
