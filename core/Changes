@@ -4,6 +4,7 @@
 
 - Upgrade version for E2E-simplified Docker images (diewald)
 - Fixed Slf4J binding
+- Implemented configurable resource filters for search and match info APIs
 
 # version 0.69.1
 
