@@ -23,8 +23,8 @@
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="locations">
 			<array>
-				<value>classpath:kustvakt-test.conf</value>
-				<value>file:./kustvakt-test.conf</value>
+				<value>file:./kustvakt-icc.conf</value>
+				<value>classpath:kustvakt-icc.conf</value>
 			</array>
 		</property>
 	</bean>
@@ -39,8 +39,8 @@
 				<value>classpath:properties/mail.properties</value>
 				<value>file:./mail.properties</value>
 				<value>classpath:test-hibernate.properties</value>
-				<value>file:./kustvakt-test.conf</value>
-				<value>classpath:kustvakt-test.conf</value>
+				<value>file:./kustvakt-icc.conf</value>
+				<value>classpath:kustvakt-icc.conf</value>
 			</array>
 		</property>
 	</bean>
@@ -172,6 +172,10 @@
 	<!-- Services -->
 	<bean id="scopeService" class="de.ids_mannheim.korap.oauth2.service.OAuth2ScopeServiceImpl" />
 	
+	
+	<!-- Controller -->
+	
+	
 	<!-- props are injected from default-config.xml -->
 	<bean id="kustvakt_config" class="de.ids_mannheim.korap.config.FullConfiguration">
 		<constructor-arg name="properties" ref="props" />
@@ -213,7 +217,7 @@
 		<!-- <ref bean="collectionConstraint" />
 		<ref bean="collectionCleanRewrite" /> -->
 		<ref bean="foundryRewrite" />
-		<ref bean="collectionRewrite" />
+		<!-- <ref bean="collectionRewrite" /> -->
 		<ref bean="virtualCorpusRewrite" />
 		<ref bean="queryReferenceRewrite" />
 	</util:list>
