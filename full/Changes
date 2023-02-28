@@ -2,6 +2,7 @@
 
 - Support token array in matchinfo (fixes #570; diewald)
 - Updated VC list API and deprecated owner VC list (addressed #580)
+- Implemented configurable resource filters for search and match info APIs
 
 # version 0.69.3
 
@@ -37,7 +38,9 @@
 - Deprecate API token (JWT) web-service
 - Fixed Slf4J binding
 2023-02-28
-Exclude junit5 dependencies to keep test runner in Eclipse using JUnit 4
+- Exclude junit5 dependencies to keep test runner in Eclipse using JUnit 4
+2023-03-06
+- Fixed testing refresh token expiry.
 
 
 # version 0.69.1

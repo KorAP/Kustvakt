@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
-
+import de.ids_mannheim.korap.web.utils.SearchResourceFilters;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -154,6 +154,7 @@ public class SearchController {
     @POST
     @Path("{version}/search")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @SearchResourceFilters
     public Response searchPost (@Context SecurityContext context,
             @Context Locale locale, 
             @Context HttpHeaders headers,
@@ -212,6 +213,7 @@ public class SearchController {
     @GET
     @Path("{version}/search")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @SearchResourceFilters
     public Response searchGet (@Context SecurityContext securityContext,
             @Context HttpServletRequest request,
             @Context HttpHeaders headers, @Context Locale locale,
@@ -251,6 +253,7 @@ public class SearchController {
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("{version}/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
+    @SearchResourceFilters
     public Response getMatchInfo (@Context SecurityContext ctx,
             @Context HttpHeaders headers, @Context Locale locale,
             @PathParam("corpusId") String corpusId,
@@ -271,6 +274,7 @@ public class SearchController {
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("{version}/corpus/{corpusId}/{docId}/{textId}/{matchId}")
+    @SearchResourceFilters
     public Response retrieveMatchInfo (@Context SecurityContext ctx,
             @Context HttpHeaders headers, @Context Locale locale,
             @PathParam("corpusId") String corpusId,
@@ -287,25 +291,27 @@ public class SearchController {
             @QueryParam("hls") Boolean highlights) throws KustvaktException {
 
         Boolean expandToSentence = true;
-        if (expansion != null && (expansion.equals("false") || expansion.equals("null"))) {
+        if (expansion != null && (expansion.equals("false")
+                || expansion.equals("null"))) {
             expandToSentence = false;
         }
-
-        TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
-        scopeService.verifyScope(tokenContext, OAuth2Scope.MATCH_INFO);
-        spans = spans != null ? spans : false;
-        Boolean snippet = true;
-        Boolean tokens = false;
-        if (snippetStr != null && (snippetStr.equals("false") || snippetStr.equals("null")))
-            snippet = false;
-
-        if (tokensStr != null && (tokensStr.equals("true") || tokensStr.equals("1") || tokensStr.equals("yes")))
-            tokens = true;
-
-        highlights = highlights != null ? highlights : false;
-        if (layers == null || layers.isEmpty()) layers = new HashSet<>();
-
         try{
+            TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
+            scopeService.verifyScope(tokenContext, OAuth2Scope.MATCH_INFO);
+            
+            spans = spans != null ? spans : false;
+            Boolean snippet = true;
+            Boolean tokens = false;
+            if (snippetStr != null && (snippetStr.equals("false") || snippetStr.equals("null")))
+                snippet = false;
+    
+            if (tokensStr != null && (tokensStr.equals("true") || tokensStr.equals("1") || tokensStr.equals("yes")))
+                tokens = true;
+    
+            highlights = highlights != null ? highlights : false;
+            if (layers == null || layers.isEmpty()) layers = new HashSet<>();
+
+        
             String results = searchService.retrieveMatchInfo(
                 corpusId, docId,
                 textId, matchId, true, foundries, tokenContext.getUsername(),
