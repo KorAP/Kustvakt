@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
-
+import de.ids_mannheim.korap.web.utils.SearchResourceFilters;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -153,6 +153,7 @@ public class SearchController {
     @POST
     @Path("{version}/search")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @SearchResourceFilters
     public Response searchPost (@Context SecurityContext context,
             @Context Locale locale, 
             @Context HttpHeaders headers,
@@ -211,6 +212,7 @@ public class SearchController {
     @GET
     @Path("{version}/search")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @SearchResourceFilters
     public Response searchGet (@Context SecurityContext securityContext,
             @Context HttpServletRequest request,
             @Context HttpHeaders headers, @Context Locale locale,
@@ -250,6 +252,7 @@ public class SearchController {
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("{version}/corpus/{corpusId}/{docId}/{textId}/{matchId}/matchInfo")
+    @SearchResourceFilters
     public Response getMatchInfo (@Context SecurityContext ctx,
             @Context HttpHeaders headers, @Context Locale locale,
             @PathParam("corpusId") String corpusId,
@@ -269,6 +272,7 @@ public class SearchController {
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("{version}/corpus/{corpusId}/{docId}/{textId}/{matchId}")
+    @SearchResourceFilters
     public Response retrieveMatchInfo (@Context SecurityContext ctx,
             @Context HttpHeaders headers, @Context Locale locale,
             @PathParam("corpusId") String corpusId,
@@ -282,18 +286,22 @@ public class SearchController {
             // Highlights may also be a list of valid highlight classes
             @QueryParam("hls") Boolean highlights) throws KustvaktException {
 
-        Boolean expandToSentence = true;
-        if (expansion != null && (expansion.equals("false") || expansion.equals("null"))) {
-            expandToSentence = false;
-        }
+        try {
+            TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
+            scopeService.verifyScope(tokenContext, OAuth2Scope.MATCH_INFO);
 
-        TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
-        scopeService.verifyScope(tokenContext, OAuth2Scope.MATCH_INFO);
-        spans = spans != null ? spans : false;
-        highlights = highlights != null ? highlights : false;
-        if (layers == null || layers.isEmpty()) layers = new HashSet<>();
 
-        try{
+            Boolean expandToSentence = true;
+            if (expansion != null && (expansion.equals("false")
+                    || expansion.equals("null"))) {
+                expandToSentence = false;
+            }
+
+            spans = spans != null ? spans : false;
+            highlights = highlights != null ? highlights : false;
+            if (layers == null || layers.isEmpty())
+                layers = new HashSet<>();
+
             String results = searchService.retrieveMatchInfo(corpusId, docId,
                     textId, matchId, foundries, tokenContext.getUsername(),
                     headers, layers, spans, expandToSentence, highlights);
