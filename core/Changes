@@ -1,6 +1,7 @@
 # version 0.69.2
 
 - Upgrade version for E2E-simplified Docker images (diewald)
+- Fixed Slf4J binding
 
 # version 0.69.1
 
