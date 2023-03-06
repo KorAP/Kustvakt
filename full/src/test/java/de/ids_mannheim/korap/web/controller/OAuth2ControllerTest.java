@@ -973,7 +973,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     private void testRefreshTokenExpiry (String refreshToken)
             throws KustvaktException {
         RefreshToken token = refreshTokenDao.retrieveRefreshToken(refreshToken);
-        ZonedDateTime expiry = token.getCreatedDate().plusYears(1);
+        ZonedDateTime expiry = token.getCreatedDate().plusDays(365);
         assertTrue(expiry.equals(token.getExpiryDate()));
     }
 }
