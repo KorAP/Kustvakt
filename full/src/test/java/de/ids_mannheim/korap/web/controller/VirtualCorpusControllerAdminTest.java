@@ -31,7 +31,6 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
     private String admin = "admin";
     private String testUser = "VirtualCorpusControllerAdminTest";
 
-    
     private void testResponseUnauthorized (Response response) throws KustvaktException {
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
 
@@ -159,8 +158,6 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         
         Response response = target().path(API_VERSION).path("admin").path("vc")
                 .path("list").request()
-                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
-                        .createBasicAuthorizationHeaderValue(admin, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED)
                 .post(Entity.form(f));
 
