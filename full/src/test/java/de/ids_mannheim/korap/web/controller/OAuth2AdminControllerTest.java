@@ -46,8 +46,8 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
             Form form)
             throws ProcessingException,
             KustvaktException {
-        Response response = target().path(API_VERSION).path("oauth2")
-                .path("admin").path("client").path("privilege")
+        Response response = target().path(API_VERSION).path("admin")
+                .path("oauth2").path("client").path("privilege")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
@@ -67,8 +67,8 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         form.param("super", Boolean.toString(false));
         form.param("token", "secret"); //adminToken
         
-        Response response = target().path(API_VERSION).path("oauth2")
-                .path("admin").path("client").path("privilege")
+        Response response = target().path(API_VERSION).path("admin")
+                .path("oauth2").path("client").path("privilege")
                 .request()
                 .header(HttpHeaders.CONTENT_TYPE,
                         ContentType.APPLICATION_FORM_URLENCODED)
@@ -99,7 +99,7 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         Form form = new Form();
         form.param("token", "secret");
         
-        target().path(API_VERSION).path("oauth2").path("admin").path("token")
+        target().path(API_VERSION).path("admin").path("oauth2").path("token")
                 .path("clean")
                 .request()
                 .post(Entity.form(form));
@@ -125,7 +125,7 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         int accessTokensAfter = accessDao.retrieveInvalidAccessTokens().size();
         assertEquals(accessTokensAfter, accessTokensBefore + 1);
 
-        target().path(API_VERSION).path("oauth2").path("admin").path("token")
+        target().path(API_VERSION).path("admin").path("oauth2").path("token")
                 .path("clean")
                 .request()
                 .header(Attributes.AUTHORIZATION, adminAuthHeader)

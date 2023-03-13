@@ -19,7 +19,7 @@ import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 
 @Controller
-@Path("{version}/oauth2/admin")
+@Path("{version}/admin/oauth2")
 @ResourceFilters({ APIVersionFilter.class, AdminFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class OAuth2AdminController {
