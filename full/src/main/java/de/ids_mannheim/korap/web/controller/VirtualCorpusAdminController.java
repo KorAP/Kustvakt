@@ -8,10 +8,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import de.ids_mannheim.korap.config.NamedVCLoader;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.dto.QueryDto;
@@ -32,6 +35,19 @@ public class VirtualCorpusAdminController {
     private KustvaktResponseHandler kustvaktResponseHandler;
     @Autowired
     private QueryService service;
+    
+    @Autowired
+    private NamedVCLoader vcLoader;
+    
+    @POST
+    @Path("load-cache")
+    public Response loadAndCacheSystemVC () {
+        Thread t = new Thread(vcLoader);
+        t.start();
+        
+        return Response.status(Status.OK).build();
+    }
+    
     
     /**
      * Lists virtual corpora by creator and type. This is a controller
