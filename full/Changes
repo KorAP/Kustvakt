@@ -1,6 +1,7 @@
 # version 0.69.3
 
 - Moved the service path of VC admin services to admin/vc (closed #543)
+- Added an admin service to load and cache system vc (solved #268)
 
 
 # version 0.69.2
