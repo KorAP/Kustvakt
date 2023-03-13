@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ids_mannheim.korap</groupId>
 	<artifactId>Kustvakt-full</artifactId>
-	<version>0.69.2</version>
+	<version>0.69.3</version>
 	<properties>
 		<java.version>11</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -163,12 +163,12 @@
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Kustvakt-core</artifactId>
-			<version>[0.68,)</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>de.ids_mannheim.korap</groupId>
 			<artifactId>Kustvakt-core</artifactId>
-			<version>[0.68,)</version>
+			<version>${project.version}</version>
 			<classifier>tests</classifier>
       		<type>test-jar</type>
       		<scope>test</scope>
