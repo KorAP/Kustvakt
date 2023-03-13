@@ -23,7 +23,7 @@ import de.ids_mannheim.korap.web.filter.AdminFilter;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 
 @Controller
-@Path("{version}/vc/admin")
+@Path("{version}/admin/vc")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 @ResourceFilters({ APIVersionFilter.class, AdminFilter.class })
 public class VirtualCorpusAdminController {

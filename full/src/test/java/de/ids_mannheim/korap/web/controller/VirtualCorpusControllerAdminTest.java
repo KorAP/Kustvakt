@@ -136,8 +136,8 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         Form f = new Form();
         f.param("createdBy", username);
         
-        Response response = target().path(API_VERSION).path("vc")
-                .path("admin").path("list")
+        Response response = target().path(API_VERSION).path("admin")
+                .path("vc").path("list")
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(admin, "pass"))
@@ -157,7 +157,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         f.param("type", type.toString());
         f.param("token", "secret");
         
-        Response response = target().path(API_VERSION).path("vc").path("admin")
+        Response response = target().path(API_VERSION).path("admin").path("vc")
                 .path("list").request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(admin, "pass"))

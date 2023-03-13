@@ -1,5 +1,7 @@
 # version 0.69.3
 
+- Moved the service path of VC admin services to admin/vc
+
 # version 0.69.2
 
 2022-12-05
