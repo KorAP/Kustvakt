@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3b4c062_d93527ee",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-03-14T11:18:52Z",
+      "side": 1,
+      "message": "I have fixed the commit. Sorry there was a mistake. The Sql file should have not been commited.",
+      "revId": "0959e17874f6b7701d7c66aee9674b98daefa7f8",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
