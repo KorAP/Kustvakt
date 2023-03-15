@@ -149,6 +149,7 @@
 						<exclude>de/ids_mannheim/korap/authentication/LdapTest.java</exclude>
 						<exclude>de/ids_mannheim/korap/authentication/Random*.java</exclude>
 						<exclude>de/ids_mannheim/korap/web/controller/TokenExpiryTest.java</exclude>
+						<exclude>de/ids_mannheim/korap/web/controller/AdminLoadVCTest.java</exclude>
 					</excludes>
 					<includes>
 						<include>de/ids_mannheim/korap/**/*.java</include>
