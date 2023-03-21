@@ -461,11 +461,14 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
+        
         assertNotNull(node.at("/access_token").asText());
         assertEquals(TokenType.BEARER.toString(),
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
-
+        assertEquals("all",node.at("/scope").asText());
+        
+        
         String refresh = node.at("/refresh_token").asText();
         RefreshToken refreshToken =
                 refreshTokenDao.retrieveRefreshToken(refresh);
@@ -474,6 +477,42 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals("[all]", scopes.toString());
         
         testRefreshTokenExpiry(refresh);
+    }
+    
+    @Test
+    public void testRequestTokenPasswordGrantWithScope ()
+            throws KustvaktException {
+        
+        String scope ="match_info search";
+        
+        Form form = new Form();
+        form.param("grant_type", "password");
+        form.param("client_id", superClientId);
+        form.param("client_secret", clientSecret);
+        form.param("username", "dory");
+        form.param("password", "pwd");
+        form.param("scope",scope);
+        
+        Response response = requestToken(form);
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        
+        assertNotNull(node.at("/access_token").asText());
+        assertEquals(TokenType.BEARER.toString(),
+                node.at("/token_type").asText());
+        assertNotNull(node.at("/expires_in").asText());
+        
+        assertEquals(scope,node.at("/scope").asText());
+        
+        String refreshToken = node.at("/refresh_token").asText();
+        testRequestRefreshTokenWithUnauthorizedScope(superClientId, clientSecret,
+                refreshToken,"all");
+        
+        testRequestRefreshTokenWithScope(superClientId, clientSecret,
+                refreshToken,"search");
     }
 
     @Test
@@ -760,6 +799,61 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
                 newRefreshToken);
     }
 
+    
+    private void testRequestRefreshTokenWithUnauthorizedScope (String clientId,
+            String clientSecret, String refreshToken, String scope)
+            throws KustvaktException {
+        Form form = new Form();
+        form.param("grant_type", GrantType.REFRESH_TOKEN.toString());
+        form.param("client_id", clientId);
+        form.param("client_secret", clientSecret);
+        form.param("refresh_token", refreshToken);
+        form.param("scope", scope);
+
+        Response response = target().path(API_VERSION).path("oauth2")
+                .path("token").request()
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(form));
+
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuth2Error.INVALID_SCOPE, node.at("/error").asText());
+    }
+    
+    private void testRequestRefreshTokenWithScope (String clientId, String clientSecret,
+            String refreshToken, String scope) throws KustvaktException {
+        Form form = new Form();
+        form.param("grant_type", GrantType.REFRESH_TOKEN.toString());
+        form.param("client_id", clientId);
+        form.param("client_secret", clientSecret);
+        form.param("refresh_token", refreshToken);
+        form.param("scope",scope);
+
+        Response response =
+                target().path(API_VERSION).path("oauth2").path("token")
+                        .request()
+                        .header(HttpHeaders.CONTENT_TYPE,
+                                ContentType.APPLICATION_FORM_URLENCODED)
+                        .post(Entity.form(form));
+
+        String entity = response.readEntity(String.class);
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        JsonNode node = JsonUtils.readTree(entity);
+        assertNotNull(node.at("/access_token").asText());
+        
+        String newRefreshToken = node.at("/refresh_token").asText();
+        assertNotNull(newRefreshToken);
+        assertEquals(TokenType.BEARER.toString(),
+                node.at("/token_type").asText());
+        assertNotNull(node.at("/expires_in").asText());
+
+        assertTrue(!newRefreshToken.equals(refreshToken));
+        
+        assertEquals(scope,node.at("/scope").asText());
+    }
+    
     private void testRequestRefreshTokenInvalidClient (String refreshToken)
             throws KustvaktException {
         Form form = new Form();

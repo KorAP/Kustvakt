@@ -39,8 +39,12 @@ public class OAuth2Client implements Comparable<OAuth2Client>{
     private String registeredBy;
     @Column(name = "registration_date", updatable = false)
     private ZonedDateTime registrationDate;
+    
+    // How long a refresh token for this client should be valid
+    // in seconds. Maximum 31536000 seconds equivalent to 1 year     
     @Column(name = "refresh_token_expiry")
     private int refreshTokenExpiry;
+    
     private String description;
     private String url;
 
