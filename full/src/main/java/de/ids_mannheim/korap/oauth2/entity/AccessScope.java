@@ -63,4 +63,9 @@ public class AccessScope implements Serializable {
 
         return false;
     }
+    
+@Override
+    public int hashCode () {
+        return this.getId().hashCode();
+    }
 }

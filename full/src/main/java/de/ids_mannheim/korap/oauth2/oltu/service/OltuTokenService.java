@@ -127,7 +127,7 @@ public class OltuTokenService extends OAuth2TokenService {
      * token is used (DONE)
      * 
      * @param refreshTokenStr
-     * @param scopes
+     * @param requestScopes
      * @param clientId
      * @param clientSecret
      * @return if successful, a new access token
@@ -135,7 +135,7 @@ public class OltuTokenService extends OAuth2TokenService {
      * @throws OAuthSystemException
      */
     private OAuthResponse requestAccessTokenWithRefreshToken (
-            String refreshTokenStr, Set<String> scopes, String clientId,
+            String refreshTokenStr, Set<String> requestScopes, String clientId,
             String clientSecret)
             throws KustvaktException, OAuthSystemException {
 
@@ -158,7 +158,7 @@ public class OltuTokenService extends OAuth2TokenService {
 
         if (!clientId.equals(refreshToken.getClient().getId())) {
             throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
-                    "Client " + clientId + "is not authorized",
+                    "Client " + clientId + " is not authorized",
                     OAuth2Error.INVALID_CLIENT);
         }
         else if (refreshToken.isRevoked()) {
@@ -172,19 +172,19 @@ public class OltuTokenService extends OAuth2TokenService {
                     "Refresh token is expired", OAuth2Error.INVALID_GRANT);
         }
 
-        Set<AccessScope> requestedScopes =
+        Set<AccessScope> tokenScopes =
                 new HashSet<>(refreshToken.getScopes());
-        if (scopes != null && !scopes.isEmpty()) {
-            requestedScopes =
-                    scopeService.verifyRefreshScope(scopes, requestedScopes);
-            scopes = scopeService
-                    .convertAccessScopesToStringSet(requestedScopes);
+        if (requestScopes != null && !requestScopes.isEmpty()) {
+            tokenScopes =
+                    scopeService.verifyRefreshScope(requestScopes, tokenScopes);
+            requestScopes = scopeService
+                    .convertAccessScopesToStringSet(tokenScopes);
         }
 
         // revoke the refresh token and all access tokens associated to it
         revokeRefreshToken(refreshTokenStr);
 
-        return createsAccessTokenResponse(scopes, requestedScopes, clientId,
+        return createsAccessTokenResponse(requestScopes, tokenScopes, clientId,
                 refreshToken.getUserId(),
                 refreshToken.getUserAuthenticationTime(), oAuth2Client);
 
