@@ -19,12 +19,14 @@ import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
@@ -37,6 +39,9 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  */
 public class OAuth2ControllerTest extends OAuth2TestBase {
 
+    @Autowired
+    public FullConfiguration config;
+    
     public String userAuthHeader;
 
     public OAuth2ControllerTest () throws KustvaktException {
@@ -973,7 +978,8 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
     private void testRefreshTokenExpiry (String refreshToken)
             throws KustvaktException {
         RefreshToken token = refreshTokenDao.retrieveRefreshToken(refreshToken);
-        ZonedDateTime expiry = token.getCreatedDate().plusDays(365);
+        ZonedDateTime expiry = token.getCreatedDate()
+                .plusSeconds(config.getRefreshTokenLongExpiry());
         assertTrue(expiry.equals(token.getExpiryDate()));
     }
 }

@@ -4,6 +4,7 @@
 - Added an admin service to load and cache system vc (solved #268)
 - Move oauth2 admin service path (closed #544) 
 - Excluded admin service to load-cache VC from the test suite
+- Fixed refresh token expiry test
 
 # version 0.69.2
 
