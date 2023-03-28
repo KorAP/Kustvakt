@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9bd4638_c4ae2444",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-03-28T07:32:38Z",
+      "side": 1,
+      "message": "I think the commit is fine, but it requires https://korap.ids-mannheim.de/gerrit/c/KorAP/Krill/+/6810.",
+      "revId": "2f41f51dc634bfbf421d81d29d130e034ef29462",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
