@@ -99,9 +99,8 @@ public class QueryService {
         }
     }
 
-    public List<QueryDto> listOwnerQuery (String username, String queryCreator,
+    public List<QueryDto> listOwnerQuery (String username,
             QueryType queryType) throws KustvaktException {
-        verifyUsername(username, queryCreator);
         List<QueryDO> list = queryDao.retrieveOwnerQuery(username, queryType);
         return createQueryDtos(list, queryType);
     }
@@ -113,23 +112,8 @@ public class QueryService {
         return createQueryDtos(list, queryType);
     }
 
-    public List<QueryDto> listAvailableQueryForUser (
-            String authenticatedUsername, String username, QueryType queryType)
-            throws KustvaktException {
-
-        boolean isAdmin = adminDao.isAdmin(authenticatedUsername);
-
-        if (username != null) {
-            if (!username.equals(authenticatedUsername) && !isAdmin) {
-                throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-                        "Unauthorized operation for user: "
-                                + authenticatedUsername,
-                        authenticatedUsername);
-            }
-        }
-        else {
-            username = authenticatedUsername;
-        }
+    public List<QueryDto> listAvailableQueryForUser (String username,
+            QueryType queryType) throws KustvaktException {
         List<QueryDO> list = queryDao.retrieveQueryByUser(username, queryType);
         return createQueryDtos(list, queryType);
     }

@@ -204,7 +204,7 @@ public class VirtualCorpusController {
     }
     
     /**
-     * Lists all virtual corpora available to the authenticated user.
+     * Lists all virtual corpora available to the user.
      *
      * System-admins can list available vc for a specific user by
      * specifiying the username parameter.
@@ -221,13 +221,24 @@ public class VirtualCorpusController {
     @GET
     public List<QueryDto> listAvailableVC (
             @Context SecurityContext securityContext,
-            @QueryParam("username") String username) {
+            @QueryParam("system_only") boolean systemOnly,
+            @QueryParam("owned_only") boolean ownedOnly) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
+
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
-            return service.listAvailableQueryForUser(context.getUsername(),
-                    username, QueryType.VIRTUAL_CORPUS);
+            if (systemOnly) {
+                return service.listSystemQuery(QueryType.VIRTUAL_CORPUS);
+            }
+            else if (ownedOnly) {
+                return service.listOwnerQuery(context.getUsername(),
+                        QueryType.VIRTUAL_CORPUS);
+            }
+            else {
+                return service.listAvailableQueryForUser(context.getUsername(),
+                    QueryType.VIRTUAL_CORPUS);
+            }
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -253,6 +264,7 @@ public class VirtualCorpusController {
      * @return all system VC, if createdBy=system, otherwise a list of
      *         virtual corpora created by the authorized user.
      */
+    @Deprecated
     @GET
     @Path("~{createdBy}")
     public List<QueryDto> listUserOrSystemVC (
@@ -266,7 +278,7 @@ public class VirtualCorpusController {
                 return service.listSystemQuery(QueryType.VIRTUAL_CORPUS);
             }
             else {
-                return service.listOwnerQuery(context.getUsername(), createdBy,
+                return service.listOwnerQuery(context.getUsername(),
                         QueryType.VIRTUAL_CORPUS);
             }
         }

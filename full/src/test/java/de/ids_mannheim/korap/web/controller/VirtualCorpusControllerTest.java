@@ -77,7 +77,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
             throws ProcessingException,
             KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
-                .path("~" + username)
+                .queryParam("owned_only", true)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
@@ -265,6 +265,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         assertEquals(4, node.size());
     }
 
+    @Deprecated
     @Test
     public void testListAvailableVCByOtherUser ()
             throws ProcessingException,
@@ -308,7 +309,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
     
     private void testListSystemVC () throws KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
-                .path("~system")
+                .queryParam("system_only", true)
                 .request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue("pearl", "pass"))
@@ -373,6 +374,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         // test list owner vc
         JsonNode node = testListOwnerVC(testUser);
+        System.out.println(node);
         assertEquals(1, node.size());
         assertEquals(vcName, node.get(0).get("name").asText());
 

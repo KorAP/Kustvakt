@@ -111,6 +111,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         testResponseUnauthorized(response);
     }
 
+    @Deprecated
     @Test
     public void testListUserVC () throws
             ProcessingException, KustvaktException {
