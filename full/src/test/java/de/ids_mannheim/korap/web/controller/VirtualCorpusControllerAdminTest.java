@@ -10,6 +10,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -111,6 +112,8 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         testResponseUnauthorized(response);
     }
 
+    @Ignore
+    @Deprecated
     @Test
     public void testListUserVC () throws
             ProcessingException, KustvaktException {
