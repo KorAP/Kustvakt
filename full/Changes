@@ -3,7 +3,9 @@
 - Support token array in matchinfo (fixes #570; diewald)
 - Updated VC list API and deprecated owner VC list (addressed #580)
 - Added user info web-service (solved #566)
-- Implemented configurable resource filters for search and match info APIs
+- Implemented configurable resource filters for search and match 
+  info APIs (#539)
+- Added getting username from LDAP (#568)
 
 # version 0.69.3
 
