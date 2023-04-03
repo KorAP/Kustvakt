@@ -154,6 +154,17 @@ public class LdapAuth3Test {
         assertEquals("peter@example.org", LdapAuth3.getEmail("testuser2", TEST_LDAPS_CONF));
         assertEquals(null, LdapAuth3.getEmail("non-exsting", TEST_LDAPS_CONF));
     }
+    
+    @Test
+    public void gettingUsernameForEmail() throws LDAPException {
+        assertEquals("idsTestUser", LdapAuth3.getUsername("testuser@example.com", TEST_LDAP_CONF));
+        assertEquals("testuser2", LdapAuth3.getUsername("peter@example.org", TEST_LDAPS_CONF));
+        assertEquals(null, LdapAuth3.getUsername("non-exsting", TEST_LDAPS_CONF));
+
+        assertEquals("testuser2", LdapAuth3.getUsername("testUser2", TEST_LDAPS_CONF));
+        // login with uid, get idsC2Profile username
+        assertEquals("idsTestUser", LdapAuth3.getUsername("testUser", TEST_LDAPS_CONF));
+    }
 
     @Test
     public void gettingMailAttributeForNotRegisteredUserWorks() throws LDAPException {

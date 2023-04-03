@@ -284,7 +284,8 @@ public class OltuTokenService extends OAuth2TokenService {
         if (config.getOAuth2passwordAuthentication()
                 .equals(AuthenticationMethod.LDAP)) {
             try {
-                username = LdapAuth3.getEmail(username, config.getLdapConfig());
+                //username = LdapAuth3.getEmail(username, config.getLdapConfig());
+                username = LdapAuth3.getUsername(username, config.getLdapConfig());
             }
             catch (LDAPException e) {
                 throw new KustvaktException(StatusCodes.LDAP_BASE_ERRCODE,
