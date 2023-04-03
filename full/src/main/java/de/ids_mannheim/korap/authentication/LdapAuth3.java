@@ -252,6 +252,26 @@ public class LdapAuth3 extends APIAuthentication {
         }
         return null;
     }
+    
+    public static String getUsername(String sUserDN, String ldapConfigFilename) throws LDAPException {
+        String sUserPwd = "*";
+        LDAPConfig ldapConfig = new LDAPConfig(ldapConfigFilename);
+        final String usernameAttribute = "uid";
+        SearchResult searchResult = search(sUserDN, sUserPwd, ldapConfig, false, false)
+                .getSearchResultValue();
+
+        if (searchResult == null) {
+            return null;
+        }
+
+        for (SearchResultEntry entry : searchResult.getSearchEntries()) {
+            String username = entry.getAttributeValue(usernameAttribute);
+            if (username != null) {
+                return username;
+            }
+        }
+        return null;
+    }
 
     public static void ldapTerminate(LDAPConnection lc) {
         if (DEBUGLOG) System.out.println("Terminating...");
