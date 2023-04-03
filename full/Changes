@@ -1,6 +1,7 @@
 # version 0.69.4
 
 - Support token array in matchinfo (fixes #570; diewald)
+- Updated VC list API and deprecated owner VC list (addressed #580)
 
 # version 0.69.3
 
