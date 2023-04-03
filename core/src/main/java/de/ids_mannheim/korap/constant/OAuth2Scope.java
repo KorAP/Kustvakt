@@ -27,6 +27,8 @@ public enum OAuth2Scope {
     SERIALIZE_QUERY,
     MATCH_INFO, 
     
+    USER_INFO,
+    
     USER_GROUP_INFO, 
     CREATE_USER_GROUP, 
     DELETE_USER_GROUP, 
