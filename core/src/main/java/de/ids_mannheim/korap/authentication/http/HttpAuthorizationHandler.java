@@ -38,7 +38,7 @@ public class HttpAuthorizationHandler {
                     "Cannot parse authorization header value "
                             + authorizationHeader
                             + ". Use this format: [authentication "
-                            + "scheme] [Base64-encoded token]",
+                            + "scheme] [authentication token]",
                     authorizationHeader);
         }
 
