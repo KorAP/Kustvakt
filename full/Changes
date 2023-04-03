@@ -1,5 +1,6 @@
 # version 0.69.4
 
+- Updated VC list API and deprecated owner VC list (addressed #580)
 
 # version 0.69.3
 

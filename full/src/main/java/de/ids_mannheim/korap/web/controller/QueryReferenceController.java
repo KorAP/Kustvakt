@@ -196,7 +196,7 @@ public class QueryReferenceController {
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
             List<QueryDto> dtos = service.listAvailableQueryForUser(
-                    context.getUsername(), username, QueryType.QUERY);
+                    context.getUsername(), QueryType.QUERY);
             return dtos;
         }
         catch (KustvaktException e) {

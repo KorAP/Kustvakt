@@ -27,6 +27,7 @@ import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.dto.QueryAccessDto;
 import de.ids_mannheim.korap.dto.QueryDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.service.QueryService;
@@ -204,7 +205,7 @@ public class VirtualCorpusController {
     }
     
     /**
-     * Lists all virtual corpora available to the authenticated user.
+     * Lists all virtual corpora available to the user.
      *
      * System-admins can list available vc for a specific user by
      * specifiying the username parameter.
@@ -221,13 +222,24 @@ public class VirtualCorpusController {
     @GET
     public List<QueryDto> listAvailableVC (
             @Context SecurityContext securityContext,
-            @QueryParam("username") String username) {
+            @QueryParam("system_only") boolean systemOnly,
+            @QueryParam("owned_only") boolean ownedOnly) {
         TokenContext context =
                 (TokenContext) securityContext.getUserPrincipal();
+
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
-            return service.listAvailableQueryForUser(context.getUsername(),
-                    username, QueryType.VIRTUAL_CORPUS);
+            if (systemOnly) {
+                return service.listSystemQuery(QueryType.VIRTUAL_CORPUS);
+            }
+            else if (ownedOnly) {
+                return service.listOwnerQuery(context.getUsername(),
+                        QueryType.VIRTUAL_CORPUS);
+            }
+            else {
+                return service.listAvailableQueryForUser(context.getUsername(),
+                    QueryType.VIRTUAL_CORPUS);
+            }
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -253,26 +265,17 @@ public class VirtualCorpusController {
      * @return all system VC, if createdBy=system, otherwise a list of
      *         virtual corpora created by the authorized user.
      */
+    @Deprecated
     @GET
     @Path("~{createdBy}")
     public List<QueryDto> listUserOrSystemVC (
             @PathParam("createdBy") String createdBy,
             @Context SecurityContext securityContext) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
-        try {
-            scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
-            if (createdBy.toLowerCase().equals("system")) {
-                return service.listSystemQuery(QueryType.VIRTUAL_CORPUS);
-            }
-            else {
-                return service.listOwnerQuery(context.getUsername(), createdBy,
-                        QueryType.VIRTUAL_CORPUS);
-            }
-        }
-        catch (KustvaktException e) {
+        
+        KustvaktException e = new KustvaktException(StatusCodes.DEPRECATED,
+                "This service has been deprecated. Please use Virtual Corpus List "
+                + "web-service.");
             throw kustvaktResponseHandler.throwit(e);
-        }
     }
     
    
