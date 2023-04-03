@@ -19,6 +19,7 @@ registered: TRUE
 extraProfile: testuser123
 extraPassword: password
 uid: testuser
+idsC2Profile: idsTestUser
 
 dn: uid=test,ou=people,dc=example,dc=com
 cn: Peter Test
