@@ -16,6 +16,23 @@
       "message": "I added an LDAP function to get username for email-address. Is it correct?",
       "revId": "d1cbc6a53acb3081690ac576f28a56ad66a5437c",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "881adf18_47a7d2fe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-04-04T15:05:36Z",
+      "side": 1,
+      "message": "Apparently uid is not username, probably idsC2Profile and idsProfile should be used instead.",
+      "revId": "d1cbc6a53acb3081690ac576f28a56ad66a5437c",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
