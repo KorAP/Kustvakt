@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32b45fb5_dac19fb5",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/web/controller/UserController.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-04-05T14:48:55Z",
+      "side": 1,
+      "message": "Is it ensured that usernames can\u0027t contain double quotes?",
+      "range": {
+        "startLine": 41,
+        "startChar": 50,
+        "endLine": 41,
+        "endChar": 61
+      },
+      "revId": "cde2fed2954ed32dc81e166701da9ec271c09891",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
