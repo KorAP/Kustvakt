@@ -347,6 +347,48 @@ public class LiteSearchControllerTest extends LiteJerseyTest {
     }
 
     @Test
+    public void testTokenRetrieval () throws KustvaktException {
+        Response response =
+                target().path(API_VERSION).path("/corpus/GOE/AGA/01784/p104-105/")
+                        .request()
+                        .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
+                response.getStatus());
+        String resp = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(resp);
+        assertTrue(node.at("/hasSnippet").asBoolean());
+        assertFalse(node.at("/hasTokens").asBoolean());
+        assertTrue(node.at("/tokens").isMissingNode());
+        assertEquals(
+            "<span class=\"context-left\"><span class=\"more\"></span></span>"+
+            "<span class=\"match\"><mark>die</mark></span>"+
+            "<span class=\"context-right\"><span class=\"more\"></span></span>",
+            node.at("/snippet").asText());
+        
+        // Tokens
+        response =
+             target().path(API_VERSION).path("/corpus/GOE/AGA/01784/p104-105")
+             .queryParam("show-snippet", "false")
+             .queryParam("show-tokens", "true")
+             .queryParam("expand", "false")
+             .request()
+             .method("GET");
+        assertEquals(Status.OK.getStatusCode(),
+                response.getStatus());
+        resp = response.readEntity(String.class);
+        node = JsonUtils.readTree(resp);
+
+        assertFalse(node.at("/hasSnippet").asBoolean());
+        assertTrue(node.at("/hasTokens").asBoolean());
+        assertTrue(node.at("/snippet").isMissingNode());
+        assertEquals(
+            "die",
+            node.at("/tokens/match/0").asText());
+        assertTrue(node.at("/tokens/match/1").isMissingNode());
+    };
+
+    
+    @Test
     public void testMetaFields () throws KustvaktException {
         Response response =
                 target().path(API_VERSION).path("/corpus/GOE/AGA/01784")
