@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0afa060_9ae7f71a",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/web/controller/VirtualCorpusController.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-04-05T15:05:39Z",
+      "side": 1,
+      "message": "I am not sure, underscore parameters are a good choice. I would guess dashed-separated parameters are more common, e.g. https://github.com/KorAP/Kustvakt/wiki/Service:-Search-GET",
+      "range": {
+        "startLine": 225,
+        "startChar": 25,
+        "endLine": 225,
+        "endChar": 36
+      },
+      "revId": "fa6480bc13e9cf1bc823e3b5e93f598a55c5574b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9044dbe_fcc1b9e8",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/web/controller/VirtualCorpusController.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-04-05T15:05:39Z",
+      "side": 1,
+      "message": "This introduces a not communicated precedence. If a user calls both \"system_only\" and \"owned_only\", the former has precedence and the second parameter is ignored without any warning. Either the parameters need to be exclusive or this situation needs to be communicated.",
+      "range": {
+        "startLine": 232,
+        "startChar": 12,
+        "endLine": 238,
+        "endChar": 13
+      },
+      "revId": "fa6480bc13e9cf1bc823e3b5e93f598a55c5574b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
