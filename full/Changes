@@ -1,5 +1,8 @@
-# version 0.69.4
+# version 0.69.5
 
+- Support token array in matchinfo (fixes #570; diewald)
+
+# version 0.69.4
 
 # version 0.69.3
 
