@@ -403,13 +403,17 @@ public class SearchService extends BasicService{
         return p;
     }
     
-    public String retrieveMatchInfo (String corpusId, String docId,
-            String textId, String matchId, Set<String> foundries,
-            String username, HttpHeaders headers, Set<String> layers,
-            boolean spans, boolean sentenceExpansion,
-            boolean highlights) throws KustvaktException {
+    public String retrieveMatchInfo (
+        String corpusId, String docId,
+        String textId, String matchId, boolean info, Set<String> foundries,
+        String username, HttpHeaders headers, Set<String> layers,
+        boolean spans,
+        boolean snippet, boolean tokens,
+        boolean sentenceExpansion,
+        boolean highlights
+        ) throws KustvaktException {
         String matchid =
-                searchKrill.getMatchId(corpusId, docId, textId, matchId);
+            searchKrill.getMatchId(corpusId, docId, textId, matchId);
 
         User user = createUser(username, headers);
         Pattern p = determineAvailabilityPattern(user);
@@ -417,28 +421,34 @@ public class SearchService extends BasicService{
         boolean match_only = foundries == null || foundries.isEmpty();
         String results;
 //        try {
-            if (!match_only) {
 
-                ArrayList<String> foundryList = new ArrayList<String>();
-                ArrayList<String> layerList = new ArrayList<String>();
+        ArrayList<String> foundryList = null;
+        ArrayList<String> layerList = null;
 
-                // EM: now without user, just list all foundries and
-                // layers
-                if (foundries.contains("*")) {
-                    foundryList = config.getFoundries();
-                    layerList = config.getLayers();
-                }
-                else {
-                    foundryList.addAll(foundries);
-                    layerList.addAll(layers);
-                }
-
-                results = searchKrill.getMatch(matchid, foundryList, layerList,
-                        spans, highlights, sentenceExpansion, p);
+        if (foundries != null && !foundries.isEmpty()) {
+            foundryList = new ArrayList<String>();
+            layerList = new ArrayList<String>();
+            // EM: now without user, just list all foundries and
+            // layers
+            if (foundries.contains("*")) {
+                foundryList = config.getFoundries();
+                layerList = config.getLayers();
             }
             else {
-                results = searchKrill.getMatch(matchid, p);
+                foundryList.addAll(foundries);
+                layerList.addAll(layers);
             }
+        } else {
+            sentenceExpansion = false;
+            spans = false;
+            info = false;
+            highlights = true;
+        };
+        
+        results = searchKrill.getMatch(
+            matchid, info, foundryList, layerList,
+            spans, snippet, tokens, highlights,
+            sentenceExpansion, p);
 //        }
 //        catch (Exception e) {
 //            jlog.error("Exception in the MatchInfo service encountered!", e);

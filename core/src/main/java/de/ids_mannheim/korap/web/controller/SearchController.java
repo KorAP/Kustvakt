@@ -16,6 +16,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -263,7 +264,8 @@ public class SearchController {
             @QueryParam("hls") Boolean highlights) throws KustvaktException {
 
         return retrieveMatchInfo(ctx, headers, locale, corpusId, docId, textId,
-                                 matchId, foundries, layers, spans, "sentence", highlights);
+                                 matchId, foundries, layers, spans, "true", "false",
+                                 "sentence", highlights);
     }
     
     @GET
@@ -278,6 +280,8 @@ public class SearchController {
             @QueryParam("foundry") Set<String> foundries,
             @QueryParam("layer") Set<String> layers,
             @QueryParam("spans") Boolean spans, 
+            @DefaultValue("true") @QueryParam("show-snippet") String snippetStr, 
+            @DefaultValue("false") @QueryParam("show-tokens") String tokensStr, 
             @QueryParam("expand") String expansion, 
             // Highlights may also be a list of valid highlight classes
             @QueryParam("hls") Boolean highlights) throws KustvaktException {
@@ -290,13 +294,23 @@ public class SearchController {
         TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
         scopeService.verifyScope(tokenContext, OAuth2Scope.MATCH_INFO);
         spans = spans != null ? spans : false;
+        Boolean snippet = true;
+        Boolean tokens = false;
+        if (snippetStr != null && (snippetStr.equals("false") || snippetStr.equals("null")))
+            snippet = false;
+
+        if (tokensStr != null && (tokensStr.equals("true") || tokensStr.equals("1") || tokensStr.equals("yes")))
+            tokens = true;
+
         highlights = highlights != null ? highlights : false;
         if (layers == null || layers.isEmpty()) layers = new HashSet<>();
 
         try{
-            String results = searchService.retrieveMatchInfo(corpusId, docId,
-                    textId, matchId, foundries, tokenContext.getUsername(),
-                    headers, layers, spans, expandToSentence, highlights);
+            String results = searchService.retrieveMatchInfo(
+                corpusId, docId,
+                textId, matchId, true, foundries, tokenContext.getUsername(),
+                headers, layers, spans, snippet, tokens,
+                expandToSentence, highlights);
             return Response.ok(results).build();
         }
         catch (KustvaktException e) {
