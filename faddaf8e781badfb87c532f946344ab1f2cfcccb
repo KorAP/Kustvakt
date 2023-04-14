@@ -136,6 +136,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b5a8194_373ae00e",
+        "filename": "core/src/main/java/de/ids_mannheim/korap/service/SearchService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-04-14T18:53:27Z",
+      "side": 1,
+      "message": "Ah okay.",
+      "parentUuid": "6ba09d92_c82fb67d",
+      "range": {
+        "startLine": 442,
+        "startChar": 10,
+        "endLine": 445,
+        "endChar": 30
+      },
+      "revId": "faddaf8e781badfb87c532f946344ab1f2cfcccb",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6961b529_eef3fdc7",
