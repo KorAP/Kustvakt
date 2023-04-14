@@ -48,6 +48,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ce17ddd_590d99fb",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/web/controller/VirtualCorpusController.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-04-14T18:47:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c7a003e_f9e420df",
+      "range": {
+        "startLine": 225,
+        "startChar": 25,
+        "endLine": 225,
+        "endChar": 36
+      },
+      "revId": "fa6480bc13e9cf1bc823e3b5e93f598a55c5574b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d9044dbe_fcc1b9e8",

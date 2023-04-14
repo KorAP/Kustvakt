@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "deb8a0f7_6d671184",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-04-14T18:47:09Z",
+      "side": 1,
+      "message": "I have updated the query parameter. Could you please re-check? Thanks!",
+      "revId": "c58df33abf795fa52f6f57f02e438192bf61dabd",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
