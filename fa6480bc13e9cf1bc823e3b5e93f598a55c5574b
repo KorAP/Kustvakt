@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5c7a003e_f9e420df",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/web/controller/VirtualCorpusController.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-04-14T14:17:17Z",
+      "side": 1,
+      "message": "Thanks. You are right. We actually usually use dash instead of underscore.",
+      "parentUuid": "e0afa060_9ae7f71a",
+      "range": {
+        "startLine": 225,
+        "startChar": 25,
+        "endLine": 225,
+        "endChar": 36
+      },
+      "revId": "fa6480bc13e9cf1bc823e3b5e93f598a55c5574b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d9044dbe_fcc1b9e8",
         "filename": "full/src/main/java/de/ids_mannheim/korap/web/controller/VirtualCorpusController.java",
         "patchSetId": 2
@@ -37,6 +61,30 @@
       "writtenOn": "2023-04-05T15:05:39Z",
       "side": 1,
       "message": "This introduces a not communicated precedence. If a user calls both \"system_only\" and \"owned_only\", the former has precedence and the second parameter is ignored without any warning. Either the parameters need to be exclusive or this situation needs to be communicated.",
+      "range": {
+        "startLine": 232,
+        "startChar": 12,
+        "endLine": 238,
+        "endChar": 13
+      },
+      "revId": "fa6480bc13e9cf1bc823e3b5e93f598a55c5574b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e32a689c_7ab2dba4",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/web/controller/VirtualCorpusController.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-04-14T14:17:17Z",
+      "side": 1,
+      "message": "After a short discussion, we agree to change this with \"filter-by\".",
+      "parentUuid": "d9044dbe_fcc1b9e8",
       "range": {
         "startLine": 232,
         "startChar": 12,
