@@ -22,6 +22,30 @@
       },
       "revId": "cde2fed2954ed32dc81e166701da9ec271c09891",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec3cfe2b_344d9fa2",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/web/controller/UserController.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-04-14T13:21:08Z",
+      "side": 1,
+      "message": "Thanks for the catch! I thought so but it seems that it is allowed in the registration. I am asking Franck about that.",
+      "parentUuid": "32b45fb5_dac19fb5",
+      "range": {
+        "startLine": 41,
+        "startChar": 50,
+        "endLine": 41,
+        "endChar": 61
+      },
+      "revId": "cde2fed2954ed32dc81e166701da9ec271c09891",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
