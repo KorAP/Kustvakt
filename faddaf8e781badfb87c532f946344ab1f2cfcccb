@@ -114,6 +114,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6ba09d92_c82fb67d",
+        "filename": "core/src/main/java/de/ids_mannheim/korap/service/SearchService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-04-14T15:59:26Z",
+      "side": 1,
+      "message": "Yes, but these are not the default values.",
+      "parentUuid": "df99fc01_c546933b",
+      "range": {
+        "startLine": 442,
+        "startChar": 10,
+        "endLine": 445,
+        "endChar": 30
+      },
+      "revId": "faddaf8e781badfb87c532f946344ab1f2cfcccb",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6961b529_eef3fdc7",
         "filename": "core/src/main/java/de/ids_mannheim/korap/web/controller/SearchController.java",
         "patchSetId": 1
@@ -149,6 +173,30 @@
       "side": 1,
       "message": "I think show-tokens and show-snippet are better to be consistent with the search API.\n\nIs there any benefit of using String instead of boolean directly?",
       "parentUuid": "6961b529_eef3fdc7",
+      "range": {
+        "startLine": 284,
+        "startChar": 48,
+        "endLine": 284,
+        "endChar": 54
+      },
+      "revId": "faddaf8e781badfb87c532f946344ab1f2cfcccb",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a275acab_7c2a3173",
+        "filename": "core/src/main/java/de/ids_mannheim/korap/web/controller/SearchController.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-04-14T15:59:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f2b8080_06de4211",
       "range": {
         "startLine": 284,
         "startChar": 48,
