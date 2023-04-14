@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8e1bb6f_b1e3838e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-04-14T14:44:13Z",
+      "side": 1,
+      "message": "Thanks for implementing this. It works as expected. \n\nCan we keep the Kustvakt version 0.69.4? I have just bumped the version before.",
+      "revId": "faddaf8e781badfb87c532f946344ab1f2cfcccb",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eae29642_9c9a82b3",
