@@ -16,6 +16,24 @@
       "message": "Thanks for changing the version numbers, but the query parameters have not been changed. Would you like to keep \"tokens\" and \"snippet\" instead of \"show-tokens\" and \"show-snippet\"?",
       "revId": "e45449a4e28c338891afed0102b06252f5a7705a",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bb7bcb4_d6c6492a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-04-15T06:44:47Z",
+      "side": 1,
+      "message": "Oh - you are right! I will do this on monday. I will also check this regarding boolean values. I guess I just copy-pasted it from somewhere.",
+      "parentUuid": "70c5645f_c275d063",
+      "revId": "e45449a4e28c338891afed0102b06252f5a7705a",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
