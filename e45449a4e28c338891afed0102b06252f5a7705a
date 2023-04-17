@@ -34,6 +34,24 @@
       "parentUuid": "70c5645f_c275d063",
       "revId": "e45449a4e28c338891afed0102b06252f5a7705a",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4bb8f32_ec0a3ce8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-04-17T05:44:48Z",
+      "side": 1,
+      "message": "I copied the boolean string code from expand ... but I\u0027ll test boolean.",
+      "parentUuid": "7bb7bcb4_d6c6492a",
+      "revId": "e45449a4e28c338891afed0102b06252f5a7705a",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
