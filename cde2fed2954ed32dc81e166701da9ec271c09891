@@ -46,6 +46,30 @@
       },
       "revId": "cde2fed2954ed32dc81e166701da9ec271c09891",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c62231e3_10b574a6",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/web/controller/UserController.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-04-17T09:51:57Z",
+      "side": 1,
+      "message": "Too many \"Bobby Tables\" out there. ;-)",
+      "parentUuid": "ec3cfe2b_344d9fa2",
+      "range": {
+        "startLine": 41,
+        "startChar": 50,
+        "endLine": 41,
+        "endChar": 61
+      },
+      "revId": "cde2fed2954ed32dc81e166701da9ec271c09891",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
