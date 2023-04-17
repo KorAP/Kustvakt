@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0acd3d7_a9cf8d15",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-04-17T06:26:22Z",
+      "side": 1,
+      "message": "The switch to boolean didn\u0027t work that well - I think we can keep it as it is.",
+      "revId": "a0b2bcdb4f50a80c2bd56bcb33675d2b73f43bd6",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
