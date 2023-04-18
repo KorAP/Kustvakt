@@ -6,6 +6,7 @@
 - Implemented configurable resource filters for search and match 
   info APIs (#539)
 - Added getting username from LDAP (#568)
+- Disabled LDAP auth provider and token API in the auth filter (#587)
 
 # version 0.69.3
 

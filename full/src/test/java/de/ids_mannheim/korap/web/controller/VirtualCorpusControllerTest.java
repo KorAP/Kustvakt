@@ -438,7 +438,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 .path("~"+testUser).path("new_vc")
                 .request()
                 .header(Attributes.AUTHORIZATION,
-                        AuthenticationScheme.API.displayName() + " "
+                        AuthenticationScheme.BEARER.displayName() + " "
                                 + authToken)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -450,7 +450,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
                 node.at("/errors/0/0").asInt());
-        assertEquals("Json Web Signature (JWS) object verification failed.",
+        assertEquals("Access token is invalid",
                 node.at("/errors/0/1").asText());
 
         checkWWWAuthenticateHeader(response);
@@ -462,16 +462,13 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         String json = "{\"type\": \"PRIVATE\","
                 + "\"corpusQuery\": \"corpusSigle=GOE\"}";
 
-        String authToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0VXNlci"
-                + "IsImlzcyI6Imh0dHBzOlwvXC9rb3JhcC5pZHMtbWFubmhlaW0uZG"
-                + "UiLCJleHAiOjE1MzA2MTgyOTR9.JUMvTQZ4tvdRXFBpQKzoNxrq7"
-                + "CuYAfytr_LWqY8woJs";
+        String authToken = "fia0123ikBWn931470H8s5gRqx7Moc4p";
 
         Response response = target().path(API_VERSION).path("vc")
-                .path("~"+testUser).path("new_vc")
+                .path("~marlin").path("new_vc")
                 .request()
                 .header(Attributes.AUTHORIZATION,
-                        AuthenticationScheme.API.displayName() + " "
+                        AuthenticationScheme.BEARER.displayName() + " "
                                 + authToken)
                 .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
@@ -482,7 +479,7 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
 
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(StatusCodes.EXPIRED, node.at("/errors/0/0").asInt());
-        assertEquals("Authentication token is expired",
+        assertEquals("Access token is expired",
                 node.at("/errors/0/1").asText());
 
         checkWWWAuthenticateHeader(response);
