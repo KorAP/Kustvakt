@@ -236,6 +236,30 @@
       },
       "revId": "51f5db02af1c749677f89a7f91c4d00172c2adfe",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41a10ca8_d7eb668c",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/scenario/ICCTest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-04-18T15:31:32Z",
+      "side": 1,
+      "message": "Ah - right, that was probably the issue I had. That\u0027s not very docker-friendly. We establish `-jar` as the entrypoint here: https://github.com/KorAP/Kustvakt/blob/master/Dockerfile#L105-L121 and then we only overwrite the client info in https://github.com/KorAP/KorAP-Docker/blob/master/compose.yaml#L56-L70 .\nCan I overwrite the default spring config by mounting a file at the same location?",
+      "parentUuid": "b814c5be_ff4951ce",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 22
+      },
+      "revId": "51f5db02af1c749677f89a7f91c4d00172c2adfe",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
