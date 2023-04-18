@@ -48,6 +48,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f715e35d_9cc7017b",
+        "filename": "core/src/main/java/de/ids_mannheim/korap/web/controller/SearchController.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-04-18T13:31:21Z",
+      "side": 1,
+      "message": "Then maybe moving the expansion check down to the other parameter checks? And maybe move the parameter checks outside the try?",
+      "parentUuid": "b801c1d8_aae32859",
+      "range": {
+        "startLine": 298,
+        "startChar": 7,
+        "endLine": 298,
+        "endChar": 12
+      },
+      "revId": "51f5db02af1c749677f89a7f91c4d00172c2adfe",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "93da3be5_ccf95e11",
@@ -132,6 +156,30 @@
       "side": 1,
       "message": "Test config files in the test resources are not included in the jar. That\u0027s why they have to be copied and place in this example in the \"config\" folder.",
       "parentUuid": "c85d39ab_cf737091",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 22
+      },
+      "revId": "51f5db02af1c749677f89a7f91c4d00172c2adfe",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "794b4f70_379a6eed",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/scenario/ICCTest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-04-18T13:31:21Z",
+      "side": 1,
+      "message": "Ah - so, I can call my own spring config from anywhere directly using `--spring-config`?",
+      "parentUuid": "677842c7_3ecab338",
       "range": {
         "startLine": 42,
         "startChar": 0,
