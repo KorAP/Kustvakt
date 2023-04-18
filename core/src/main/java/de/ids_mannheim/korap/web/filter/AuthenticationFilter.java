@@ -1,13 +1,15 @@
 package de.ids_mannheim.korap.web.filter;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.glassfish.jersey.server.ContainerRequest;
-
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.glassfish.jersey.server.ContainerRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.authentication.AuthenticationManager;
 import de.ids_mannheim.korap.authentication.http.AuthorizationData;
@@ -34,6 +36,8 @@ import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 public class AuthenticationFilter
         implements ContainerRequestFilter {
 
+    private static Logger jlog = LogManager.getLogger(AuthenticationFilter.class);
+    
     @Autowired
     private HttpAuthorizationHandler authorizationHandler;
 
@@ -81,9 +85,10 @@ public class AuthenticationFilter
                         break;
                     // EM: JWT token-based authentication scheme
                     case API:
-                        context = authenticationManager.getTokenContext(
-                                TokenType.API, authData.getToken(), host, ua);
-                        break;
+                        jlog.warn("Authentication filter using token API");
+                        throw new KustvaktException(
+                                StatusCodes.AUTHENTICATION_FAILED,
+                                "Authentication API is no longer supported.");
                     default:
                         throw new KustvaktException(
                                 StatusCodes.AUTHENTICATION_FAILED,

@@ -268,14 +268,6 @@
 	</bean>
 
 	<!-- authentication providers to use -->
-	<!-- <bean id="api_auth" class="de.ids_mannheim.korap.authentication.APIAuthentication"> 
-		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration" 
-		ref="kustvakt_config" /> </bean> -->
-
-	<bean id="ldap_auth" class="de.ids_mannheim.korap.authentication.LdapAuth3">
-		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
-			ref="kustvakt_config" />
-	</bean>
 
 	<!-- <bean id="openid_auth"
 		class="de.ids_mannheim.korap.authentication.OpenIDconnectAuthentication">
@@ -285,22 +277,20 @@
 			type="de.ids_mannheim.korap.interfaces.db.PersistenceClient" ref="kustvakt_db" />
 	</bean> -->
 
-	<bean id="session_auth"
+	<!-- <bean id="session_auth"
 		class="de.ids_mannheim.korap.authentication.SessionAuthentication">
 		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
 			ref="kustvakt_config" />
 		<constructor-arg type="de.ids_mannheim.korap.interfaces.EncryptionIface"
 			ref="kustvakt_encryption" />
-	</bean>
+	</bean> -->
 
 	<bean id="oauth2_auth"
 		class="de.ids_mannheim.korap.authentication.OAuth2Authentication" />
 	
 	<util:list id="kustvakt_authproviders"
 		value-type="de.ids_mannheim.korap.interfaces.AuthenticationIface">
-		<ref bean="ldap_auth" />
-		<ref bean="session_auth" />
-		<!-- <ref bean="api_auth" /> -->
+		<!-- <ref bean="session_auth" /> -->
 		<!-- <ref bean="openid_auth" /> -->
 		<ref bean="oauth2_auth" />
 	</util:list>

@@ -4,30 +4,41 @@
 
 package de.ids_mannheim.korap.authentication;
 
-import com.nimbusds.jose.JOSEException;
-import com.unboundid.ldap.sdk.*;
+import java.net.UnknownHostException;
+import java.security.GeneralSecurityException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.net.ssl.SSLSocketFactory;
+
+import org.apache.commons.text.StringSubstitutor;
+
+import com.unboundid.ldap.sdk.BindResult;
+import com.unboundid.ldap.sdk.Filter;
+import com.unboundid.ldap.sdk.LDAPConnection;
+import com.unboundid.ldap.sdk.LDAPException;
+import com.unboundid.ldap.sdk.LDAPSearchException;
+import com.unboundid.ldap.sdk.ResultCode;
+import com.unboundid.ldap.sdk.SearchResult;
+import com.unboundid.ldap.sdk.SearchResultEntry;
+import com.unboundid.ldap.sdk.SearchScope;
 import com.unboundid.util.NotNull;
 import com.unboundid.util.ssl.SSLUtil;
 import com.unboundid.util.ssl.TrustAllTrustManager;
 import com.unboundid.util.ssl.TrustStoreTrustManager;
-import de.ids_mannheim.korap.config.FullConfiguration;
-import de.ids_mannheim.korap.constant.TokenType;
-import de.ids_mannheim.korap.server.EmbeddedLdapServer;
-import org.apache.commons.text.StringSubstitutor;
 
-import javax.net.ssl.SSLSocketFactory;
-import java.net.UnknownHostException;
-import java.security.GeneralSecurityException;
-import java.util.*;
+import de.ids_mannheim.korap.server.EmbeddedLdapServer;
 
 
 /**
  * LDAP Login
  *
  * @author bodmer, margaretha, kupietz
- * @see APIAuthentication
  */
-public class LdapAuth3 extends APIAuthentication {
+public class LdapAuth3 {
 
     public static final int LDAP_AUTH_ROK = 0;
     public static final int LDAP_AUTH_RCONNECT = 1; // cannot connect to LDAP Server
@@ -39,9 +50,6 @@ public class LdapAuth3 extends APIAuthentication {
     public static final int LDAP_AUTH_RNAUTH = 7; // User Account or Pwd unknown, or not authorized
     final static Boolean DEBUGLOG = false;        // log debug output.
 
-    public LdapAuth3(FullConfiguration config) throws JOSEException {
-        super(config);
-    }
 
     public static String getErrMessage(int code) {
         switch (code) {
@@ -268,11 +276,6 @@ public class LdapAuth3 extends APIAuthentication {
         ciphers.addAll(SSLUtil.getEnabledSSLCipherSuites());
         ciphers.addAll(Arrays.asList(ciphersCsv.split(", *")));
         SSLUtil.setEnabledSSLCipherSuites(ciphers);
-    }
-
-    @Override
-    public TokenType getTokenType() {
-        return TokenType.API;
     }
 
     public static class LdapAuth3Result {
