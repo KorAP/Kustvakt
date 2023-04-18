@@ -72,6 +72,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3bd3442_74bb87cf",
+        "filename": "core/src/main/java/de/ids_mannheim/korap/web/controller/SearchController.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-04-18T13:41:59Z",
+      "side": 1,
+      "message": "I have move them in Patch 17. Feel free to change it, if it is not what you meant.",
+      "parentUuid": "f715e35d_9cc7017b",
+      "range": {
+        "startLine": 298,
+        "startChar": 7,
+        "endLine": 298,
+        "endChar": 12
+      },
+      "revId": "51f5db02af1c749677f89a7f91c4d00172c2adfe",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "93da3be5_ccf95e11",
@@ -180,6 +204,30 @@
       "side": 1,
       "message": "Ah - so, I can call my own spring config from anywhere directly using `--spring-config`?",
       "parentUuid": "677842c7_3ecab338",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 22
+      },
+      "revId": "51f5db02af1c749677f89a7f91c4d00172c2adfe",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b814c5be_ff4951ce",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/scenario/ICCTest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-04-18T13:41:59Z",
+      "side": 1,
+      "message": "yes it just has to be included in the classpath",
+      "parentUuid": "794b4f70_379a6eed",
       "range": {
         "startLine": 42,
         "startChar": 0,
