@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cd2d019_aa2cda5c",
+        "filename": "core/src/main/java/de/ids_mannheim/korap/web/controller/SearchController.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-04-18T09:38:48Z",
+      "side": 1,
+      "message": "What is the point in repositioning the try here? Or is that a rebase-artifact?",
+      "range": {
+        "startLine": 298,
+        "startChar": 7,
+        "endLine": 298,
+        "endChar": 12
+      },
+      "revId": "51f5db02af1c749677f89a7f91c4d00172c2adfe",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93da3be5_ccf95e11",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/oauth2/service/OAuth2ScopeServiceImpl.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-04-18T09:38:48Z",
+      "side": 1,
+      "message": "This seems to be a useless \"else\".",
+      "range": {
+        "startLine": 115,
+        "startChar": 8,
+        "endLine": 115,
+        "endChar": 12
+      },
+      "revId": "51f5db02af1c749677f89a7f91c4d00172c2adfe",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c85d39ab_cf737091",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/scenario/ICCTest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-04-18T09:38:48Z",
+      "side": 1,
+      "message": "How can I pass a spring configuration file that is not part of the jar? That would be required for Docker. Alternatively the filters may also be set in the conf? Or is that impossible because of the conf order?",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 22
+      },
+      "revId": "51f5db02af1c749677f89a7f91c4d00172c2adfe",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
