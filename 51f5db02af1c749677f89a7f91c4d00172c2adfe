@@ -24,6 +24,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b801c1d8_aae32859",
+        "filename": "core/src/main/java/de/ids_mannheim/korap/web/controller/SearchController.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-04-18T13:19:05Z",
+      "side": 1,
+      "message": "It is necessary for scope verification. If the context is null, there will be an error.",
+      "parentUuid": "8cd2d019_aa2cda5c",
+      "range": {
+        "startLine": 298,
+        "startChar": 7,
+        "endLine": 298,
+        "endChar": 12
+      },
+      "revId": "51f5db02af1c749677f89a7f91c4d00172c2adfe",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "93da3be5_ccf95e11",
@@ -47,6 +71,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfdb35b0_89f036b1",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/oauth2/service/OAuth2ScopeServiceImpl.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-04-18T13:19:05Z",
+      "side": 1,
+      "message": "Okay. Will update it in the next patch.",
+      "parentUuid": "93da3be5_ccf95e11",
+      "range": {
+        "startLine": 115,
+        "startChar": 8,
+        "endLine": 115,
+        "endChar": 12
+      },
+      "revId": "51f5db02af1c749677f89a7f91c4d00172c2adfe",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c85d39ab_cf737091",
@@ -60,6 +108,30 @@
       "writtenOn": "2023-04-18T09:38:48Z",
       "side": 1,
       "message": "How can I pass a spring configuration file that is not part of the jar? That would be required for Docker. Alternatively the filters may also be set in the conf? Or is that impossible because of the conf order?",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 22
+      },
+      "revId": "51f5db02af1c749677f89a7f91c4d00172c2adfe",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "677842c7_3ecab338",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/scenario/ICCTest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-04-18T13:19:05Z",
+      "side": 1,
+      "message": "Test config files in the test resources are not included in the jar. That\u0027s why they have to be copied and place in this example in the \"config\" folder.",
+      "parentUuid": "c85d39ab_cf737091",
       "range": {
         "startLine": 42,
         "startChar": 0,
