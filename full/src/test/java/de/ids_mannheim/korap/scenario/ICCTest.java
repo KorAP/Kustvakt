@@ -69,6 +69,15 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * </code>
  * </pre>
  * 
+ * <p>For production, the init-method of Initializator should be changed to init.</p>
+ * 
+ * <pre>
+ * <code>
+ * &lt;bean id="initializator" class="de.ids_mannheim.de.init.Initializator"
+   init-method="init"&gt;&lt;/bean&gt;
+ * </code>
+ * </pre>
+ * 
  * <h1>Kustvakt configuration file</h1>
  * The configuration file: <em>kustvakt-icc.conf</em> includes the
  * following setup:
@@ -98,9 +107,6 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * <p>
  * <code>search.resource.filters=AuthenticationFilter </code>
  * </p>
- * 
- * 
- * 
  * 
  * <li><em>oauth2.password.authentication</em> indicating the
  * authentication method to match usernames and password.
