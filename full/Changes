@@ -7,6 +7,7 @@
   info APIs (#539)
 - Added getting username from LDAP (#568)
 - Disabled LDAP auth provider and token API in the auth filter (#587)
+- Added LDAP log for users without idsC2Profile
 
 # version 0.69.3
 
