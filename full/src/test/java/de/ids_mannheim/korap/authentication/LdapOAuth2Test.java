@@ -50,6 +50,7 @@ public class LdapOAuth2Test extends OAuth2TestBase {
     @Autowired
     private OAuth2ClientDao clientDao;
     
+    private String testUsername = "idsTestUser";
     private String testUserEmail = "testuser@example.com";
     private String redirectUri = "https://client.com/redirect";
 
@@ -94,20 +95,20 @@ public class LdapOAuth2Test extends OAuth2TestBase {
     }
 
     @Test
-    public void testMapUsernameToEmail () throws KustvaktException {
+    public void testMapEmailToUsername () throws KustvaktException {
         Response response = requestTokenWithPassword(superClientId,
-                clientSecret, "testUser", "password");
+                clientSecret, testUserEmail, "password");
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         
         String accessToken = node.at("/access_token").asText();
         AccessToken accessTokenObj = accessDao.retrieveAccessToken(accessToken);
-        assertEquals(testUserEmail, accessTokenObj.getUserId());
+        assertEquals(testUsername, accessTokenObj.getUserId());
 
         String refreshToken = node.at("/refresh_token").asText();
         RefreshToken rt = refreshDao.retrieveRefreshToken(refreshToken);
-        assertEquals(testUserEmail, rt.getUserId());
+        assertEquals(testUsername, rt.getUserId());
         
         testRegisterPublicClient(accessToken);
         node = testRegisterConfidentialClient(accessToken);
@@ -138,7 +139,7 @@ public class LdapOAuth2Test extends OAuth2TestBase {
 
         String clientId = node.at("/client_id").asText();
         OAuth2Client client = clientDao.retrieveClientById(clientId);
-        assertEquals(testUserEmail, client.getRegisteredBy());
+        assertEquals(testUsername, client.getRegisteredBy());
     }
     
     private JsonNode testRegisterConfidentialClient (String accessToken)
@@ -163,7 +164,7 @@ public class LdapOAuth2Test extends OAuth2TestBase {
 
         String clientId = node.at("/client_id").asText();
         OAuth2Client client = clientDao.retrieveClientById(clientId);
-        assertEquals(testUserEmail, client.getRegisteredBy());
+        assertEquals(testUsername, client.getRegisteredBy());
         return node;
     }
     
@@ -193,10 +194,10 @@ public class LdapOAuth2Test extends OAuth2TestBase {
 
         String at = node.at("/access_token").asText();
         AccessToken accessTokenObj = accessDao.retrieveAccessToken(at);
-        assertEquals(testUserEmail, accessTokenObj.getUserId());
+        assertEquals(testUsername, accessTokenObj.getUserId());
 
         String refreshToken = node.at("/refresh_token").asText();
         RefreshToken rt = refreshDao.retrieveRefreshToken(refreshToken);
-        assertEquals(testUserEmail, rt.getUserId());
+        assertEquals(testUsername, rt.getUserId());
     }
 }
