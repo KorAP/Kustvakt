@@ -5,7 +5,6 @@
 - Implemented configurable resource filters for search and match info APIs
 - Make --spring-config to expect an external file instead of a classpath file
 
-
 # version 0.69.3
 
 # version 0.69.2
