@@ -116,9 +116,9 @@ USER kustvakt
 
 EXPOSE 8089
 
-ENTRYPOINT [ "java", "-jar" ]
+ENTRYPOINT [ "java"]
 
-CMD [ "Kustvakt-full.jar" ]
+CMD [ "-jar", "Kustvakt-full.jar" ]
 
 # docker build -f Dockerfile -t korap/kustvakt:{nr}-full --target kustvakt-full .
 # docker build -f Dockerfile -t korap/kustvakt:{nr} --target kustvakt-lite .
