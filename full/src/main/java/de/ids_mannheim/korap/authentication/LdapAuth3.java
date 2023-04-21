@@ -15,6 +15,8 @@ import java.util.Set;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.apache.commons.text.StringSubstitutor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.unboundid.ldap.sdk.BindResult;
 import com.unboundid.ldap.sdk.Filter;
@@ -50,6 +52,7 @@ public class LdapAuth3 {
     public static final int LDAP_AUTH_RNAUTH = 7; // User Account or Pwd unknown, or not authorized
     final static Boolean DEBUGLOG = false;        // log debug output.
 
+    private static Logger jlog = LogManager.getLogger(LdapAuth3.class);
 
     public static String getErrMessage(int code) {
         switch (code) {
@@ -279,6 +282,7 @@ public class LdapAuth3 {
             username = entry.getAttributeValue(idsC2Attribute);
             if (username == null) {
                 username = entry.getAttributeValue(uidAttribute);
+                jlog.warn("idsC2Profile not found for uid: "+username);
             }
         }
         return username;

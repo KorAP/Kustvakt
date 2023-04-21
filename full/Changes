@@ -6,6 +6,7 @@
 - Implemented configurable resource filters for search and match 
   info APIs (#539)
 - Added getting username from LDAP (#568)
+- Added LDAP log for users without idsC2Profile
 
 # version 0.69.3
 
