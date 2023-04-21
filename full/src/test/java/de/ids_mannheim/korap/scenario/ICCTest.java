@@ -27,21 +27,25 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * The instance requires user authentication and access to data is
  * restricted to only logged-in users.
  * 
+ * 
  * This class uses <em>test-config-icc.xml</em> spring XML config
  * defining the location of a specific kustvakt configuration file for
- * this instance:<em>kustvakt-icc.conf</em>. These files are not
- * included in a Kustvakt jar file.
+ * this instance:<em>kustvakt-icc.conf</em>. 
  * 
- * When running a Kustvakt jar file, these files must be included in
- * the classpath. In the example below, the files are placed together
- * in the a folder named <em>config</em> and it is included in the
- * classpath. Besides, <em>jdbc.properties</em> is required at the
- * same folder as the jar.
+ * <p>
+ * To run a Kustvakt jar with ICC setup, the following files are needed:
+ * </p>
+ * <ul>
+ * <li>a Spring configuration file</li>
+ * <li>a Kustvakt configuration file that must be placed at the jar folder</li>
+ * <li>a JDBC properties file that must be placed at the jar folder</li>
+ * </ul>
+ * 
+ * Example:
  * 
  * <p>
  * <code>
- * java -cp Kustvakt-full-0.69.3.jar:config
- * de.ids_mannheim.korap.server.KustvaktServer --spring-config
+ * java -jar Kustvakt-full-0.69.3.jar --spring-config
  * test-config-icc.xml
  * </code>
  * </p>
@@ -60,8 +64,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * 
  * <pre><code>
  * &lt;bean id="basic_auth"
- * class="de.ids_mannheim.korap.authentication.BasicAuthentication"
- * /&gt;
+ * class="de.ids_mannheim.korap.authentication.BasicAuthentication"/&gt;
  * 
  * &lt;util:list id="kustvakt_authproviders"
  * value-type="de.ids_mannheim.korap.interfaces.AuthenticationIface"&gt;
@@ -69,9 +72,21 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * </code>
  * </pre>
  * 
+ * <p>For production, the init-method of Initializator should be changed to init.</p>
+ * 
+ * <pre>
+ * <code>
+ * &lt;bean id="initializator" class="de.ids_mannheim.de.init.Initializator"
+   init-method="init"&gt;&lt;/bean&gt;
+ * </code>
+ * </pre>
+ * 
  * <h1>Kustvakt configuration file</h1>
+ * 
+ * <p>
  * The configuration file: <em>kustvakt-icc.conf</em> includes the
  * following setup:
+ * </p>
  * 
  * <ul>
  * <li>
@@ -98,9 +113,6 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * <p>
  * <code>search.resource.filters=AuthenticationFilter </code>
  * </p>
- * 
- * 
- * 
  * 
  * <li><em>oauth2.password.authentication</em> indicating the
  * authentication method to match usernames and password.
