@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
@@ -20,10 +18,9 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ShutdownHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.springframework.web.context.ContextLoaderListener;
-
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
+import org.springframework.web.context.ContextLoaderListener;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
@@ -61,7 +58,7 @@ public abstract class KustvaktBaseServer {
                     StringBuffer b = new StringBuffer();
 
                     b.append("Parameter description: \n")
-                            .append("--spring-config  <Spring XML configuration filename in classpath>\n")
+                            .append("--spring-config  <Spring XML configuration>\n")
                             .append("--port  <Server port number>\n")
                             .append("--help : This help menu\n");
                     System.out.println(b.toString());
@@ -103,9 +100,15 @@ public abstract class KustvaktBaseServer {
         ServletContextHandler contextHandler =
                 new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
         contextHandler.setContextPath("/");
-        contextHandler.setInitParameter("contextConfigLocation",
-                "classpath:" + kargs.getSpringConfig());
-
+        if (kargs.getSpringConfig()!=null) {
+            contextHandler.setInitParameter("contextConfigLocation",
+                    "file:" + kargs.getSpringConfig());
+        }
+        else {
+            contextHandler.setInitParameter("contextConfigLocation",
+                    "classpath:" + kargs.getSpringConfig());
+        }
+        
         ServletContextListener listener = new ContextLoaderListener();
         contextHandler.addEventListener(listener);
         contextHandler.setInitParameter("adminToken", adminToken);

@@ -3,6 +3,8 @@
 - Support token array in matchinfo (fixes #570; diewald)
 - Added user info web-service (solved #566)
 - Implemented configurable resource filters for search and match info APIs
+- Make --spring-config to expect an external file instead of a classpath file
+
 
 # version 0.69.3
 
