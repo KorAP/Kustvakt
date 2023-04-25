@@ -32,7 +32,7 @@ public class KustvaktLiteServer extends KustvaktBaseServer {
         config = new KustvaktConfiguration();
         config.loadBasicProperties(properties);
 
-        kargs.setSpringConfig("lite-config.xml");
+        springConfig =  "lite-config.xml";
 
         server.start();
     }

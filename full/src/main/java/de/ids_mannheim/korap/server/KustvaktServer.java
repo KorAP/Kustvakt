@@ -39,10 +39,6 @@ public class KustvaktServer extends KustvaktBaseServer {
 		if (kargs == null)
 			System.exit(0);
 
-        if (kargs.getSpringConfig() == null){
-            kargs.setSpringConfig("default-config.xml");
-        }
-        
         server.start();
     }
 }
