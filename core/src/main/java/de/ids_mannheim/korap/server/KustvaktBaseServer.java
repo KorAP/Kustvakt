@@ -35,6 +35,7 @@ import lombok.Setter;
 public abstract class KustvaktBaseServer {
 
     protected static KustvaktConfiguration config;
+    protected static String springConfig = "default-config.xml";
 
     protected static String rootPackages;
     protected static KustvaktArgs kargs;
@@ -100,13 +101,14 @@ public abstract class KustvaktBaseServer {
         ServletContextHandler contextHandler =
                 new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
         contextHandler.setContextPath("/");
+        
         if (kargs.getSpringConfig()!=null) {
             contextHandler.setInitParameter("contextConfigLocation",
                     "file:" + kargs.getSpringConfig());
         }
         else {
             contextHandler.setInitParameter("contextConfigLocation",
-                    "classpath:" + kargs.getSpringConfig());
+                    "classpath:" + this.springConfig);
         }
         
         ServletContextListener listener = new ContextLoaderListener();
@@ -145,7 +147,7 @@ public abstract class KustvaktBaseServer {
             System.exit(-1);
         }
     }
-
+    
     @Setter
     public static class KustvaktArgs {
 
