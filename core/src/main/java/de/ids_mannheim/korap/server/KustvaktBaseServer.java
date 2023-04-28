@@ -43,6 +43,11 @@ public abstract class KustvaktBaseServer {
     public KustvaktBaseServer () {
         rootPackages = "de.ids_mannheim.korap.web; "
                 + "com.fasterxml.jackson.jaxrs.json;";
+        
+        File d = new File(KustvaktConfiguration.DATA_FOLDER);
+        if (!d.exists()) {
+            d.mkdir();
+        }
     }
 
     protected KustvaktArgs readAttributes (String[] args) {

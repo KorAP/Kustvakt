@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.oauth2.dao.OAuth2ClientDao;
@@ -26,7 +27,6 @@ public class OAuth2InitClientService {
             LogManager.getLogger(OAuth2InitClientService.class);
     public static String OAUTH2_CLIENT_JSON_INPUT_FILE =
             "initial_super_client.json";
-    public static String OUTPUT_FOLDER = "client";
     public static String OUTPUT_FILENAME = "super_client_info";
     public static String TEST_OUTPUT_FILENAME = "test_super_client_info";
 
@@ -40,12 +40,12 @@ public class OAuth2InitClientService {
     public void createInitialSuperClient (String outputFilename)
             throws IOException, KustvaktException {
 
-        File dir = new File(OUTPUT_FOLDER);
+        File dir = new File(KustvaktConfiguration.DATA_FOLDER);
         if (!dir.exists()) {
             dir.mkdir();
         }
 
-        String path = OUTPUT_FOLDER + "/" + outputFilename;
+        String path = KustvaktConfiguration.DATA_FOLDER + "/" + outputFilename;
         File f = new File(path);
 
         if (!f.exists()) {

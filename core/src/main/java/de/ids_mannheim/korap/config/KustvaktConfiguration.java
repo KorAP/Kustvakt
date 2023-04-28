@@ -38,6 +38,7 @@ import lombok.Setter;
 public class KustvaktConfiguration {
 
     public static final Map<String, Object> KUSTVAKT_USER = new HashMap<>();
+    public static final String DATA_FOLDER = "data";
 
     private String vcInCaching;
     
@@ -120,7 +121,7 @@ public class KustvaktConfiguration {
     public KustvaktConfiguration () {}
     
     public void loadBasicProperties (Properties properties) {
-        port = new Integer(properties.getProperty("server.port", "8095"));
+        port = Integer.valueOf(properties.getProperty("server.port", "8095"));
         baseURL = properties.getProperty("kustvakt.base.url", "/api/*");
         setSecureRandomAlgorithm(properties
                 .getProperty("security.secure.random.algorithm", ""));
@@ -151,8 +152,8 @@ public class KustvaktConfiguration {
         }
         this.supportedVersions.add(currentVersion);
 
-        maxhits = new Integer(properties.getProperty("maxhits", "50000"));
-        returnhits = new Integer(properties.getProperty("returnhits", "50000"));
+        maxhits = Integer.valueOf(properties.getProperty("maxhits", "50000"));
+        returnhits = Integer.valueOf(properties.getProperty("returnhits", "50000"));
         indexDir = properties.getProperty("krill.indexDir", "");
         
         // server options
