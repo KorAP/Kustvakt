@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ec2c894_efd596ca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-04-28T12:23:43Z",
+      "side": 1,
+      "message": "Looks good - but it seems to not play well with installations that have their super_client file in `client` - or is that place only relevant for the initialization?",
+      "revId": "c9d29415812fd3f293d31e8722beeb162368e50d",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
