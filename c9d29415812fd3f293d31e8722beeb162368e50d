@@ -16,6 +16,24 @@
       "message": "Looks good - but it seems to not play well with installations that have their super_client file in `client` - or is that place only relevant for the initialization?",
       "revId": "c9d29415812fd3f293d31e8722beeb162368e50d",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77e8cd17_d9217e3a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-05-02T08:32:16Z",
+      "side": 1,
+      "message": "It is only for initialization. Now the initialization uses the data folder instead.",
+      "parentUuid": "3ec2c894_efd596ca",
+      "revId": "c9d29415812fd3f293d31e8722beeb162368e50d",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
