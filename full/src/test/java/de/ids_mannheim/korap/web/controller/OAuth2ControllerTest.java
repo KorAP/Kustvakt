@@ -400,13 +400,13 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         Response response =
                 requestAuthorizationCode("code", confidentialClientId,
                         redirect_uri, scope, state, userAuthHeader);
-        MultivaluedMap<String, String> params =
-                getQueryParamsFromURI(response.getLocation());
-        String code = params.get("code").get(0);
+        String code = parseAuthorizationCode(response);
 
         testRequestTokenAuthorizationInvalidClient(code);
+        testRequestTokenAuthorizationMissingRedirectUri(code);
         testRequestTokenAuthorizationInvalidRedirectUri(code);
         testRequestTokenAuthorizationRevoked(code, redirect_uri);
+        
     }
 
     private void testRequestTokenAuthorizationInvalidClient (String code)
@@ -416,6 +416,17 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_CLIENT, node.at("/error").asText());
+    }
+    
+    private void testRequestTokenAuthorizationMissingRedirectUri (String code)
+            throws KustvaktException {
+        Response response = requestTokenWithAuthorizationCodeAndForm(
+                confidentialClientId, "secret", code);
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
+        assertEquals("Missing redirect URI",
+                node.at("/error_description").asText());
     }
 
     private void testRequestTokenAuthorizationInvalidRedirectUri (String code)

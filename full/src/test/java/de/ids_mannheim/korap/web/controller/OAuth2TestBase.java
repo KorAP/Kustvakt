@@ -82,6 +82,17 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         return form;
     }
 
+    protected String parseAuthorizationCode (Response response) {
+        
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
+                response.getStatus());
+
+        URI redirectUri = response.getLocation();
+        MultiValueMap<String, String> params = UriComponentsBuilder
+                .fromUri(redirectUri).build().getQueryParams();
+        return params.getFirst("code");
+    }
+    
     protected Response requestAuthorizationCode (String responseType,
             String clientId, String redirectUri, String scope, String state,
             String authHeader) throws KustvaktException {
@@ -205,6 +216,8 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
                         ContentType.APPLICATION_FORM_URLENCODED)
                 .post(Entity.form(form));
 
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        
         String entity = response.readEntity(String.class);
         return JsonUtils.readTree(entity);
     }
