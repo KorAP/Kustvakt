@@ -334,7 +334,7 @@ public class VirtualCorpusControllerAdminTest extends VirtualCorpusTestBase {
         node2 = testAdminListVC_UsingAdminToken(vcCreator,ResourceType.PROJECT);
         assertEquals(1, node2.size());
         
-        testEditVCType(admin, vcCreator, vcName, ResourceType.PRIVATE);
+        editVCType(admin, vcCreator, vcName, ResourceType.PRIVATE);
         
         node2 = testAdminListVC_UsingAdminToken(vcCreator,ResourceType.PROJECT);
         assertEquals(0, node2.size());

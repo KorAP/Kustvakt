@@ -4,6 +4,7 @@
   for mounting into docker
 - Added an error for missing redirect uri in a token request 
   when it has been included in the authorization request.
+- Added tests for VC sharing and for OAuth2 client using VC services    
 
 # version 0.69.4
 
