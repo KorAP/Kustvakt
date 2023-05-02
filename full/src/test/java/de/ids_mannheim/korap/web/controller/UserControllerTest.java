@@ -53,14 +53,7 @@ public class UserControllerTest extends OAuth2TestBase {
             throws KustvaktException {
         Response response = requestAuthorizationCode("code", clientId, "",
                 "user_info", "", userAuthHeader);
-
-        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
-                response.getStatus());
-
-        URI redirectUri = response.getLocation();
-        MultiValueMap<String, String> params = UriComponentsBuilder
-                .fromUri(redirectUri).build().getQueryParams();
-        String code = params.getFirst("code");
+        String code = parseAuthorizationCode(response);
 
         response =
                 requestTokenWithAuthorizationCodeAndForm(clientId, null, code);
