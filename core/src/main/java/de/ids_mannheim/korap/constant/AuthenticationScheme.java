@@ -13,6 +13,7 @@ public enum AuthenticationScheme {
     BASIC, BEARER,
     // custom
     // SESSION, has not been supported yet 
+    @Deprecated
     API;
 
     public String displayName () {

@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.web.controller;
 
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -50,8 +51,9 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 response.getHeaders().entrySet();
 
         for (Entry<String, List<Object>> header : headers) {
+            System.out.println(header.toString());
             if (header.getKey().equals(ContainerRequest.WWW_AUTHENTICATE)) {
-                assertThat(header.getValue(), hasItem("Api realm=\"Kustvakt\""));
+                assertThat(header.getValue(), not(hasItem("Api realm=\"Kustvakt\"")));
                 assertThat(header.getValue(), hasItem("Bearer realm=\"Kustvakt\""));
                 assertThat(header.getValue(), hasItem("Basic realm=\"Kustvakt\""));
             }
