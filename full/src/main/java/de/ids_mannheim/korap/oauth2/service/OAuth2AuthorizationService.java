@@ -163,9 +163,14 @@ public class OAuth2AuthorizationService {
 
         String authorizedUri = authorization.getRedirectURI();
         if (authorizedUri != null && !authorizedUri.isEmpty()) {
-            if (!authorizedUri.equals(redirectURI))
+            if (redirectURI == null || redirectURI.isEmpty()) {
+                throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
+                        "Missing redirect URI", OAuth2Error.INVALID_GRANT);
+            }    
+            if (!authorizedUri.equals(redirectURI)) {
                 throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
                         "Invalid redirect URI", OAuth2Error.INVALID_GRANT);
+            }
         }
         else if (redirectURI != null && !redirectURI.isEmpty()) {
             throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
