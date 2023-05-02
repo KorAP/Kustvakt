@@ -57,8 +57,11 @@ public class KustvaktResponseHandler extends CoreResponseHandler {
     public Response createUnauthenticatedResponse (String notification) {
         ResponseBuilder builder = Response.status(Response.Status.UNAUTHORIZED);
 
-        for (AuthenticationScheme s : EnumSet
-                .allOf(AuthenticationScheme.class)) {
+        EnumSet<AuthenticationScheme> schemes = EnumSet
+                .allOf(AuthenticationScheme.class);
+        schemes.remove(AuthenticationScheme.API);
+        
+        for (AuthenticationScheme s : schemes) {
             builder = builder.header(HttpHeaders.WWW_AUTHENTICATE,
                     s.displayName() + " realm=\"Kustvakt\"");
         }
