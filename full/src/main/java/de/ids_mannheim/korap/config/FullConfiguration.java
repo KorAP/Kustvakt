@@ -82,7 +82,9 @@ public class FullConfiguration extends KustvaktConfiguration {
     private int refreshTokenLongExpiry;
     private int refreshTokenExpiry;
     private int authorizationCodeExpiry;
-
+    
+    private int maxNumberOfUserQueries;
+    
     private URL issuer;
     private URI issuerURI;
     private OpenIdConfiguration openidConfig;
@@ -129,13 +131,15 @@ public class FullConfiguration extends KustvaktConfiguration {
         config.setMaxBytesLocalDisk(properties.getProperty("cache.max.bytes.local.disk", "2G"));
         jlog.info("max local heap:"+config.getMaxBytesLocalHeapAsString());
         jlog.info("max local disk:"+config.getMaxBytesLocalDiskAsString());
+        
+        setMaxNumberOfUserQueries(Integer.parseInt(
+                properties.getProperty("max.user.persistent.queries", "20")));
     }
 
     private void setSecurityConfiguration (Properties properties) {
         setSecureHashAlgorithm(Enum.valueOf(EncryptionIface.Encryption.class,
                 properties.getProperty("security.secure.hash.algorithm",
                         "BCRYPT")));
-
     }
 
     private void setOpenIdConfiguration (Properties properties)
@@ -685,6 +689,13 @@ public class FullConfiguration extends KustvaktConfiguration {
     public void setCreateInitialSuperClient (boolean initialSuperClient) {
         this.createInitialSuperClient = initialSuperClient;
     }
-    
+
+    public int getMaxNumberOfUserQueries () {
+        return maxNumberOfUserQueries;
+    }
+
+    public void setMaxNumberOfUserQueries (int maxNumberOfUserQueries) {
+        this.maxNumberOfUserQueries = maxNumberOfUserQueries;
+    }
     
 }

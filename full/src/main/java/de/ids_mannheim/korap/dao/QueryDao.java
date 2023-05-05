@@ -11,6 +11,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
@@ -21,18 +22,18 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.ids_mannheim.korap.constant.GroupMemberStatus;
+import de.ids_mannheim.korap.constant.QueryAccessStatus;
 import de.ids_mannheim.korap.constant.QueryType;
 import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.constant.UserGroupStatus;
-import de.ids_mannheim.korap.constant.QueryAccessStatus;
+import de.ids_mannheim.korap.entity.QueryAccess;
+import de.ids_mannheim.korap.entity.QueryAccess_;
 import de.ids_mannheim.korap.entity.QueryDO;
 import de.ids_mannheim.korap.entity.QueryDO_;
 import de.ids_mannheim.korap.entity.UserGroup;
 import de.ids_mannheim.korap.entity.UserGroupMember;
 import de.ids_mannheim.korap.entity.UserGroupMember_;
 import de.ids_mannheim.korap.entity.UserGroup_;
-import de.ids_mannheim.korap.entity.QueryAccess;
-import de.ids_mannheim.korap.entity.QueryAccess_;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
@@ -373,6 +374,26 @@ public class QueryDao {
         criteriaQuery.where(builder.equal(accessGroup.get(UserGroup_.id), groupId));
         Query q = entityManager.createQuery(criteriaQuery);
         return q.getResultList();
+    }
+
+    public Long countNumberOfQuery (String userId, QueryType queryType)
+            throws KustvaktException {
+        ParameterChecker.checkStringValue(userId, "userId");
+        ParameterChecker.checkObjectValue(queryType, "queryType");
+
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = builder.createQuery(Long.class);
+
+        Root<QueryDO> query = cq.from(QueryDO.class);
+        Predicate conditions = builder.and(
+                builder.equal(query.get(QueryDO_.createdBy), userId),
+                builder.equal(query.get(QueryDO_.queryType), queryType));
+
+        cq.select(builder.count(query));
+        cq.where(conditions);
+
+        TypedQuery<Long> q = entityManager.createQuery(cq);
+        return q.getSingleResult();
     }
 
 }
