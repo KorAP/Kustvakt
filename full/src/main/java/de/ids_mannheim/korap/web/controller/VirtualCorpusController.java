@@ -2,7 +2,6 @@ package de.ids_mannheim.korap.web.controller;
 
 import java.util.List;
 
-import javax.validation.constraints.Email;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;

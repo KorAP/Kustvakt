@@ -9,6 +9,7 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.http.HttpStatus;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,7 +26,60 @@ public class VirtualCorpusSharingTest extends VirtualCorpusTestBase {
     private String testUser = "VirtualCorpusSharingTest";
 
     @Test
-    public void testProjectVC () throws KustvaktException {
+    public void testShareUnknownVC () throws
+            ProcessingException, KustvaktException {
+        Response response = testShareVCByCreator("marlin",
+                "non-existing-vc", "marlin group");
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
+        assertEquals(HttpStatus.SC_NOT_FOUND, response.getStatus());
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                node.at("/errors/0/0").asInt());
+    }
+
+    @Test
+    public void testShareUnknownGroup () throws
+            ProcessingException, KustvaktException {
+        Response response = testShareVCByCreator("marlin", "marlin-vc",
+                "non-existing-group");
+        JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
+        assertEquals(HttpStatus.SC_NOT_FOUND, response.getStatus());
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                node.at("/errors/0/0").asInt());
+    }
+
+    @Test
+    public void testShareVC_notOwner () throws
+            ProcessingException, KustvaktException {
+
+        // dory is VCA in marlin group
+        Response response = target().path(API_VERSION).path("vc")
+                .path("~marlin").path("marlin-vc").path("share")
+                .path("@marlin group")
+                .request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("dory", "pass"))
+                .post(Entity.form(new Form()));
+
+        testResponseUnauthorized(response, "dory");
+    }
+    
+    @Test
+    public void testShareVC_byMember () throws
+            ProcessingException, KustvaktException {
+
+        // nemo is not VCA in marlin group
+        Response response = target().path(API_VERSION).path("vc")
+                .path("~nemo").path("nemo-vc").path("share").path("@marlin-group")
+                .request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("nemo", "pass"))
+                .post(Entity.form(new Form()));
+
+        testResponseUnauthorized(response, "nemo");
+    }
+    
+    @Test
+    public void testCreateShareProjectVC () throws KustvaktException {
         String json =
                 "{\"type\": \"PROJECT\"" + ",\"queryType\": \"VIRTUAL_CORPUS\""
                         + ",\"corpusQuery\": \"corpusSigle=GOE\"}";

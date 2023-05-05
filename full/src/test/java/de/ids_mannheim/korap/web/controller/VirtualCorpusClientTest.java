@@ -18,7 +18,7 @@ public class VirtualCorpusClientTest extends VirtualCorpusTestBase {
     private String username = "VirtualCorpusClientTest";
 
     @Test
-    public void testVirtualCorpusWithClient () throws KustvaktException {
+    public void testVC_withClient () throws KustvaktException {
         // create client
         Response response = registerConfidentialClient(username);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
@@ -41,17 +41,27 @@ public class VirtualCorpusClientTest extends VirtualCorpusTestBase {
 
         String accessTokenHeader = "Bearer " + accessToken;
 
-        // create VC
+        // create VC 1
         String vcName = "vc-client1";
         String vcJson =
                 "{\"type\": \"PRIVATE\"" + ",\"queryType\": \"VIRTUAL_CORPUS\""
                         + ",\"corpusQuery\": \"creationDate since 1820\"}";
         createVC(accessTokenHeader, username, vcName, vcJson);
-
+        
+        // create VC 2
         vcName = "vc-client2";
         vcJson = "{\"type\": \"PRIVATE\"" + ",\"queryType\": \"VIRTUAL_CORPUS\""
                 + ",\"corpusQuery\": \"creationDate until 1820\"}";
         createVC(accessTokenHeader, username, vcName, vcJson);
+
+        // edit VC
+        String description = "vc created from client";
+        vcJson = "{\"description\": \""+description+"\"}";
+        editVC(username, username, vcName, vcJson);
+        
+        // retrieve vc info
+        node = retrieveVCInfo(username, username, vcName);
+        assertEquals(description, node.at("/description").asText());
 
         // list vc
         node = listVCWithAuthHeader(accessTokenHeader);

@@ -1,6 +1,13 @@
 package de.ids_mannheim.korap.web.controller;
 
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Entity;
@@ -9,14 +16,15 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
+import org.glassfish.jersey.server.ContainerRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.constant.ResourceType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 public abstract class VirtualCorpusTestBase extends OAuth2TestBase {
@@ -46,21 +54,16 @@ public abstract class VirtualCorpusTestBase extends OAuth2TestBase {
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
     }
 
-    protected void editVCType (String username, String vcCreator, String vcName,
-            ResourceType type) throws KustvaktException {
-        String json = "{\"type\": \"" + type + "\"}";
-
+    protected void editVC (String username, String vcCreator, String vcName,
+            String vcJson) throws KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("~" + vcCreator).path(vcName).request()
                 .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
                         .createBasicAuthorizationHeaderValue(username, "pass"))
                 .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
-                .put(Entity.json(json));
+                .put(Entity.json(vcJson));
 
         assertEquals(Status.NO_CONTENT.getStatusCode(), response.getStatus());
-
-        JsonNode node = retrieveVCInfo(username, vcCreator, vcName);
-        assertEquals(type.displayName(), node.at("/type").asText());
     }
 
     protected JsonNode listVC (String username)
@@ -84,6 +87,31 @@ public abstract class VirtualCorpusTestBase extends OAuth2TestBase {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         return JsonUtils.readTree(entity);
+    }
+    
+    protected JsonNode testListOwnerVC (String username)
+            throws ProcessingException, KustvaktException {
+        Response response = target().path(API_VERSION).path("vc")
+                .queryParam("filter-by", "own").request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .get();
+
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        String entity = response.readEntity(String.class);
+        return JsonUtils.readTree(entity);
+    }
+
+    protected JsonNode listSystemVC (String username) throws KustvaktException {
+        Response response = target().path(API_VERSION).path("vc")
+                .queryParam("filter-by", "system").request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("pearl", "pass"))
+                .get();
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        return node;
     }
 
     protected Response testShareVCByCreator (String vcCreator, String vcName,
@@ -117,5 +145,33 @@ public abstract class VirtualCorpusTestBase extends OAuth2TestBase {
                 .delete();
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+    
+    protected void testResponseUnauthorized (Response response, String username)
+            throws KustvaktException {
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Unauthorized operation for user: " + username,
+                node.at("/errors/0/1").asText());
+        
+        checkWWWAuthenticateHeader(response);
+    }
+    
+    protected void checkWWWAuthenticateHeader (Response response) {
+        Set<Entry<String, List<Object>>> headers =
+                response.getHeaders().entrySet();
+
+        for (Entry<String, List<Object>> header : headers) {
+            if (header.getKey().equals(ContainerRequest.WWW_AUTHENTICATE)) {
+                assertThat(header.getValue(), not(hasItem("Api realm=\"Kustvakt\"")));
+                assertThat(header.getValue(), hasItem("Bearer realm=\"Kustvakt\""));
+                assertThat(header.getValue(), hasItem("Basic realm=\"Kustvakt\""));
+            }
+        }
     }
 }
