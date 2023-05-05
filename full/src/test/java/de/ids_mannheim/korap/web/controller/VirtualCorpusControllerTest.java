@@ -381,6 +381,47 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
                 "Cannot deserialize value of type `de.ids_mannheim.korap.constant."
                         + "ResourceType` from String \"PRIVAT\""));
     }
+    
+    @Test
+    public void testMaxNumberOfVC () throws KustvaktException {
+        String json = "{\"type\": \"PRIVATE\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
+
+        for (int i=1; i<6; i++) {
+            createVC(authHeader,testUser, "new_vc_"+i, json);
+        }
+
+        Response response = target().path(API_VERSION).path("vc")
+                .path("~" + testUser).path("new_vc_6").request()
+                .header(Attributes.AUTHORIZATION, authHeader)
+                .header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)
+                .put(Entity.json(json));
+
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        
+        assertEquals(StatusCodes.NOT_ALLOWED,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Cannot create virtual corpus. The maximum number of "
+                + "virtual corpus has been reached.",
+                node.at("/errors/0/1").asText());
+
+        // list user VC
+        node = listVC(testUser);
+        assertEquals(6, node.size()); // including 1 system-vc
+
+        // delete new VC
+        for (int i=1; i<6; i++) {
+            deleteVC("new_vc_"+i, testUser, testUser);
+        }
+
+        // list VC
+        node = listVC(testUser);
+        assertEquals(1, node.size()); // system-vc
+    }
 
     @Test
     public void testDeleteVC_unauthorized () throws KustvaktException {

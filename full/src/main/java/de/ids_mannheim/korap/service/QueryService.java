@@ -267,24 +267,44 @@ public class QueryService {
 
     public void storeQuery (QueryJson query, String queryName,
             String queryCreator, String username) throws KustvaktException {
-        String koralQuery = null;
-        if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
-            ParameterChecker.checkStringValue(query.getCorpusQuery(),
-                    "corpusQuery");
-            koralQuery = serializeCorpusQuery(query.getCorpusQuery());
+        QueryType queryType = query.getQueryType();
+        if (!checkNumberOfQueryLimit(username, queryType)) {
+            String type = queryType.displayName().toLowerCase();
+            throw new KustvaktException(StatusCodes.NOT_ALLOWED, 
+                    "Cannot create "+type+". The maximum number "
+                            + "of "+type+" has been reached.");
         }
-        else if (query.getQueryType().equals(QueryType.QUERY)) {
-            ParameterChecker.checkStringValue(query.getQuery(), "query");
-            ParameterChecker.checkStringValue(query.getQueryLanguage(),
-                    "queryLanguage");
-            koralQuery =
-                    serializeQuery(query.getQuery(), query.getQueryLanguage());
-        }
-
+        
+        String koralQuery = computeKoralQuery(query);
         storeQuery(username, queryName, query.getType(), query.getQueryType(),
                 koralQuery, query.getDefinition(), query.getDescription(),
                 query.getStatus(), query.isCached(), queryCreator,
                 query.getQuery(), query.getQueryLanguage());
+    }
+    
+    private boolean checkNumberOfQueryLimit (String username,
+            QueryType queryType) throws KustvaktException {
+        Long num = queryDao.countNumberOfQuery(username, queryType);
+        if (num < config.getMaxNumberOfUserQueries()) return true;
+        else return false;
+    }
+    
+    private String computeKoralQuery (QueryJson query) throws KustvaktException {
+        if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
+            ParameterChecker.checkStringValue(query.getCorpusQuery(),
+                    "corpusQuery");
+            return serializeCorpusQuery(query.getCorpusQuery());
+        }
+        
+        if (query.getQueryType().equals(QueryType.QUERY)) {
+            ParameterChecker.checkStringValue(query.getQuery(), "query");
+            ParameterChecker.checkStringValue(query.getQueryLanguage(),
+                    "queryLanguage");
+            return
+                    serializeQuery(query.getQuery(), query.getQueryLanguage());
+        }
+        
+        return null;
     }
 
     public void storeQuery (String username, String queryName,
