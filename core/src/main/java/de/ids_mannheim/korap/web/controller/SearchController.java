@@ -227,6 +227,7 @@ public class SearchController {
             @QueryParam("pipes") String pipes,
             @QueryParam("access-rewrite-disabled") boolean accessRewriteDisabled,
             @QueryParam("show-tokens") boolean showTokens,
+            @DefaultValue("true") @QueryParam("show-snippet") boolean showSnippet,
             @QueryParam("cq") List<String> cq, 
             @QueryParam("engine") String engine) {
 
@@ -239,7 +240,7 @@ public class SearchController {
             result = searchService.search(engine, context.getUsername(),
                     headers, q, ql, v, cq, fields, pipes, pageIndex,
                     pageInteger, ctx, pageLength, cutoff,
-                    accessRewriteDisabled, showTokens);
+                    accessRewriteDisabled, showTokens, showSnippet);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
