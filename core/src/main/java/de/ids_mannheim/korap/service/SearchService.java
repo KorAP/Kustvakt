@@ -136,7 +136,7 @@ public class SearchService extends BasicService{
             String q, String ql, String v, List<String> cqList, String fields,
             String pipes, Integer pageIndex, Integer pageInteger, String ctx,
             Integer pageLength, Boolean cutoff, boolean accessRewriteDisabled,
-            boolean showTokens)
+            boolean showTokens, boolean showSnippet)
             throws KustvaktException {
 
         if (pageInteger != null && pageInteger < 1) {
@@ -169,7 +169,7 @@ public class SearchService extends BasicService{
         
         MetaQueryBuilder meta = createMetaQuery(pageIndex, pageInteger, ctx,
                 pageLength, cutoff, corpusAccess, fieldList, accessRewriteDisabled,
-                showTokens);
+                showTokens, showSnippet);
         serializer.setMeta(meta.raw());
         
         // There is an error in query processing
@@ -322,7 +322,7 @@ public class SearchService extends BasicService{
             Integer pageInteger, String ctx, Integer pageLength,
             Boolean cutoff, CorpusAccess corpusAccess, List<String> fieldList,
             boolean accessRewriteDisabled,
-            boolean showTokens) {
+            boolean showTokens, boolean showSnippet) {
         MetaQueryBuilder meta = new MetaQueryBuilder();
         meta.addEntry("startIndex", pageIndex);
         meta.addEntry("startPage", pageInteger);
@@ -330,7 +330,7 @@ public class SearchService extends BasicService{
         meta.addEntry("count", pageLength);
         // todo: what happened to cutoff?
         meta.addEntry("cutOff", cutoff);
-        meta.addEntry("snippets", !accessRewriteDisabled);
+        meta.addEntry("snippets", (showSnippet && !accessRewriteDisabled));
         if (!accessRewriteDisabled) {
             meta.addEntry("tokens", showTokens);
         }

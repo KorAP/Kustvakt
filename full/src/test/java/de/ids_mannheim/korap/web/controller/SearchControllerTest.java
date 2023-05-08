@@ -76,11 +76,41 @@ public class SearchControllerTest extends SpringJerseyTest {
     }
 
     @Test
+    public void testSearchShowTokens () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
+                .queryParam("show-tokens", true).request()
+                .get();
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(3, node.at("/matches/0/tokens").size());
+        assertFalse(node.at("/matches/0/snippet").isMissingNode());
+    }
+    
+    @Test
+    public void testSearchDisableSnippet () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
+                .queryParam("show-snippet", false)
+                .queryParam("show-tokens", true)
+                .request()
+                .get();
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertTrue(node.at("/matches/0/snippet").isMissingNode());
+        assertEquals(3, node.at("/matches/0/tokens").size());
+    }
+    
+    @Test
     public void testSearchWithField () throws KustvaktException {
         JsonNode node = requestSearchWithFields("author");
         assertNotEquals(0, node.at("/matches").size());
         assertEquals("[\"author\"]",
                 node.at("/meta/fields").toString());
+        
+        assertTrue(node.at("/matches/0/tokens").isMissingNode());
     }
     
     @Test
@@ -265,6 +295,31 @@ public class SearchControllerTest extends SpringJerseyTest {
                 node.at("/collection/rewrites/0/scope").asText());
         assertEquals("operation:insertion",
                 node.at("/collection/rewrites/0/operation").asText());
+    }
+    
+    @Test
+    public void testSearchWithCorpusQuery () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("cq", "corpusTitle=gingko")
+                .request()
+                .accept(MediaType.APPLICATION_JSON).get();
+        assertEquals(Status.OK.getStatusCode(),
+                response.getStatus());
+        String ent = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(ent);
+
+        assertEquals("koral:docGroup", node.at("/collection/@type").asText());
+        assertEquals("operation:and", node.at("/collection/operation").asText());
+        assertEquals(2, node.at("/collection/operands").size());
+        assertEquals("CC-BY.*",
+                node.at("/collection/operands/0/value").asText());
+        
+        assertEquals("gingko",
+                node.at("/collection/operands/1/value").asText());
+        assertEquals("match:eq",
+                node.at("/collection/operands/1/match").asText());
+        assertTrue(node.at("/collection/operands/1/type").isMissingNode());
     }
 
     @Test
