@@ -6,6 +6,7 @@
   when it has been included in the authorization request.
 - Added tests for VC sharing and for OAuth2 client using VC services
 - Added and updated VC controller tests
+- Moved hibernate.properties
 
 # version 0.69.4
 
