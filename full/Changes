@@ -1,3 +1,5 @@
+# version 0.70.1
+
 # version 0.70
 
 - Added data folder containing super_client_info and database 
@@ -6,11 +8,8 @@
   when it has been included in the authorization request.
 - Added tests for VC sharing and for OAuth2 client using VC services
 - Added and updated VC controller tests
-<<<<<<< Upstream, based on master
 - Moved hibernate.properties
-=======
 - Added maximum number of user persistent virtual corpora and queries
->>>>>>> 4db5bf8 Added maximum number of user persistent virtual corpora and queries
 
 # version 0.69.4
 
