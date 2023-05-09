@@ -38,7 +38,7 @@
 				<value>file:./jdbc.properties</value>
 				<value>classpath:properties/mail.properties</value>
 				<value>file:./mail.properties</value>
-				<value>classpath:hibernate.properties</value>
+				<value>classpath:properties/hibernate.properties</value>
 				<value>file:./kustvakt-icc.conf</value>
 				<value>classpath:kustvakt-icc.conf</value>
 			</array>
