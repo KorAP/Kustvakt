@@ -7,9 +7,9 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
+import de.ids_mannheim.korap.core.entity.AnnotationLayer;
+import de.ids_mannheim.korap.core.entity.Resource;
 import de.ids_mannheim.korap.dto.ResourceDto;
-import de.ids_mannheim.korap.entity.AnnotationLayer;
-import de.ids_mannheim.korap.entity.Resource;
 
 /**
  * ResourceConverter prepares data transfer objects (DTOs) from

@@ -10,13 +10,13 @@ import java.util.TreeSet;
 
 import org.springframework.stereotype.Component;
 
+import de.ids_mannheim.korap.core.entity.Annotation;
+import de.ids_mannheim.korap.core.entity.AnnotationKey;
+import de.ids_mannheim.korap.core.entity.AnnotationLayer;
 import de.ids_mannheim.korap.dto.FoundryDto;
 import de.ids_mannheim.korap.dto.FoundryDto.Key;
 import de.ids_mannheim.korap.dto.FoundryDto.Layer;
 import de.ids_mannheim.korap.dto.LayerDto;
-import de.ids_mannheim.korap.entity.Annotation;
-import de.ids_mannheim.korap.entity.AnnotationKey;
-import de.ids_mannheim.korap.entity.AnnotationLayer;
 
 /**
  * AnnotationConverter prepares data transfer objects (DTOs) from

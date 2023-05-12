@@ -14,7 +14,7 @@
 
 	<context:component-scan
 		base-package="de.ids_mannheim.korap.rewrite,
-		de.ids_mannheim.korap.service, 
+		de.ids_mannheim.korap.core.service, 
 	    de.ids_mannheim.korap.web.filter, 
 		de.ids_mannheim.korap.web.utils,
 		de.ids_mannheim.korap.authentication.http" />
@@ -91,7 +91,7 @@
 
 		<property name="packagesToScan">
 			<array>
-				<value>de.ids_mannheim.korap.entity</value>
+				<value>de.ids_mannheim.korap.core.entity</value>
 			</array>
 		</property>
 		<property name="jpaVendorAdapter">

@@ -15,9 +15,9 @@ import javax.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import de.ids_mannheim.korap.entity.AnnotationLayer;
-import de.ids_mannheim.korap.entity.Resource;
-import de.ids_mannheim.korap.entity.Resource_;
+import de.ids_mannheim.korap.core.entity.AnnotationLayer;
+import de.ids_mannheim.korap.core.entity.Resource;
+import de.ids_mannheim.korap.core.entity.Resource_;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 

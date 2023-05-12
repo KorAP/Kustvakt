@@ -15,12 +15,11 @@ import org.springframework.stereotype.Controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
-
+import de.ids_mannheim.korap.core.service.AnnotationService;
 import de.ids_mannheim.korap.dto.FoundryDto;
 import de.ids_mannheim.korap.dto.LayerDto;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.service.AnnotationService;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;

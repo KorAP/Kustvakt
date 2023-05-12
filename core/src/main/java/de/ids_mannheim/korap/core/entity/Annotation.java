@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.entity;
+package de.ids_mannheim.korap.core.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

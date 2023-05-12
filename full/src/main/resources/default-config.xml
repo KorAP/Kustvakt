@@ -137,6 +137,7 @@
 
 		<property name="packagesToScan">
 			<array>
+				<value>de.ids_mannheim.korap.core.entity</value>
 				<value>de.ids_mannheim.korap.entity</value>
 				<value>de.ids_mannheim.korap.oauth2.entity</value>
 			</array>

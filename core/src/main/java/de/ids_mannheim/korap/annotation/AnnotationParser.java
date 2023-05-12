@@ -18,10 +18,10 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.constant.AnnotationType;
+import de.ids_mannheim.korap.core.entity.Annotation;
+import de.ids_mannheim.korap.core.entity.AnnotationKey;
+import de.ids_mannheim.korap.core.entity.AnnotationLayer;
 import de.ids_mannheim.korap.dao.AnnotationDao;
-import de.ids_mannheim.korap.entity.Annotation;
-import de.ids_mannheim.korap.entity.AnnotationKey;
-import de.ids_mannheim.korap.entity.AnnotationLayer;
 
 /** Parser for extracting annotation descriptions from Kalamar javascripts 
  * 

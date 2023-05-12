@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.ids_mannheim.korap.constant.AnnotationType;
-import de.ids_mannheim.korap.entity.Annotation;
+import de.ids_mannheim.korap.core.entity.Annotation;
 
 /**
  * Helper class to parse annotation scripts variables. It prints out

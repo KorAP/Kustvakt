@@ -15,10 +15,10 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import de.ids_mannheim.korap.core.entity.AnnotationLayer;
+import de.ids_mannheim.korap.core.entity.Resource;
 import de.ids_mannheim.korap.dao.AnnotationDao;
 import de.ids_mannheim.korap.dao.ResourceDao;
-import de.ids_mannheim.korap.entity.AnnotationLayer;
-import de.ids_mannheim.korap.entity.Resource;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 
 /** Parser for extracting data from free-resources.json containing

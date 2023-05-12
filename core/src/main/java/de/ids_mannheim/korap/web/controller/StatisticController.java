@@ -20,9 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
-
+import de.ids_mannheim.korap.core.service.StatisticService;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.service.StatisticService;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
