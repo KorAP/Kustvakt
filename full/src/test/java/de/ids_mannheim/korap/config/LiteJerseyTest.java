@@ -17,7 +17,7 @@ import org.glassfish.jersey.test.spi.TestContainerException;
 import org.glassfish.jersey.test.spi.TestContainerFactory;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:test-config.xml")
+@ContextConfiguration("classpath:test-config-lite.xml")
 public abstract class LiteJerseyTest extends JerseyTest{
     
     public static final String API_VERSION = "v1.0";
@@ -26,8 +26,10 @@ public abstract class LiteJerseyTest extends JerseyTest{
     protected GenericApplicationContext applicationContext;
     
     public static String[] classPackages =
-            new String[] { "de.ids_mannheim.korap.web",
+            new String[] {
                     "de.ids_mannheim.korap.core.web",
+                    "de.ids_mannheim.korap.web.filter", 
+                    "de.ids_mannheim.korap.web.utils",
                     "de.ids_mannheim.korap.test",
                     "com.fasterxml.jackson.jaxrs.json"};
     
