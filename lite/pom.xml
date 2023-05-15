@@ -119,15 +119,20 @@
 							</transformers>
 							<!-- Additional configuration. -->
 							<!-- apparently there is a securityexception -->
+							<configuration>
+						        <artifactSet>
+						          <includes>
+						            <include>de.ids_mannheim.korap</include>
+						          </includes>
+						        </artifactSet>
+						      </configuration>
 							<filters>
 								<filter>
 									<artifact>*:*</artifact>
 									<excludes>
-										<exclude>META-INF/*.SF</exclude>
-										<exclude>META-INF/*.DSA
-										</exclude>
-										<exclude>META-INF/*.RSA
-										</exclude>
+										<exclude>de/ids_mannheim/korap/entity</exclude>
+										<exclude>de/ids_mannheim/korap/oauth2</exclude>
+										<exclude>de/ids_mannheim/korap/web/input</exclude>
 									</excludes>
 								</filter>
 							</filters>

@@ -18,6 +18,7 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.query.serialize.MetaQueryBuilder;
 import de.ids_mannheim.korap.query.serialize.QuerySerializer;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import de.ids_mannheim.korap.web.SearchKrill;
 
 /**
  * Created by hanl on 02.06.16.
