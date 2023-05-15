@@ -4,6 +4,7 @@
 - Renamed web.controller package in core
 - Moved SearchNetworkEndpoint to core.service package
 - Merged lite into full
+- Merged core into full
 
 # version 0.70
 
