@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "295bdc7e_daa16ef9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-05-15T16:21:09Z",
+      "side": 1,
+      "message": "Moved files from lite folder to full to preserve history in patch 4.\nRemoved lite folder in patch 5.",
+      "revId": "ebbc86396b6249270edfdadb08f4d831c9ffc73b",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
