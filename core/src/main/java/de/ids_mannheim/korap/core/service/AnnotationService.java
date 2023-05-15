@@ -9,13 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.ids_mannheim.korap.core.entity.AnnotationLayer;
+import de.ids_mannheim.korap.core.web.controller.AnnotationController;
 import de.ids_mannheim.korap.dao.AnnotationDao;
 import de.ids_mannheim.korap.dto.FoundryDto;
 import de.ids_mannheim.korap.dto.LayerDto;
 import de.ids_mannheim.korap.dto.converter.AnnotationConverter;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.web.controller.AnnotationController;
 
 /** AnnotationService defines the logic behind {@link AnnotationController}.
  * 

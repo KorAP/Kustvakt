@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web;
+package de.ids_mannheim.korap.core.service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

@@ -15,6 +15,7 @@
 	<context:component-scan
 		base-package="de.ids_mannheim.korap.rewrite,
 		de.ids_mannheim.korap.core.service,
+		de.ids_mannheim.korap.core.web,
 		de.ids_mannheim.korap.web.filter, 
 		de.ids_mannheim.korap.web.utils,
 		de.ids_mannheim.korap.authentication.http" />
@@ -132,8 +133,6 @@
 	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">
 		<constructor-arg value="${krill.indexDir}" />
 	</bean>
-	<bean id="search_network" class="de.ids_mannheim.korap.web.SearchNetworkEndpoint"/>
-	
 
 	<!-- Filters -->
 	<!-- <bean id="APIVersionFilter" class="de.ids_mannheim.korap.web.APIVersionFilter" 
@@ -148,13 +147,13 @@
 	</bean>
 
 	<!-- Controllers -->
+	<!-- added via component-scan
 	<bean id="annotationController"
 		class="de.ids_mannheim.korap.web.controller.AnnotationController" />
 	<bean id="searchController" class="de.ids_mannheim.korap.web.controller.SearchController" />
 	<bean id="statisticController"
 		class="de.ids_mannheim.korap.web.controller.StatisticController" />
-	<!-- <bean id="testController"
-		class="de.ids_mannheim.korap.test.TestController" /> -->
+	-->
 
 	<!-- Services -->
 	<bean id="scopeService"

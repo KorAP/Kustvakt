@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.controller;
+package de.ids_mannheim.korap.core.web.controller;
 
 import java.io.IOException;
 import java.util.List;

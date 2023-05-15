@@ -40,7 +40,6 @@ import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.ClientsHandler;
 import de.ids_mannheim.korap.web.SearchKrill;
-import de.ids_mannheim.korap.web.SearchNetworkEndpoint;
 
 @Service
 public class SearchService extends BasicService{
@@ -418,7 +417,7 @@ public class SearchService extends BasicService{
         User user = createUser(username, headers);
         Pattern p = determineAvailabilityPattern(user);
 
-        boolean match_only = foundries == null || foundries.isEmpty();
+//        boolean match_only = foundries == null || foundries.isEmpty();
         String results;
 //        try {
 

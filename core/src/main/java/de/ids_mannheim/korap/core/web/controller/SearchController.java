@@ -1,4 +1,4 @@
-package de.ids_mannheim.korap.web.controller;// package
+package de.ids_mannheim.korap.core.web.controller;// package
                                              // de.ids_mannheim.korap.ext.web;
 
 import java.util.HashMap;
