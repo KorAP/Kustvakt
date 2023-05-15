@@ -11,13 +11,10 @@
            http://www.springframework.org/schema/util
            http://www.springframework.org/schema/util/spring-util.xsd">
 
-
-	<context:component-scan
-		base-package="
-		de.ids_mannheim.korap.rewrite,
-		de.ids_mannheim.korap.core.service, 
-	    de.ids_mannheim.korap.core.web,
-	    de.ids_mannheim.korap.web.filter, 
+	<context:component-scan base-package="
+		de.ids_mannheim.korap.core.service,
+		de.ids_mannheim.korap.core.web,
+		de.ids_mannheim.korap.web.filter, 
 		de.ids_mannheim.korap.web.utils,
 		de.ids_mannheim.korap.authentication.http" />
 	<context:annotation-config />
@@ -27,9 +24,9 @@
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="locations">
 			<array>
-				<value>classpath:lite-jdbc.properties</value>
+				<value>classpath:properties/lite-jdbc.properties</value>
 				<value>file:./lite-jdbc.properties</value>
-				<value>classpath:hibernate.properties</value>
+				<value>classpath:properties/hibernate.properties</value>
 				<value>classpath:kustvakt-lite.conf</value>
 				<value>file:./kustvakt-lite.conf</value>
 			</array>
@@ -143,6 +140,7 @@
 	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">
 		<constructor-arg value="${krill.indexDir}" />
 	</bean>
+	
 
 	<!-- Filters -->
 	<!-- <bean id="APIVersionFilter" class="de.ids_mannheim.korap.web.APIVersionFilter"
@@ -164,7 +162,7 @@
 	<bean id="searchController" class="de.ids_mannheim.korap.web.controller.SearchController" />
 	<bean id="statisticController"
 		class="de.ids_mannheim.korap.web.controller.StatisticController" />
- -->
+ 	-->
 	<!-- Services -->
 	<bean id="scopeService"
 		class="de.ids_mannheim.korap.oauth2.service.DummyOAuth2ScopeServiceImpl" />
@@ -177,10 +175,11 @@
 	<bean id="annotationConverter" class="de.ids_mannheim.korap.dto.converter.AnnotationConverter" />
 
 	<!-- Rewrite -->
+	<bean id="layerMapper" class="de.ids_mannheim.korap.rewrite.LayerMapper" />
 	<bean id="foundryInject" class="de.ids_mannheim.korap.rewrite.FoundryInject" />
-	
+
 	<util:list id="rewriteTasks" value-type="de.ids_mannheim.korap.rewrite.RewriteTask">
-		<ref bean="foundryInject"/>
+		<ref bean="foundryInject" />
 	</util:list>
 	
 	<bean id="rewriteHandler" class="de.ids_mannheim.korap.rewrite.RewriteHandler">
