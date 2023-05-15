@@ -25,6 +25,7 @@ import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
+import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import net.minidev.json.JSONObject;
 
 /** Generates OpenId specific responses.
