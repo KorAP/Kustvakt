@@ -11,9 +11,7 @@
            http://www.springframework.org/schema/util
            http://www.springframework.org/schema/util/spring-util.xsd">
 
-
-	<context:component-scan
-		base-package="de.ids_mannheim.korap.rewrite,
+	<context:component-scan base-package="
 		de.ids_mannheim.korap.core.service,
 		de.ids_mannheim.korap.core.web,
 		de.ids_mannheim.korap.web.filter, 
@@ -26,9 +24,9 @@
 		<property name="ignoreResourceNotFound" value="true" />
 		<property name="locations">
 			<array>
-				<value>classpath:test-jdbc.properties</value>
-				<value>file:./test-jdbc.properties</value>
-				<value>classpath:hibernate.properties</value>
+				<value>classpath:properties/lite-jdbc.properties</value>
+				<value>file:./lite-jdbc.properties</value>
+				<value>classpath:properties/hibernate.properties</value>
 				<value>classpath:kustvakt-lite.conf</value>
 				<value>file:./kustvakt-lite.conf</value>
 			</array>
@@ -69,10 +67,11 @@
 		<property name="suppressClose">
 			<value>true</value>
 		</property>
+		<!--<property name="initialSize" value="2"/> -->
+		<!--<property name="poolPreparedStatements" value="true"/> -->
 	</bean>
-
 	<bean id="flywayConfig" class="org.flywaydb.core.api.configuration.ClassicConfiguration">
-	    <property name="baselineOnMigrate" value="true" />
+		<property name="baselineOnMigrate" value="true" />
 		<!-- <property name="validateOnMigrate" value="false" /> -->
 		<!-- <property name="cleanOnValidationError" value="true" /> -->
 		<property name="locations" value="#{'${jdbc.schemaPath}'.split(',')}"/>
@@ -83,6 +82,7 @@
 	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
 	    <constructor-arg ref="flywayConfig"/>
 	</bean>
+	
 
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
@@ -129,14 +129,23 @@
 		<property name="dataSource" ref="sqliteDataSource" />
 	</bean>
 
+	<!-- Initialization -->
+	<!-- <bean id="initializator" class="de.ids_mannheim.de.init.LiteInitializatorImpl"
+		init-method="init">
+	</bean> -->
+	<bean id="annotationParser" class="de.ids_mannheim.korap.annotation.AnnotationParser"
+		scope="singleton" />
+
 	<!-- Search Engine -->
 	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">
 		<constructor-arg value="${krill.indexDir}" />
 	</bean>
+	
 
 	<!-- Filters -->
-	<!-- <bean id="APIVersionFilter" class="de.ids_mannheim.korap.web.APIVersionFilter" 
+	<!-- <bean id="APIVersionFilter" class="de.ids_mannheim.korap.web.APIVersionFilter"
 		scope="singleton" /> -->
+
 	<!-- Authentication -->
 	<bean id="authenticationManager"
 		class="de.ids_mannheim.korap.authentication.DummyAuthenticationManager" />
@@ -153,8 +162,7 @@
 	<bean id="searchController" class="de.ids_mannheim.korap.web.controller.SearchController" />
 	<bean id="statisticController"
 		class="de.ids_mannheim.korap.web.controller.StatisticController" />
-	-->
-
+ 	-->
 	<!-- Services -->
 	<bean id="scopeService"
 		class="de.ids_mannheim.korap.oauth2.service.DummyOAuth2ScopeServiceImpl" />
@@ -167,16 +175,16 @@
 	<bean id="annotationConverter" class="de.ids_mannheim.korap.dto.converter.AnnotationConverter" />
 
 	<!-- Rewrite -->
+	<bean id="layerMapper" class="de.ids_mannheim.korap.rewrite.LayerMapper" />
 	<bean id="foundryInject" class="de.ids_mannheim.korap.rewrite.FoundryInject" />
 
 	<util:list id="rewriteTasks" value-type="de.ids_mannheim.korap.rewrite.RewriteTask">
 		<ref bean="foundryInject" />
 	</util:list>
-
+	
 	<bean id="rewriteHandler" class="de.ids_mannheim.korap.rewrite.RewriteHandler">
 		<constructor-arg ref="rewriteTasks" />
 	</bean>
-
 
 
 
