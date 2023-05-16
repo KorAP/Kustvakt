@@ -6,7 +6,7 @@
 version: 2
 updates:
   - package-ecosystem: "maven" # See documentation for possible values
-    directory: "/core" # Location of package manifests
+    directory: "/full" # Location of package manifests
     schedule:
       interval: "daily"
     ignore:
@@ -36,30 +36,4 @@ updates:
       - dependency-name: "org.glassfish.jersey.*"
         versions:
           - ">=3"
-    open-pull-requests-limit: 50
-
-  - package-ecosystem: "maven" # See documentation for possible values
-    directory: "/lite" # Location of package manifests
-    schedule:
-      interval: "daily"
-    ignore:
-    - dependency-name: "org.hibernate:hibernate-*"
-      versions:
-          - ">= 6.0.0"
-    - dependency-name: "org.glassfish.jersey.*"
-      versions:
-        - ">=3"
-    open-pull-requests-limit: 50
-
-  - package-ecosystem: "maven" # See documentation for possible values
-    directory: "/full" # Location of package manifests
-    schedule:
-      interval: "daily"
-    ignore:
-    - dependency-name: "org.hibernate:hibernate-*"
-      versions:
-        - ">= 6.0.0"
-    - dependency-name: "org.glassfish.jersey.*"
-      versions:
-        - ">=3"
     open-pull-requests-limit: 50
