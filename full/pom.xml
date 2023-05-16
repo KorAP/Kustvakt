@@ -12,7 +12,7 @@
 		<spring.version>5.3.27</spring.version>
 		<jetty.version>9.4.51.v20230217</jetty.version>
 		<flyway.version>9.18.0</flyway.version>
-		<log4j.version>2.19.0</log4j.version>
+		<log4j.version>2.20.0</log4j.version>
 		<krill.version>[0.61.2,)</krill.version>
 		<koral.version>[0.39.1,)</koral.version>
 	</properties>
