@@ -29,25 +29,18 @@ Clone the latest version of Kustvakt
 git clone git@github.com:KorAP/Kustvakt.git
 </pre>
 
-Since Kustvakt requires Krill and Koral, please install [Krill](https://github.com/KorAP/Krill) and [Koral](https://github.com/KorAP/Koral) in your maven local repository according to the required versions specified in ```Kustvakt/core/pom.xml```. 
+Since Kustvakt requires Krill and Koral, please install [Krill](https://github.com/KorAP/Krill) and [Koral](https://github.com/KorAP/Koral) in your maven local repository according to the required versions specified in ```Kustvakt/full/pom.xml```. 
 
-Install Kustvakt-core in your maven local repository
-<pre>
-cd Kustvakt/core
-mvn clean install
-</pre>
-
-Package Kustvakt full version
+Packaging Kustvakt full version
 <pre>
 cd ../full
 mvn clean package
 </pre>
-The jar file is located in the ```target/``` folder.
 
-Package Kustvakt lite version
+Packaging Kustvakt lite version
 <pre>
-cd ../lite
-mvn clean package
+cd ../full
+mvn package -P lite
 </pre>
 The jar file is located in the ```target/``` folder.
 
@@ -62,16 +55,13 @@ will run Kustvakt full version with the example [kustvakt.conf](https://github.c
 
 Kustvakt full version requires a Krill index and [LDAP configuration](https://github.com/KorAP/Kustvakt/wiki/LDAP-Setting). By default, Kustvakt uses the [sample-index](https://github.com/KorAP/Kustvakt/tree/master/sample-index) located in the parent directory of the jar file and [the embedded LDAP server](https://github.com/KorAP/Kustvakt/blob/master/full/src/main/resources/embedded-ldap-example.conf) example.
 
-### Running a custom Spring XML configuration
+### Running Kustvakt with a custom Spring XML configuration
 
-To run Kustvakt with a custom Spring XML configuration file, it must be included in the classpath. For instance:
-```custom-spring-config.xml``` is located in ```config``` folder. 
-The ```config``` folder must be included in the classpath with ```-cp``` command.
+Kustvakt can be run using an external Spring XML configuration file, e.g. using test-config-icc.xml located in data folder:
 
 <pre>
 cd target/
-java -cp Kustvakt-full-[version].jar:config de.ids_mannheim.korap.server.KustvaktServer 
---spring-config custom-spring-config.xml
+java -jar Kustvakt-full-[version].jar --spring-config data/test-config-icc.xml 
 </pre>
 
 ### Generating an OAuth2 super client
