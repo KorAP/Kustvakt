@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "509b0bd2_868d5f8f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-05-16T13:13:10Z",
+      "side": 1,
+      "message": "Tests run fine. I even deleted the maven repo just in case.",
+      "revId": "6a925fe6aaf1d09a6d566d56462947c7f63f6727",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
