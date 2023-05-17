@@ -32,20 +32,17 @@ RUN mkdir built && \
 
 RUN rm -r Krill
 
-# Install Kustvakt core
-RUN mvn -f core/pom.xml clean install
-
 # Package lite
-RUN cd lite && \
-    mvn clean package && \
+RUN cd full && \
+    mvn clean package -P lite && \
     find target/Kustvakt-lite-*.jar -exec mv {} ../built/Kustvakt-lite.jar ';'
 
-RUN sed 's!\(krill\.indexDir\s*=\).\+!\1\/kustvakt\/index!' lite/src/main/resources/kustvakt-lite.conf \
+RUN sed 's!\(krill\.indexDir\s*=\).\+!\1\/kustvakt\/index!' full/src/main/resources/kustvakt-lite.conf \
     > built/kustvakt-lite.conf
 
 # Package full
 RUN cd full && \
-    mvn clean package && \
+    mvn clean package -DskipTests=true && \
     find target/Kustvakt-full-*.jar -exec mv {} ../built/Kustvakt-full.jar ';'
 
 RUN cat full/src/main/resources/kustvakt.conf | \
@@ -63,10 +60,9 @@ RUN cat full/src/main/resources/example-users.ldif \
     > built/ldap.ldif
 
 # Cleanup
-RUN rm -r core && \
-    rm -r full && \
-    rm -r lite && \
-    rm -r sample-index
+RUN rm -r full && \
+    rm -r sample-index && \
+    rm -r wiki-index
 
 RUN apk del git \
             maven
@@ -93,7 +89,6 @@ EXPOSE 8089
 ENTRYPOINT [ "java", "-jar" ]
 
 CMD [ "Kustvakt-lite.jar" ]
-
 
 FROM openjdk:19-alpine AS kustvakt-full
 
