@@ -19,7 +19,6 @@ import com.mchange.rmi.NotAuthorizedException;
 //Using JAR from unboundID:
 import com.unboundid.ldap.sdk.LDAPException;
 
-import de.ids_mannheim.korap.auditing.AuditRecord;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.FullConfiguration;
@@ -33,7 +32,6 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.exceptions.WrappedException;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.EntityHandlerIface;
-import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.DemoUser;
@@ -64,7 +62,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 	private EntityHandlerIface entHandler;
 	@Autowired
 	private AdminDao adminDao;
-	private AuditingIface auditing;
 	private FullConfiguration config;
 	@Deprecated
 	private Collection userdatadaos;
@@ -73,12 +70,11 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 	private Validator validator;
 	
 	public KustvaktAuthenticationManager(EntityHandlerIface userdb, EncryptionIface crypto,
-			FullConfiguration config, AuditingIface auditer, Collection<UserDataDbIface> userdatadaos) {
+			FullConfiguration config, Collection<UserDataDbIface> userdatadaos) {
 	    super("id_tokens");
 		this.entHandler = userdb;
 		this.config = config;
 		this.crypto = crypto;
-		this.auditing = auditer;
 		this.counter = new LoginCounter(config);
 		this.userdatadaos = userdatadaos;
 		// todo: load via beancontext
@@ -210,7 +206,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 			user = authenticate(username, password, attributes);
 			break;
 		}
-		auditing.audit(AuditRecord.serviceRecord(user.getId(), StatusCodes.LOGIN_SUCCESSFUL, user.toString()));
 		return user;
 	}
 
@@ -559,6 +554,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 
 	} // authenticateIdM
 
+	@Deprecated
 	public boolean isRegistered(String username) {
 		User user;
 		if (username == null || username.isEmpty())
@@ -582,6 +578,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		return user != null;
 	}
 
+	@Deprecated
 	public void logout(TokenContext context) throws KustvaktException {
 		try {
 			AuthenticationIface provider = getProvider(context.getTokenType(), null);
@@ -594,11 +591,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		} catch (KustvaktException e) {
 			throw new WrappedException(e, StatusCodes.LOGOUT_FAILED, context.toString());
 		}
-		auditing.audit(
-				AuditRecord.serviceRecord(context.getUsername(), StatusCodes.LOGOUT_SUCCESSFUL, context.toString()));
 		this.removeCacheEntry(context.getToken());
 	}
 
+	@Deprecated
 	private void processLoginFail(User user) throws KustvaktException {
 		counter.registerFail(user.getUsername());
 		if (!counter.validate(user.getUsername())) {
@@ -613,6 +609,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		}
 	}
 
+	@Deprecated
 	public void lockAccount(User user) throws KustvaktException {
 		if (!(user instanceof KorAPUser))
 			throw new KustvaktException(StatusCodes.REQUEST_INVALID);
@@ -678,6 +675,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 	 * @throws KustvaktException
 	 */
 	// todo:
+	@Deprecated
 	public void accountLink(User current, String for_name, int transstrat) throws KustvaktException {
 		// User foreign = entHandler.getAccount(for_name);
 
@@ -704,6 +702,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		// }
 	}
 
+	@Deprecated
 	// todo: test and rest usage?!
 	public boolean updateAccount(User user) throws KustvaktException {
 		boolean result;
@@ -719,14 +718,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 				throw new WrappedException(e, StatusCodes.UPDATE_ACCOUNT_FAILED);
 			}
 		}
-		if (result) {
-			// this.removeCacheEntry(user.getUsername());
-			auditing.audit(
-					AuditRecord.serviceRecord(user.getId(), StatusCodes.UPDATE_ACCOUNT_SUCCESSFUL, user.toString()));
-		}
 		return result;
 	}
 
+	@Deprecated
 	public boolean deleteAccount(User user) throws KustvaktException {
 		boolean result;
 		if (user instanceof DemoUser)
@@ -738,11 +733,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 				jlog.error("Error: "+ e.string());
 				throw new WrappedException(e, StatusCodes.DELETE_ACCOUNT_FAILED);
 			}
-		}
-		if (result) {
-			// this.removeCacheEntry(user.getUsername());
-			auditing.audit(AuditRecord.serviceRecord(user.getUsername(), StatusCodes.DELETE_ACCOUNT_SUCCESSFUL,
-					user.toString()));
 		}
 		return result;
 	}

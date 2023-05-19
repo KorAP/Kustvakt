@@ -1,14 +1,10 @@
 package de.ids_mannheim.korap.web;
 
-import java.util.List;
-
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
-import de.ids_mannheim.korap.auditing.AuditRecord;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.response.Notifications;
 
 /**
@@ -17,20 +13,6 @@ import de.ids_mannheim.korap.response.Notifications;
  * @last 04/12/2017
  */
 public class CoreResponseHandler {
-
-    private AuditingIface auditing;
-
-    public CoreResponseHandler (AuditingIface iface) {
-        this.auditing = iface;
-    }
-
-    private void register (List<AuditRecord> records) {
-        if (auditing != null && !records.isEmpty())
-            auditing.audit(records);
-        else if (auditing == null)
-            throw new RuntimeException("Auditing handler must be set!");
-    }
-
 
     public WebApplicationException throwit (KustvaktException e) {
         Response s;
@@ -70,7 +52,6 @@ public class CoreResponseHandler {
     }
 
     protected String buildNotification (KustvaktException e) {
-        register(e.getRecords());
         return buildNotification(e.getStatusCode(), e.getMessage(),
                 e.getEntity());
     }

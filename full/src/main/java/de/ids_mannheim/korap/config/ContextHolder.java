@@ -5,7 +5,6 @@ import java.util.Collection;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 
-import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
 import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
@@ -37,7 +36,7 @@ public abstract class ContextHolder {
         this.handler = new DefaultHandler();
         this.context = context;
         // todo: better method?!
-        new CoreResponseHandler(getAuditingProvider());
+        new CoreResponseHandler();
     }
 
 
@@ -70,11 +69,6 @@ public abstract class ContextHolder {
     }
 
 
-    public AuditingIface getAuditingProvider () {
-        return (AuditingIface) getBean(KUSTVAKT_AUDITING);
-    }
-
-
     @Deprecated
     public <T extends KustvaktConfiguration> T getConfiguration () {
         return (T) getBean(KUSTVAKT_CONFIG);
@@ -92,7 +86,6 @@ public abstract class ContextHolder {
     }
 
     private void close () {
-        this.getAuditingProvider().finish();
         this.context = null;
     }
 }
