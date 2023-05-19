@@ -2,6 +2,7 @@
 
 - Removed auditing (#611)
 - Removed old database configurations (#612)
+- Removed old tests
 
 # version 0.70.1
 
