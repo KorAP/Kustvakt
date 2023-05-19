@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.springframework.jdbc.core.RowMapper;
 
-import de.ids_mannheim.korap.auditing.AuditRecord;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.user.KorAPUser;
@@ -77,23 +76,6 @@ public class RowMapperFactory {
 //            return user;
 //        }
 
-    }
-
-    public static class AuditMapper implements RowMapper<AuditRecord> {
-
-        @Override
-        public AuditRecord mapRow (ResultSet rs, int rowNum)
-                throws SQLException {
-            AuditRecord r = new AuditRecord(AuditRecord.CATEGORY.valueOf(rs
-                    .getString("aud_category")));
-            r.setUserid(rs.getString("aud_user"));
-            r.setField_1(rs.getString("aud_field_1"));
-            r.setTimestamp(rs.getTimestamp("aud_timestamp").getTime());
-            r.setId(rs.getInt("aud_id"));
-            r.setStatus(rs.getInt("aud_status"));
-            r.setLoc(rs.getString("aud_location"));
-            return r;
-        }
     }
 
 }

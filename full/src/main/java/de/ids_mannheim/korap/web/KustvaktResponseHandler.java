@@ -10,7 +10,6 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import de.ids_mannheim.korap.constant.AuthenticationScheme;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 
 /**
  * KustvaktResponseHandler includes exceptions regarding
@@ -20,10 +19,6 @@ import de.ids_mannheim.korap.interfaces.db.AuditingIface;
  *
  */
 public class KustvaktResponseHandler extends CoreResponseHandler {
-
-    public KustvaktResponseHandler (AuditingIface iface) {
-        super(iface);
-    }
 
     @Override
     public WebApplicationException throwit (KustvaktException e) {
