@@ -13,24 +13,24 @@ import static org.junit.Assert.assertTrue;
 import java.util.Iterator;
 
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.FastJerseyTest;
 
 
 // EM: The API is disabled
 @Ignore
-public class QuerySerializationControllerTest extends FastJerseyTest {
+public class QuerySerializationControllerTest extends SpringJerseyTest {
 
     @Test
     public void testQuerySerializationFilteredPublic ()
