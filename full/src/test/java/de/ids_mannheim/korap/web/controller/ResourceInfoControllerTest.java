@@ -5,19 +5,19 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
-import de.ids_mannheim.korap.web.FastJerseyTest;
 
 /**
  * @author hanl, margaretha
@@ -25,11 +25,11 @@ import de.ids_mannheim.korap.web.FastJerseyTest;
  *             EM: FIX ME: Database restructure
  */
 @Ignore
-public class ResourceInfoControllerTest extends FastJerseyTest {
+public class ResourceInfoControllerTest extends SpringJerseyTest {
 
     @Test
     public void testGetPublicVirtualCollectionInfo () throws KustvaktException {
-        Response response = target().path(getAPIVersion())
+        Response response = target().path(API_VERSION)
                 .path("collection")
                 .request()
                 .get();
@@ -45,7 +45,7 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
     @Test
     public void testGetVirtualCollectionInfoWithAuthentication ()
             throws KustvaktException {
-        Response response = target().path(getAPIVersion())
+        Response response = target().path(API_VERSION)
                 .path("collection")
                 .request()
                 .header(Attributes.AUTHORIZATION,
@@ -65,7 +65,7 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
     @Test
     public void testGetVirtualCollectionInfoById () throws KustvaktException {
-        Response response = target().path(getAPIVersion())
+        Response response = target().path(API_VERSION)
                 .path("collection").path("GOE-VC")
                 .request()
                 .get();
@@ -83,7 +83,7 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
     @Test
     public void testGetVirtualCollectionInfoByIdUnauthorized ()
             throws KustvaktException {
-        Response response = target().path(getAPIVersion())
+        Response response = target().path(API_VERSION)
                 .path("collection").path("WPD15-VC")
                 .request()
                 .get();
@@ -101,7 +101,7 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
     @Test
     public void testGetPublicCorporaInfo () throws KustvaktException {
-        Response response = target().path(getAPIVersion())
+        Response response = target().path(API_VERSION)
                 .path("corpus")
                 .request()
                 .get();
@@ -117,7 +117,7 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
     @Test
     public void testGetCorpusInfoById () throws KustvaktException {
-        Response response = target().path(getAPIVersion())
+        Response response = target().path(API_VERSION)
                 .path("corpus").path("WPD13")
                 .request()
                 .get();
@@ -135,7 +135,7 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
     @Test
     public void testGetCorpusInfoById2 () throws KustvaktException {
-        Response response = target().path(getAPIVersion())
+        Response response = target().path(API_VERSION)
                 .path("corpus").path("GOE")
                 .request()
                 .get();
@@ -151,7 +151,7 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
     @Test
     public void testGetPublicFoundriesInfo () throws KustvaktException {
-        Response response = target().path(getAPIVersion())
+        Response response = target().path(API_VERSION)
                 .path("foundry")
                 .request()
                 .get();
@@ -167,7 +167,7 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
     @Test
     public void testGetFoundryInfoById () throws KustvaktException {
-        Response response = target().path(getAPIVersion())
+        Response response = target().path(API_VERSION)
                 .path("foundry").path("tt")
                 .request()
                 .get();
@@ -183,7 +183,7 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
 
     @Test
     public void testGetUnexistingCorpusInfo () throws KustvaktException {
-        Response response = target().path(getAPIVersion())
+        Response response = target().path(API_VERSION)
                 .path("corpus").path("ZUW19")
                 .request()
                 .get();
@@ -205,7 +205,7 @@ public class ResourceInfoControllerTest extends FastJerseyTest {
     // exception instead?
     @Test
     public void testGetUnauthorizedCorpusInfo () throws KustvaktException {
-        Response response = target().path(getAPIVersion())
+        Response response = target().path(API_VERSION)
                 .path("corpus").path("BRZ10")
                 .request()
                 .get();
