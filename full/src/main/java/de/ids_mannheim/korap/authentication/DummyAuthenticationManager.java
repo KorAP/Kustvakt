@@ -13,7 +13,6 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.Userdata;
 import de.ids_mannheim.korap.utils.TimeUtils;
 
 public class DummyAuthenticationManager extends AuthenticationManager {
@@ -45,12 +44,6 @@ public class DummyAuthenticationManager extends AuthenticationManager {
     }
 
     @Override
-    public boolean isRegistered (String id) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
     public User authenticate (AuthenticationMethod method, String username,
             String password, Map<String, Object> attributes)
             throws KustvaktException {
@@ -67,37 +60,6 @@ public class DummyAuthenticationManager extends AuthenticationManager {
 
     @Override
     public void setAccessAndLocation (User user, HttpHeaders headers) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void logout (TokenContext context) throws KustvaktException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void lockAccount (User user) throws KustvaktException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public boolean deleteAccount (User user) throws KustvaktException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public <T extends Userdata> T getUserData (User user, Class<T> clazz)
-            throws KustvaktException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void updateUserData (Userdata data) throws KustvaktException {
         // TODO Auto-generated method stub
 
     }

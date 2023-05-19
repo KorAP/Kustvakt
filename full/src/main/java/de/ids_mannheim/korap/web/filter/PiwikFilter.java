@@ -8,41 +8,29 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
-import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Priority;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.logging.LoggingFeature;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.authentication.AuthenticationManager;
-import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.security.context.TokenContext;
-import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.UserSettingProcessor;
-import de.ids_mannheim.korap.user.Userdata;
 import net.minidev.json.JSONArray;
 
 /**
  * @author hanl
  * @date 13/05/2014
  */
-@Component
-@Priority(Priorities.AUTHORIZATION)
+@Deprecated
+//@Component
+//@Priority(Priorities.AUTHORIZATION)
 public class PiwikFilter implements ContainerRequestFilter {
 
     private WebTarget service;
@@ -121,25 +109,25 @@ public class PiwikFilter implements ContainerRequestFilter {
     @Override
     public void filter (ContainerRequestContext request) {
         if (ENABLED) {
-            try {
-                TokenContext context;
-                SecurityContext securityContext = request.getSecurityContext();
-                if (securityContext != null) {
-                    context = (TokenContext) securityContext.getUserPrincipal();
-
-                    if (context.getUsername() != null){
-                        // since this is cached, not very expensive!
-                        User user = authenticationManager.getUser(context.getUsername());
-                        Userdata data = authenticationManager
-                                .getUserData(user, UserSettingProcessor.class);
-                        if ((Boolean) data.get(Attributes.COLLECT_AUDITING_DATA))
-                            customVars.put("username", context.getUsername());
-                    }
-                }
-            }
-            catch (KustvaktException e) {
-                //do nothing
-            }
+//            try {
+//                TokenContext context;
+//                SecurityContext securityContext = request.getSecurityContext();
+//                if (securityContext != null) {
+//                    context = (TokenContext) securityContext.getUserPrincipal();
+//
+//                    if (context.getUsername() != null){
+//                        // since this is cached, not very expensive!
+//                        User user = authenticationManager.getUser(context.getUsername());
+//                        Userdata data = authenticationManager
+//                                .getUserData(user, UserSettingProcessor.class);
+//                        if ((Boolean) data.get(Attributes.COLLECT_AUDITING_DATA))
+//                            customVars.put("username", context.getUsername());
+//                    }
+//                }
+//            }
+//            catch (KustvaktException e) {
+//                //do nothing
+//            }
             send(request);
         }
     }

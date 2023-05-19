@@ -13,7 +13,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import de.ids_mannheim.korap.exceptions.KustvaktException;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
