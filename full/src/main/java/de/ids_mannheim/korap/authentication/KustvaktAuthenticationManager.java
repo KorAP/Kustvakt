@@ -3,7 +3,6 @@ package de.ids_mannheim.korap.authentication;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 
 import javax.ws.rs.core.HttpHeaders;
@@ -14,25 +13,21 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.http.HttpHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.mchange.rmi.NotAuthorizedException;
 // import com.novell.ldap.*; search() funktioniert nicht korrekt, ausgewechselt gegen unboundID's Bibliothek 20.04.17/FB
 //Using JAR from unboundID:
 import com.unboundid.ldap.sdk.LDAPException;
 
 import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.config.BeansFactory;
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.URIParam;
 import de.ids_mannheim.korap.constant.AuthenticationMethod;
 import de.ids_mannheim.korap.constant.TokenType;
-import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.exceptions.EmptyResultException;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.exceptions.WrappedException;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.interfaces.EntityHandlerIface;
-import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.DemoUser;
 import de.ids_mannheim.korap.user.KorAPUser;
@@ -40,9 +35,6 @@ import de.ids_mannheim.korap.user.ShibbolethUser;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.user.User.Location;
-import de.ids_mannheim.korap.user.UserDetails;
-import de.ids_mannheim.korap.user.UserSettingProcessor;
-import de.ids_mannheim.korap.user.Userdata;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.validator.Validator;
 
@@ -61,22 +53,15 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 	private EncryptionIface crypto;
 	private EntityHandlerIface entHandler;
 	@Autowired
-	private AdminDao adminDao;
 	private FullConfiguration config;
-	@Deprecated
-	private Collection userdatadaos;
-	private LoginCounter counter;
 	@Autowired
 	private Validator validator;
 	
-	public KustvaktAuthenticationManager(EntityHandlerIface userdb, EncryptionIface crypto,
-			FullConfiguration config, Collection<UserDataDbIface> userdatadaos) {
+	public KustvaktAuthenticationManager(EncryptionIface crypto,
+			FullConfiguration config) {
 	    super("id_tokens");
-		this.entHandler = userdb;
 		this.config = config;
 		this.crypto = crypto;
-		this.counter = new LoginCounter(config);
-		this.userdatadaos = userdatadaos;
 		// todo: load via beancontext
 //		try {
 //			this.validator = new ApacheValidator();
@@ -300,16 +285,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		return context;
 	}
 
-	// todo: test
-	@Deprecated
-	private boolean matchStatus(String host, String useragent, TokenContext context) {
-		if (host.equals(context.getHostAddress())) {
-			if (useragent.equals(context.getUserAgent()))
-				return true;
-		}
-		return false;
-	}
-
 	@Deprecated
 	private User authenticateShib(Map<String, Object> attributes) throws KustvaktException {
 		// todo use persistent id, since eppn is not unique
@@ -322,8 +297,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 			attributes.put(Attributes.EMAIL, eppn);
 
 		User user = null;
-		if (isRegistered(eppn))
-			user = createShibbUserAccount(attributes);
 		return user;
 	}
 
@@ -357,7 +330,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 			}
 		}
 
-		boolean isAdmin = adminDao.isAdmin(unknown.getUsername());
         if (DEBUG) {
             jlog.debug(
                     "Authentication: found username " + unknown.getUsername());
@@ -373,7 +345,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 			if (!check) {
 				// the fail counter only applies for wrong password
 				jlog.warn("Wrong Password!");
-				processLoginFail(unknown);
 				throw new WrappedException(new KustvaktException(user.getId(), StatusCodes.BAD_CREDENTIALS),
 						StatusCodes.LOGIN_FAILED, username);
 			}
@@ -391,7 +362,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
                     }
 					if (TimeUtils.getNow().isAfter(param.getUriExpiration())) {
 						jlog.error("URI token is expired. Deleting account for user "+ user.getUsername());
-						deleteAccount(user);
 						throw new WrappedException(
 								new KustvaktException(unknown.getId(), StatusCodes.EXPIRED,
 										"account confirmation uri has expired!", param.getUriFragment()),
@@ -429,7 +399,6 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 
 	private User authenticateIdM(String username, String password, Map<String, Object> attr) throws KustvaktException {
 
-		Map<String, Object> attributes = validator.validateMap(attr);
 		User unknown = null;
 		// just to make sure that the plain password does not appear anywhere in
 		// the logs!
@@ -543,9 +512,10 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 			 * username); }
 			 */
 
-		} else if (unknown instanceof ShibbolethUser) {
-			// todo
-		}
+		} 
+//		else if (unknown instanceof ShibbolethUser) {
+//			// todo
+//		}
 
         if (DEBUG) {
             jlog.debug("Authentication done: " + username);
@@ -553,225 +523,5 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		return unknown;
 
 	} // authenticateIdM
-
-	@Deprecated
-	public boolean isRegistered(String username) {
-		User user;
-		if (username == null || username.isEmpty())
-			return false;
-		// throw new KustvaktException(username, StatusCodes.ILLEGAL_ARGUMENT,
-		// "username must be set", username);
-
-		try {
-			user = entHandler.getAccount(username);
-		} catch (EmptyResultException e) {
-			jlog.debug("user does not exist: "+ username);
-			return false;
-
-		} catch (KustvaktException e) {
-			jlog.error("KorAPException "+ e.string());
-			return false;
-			// throw new KustvaktException(username,
-			// StatusCodes.ILLEGAL_ARGUMENT,
-			// "username invalid", username);
-		}
-		return user != null;
-	}
-
-	@Deprecated
-	public void logout(TokenContext context) throws KustvaktException {
-		try {
-			AuthenticationIface provider = getProvider(context.getTokenType(), null);
-
-			if (provider == null) {
-				throw new KustvaktException(StatusCodes.ILLEGAL_ARGUMENT, "Authentication "
-				        + "provider not supported!", context.getTokenType().displayName());
-			}
-			provider.removeUserSession(context.getToken());
-		} catch (KustvaktException e) {
-			throw new WrappedException(e, StatusCodes.LOGOUT_FAILED, context.toString());
-		}
-		this.removeCacheEntry(context.getToken());
-	}
-
-	@Deprecated
-	private void processLoginFail(User user) throws KustvaktException {
-		counter.registerFail(user.getUsername());
-		if (!counter.validate(user.getUsername())) {
-			try {
-				this.lockAccount(user);
-			} catch (KustvaktException e) {
-				jlog.error("user account could not be locked", e);
-				throw new WrappedException(e, StatusCodes.UPDATE_ACCOUNT_FAILED);
-			}
-			throw new WrappedException(new KustvaktException(user.getId(), StatusCodes.ACCOUNT_DEACTIVATED),
-					StatusCodes.LOGIN_FAILED);
-		}
-	}
-
-	@Deprecated
-	public void lockAccount(User user) throws KustvaktException {
-		if (!(user instanceof KorAPUser))
-			throw new KustvaktException(StatusCodes.REQUEST_INVALID);
-
-		KorAPUser u = (KorAPUser) user;
-		u.setAccountLocked(true);
-		jlog.info("locking account for user: "+ user.getUsername());
-		entHandler.updateAccount(u);
-	}
-
-	@Deprecated	// todo:
-	private ShibbolethUser createShibbUserAccount(Map<String, Object> attributes) throws KustvaktException {
-        if (DEBUG) {
-            jlog.debug("creating shibboleth user account for user attr: "
-                    + attributes);
-        }
-		Map<String, Object> safeMap = validator.validateMap(attributes);
-
-		// todo eppn non-unique.join with idp or use persistent_id as username
-		// identifier
-		// EM: disabled
-//		ShibbolethUser user = User.UserFactory.getShibInstance((String) safeMap.get(Attributes.EPPN),
-//				(String) safeMap.get(Attributes.MAIL), (String) safeMap.get(Attributes.CN));
-//		user.setAffiliation((String) safeMap.get(Attributes.EDU_AFFIL));
-//		user.setAccountCreation(TimeUtils.getNow().getMillis());
-
-		ShibbolethUser user = null;
-		
-		UserDetails d = new UserDetails();
-		d.read(attributes, true);
-
-		UserSettingProcessor s = new UserSettingProcessor();
-		s.read(attributes, true);
-
-		entHandler.createAccount(user);
-
-//		s.setUserId(user.getId());
-//		d.setUserId(user.getId());
-
-		UserDataDbIface dao = BeansFactory.getTypeFactory().getTypeInterfaceBean(userdatadaos, UserDetails.class);
-		assert dao != null;
-		dao.store(d);
-
-		dao = BeansFactory.getTypeFactory().getTypeInterfaceBean(userdatadaos, UserSettingProcessor.class);
-		assert dao != null;
-		dao.store(d);
-
-		return user;
-	}
-
-	/**
-	 * link shibboleth and korap user account to one another.
-	 * 
-	 * @param current
-	 *            currently logged in user
-	 * @param for_name
-	 *            foreign user name the current account should be linked to
-	 * @param transstrat
-	 *            transfer status of user data (details, settings, user queries)
-	 *            0 = the currently logged in data should be kept 1 = the
-	 *            foreign account data should be kept
-	 * @throws NotAuthorizedException
-	 * @throws KustvaktException
-	 */
-	// todo:
-	@Deprecated
-	public void accountLink(User current, String for_name, int transstrat) throws KustvaktException {
-		// User foreign = entHandler.getAccount(for_name);
-
-		// if (current.getAccountLink() == null && current.getAccountLink()
-		// .isEmpty()) {
-		// if (current instanceof KorAPUser && foreign instanceof ShibUser) {
-		// if (transstrat == 1)
-		// current.transfer(foreign);
-		//// foreign.setAccountLink(current.getUsername());
-		//// current.setAccountLink(foreign.getUsername());
-		// // entHandler.purgeDetails(foreign);
-		// // entHandler.purgeSettings(foreign);
-		// }else if (foreign instanceof KorAPUser
-		// && current instanceof ShibUser) {
-		// if (transstrat == 0)
-		// foreign.transfer(current);
-		//// current.setAccountLink(foreign.getUsername());
-		// // entHandler.purgeDetails(current);
-		// // entHandler.purgeSettings(current);
-		// // entHandler.purgeSettings(current);
-		// }
-		// entHandler.updateAccount(current);
-		// entHandler.updateAccount(foreign);
-		// }
-	}
-
-	@Deprecated
-	// todo: test and rest usage?!
-	public boolean updateAccount(User user) throws KustvaktException {
-		boolean result;
-		if (user instanceof DemoUser)
-			throw new KustvaktException(user.getId(), StatusCodes.REQUEST_INVALID,
-					"account not updateable for demo user", user.getUsername());
-		else {
-			// crypto.validate(user);
-			try {
-				result = entHandler.updateAccount(user) > 0;
-			} catch (KustvaktException e) {
-				jlog.error("Error: "+ e.string());
-				throw new WrappedException(e, StatusCodes.UPDATE_ACCOUNT_FAILED);
-			}
-		}
-		return result;
-	}
-
-	@Deprecated
-	public boolean deleteAccount(User user) throws KustvaktException {
-		boolean result;
-		if (user instanceof DemoUser)
-			return true;
-		else {
-			try {
-				result = entHandler.deleteAccount(user.getId()) > 0;
-			} catch (KustvaktException e) {
-				jlog.error("Error: "+ e.string());
-				throw new WrappedException(e, StatusCodes.DELETE_ACCOUNT_FAILED);
-			}
-		}
-		return result;
-	}
-
-	// EM: not in the new DB
-	@Deprecated
-	@Override
-	public <T extends Userdata> T getUserData(User user, Class<T> clazz) throws WrappedException {
-		try {
-			UserDataDbIface<T> dao = BeansFactory.getTypeFactory()
-					.getTypeInterfaceBean(BeansFactory.getKustvaktContext().getUserDataProviders(), clazz);
-			T data = null;
-			if (dao != null)
-				data = dao.get(user);
-
-			if (data == null)
-				throw new KustvaktException(user.getId(), StatusCodes.NO_RESULT_FOUND, "No data found!",
-						clazz.getSimpleName());
-			return data;
-		} catch (KustvaktException e) {
-			jlog.error("Error during user data retrieval: "+ e.getEntity());
-			throw new WrappedException(e, StatusCodes.GET_ACCOUNT_FAILED);
-		}
-	}
-
-	@Deprecated
-	// todo: cache userdata outside of the user object!
-	@Override
-	public void updateUserData(Userdata data) throws WrappedException {
-		try {
-			data.validate(this.validator);
-			UserDataDbIface dao = BeansFactory.getTypeFactory()
-					.getTypeInterfaceBean(BeansFactory.getKustvaktContext().getUserDataProviders(), data.getClass());
-			if (dao != null)
-				dao.update(data);
-		} catch (KustvaktException e) {
-			jlog.error("Error during update of user data! "+ e.getEntity());
-			throw new WrappedException(e, StatusCodes.UPDATE_ACCOUNT_FAILED);
-		}
-	}
 
 }

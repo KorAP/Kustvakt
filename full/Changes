@@ -1,7 +1,7 @@
 # version 0.71
 
-- Removed auditing (closes #611)
-
+- Removed auditing (#611)
+- Removed old database configurations (#612)
 
 # version 0.70.1
 

@@ -12,7 +12,6 @@ import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
-import de.ids_mannheim.korap.user.Userdata;
 
 /**
  * @author hanl
@@ -61,8 +60,6 @@ public abstract class AuthenticationManager extends KustvaktCacheable {
 
     public abstract User getUser (String username) throws KustvaktException;
 
-    public abstract boolean isRegistered (String id);
-
     public abstract User authenticate (AuthenticationMethod method,
             String username, String password, Map<String, Object> attributes)
             throws KustvaktException;
@@ -71,20 +68,6 @@ public abstract class AuthenticationManager extends KustvaktCacheable {
             Map<String, Object> attr, TokenType type) throws KustvaktException;
 
     public abstract void setAccessAndLocation (User user, HttpHeaders headers);
-
-    public abstract void logout (TokenContext context) throws KustvaktException;
-
-    public abstract void lockAccount (User user) throws KustvaktException;
-
-    public abstract boolean deleteAccount (User user) throws KustvaktException;
-
-    @Deprecated
-    public abstract <T extends Userdata> T getUserData (User user,
-            Class<T> clazz) throws KustvaktException;
-
-    @Deprecated
-    public abstract void updateUserData (Userdata data)
-            throws KustvaktException;
 
     public String providerList () {
         return "provider list: " + this.providers.toString();
