@@ -1,5 +1,8 @@
 # version 0.71
 
+- Removed auditing (closes #611)
+
+
 # version 0.70.1
 
 - Renamed entity and service packages in core

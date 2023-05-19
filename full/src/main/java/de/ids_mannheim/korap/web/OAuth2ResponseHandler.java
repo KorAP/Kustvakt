@@ -18,7 +18,6 @@ import org.apache.oltu.oauth2.common.message.OAuthResponse.OAuthErrorResponseBui
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 
 /**
@@ -37,10 +36,6 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
  *
  */
 public class OAuth2ResponseHandler extends KustvaktResponseHandler {
-
-    public OAuth2ResponseHandler (AuditingIface iface) {
-        super(iface);
-    }
 
     public WebApplicationException throwit (OAuthSystemException e) {
         return throwit(StatusCodes.OAUTH2_SYSTEM_ERROR, e.getMessage());

@@ -1,11 +1,8 @@
 package de.ids_mannheim.korap.exceptions;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-import de.ids_mannheim.korap.auditing.AuditRecord;
 //import de.ids_mannheim.korap.constant.TokenType;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +16,6 @@ import lombok.Setter;
 public class KustvaktException extends Exception {
 
     private static final long serialVersionUID = -1955783565699446322L;
-    protected List<AuditRecord> records = new ArrayList<>();
     private String userid;
     private Integer statusCode;
     private int responseStatus;

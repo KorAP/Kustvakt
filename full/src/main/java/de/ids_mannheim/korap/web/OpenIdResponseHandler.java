@@ -23,7 +23,6 @@ import com.nimbusds.oauth2.sdk.token.BearerTokenError;
 import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.interfaces.db.AuditingIface;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import net.minidev.json.JSONObject;
 
@@ -67,10 +66,6 @@ public class OpenIdResponseHandler extends KustvaktResponseHandler {
                 BearerTokenError.INVALID_TOKEN);
         tokenErrorObjectMap.put(OAuth2Error.INVALID_REQUEST,
                 BearerTokenError.INVALID_REQUEST);
-    }
-
-    public OpenIdResponseHandler (AuditingIface iface) {
-        super(iface);
     }
 
     /**
