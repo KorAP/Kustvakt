@@ -430,23 +430,4 @@ public class AuthenticationController {
         }
     }
 
-
-    //fixme: moved from userservice
-    @GET
-    @Path("logout")
-    @ResourceFilters({ AuthenticationFilter.class, DemoUserFilter.class,
-            PiwikFilter.class })
-    public Response logout (@Context SecurityContext ctx,
-            @Context Locale locale) {
-        TokenContext context = (TokenContext) ctx.getUserPrincipal();
-        try {
-            controller.logout(context);
-        }
-        catch (KustvaktException e) {
-            jlog.error("Logout Exception:"+ e.string());
-            throw kustvaktResponseHandler.throwit(e);
-        }
-        return Response.ok().build();
-    }
-
 }

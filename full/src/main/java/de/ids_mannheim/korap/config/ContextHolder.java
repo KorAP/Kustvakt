@@ -1,12 +1,8 @@
 package de.ids_mannheim.korap.config;
 
-import java.util.Collection;
-
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 
-import de.ids_mannheim.korap.interfaces.db.PersistenceClient;
-import de.ids_mannheim.korap.interfaces.db.UserDataDbIface;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
 
 /**
@@ -72,17 +68,6 @@ public abstract class ContextHolder {
     @Deprecated
     public <T extends KustvaktConfiguration> T getConfiguration () {
         return (T) getBean(KUSTVAKT_CONFIG);
-    }
-
-
-    @Deprecated
-    public PersistenceClient getPersistenceClient () {
-        return getBean(KUSTVAKT_DB);
-    }
-
-    @Deprecated
-    public Collection<UserDataDbIface> getUserDataProviders () {
-        return getBean(KUSTVAKT_USERDATA);
     }
 
     private void close () {
