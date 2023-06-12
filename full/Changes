@@ -4,6 +4,7 @@
 - Removed old database configurations (#612)
 - Removed old tests
 - Removed unnecessary caches and methods in the authentication interface
+- Added total result cache (#599)
 
 # version 0.70.1
 
