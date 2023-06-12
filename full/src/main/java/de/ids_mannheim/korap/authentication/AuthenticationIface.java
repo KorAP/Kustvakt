@@ -16,10 +16,9 @@ public interface AuthenticationIface {
             throws KustvaktException;
 
 
-    void removeUserSession (String token) throws KustvaktException;
-
-
-    public TokenContext refresh (TokenContext context) throws KustvaktException;
+//    void removeUserSession (String token) throws KustvaktException;
+//
+//    public TokenContext refresh (TokenContext context) throws KustvaktException;
 
 
     public TokenType getTokenType ();

@@ -3,6 +3,7 @@
 - Removed auditing (#611)
 - Removed old database configurations (#612)
 - Removed old tests
+- Removed unnecessary caches and methods in the authentication interface
 
 # version 0.70.1
 

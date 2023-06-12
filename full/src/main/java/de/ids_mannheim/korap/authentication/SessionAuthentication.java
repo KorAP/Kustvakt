@@ -24,6 +24,7 @@ import de.ids_mannheim.korap.utils.TimeUtils;
  * 
  * @author hanl
  */
+@Deprecated
 public class SessionAuthentication implements AuthenticationIface {
 
     private static final Logger jlog = LogManager
@@ -86,17 +87,10 @@ public class SessionAuthentication implements AuthenticationIface {
     }
 
 
-    @Override
-    public void removeUserSession (String token) {
-        this.sessions.removeSession(token);
-    }
-
-
-    @Override
-    public TokenContext refresh (TokenContext context) throws KustvaktException {
-        throw new UnsupportedOperationException("method not supported");
-    }
-
+//    @Override
+//    public void removeUserSession (String token) {
+//        this.sessions.removeSession(token);
+//    }
 
     @Override
     public TokenType getTokenType () {

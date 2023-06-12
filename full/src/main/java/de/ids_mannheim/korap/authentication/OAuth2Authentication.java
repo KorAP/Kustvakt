@@ -60,19 +60,6 @@ public class OAuth2Authentication implements AuthenticationIface {
     }
 
     @Override
-    public void removeUserSession (String token) throws KustvaktException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public TokenContext refresh (TokenContext context)
-            throws KustvaktException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public TokenType getTokenType () {
         return TokenType.BEARER;
     }

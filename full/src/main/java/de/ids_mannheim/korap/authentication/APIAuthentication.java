@@ -22,7 +22,6 @@ import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 
 /**
  * Authentication provider using JWT tokens
@@ -36,10 +35,6 @@ public class APIAuthentication implements AuthenticationIface {
     public static boolean DEBUG = false;
     
     private JWTSigner signedToken;
-    private Cache invalided =
-            CacheManager.getInstance().getCache("id_tokens_inv");
-    // private Cache id_tokens =
-    // CacheManager.getInstance().getCache("id_tokens");
 
     public APIAuthentication (FullConfiguration config) throws JOSEException {
         this.signedToken = new JWTSigner(config.getSharedSecret(),
@@ -99,23 +94,6 @@ public class APIAuthentication implements AuthenticationIface {
         c.setToken(jwt.serialize());
         // id_tokens.put(new Element(c.getToken(), c));
         return c;
-    }
-
-
-    // todo: cache and set expiration to token expiration. if token in
-    // that cache, it is not to be used anymore!
-    // @CacheEvict(value = "id_tokens", key = "#token")
-    @Override
-    public void removeUserSession (String token) throws KustvaktException {
-        // invalidate token!
-        invalided.put(new Element(token, null));
-    }
-
-
-    @Override
-    public TokenContext refresh (TokenContext context)
-            throws KustvaktException {
-        return null;
     }
 
 

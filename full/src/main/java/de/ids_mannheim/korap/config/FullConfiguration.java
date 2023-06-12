@@ -31,9 +31,6 @@ import de.ids_mannheim.korap.constant.AuthenticationMethod;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.oauth2.openid.OpenIdConfiguration;
 import de.ids_mannheim.korap.utils.TimeUtils;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.config.CacheConfiguration;
 
 /**
  * Configuration for Kustvakt full version including properties
@@ -125,12 +122,12 @@ public class FullConfiguration extends KustvaktConfiguration {
 
         setNamedVCPath(properties.getProperty("krill.namedVC", ""));
         
-        Cache cache = CacheManager.newInstance().getCache("named_vc");
-        CacheConfiguration config = cache.getCacheConfiguration();
-        config.setMaxBytesLocalHeap(properties.getProperty("cache.max.bytes.local.heap", "256m"));
-        config.setMaxBytesLocalDisk(properties.getProperty("cache.max.bytes.local.disk", "2G"));
-        jlog.info("max local heap:"+config.getMaxBytesLocalHeapAsString());
-        jlog.info("max local disk:"+config.getMaxBytesLocalDiskAsString());
+//        Cache cache = CacheManager.newInstance().getCache("named_vc");
+//        CacheConfiguration config = cache.getCacheConfiguration();
+//        config.setMaxBytesLocalHeap(properties.getProperty("cache.max.bytes.local.heap", "256m"));
+//        config.setMaxBytesLocalDisk(properties.getProperty("cache.max.bytes.local.disk", "2G"));
+//        jlog.info("max local heap:"+config.getMaxBytesLocalHeapAsString());
+//        jlog.info("max local disk:"+config.getMaxBytesLocalDiskAsString());
         
         setMaxNumberOfUserQueries(Integer.parseInt(
                 properties.getProperty("max.user.persistent.queries", "20")));

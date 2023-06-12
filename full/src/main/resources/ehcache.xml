@@ -5,36 +5,6 @@
     <!--maxBytesLocalHeap="200M"-->
     <diskStore path="./cache_store"/>
     
-    <cache name='id_tokens'
-           eternal='true'
-           maxElementsOnDisk="10000000"
-           memoryStoreEvictionPolicy="LRU"
-           maxEntriesLocalHeap="50"
-           overflowToDisk='true'/>
-
-	<cache name='id_tokens_inv'
-           eternal='true'
-           maxElementsOnDisk="10000000"
-           memoryStoreEvictionPolicy="LRU"
-           maxEntriesLocalHeap="50"
-           overflowToDisk='true'/>
-           
-    <cache name='auth_codes'
-           timeToIdleSeconds="600"
-           eternal='false'
-           memoryStoreEvictionPolicy="LRU"
-           maxEntriesLocalHeap="100"
-           overflowToDisk='false'/>
-
-    <cache name='resources'
-           eternal='false'
-           overflowToDisk='false'
-           maxEntriesLocalHeap="60"
-           timeToIdleSeconds="172800"
-           diskSpoolBufferSizeMB="30"
-           diskExpiryThreadIntervalSeconds="120"
-           memoryStoreEvictionPolicy="LRU"
-           />
            
     <!-- EM --> 
     <cache name='authorization'
@@ -52,7 +22,7 @@
            maxEntriesLocalHeap="500"
            overflowToDisk='false'/>  
            
-    <cache name="named_vc" 
+    <!-- <cache name="named_vc" 
 		eternal="true" 
 		memoryStoreEvictionPolicy="LRU"
 		maxBytesLocalHeap="256M" 
@@ -60,5 +30,5 @@
 		diskExpiryThreadIntervalSeconds = "120" > 
 		<persistence strategy="localTempSwap"/>
 		<sizeOfPolicy maxDepth="3000" maxDepthExceededBehavior="abort" />
-	</cache>        
+	</cache>    -->     
 </ehcache>

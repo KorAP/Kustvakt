@@ -153,7 +153,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		}
 
 		try {
-			provider.removeUserSession(context.getToken());
+//			provider.removeUserSession(context.getToken());
 			User user = getUser(context.getUsername());
 			return provider.createTokenContext(user, context.params());
 		} catch (KustvaktException e) {

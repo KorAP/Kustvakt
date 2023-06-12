@@ -92,20 +92,6 @@ public class BasicAuthentication implements AuthenticationIface {
         return null;
     }
 
-
-    @Override
-    public void removeUserSession (String token) throws KustvaktException {
-        throw new KustvaktException(StatusCodes.NOT_SUPPORTED);
-    }
-
-
-    @Override
-    public TokenContext refresh (TokenContext context)
-            throws KustvaktException {
-        return null;
-    }
-
-
     @Override
     public TokenType getTokenType () {
         return TokenType.BASIC;
