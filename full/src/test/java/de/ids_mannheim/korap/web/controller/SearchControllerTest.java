@@ -166,7 +166,7 @@ public class SearchControllerTest extends SpringJerseyTest {
     @Test
     public void testSearchQueryWithMeta () throws KustvaktException {
         Response response = target().path(API_VERSION).path("search")
-                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("q", "[orth=Bachelor]").queryParam("ql", "poliqarp")
                 .queryParam("cutoff", "true").queryParam("count", "5")
                 .queryParam("page", "1").queryParam("context", "40-t,30-t")
                 .request()

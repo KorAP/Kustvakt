@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 //import de.ids_mannheim.de.init.VCLoader;
 import de.ids_mannheim.korap.authentication.AuthenticationManager;
+import de.ids_mannheim.korap.config.KustvaktCacheable;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -43,6 +44,13 @@ import de.ids_mannheim.korap.web.SearchKrill;
 
 @Service
 public class SearchService extends BasicService{
+    
+    public class TotalResultCache extends KustvaktCacheable{
+        
+        public TotalResultCache () {
+            super("total_results","key:hashedKoralQuery");
+        }
+    }
 
     private static final boolean DEBUG = false;
 
@@ -62,11 +70,15 @@ public class SearchService extends BasicService{
     private SearchNetworkEndpoint searchNetwork;
 
     private ClientsHandler graphDBhandler;
+    
+    private TotalResultCache totalResultCache;
 
     @PostConstruct
     private void doPostConstruct () {
         UriBuilder builder = UriBuilder.fromUri("http://10.0.10.13").port(9997);
         this.graphDBhandler = new ClientsHandler(builder.build());
+        
+        totalResultCache = new TotalResultCache();
     }
 
     public String getKrillVersion () {
@@ -194,6 +206,12 @@ public class SearchService extends BasicService{
             jlog.debug("the serialized query " + query);
         }
 
+        int hashedKoralQuery = createTotalResultCacheKey(query);
+        boolean hasCutOff = hasCutOff(query);
+        if (!hasCutOff) {
+            query = precheckTotalResultCache(hashedKoralQuery,query);
+        }
+
         KustvaktConfiguration.BACKENDS searchEngine = this.config.chooseBackend(engine);
         String result;
         if (searchEngine.equals(KustvaktConfiguration.BACKENDS.NEO4J)) {
@@ -206,8 +224,78 @@ public class SearchService extends BasicService{
             result = searchKrill.search(query);
         }
         // jlog.debug("Query result: " + result);
+        
+        result = afterCheckTotalResultCache(hashedKoralQuery,result);
+        if (!hasCutOff) {
+            result = removeCutOff(result);
+        }
         return result;
 
+    }
+    
+    private String removeCutOff (String result) throws KustvaktException {
+        ObjectNode resultNode = (ObjectNode) JsonUtils.readTree(result);
+        ObjectNode meta = (ObjectNode) resultNode.at("/meta");
+        meta.remove("cutOff");
+        return resultNode.toString();
+    }
+
+    public int createTotalResultCacheKey (String query) throws KustvaktException {
+        ObjectNode queryNode = (ObjectNode) JsonUtils.readTree(query);
+        queryNode.remove("meta");
+        return queryNode.hashCode();
+    }
+
+    private String afterCheckTotalResultCache (int hashedKoralQuery,
+            String result) throws KustvaktException {
+        
+        String totalResults =
+                (String) totalResultCache.getCacheValue(hashedKoralQuery);
+        if (totalResults != null) {
+            ObjectNode queryNode = (ObjectNode) JsonUtils.readTree(result);
+            ObjectNode meta = (ObjectNode) queryNode.at("/meta");
+            if (meta.isMissingNode()) {
+                queryNode.put("totalResults", totalResults);
+            }
+            else {
+                meta.put("totalResults", totalResults);
+            }
+            result = queryNode.toString();
+        }
+        else {
+            JsonNode node = JsonUtils.readTree(result);
+            totalResults = node.at("/meta/totalResults").asText();
+            if (totalResults != null &&
+                    !totalResults.isEmpty() &&
+                    Integer.parseInt(totalResults) > 0)
+                totalResultCache.storeInCache(hashedKoralQuery, totalResults);
+        }
+        return result;
+    }
+
+    public String precheckTotalResultCache (int hashedKoralQuery, String query)
+            throws KustvaktException {
+        String totalResults =
+                (String) totalResultCache.getCacheValue(hashedKoralQuery);
+        if (totalResults != null) {
+            // add cutoff
+            ObjectNode queryNode = (ObjectNode) JsonUtils.readTree(query);
+            ObjectNode meta = (ObjectNode) queryNode.at("/meta");
+            meta.put("cutOff", "true");
+            query = queryNode.toString();
+        }
+        return query;
+    }
+    
+    private boolean hasCutOff (String query) throws KustvaktException {
+        JsonNode queryNode = JsonUtils.readTree(query);
+        JsonNode cutOff = queryNode.at("/meta/cutOff");
+        if (cutOff.isMissingNode()) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 
     /**
@@ -489,5 +577,9 @@ public class SearchService extends BasicService{
      */
     public String getIndexFingerprint () {
         return searchKrill.getIndexFingerprint();
+    }
+    
+    public TotalResultCache getTotalResultCache () {
+        return totalResultCache;
     }
 }

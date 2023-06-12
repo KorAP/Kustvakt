@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.config;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 import de.ids_mannheim.korap.utils.ServiceInfo;
@@ -114,5 +115,10 @@ public abstract class KustvaktCacheable {
     public Map<Object, Element> getAllCacheElements () {
         Cache cache = getCache(name);
         return cache.getAll(cache.getKeysWithExpiryCheck());
+    }
+    
+    public List getKeysWithExpiryCheck () {
+        Cache cache = getCache(name);
+        return cache.getKeysWithExpiryCheck();
     }
 }
