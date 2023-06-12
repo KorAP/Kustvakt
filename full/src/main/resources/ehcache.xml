@@ -30,5 +30,14 @@
 		diskExpiryThreadIntervalSeconds = "120" > 
 		<persistence strategy="localTempSwap"/>
 		<sizeOfPolicy maxDepth="3000" maxDepthExceededBehavior="abort" />
-	</cache>    -->     
+	-->     
+	
+	<cache name="total_results"
+    	timeToIdleSeconds="3600"
+        timeToLiveSeconds="15000"
+        eternal='false'
+        memoryStoreEvictionPolicy="LRU"
+        overflowToDisk='false'
+         maxEntriesLocalHeap="500"
+	/>
 </ehcache>
