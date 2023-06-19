@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9147ac56_74f3eee0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-06-19T07:52:34Z",
+      "side": 1,
+      "message": "Breaks for me with `SearchControllerTest.testSearchQueryWithMeta:185 expected:\u003c-1\u003e but was:\u003c1858\u003e`",
+      "revId": "3eb8e9de4dd8e116ae31aa8de1fb7a9f0abb8406",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
