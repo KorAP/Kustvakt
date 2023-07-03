@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1263cd49_dafa6b82",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/core/service/SearchService.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-07-03T12:15:46Z",
+      "side": 1,
+      "message": "Do you mean that totalResults can be directly added to queryNode without meta? I have updated the code could you please check it in the newer patch?",
+      "parentUuid": "ed914ade_9b8d3b07",
+      "range": {
+        "startLine": 243,
+        "startChar": 11,
+        "endLine": 244,
+        "endChar": 51
+      },
+      "revId": "4745fcc85321fe407d56ae6809e805b668427cc6",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c6689bc3_25f56415",
         "filename": "full/src/main/java/de/ids_mannheim/korap/core/service/SearchService.java",
         "patchSetId": 3
@@ -37,6 +61,30 @@
       "writtenOn": "2023-06-26T11:28:06Z",
       "side": 1,
       "message": "This requires some tests, I guess. The totalResult may, e.g. be -1. The behaviour for timeouts should also be tested (then the cache should not be saved).",
+      "range": {
+        "startLine": 250,
+        "startChar": 11,
+        "endLine": 250,
+        "endChar": 74
+      },
+      "revId": "4745fcc85321fe407d56ae6809e805b668427cc6",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef828b2c_143f2730",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/core/service/SearchService.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-07-03T12:15:46Z",
+      "side": 1,
+      "message": "I have added a test for this.",
+      "parentUuid": "c6689bc3_25f56415",
       "range": {
         "startLine": 250,
         "startChar": 11,
@@ -60,6 +108,30 @@
       "writtenOn": "2023-06-26T11:28:06Z",
       "side": 1,
       "message": "cutoff could be false.",
+      "range": {
+        "startLine": 261,
+        "startChar": 12,
+        "endLine": 261,
+        "endChar": 53
+      },
+      "revId": "4745fcc85321fe407d56ae6809e805b668427cc6",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dac6b97f_33d30deb",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/core/service/SearchService.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-07-03T12:15:46Z",
+      "side": 1,
+      "message": "I have also addded a test for this. Thanks!",
+      "parentUuid": "4790353d_12512ae2",
       "range": {
         "startLine": 261,
         "startChar": 12,
