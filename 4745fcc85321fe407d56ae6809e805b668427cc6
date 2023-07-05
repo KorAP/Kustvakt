@@ -48,6 +48,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c861aaaa_b27e81fe",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/core/service/SearchService.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-07-05T10:14:55Z",
+      "side": 1,
+      "message": "Actually I can\u0027t remember. :-/ I guess I thought \"put\" was directly available on the return value of \"at\" - but that\u0027s not true.",
+      "parentUuid": "1263cd49_dafa6b82",
+      "range": {
+        "startLine": 243,
+        "startChar": 11,
+        "endLine": 244,
+        "endChar": 51
+      },
+      "revId": "4745fcc85321fe407d56ae6809e805b668427cc6",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c6689bc3_25f56415",
@@ -132,6 +156,30 @@
       "side": 1,
       "message": "I have also addded a test for this. Thanks!",
       "parentUuid": "4790353d_12512ae2",
+      "range": {
+        "startLine": 261,
+        "startChar": 12,
+        "endLine": 261,
+        "endChar": 53
+      },
+      "revId": "4745fcc85321fe407d56ae6809e805b668427cc6",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "28055749_b38a5019",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/core/service/SearchService.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-07-05T10:14:55Z",
+      "side": 1,
+      "message": "Will this be mirrored as the original query to the user? I think, changing the cutoff shouldn\u0027t be visible as a rewrite to the user.",
+      "parentUuid": "dac6b97f_33d30deb",
       "range": {
         "startLine": 261,
         "startChar": 12,
