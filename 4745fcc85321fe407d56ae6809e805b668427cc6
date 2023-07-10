@@ -188,6 +188,30 @@
       },
       "revId": "4745fcc85321fe407d56ae6809e805b668427cc6",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "35f4e3df_2b985743",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/core/service/SearchService.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-07-10T07:51:30Z",
+      "side": 1,
+      "message": "I have updated the code. If the original query doesn\u0027t contain cutOff, it will be removed in the results.",
+      "parentUuid": "28055749_b38a5019",
+      "range": {
+        "startLine": 261,
+        "startChar": 12,
+        "endLine": 261,
+        "endChar": 53
+      },
+      "revId": "4745fcc85321fe407d56ae6809e805b668427cc6",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
