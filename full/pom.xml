@@ -136,10 +136,17 @@
 
 	</profiles>
 	<build>
-		<!-- <resources> <resource> <directory>src/main/resources</directory> <filtering>true</filtering> 
+		<resources> 
+			<resource> 
+				<directory>src/main/resources</directory> 
+				<filtering>true</filtering> 
+		<!-- 	
 			<includes> <include>**/*.info</include> <include>**/*.xml</include> <include>**/*.conf</include> 
 			<include>**/*.kustvakt</include> <include>**/*.properties</include> <include>**/*.sql</include> 
-			<include>**/*.vm</include> </includes> </resource> </resources> -->
+			<include>**/*.vm</include> </includes> 
+		 -->	
+			</resource> 
+		</resources>
 		<testResources>
 			<testResource>
 				<directory>src/test/resources</directory>
@@ -149,10 +156,7 @@
 				<filtering>true</filtering>
 				<includes>
 					<include>**/*.info</include>
-					<include>**/*.conf</include>
 					<include>**/*.json</include>
-					<include>**/*.p12</include>
-					<include>**/*.jks</include>
 					<include>**/*.ldif</include>
 				</includes>
 			</testResource>
