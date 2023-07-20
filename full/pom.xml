@@ -11,7 +11,7 @@
 		<hibernate.version>5.6.15.Final</hibernate.version>
 		<spring.version>5.3.29</spring.version>
 		<jetty.version>9.4.51.v20230217</jetty.version>
-		<flyway.version>9.20.0</flyway.version>
+		<flyway.version>9.21.0</flyway.version>
 		<log4j.version>2.20.0</log4j.version>
 		<krill.version>[0.61.2,)</krill.version>
 		<koral.version>[0.39.1,)</koral.version>
