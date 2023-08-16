@@ -5,11 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.net.URI;
 import java.security.GeneralSecurityException;
 
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 import org.apache.http.entity.ContentType;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -38,6 +33,9 @@ import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.controller.OAuth2TestBase;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 public class LdapOAuth2Test extends OAuth2TestBase {
 
@@ -119,8 +117,7 @@ public class LdapOAuth2Test extends OAuth2TestBase {
     }
     
     private void testRegisterPublicClient (String accessToken)
-            throws ProcessingException,
-            KustvaktException {
+            throws KustvaktException {
         OAuth2ClientJson json = new OAuth2ClientJson();
         json.setName("LDAP test client");
         json.setType(OAuth2ClientType.PUBLIC);
@@ -143,8 +140,7 @@ public class LdapOAuth2Test extends OAuth2TestBase {
     }
     
     private JsonNode testRegisterConfidentialClient (String accessToken)
-            throws ProcessingException,
-            KustvaktException {
+            throws KustvaktException {
         OAuth2ClientJson json = new OAuth2ClientJson();
         json.setName("LDAP test client");
         json.setType(OAuth2ClientType.CONFIDENTIAL);

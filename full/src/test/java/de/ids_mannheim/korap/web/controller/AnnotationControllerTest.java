@@ -6,12 +6,12 @@ import static org.junit.Assert.assertTrue;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import javax.ws.rs.client.Entity;
+import jakarta.ws.rs.client.Entity;
 
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;

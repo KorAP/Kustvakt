@@ -2,8 +2,8 @@ package de.ids_mannheim.korap.web.controller;
 
 import static org.junit.Assert.assertEquals;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.junit.Test;
 

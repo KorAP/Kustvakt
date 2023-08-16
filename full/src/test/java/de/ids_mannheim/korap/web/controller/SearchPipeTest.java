@@ -16,7 +16,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -27,7 +27,7 @@ import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;

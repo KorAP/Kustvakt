@@ -4,13 +4,12 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-
 import org.junit.Test;
 
 import de.ids_mannheim.korap.web.utils.MapUtils;
 import edu.emory.mathcs.backport.java.util.Arrays;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 public class MapUtilsTest {
 

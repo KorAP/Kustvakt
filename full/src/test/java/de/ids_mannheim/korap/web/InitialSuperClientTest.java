@@ -6,13 +6,10 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import javax.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
@@ -22,6 +19,8 @@ import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.service.OAuth2InitClientService;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.controller.OAuth2TestBase;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 public class InitialSuperClientTest extends OAuth2TestBase {
 

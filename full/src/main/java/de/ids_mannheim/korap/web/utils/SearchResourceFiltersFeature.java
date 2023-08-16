@@ -2,21 +2,20 @@ package de.ids_mannheim.korap.web.utils;
 
 import java.util.List;
 
-import javax.ws.rs.container.DynamicFeature;
-import javax.ws.rs.container.ResourceInfo;
-import javax.ws.rs.core.FeatureContext;
-import javax.ws.rs.ext.Provider;
-
 import org.glassfish.jersey.model.internal.CommonConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import edu.emory.mathcs.backport.java.util.Arrays;
+import jakarta.ws.rs.container.DynamicFeature;
+import jakarta.ws.rs.container.ResourceInfo;
+import jakarta.ws.rs.core.FeatureContext;
+import jakarta.ws.rs.ext.Provider;
 
 /**
- * Registers {@link javax.ws.rs.container.ContainerRequestFilter}
- * and {@link javax.ws.rs.container.ContainerResponseFilter}
+ * Registers {@link jakarta.ws.rs.container.ContainerRequestFilter}
+ * and {@link jakarta.ws.rs.container.ContainerResponseFilter}
  * classes for a resource method annotated with {@link ResourceFilters}.
  */
 @Provider

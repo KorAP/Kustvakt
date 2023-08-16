@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;

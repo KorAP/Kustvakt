@@ -4,11 +4,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
-
 import org.apache.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +19,10 @@ import com.nimbusds.openid.connect.sdk.AuthenticationErrorResponse;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.Response.Status;
 import net.minidev.json.JSONObject;
 
 /** Generates OpenId specific responses.

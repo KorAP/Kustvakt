@@ -1,11 +1,11 @@
 package de.ids_mannheim.korap.utils;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
-
 import org.glassfish.jersey.message.internal.MediaTypes;
 import org.glassfish.jersey.server.ContainerRequest;
+
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
 
 public class JerseyUtils {
 

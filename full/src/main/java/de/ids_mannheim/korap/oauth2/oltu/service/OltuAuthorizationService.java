@@ -15,8 +15,6 @@ import org.apache.oltu.oauth2.common.message.OAuthResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.core.Response.Status;
-
 import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -24,6 +22,7 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.service.OAuth2AuthorizationService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ClientService;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * OAuth2 authorization service using Apache Oltu

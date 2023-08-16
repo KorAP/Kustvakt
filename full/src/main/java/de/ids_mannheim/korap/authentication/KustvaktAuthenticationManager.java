@@ -5,9 +5,6 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Map;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedMap;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.http.HttpHeader;
@@ -37,6 +34,8 @@ import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.user.User.Location;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.validator.Validator;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 /**
  * contains the logic to authentication and registration processes. Uses

@@ -10,8 +10,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
 import java.util.Date;
 
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
 
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.message.types.TokenType;
@@ -30,9 +30,9 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.GrantType;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.client.Entity;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.client.Entity;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;

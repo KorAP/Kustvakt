@@ -3,16 +3,15 @@ package de.ids_mannheim.korap.web.filter;
 import java.util.List;
 
 import javax.annotation.Priority;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.core.PathSegment;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.PathSegment;
 
 /**
  * Checks API version in URL path.

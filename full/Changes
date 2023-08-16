@@ -1,3 +1,9 @@
+# version 0.72
+
+- Replaced javax.ws to jakarta.ws namespace (#648)
+- Upgrading Jersey 2.40 to 3.x (#646)
+
+
 # version 0.71
 
 - Removed auditing (#611)

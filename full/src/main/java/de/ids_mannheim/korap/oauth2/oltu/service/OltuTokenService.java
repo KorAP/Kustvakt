@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.NoResultException;
-import javax.ws.rs.core.Response.Status;
 
 import org.apache.oltu.oauth2.as.request.AbstractOAuthTokenRequest;
 import org.apache.oltu.oauth2.as.response.OAuthASResponse;
@@ -45,6 +44,7 @@ import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
 import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenSuperRequest;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ClientService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
+import jakarta.ws.rs.core.Response.Status;
 
 /** Implementation of token service using Apache Oltu.
  * 

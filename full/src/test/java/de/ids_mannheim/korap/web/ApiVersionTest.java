@@ -4,15 +4,13 @@ import static org.junit.Assert.assertEquals;
 
 import java.net.URI;
 
-import javax.ws.rs.core.MediaType;
-
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Test;
 
-import javax.ws.rs.core.Response;
-
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 /**
  * @author margaretha

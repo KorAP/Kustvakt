@@ -2,10 +2,6 @@ package de.ids_mannheim.korap.web.filter;
 
 import javax.annotation.Priority;
 import javax.servlet.ServletContext;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.SecurityContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,6 +12,10 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.utils.JerseyUtils;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.SecurityContext;
 
 /**
  * Verifies admin credentials or token before allowing access to
