@@ -3,9 +3,6 @@ package de.ids_mannheim.korap.service;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.velocity.VelocityContext;
@@ -22,6 +19,8 @@ import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.ParameterChecker;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 
 /**
  * Manages mail related services, such as sending group member

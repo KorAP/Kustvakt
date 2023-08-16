@@ -9,8 +9,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jersey.version>3.0.11</jersey.version>
 		<hibernate.version>5.6.15.Final</hibernate.version>
-		<spring.version>5.3.29</spring.version>
-		<jetty.version>9.4.51.v20230217</jetty.version>
+		<spring.version>6.0.11</spring.version>
+		<jetty.version>11.0.15</jetty.version>
 		<flyway.version>9.21.1</flyway.version>
 		<log4j.version>2.20.0</log4j.version>
 		<krill.version>[0.61.4,)</krill.version>
@@ -259,7 +259,7 @@
 
 		<dependency>
 			<groupId>org.glassfish.jersey.ext</groupId>
-			<artifactId>jersey-spring5</artifactId>
+			<artifactId>jersey-spring6</artifactId>
 			<version>${jersey.version}</version>
 			<exclusions>
 				<exclusion>
@@ -638,6 +638,12 @@
 			<version>0.1.0</version>
 		</dependency>
 		
+		<dependency>
+		    <groupId>jakarta.persistence</groupId>
+		    <artifactId>jakarta.persistence-api</artifactId>
+		    <version>3.1.0</version>
+		</dependency>
+
 		<!-- servlet -->
 		<dependency>
 		    <groupId>jakarta.servlet</groupId>
@@ -646,6 +652,7 @@
 		    <scope>provided</scope>
 		</dependency>
 
+		<!-- needed by apache Oltu -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
@@ -728,12 +735,14 @@
 			<artifactId>velocity-tools-generic</artifactId>
 			<version>3.1</version>
 		</dependency>
-		<!-- mail -->
+		
+		<!-- Mail -->
 		<dependency>
-			<groupId>com.sun.mail</groupId>
-			<artifactId>javax.mail</artifactId>
-			<version>1.6.2</version>
+		    <groupId>com.sun.mail</groupId>
+		    <artifactId>jakarta.mail</artifactId>
+		    <version>2.0.1</version>
 		</dependency>
+
 		<dependency>
 			<groupId>javax.activation</groupId>
 			<artifactId>activation</artifactId>
