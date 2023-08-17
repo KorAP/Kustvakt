@@ -6,7 +6,7 @@ import static org.junit.Assert.assertThrows;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 import org.hibernate.exception.GenericJDBCException;
 import org.junit.Test;

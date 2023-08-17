@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.NoResultException;
+import jakarta.persistence.NoResultException;
 
 import org.apache.oltu.oauth2.as.request.AbstractOAuthTokenRequest;
 import org.apache.oltu.oauth2.as.response.OAuthASResponse;
