@@ -5,7 +5,9 @@
 - Updated Spring 5.x to 6.x and jetty 9.x to 11.x (#645)
 - Replaced javax.persistence with jakarta.persistence (#648)
 - Migrate Hibernate 5 to 6 (#649)
-- Fix missing placeholders
+- Fix missing placeholders 
+- Fixed conflicting jackson-jarxrs
+- Fixed conflicting commons-logging and spring jcl
 
 # version 0.71
 
