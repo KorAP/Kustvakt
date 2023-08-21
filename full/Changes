@@ -4,7 +4,8 @@
 - Upgrading Jersey 2.40 to 3.x (#646)
 - Updated Spring 5.x to 6.x and jetty 9.x to 11.x (#645)
 - Replaced javax.persistence with jakarta.persistence (#648)
-
+- Migrate Hibernate 5 to 6 (#649)
+- Fix missing placeholders
 
 # version 0.71
 

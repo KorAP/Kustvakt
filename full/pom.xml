@@ -8,7 +8,8 @@
 		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jersey.version>3.0.11</jersey.version>
-		<hibernate.version>5.6.15.Final</hibernate.version>
+		<hibernate.ehcache.version>6.0.0.Alpha7</hibernate.ehcache.version>
+		<hibernate.version>6.1.7.Final</hibernate.version>
 		<spring.version>6.0.11</spring.version>
 		<jetty.version>11.0.15</jetty.version>
 		<flyway.version>9.21.1</flyway.version>
@@ -158,6 +159,7 @@
 					<include>**/*.info</include>
 					<include>**/*.json</include>
 					<include>**/*.ldif</include>
+					<include>**/*.properties</include>
 				</includes>
 			</testResource>
 		</testResources>
@@ -599,43 +601,42 @@
 
 		<!-- Hibernate -->
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-ehcache</artifactId>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-core</artifactId>
 			<version>${hibernate.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.hibernate</groupId>
+			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-jpamodelgen</artifactId>
 			<version>${hibernate.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-			<version>${hibernate.version}</version>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-ehcache</artifactId>
+			<version>${hibernate.ehcache.version}</version>
 			<exclusions>
 				<exclusion>
-					<groupId>org.javassist</groupId>
-					<artifactId>javassist</artifactId>
+					<groupId>org.hibernate</groupId>
+					<artifactId>hibernate-core</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-java8</artifactId>
-			<version>${hibernate.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
+			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-c3p0</artifactId>
 			<version>${hibernate.version}</version>
 		</dependency>
 		
 		<!-- Sqlite -->
-		<dependency>
+		<!--<dependency>
 			<groupId>com.github.gwenn</groupId>
 			<artifactId>sqlite-dialect</artifactId>
 			<version>0.1.0</version>
+		</dependency>-->
+		<dependency>
+		    <groupId>org.hibernate.orm</groupId>
+		    <artifactId>hibernate-community-dialects</artifactId>
+		    <version>${hibernate.version}</version>
 		</dependency>
 		
 		<dependency>
@@ -744,10 +745,16 @@
 		</dependency>
 
 		<dependency>
+			<groupId>jakarta.activation</groupId>
+			<artifactId>jakarta.activation-api</artifactId>
+			<version>2.1.2</version>
+		</dependency>
+		
+		<!--<dependency>
 			<groupId>javax.activation</groupId>
 			<artifactId>activation</artifactId>
 			<version>1.1.1</version>
-		</dependency>
+		</dependency>-->
 
 		<!-- OAuth -->
 		<dependency>
