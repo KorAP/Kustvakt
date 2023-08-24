@@ -29,17 +29,17 @@ Clone the latest version of Kustvakt
 git clone git@github.com:KorAP/Kustvakt.git
 </pre>
 
-Since Kustvakt requires Krill and Koral, please install [Krill](https://github.com/KorAP/Krill) and [Koral](https://github.com/KorAP/Koral) in your maven local repository according to the required versions specified in ```Kustvakt/full/pom.xml```. 
+Since Kustvakt requires Krill and Koral, please install [Krill](https://github.com/KorAP/Krill) and [Koral](https://github.com/KorAP/Koral) in your maven local repository according to the required versions specified in ```Kustvakt/full/pom.xml```. For packaging Kustvakt, change into the `Kustvakt` folder.
 
 Packaging Kustvakt full version
 <pre>
-cd ../full
+cd full
 mvn clean package
 </pre>
 
 Packaging Kustvakt lite version
 <pre>
-cd ../full
+cd full
 mvn package -P lite
 </pre>
 The jar file is located in the ```target/``` folder.
