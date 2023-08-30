@@ -3,9 +3,8 @@ package de.ids_mannheim.korap.web.utils;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.ws.rs.core.MultivaluedMap;
 
 /**

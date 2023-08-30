@@ -8,6 +8,7 @@
 - Fix missing placeholders 
 - Fixed conflicting jackson-jarxrs
 - Fixed conflicting commons-logging and spring jcl
+- Replaced javax.servlet with jakarta.servlet (#648)
 
 # version 0.71
 

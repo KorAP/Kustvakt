@@ -1,7 +1,6 @@
 package de.ids_mannheim.korap.web.filter;
 
 import javax.annotation.Priority;
-import javax.servlet.ServletContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,6 +11,7 @@ import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.utils.JerseyUtils;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
+import jakarta.servlet.ServletContext;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
