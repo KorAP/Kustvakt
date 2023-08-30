@@ -366,7 +366,7 @@ public class AuthenticationController {
                 authorizationData.getPassword()== null || 
                 authorizationData.getPassword().isEmpty())
             // is actual an invalid request
-            throw kustvaktResponseHandler.throwit(StatusCodes.REQUEST_INVALID);
+            throw kustvaktResponseHandler.throwit(StatusCodes.INVALID_REQUEST);
 
         Map<String, Object> attr = new HashMap<>();
         attr.put(Attributes.HOST, host);

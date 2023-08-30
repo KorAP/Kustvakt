@@ -290,7 +290,7 @@ public class KustvaktAuthenticationManager extends AuthenticationManager {
 		String eppn = (String) attributes.get(Attributes.EPPN);
 
 		if (eppn == null || eppn.isEmpty())
-			throw new KustvaktException(StatusCodes.REQUEST_INVALID);
+			throw new KustvaktException(StatusCodes.INVALID_REQUEST);
 
 		if (!attributes.containsKey(Attributes.EMAIL) && validator.isValid(eppn, Attributes.EMAIL))
 			attributes.put(Attributes.EMAIL, eppn);

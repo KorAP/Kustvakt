@@ -34,7 +34,7 @@ public class ClientsHandler {
             return service.path(path).queryParam(key, value).request().get(String.class);
         }
         catch (WebApplicationException e) {
-            throw new KustvaktException(StatusCodes.REQUEST_INVALID);
+            throw new KustvaktException(StatusCodes.INVALID_REQUEST);
         }
     }
 
@@ -52,7 +52,7 @@ public class ClientsHandler {
             return resource.request().get(String.class);
         }
         catch (WebApplicationException e) {
-            throw new KustvaktException(StatusCodes.REQUEST_INVALID);
+            throw new KustvaktException(StatusCodes.INVALID_REQUEST);
         }
     }
 

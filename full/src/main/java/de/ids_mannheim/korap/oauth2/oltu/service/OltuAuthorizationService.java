@@ -61,16 +61,7 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
         OAuth2Client client = clientService.authenticateClientId(clientId);
 
         String redirectUriStr = authzRequest.getRedirectURI();
-        String verifiedRedirectUri = verifyRedirectUri(client, redirectUriStr);
-
-        URI redirectURI;
-        try {
-            redirectURI = new URI(verifiedRedirectUri);
-        }
-        catch (URISyntaxException e) {
-            throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
-                    "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
-        }
+        URI redirectURI = verifyRedirectUri(client, redirectUriStr);
 
         String scope, code;
         try {
@@ -91,7 +82,7 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
                     .authorizationResponse(request,
                             Status.FOUND.getStatusCode())
                     .setCode(code).setScope(scope)
-                    .location(verifiedRedirectUri)
+                    .location(redirectURI.toString())
                     .buildQueryMessage();
         }
         catch (OAuthSystemException e) {
@@ -137,53 +128,4 @@ public class OltuAuthorizationService extends OAuth2AuthorizationService {
         return e;
     }
     
-    public KustvaktException checkRedirectUri (KustvaktException e,
-            String clientId, String redirectUri){
-        int statusCode = e.getStatusCode();
-        if (!clientId.isEmpty()
-                && statusCode != StatusCodes.CLIENT_NOT_FOUND
-                && statusCode != StatusCodes.AUTHORIZATION_FAILED
-                && statusCode != StatusCodes.INVALID_REDIRECT_URI) {
-            String registeredUri = null;
-            try {
-                OAuth2Client client = clientService.retrieveClient(clientId);
-                registeredUri = client.getRedirectURI();
-            }
-            catch (KustvaktException e1) {}
-
-            if (redirectUri != null && !redirectUri.isEmpty()) {
-                if (registeredUri != null && !registeredUri.isEmpty()
-                        && !redirectUri.equals(registeredUri)) {
-                    return new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
-                            "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
-                }
-                else {
-                    try {
-                        e.setRedirectUri(new URI(redirectUri));
-                    }
-                    catch (URISyntaxException e1) {
-                        return new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
-                                "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
-                    }
-                    e.setResponseStatus(HttpStatus.SC_TEMPORARY_REDIRECT);
-                }
-            }
-            else if (registeredUri != null && !registeredUri.isEmpty()) {
-                try {
-                    e.setRedirectUri(new URI(registeredUri));
-                }
-                catch (URISyntaxException e1) {
-                    return new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
-                            "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
-                }
-                e.setResponseStatus(HttpStatus.SC_TEMPORARY_REDIRECT);
-            }
-            else {
-                return new KustvaktException(StatusCodes.MISSING_REDIRECT_URI,
-                        "Missing parameter: redirect URI", OAuth2Error.INVALID_REQUEST);
-            }
-        }
-
-        return e;
-    }
 }

@@ -179,7 +179,7 @@ public class JWTSigner {
         try {
             jwt = SignedJWT.parse(signedContent);
             if (!jwt.verify(verifier))
-                throw new KustvaktException(StatusCodes.REQUEST_INVALID,
+                throw new KustvaktException(StatusCodes.INVALID_REQUEST,
                         "token invalid", signedContent);
             return jwt.getJWTClaimsSet().getStringClaim("data");
         }

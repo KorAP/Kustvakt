@@ -1,49 +1,33 @@
 package de.ids_mannheim.korap.web.controller;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
-import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.oltu.oauth2.as.request.AbstractOAuthTokenRequest;
-import org.apache.oltu.oauth2.as.request.OAuthTokenRequest;
-import org.apache.oltu.oauth2.as.request.OAuthUnauthenticatedTokenRequest;
-import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
-import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
-import org.apache.oltu.oauth2.common.message.OAuthResponse;
-import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+
+import com.nimbusds.oauth2.sdk.AuthorizationErrorResponse;
+import com.nimbusds.oauth2.sdk.OAuth2Error;
+import com.nimbusds.oauth2.sdk.id.State;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
-import de.ids_mannheim.korap.oauth2.dto.OAuth2TokenDto;
-import de.ids_mannheim.korap.oauth2.oltu.OAuth2AuthorizationRequest;
-import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeAllTokenSuperRequest;
-import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
-import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenSuperRequest;
-import de.ids_mannheim.korap.oauth2.oltu.service.OltuAuthorizationService;
-import de.ids_mannheim.korap.oauth2.oltu.service.OltuTokenService;
+import de.ids_mannheim.korap.oauth2.service.OAuth2AuthorizationService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
-import de.ids_mannheim.korap.web.filter.BlockingFilter;
-import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.FormParam;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 
@@ -60,16 +44,23 @@ import jakarta.ws.rs.core.SecurityContext;
  */
 @Controller
 @Path("{version}/oauth2")
-@ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class, BlockingFilter.class })
+@ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class
+    //, BlockingFilter.class 
+    })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class OAuth2Controller {
 
     @Autowired
     private OAuth2ResponseHandler responseHandler;
+//    @Autowired
+//    private OltuTokenService tokenService;
+//    @Deprecated
+//    @Autowired
+//    private OltuAuthorizationService authorizationService;
+    
     @Autowired
-    private OltuTokenService tokenService;
-    @Autowired
-    private OltuAuthorizationService authorizationService;
+    private OAuth2AuthorizationService authorizationService;
+    
     @Autowired
     private OAuth2ScopeService scopeService;
 
@@ -94,81 +85,90 @@ public class OAuth2Controller {
      *            form parameters
      * @return a redirect URL
      */
-    @Deprecated
-    @POST
-    @Path("authorize")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response requestAuthorizationCode (
-            @Context HttpServletRequest request,
-            @Context SecurityContext context, 
-            @FormParam("state") String state,
-            @FormParam("client_id") String clientId,
-            @FormParam("redirect_uri") String redirectUri,
-            MultivaluedMap<String, String> form) {
-
-        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
-        String username = tokenContext.getUsername();
-        ZonedDateTime authTime = tokenContext.getAuthenticationTime();
-
-        try {
-            scopeService.verifyScope(tokenContext, OAuth2Scope.AUTHORIZE);
-
-            HttpServletRequest requestWithForm =
-                    new FormRequestWrapper(request, form);
-            OAuth2AuthorizationRequest authzRequest =
-                    new OAuth2AuthorizationRequest(requestWithForm);
-            String uri = authorizationService.requestAuthorizationCode(
-                    requestWithForm, authzRequest, username, authTime);
-            return responseHandler.sendRedirect(uri);
-        }
-        catch (OAuthSystemException e) {
-            throw responseHandler.throwit(e, state);
-        }
-        catch (OAuthProblemException e) {
-            e.state(state);
-            e = authorizationService.checkRedirectUri(e, clientId, redirectUri);
-            throw responseHandler.throwit(e);
-        }
-        catch (KustvaktException e) {
-            e = authorizationService.checkRedirectUri(e, clientId, redirectUri);
-            throw responseHandler.throwit(e, state);
-        }
-    }
+//    @Deprecated
+//    @POST
+//    @Path("authorize")
+//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+//    public Response requestAuthorizationCode (
+//            @Context HttpServletRequest request,
+//            @Context SecurityContext context, 
+//            @FormParam("state") String state,
+//            @FormParam("client_id") String clientId,
+//            @FormParam("redirect_uri") String redirectUri,
+//            MultivaluedMap<String, String> form) {
+//
+//        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+//        String username = tokenContext.getUsername();
+//        ZonedDateTime authTime = tokenContext.getAuthenticationTime();
+//
+//        try {
+//            scopeService.verifyScope(tokenContext, OAuth2Scope.AUTHORIZE);
+//
+//            HttpServletRequest requestWithForm =
+//                    new FormRequestWrapper(request, form);
+//            OAuth2AuthorizationRequest authzRequest =
+//                    new OAuth2AuthorizationRequest(requestWithForm);
+//            String uri = authorizationService.requestAuthorizationCode(
+//                    requestWithForm, authzRequest, username, authTime);
+//            return responseHandler.sendRedirect(uri);
+//        }
+//        catch (OAuthSystemException e) {
+//            throw responseHandler.throwit(e, state);
+//        }
+//        catch (OAuthProblemException e) {
+//            e.state(state);
+//            e = authorizationService.checkRedirectUri(e, clientId, redirectUri);
+//            throw responseHandler.throwit(e);
+//        }
+//        catch (KustvaktException e) {
+//            e = authorizationService.checkRedirectUri(e, clientId, redirectUri);
+//            throw responseHandler.throwit(e, state);
+//        }
+//    }
     
     @GET
     @Path("authorize")
     public Response requestAuthorizationCode (
             @Context HttpServletRequest request,
             @Context SecurityContext context,
+            @QueryParam("response_type") String responseType,
             @QueryParam("client_id") String clientId,
             @QueryParam("redirect_uri") String redirectUri,
-            @QueryParam("state") String state
-            ) {
+            @QueryParam("scope") String scope,
+            @QueryParam("state") String state) {
 
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
         String username = tokenContext.getUsername();
         ZonedDateTime authTime = tokenContext.getAuthenticationTime();
 
+        URI requestURI;
+        try {
+            requestURI = new URI(request.getRequestURI()+"?"+request.getQueryString());
+        }
+        catch (URISyntaxException e) {
+            KustvaktException ke = new KustvaktException(
+                    StatusCodes.INVALID_REQUEST, "Failed parsing request URI.",
+                    OAuth2Error.INVALID_REQUEST_URI);
+            throw responseHandler.throwit(ke, state);
+        }
+        
         try {
             scopeService.verifyScope(tokenContext, OAuth2Scope.AUTHORIZE);
-
-            OAuth2AuthorizationRequest authzRequest =
-                    new OAuth2AuthorizationRequest(request);
-            String uri = authorizationService.requestAuthorizationCode(
-                    request, authzRequest, username, authTime);
+            URI uri = authorizationService.requestAuthorizationCode(
+                    requestURI, clientId, redirectUri,
+                    scope, state, username, authTime);
             return responseHandler.sendRedirect(uri);
-        }
-        catch (OAuthSystemException e) {
-            throw responseHandler.throwit(e,state);
-        }
-        catch (OAuthProblemException e) {
-            e.state(state);
-            e = authorizationService.checkRedirectUri(e,clientId,redirectUri);
-            throw responseHandler.throwit(e);
         }
         catch (KustvaktException e) {
             e = authorizationService.checkRedirectUri(e, clientId, redirectUri);
-            throw responseHandler.throwit(e,state);
+            if (e.getRedirectUri() != null) {
+                AuthorizationErrorResponse errorResponse =
+                        authorizationService.createAuthorizationError(e, state);
+                return responseHandler.sendRedirect(errorResponse.toURI());
+            }
+            else {
+                throw responseHandler.throwit(e, state);
+            } 
         }
     }
 
@@ -234,42 +234,42 @@ public class OAuth2Controller {
      *         if successful, an error code and an error description
      *         otherwise.
      */
-    @POST
-    @Path("token")
-    @ResourceFilters({APIVersionFilter.class})
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response requestAccessToken (@Context HttpServletRequest request,
-            @FormParam("grant_type") String grantType,
-            MultivaluedMap<String, String> form) {
-
-        try {
-            boolean grantTypeExist = grantType != null && !grantType.isEmpty();
-            AbstractOAuthTokenRequest oAuthRequest = null;
-            if (grantTypeExist && grantType
-                    .equals(GrantType.CLIENT_CREDENTIALS.toString())) {
-                oAuthRequest = new OAuthTokenRequest(
-                        new FormRequestWrapper(request, form));
-            }
-            else {
-                oAuthRequest = new OAuthUnauthenticatedTokenRequest(
-                        new FormRequestWrapper(request, form));
-            }
-
-            OAuthResponse oAuthResponse =
-                    tokenService.requestAccessToken(oAuthRequest);
-
-            return responseHandler.createResponse(oAuthResponse);
-        }
-        catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
-        }
-        catch (OAuthProblemException e) {
-            throw responseHandler.throwit(e);
-        }
-        catch (OAuthSystemException e) {
-            throw responseHandler.throwit(e);
-        }
-    }
+//    @POST
+//    @Path("token")
+//    @ResourceFilters({APIVersionFilter.class})
+//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+//    public Response requestAccessToken (@Context HttpServletRequest request,
+//            @FormParam("grant_type") String grantType,
+//            MultivaluedMap<String, String> form) {
+//
+//        try {
+//            boolean grantTypeExist = grantType != null && !grantType.isEmpty();
+//            AbstractOAuthTokenRequest oAuthRequest = null;
+//            if (grantTypeExist && grantType
+//                    .equals(GrantType.CLIENT_CREDENTIALS.toString())) {
+//                oAuthRequest = new OAuthTokenRequest(
+//                        new FormRequestWrapper(request, form));
+//            }
+//            else {
+//                oAuthRequest = new OAuthUnauthenticatedTokenRequest(
+//                        new FormRequestWrapper(request, form));
+//            }
+//
+//            OAuthResponse oAuthResponse =
+//                    tokenService.requestAccessToken(oAuthRequest);
+//
+//            return responseHandler.createResponse(oAuthResponse);
+//        }
+//        catch (KustvaktException e) {
+//            throw responseHandler.throwit(e);
+//        }
+//        catch (OAuthProblemException e) {
+//            throw responseHandler.throwit(e);
+//        }
+//        catch (OAuthSystemException e) {
+//            throw responseHandler.throwit(e);
+//        }
+//    }
 
     /**
      * Revokes either an access token or a refresh token. Revoking a
@@ -289,59 +289,59 @@ public class OAuth2Controller {
      * @return 200 if token invalidation is successful or the given
      *         token is invalid
      */
-    @POST
-    @Path("revoke")
-    @ResourceFilters({APIVersionFilter.class})
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response revokeAccessToken (@Context HttpServletRequest request,
-            MultivaluedMap<String, String> form) {
-
-        try {
-            OAuth2RevokeTokenRequest revokeTokenRequest =
-                    new OAuth2RevokeTokenRequest(
-                            new FormRequestWrapper(request, form));
-            tokenService.revokeToken(revokeTokenRequest);
-            return Response.ok("SUCCESS").build();
-        }
-        catch (OAuthProblemException e) {
-            throw responseHandler.throwit(e);
-        }
-        catch (OAuthSystemException e) {
-            throw responseHandler.throwit(e);
-        }
-        catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
-        }
-    }
-
-    @POST
-    @Path("revoke/super")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response revokeTokenViaSuperClient (@Context SecurityContext context,
-            @Context HttpServletRequest request,
-            MultivaluedMap<String, String> form) {
-
-        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
-        String username = tokenContext.getUsername();
-
-        try {
-            OAuth2RevokeTokenSuperRequest revokeTokenRequest =
-                    new OAuth2RevokeTokenSuperRequest(
-                            new FormRequestWrapper(request, form));
-            tokenService.revokeTokensViaSuperClient(username,
-                    revokeTokenRequest);
-            return Response.ok("SUCCESS").build();
-        }
-        catch (OAuthSystemException e) {
-            throw responseHandler.throwit(e);
-        }
-        catch (OAuthProblemException e) {
-            throw responseHandler.throwit(e);
-        }
-        catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
-        }
-    }
+//    @POST
+//    @Path("revoke")
+//    @ResourceFilters({APIVersionFilter.class})
+//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+//    public Response revokeAccessToken (@Context HttpServletRequest request,
+//            MultivaluedMap<String, String> form) {
+//
+//        try {
+//            OAuth2RevokeTokenRequest revokeTokenRequest =
+//                    new OAuth2RevokeTokenRequest(
+//                            new FormRequestWrapper(request, form));
+//            tokenService.revokeToken(revokeTokenRequest);
+//            return Response.ok("SUCCESS").build();
+//        }
+//        catch (OAuthProblemException e) {
+//            throw responseHandler.throwit(e);
+//        }
+//        catch (OAuthSystemException e) {
+//            throw responseHandler.throwit(e);
+//        }
+//        catch (KustvaktException e) {
+//            throw responseHandler.throwit(e);
+//        }
+//    }
+//
+//    @POST
+//    @Path("revoke/super")
+//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+//    public Response revokeTokenViaSuperClient (@Context SecurityContext context,
+//            @Context HttpServletRequest request,
+//            MultivaluedMap<String, String> form) {
+//
+//        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+//        String username = tokenContext.getUsername();
+//
+//        try {
+//            OAuth2RevokeTokenSuperRequest revokeTokenRequest =
+//                    new OAuth2RevokeTokenSuperRequest(
+//                            new FormRequestWrapper(request, form));
+//            tokenService.revokeTokensViaSuperClient(username,
+//                    revokeTokenRequest);
+//            return Response.ok("SUCCESS").build();
+//        }
+//        catch (OAuthSystemException e) {
+//            throw responseHandler.throwit(e);
+//        }
+//        catch (OAuthProblemException e) {
+//            throw responseHandler.throwit(e);
+//        }
+//        catch (KustvaktException e) {
+//            throw responseHandler.throwit(e);
+//        }
+//    }
 
     /**
      * Revokes all tokens of a client for the authenticated user from
@@ -357,67 +357,67 @@ public class OAuth2Controller {
      * @return 200 if token invalidation is successful or the given
      *         token is invalid
      */
-    @POST
-    @Path("revoke/super/all")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response revokeAllClientTokensViaSuperClient (
-            @Context SecurityContext context,
-            @Context HttpServletRequest request,
-            MultivaluedMap<String, String> form) {
-
-        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
-        String username = tokenContext.getUsername();
-
-        try {
-            OAuth2RevokeAllTokenSuperRequest revokeTokenRequest =
-                    new OAuth2RevokeAllTokenSuperRequest(
-                            new FormRequestWrapper(request, form));
-            tokenService.revokeAllClientTokensViaSuperClient(username,
-                    revokeTokenRequest);
-            return Response.ok("SUCCESS").build();
-        }
-        catch (OAuthSystemException e) {
-            throw responseHandler.throwit(e);
-        }
-        catch (OAuthProblemException e) {
-            throw responseHandler.throwit(e);
-        }
-        catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
-        }
-    }
-
-    @POST
-    @Path("token/list")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public List<OAuth2TokenDto> listUserToken (
-            @Context SecurityContext context,
-            @FormParam("super_client_id") String superClientId,
-            @FormParam("super_client_secret") String superClientSecret,
-            @FormParam("client_id") String clientId, // optional
-            @FormParam("token_type") String tokenType) {
-
-        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
-        String username = tokenContext.getUsername();
-
-        try {
-            if (tokenType.equals("access_token")) {
-                return tokenService.listUserAccessToken(username, superClientId,
-                        superClientSecret, clientId);
-            }
-            else if (tokenType.equals("refresh_token")) {
-                return tokenService.listUserRefreshToken(username,
-                        superClientId, superClientSecret, clientId);
-            }
-            else {
-                throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
-                        "Missing token_type parameter value",
-                        OAuth2Error.INVALID_REQUEST);
-            }
-        }
-        catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
-        }
-
-    }
+//    @POST
+//    @Path("revoke/super/all")
+//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+//    public Response revokeAllClientTokensViaSuperClient (
+//            @Context SecurityContext context,
+//            @Context HttpServletRequest request,
+//            MultivaluedMap<String, String> form) {
+//
+//        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+//        String username = tokenContext.getUsername();
+//
+//        try {
+//            OAuth2RevokeAllTokenSuperRequest revokeTokenRequest =
+//                    new OAuth2RevokeAllTokenSuperRequest(
+//                            new FormRequestWrapper(request, form));
+//            tokenService.revokeAllClientTokensViaSuperClient(username,
+//                    revokeTokenRequest);
+//            return Response.ok("SUCCESS").build();
+//        }
+//        catch (OAuthSystemException e) {
+//            throw responseHandler.throwit(e);
+//        }
+//        catch (OAuthProblemException e) {
+//            throw responseHandler.throwit(e);
+//        }
+//        catch (KustvaktException e) {
+//            throw responseHandler.throwit(e);
+//        }
+//    }
+//
+//    @POST
+//    @Path("token/list")
+//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+//    public List<OAuth2TokenDto> listUserToken (
+//            @Context SecurityContext context,
+//            @FormParam("super_client_id") String superClientId,
+//            @FormParam("super_client_secret") String superClientSecret,
+//            @FormParam("client_id") String clientId, // optional
+//            @FormParam("token_type") String tokenType) {
+//
+//        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+//        String username = tokenContext.getUsername();
+//
+//        try {
+//            if (tokenType.equals("access_token")) {
+//                return tokenService.listUserAccessToken(username, superClientId,
+//                        superClientSecret, clientId);
+//            }
+//            else if (tokenType.equals("refresh_token")) {
+//                return tokenService.listUserRefreshToken(username,
+//                        superClientId, superClientSecret, clientId);
+//            }
+//            else {
+//                throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
+//                        "Missing token_type parameter value",
+//                        OAuth2Error.INVALID_REQUEST);
+//            }
+//        }
+//        catch (KustvaktException e) {
+//            throw responseHandler.throwit(e);
+//        }
+//
+//    }
 }

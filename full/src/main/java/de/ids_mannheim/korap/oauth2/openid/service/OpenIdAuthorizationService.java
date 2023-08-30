@@ -100,15 +100,7 @@ public class OpenIdAuthorizationService extends OAuth2AuthorizationService {
 
         String clientId = authzRequest.getClientID().getValue();
         OAuth2Client client = clientService.authenticateClientId(clientId);
-        String verifiedRedirectUri = verifyRedirectUri(client, redirectUriStr);
-
-        try {
-            redirectUri = new URI(verifiedRedirectUri);
-        }
-        catch (URISyntaxException e) {
-            throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
-                    "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
-        }
+        URI verifiedRedirectUri = verifyRedirectUri(client, redirectUriStr);
 
         try {
             ResponseType responseType = authzRequest.getResponseType();

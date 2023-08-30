@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.apache.http.entity.ContentType;
-import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
@@ -19,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
+import com.nimbusds.oauth2.sdk.OAuth2Error;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -26,7 +26,6 @@ import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
-import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
@@ -35,6 +34,7 @@ import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.Invocation.Builder;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.Form;
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -119,8 +119,9 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
             request = request.queryParam("state", state);
         }
         
-        return request.request().header(Attributes.AUTHORIZATION, authHeader)
-                .get();
+        Builder builder = request.request().header(Attributes.AUTHORIZATION, authHeader);
+        
+        return builder.get();
     }
 
     protected String requestAuthorizationCode (String clientId,
@@ -449,7 +450,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     protected void testInvalidRedirectUri (String entity, String contentType,
             boolean includeState, int status) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
+        assertEquals(OAuth2Error.INVALID_REQUEST.getCode(),
                 node.at("/error").asText());
         assertEquals("Invalid redirect URI",
                 node.at("/error_description").asText());
