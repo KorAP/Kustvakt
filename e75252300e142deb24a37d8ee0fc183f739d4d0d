@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00563dbe_9f4a205e",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-09-01T08:01:16Z",
+      "side": 1,
+      "message": "Do you mean to change into the \"full\" folder?",
+      "revId": "e75252300e142deb24a37d8ee0fc183f739d4d0d",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
