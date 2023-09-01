@@ -10,6 +10,8 @@
 - Fixed conflicting commons-logging and spring jcl
 - Replaced javax.servlet with jakarta.servlet (#648)
 - Updated authorization services using Nimbus (#650)
+- Fixed BlockingFilter by replacing javax.annotation.Priority 
+  with jakarta.annotation.Priority (#659, #648)
 
 # version 0.71
 

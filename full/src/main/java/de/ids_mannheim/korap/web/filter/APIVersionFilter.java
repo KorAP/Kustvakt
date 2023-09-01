@@ -2,12 +2,11 @@ package de.ids_mannheim.korap.web.filter;
 
 import java.util.List;
 
-import javax.annotation.Priority;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
+import jakarta.annotation.Priority;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;

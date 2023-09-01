@@ -9,7 +9,6 @@ import org.springframework.stereotype.Controller;
 
 import com.nimbusds.oauth2.sdk.AuthorizationErrorResponse;
 import com.nimbusds.oauth2.sdk.OAuth2Error;
-import com.nimbusds.oauth2.sdk.id.State;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -20,6 +19,7 @@ import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
+import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.GET;
@@ -44,19 +44,14 @@ import jakarta.ws.rs.core.SecurityContext;
  */
 @Controller
 @Path("{version}/oauth2")
-@ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class
-    //, BlockingFilter.class 
-    })
+@ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
+        BlockingFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class OAuth2Controller {
 
     @Autowired
     private OAuth2ResponseHandler responseHandler;
-//    @Autowired
-//    private OltuTokenService tokenService;
-//    @Deprecated
-//    @Autowired
-//    private OltuAuthorizationService authorizationService;
+
     
     @Autowired
     private OAuth2AuthorizationService authorizationService;

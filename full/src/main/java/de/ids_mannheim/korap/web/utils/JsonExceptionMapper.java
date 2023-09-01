@@ -1,11 +1,11 @@
 package de.ids_mannheim.korap.web.utils;
 
-import javax.annotation.Priority;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.web.CoreResponseHandler;
+import jakarta.annotation.Priority;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;

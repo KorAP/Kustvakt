@@ -10,10 +10,11 @@ import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.nimbusds.oauth2.sdk.OAuth2Error;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
@@ -28,6 +29,19 @@ public class OAuth2AuthorizationTest extends OAuth2TestBase {
                 .createBasicAuthorizationHeaderValue("dory", "password");
     }
     
+    @Test
+    public void testAuthorizeUnauthenticated () throws KustvaktException {
+
+        Response response = requestAuthorizationCode("code", publicClientId, "",
+                "search match_info", "", "");
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals("Unauthorized operation for user: guest",
+                node.at("/errors/0/1").asText());
+    }
     @Test
     public void testAuthorizeConfidentialClient () throws KustvaktException {
         // with registered redirect URI
@@ -105,7 +119,7 @@ public class OAuth2AuthorizationTest extends OAuth2TestBase {
 
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
+        assertEquals(OAuth2Error.INVALID_REQUEST.getCode(),
                 node.at("/error").asText());
         assertEquals("Missing parameter: redirect URI",
                 node.at("/error_description").asText());
@@ -148,7 +162,7 @@ public class OAuth2AuthorizationTest extends OAuth2TestBase {
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuth2Error.INVALID_CLIENT, node.at("/error").asText());
+        assertEquals(OAuth2Error.INVALID_CLIENT.getCode(), node.at("/error").asText());
         assertEquals("Unknown client: unknown-client-id",
                 node.at("/error_description").asText());
     }
