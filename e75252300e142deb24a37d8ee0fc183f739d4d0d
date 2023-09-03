@@ -16,6 +16,24 @@
       "message": "Do you mean to change into the \"full\" folder?",
       "revId": "e75252300e142deb24a37d8ee0fc183f739d4d0d",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4717ff0b_1a659e31",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-09-03T11:48:20Z",
+      "side": 1,
+      "message": "No. After the user has cloned the Kustvakt repository, it must change into the `Kustvakt` directory first. My problem was, that before the user is not in a subdirectory, where `../full` made sense.",
+      "parentUuid": "00563dbe_9f4a205e",
+      "revId": "e75252300e142deb24a37d8ee0fc183f739d4d0d",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
