@@ -14,7 +14,7 @@
 		<flyway.version>9.21.1</flyway.version>
 		<log4j.version>2.20.0</log4j.version>
 		<krill.version>[0.61.3,)</krill.version>
-		<koral.version>[0.39.1,)</koral.version>
+		<koral.version>[0.41,)</koral.version>
 	</properties>
 	<profiles>
 		<profile>
