@@ -6,6 +6,8 @@
 - Removed unnecessary caches and methods in the authentication interface
 - Added total result cache (#599)
 - Fixed missing project.version in info web-service
+- Make sure totalResults and other numeric results are numbers (Kupietz)
+- Introduce CQP query language in Koral 0.41
 
 # version 0.70.1
 
