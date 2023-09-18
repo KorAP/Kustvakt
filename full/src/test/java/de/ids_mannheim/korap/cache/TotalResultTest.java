@@ -33,6 +33,7 @@ public class TotalResultTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
+        assertTrue("totalResults should be a number", node.at("/meta/totalResults").isNumber());
         int totalResults = node.at("/meta/totalResults").asInt();
 
         assertEquals(1, searchService.getTotalResultCache()
@@ -45,8 +46,9 @@ public class TotalResultTest extends SpringJerseyTest {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         entity = response.readEntity(String.class);
         node = JsonUtils.readTree(entity);
+        assertTrue("totalResults should be a number", node.at("/meta/totalResults").isNumber());
         assertEquals(totalResults, node.at("/meta/totalResults").asInt());
-        
+
         assertEquals(1, searchService.getTotalResultCache()
                 .getAllCacheElements().size());
         

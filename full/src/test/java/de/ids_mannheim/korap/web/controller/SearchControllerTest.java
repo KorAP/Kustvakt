@@ -183,6 +183,11 @@ public class SearchControllerTest extends SpringJerseyTest {
         assertEquals(40, node.at("/meta/context/left/1").asInt());
         assertEquals(30, node.at("/meta/context/right/1").asInt());
         assertEquals(-1, node.at("/meta/totalResults").asInt());
+        for (String path : new String[] { "/meta/count", "/meta/startIndex",
+                "/meta/context/left/1", "/meta/context/right/1",
+                "/meta/totalResults", "/meta/itemsPerPage" }) {
+            assertTrue(path + " should be a number", node.at(path).isNumber());
+        }
     }
 
     @Test
