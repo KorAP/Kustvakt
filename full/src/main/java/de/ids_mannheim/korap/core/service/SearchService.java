@@ -255,10 +255,10 @@ public class SearchService extends BasicService{
             ObjectNode queryNode = (ObjectNode) JsonUtils.readTree(result);
             ObjectNode meta = (ObjectNode) queryNode.at("/meta");
             if (meta.isMissingNode()) {
-                queryNode.put("totalResults", totalResults);
+                queryNode.put("totalResults", Integer.valueOf(totalResults));
             }
             else {
-                meta.put("totalResults", totalResults);
+                meta.put("totalResults", Integer.valueOf(totalResults));
             }
             result = queryNode.toString();
         }
