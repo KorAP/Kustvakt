@@ -112,8 +112,8 @@
 		<!-- <property name="validateOnMigrate" value="false" /> -->
 		<!-- <property name="cleanOnValidationError" value="true" /> -->
 		<property name="locations" value="#{'${jdbc.schemaPath}'.split(',')}"/>
-		<!-- <property name="dataSource" ref="dataSource" /> -->
-		<property name="dataSource" ref="sqliteDataSource" />
+		<property name="dataSource" ref="dataSource" />
+		<!-- <property name="dataSource" ref="sqliteDataSource" /> -->
 		<!-- <property name="dataSource" ref="c3p0DataSource" /> -->
 		<property name="outOfOrder" value="true" />
 	</bean>
@@ -125,8 +125,8 @@
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
 		depends-on="flyway">
-		<!-- <property name="dataSource" ref="dataSource" /> -->
-		<property name="dataSource" ref="sqliteDataSource" />
+		<property name="dataSource" ref="dataSource" />
+		<!--  <property name="dataSource" ref="sqliteDataSource" /> -->
 		<!-- <property name="dataSource" ref="c3p0DataSource" /> -->
 
 		<property name="packagesToScan">

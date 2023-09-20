@@ -4,8 +4,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Entity;
@@ -37,6 +47,9 @@ public class OAuth2PluginTest extends OAuth2TestBase {
     private String username = "plugin-user";
     @Autowired
     private InstalledPluginDao pluginDao;
+    
+    private final AtomicBoolean testFailed = new AtomicBoolean(false);
+
 
     @Test
     public void testRegisterPlugin () throws
@@ -220,6 +233,68 @@ public class OAuth2PluginTest extends OAuth2TestBase {
                 node.at("/errors/0/0").asInt());
     }
 
+    
+
+    @Test
+    public void testListPluginsConcurrent () throws InterruptedException {
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
+        List<Future<Void>> futures = new ArrayList<>();
+
+        for (int i = 0; i < 3; i++) {
+            futures.add(executorService
+                    .submit(new PluginListCallable("Thread " + (i + 1))));
+        }
+
+        executorService.shutdown();
+        executorService.awaitTermination(2, TimeUnit.SECONDS);
+
+        for (Future<Void> future : futures) {
+            try {
+                future.get(); // This will re-throw any exceptions
+                              // that occurred in threads
+            }
+            catch (ExecutionException e) {
+                fail("Test failed: " + e.getCause().getMessage());
+            }
+        }
+    }
+
+    class PluginListCallable implements Callable<Void> {
+        private final String name;
+
+        public PluginListCallable (String name) {
+            this.name = name;
+        }
+
+        @Override
+        public Void call () {
+            Form form = getSuperClientForm();
+            try {
+                Response response = target().path(API_VERSION).path("plugins")
+                        .request()
+                        .header(Attributes.AUTHORIZATION,
+                                HttpAuthorizationHandler
+                                        .createBasicAuthorizationHeaderValue(
+                                                username, "pass"))
+                        .header(HttpHeaders.CONTENT_TYPE,
+                                ContentType.APPLICATION_FORM_URLENCODED)
+                        .post(Entity.form(form));
+
+                assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+                String entity = response.readEntity(String.class);
+                JsonNode node = JsonUtils.readTree(entity);
+                assertEquals(2, node.size());
+            }
+            catch (KustvaktException e) {
+                e.printStackTrace();
+                throw new RuntimeException(name, e);
+            }
+            return null;
+        }
+    }
+    
+    
     @Test
     public void testListAllPlugins () throws
             ProcessingException, KustvaktException {
