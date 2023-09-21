@@ -9,6 +9,7 @@
 - Make sure totalResults and other numeric results are numbers (Kupietz)
 - Introduce CQP query language in Koral 0.41
 - Changed DB connection (fixed #670)
+- Resolved duplicate libraries.
 
 # version 0.70.1
 
