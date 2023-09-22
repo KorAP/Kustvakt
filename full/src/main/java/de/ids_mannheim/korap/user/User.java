@@ -1,14 +1,6 @@
 package de.ids_mannheim.korap.user;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.joda.time.DateTime;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.ParamFields;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -16,11 +8,19 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.utils.KustvaktMap;
 import lombok.AccessLevel;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.joda.time.DateTime;
 
-@Data
+import javax.persistence.Entity;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Getter
+@Setter
+@Entity
 public abstract class User implements Serializable {
 
     //EM: add
