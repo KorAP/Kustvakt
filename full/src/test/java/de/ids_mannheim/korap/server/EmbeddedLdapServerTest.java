@@ -3,8 +3,8 @@ package de.ids_mannheim.korap.server;
 import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.util.Base64;
 import de.ids_mannheim.korap.authentication.LdapAuth3;
-import org.junit.AfterClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -16,14 +16,15 @@ import java.security.spec.KeySpec;
 
 import static de.ids_mannheim.korap.authentication.LdapAuth3.LDAP_AUTH_ROK;
 import static de.ids_mannheim.korap.authentication.LdapAuth3.LDAP_AUTH_RUNKNOWN;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class EmbeddedLdapServerTest {
 
     public static final String TEST_EMBEDDED_LDAP_CONF = "src/test/resources/test-embedded-ldap.conf";
 
-    @AfterClass
-    public static void shutdownEmbeddedLdapServer() {
+    @AfterAll
+    static void shutdownEmbeddedLdapServer() {
         EmbeddedLdapServer.stop();
     }
 
@@ -58,14 +59,13 @@ public class EmbeddedLdapServerTest {
         KeySpec spec = new PBEKeySpec("password5".toCharArray(), salt, 65536, 256);
         SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2withHmacSHA256");
         byte[] hash = f.generateSecret(spec).getEncoded();
-
         final String pbkdf2sha256Password = "{PBKDF2-SHA256}" + Base64.encode(hash);
-//        System.out.println(pbkdf2sha256Password);
+        // System.out.println(pbkdf2sha256Password);
         assertEquals(LDAP_AUTH_ROK, LdapAuth3.login("user5", pbkdf2sha256Password, TEST_EMBEDDED_LDAP_CONF));
     }
 
     @Test
-    public void loginWithUnEncodedPBKDF2PasswordFails() throws LDAPException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public void loginWithUnencodedPBKDF2PasswordFails() throws LDAPException, NoSuchAlgorithmException, InvalidKeySpecException {
         assertEquals(LDAP_AUTH_RUNKNOWN, LdapAuth3.login("user5", "password5", TEST_EMBEDDED_LDAP_CONF));
     }
 
@@ -77,13 +77,12 @@ public class EmbeddedLdapServerTest {
     @Test
     public void gettingMailForUser() throws LDAPException, UnknownHostException, GeneralSecurityException {
         EmbeddedLdapServer.startIfNotRunning(TEST_EMBEDDED_LDAP_CONF);
-        assertEquals("user2@example.com", LdapAuth3.getEmail("user2", TEST_EMBEDDED_LDAP_CONF));
+        assertEquals(LdapAuth3.getEmail("user2", TEST_EMBEDDED_LDAP_CONF), "user2@example.com");
     }
 
     @Test
-    public void gettingMailFoRNAUTHUserIsNull() throws LDAPException, UnknownHostException, GeneralSecurityException {
+    public void gettingMailForNAUTHUserIsNull() throws LDAPException, UnknownHostException, GeneralSecurityException {
         EmbeddedLdapServer.startIfNotRunning(TEST_EMBEDDED_LDAP_CONF);
         assertEquals(null, LdapAuth3.getEmail("user1000", TEST_EMBEDDED_LDAP_CONF));
     }
-
 }
