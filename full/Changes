@@ -11,6 +11,7 @@
 - Changed DB connection (fixed #670)
 - Resolved duplicate libraries
 - Fixed testing expiry access token
+- Fix lombok compile warning
 
 # version 0.70.1
 
