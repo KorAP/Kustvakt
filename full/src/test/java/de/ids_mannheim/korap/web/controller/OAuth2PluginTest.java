@@ -15,7 +15,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Entity;
@@ -48,9 +47,6 @@ public class OAuth2PluginTest extends OAuth2TestBase {
     @Autowired
     private InstalledPluginDao pluginDao;
     
-    private final AtomicBoolean testFailed = new AtomicBoolean(false);
-
-
     @Test
     public void testRegisterPlugin () throws
             ProcessingException, KustvaktException {

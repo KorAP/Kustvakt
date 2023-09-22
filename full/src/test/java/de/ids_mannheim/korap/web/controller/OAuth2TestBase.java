@@ -6,6 +6,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
@@ -33,11 +37,18 @@ import com.google.common.net.HttpHeaders;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.SpringJerseyTest;
+import de.ids_mannheim.korap.constant.OAuth2Scope;
+import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
+import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
+import de.ids_mannheim.korap.oauth2.dao.OAuth2ClientDao;
 import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
+import de.ids_mannheim.korap.oauth2.entity.AccessScope;
+import de.ids_mannheim.korap.oauth2.entity.AccessToken;
+import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
@@ -51,6 +62,12 @@ import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
  */
 public abstract class OAuth2TestBase extends SpringJerseyTest {
 
+    @Autowired
+    private AccessTokenDao tokenDao;
+    @Autowired
+    private OAuth2ClientDao clientDao;
+    @Autowired
+    private RandomCodeGenerator codeGenerator;
     @Autowired
     protected RefreshTokenDao refreshTokenDao;
 
@@ -460,5 +477,28 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
         assertEquals("application/json;charset=utf-8", contentType);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), status);
+    }
+    
+    protected String createExpiredAccessToken () throws KustvaktException {
+        String authToken = codeGenerator.createRandomCode();
+        
+        // create new access token
+        OAuth2Client client = clientDao.retrieveClientById(publicClientId);
+
+        ZonedDateTime now =
+                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+        Set<AccessScope> scopes = new HashSet<>();
+        scopes.add(new AccessScope(OAuth2Scope.EDIT_VC));
+        
+        AccessToken accessToken = new AccessToken();
+        accessToken.setCreatedDate(now.minusSeconds(5));
+        accessToken.setExpiryDate(now.minusSeconds(3));
+        accessToken.setToken(authToken);
+        accessToken.setScopes(scopes);
+        accessToken.setUserId("marlin");
+        accessToken.setClient(client);
+        accessToken.setUserAuthenticationTime(now.minusSeconds(5));
+        tokenDao.storeAccessToken(accessToken);
+        return authToken;
     }
 }

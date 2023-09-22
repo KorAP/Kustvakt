@@ -91,6 +91,11 @@ public class AccessTokenDao extends KustvaktCacheable {
         entityManager.persist(accessToken);
     }
 
+    public void storeAccessToken (AccessToken accessToken) 
+                    throws KustvaktException {
+        ParameterChecker.checkObjectValue(accessToken, "access token");
+        entityManager.persist(accessToken);
+    }
     public AccessToken updateAccessToken (AccessToken accessToken)
             throws KustvaktException {
         ParameterChecker.checkObjectValue(accessToken, "access_token");
