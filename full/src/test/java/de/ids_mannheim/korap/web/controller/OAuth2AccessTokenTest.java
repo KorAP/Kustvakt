@@ -1,11 +1,10 @@
 package de.ids_mannheim.korap.web.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
-
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
@@ -13,11 +12,9 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.OAuth2Scope;
@@ -25,73 +22,57 @@ import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-public class OAuth2AccessTokenTest extends OAuth2TestBase {
+@DisplayName("OAuth2 Access Token Test")
+class OAuth2AccessTokenTest extends OAuth2TestBase {
 
     private String userAuthHeader;
+
     private String clientAuthHeader;
 
-    public OAuth2AccessTokenTest () throws KustvaktException {
-        userAuthHeader = HttpAuthorizationHandler
-                .createBasicAuthorizationHeaderValue("dory", "password");
-        clientAuthHeader =
-                HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(
-                        confidentialClientId, clientSecret);
+    public OAuth2AccessTokenTest() throws KustvaktException {
+        userAuthHeader = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("dory", "password");
+        clientAuthHeader = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(confidentialClientId, clientSecret);
     }
 
     @Test
-    public void testScopeWithSuperClient () throws KustvaktException {
-        Response response =
-                requestTokenWithDoryPassword(superClientId, clientSecret);
-
+    @DisplayName("Test Scope With Super Client")
+    void testScopeWithSuperClient() throws KustvaktException {
+        Response response = requestTokenWithDoryPassword(superClientId, clientSecret);
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
-        assertEquals("all", node.at("/scope").asText());
+        assertEquals(node.at("/scope").asText(), "all");
         String accessToken = node.at("/access_token").asText();
-
         // test list user group
-        response = target().path(API_VERSION).path("group")
-                .request()
-                .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
-                .get();
-
+        response = target().path(API_VERSION).path("group").request().header(Attributes.AUTHORIZATION, "Bearer " + accessToken).get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(2, node.size());
     }
 
     @Test
-    public void testCustomScope () throws KustvaktException {
-        Response response =
-                requestAuthorizationCode("code", confidentialClientId, "",
-                        OAuth2Scope.VC_INFO.toString(), "", userAuthHeader);
+    @DisplayName("Test Custom Scope")
+    void testCustomScope() throws KustvaktException {
+        Response response = requestAuthorizationCode("code", confidentialClientId, "", OAuth2Scope.VC_INFO.toString(), "", userAuthHeader);
         String code = parseAuthorizationCode(response);
-        
-        response = requestTokenWithAuthorizationCodeAndForm(
-                confidentialClientId, clientSecret, code);
+        response = requestTokenWithAuthorizationCodeAndForm(confidentialClientId, clientSecret, code);
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
-
         String token = node.at("/access_token").asText();
-        assertTrue(node.at("/scope").asText()
-                .contains(OAuth2Scope.VC_INFO.toString()));
-
+        assertTrue(node.at("/scope").asText().contains(OAuth2Scope.VC_INFO.toString()));
         // test list vc using the token
-        response = target().path(API_VERSION).path("vc")
-                .request()
-                .header(Attributes.AUTHORIZATION, "Bearer " + token)
-                .get();
-
+        response = target().path(API_VERSION).path("vc").request().header(Attributes.AUTHORIZATION, "Bearer " + token).get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(4, node.size());
     }
 
     @Test
-    public void testDefaultScope () throws KustvaktException, IOException {
+    @DisplayName("Test Default Scope")
+    void testDefaultScope() throws KustvaktException, IOException {
         String code = requestAuthorizationCode(confidentialClientId, userAuthHeader);
-        Response response = requestTokenWithAuthorizationCodeAndForm(
-                confidentialClientId, clientSecret, code);
+        Response response = requestTokenWithAuthorizationCodeAndForm(confidentialClientId, clientSecret, code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         String accessToken = node.at("/access_token").asText();
         testScopeNotAuthorized(accessToken);
@@ -99,91 +80,55 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
         testSearchWithOAuth2Token(accessToken);
     }
 
-    private void testScopeNotAuthorized (String accessToken)
-            throws KustvaktException {
-        Response response = target().path(API_VERSION).path("vc")
-                .request()
-                .header(Attributes.AUTHORIZATION, "Bearer " + accessToken)
-                .get();
-
-        assertEquals(Status.UNAUTHORIZED.getStatusCode(),
-                response.getStatus());
+    private void testScopeNotAuthorized(String accessToken) throws KustvaktException {
+        Response response = target().path(API_VERSION).path("vc").request().header(Attributes.AUTHORIZATION, "Bearer " + accessToken).get();
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
-                node.at("/errors/0/0").asInt());
-        assertEquals("Scope vc_info is not authorized",
-                node.at("/errors/0/1").asText());
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED, node.at("/errors/0/0").asInt());
+        assertEquals(node.at("/errors/0/1").asText(), "Scope vc_info is not authorized");
     }
 
-    private void testScopeNotAuthorize2 (String accessToken)
-            throws KustvaktException {
-        Response response =
-                target().path(API_VERSION).path("vc").path("access")
-                        .request()
-                        .header(Attributes.AUTHORIZATION,
-                                "Bearer " + accessToken)
-                        .get();
+    private void testScopeNotAuthorize2(String accessToken) throws KustvaktException {
+        Response response = target().path(API_VERSION).path("vc").path("access").request().header(Attributes.AUTHORIZATION, "Bearer " + accessToken).get();
         String entity = response.readEntity(String.class);
-        assertEquals(Status.UNAUTHORIZED.getStatusCode(),
-                response.getStatus());
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
-                node.at("/errors/0/0").asInt());
-        assertEquals("Scope vc_access_info is not authorized",
-                node.at("/errors/0/1").asText());
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED, node.at("/errors/0/0").asInt());
+        assertEquals(node.at("/errors/0/1").asText(), "Scope vc_access_info is not authorized");
     }
 
     @Test
-    public void testSearchWithUnknownToken ()
-            throws KustvaktException, IOException {
-        Response response =
-                searchWithAccessToken("ljsa8tKNRSczJhk20öhq92zG8z350");
-
-        assertEquals(Status.UNAUTHORIZED.getStatusCode(),
-                response.getStatus());
-
+    @DisplayName("Test Search With Unknown Token")
+    void testSearchWithUnknownToken() throws KustvaktException, IOException {
+        Response response = searchWithAccessToken("ljsa8tKNRSczJhk20öhq92zG8z350");
+        assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
-        assertEquals(StatusCodes.INVALID_ACCESS_TOKEN,
-                node.at("/errors/0/0").asInt());
-        assertEquals("Access token is invalid",
-                node.at("/errors/0/1").asText());
+        assertEquals(StatusCodes.INVALID_ACCESS_TOKEN, node.at("/errors/0/0").asInt());
+        assertEquals(node.at("/errors/0/1").asText(), "Access token is invalid");
     }
 
     @Test
-    public void testRevokeAccessTokenConfidentialClient ()
-            throws KustvaktException {
-        String code = requestAuthorizationCode(confidentialClientId,
-                userAuthHeader);
-        JsonNode node = requestTokenWithAuthorizationCodeAndHeader(
-                confidentialClientId, code, clientAuthHeader);
-
+    @DisplayName("Test Revoke Access Token Confidential Client")
+    void testRevokeAccessTokenConfidentialClient() throws KustvaktException {
+        String code = requestAuthorizationCode(confidentialClientId, userAuthHeader);
+        JsonNode node = requestTokenWithAuthorizationCodeAndHeader(confidentialClientId, code, clientAuthHeader);
         String accessToken = node.at("/access_token").asText();
         Form form = new Form();
         form.param("token", accessToken);
         form.param("client_id", confidentialClientId);
         form.param("client_secret", "secret");
-
-        Response response = target().path(API_VERSION).path("oauth2").path("revoke")
-                .request()
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .post(Entity.form(form));
-
+        Response response = target().path(API_VERSION).path("oauth2").path("revoke").request().header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED).post(Entity.form(form));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
         testSearchWithRevokedAccessToken(accessToken);
     }
-    
+
     @Test
-    public void testRevokeAccessTokenPublicClientViaSuperClient()
-            throws KustvaktException {
-        String code = requestAuthorizationCode(publicClientId,
-                userAuthHeader);
-        Response response = requestTokenWithAuthorizationCodeAndForm(
-                publicClientId, "", code);
-        
+    @DisplayName("Test Revoke Access Token Public Client Via Super Client")
+    void testRevokeAccessTokenPublicClientViaSuperClient() throws KustvaktException {
+        String code = requestAuthorizationCode(publicClientId, userAuthHeader);
+        Response response = requestTokenWithAuthorizationCodeAndForm(publicClientId, "", code);
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         String accessToken = node.at("/access_token").asText();
         testRevokeTokenViaSuperClient(accessToken, userAuthHeader);
@@ -191,77 +136,50 @@ public class OAuth2AccessTokenTest extends OAuth2TestBase {
     }
 
     @Test
-    public void testAccessTokenAfterRequestRefreshToken ()
-            throws KustvaktException, IOException {
-        String code =
-                requestAuthorizationCode(confidentialClientId, userAuthHeader);
-        JsonNode node = requestTokenWithAuthorizationCodeAndHeader(
-                confidentialClientId, code, clientAuthHeader);
-
+    @DisplayName("Test Access Token After Request Refresh Token")
+    void testAccessTokenAfterRequestRefreshToken() throws KustvaktException, IOException {
+        String code = requestAuthorizationCode(confidentialClientId, userAuthHeader);
+        JsonNode node = requestTokenWithAuthorizationCodeAndHeader(confidentialClientId, code, clientAuthHeader);
         String accessToken = node.at("/access_token").asText();
         String refreshToken = node.at("/refresh_token").asText();
-
         Form form = new Form();
         form.param("grant_type", GrantType.REFRESH_TOKEN.toString());
         form.param("client_id", confidentialClientId);
         form.param("client_secret", "secret");
         form.param("refresh_token", refreshToken);
-
-        Response response = target().path(API_VERSION).path("oauth2").path("token")
-                .request()
-                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .post(Entity.form(form));
-
+        Response response = target().path(API_VERSION).path("oauth2").path("token").request().header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED).post(Entity.form(form));
         String entity = response.readEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
         node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
         assertTrue(!refreshToken.equals(node.at("/refresh_token").asText()));
-
         testSearchWithRevokedAccessToken(accessToken);
     }
 
     @Test
-    public void testRequestAuthorizationWithBearerTokenUnauthorized ()
-            throws KustvaktException {
-        String code = requestAuthorizationCode(confidentialClientId,
-                userAuthHeader);
-        JsonNode node = requestTokenWithAuthorizationCodeAndHeader(
-                confidentialClientId, code, clientAuthHeader);
+    @DisplayName("Test Request Authorization With Bearer Token Unauthorized")
+    void testRequestAuthorizationWithBearerTokenUnauthorized() throws KustvaktException {
+        String code = requestAuthorizationCode(confidentialClientId, userAuthHeader);
+        JsonNode node = requestTokenWithAuthorizationCodeAndHeader(confidentialClientId, code, clientAuthHeader);
         String userAuthToken = node.at("/access_token").asText();
-
-        Response response = requestAuthorizationCode("code",
-                confidentialClientId, "", "search", "", "Bearer " + userAuthToken);
-
+        Response response = requestAuthorizationCode("code", confidentialClientId, "", "search", "", "Bearer " + userAuthToken);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-
         node = JsonUtils.readTree(response.readEntity(String.class));
-        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
-                node.at("/errors/0/0").asInt());
-        assertEquals("Scope authorize is not authorized",
-                node.at("/errors/0/1").asText());
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED, node.at("/errors/0/0").asInt());
+        assertEquals(node.at("/errors/0/1").asText(), "Scope authorize is not authorized");
     }
 
     @Test
-    public void testRequestAuthorizationWithBearerToken ()
-            throws KustvaktException {
-        Response response =
-                requestTokenWithDoryPassword(superClientId, clientSecret);
+    @DisplayName("Test Request Authorization With Bearer Token")
+    void testRequestAuthorizationWithBearerToken() throws KustvaktException {
+        Response response = requestTokenWithDoryPassword(superClientId, clientSecret);
         String entity = response.readEntity(String.class);
-        
         JsonNode node = JsonUtils.readTree(entity);
         String userAuthToken = node.at("/access_token").asText();
         assertNotNull(userAuthToken);
-        assertEquals(TokenType.BEARER.displayName(),
-                node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.displayName(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
-
-        String code = requestAuthorizationCode(superClientId,
-                "Bearer " + userAuthToken);
+        String code = requestAuthorizationCode(superClientId, "Bearer " + userAuthToken);
         assertNotNull(code);
     }
-
 }

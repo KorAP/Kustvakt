@@ -1,9 +1,5 @@
 package de.ids_mannheim.korap.web.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.net.URI;
 
@@ -41,6 +37,8 @@ import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Provides common methods and variables for OAuth2 tests,
