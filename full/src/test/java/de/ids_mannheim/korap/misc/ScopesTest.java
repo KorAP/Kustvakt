@@ -1,20 +1,23 @@
 package de.ids_mannheim.korap.misc;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author hanl
  * @date 20/01/2016
  */
-public class ScopesTest {
+@DisplayName("Scopes Test")
+class ScopesTest {
 
     @Test
-    public void testScopes () {
-
+    @DisplayName("Test Scopes")
+    void testScopes() {
     }
 
-
     @Test
-    public void testOpenIDScopes () {
-
+    @DisplayName("Test Open ID Scopes")
+    void testOpenIDScopes() {
     }
 }

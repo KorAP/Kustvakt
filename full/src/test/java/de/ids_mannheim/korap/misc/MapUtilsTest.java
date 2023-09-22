@@ -1,42 +1,44 @@
 package de.ids_mannheim.korap.misc;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Map;
-
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.junit.Test;
-
+import org.junit.jupiter.api.Test;
 import de.ids_mannheim.korap.web.utils.MapUtils;
 import edu.emory.mathcs.backport.java.util.Arrays;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-public class MapUtilsTest {
+@DisplayName("Map Utils Test")
+class MapUtilsTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testConvertToMap () {
+    @DisplayName("Test Convert To Map")
+    void testConvertToMap() {
         MultivaluedMap<String, String> mm = new MultivaluedHashMap<String, String>();
-        mm.put("k1", Arrays.asList(new String[] { "a", "b", "c" }));
-        mm.put("k2", Arrays.asList(new String[] { "d", "e", "f" }));
-
+        mm.put("k1", Arrays.asList(new String[]{"a", "b", "c"}));
+        mm.put("k2", Arrays.asList(new String[]{"d", "e", "f"}));
         Map<String, String> map = MapUtils.toMap(mm);
-        assertEquals("a b c", map.get("k1"));
-        assertEquals("d e f", map.get("k2"));
+        assertEquals(map.get("k1"), "a b c");
+        assertEquals(map.get("k2"), "d e f");
     }
 
     @Test
-    public void testConvertNullMap () {
+    @DisplayName("Test Convert Null Map")
+    void testConvertNullMap() {
         Map<String, String> map = MapUtils.toMap(null);
         assertEquals(0, map.size());
     }
 
     @Test
-    public void testConvertEmptyMap () {
+    @DisplayName("Test Convert Empty Map")
+    void testConvertEmptyMap() {
         MultivaluedMap<String, String> mm = new MultivaluedHashMap<String, String>();
         Map<String, String> map = MapUtils.toMap(mm);
         assertEquals(0, map.size());
     }
-
 }

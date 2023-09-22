@@ -1,13 +1,12 @@
 package de.ids_mannheim.korap.web.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.Set;
-
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MultivaluedMap;
@@ -18,12 +17,10 @@ import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.apache.oltu.oauth2.common.message.types.TokenType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.FullConfiguration;
@@ -32,623 +29,450 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author margaretha
- *
  */
-public class OAuth2ControllerTest extends OAuth2TestBase {
+@DisplayName("O Auth 2 Controller Test")
+class OAuth2ControllerTest extends OAuth2TestBase {
 
     @Autowired
     public FullConfiguration config;
-    
+
     public String userAuthHeader;
 
-    public OAuth2ControllerTest () throws KustvaktException {
-        userAuthHeader = HttpAuthorizationHandler
-                .createBasicAuthorizationHeaderValue("dory", "password");
+    public OAuth2ControllerTest() throws KustvaktException {
+        userAuthHeader = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("dory", "password");
     }
 
     @Test
-    public void testAuthorizeConfidentialClient () throws KustvaktException {
+    @DisplayName("Test Authorize Confidential Client")
+    void testAuthorizeConfidentialClient() throws KustvaktException {
         // with registered redirect URI
-        Response response =
-                requestAuthorizationCode("code", confidentialClientId, "",
-                        "match_info search client_info", state, userAuthHeader);
-
-        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
-                response.getStatus());
+        Response response = requestAuthorizationCode("code", confidentialClientId, "", "match_info search client_info", state, userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(), response.getStatus());
         URI redirectUri = response.getLocation();
-        MultivaluedMap<String, String> params =
-                getQueryParamsFromURI(redirectUri);
+        MultivaluedMap<String, String> params = getQueryParamsFromURI(redirectUri);
         assertNotNull(params.getFirst("code"));
         assertEquals(state, params.getFirst("state"));
-        assertEquals("match_info search client_info", params.getFirst("scope"));
+        assertEquals(params.getFirst("scope"), "match_info search client_info");
     }
 
     @Test
-    public void testAuthorizePublicClient () throws KustvaktException {
+    @DisplayName("Test Authorize Public Client")
+    void testAuthorizePublicClient() throws KustvaktException {
         // with registered redirect URI
         String code = requestAuthorizationCode(publicClientId, userAuthHeader);
         assertNotNull(code);
     }
 
     @Test
-    public void testAuthorizeWithRedirectUri () throws KustvaktException {
-        Response response =
-                requestAuthorizationCode("code", publicClientId2,
-                        "https://public.com/redirect", "search match_info", 
-                        "", userAuthHeader);
-        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
-                response.getStatus());
-
+    @DisplayName("Test Authorize With Redirect Uri")
+    void testAuthorizeWithRedirectUri() throws KustvaktException {
+        Response response = requestAuthorizationCode("code", publicClientId2, "https://public.com/redirect", "search match_info", "", userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(), response.getStatus());
         URI redirectUri = response.getLocation();
-        assertEquals("https", redirectUri.getScheme());
-        assertEquals("public.com", redirectUri.getHost());
-        assertEquals("/redirect", redirectUri.getPath());
-
+        assertEquals(redirectUri.getScheme(), "https");
+        assertEquals(redirectUri.getHost(), "public.com");
+        assertEquals(redirectUri.getPath(), "/redirect");
         String[] queryParts = redirectUri.getQuery().split("&");
         assertTrue(queryParts[0].startsWith("code="));
-        assertEquals("scope=match_info+search", queryParts[1]);
+        assertEquals(queryParts[1], "scope=match_info+search");
     }
 
     @Test
-    public void testAuthorizeWithoutScope () throws KustvaktException {
-        Response response = requestAuthorizationCode("code",
-                confidentialClientId, "", "", "", userAuthHeader);
-        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
-                response.getStatus());
-
+    @DisplayName("Test Authorize Without Scope")
+    void testAuthorizeWithoutScope() throws KustvaktException {
+        Response response = requestAuthorizationCode("code", confidentialClientId, "", "", "", userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(), response.getStatus());
         URI redirectUri = response.getLocation();
         assertEquals(redirectUri.getScheme(), "https");
         assertEquals(redirectUri.getHost(), "third.party.com");
         assertEquals(redirectUri.getPath(), "/confidential/redirect");
-
         String[] queryParts = redirectUri.getQuery().split("&");
         assertTrue(queryParts[0].startsWith("error_description=scope+is+required"));
         assertEquals(queryParts[1], "error=invalid_scope");
     }
 
     @Test
-    public void testAuthorizeMissingClientId () throws KustvaktException {
-        Response response = requestAuthorizationCode("code", "", "", "search",
-                "", userAuthHeader);
+    @DisplayName("Test Authorize Missing Client Id")
+    void testAuthorizeMissingClientId() throws KustvaktException {
+        Response response = requestAuthorizationCode("code", "", "", "search", "", userAuthHeader);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals("Missing parameters: client_id",
-                node.at("/error_description").asText());
+        assertEquals(node.at("/error_description").asText(), "Missing parameters: client_id");
     }
 
     @Test
-    public void testAuthorizeMissingRedirectUri () throws KustvaktException {
-        Response response = requestAuthorizationCode("code",
-                publicClientId2, "", "search", state, userAuthHeader);
+    @DisplayName("Test Authorize Missing Redirect Uri")
+    void testAuthorizeMissingRedirectUri() throws KustvaktException {
+        Response response = requestAuthorizationCode("code", publicClientId2, "", "search", state, userAuthHeader);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
-                node.at("/error").asText());
-        assertEquals("Missing parameter: redirect URI",
-                node.at("/error_description").asText());
+        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST, node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(), "Missing parameter: redirect URI");
         assertEquals(state, node.at("/state").asText());
     }
 
     @Test
-    public void testAuthorizeMissingResponseType() throws KustvaktException {
-        Response response = requestAuthorizationCode("",
-                confidentialClientId, "", "search", "", userAuthHeader);
-        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
-                response.getStatus());
-
-        assertEquals("https://third.party.com/confidential/redirect?"
-                + "error_description=Missing+parameters%3A+response_type&"
-                + "error=invalid_request", response.getLocation().toString());
+    @DisplayName("Test Authorize Missing Response Type")
+    void testAuthorizeMissingResponseType() throws KustvaktException {
+        Response response = requestAuthorizationCode("", confidentialClientId, "", "search", "", userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(), response.getStatus());
+        assertEquals("https://third.party.com/confidential/redirect?" + "error_description=Missing+parameters%3A+response_type&" + "error=invalid_request", response.getLocation().toString());
     }
-    
+
     @Test
-    public void testAuthorizeMissingResponseTypeWithoutClientId () throws KustvaktException {
-        Response response = requestAuthorizationCode("",
-                "", "", "search", "", userAuthHeader);
-        
-        assertEquals(Status.BAD_REQUEST.getStatusCode(),
-                response.getStatus());
+    @DisplayName("Test Authorize Missing Response Type Without Client Id")
+    void testAuthorizeMissingResponseTypeWithoutClientId() throws KustvaktException {
+        Response response = requestAuthorizationCode("", "", "", "search", "", userAuthHeader);
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        
-        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
-                node.at("/error").asText());
-        assertEquals("Missing parameters: response_type client_id",
-                node.at("/error_description").asText());
+        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST, node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(), "Missing parameters: response_type client_id");
     }
 
     @Test
-    public void testAuthorizeInvalidClientId () throws KustvaktException {
-        Response response = requestAuthorizationCode("code",
-                "unknown-client-id", "", "search", "", userAuthHeader);
+    @DisplayName("Test Authorize Invalid Client Id")
+    void testAuthorizeInvalidClientId() throws KustvaktException {
+        Response response = requestAuthorizationCode("code", "unknown-client-id", "", "search", "", userAuthHeader);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_CLIENT, node.at("/error").asText());
-        assertEquals("Unknown client: unknown-client-id",
-                node.at("/error_description").asText());
+        assertEquals(node.at("/error_description").asText(), "Unknown client: unknown-client-id");
     }
 
     @Test
-    public void testAuthorizeDifferentRedirectUri () throws KustvaktException {
+    @DisplayName("Test Authorize Different Redirect Uri")
+    void testAuthorizeDifferentRedirectUri() throws KustvaktException {
         String redirectUri = "https://different.uri/redirect";
-        Response response = requestAuthorizationCode("code",
-                confidentialClientId, redirectUri, "", state, userAuthHeader);
-        
-        testInvalidRedirectUri(response.readEntity(String.class), 
-                response.getHeaderString("Content-Type"),true,
-                response.getStatus());
+        Response response = requestAuthorizationCode("code", confidentialClientId, redirectUri, "", state, userAuthHeader);
+        testInvalidRedirectUri(response.readEntity(String.class), response.getHeaderString("Content-Type"), true, response.getStatus());
     }
 
     @Test
-    public void testAuthorizeWithRedirectUriLocalhost ()
-            throws KustvaktException {
-        Response response = requestAuthorizationCode("code", publicClientId2,
-                "http://localhost:1410", "search", state, userAuthHeader);
-        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
-                response.getStatus());
-
+    @DisplayName("Test Authorize With Redirect Uri Localhost")
+    void testAuthorizeWithRedirectUriLocalhost() throws KustvaktException {
+        Response response = requestAuthorizationCode("code", publicClientId2, "http://localhost:1410", "search", state, userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(), response.getStatus());
         URI redirectUri = response.getLocation();
-        MultivaluedMap<String, String> params =
-                getQueryParamsFromURI(redirectUri);
+        MultivaluedMap<String, String> params = getQueryParamsFromURI(redirectUri);
         assertNotNull(params.getFirst("code"));
         assertEquals(state, params.getFirst("state"));
-        assertEquals("search", params.getFirst("scope"));
+        assertEquals(params.getFirst("scope"), "search");
     }
 
     @Test
-    public void testAuthorizeWithRedirectUriFragment ()
-            throws KustvaktException {
-        Response response = requestAuthorizationCode("code",
-                publicClientId2, "http://public.com/index.html#redirect", "search",
-                state, userAuthHeader);
-        testInvalidRedirectUri(response.readEntity(String.class), 
-                response.getHeaderString("Content-Type"),true,
-                response.getStatus());
+    @DisplayName("Test Authorize With Redirect Uri Fragment")
+    void testAuthorizeWithRedirectUriFragment() throws KustvaktException {
+        Response response = requestAuthorizationCode("code", publicClientId2, "http://public.com/index.html#redirect", "search", state, userAuthHeader);
+        testInvalidRedirectUri(response.readEntity(String.class), response.getHeaderString("Content-Type"), true, response.getStatus());
     }
 
     @Test
-    public void testAuthorizeInvalidRedirectUri () throws KustvaktException {
+    @DisplayName("Test Authorize Invalid Redirect Uri")
+    void testAuthorizeInvalidRedirectUri() throws KustvaktException {
         // host not allowed by Apache URI Validator
         String redirectUri = "https://public.uri/redirect";
-        Response response = requestAuthorizationCode("code",
-                publicClientId2, redirectUri, "", state, userAuthHeader);
-        testInvalidRedirectUri(response.readEntity(String.class), 
-                response.getHeaderString("Content-Type"),true,
-                response.getStatus());
+        Response response = requestAuthorizationCode("code", publicClientId2, redirectUri, "", state, userAuthHeader);
+        testInvalidRedirectUri(response.readEntity(String.class), response.getHeaderString("Content-Type"), true, response.getStatus());
     }
 
     @Test
-    public void testAuthorizeInvalidResponseType () throws KustvaktException {
+    @DisplayName("Test Authorize Invalid Response Type")
+    void testAuthorizeInvalidResponseType() throws KustvaktException {
         // without redirect URI in the request
-        Response response = requestAuthorizationCode("string",
-                confidentialClientId, "", "search", state, userAuthHeader);
-        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
-                response.getStatus());
-
-        assertEquals("https://third.party.com/confidential/redirect?"
-                + "error_description=Invalid+response_type+parameter+"
-                + "value&state=thisIsMyState&" + "error=invalid_request",
-                response.getLocation().toString());
-
+        Response response = requestAuthorizationCode("string", confidentialClientId, "", "search", state, userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(), response.getStatus());
+        assertEquals("https://third.party.com/confidential/redirect?" + "error_description=Invalid+response_type+parameter+" + "value&state=thisIsMyState&" + "error=invalid_request", response.getLocation().toString());
         // with redirect URI, and no registered redirect URI
-        response = requestAuthorizationCode("string", publicClientId2,
-                "https://public.client.com/redirect", "", state,
-                userAuthHeader);
-        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
-                response.getStatus());
-
-        assertEquals("https://public.client.com/redirect?error_description="
-                + "Invalid+response_type+parameter+value&state=thisIsMyState&"
-                + "error=invalid_request", response.getLocation().toString());
-
+        response = requestAuthorizationCode("string", publicClientId2, "https://public.client.com/redirect", "", state, userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(), response.getStatus());
+        assertEquals("https://public.client.com/redirect?error_description=" + "Invalid+response_type+parameter+value&state=thisIsMyState&" + "error=invalid_request", response.getLocation().toString());
         // with different redirect URI
         String redirectUri = "https://different.uri/redirect";
-        response = requestAuthorizationCode("string", confidentialClientId,
-                redirectUri, "", state, userAuthHeader);
+        response = requestAuthorizationCode("string", confidentialClientId, redirectUri, "", state, userAuthHeader);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
-        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
-                node.at("/error").asText());
-        assertEquals("Invalid redirect URI",
-                node.at("/error_description").asText());
+        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST, node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(), "Invalid redirect URI");
         assertEquals(state, node.at("/state").asText());
-
         // without redirect URI in the request and no registered
         // redirect URI
-        response = requestAuthorizationCode("string", publicClientId2, "", "",
-                state, userAuthHeader);
+        response = requestAuthorizationCode("string", publicClientId2, "", "", state, userAuthHeader);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-
         node = JsonUtils.readTree(response.readEntity(String.class));
-        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
-                node.at("/error").asText());
-        assertEquals("Missing parameter: redirect URI",
-                node.at("/error_description").asText());
+        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST, node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(), "Missing parameter: redirect URI");
         assertEquals(state, node.at("/state").asText());
     }
 
     @Test
-    public void testAuthorizeInvalidScope () throws KustvaktException {
+    @DisplayName("Test Authorize Invalid Scope")
+    void testAuthorizeInvalidScope() throws KustvaktException {
         String scope = "read_address";
-        Response response = requestAuthorizationCode("code",
-                confidentialClientId, "", scope, state, userAuthHeader);
-        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
-                response.getStatus());
-
-        assertEquals(
-                "https://third.party.com/confidential/redirect?"
-                        + "error_description=read_address+is+an+invalid+scope&"
-                        + "state=thisIsMyState&error=invalid_scope",
-                response.getLocation().toString());
+        Response response = requestAuthorizationCode("code", confidentialClientId, "", scope, state, userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(), response.getStatus());
+        assertEquals("https://third.party.com/confidential/redirect?" + "error_description=read_address+is+an+invalid+scope&" + "state=thisIsMyState&error=invalid_scope", response.getLocation().toString());
     }
 
     @Test
-    public void testAuthorizeUnsupportedTokenResponseType ()
-            throws KustvaktException {
-        Response response = requestAuthorizationCode("token",
-                confidentialClientId, "", "search", state, userAuthHeader);
-        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
-                response.getStatus());
-
-        assertEquals("https://third.party.com/confidential/redirect?"
-                + "error_description=response_type+token+is+not+"
-                + "supported&state=thisIsMyState&error=unsupported_"
-                + "response_type", response.getLocation().toString());
+    @DisplayName("Test Authorize Unsupported Token Response Type")
+    void testAuthorizeUnsupportedTokenResponseType() throws KustvaktException {
+        Response response = requestAuthorizationCode("token", confidentialClientId, "", "search", state, userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(), response.getStatus());
+        assertEquals("https://third.party.com/confidential/redirect?" + "error_description=response_type+token+is+not+" + "supported&state=thisIsMyState&error=unsupported_" + "response_type", response.getLocation().toString());
     }
 
     @Test
-    public void testRequestTokenAuthorizationPublic ()
-            throws KustvaktException {
+    @DisplayName("Test Request Token Authorization Public")
+    void testRequestTokenAuthorizationPublic() throws KustvaktException {
         String code = requestAuthorizationCode(publicClientId, userAuthHeader);
-
-        Response response = requestTokenWithAuthorizationCodeAndForm(
-                publicClientId, clientSecret, code);
+        Response response = requestTokenWithAuthorizationCodeAndForm(publicClientId, clientSecret, code);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-
         String accessToken = node.at("/access_token").asText();
-
-        assertEquals(TokenType.BEARER.toString(),
-                node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
         assertEquals(31536000, node.at("/expires_in").asInt());
-
         testRevokeToken(accessToken, publicClientId, null, ACCESS_TOKEN_TYPE);
-
         assertTrue(node.at("/refresh_token").isMissingNode());
     }
 
     @Test
-    public void testRequestTokenAuthorizationConfidential ()
-            throws KustvaktException {
-
+    @DisplayName("Test Request Token Authorization Confidential")
+    void testRequestTokenAuthorizationConfidential() throws KustvaktException {
         String scope = "search";
-        Response response = requestAuthorizationCode("code",
-                confidentialClientId, "", scope, state, userAuthHeader);
-        MultivaluedMap<String, String> params =
-                getQueryParamsFromURI(response.getLocation());
+        Response response = requestAuthorizationCode("code", confidentialClientId, "", scope, state, userAuthHeader);
+        MultivaluedMap<String, String> params = getQueryParamsFromURI(response.getLocation());
         String code = params.get("code").get(0);
         String scopes = params.get("scope").get(0);
-
         assertEquals(scopes, "search");
-
-        response = requestTokenWithAuthorizationCodeAndForm(
-                confidentialClientId, clientSecret, code);
+        response = requestTokenWithAuthorizationCodeAndForm(confidentialClientId, clientSecret, code);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());
-        assertEquals(TokenType.BEARER.toString(),
-                node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
-
         testRequestTokenWithUsedAuthorization(code);
-
         String refreshToken = node.at("/refresh_token").asText();
-        
         testRefreshTokenExpiry(refreshToken);
         testRequestRefreshTokenInvalidScope(confidentialClientId, refreshToken);
         testRequestRefreshTokenInvalidClient(refreshToken);
         testRequestRefreshTokenInvalidRefreshToken(confidentialClientId);
-
-        testRequestRefreshToken(confidentialClientId, clientSecret,
-                refreshToken);
+        testRequestRefreshToken(confidentialClientId, clientSecret, refreshToken);
     }
 
-    private void testRequestTokenWithUsedAuthorization (String code)
-            throws KustvaktException {
-        Response response = requestTokenWithAuthorizationCodeAndForm(
-                confidentialClientId, clientSecret, code);
+    private void testRequestTokenWithUsedAuthorization(String code) throws KustvaktException {
+        Response response = requestTokenWithAuthorizationCodeAndForm(confidentialClientId, clientSecret, code);
         String entity = response.readEntity(String.class);
-
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_GRANT,
-                node.at("/error").asText());
-        assertEquals("Invalid authorization",
-                node.at("/error_description").asText());
+        assertEquals(OAuthError.TokenResponse.INVALID_GRANT, node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(), "Invalid authorization");
     }
 
     @Test
-    public void testRequestTokenInvalidAuthorizationCode ()
-            throws KustvaktException {
-        Response response = requestTokenWithAuthorizationCodeAndForm(
-                confidentialClientId, clientSecret, "blahblah");
+    @DisplayName("Test Request Token Invalid Authorization Code")
+    void testRequestTokenInvalidAuthorizationCode() throws KustvaktException {
+        Response response = requestTokenWithAuthorizationCodeAndForm(confidentialClientId, clientSecret, "blahblah");
         String entity = response.readEntity(String.class);
-
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
-                node.at("/error").asText());
+        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST, node.at("/error").asText());
     }
 
     @Test
-    public void testRequestTokenAuthorizationReplyAttack ()
-            throws KustvaktException {
+    @DisplayName("Test Request Token Authorization Reply Attack")
+    void testRequestTokenAuthorizationReplyAttack() throws KustvaktException {
         String redirect_uri = "https://third.party.com/confidential/redirect";
         String scope = "search";
-
-        Response response =
-                requestAuthorizationCode("code", confidentialClientId,
-                        redirect_uri, scope, state, userAuthHeader);
+        Response response = requestAuthorizationCode("code", confidentialClientId, redirect_uri, scope, state, userAuthHeader);
         String code = parseAuthorizationCode(response);
-
         testRequestTokenAuthorizationInvalidClient(code);
         testRequestTokenAuthorizationMissingRedirectUri(code);
         testRequestTokenAuthorizationInvalidRedirectUri(code);
         testRequestTokenAuthorizationRevoked(code, redirect_uri);
-        
     }
 
-    private void testRequestTokenAuthorizationInvalidClient (String code)
-            throws KustvaktException {
-        Response response = requestTokenWithAuthorizationCodeAndForm(
-                confidentialClientId, "wrong_secret", code);
+    private void testRequestTokenAuthorizationInvalidClient(String code) throws KustvaktException {
+        Response response = requestTokenWithAuthorizationCodeAndForm(confidentialClientId, "wrong_secret", code);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_CLIENT, node.at("/error").asText());
     }
-    
-    private void testRequestTokenAuthorizationMissingRedirectUri (String code)
-            throws KustvaktException {
-        Response response = requestTokenWithAuthorizationCodeAndForm(
-                confidentialClientId, "secret", code);
+
+    private void testRequestTokenAuthorizationMissingRedirectUri(String code) throws KustvaktException {
+        Response response = requestTokenWithAuthorizationCodeAndForm(confidentialClientId, "secret", code);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
-        assertEquals("Missing redirect URI",
-                node.at("/error_description").asText());
+        assertEquals(node.at("/error_description").asText(), "Missing redirect URI");
     }
 
-    private void testRequestTokenAuthorizationInvalidRedirectUri (String code)
-            throws KustvaktException {
+    private void testRequestTokenAuthorizationInvalidRedirectUri(String code) throws KustvaktException {
         Form tokenForm = new Form();
         tokenForm.param("grant_type", "authorization_code");
         tokenForm.param("client_id", confidentialClientId);
         tokenForm.param("client_secret", "secret");
         tokenForm.param("code", code);
         tokenForm.param("redirect_uri", "https://blahblah.com");
-
         Response response = requestToken(tokenForm);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
     }
 
-    private void testRequestTokenAuthorizationRevoked (String code, String uri)
-            throws KustvaktException {
+    private void testRequestTokenAuthorizationRevoked(String code, String uri) throws KustvaktException {
         Form tokenForm = new Form();
         tokenForm.param("grant_type", "authorization_code");
         tokenForm.param("client_id", confidentialClientId);
         tokenForm.param("client_secret", "secret");
         tokenForm.param("code", code);
         tokenForm.param("redirect_uri", uri);
-
         Response response = requestToken(tokenForm);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_GRANT,
-                node.at("/error").asText());
-        assertEquals("Invalid authorization",
-                node.at("/error_description").asText());
+        assertEquals(OAuthError.TokenResponse.INVALID_GRANT, node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(), "Invalid authorization");
     }
 
     @Test
-    public void testRequestTokenPasswordGrantConfidentialSuper ()
-            throws KustvaktException {
-        Response response =
-                requestTokenWithDoryPassword(superClientId, clientSecret);
-
+    @DisplayName("Test Request Token Password Grant Confidential Super")
+    void testRequestTokenPasswordGrantConfidentialSuper() throws KustvaktException {
+        Response response = requestTokenWithDoryPassword(superClientId, clientSecret);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        
         assertNotNull(node.at("/access_token").asText());
-        assertEquals(TokenType.BEARER.toString(),
-                node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
-        assertEquals("all",node.at("/scope").asText());
-        
-        
+        assertEquals(node.at("/scope").asText(), "all");
         String refresh = node.at("/refresh_token").asText();
-        RefreshToken refreshToken =
-                refreshTokenDao.retrieveRefreshToken(refresh);
+        RefreshToken refreshToken = refreshTokenDao.retrieveRefreshToken(refresh);
         Set<AccessScope> scopes = refreshToken.getScopes();
         assertEquals(1, scopes.size());
-        assertEquals("[all]", scopes.toString());
-        
+        assertEquals(scopes.toString(), "[all]");
         testRefreshTokenExpiry(refresh);
     }
-    
+
     @Test
-    public void testRequestTokenPasswordGrantWithScope ()
-            throws KustvaktException {
-        
-        String scope ="match_info search";
-        
+    @DisplayName("Test Request Token Password Grant With Scope")
+    void testRequestTokenPasswordGrantWithScope() throws KustvaktException {
+        String scope = "match_info search";
         Form form = new Form();
         form.param("grant_type", "password");
         form.param("client_id", superClientId);
         form.param("client_secret", clientSecret);
         form.param("username", "dory");
         form.param("password", "pwd");
-        form.param("scope",scope);
-        
+        form.param("scope", scope);
         Response response = requestToken(form);
-
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        
         assertNotNull(node.at("/access_token").asText());
-        assertEquals(TokenType.BEARER.toString(),
-                node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
-        
-        assertEquals(scope,node.at("/scope").asText());
-        
+        assertEquals(scope, node.at("/scope").asText());
         String refreshToken = node.at("/refresh_token").asText();
-        testRequestRefreshTokenWithUnauthorizedScope(superClientId, clientSecret,
-                refreshToken,"all");
-        
-        testRequestRefreshTokenWithScope(superClientId, clientSecret,
-                refreshToken,"search");
+        testRequestRefreshTokenWithUnauthorizedScope(superClientId, clientSecret, refreshToken, "all");
+        testRequestRefreshTokenWithScope(superClientId, clientSecret, refreshToken, "search");
     }
 
     @Test
-    public void testRequestTokenPasswordGrantConfidentialNonSuper ()
-            throws KustvaktException {
-        Response response = requestTokenWithDoryPassword(
-                confidentialClientId, clientSecret);
+    @DisplayName("Test Request Token Password Grant Confidential Non Super")
+    void testRequestTokenPasswordGrantConfidentialNonSuper() throws KustvaktException {
+        Response response = requestTokenWithDoryPassword(confidentialClientId, clientSecret);
         String entity = response.readEntity(String.class);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.UNAUTHORIZED_CLIENT,
-                node.at("/error").asText());
-        assertEquals("Password grant is not allowed for third party clients",
-                node.at("/error_description").asText());
+        assertEquals(OAuthError.TokenResponse.UNAUTHORIZED_CLIENT, node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(), "Password grant is not allowed for third party clients");
     }
 
     @Test
-    public void testRequestTokenPasswordGrantPublic ()
-            throws KustvaktException {
-        Response response =
-                requestTokenWithDoryPassword(publicClientId, "");
+    @DisplayName("Test Request Token Password Grant Public")
+    void testRequestTokenPasswordGrantPublic() throws KustvaktException {
+        Response response = requestTokenWithDoryPassword(publicClientId, "");
         String entity = response.readEntity(String.class);
-
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuth2Error.UNAUTHORIZED_CLIENT,
-                node.at("/error").asText());
-        assertEquals("Password grant is not allowed for third party clients",
-                node.at("/error_description").asText());
+        assertEquals(OAuth2Error.UNAUTHORIZED_CLIENT, node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(), "Password grant is not allowed for third party clients");
     }
 
     @Test
-    public void testRequestTokenPasswordGrantAuthorizationHeader ()
-            throws KustvaktException {
+    @DisplayName("Test Request Token Password Grant Authorization Header")
+    void testRequestTokenPasswordGrantAuthorizationHeader() throws KustvaktException {
         Form form = new Form();
         form.param("grant_type", "password");
         form.param("client_id", superClientId);
         form.param("username", "dory");
         form.param("password", "password");
-
-        Response response =
-                target().path(API_VERSION).path("oauth2").path("token")
-                        .request()
-                        .header(HttpHeaders.AUTHORIZATION,
-                                "Basic ZkNCYlFrQXlZekk0TnpVeE1nOnNlY3JldA==")
-                        .header(HttpHeaders.CONTENT_TYPE,
-                                ContentType.APPLICATION_FORM_URLENCODED)
-                        .post(Entity.form(form));
+        Response response = target().path(API_VERSION).path("oauth2").path("token").request().header(HttpHeaders.AUTHORIZATION, "Basic ZkNCYlFrQXlZekk0TnpVeE1nOnNlY3JldA==").header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED).post(Entity.form(form));
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());
-        assertEquals(TokenType.BEARER.toString(),
-                node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
     }
 
     /**
      * In case, client_id is specified both in Authorization header
      * and request body, client_id in the request body is ignored.
-     * 
+     *
      * @throws KustvaktException
      */
     @Test
-    public void testRequestTokenPasswordGrantDifferentClientIds ()
-            throws KustvaktException {
+    @DisplayName("Test Request Token Password Grant Different Client Ids")
+    void testRequestTokenPasswordGrantDifferentClientIds() throws KustvaktException {
         Form form = new Form();
         form.param("grant_type", "password");
         form.param("client_id", "9aHsGW6QflV13ixNpez");
         form.param("username", "dory");
         form.param("password", "password");
-
-        Response response =
-                target().path(API_VERSION).path("oauth2").path("token")
-                        .request()
-                        .header(HttpHeaders.AUTHORIZATION,
-                                "Basic ZkNCYlFrQXlZekk0TnpVeE1nOnNlY3JldA==")
-                        .header(HttpHeaders.CONTENT_TYPE,
-                                ContentType.APPLICATION_FORM_URLENCODED)
-                        .post(Entity.form(form));
+        Response response = target().path(API_VERSION).path("oauth2").path("token").request().header(HttpHeaders.AUTHORIZATION, "Basic ZkNCYlFrQXlZekk0TnpVeE1nOnNlY3JldA==").header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED).post(Entity.form(form));
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());
-        assertEquals(TokenType.BEARER.toString(),
-                node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
     }
 
     @Test
-    public void testRequestTokenPasswordGrantMissingClientSecret ()
-            throws KustvaktException {
-        Response response =
-                requestTokenWithDoryPassword(confidentialClientId, "");
+    @DisplayName("Test Request Token Password Grant Missing Client Secret")
+    void testRequestTokenPasswordGrantMissingClientSecret() throws KustvaktException {
+        Response response = requestTokenWithDoryPassword(confidentialClientId, "");
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
-                node.at("/error").asText());
-        assertEquals("Missing parameter: client_secret",
-                node.at("/error_description").asText());
+        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST, node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(), "Missing parameter: client_secret");
     }
 
     @Test
-    public void testRequestTokenPasswordGrantMissingClientId ()
-            throws KustvaktException {
-        Response response =
-                requestTokenWithDoryPassword(null, clientSecret);
+    @DisplayName("Test Request Token Password Grant Missing Client Id")
+    void testRequestTokenPasswordGrantMissingClientId() throws KustvaktException {
+        Response response = requestTokenWithDoryPassword(null, clientSecret);
         String entity = response.readEntity(String.class);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
-                node.at("/error").asText());
-        assertEquals("Missing parameters: client_id",
-                node.at("/error_description").asText());
+        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST, node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(), "Missing parameters: client_id");
     }
 
     @Test
-    public void testRequestTokenClientCredentialsGrant ()
-            throws KustvaktException {
-
+    @DisplayName("Test Request Token Client Credentials Grant")
+    void testRequestTokenClientCredentialsGrant() throws KustvaktException {
         Form form = new Form();
         form.param("grant_type", "client_credentials");
         form.param("client_id", confidentialClientId);
@@ -656,13 +480,11 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         Response response = requestToken(form);
         String entity = response.readEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
         JsonNode node = JsonUtils.readTree(entity);
         // length?
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());
-        assertEquals(TokenType.BEARER.toString(),
-                node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
     }
 
@@ -671,395 +493,259 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
      * clients.
      */
     @Test
-    public void testRequestTokenClientCredentialsGrantPublic ()
-            throws KustvaktException {
-
+    @DisplayName("Test Request Token Client Credentials Grant Public")
+    void testRequestTokenClientCredentialsGrantPublic() throws KustvaktException {
         Form form = new Form();
         form.param("grant_type", "client_credentials");
         form.param("client_id", publicClientId);
         form.param("client_secret", "");
         Response response = requestToken(form);
-
         String entity = response.readEntity(String.class);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
-                node.at("/error").asText());
-        assertEquals("Missing parameters: client_secret",
-                node.at("/error_description").asText());
+        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST, node.at("/error").asText());
+        assertEquals(node.at("/error_description").asText(), "Missing parameters: client_secret");
     }
 
     @Test
-    public void testRequestTokenClientCredentialsGrantReducedScope ()
-            throws KustvaktException {
-
+    @DisplayName("Test Request Token Client Credentials Grant Reduced Scope")
+    void testRequestTokenClientCredentialsGrantReducedScope() throws KustvaktException {
         Form form = new Form();
         form.param("grant_type", "client_credentials");
         form.param("client_id", confidentialClientId);
         form.param("client_secret", "secret");
         form.param("scope", "preferred_username client_info");
-
         Response response = requestToken(form);
         String entity = response.readEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
         JsonNode node = JsonUtils.readTree(entity);
         // length?
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());
-        assertEquals(TokenType.BEARER.toString(),
-                node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
-        assertEquals("client_info", node.at("/scope").asText());
+        assertEquals(node.at("/scope").asText(), "client_info");
     }
 
     @Test
-    public void testRequestTokenMissingGrantType () throws KustvaktException {
+    @DisplayName("Test Request Token Missing Grant Type")
+    void testRequestTokenMissingGrantType() throws KustvaktException {
         Form form = new Form();
         Response response = requestToken(form);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
-                node.at("/error").asText());
+        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST, node.at("/error").asText());
     }
 
     @Test
-    public void testRequestTokenUnsupportedGrant () throws KustvaktException {
-
+    @DisplayName("Test Request Token Unsupported Grant")
+    void testRequestTokenUnsupportedGrant() throws KustvaktException {
         Form form = new Form();
         form.param("grant_type", "blahblah");
-
-        Response response =
-                target().path(API_VERSION).path("oauth2").path("token")
-                        .request()
-                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                        .header(HttpHeaders.CONTENT_TYPE,
-                                ContentType.APPLICATION_FORM_URLENCODED)
-                        .post(Entity.form(form));
-
+        Response response = target().path(API_VERSION).path("oauth2").path("token").request().header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED).post(Entity.form(form));
         String entity = response.readEntity(String.class);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals("Invalid grant_type parameter value",
-                node.get("error_description").asText());
-        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
-                node.get("error").asText());
+        assertEquals(node.get("error_description").asText(), "Invalid grant_type parameter value");
+        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST, node.get("error").asText());
     }
 
-    private void testRequestRefreshTokenInvalidScope (String clientId,
-            String refreshToken) throws KustvaktException {
+    private void testRequestRefreshTokenInvalidScope(String clientId, String refreshToken) throws KustvaktException {
         Form form = new Form();
         form.param("grant_type", GrantType.REFRESH_TOKEN.toString());
         form.param("client_id", clientId);
         form.param("client_secret", clientSecret);
         form.param("refresh_token", refreshToken);
         form.param("scope", "search serialize_query");
-
-        Response response =
-                target().path(API_VERSION).path("oauth2").path("token")
-                        .request()
-                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                        .header(HttpHeaders.CONTENT_TYPE,
-                                ContentType.APPLICATION_FORM_URLENCODED)
-                        .post(Entity.form(form));
-
+        Response response = target().path(API_VERSION).path("oauth2").path("token").request().header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED).post(Entity.form(form));
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_SCOPE, node.at("/error").asText());
     }
 
-    private void testRequestRefreshToken (String clientId, String clientSecret,
-            String refreshToken) throws KustvaktException {
+    private void testRequestRefreshToken(String clientId, String clientSecret, String refreshToken) throws KustvaktException {
         Form form = new Form();
         form.param("grant_type", GrantType.REFRESH_TOKEN.toString());
         form.param("client_id", clientId);
         form.param("client_secret", clientSecret);
         form.param("refresh_token", refreshToken);
-
-        Response response =
-                target().path(API_VERSION).path("oauth2").path("token")
-                        .request()
-                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                        .header(HttpHeaders.CONTENT_TYPE,
-                                ContentType.APPLICATION_FORM_URLENCODED)
-                        .post(Entity.form(form));
-
+        Response response = target().path(API_VERSION).path("oauth2").path("token").request().header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED).post(Entity.form(form));
         String entity = response.readEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
-
         String newRefreshToken = node.at("/refresh_token").asText();
         assertNotNull(newRefreshToken);
-        assertEquals(TokenType.BEARER.toString(),
-                node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
-
         assertTrue(!newRefreshToken.equals(refreshToken));
-
-        testRequestTokenWithRevokedRefreshToken(clientId, clientSecret,
-                refreshToken);
-
-        testRevokeToken(newRefreshToken, clientId, clientSecret,
-                REFRESH_TOKEN_TYPE);
-        testRequestTokenWithRevokedRefreshToken(clientId, clientSecret,
-                newRefreshToken);
+        testRequestTokenWithRevokedRefreshToken(clientId, clientSecret, refreshToken);
+        testRevokeToken(newRefreshToken, clientId, clientSecret, REFRESH_TOKEN_TYPE);
+        testRequestTokenWithRevokedRefreshToken(clientId, clientSecret, newRefreshToken);
     }
 
-    
-    private void testRequestRefreshTokenWithUnauthorizedScope (String clientId,
-            String clientSecret, String refreshToken, String scope)
-            throws KustvaktException {
+    private void testRequestRefreshTokenWithUnauthorizedScope(String clientId, String clientSecret, String refreshToken, String scope) throws KustvaktException {
         Form form = new Form();
         form.param("grant_type", GrantType.REFRESH_TOKEN.toString());
         form.param("client_id", clientId);
         form.param("client_secret", clientSecret);
         form.param("refresh_token", refreshToken);
         form.param("scope", scope);
-
-        Response response = target().path(API_VERSION).path("oauth2")
-                .path("token").request()
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .post(Entity.form(form));
-
+        Response response = target().path(API_VERSION).path("oauth2").path("token").request().header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED).post(Entity.form(form));
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_SCOPE, node.at("/error").asText());
     }
-    
-    private void testRequestRefreshTokenWithScope (String clientId, String clientSecret,
-            String refreshToken, String scope) throws KustvaktException {
+
+    private void testRequestRefreshTokenWithScope(String clientId, String clientSecret, String refreshToken, String scope) throws KustvaktException {
         Form form = new Form();
         form.param("grant_type", GrantType.REFRESH_TOKEN.toString());
         form.param("client_id", clientId);
         form.param("client_secret", clientSecret);
         form.param("refresh_token", refreshToken);
-        form.param("scope",scope);
-
-        Response response =
-                target().path(API_VERSION).path("oauth2").path("token")
-                        .request()
-                        .header(HttpHeaders.CONTENT_TYPE,
-                                ContentType.APPLICATION_FORM_URLENCODED)
-                        .post(Entity.form(form));
-
+        form.param("scope", scope);
+        Response response = target().path(API_VERSION).path("oauth2").path("token").request().header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED).post(Entity.form(form));
         String entity = response.readEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
-        
         String newRefreshToken = node.at("/refresh_token").asText();
         assertNotNull(newRefreshToken);
-        assertEquals(TokenType.BEARER.toString(),
-                node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
-
         assertTrue(!newRefreshToken.equals(refreshToken));
-        
-        assertEquals(scope,node.at("/scope").asText());
+        assertEquals(scope, node.at("/scope").asText());
     }
-    
-    private void testRequestRefreshTokenInvalidClient (String refreshToken)
-            throws KustvaktException {
+
+    private void testRequestRefreshTokenInvalidClient(String refreshToken) throws KustvaktException {
         Form form = new Form();
         form.param("grant_type", GrantType.REFRESH_TOKEN.toString());
         form.param("client_id", "iBr3LsTCxOj7D2o0A5m");
         form.param("refresh_token", refreshToken);
-
-        Response response =
-                target().path(API_VERSION).path("oauth2").path("token")
-                        .request()
-                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                        .header(HttpHeaders.CONTENT_TYPE,
-                                ContentType.APPLICATION_FORM_URLENCODED)
-                        .post(Entity.form(form));
-
+        Response response = target().path(API_VERSION).path("oauth2").path("token").request().header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED).post(Entity.form(form));
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_CLIENT, node.at("/error").asText());
     }
 
-    private void testRequestRefreshTokenInvalidRefreshToken (String clientId)
-            throws KustvaktException {
+    private void testRequestRefreshTokenInvalidRefreshToken(String clientId) throws KustvaktException {
         Form form = new Form();
         form.param("grant_type", GrantType.REFRESH_TOKEN.toString());
         form.param("client_id", clientId);
         form.param("client_secret", clientSecret);
         form.param("refresh_token", "Lia8s8w8tJeZSBlaQDrYV8ion3l");
-
-        Response response =
-                target().path(API_VERSION).path("oauth2").path("token")
-                        .request()
-                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                        .header(HttpHeaders.CONTENT_TYPE,
-                                ContentType.APPLICATION_FORM_URLENCODED)
-                        .post(Entity.form(form));
-
+        Response response = target().path(API_VERSION).path("oauth2").path("token").request().header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED).post(Entity.form(form));
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
     }
 
-    private JsonNode requestTokenList (String userAuthHeader, String tokenType,
-            String clientId) throws KustvaktException {
+    private JsonNode requestTokenList(String userAuthHeader, String tokenType, String clientId) throws KustvaktException {
         Form form = new Form();
         form.param("super_client_id", superClientId);
         form.param("super_client_secret", clientSecret);
         form.param("token_type", tokenType);
-
         if (clientId != null && !clientId.isEmpty()) {
             form.param("client_id", clientId);
         }
-
-        Response response = target().path(API_VERSION).path("oauth2")
-                .path("token").path("list")
-                .request()
-                .header(Attributes.AUTHORIZATION, userAuthHeader)
-                .header(HttpHeaders.CONTENT_TYPE,
-                        ContentType.APPLICATION_FORM_URLENCODED)
-                .post(Entity.form(form));
-
+        Response response = target().path(API_VERSION).path("oauth2").path("token").path("list").request().header(Attributes.AUTHORIZATION, userAuthHeader).header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED).post(Entity.form(form));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
         String entity = response.readEntity(String.class);
         return JsonUtils.readTree(entity);
     }
 
-    private JsonNode requestTokenList (String userAuthHeader, String tokenType)
-            throws KustvaktException {
+    private JsonNode requestTokenList(String userAuthHeader, String tokenType) throws KustvaktException {
         return requestTokenList(userAuthHeader, tokenType, null);
     }
 
     @Test
-    public void testListRefreshTokenConfidentialClient ()
-            throws KustvaktException {
+    @DisplayName("Test List Refresh Token Confidential Client")
+    void testListRefreshTokenConfidentialClient() throws KustvaktException {
         String username = "gurgle";
         String password = "pwd";
-        userAuthHeader = HttpAuthorizationHandler
-                .createBasicAuthorizationHeaderValue(username, password);
-
+        userAuthHeader = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(username, password);
         // super client
-        Response response = requestTokenWithPassword(superClientId,
-                clientSecret, username, password);
+        Response response = requestTokenWithPassword(superClientId, clientSecret, username, password);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         String refreshToken1 = node.at("/refresh_token").asText();
-
         // client 1
-        String code =
-                requestAuthorizationCode(confidentialClientId, userAuthHeader);
-        response = requestTokenWithAuthorizationCodeAndForm(
-                confidentialClientId, clientSecret, code);
+        String code = requestAuthorizationCode(confidentialClientId, userAuthHeader);
+        response = requestTokenWithAuthorizationCodeAndForm(confidentialClientId, clientSecret, code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
         // client 2
-        code = requestAuthorizationCode(confidentialClientId2,
-                clientRedirectUri, userAuthHeader);
-        response = requestTokenWithAuthorizationCodeAndForm(
-                confidentialClientId2, clientSecret, code, clientRedirectUri);
+        code = requestAuthorizationCode(confidentialClientId2, clientRedirectUri, userAuthHeader);
+        response = requestTokenWithAuthorizationCodeAndForm(confidentialClientId2, clientSecret, code, clientRedirectUri);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
         // list
         node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(2, node.size());
         assertEquals(confidentialClientId, node.at("/0/client_id").asText());
         assertEquals(confidentialClientId2, node.at("/1/client_id").asText());
-
         // client 1
         code = requestAuthorizationCode(confidentialClientId, userAuthHeader);
-        response = requestTokenWithAuthorizationCodeAndForm(
-                confidentialClientId, clientSecret, code);
+        response = requestTokenWithAuthorizationCodeAndForm(confidentialClientId, clientSecret, code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-
         // another user
-        String darlaAuthHeader = HttpAuthorizationHandler
-                .createBasicAuthorizationHeaderValue("darla", "pwd");
-
+        String darlaAuthHeader = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("darla", "pwd");
         // test listing clients
         node = requestTokenList(darlaAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(0, node.size());
-
         // client 1
         code = requestAuthorizationCode(confidentialClientId, darlaAuthHeader);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        response = requestTokenWithAuthorizationCodeAndForm(
-                confidentialClientId, clientSecret, code);
-
+        response = requestTokenWithAuthorizationCodeAndForm(confidentialClientId, clientSecret, code);
         node = JsonUtils.readTree(response.readEntity(String.class));
         String refreshToken5 = node.at("/refresh_token").asText();
-
         // list all refresh tokens
         node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(3, node.size());
-
         // list refresh tokens from client 1
-        node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE,
-                confidentialClientId);
+        node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE, confidentialClientId);
         assertEquals(2, node.size());
-
-        testRevokeToken(refreshToken1, superClientId, clientSecret,
-                REFRESH_TOKEN_TYPE);
-        testRevokeToken(node.at("/0/token").asText(), confidentialClientId,
-                clientSecret, REFRESH_TOKEN_TYPE);
-        testRevokeToken(node.at("/1/token").asText(), confidentialClientId2,
-                clientSecret, REFRESH_TOKEN_TYPE);
-
+        testRevokeToken(refreshToken1, superClientId, clientSecret, REFRESH_TOKEN_TYPE);
+        testRevokeToken(node.at("/0/token").asText(), confidentialClientId, clientSecret, REFRESH_TOKEN_TYPE);
+        testRevokeToken(node.at("/1/token").asText(), confidentialClientId2, clientSecret, REFRESH_TOKEN_TYPE);
         node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(1, node.size());
-
-        testRevokeTokenViaSuperClient(node.at("/0/token").asText(),
-                userAuthHeader);
+        testRevokeTokenViaSuperClient(node.at("/0/token").asText(), userAuthHeader);
         node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(0, node.size());
-
         // try revoking a token belonging to another user
         // should not return any errors
         testRevokeTokenViaSuperClient(refreshToken5, userAuthHeader);
         node = requestTokenList(darlaAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(1, node.size());
-
         testRevokeTokenViaSuperClient(refreshToken5, darlaAuthHeader);
         node = requestTokenList(darlaAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(0, node.size());
     }
 
     @Test
-    public void testListTokenPublicClient () throws KustvaktException {
+    @DisplayName("Test List Token Public Client")
+    void testListTokenPublicClient() throws KustvaktException {
         String username = "nemo";
         String password = "pwd";
-        userAuthHeader = HttpAuthorizationHandler
-                .createBasicAuthorizationHeaderValue(username, password);
-
+        userAuthHeader = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(username, password);
         // access token 1
         String code = requestAuthorizationCode(publicClientId, userAuthHeader);
-        Response response = requestTokenWithAuthorizationCodeAndForm(
-                publicClientId, "", code);
+        Response response = requestTokenWithAuthorizationCodeAndForm(publicClientId, "", code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         String accessToken1 = node.at("/access_token").asText();
-
         // access token 2
         code = requestAuthorizationCode(publicClientId, userAuthHeader);
-        response = requestTokenWithAuthorizationCodeAndForm(publicClientId, "",
-                code);
+        response = requestTokenWithAuthorizationCodeAndForm(publicClientId, "", code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         node = JsonUtils.readTree(response.readEntity(String.class));
         String accessToken2 = node.at("/access_token").asText();
-
         // list access tokens
         node = requestTokenList(userAuthHeader, ACCESS_TOKEN_TYPE);
         assertEquals(2, node.size());
-
         // list refresh tokens
         node = requestTokenList(userAuthHeader, REFRESH_TOKEN_TYPE);
         assertEquals(0, node.size());
-
         testRevokeTokenViaSuperClient(accessToken1, userAuthHeader);
         node = requestTokenList(userAuthHeader, ACCESS_TOKEN_TYPE);
         // System.out.println(node);
@@ -1069,22 +755,18 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertNotNull(node.at("/0/created_date").asText());
         assertNotNull(node.at("/0/expires_in").asLong());
         assertNotNull(node.at("/0/user_authentication_time").asText());
-
         assertEquals(publicClientId, node.at("/0/client_id").asText());
         assertNotNull(node.at("/0/client_name").asText());
         assertNotNull(node.at("/0/client_description").asText());
         assertNotNull(node.at("/0/client_url").asText());
-
         testRevokeTokenViaSuperClient(accessToken2, userAuthHeader);
         node = requestTokenList(userAuthHeader, ACCESS_TOKEN_TYPE);
         assertEquals(0, node.size());
     }
-    
-    private void testRefreshTokenExpiry (String refreshToken)
-            throws KustvaktException {
+
+    private void testRefreshTokenExpiry(String refreshToken) throws KustvaktException {
         RefreshToken token = refreshTokenDao.retrieveRefreshToken(refreshToken);
-        ZonedDateTime expiry = token.getCreatedDate()
-                .plusSeconds(config.getRefreshTokenLongExpiry());
+        ZonedDateTime expiry = token.getCreatedDate().plusSeconds(config.getRefreshTokenLongExpiry());
         assertTrue(expiry.equals(token.getExpiryDate()));
     }
 }
