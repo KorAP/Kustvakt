@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5916f50b_49ffdeae",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2023-09-22T15:49:17Z",
+      "side": 1,
+      "message": "Of course, \"with cannons on birds\" wrt to the CI test issue, but more importantly killing also the second bird with one stone 😄\n\nSee CI test here:\n\nhttps://github.com/morckx/Kustvakt/actions/runs/6276290813/job/17045628333",
+      "revId": "412bb7115b74602ce0171240539524ad5f307b16",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
