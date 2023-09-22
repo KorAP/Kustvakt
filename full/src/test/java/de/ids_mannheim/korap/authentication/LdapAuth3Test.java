@@ -10,50 +10,55 @@ import com.unboundid.util.ssl.KeyStoreKeyManager;
 import com.unboundid.util.ssl.SSLUtil;
 import com.unboundid.util.ssl.TrustAllTrustManager;
 import com.unboundid.util.ssl.TrustStoreTrustManager;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.security.GeneralSecurityException;
 
 import static de.ids_mannheim.korap.authentication.LdapAuth3.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class LdapAuth3Test {
+
     public static final String TEST_LDAP_CONF = "src/test/resources/test-ldap.conf";
+
     public static final String TEST_LDAPS_CONF = "src/test/resources/test-ldaps.conf";
+
     public static final String TEST_LDAPS_TS_CONF = "src/test/resources/test-ldaps-with-truststore.conf";
+
     public static final String TEST_LDAP_USERS_LDIF = "src/test/resources/test-ldap-users.ldif";
+
     private static final String keyStorePath = "src/test/resources/keystore.p12";
+
     static InMemoryDirectoryServer server;
 
-    @BeforeClass
-    public static void startDirectoryServer() throws LDAPException, GeneralSecurityException {
+    @BeforeAll
+    static void startDirectoryServer() throws LDAPException, GeneralSecurityException {
         InMemoryDirectoryServerConfig config = new InMemoryDirectoryServerConfig("dc=example,dc=com");
         config.addAdditionalBindCredentials("cn=admin,dc=example,dc=com", "adminpassword");
         config.setSchema(null);
-
         final SSLUtil serverSSLUtil = new SSLUtil(new KeyStoreKeyManager(keyStorePath, "password".toCharArray(), "PKCS12", "server-cert"), new TrustStoreTrustManager(keyStorePath));
-
         final SSLUtil clientSslUtil = new SSLUtil(new TrustAllTrustManager());
-
-        config.setListenerConfigs(InMemoryListenerConfig.createLDAPConfig("LDAP", // Listener name
-                        null, // Listen address. (null = listen on all interfaces)
-                        3268, // Listen port (0 = automatically choose an available port)
-                        clientSslUtil.createSSLSocketFactory()), // StartTLS factory
-                InMemoryListenerConfig.createLDAPSConfig("LDAPS", // Listener name
-                        null, // Listen address. (null = listen on all interfaces)
-                        3269, // Listen port (0 = automatically choose an available port)
-                        serverSSLUtil.createSSLServerSocketFactory(), clientSslUtil.createSSLSocketFactory()));
+        config.setListenerConfigs(// Listener name
+                InMemoryListenerConfig.createLDAPConfig(// Listener name
+                        "LDAP", // Listen address. (null = listen on all interfaces)
+                        null, // Listen port (0 = automatically choose an available port)
+                        3268, // StartTLS factory
+                        clientSslUtil.createSSLSocketFactory()), // Listener name
+                InMemoryListenerConfig.createLDAPSConfig(// Listener name
+                        "LDAPS", // Listen address. (null = listen on all interfaces)
+                        null, // Listen port (0 = automatically choose an available port)
+                        3269, serverSSLUtil.createSSLServerSocketFactory(), clientSslUtil.createSSLSocketFactory()));
         server = new InMemoryDirectoryServer(config);
-
         String configPath = TEST_LDAP_USERS_LDIF;
         server.importFromLDIF(true, configPath);
         server.startListening();
     }
 
-    @AfterClass
-    public static void shutDownDirectoryServer() {
+    @AfterAll
+    static void shutDownDirectoryServer() {
         server.shutDown(true);
     }
 
@@ -150,36 +155,35 @@ public class LdapAuth3Test {
 
     @Test
     public void gettingMailAttributeForUid() throws LDAPException {
-        assertEquals("testuser@example.com", LdapAuth3.getEmail("testuser", TEST_LDAP_CONF));
-        assertEquals("peter@example.org", LdapAuth3.getEmail("testuser2", TEST_LDAPS_CONF));
+        assertEquals(LdapAuth3.getEmail("testuser", TEST_LDAP_CONF), "testuser@example.com");
+        assertEquals(LdapAuth3.getEmail("testuser2", TEST_LDAPS_CONF), "peter@example.org");
         assertEquals(null, LdapAuth3.getEmail("non-exsting", TEST_LDAPS_CONF));
     }
-    
+
     @Test
     public void gettingUsernameForEmail() throws LDAPException {
-        assertEquals("idsTestUser", LdapAuth3.getUsername("testuser@example.com", TEST_LDAP_CONF));
-        assertEquals("testuser2", LdapAuth3.getUsername("peter@example.org", TEST_LDAPS_CONF));
+        assertEquals(LdapAuth3.getUsername("testuser@example.com", TEST_LDAP_CONF), "idsTestUser");
+        assertEquals(LdapAuth3.getUsername("peter@example.org", TEST_LDAPS_CONF), "testuser2");
         assertEquals(null, LdapAuth3.getUsername("non-exsting", TEST_LDAPS_CONF));
-
-        assertEquals("testuser2", LdapAuth3.getUsername("testUser2", TEST_LDAPS_CONF));
+        assertEquals(LdapAuth3.getUsername("testUser2", TEST_LDAPS_CONF), "testuser2");
         // login with uid, get idsC2Profile username
-        assertEquals("idsTestUser", LdapAuth3.getUsername("testUser", TEST_LDAPS_CONF));
+        assertEquals(LdapAuth3.getUsername("testUser", TEST_LDAPS_CONF), "idsTestUser");
     }
 
     @Test
     public void gettingMailAttributeForNotRegisteredUserWorks() throws LDAPException {
-        assertEquals("not_registered_user@example.com", LdapAuth3.getEmail("not_registered_user", TEST_LDAP_CONF));
+        assertEquals(LdapAuth3.getEmail("not_registered_user", TEST_LDAP_CONF), "not_registered_user@example.com");
     }
 
     @Test
     public void gettingMailAttributeForBlockedUserWorks() throws LDAPException {
-        assertEquals("nameOfBlockedUser@example.com", LdapAuth3.getEmail("nameOfBlockedUser", TEST_LDAP_CONF));
+        assertEquals(LdapAuth3.getEmail("nameOfBlockedUser", TEST_LDAP_CONF), "nameOfBlockedUser@example.com");
     }
 
     @Test
     public void canLoadLdapConfig() {
         LDAPConfig ldapConfig = new LDAPConfig(TEST_LDAPS_CONF);
         assertEquals(3269, ldapConfig.port);
-        assertEquals("localhost", ldapConfig.host);
+        assertEquals(ldapConfig.host, "localhost");
     }
 }

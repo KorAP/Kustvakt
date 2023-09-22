@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.misc;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * @author hanl
@@ -8,13 +9,10 @@ import org.junit.Test;
 public class ScopesTest {
 
     @Test
-    public void testScopes () {
-
+    public void testScopes() {
     }
 
-
     @Test
-    public void testOpenIDScopes () {
-
+    public void testOpenIDScopes() {
     }
 }
