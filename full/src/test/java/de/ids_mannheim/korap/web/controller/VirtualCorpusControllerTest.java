@@ -159,8 +159,9 @@ public class VirtualCorpusControllerTest extends VirtualCorpusTestBase {
         String json = "{\"type\": \"PRIVATE\","
                 + "\"corpusQuery\": \"corpusSigle=GOE\"}";
 
-        String authToken = "fia0123ikBWn931470H8s5gRqx7Moc4p";
-
+        //String authToken = "fia0123ikBWn931470H8s5gRqx7Moc4p";
+        String authToken = createExpiredAccessToken();
+        
         Response response = target().path(API_VERSION).path("vc")
                 .path("~marlin").path("new_vc")
                 .request()

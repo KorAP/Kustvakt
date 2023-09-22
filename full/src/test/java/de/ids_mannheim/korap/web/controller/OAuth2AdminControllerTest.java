@@ -88,7 +88,9 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
     }
 
     @Test
-    public void testCleanExpiredTokensUsingAdminToken () {
+    public void testCleanExpiredTokensUsingAdminToken () throws KustvaktException {
+        createExpiredAccessToken();
+        
         int refreshTokensBefore =
                 refreshDao.retrieveInvalidRefreshTokens().size();
         assertTrue(refreshTokensBefore > 0);
