@@ -88,7 +88,12 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
     }
 
     @Test
-    public void testCleanExpiredTokensUsingAdminToken () throws KustvaktException {
+    public void testCleanTokens () throws KustvaktException {
+        testCleanExpiredTokensUsingAdminToken();
+        testCleanRevokedTokens();
+    }
+    
+    private void testCleanExpiredTokensUsingAdminToken () throws KustvaktException {
         createExpiredAccessToken();
         
         int refreshTokensBefore =
@@ -110,8 +115,8 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
         assertEquals(0, accessDao.retrieveInvalidAccessTokens().size());
     }
 
-    @Test
-    public void testCleanRevokedTokens () throws KustvaktException {
+    
+    private void testCleanRevokedTokens () throws KustvaktException {
 
         int accessTokensBefore = accessDao.retrieveInvalidAccessTokens().size();
         String code = requestAuthorizationCode(publicClientId, userAuthHeader);
