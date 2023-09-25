@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.security.NoSuchAlgorithmException;
 
-import org.apache.oltu.oauth2.as.issuer.MD5Generator;
-import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +26,7 @@ public class RandomCodeGeneratorTest extends SpringJerseyTest {
     }
 
     @Ignore
-    public void testRandomGeneratorPerformance () throws OAuthSystemException,
+    public void testRandomGeneratorPerformance () throws 
             NoSuchAlgorithmException, KustvaktException {
         long min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
 
@@ -49,14 +47,4 @@ public class RandomCodeGeneratorTest extends SpringJerseyTest {
 
         }
     }
-
-    @Ignore
-    public void testMD5Generator () throws OAuthSystemException,
-            NoSuchAlgorithmException, KustvaktException {
-        MD5Generator m = new MD5Generator();
-        String value = m.generateValue();
-        value = m.generateValue(value);
-        System.out.println(value);
-    }
-
 }

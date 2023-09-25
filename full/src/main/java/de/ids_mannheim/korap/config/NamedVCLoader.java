@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 
-import javax.management.RuntimeErrorException;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -61,7 +59,7 @@ public class NamedVCLoader implements Runnable{
         }
         catch (IOException | QueryException e) {
 //            e.printStackTrace();
-            throw new RuntimeErrorException(new Error(e.getMessage(), e.getCause()));
+            throw new RuntimeException(e.getMessage(), e.getCause());
         }
     }
     

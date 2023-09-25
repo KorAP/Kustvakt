@@ -44,14 +44,15 @@
 			</array>
 		</property>
 	</bean>
-
+	
+	<!-- 
 	<bean id='cacheManager' class='org.springframework.cache.ehcache.EhCacheCacheManager'
 		p:cacheManager-ref='ehcache' />
 
 	<bean id='ehcache'
 		class='org.springframework.cache.ehcache.EhCacheManagerFactoryBean'
 		p:configLocation='classpath:ehcache.xml' p:shared='true' />
-
+ 	-->
 	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
 		lazy-init="true">
 		<!-- <property name="driverClassName" value="${jdbc.driverClassName}" /> -->
@@ -296,7 +297,7 @@
 		<constructor-arg index="0" value="${mail.username}" />
 		<constructor-arg index="1" value="${mail.password}" />
 	</bean>
-	<bean id="smtpSession" class="javax.mail.Session" factory-method="getInstance">
+	<bean id="smtpSession" class="jakarta.mail.Session" factory-method="getInstance">
 		<constructor-arg index="0">
 			<props>
 				<prop key="mail.smtp.submitter">${mail.username}</prop>
