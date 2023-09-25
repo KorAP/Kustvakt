@@ -27,7 +27,7 @@
 				<plugins>
 					<plugin>
 						<artifactId>maven-shade-plugin</artifactId>
-						<version>3.5.0</version>
+						<version>3.5.1</version>
 						<executions>
 							<!-- option 1 -->
 							<execution>
@@ -79,7 +79,7 @@
 				<plugins>
 					<plugin>
 						<artifactId>maven-shade-plugin</artifactId>
-							<version>3.5.0</version>
+							<version>3.5.1</version>
 							<executions>
 								<!--option 2-->
 								<execution>
