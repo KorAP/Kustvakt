@@ -42,6 +42,8 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
+// Open ID is not maintained and used.
+@Deprecated
 public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
 
     @Autowired
@@ -83,13 +85,14 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
         Form form = new Form();
         form.param("response_type", "code");
         form.param("client_id", "fCBbQkAyYzI4NzUxMg");
+        form.param("scope", "search");
 
-        testRequestAuthorizationCodeWithoutOpenID(form, redirectUri);
-        form.param("scope", "openid");
+        //testRequestAuthorizationCodeMissingRedirectUri(form);
+        //testRequestAuthorizationCodeInvalidRedirectUri(form);
 
-        testRequestAuthorizationCodeMissingRedirectUri(form);
-        testRequestAuthorizationCodeInvalidRedirectUri(form);
         form.param("redirect_uri", redirectUri);
+        
+        testRequestAuthorizationCodeWithoutOpenID(form, redirectUri);
 
         form.param("state", "thisIsMyState");
 
@@ -108,6 +111,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
             Form form, String redirectUri)
             throws KustvaktException {
         Response response = sendAuthorizationRequest(form);
+
         URI location = response.getLocation();
         // System.out.println(location.toString());
         assertEquals(redirectUri, location.getScheme() + "://"
@@ -118,7 +122,7 @@ public class OAuth2OpenIdControllerTest extends SpringJerseyTest {
             Form form) throws KustvaktException {
         Response response = sendAuthorizationRequest(form);
         String entity = response.readEntity(String.class);
-
+System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
         assertEquals("redirect_uri is required",

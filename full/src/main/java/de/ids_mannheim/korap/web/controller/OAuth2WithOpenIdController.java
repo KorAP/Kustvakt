@@ -47,7 +47,8 @@ import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.SecurityContext;
 
-/**
+/** WARNING: Open ID is not maintained and used.
+ * 
  * Describes OAuth2 webAPI with OpenId Connect implementation, an
  * additional authentication protocol allowing clients to verify
  * user authentication data represented by ID tokens.
@@ -55,6 +56,7 @@ import jakarta.ws.rs.core.SecurityContext;
  * @author margaretha
  *
  */
+@Deprecated
 @Controller
 @Path("{version}/oauth2/openid")
 @ResourceFilters({ APIVersionFilter.class })

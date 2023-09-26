@@ -22,14 +22,19 @@ import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.UriBuilder;
 
 /**
  * OAuth2Controller describes OAuth2 web API for authorization
@@ -80,46 +85,49 @@ public class OAuth2Controller {
      *            form parameters
      * @return a redirect URL
      */
-//    @Deprecated
-//    @POST
-//    @Path("authorize")
-//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-//    public Response requestAuthorizationCode (
-//            @Context HttpServletRequest request,
-//            @Context SecurityContext context, 
-//            @FormParam("state") String state,
-//            @FormParam("client_id") String clientId,
-//            @FormParam("redirect_uri") String redirectUri,
-//            MultivaluedMap<String, String> form) {
-//
-//        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
-//        String username = tokenContext.getUsername();
-//        ZonedDateTime authTime = tokenContext.getAuthenticationTime();
-//
-//        try {
-//            scopeService.verifyScope(tokenContext, OAuth2Scope.AUTHORIZE);
-//
-//            HttpServletRequest requestWithForm =
-//                    new FormRequestWrapper(request, form);
-//            OAuth2AuthorizationRequest authzRequest =
-//                    new OAuth2AuthorizationRequest(requestWithForm);
-//            String uri = authorizationService.requestAuthorizationCode(
-//                    requestWithForm, authzRequest, username, authTime);
-//            return responseHandler.sendRedirect(uri);
-//        }
-//        catch (OAuthSystemException e) {
-//            throw responseHandler.throwit(e, state);
-//        }
-//        catch (OAuthProblemException e) {
-//            e.state(state);
-//            e = authorizationService.checkRedirectUri(e, clientId, redirectUri);
-//            throw responseHandler.throwit(e);
-//        }
-//        catch (KustvaktException e) {
-//            e = authorizationService.checkRedirectUri(e, clientId, redirectUri);
-//            throw responseHandler.throwit(e, state);
-//        }
-//    }
+    @Deprecated
+    @POST
+    @Path("authorize")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response requestAuthorizationCode (
+            @Context HttpServletRequest request,
+            @Context SecurityContext context, 
+            @FormParam("scope") String scope,
+            @FormParam("state") String state,
+            @FormParam("client_id") String clientId,
+            @FormParam("redirect_uri") String redirectUri,
+            MultivaluedMap<String, String> form) {
+
+        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+        String username = tokenContext.getUsername();
+        ZonedDateTime authTime = tokenContext.getAuthenticationTime();
+
+        URI requestURI;
+        UriBuilder builder = UriBuilder.fromPath(request.getRequestURI());
+        for (String key : form.keySet()) {
+            builder.queryParam(key, form.get(key).toArray());
+        }
+        requestURI = builder.build();
+       
+        try {
+            scopeService.verifyScope(tokenContext, OAuth2Scope.AUTHORIZE);
+            URI uri = authorizationService.requestAuthorizationCode(
+                    requestURI, clientId, redirectUri,
+                    scope, state, username, authTime);
+            return responseHandler.sendRedirect(uri);
+        }
+        catch (KustvaktException e) {
+            e = authorizationService.checkRedirectUri(e, clientId, redirectUri);
+            if (e.getRedirectUri() != null) {
+                AuthorizationErrorResponse errorResponse =
+                        authorizationService.createAuthorizationError(e, state);
+                return responseHandler.sendRedirect(errorResponse.toURI());
+            }
+            else {
+                throw responseHandler.throwit(e, state);
+            } 
+        }
+    }
     
     @GET
     @Path("authorize")

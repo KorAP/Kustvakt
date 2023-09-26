@@ -78,11 +78,10 @@ public class OAuth2AuthorizationService {
         return errorResponse;
     }
     
-    public URI requestAuthorizationCode (URI requestURI,
-            String clientId, String redirectUri, String scope,
-            String state, String username,
+    public URI requestAuthorizationCode (URI requestURI, String clientId,
+            String redirectUri, String scope, String state, String username,
             ZonedDateTime authenticationTime) throws KustvaktException {
-        
+
         URI redirectURI = null;
         String code;
         try {
@@ -90,9 +89,13 @@ public class OAuth2AuthorizationService {
             redirectURI = verifyRedirectUri(client, redirectUri);
             //checkResponseType(authzRequest.getResponseType(), redirectURI);
             code = codeGenerator.createRandomCode();
-            createAuthorization(username, clientId, redirectUri, scope, code.toString(),
-                    authenticationTime, null);
-            return createAuthorizationResponse(requestURI, redirectURI, code, state);
+            URI responseURI = createAuthorizationResponse(requestURI,
+                    redirectURI, code, state);
+
+            createAuthorization(username, clientId, redirectUri, scope,
+                    code.toString(), authenticationTime, null);
+            return responseURI;
+            
         }
         catch (KustvaktException e) {
             e.setRedirectUri(redirectURI);
@@ -101,7 +104,8 @@ public class OAuth2AuthorizationService {
     }
 
     private URI createAuthorizationResponse (URI requestURI, URI redirectURI,
-            String code, String state) throws KustvaktException {
+            String code, String state)
+            throws KustvaktException {
         AuthorizationRequest authRequest = null;
         try {
             authRequest = AuthorizationRequest.parse(requestURI);
@@ -365,4 +369,5 @@ public class OAuth2AuthorizationService {
         }
         return true;
     }
+
 }
