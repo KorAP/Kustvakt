@@ -422,7 +422,6 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         form.param("client_secret", "secret");
         Response response = requestToken(form);
         String entity = response.readEntity(String.class);
-        System.out.println(entity);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);

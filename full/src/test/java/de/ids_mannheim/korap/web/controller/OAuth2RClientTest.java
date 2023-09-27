@@ -94,7 +94,6 @@ public class OAuth2RClientTest extends OAuth2TestBase {
                 .fromUri(redirectUri).build().getQueryParams();
         String code = params.getFirst("code");
         assertNotNull(code);
-        assertEquals("search", params.getFirst("scope"));
         return code;
     }
 

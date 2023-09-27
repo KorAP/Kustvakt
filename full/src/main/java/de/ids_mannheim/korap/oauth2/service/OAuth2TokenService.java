@@ -511,13 +511,8 @@ public class OAuth2TokenService {
                 .setScope(String.join(" ", scopes)).buildJSONMessage();
     }
 
-    public void revokeToken (OAuth2RevokeTokenRequest revokeTokenRequest)
-            throws KustvaktException {
-        String clientId = revokeTokenRequest.getClientId();
-        String clientSecret = revokeTokenRequest.getClientSecret();
-        String token = revokeTokenRequest.getToken();
-        String tokenType = revokeTokenRequest.getTokenType();
-
+    public void revokeToken (String clientId, String clientSecret,
+            String token, String tokenType) throws KustvaktException {
         clientService.authenticateClient(clientId, clientSecret);
         if (tokenType != null && tokenType.equals("refresh_token")) {
             if (!revokeRefreshToken(token)) {
@@ -582,11 +577,8 @@ public class OAuth2TokenService {
     }
 
     public void revokeAllClientTokensViaSuperClient (String username,
-            OAuth2RevokeAllTokenSuperRequest revokeTokenRequest)
+            String superClientId, String superClientSecret, String clientId)
             throws KustvaktException {
-        String superClientId = revokeTokenRequest.getSuperClientId();
-        String superClientSecret = revokeTokenRequest.getSuperClientSecret();
-
         OAuth2Client superClient = clientService
                 .authenticateClient(superClientId, superClientSecret);
         if (!superClient.isSuper()) {
@@ -594,7 +586,6 @@ public class OAuth2TokenService {
                     StatusCodes.CLIENT_AUTHENTICATION_FAILED);
         }
 
-        String clientId = revokeTokenRequest.getClientId();
         revokeAllClientTokensForUser(clientId, username);
     }
     
@@ -618,21 +609,20 @@ public class OAuth2TokenService {
     }
     
     public void revokeTokensViaSuperClient (String username,
-            OAuth2RevokeTokenSuperRequest revokeTokenRequest) throws KustvaktException {
-        String superClientId = revokeTokenRequest.getSuperClientId();
-        String superClientSecret = revokeTokenRequest.getSuperClientSecret();
-
+            String superClientId, String superClientSecret, String token)
+            throws KustvaktException {
         OAuth2Client superClient = clientService
                 .authenticateClient(superClientId, superClientSecret);
         if (!superClient.isSuper()) {
             throw new KustvaktException(
                     StatusCodes.CLIENT_AUTHENTICATION_FAILED);
         }
-        
-        String token = revokeTokenRequest.getToken();
-        RefreshToken refreshToken = refreshDao.retrieveRefreshToken(token, username);
-        if (!revokeRefreshToken(refreshToken)){
-            AccessToken accessToken = tokenDao.retrieveAccessToken(token, username);
+
+        RefreshToken refreshToken =
+                refreshDao.retrieveRefreshToken(token, username);
+        if (!revokeRefreshToken(refreshToken)) {
+            AccessToken accessToken =
+                    tokenDao.retrieveAccessToken(token, username);
             revokeAccessToken(accessToken);
         }
     }
