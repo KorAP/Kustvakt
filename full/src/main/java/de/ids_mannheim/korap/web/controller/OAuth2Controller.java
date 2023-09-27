@@ -4,17 +4,30 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 
+import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
+import org.apache.oltu.oauth2.common.message.OAuthResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import com.nimbusds.oauth2.sdk.AuthorizationErrorResponse;
+import com.nimbusds.oauth2.sdk.AuthorizationGrant;
+import com.nimbusds.oauth2.sdk.ClientCredentialsGrant;
 import com.nimbusds.oauth2.sdk.OAuth2Error;
+import com.nimbusds.oauth2.sdk.ParseException;
+import com.nimbusds.oauth2.sdk.Scope;
+import com.nimbusds.oauth2.sdk.TokenRequest;
+import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
+import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod;
+import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
+import com.nimbusds.oauth2.sdk.auth.ClientSecretPost;
+import com.nimbusds.oauth2.sdk.id.ClientID;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.service.OAuth2AuthorizationService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
+import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
@@ -57,7 +70,8 @@ public class OAuth2Controller {
     @Autowired
     private OAuth2ResponseHandler responseHandler;
 
-    
+    @Autowired
+    private OAuth2TokenService tokenService;
     @Autowired
     private OAuth2AuthorizationService authorizationService;
     
@@ -237,42 +251,83 @@ public class OAuth2Controller {
      *         if successful, an error code and an error description
      *         otherwise.
      */
-//    @POST
-//    @Path("token")
-//    @ResourceFilters({APIVersionFilter.class})
-//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-//    public Response requestAccessToken (@Context HttpServletRequest request,
-//            @FormParam("grant_type") String grantType,
-//            MultivaluedMap<String, String> form) {
-//
-//        try {
-//            boolean grantTypeExist = grantType != null && !grantType.isEmpty();
-//            AbstractOAuthTokenRequest oAuthRequest = null;
-//            if (grantTypeExist && grantType
-//                    .equals(GrantType.CLIENT_CREDENTIALS.toString())) {
-//                oAuthRequest = new OAuthTokenRequest(
-//                        new FormRequestWrapper(request, form));
-//            }
-//            else {
-//                oAuthRequest = new OAuthUnauthenticatedTokenRequest(
-//                        new FormRequestWrapper(request, form));
-//            }
-//
-//            OAuthResponse oAuthResponse =
-//                    tokenService.requestAccessToken(oAuthRequest);
-//
-//            return responseHandler.createResponse(oAuthResponse);
-//        }
-//        catch (KustvaktException e) {
-//            throw responseHandler.throwit(e);
-//        }
-//        catch (OAuthProblemException e) {
-//            throw responseHandler.throwit(e);
-//        }
-//        catch (OAuthSystemException e) {
-//            throw responseHandler.throwit(e);
-//        }
-//    }
+    @POST
+    @Path("token")
+    @ResourceFilters({APIVersionFilter.class})
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response requestAccessToken (@Context HttpServletRequest request,
+            @FormParam("client_id") String clientId,
+            @FormParam("client_secret") String clientSecret,
+            MultivaluedMap<String, String> form) {
+
+        OAuthResponse oAuthResponse = null;
+        try {
+            URI requestURI;
+            UriBuilder builder = UriBuilder.fromPath(
+                    request.getRequestURL().toString());
+            for (String key : form.keySet()) {
+                builder.queryParam(key, form.get(key).toArray());
+            }
+            requestURI = builder.build();
+            
+            try {
+                AuthorizationGrant authGrant = AuthorizationGrant.parse(form);  
+                
+                ClientAuthentication clientAuth = null;
+                String authorizationHeader = request.getHeader("Authorization");
+                if (authorizationHeader!=null && !authorizationHeader.isEmpty() ) {
+                    clientAuth = ClientSecretBasic.parse(authorizationHeader);
+                }
+                else if (authGrant instanceof ClientCredentialsGrant) {
+                    // this doesn't allow public clients
+                    clientAuth = ClientSecretPost.parse(form);
+                }
+                
+                TokenRequest tokenRequest = null;
+                if (clientAuth!=null) {
+                    ClientAuthenticationMethod method = clientAuth.getMethod();
+                    if (method.equals(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)) {
+                        ClientSecretBasic basic = (ClientSecretBasic) clientAuth;
+                        clientSecret = basic.getClientSecret().getValue();
+                        clientId = basic.getClientID().getValue();
+                    }
+                    else if (method.equals(ClientAuthenticationMethod.CLIENT_SECRET_POST)) {
+                        ClientSecretPost post = (ClientSecretPost) clientAuth;
+                        clientSecret = post.getClientSecret().getValue();
+                        clientId = post.getClientID().getValue();
+                    }
+                    
+                    tokenRequest = new TokenRequest(requestURI,
+                            clientAuth,
+                            AuthorizationGrant.parse(form),
+                            Scope.parse(form.getFirst("scope")));
+                }
+                else {
+                    // requires ClientAuthentication for client_credentials grant
+                    tokenRequest = new TokenRequest(requestURI,
+                        new ClientID(clientId),
+                        AuthorizationGrant.parse(form),
+                        Scope.parse(form.getFirst("scope")));
+                }
+            
+                oAuthResponse = tokenService.requestAccessToken(tokenRequest,
+                        clientId, clientSecret);
+            }
+            catch (ParseException | IllegalArgumentException e) {
+                throw new KustvaktException(StatusCodes.INVALID_REQUEST,
+                        e.getMessage(), OAuth2Error.INVALID_REQUEST); 
+            }
+            
+        }
+        catch (KustvaktException e) {
+            throw responseHandler.throwit(e);
+        }
+        catch (OAuthSystemException e) {
+            throw responseHandler.throwit(e);
+        }
+        
+        return responseHandler.createResponse(oAuthResponse);
+    }
 
     /**
      * Revokes either an access token or a refresh token. Revoking a

@@ -234,7 +234,9 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         Form form = new Form();
         form.param("grant_type", "password");
         form.param("client_id", clientId);
-        form.param("client_secret", clientSecret);
+        if (clientSecret !=null && !clientSecret.isEmpty()) {
+            form.param("client_secret", clientSecret);
+        }
         form.param("username", username);
         form.param("password", password);
 
@@ -262,7 +264,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
+        assertEquals(OAuth2Error.INVALID_GRANT.getCode(), node.at("/error").asText());
         assertEquals("Refresh token has been revoked",
                 node.at("/error_description").asText());
     }

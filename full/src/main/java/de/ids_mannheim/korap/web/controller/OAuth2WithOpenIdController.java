@@ -64,7 +64,7 @@ public class OAuth2WithOpenIdController {
 
     @Autowired
     private OpenIdAuthorizationService authzService;
-    @Autowired
+    //@Autowired
     private OpenIdTokenService tokenService;
     @Autowired
     private JWKService jwkService;
@@ -197,7 +197,7 @@ public class OAuth2WithOpenIdController {
 
             TokenRequest tokenRequest = TokenRequest.parse(httpRequest);
             AccessTokenResponse tokenResponse =
-                    tokenService.requestAccessToken(tokenRequest);
+                    tokenService.requestAccessTokenWithOpenID(tokenRequest);
             return openIdResponseHandler.createResponse(tokenResponse,
                     Status.OK);
         }

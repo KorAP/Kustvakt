@@ -35,7 +35,6 @@ import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
-import de.ids_mannheim.korap.oauth2.oltu.service.OltuTokenService;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
@@ -67,7 +66,7 @@ public class OAuth2ClientService {
 //                    UrlValidator.NO_FRAGMENTS + UrlValidator.ALLOW_LOCAL_URLS);
 
     @Autowired
-    private OltuTokenService tokenService;
+    private OAuth2TokenService tokenService;
     @Autowired
     private InstalledPluginDao pluginDao;
     @Autowired

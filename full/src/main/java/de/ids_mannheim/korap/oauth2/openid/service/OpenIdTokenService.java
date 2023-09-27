@@ -71,7 +71,7 @@ import de.ids_mannheim.korap.utils.TimeUtils;
  * @author margaretha
  *
  */
-@Service
+//@Service
 public class OpenIdTokenService extends OAuth2TokenService {
 
     @Autowired
@@ -79,7 +79,7 @@ public class OpenIdTokenService extends OAuth2TokenService {
     @Autowired
     private RefreshTokenDao refreshDao;
 
-    public AccessTokenResponse requestAccessToken (TokenRequest tokenRequest)
+    public AccessTokenResponse requestAccessTokenWithOpenID (TokenRequest tokenRequest)
             throws KustvaktException {
         AuthorizationGrant grant = tokenRequest.getAuthorizationGrant();
         GrantType grantType = grant.getType();
@@ -88,13 +88,13 @@ public class OpenIdTokenService extends OAuth2TokenService {
         ClientID clientId = tokenRequest.getClientID();
 
         if (grantType.equals(GrantType.AUTHORIZATION_CODE)) {
-            return requestAccessTokenWithAuthorizationCode(grant,
+            return requestAccessTokenWithAuthorizationCodeAndOpenID(grant,
                     clientAuthentication, clientId);
         }
         else if (grantType.equals(GrantType.PASSWORD)) {
             ResourceOwnerPasswordCredentialsGrant passwordGrant =
                     (ResourceOwnerPasswordCredentialsGrant) grant;
-            return requestAccessTokenWithPassword(passwordGrant.getUsername(),
+            return requestAccessTokenWithPasswordAndOpenID(passwordGrant.getUsername(),
                     passwordGrant.getPassword().getValue(),
                     tokenRequest.getScope(), clientAuthentication, clientId);
         }
@@ -133,7 +133,7 @@ public class OpenIdTokenService extends OAuth2TokenService {
      * @return
      * @throws KustvaktException
      */
-    private AccessTokenResponse requestAccessTokenWithPassword (String username,
+    private AccessTokenResponse requestAccessTokenWithPasswordAndOpenID (String username,
             String password, Scope scope,
             ClientAuthentication clientAuthentication, ClientID clientId)
             throws KustvaktException {
@@ -193,7 +193,7 @@ public class OpenIdTokenService extends OAuth2TokenService {
                 clientIdStr, username, authenticationTime, null);
     }
 
-    private AccessTokenResponse requestAccessTokenWithAuthorizationCode (
+    private AccessTokenResponse requestAccessTokenWithAuthorizationCodeAndOpenID (
             AuthorizationGrant grant, ClientAuthentication clientAuthentication,
             ClientID clientId) throws KustvaktException {
         AuthorizationCodeGrant codeGrant = (AuthorizationCodeGrant) grant;
