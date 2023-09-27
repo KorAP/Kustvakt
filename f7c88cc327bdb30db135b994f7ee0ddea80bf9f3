@@ -16,6 +16,24 @@
       "message": "Because of the style changes, it\u0027s hard to review line-by-line. I can say that it works on my machine.",
       "revId": "f7c88cc327bdb30db135b994f7ee0ddea80bf9f3",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42e789c0_469a5fd9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6
+      },
+      "writtenOn": "2023-09-27T10:07:55Z",
+      "side": 1,
+      "message": "Sure, absolutely. This was mostly done automatically, and the API and behaviour changes are not that big.",
+      "parentUuid": "a754a79d_8d0cf80a",
+      "revId": "f7c88cc327bdb30db135b994f7ee0ddea80bf9f3",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
