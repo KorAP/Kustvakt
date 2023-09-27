@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a754a79d_8d0cf80a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-09-27T09:45:37Z",
+      "side": 1,
+      "message": "Because of the style changes, it\u0027s hard to review line-by-line. I can say that it works on my machine.",
+      "revId": "f7c88cc327bdb30db135b994f7ee0ddea80bf9f3",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
