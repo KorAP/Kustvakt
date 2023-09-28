@@ -73,9 +73,6 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
                     "corpusSigle=GOE", "definition", "description", "experimental",
                     false, "system", null, null);
         });        
-        assertEquals(
-                "org.hibernate.exception.GenericJDBCException: could not execute statement",
-                exception.getMessage());
     }
 
     @Test

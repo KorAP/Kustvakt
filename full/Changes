@@ -17,6 +17,7 @@
 - Changed OAuth2 token request using Nimbus (#650) 
 - Removed Apache Oltu API from token requests (#650)
 - Removed OpenID
+- Fixed clearing cache
 
 # version 0.71
 

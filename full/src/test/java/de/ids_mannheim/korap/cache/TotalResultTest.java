@@ -19,13 +19,26 @@ public class TotalResultTest extends SpringJerseyTest {
 
     @Autowired
     private SearchService searchService;
+    
+    @Test
+    public void testClearCache () {
+        for (int i = 1; i < 10; i++) {
+            searchService.getTotalResultCache().storeInCache(i, "10");
+        }
+        
+        searchService.getTotalResultCache().clearCache();
+        
+        assertEquals(0, searchService.getTotalResultCache()
+                .getAllCacheElements().size());
+    }
 
     @Test
     public void testSearchWithPaging () throws KustvaktException {
-
+        searchService.getTotalResultCache().clearCache();
+        
         assertEquals(0, searchService.getTotalResultCache()
                 .getAllCacheElements().size());
-
+        
         Response response = target().path(API_VERSION).path("search")
                 .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
                 .queryParam("page", "1").request().get();
