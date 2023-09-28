@@ -93,11 +93,11 @@ public class TokenExpiryTest extends SpringJerseyTest {
         form.param("client_id", "fCBbQkAyYzI4NzUxMg");
         form.param("redirect_uri",
                 "https://korap.ids-mannheim.de/confidential/redirect");
-        form.param("scope", "openid");
+        form.param("scope", "search");
         form.param("max_age", "1");
 
         Response response =
-                target().path(API_VERSION).path("oauth2").path("openid").path("authorize")
+                target().path(API_VERSION).path("oauth2").path("authorize")
                         .request()
                         .header(Attributes.AUTHORIZATION, "Bearer " + token)
                         .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")

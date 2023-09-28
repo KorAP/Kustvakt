@@ -126,7 +126,7 @@ public class StatusCodes {
     public static final int GROUP_DELETED = 1606;
     
     /**
-     * 1800 Oauth2 and OpenID
+     * 1800 Oauth2
      */
 
     public static final int OAUTH2_SYSTEM_ERROR = 1800;
@@ -146,8 +146,6 @@ public class StatusCodes {
     public static final int UNSUPPORTED_AUTHENTICATION_METHOD = 1812;
     public static final int UNSUPPORTED_RESPONSE_TYPE = 1813;
     
-    public static final int ID_TOKEN_CLAIM_ERROR = 1820;
-    public static final int ID_TOKEN_SIGNING_FAILED = 1821;
     public static final int USER_REAUTHENTICATION_REQUIRED = 1822;
     
     public static final int INVALID_REFRESH_TOKEN_EXPIRY = 1830;

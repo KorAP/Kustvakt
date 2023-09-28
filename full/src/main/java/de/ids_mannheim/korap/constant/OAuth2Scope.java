@@ -11,7 +11,6 @@ public enum OAuth2Scope {
     @Deprecated
     ADMIN,
     
-    OPENID, 
     AUTHORIZE,
     
     LIST_USER_CLIENT,

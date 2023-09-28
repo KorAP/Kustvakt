@@ -16,7 +16,7 @@ import java.util.Map;
 public class Scopes {
 
     public enum Scope {
-        openid, profile, email, queries, account, preferences, search
+        profile, email, queries, account, preferences, search
 
     }
 
@@ -24,8 +24,6 @@ public class Scopes {
             Attributes.FIRSTNAME, Attributes.LASTNAME, Attributes.INSTITUTION,
             Attributes.ADDRESS, Attributes.PHONE, Attributes.GENDER,
             Attributes.COUNTRY };
-
-    private static final String[] OPENID_CONNECT = { Scope.profile.toString() };
 
     private static final Enum[] SERVICE_DEFAULTS = { Scope.account,
             Scope.preferences, Scope.search, Scope.queries };

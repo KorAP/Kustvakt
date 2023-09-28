@@ -12,6 +12,11 @@
 - Updated authorization services using Nimbus (#650)
 - Fixed BlockingFilter by replacing javax.annotation.Priority 
   with jakarta.annotation.Priority (#659, #648)
+- Replaced javax.annotation with jakarta.annotation
+- Enabled legacy support for authorization POST request
+- Changed OAuth2 token request using Nimbus (#650) 
+- Removed Apache Oltu API from token requests (#650)
+- Removed OpenID
 
 # version 0.71
 

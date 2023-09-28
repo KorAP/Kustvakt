@@ -248,14 +248,6 @@
 
 	<!-- authentication providers to use -->
 
-	<!-- <bean id="openid_auth"
-		class="de.ids_mannheim.korap.authentication.OpenIDconnectAuthentication">
-		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
-			ref="kustvakt_config" />
-		<constructor-arg
-			type="de.ids_mannheim.korap.interfaces.db.PersistenceClient" ref="kustvakt_db" />
-	</bean> -->
-
 	<!-- <bean id="session_auth"
 		class="de.ids_mannheim.korap.authentication.SessionAuthentication">
 		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
@@ -270,7 +262,6 @@
 	<util:list id="kustvakt_authproviders"
 		value-type="de.ids_mannheim.korap.interfaces.AuthenticationIface">
 		<!-- <ref bean="session_auth" /> -->
-		<!-- <ref bean="openid_auth" /> -->
 		<ref bean="oauth2_auth" />
 	</util:list>
 
