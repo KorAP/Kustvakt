@@ -1,18 +1,7 @@
 package de.ids_mannheim.korap.web.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.net.HttpHeaders;
-import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
-import de.ids_mannheim.korap.config.Attributes;
-import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
-import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
-import de.ids_mannheim.korap.utils.JsonUtils;
-import org.apache.http.entity.ContentType;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Entity;
@@ -20,8 +9,21 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.apache.http.entity.ContentType;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.net.HttpHeaders;
+
+import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
+import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.exceptions.KustvaktException;
+import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
+import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
+import de.ids_mannheim.korap.utils.JsonUtils;
 
 @Order(Integer.MAX_VALUE) // make sure this runs as last test as it removes tokens
 public class OAuth2AdminControllerTest extends OAuth2TestBase {
@@ -66,6 +68,7 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
     }
 
     @Test
+    @Order(1)
     public void testCleanExpiredTokensUsingAdminToken() throws KustvaktException {
         createExpiredAccessToken();
         
@@ -83,7 +86,9 @@ public class OAuth2AdminControllerTest extends OAuth2TestBase {
     }
 
     @Test
-    public void testCleanRevokedTokens() throws KustvaktException {
+    @Order(2)
+    public void testCleanRevokedTokens () throws KustvaktException {
+
         int accessTokensBefore = accessDao.retrieveInvalidAccessTokens().size();
         String code = requestAuthorizationCode(publicClientId, userAuthHeader);
         Response response = requestTokenWithAuthorizationCodeAndForm(publicClientId, clientSecret, code);

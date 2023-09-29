@@ -13,8 +13,8 @@
 		<jetty.version>9.4.51.v20230217</jetty.version>
 		<flyway.version>9.21.1</flyway.version>
 		<log4j.version>2.20.0</log4j.version>
-		<krill.version>[0.61.3,)</krill.version>
-		<koral.version>[0.41,)</koral.version>
+		<krill.version>0.61.3</krill.version>
+		<koral.version>0.41.0</koral.version>
 	</properties>
 	<profiles>
 		<profile>

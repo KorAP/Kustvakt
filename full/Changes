@@ -12,6 +12,7 @@
 - Resolved duplicate libraries
 - Fixed testing expiry access token
 - Fix lombok compile warning
+- Ensure the order of clean token tests.
 
 # version 0.70.1
 
