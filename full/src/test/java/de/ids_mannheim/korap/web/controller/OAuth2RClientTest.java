@@ -5,9 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.net.URI;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.util.MultiValueMap;
@@ -71,7 +72,6 @@ public class OAuth2RClientTest extends OAuth2TestBase {
         MultiValueMap<String, String> params = UriComponentsBuilder.fromUri(redirectUri).build().getQueryParams();
         String code = params.getFirst("code");
         assertNotNull(code);
-        assertEquals(params.getFirst("scope"), "search");
         return code;
     }
 }

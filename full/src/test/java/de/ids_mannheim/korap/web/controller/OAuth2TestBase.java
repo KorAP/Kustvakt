@@ -7,18 +7,7 @@ import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 import org.apache.http.entity.ContentType;
-import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
@@ -29,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
+import com.nimbusds.oauth2.sdk.OAuth2Error;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
@@ -38,7 +28,6 @@ import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
-import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
 import de.ids_mannheim.korap.oauth2.dao.OAuth2ClientDao;
 import de.ids_mannheim.korap.oauth2.dao.RefreshTokenDao;
@@ -48,6 +37,16 @@ import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.Invocation.Builder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -135,8 +134,9 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
             request = request.queryParam("state", state);
         }
         
-        return request.request().header(Attributes.AUTHORIZATION, authHeader)
-                .get();
+        Builder builder = request.request().header(Attributes.AUTHORIZATION, authHeader);
+        
+        return builder.get();
     }
 
     protected String requestAuthorizationCode (String clientId,
@@ -249,7 +249,9 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
         Form form = new Form();
         form.param("grant_type", "password");
         form.param("client_id", clientId);
-        form.param("client_secret", clientSecret);
+        if (clientSecret !=null && !clientSecret.isEmpty()) {
+            form.param("client_secret", clientSecret);
+        }
         form.param("username", username);
         form.param("password", password);
 
@@ -277,7 +279,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
 
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
+        assertEquals(OAuth2Error.INVALID_GRANT.getCode(), node.at("/error").asText());
         assertEquals("Refresh token has been revoked",
                 node.at("/error_description").asText());
     }
@@ -465,7 +467,7 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     protected void testInvalidRedirectUri (String entity, String contentType,
             boolean includeState, int status) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
+        assertEquals(OAuth2Error.INVALID_REQUEST.getCode(),
                 node.at("/error").asText());
         assertEquals("Invalid redirect URI",
                 node.at("/error_description").asText());

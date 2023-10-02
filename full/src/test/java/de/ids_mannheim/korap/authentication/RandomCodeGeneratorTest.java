@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.security.NoSuchAlgorithmException;
 
-import org.apache.oltu.oauth2.as.issuer.MD5Generator;
-import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +24,7 @@ public class RandomCodeGeneratorTest extends SpringJerseyTest {
     }
 
     @Disabled
-    public void testRandomGeneratorPerformance() throws OAuthSystemException, NoSuchAlgorithmException, KustvaktException {
+    public void testRandomGeneratorPerformance() throws NoSuchAlgorithmException, KustvaktException {
         long min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
         String code;
         while (true) {
@@ -43,13 +41,5 @@ public class RandomCodeGeneratorTest extends SpringJerseyTest {
                 max = duration;
             System.out.println("d : " + duration + " min :" + min + ", max: " + max);
         }
-    }
-
-    @Disabled
-    public void testMD5Generator() throws OAuthSystemException, NoSuchAlgorithmException, KustvaktException {
-        MD5Generator m = new MD5Generator();
-        String value = m.generateValue();
-        value = m.generateValue(value);
-        System.out.println(value);
     }
 }

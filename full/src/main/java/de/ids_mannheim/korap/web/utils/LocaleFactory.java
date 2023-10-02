@@ -1,11 +1,13 @@
 package de.ids_mannheim.korap.web.utils;
 
-import org.glassfish.hk2.api.Factory;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.ext.Provider;
 import java.util.List;
 import java.util.Locale;
+
+import org.glassfish.hk2.api.Factory;
+
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.ext.Provider;
 
 @Provider
 public class LocaleFactory implements Factory<Locale> {

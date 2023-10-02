@@ -8,8 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
-import javax.servlet.ServletContextListener;
-
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
@@ -25,6 +23,7 @@ import org.springframework.web.context.ContextLoaderListener;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.encryption.RandomCodeGenerator;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
+import jakarta.servlet.ServletContextListener;
 import lombok.Getter;
 import lombok.Setter;
 

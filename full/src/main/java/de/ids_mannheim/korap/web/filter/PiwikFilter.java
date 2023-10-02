@@ -8,13 +8,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.UriBuilder;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.client.ClientConfig;
@@ -22,6 +15,12 @@ import org.glassfish.jersey.logging.LoggingFeature;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.authentication.AuthenticationManager;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.UriBuilder;
 import net.minidev.json.JSONArray;
 
 /**

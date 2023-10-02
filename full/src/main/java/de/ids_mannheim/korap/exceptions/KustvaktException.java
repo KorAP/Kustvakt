@@ -3,6 +3,8 @@ package de.ids_mannheim.korap.exceptions;
 import java.net.URI;
 import java.util.Arrays;
 
+import com.nimbusds.oauth2.sdk.ErrorObject;
+
 //import de.ids_mannheim.korap.constant.TokenType;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +27,7 @@ public class KustvaktException extends Exception {
     private boolean isNotification;
 //    private TokenType authType;
     private URI redirectUri;
+    private ErrorObject oauth2Error;
 
     public KustvaktException (int status) {
         this.statusCode = status;
@@ -92,6 +95,13 @@ public class KustvaktException extends Exception {
         this.statusCode = status;
     }
 
+    public KustvaktException (int status, String message,
+            ErrorObject oauth2Error) {
+        super(message);
+        this.statusCode = status;
+        this.oauth2Error = oauth2Error;
+        this.entity = oauth2Error.toString();
+    }
 
     public KustvaktException (Throwable cause, int status) {
         super(cause);

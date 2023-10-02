@@ -2,8 +2,6 @@ package de.ids_mannheim.korap.authentication;
 
 import java.util.Map;
 
-import javax.ws.rs.core.HttpHeaders;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
@@ -14,6 +12,7 @@ import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.User;
 import de.ids_mannheim.korap.utils.TimeUtils;
+import jakarta.ws.rs.core.HttpHeaders;
 
 public class DummyAuthenticationManager extends AuthenticationManager {
 

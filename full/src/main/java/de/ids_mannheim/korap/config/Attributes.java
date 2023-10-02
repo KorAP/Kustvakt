@@ -2,17 +2,14 @@ package de.ids_mannheim.korap.config;
 
 public class Attributes {
 
-    // EM: openid auth_time
     public static final String AUTHENTICATION_TIME = "auth_time";
     public static final String DEFAULT_TIME_ZONE = "Europe/Berlin";
-    // -- EM
     
     public static final String AUTHORIZATION = "Authorization";
     // moved to de.ids_mannheim.korap.config.AuthenticationScheme
 //    public static final String SESSION_AUTHENTICATION = "session_token";
 //    public static final String API_AUTHENTICATION = "api_token";
 //    public static final String OAUTH2_AUTHORIZATION = "bearer";
-//    public static final String OPENID_AUTHENTICATION = "id_token";
 //    public static final String BASIC_AUTHENTICATION = "basic";
 
     public static final String LOCATION = "location"; // location of Client: User.INTERN/EXTERN
