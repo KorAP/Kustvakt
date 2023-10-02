@@ -221,12 +221,6 @@
 	<bean id="oauth2ResponseHandler" class="de.ids_mannheim.korap.web.OAuth2ResponseHandler">
 	</bean>
 
-	<bean id="mdGenerator" class="org.apache.oltu.oauth2.as.issuer.MD5Generator">
-	</bean>
-	<bean id="oauthIssuer" class="org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl">
-		<constructor-arg index="0" ref="mdGenerator" />
-	</bean>
-
 	<bean id="kustvakt_userdb" class="de.ids_mannheim.korap.handlers.EntityDao">
 		<constructor-arg ref="kustvakt_db" />
 	</bean>
@@ -333,7 +327,7 @@
 		<constructor-arg index="0" value="${mail.username}" />
 		<constructor-arg index="1" value="${mail.password}" />
 	</bean>
-	<bean id="smtpSession" class="javax.mail.Session" factory-method="getInstance">
+	<bean id="smtpSession" class="jakarta.mail.Session" factory-method="getInstance">
 		<constructor-arg index="0">
 			<props>
 				<prop key="mail.smtp.submitter">${mail.username}</prop>

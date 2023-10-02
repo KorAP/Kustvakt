@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.joda.time.DateTime;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;

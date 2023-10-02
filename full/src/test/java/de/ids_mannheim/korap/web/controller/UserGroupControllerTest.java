@@ -3,18 +3,18 @@ package de.ids_mannheim.korap.web.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.Set;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
+
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
-
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.client.Entity;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.client.Entity;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;

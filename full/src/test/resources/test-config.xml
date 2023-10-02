@@ -45,12 +45,12 @@
 		</property>
 	</bean>
 
-	<bean id='cacheManager' class='org.springframework.cache.ehcache.EhCacheCacheManager'
+	<!-- <bean id='cacheManager' class='org.springframework.cache.ehcache.EhCacheCacheManager'
 		p:cacheManager-ref='ehcache' />
 
 	<bean id='ehcache'
 		class='org.springframework.cache.ehcache.EhCacheManagerFactoryBean'
-		p:configLocation='classpath:ehcache.xml' p:shared='true' />
+		p:configLocation='classpath:ehcache.xml' p:shared='true' /> -->
 
 	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
 		lazy-init="true">
@@ -172,7 +172,7 @@
 		<constructor-arg name="properties" ref="props" />
 	</bean>
 
-	<bean id="initializator" class="de.ids_mannheim.de.init.Initializator"
+	<bean id="initializator" class="de.ids_mannheim.korap.init.Initializator"
 		init-method="initTest">
 	</bean>
 
@@ -224,25 +224,11 @@
 	<bean id="oauth2ResponseHandler" class="de.ids_mannheim.korap.web.OAuth2ResponseHandler">
 	</bean>
 
-	<bean id="mdGenerator" class="org.apache.oltu.oauth2.as.issuer.MD5Generator">
-	</bean>
-	<bean id="oauthIssuer" class="org.apache.oltu.oauth2.as.issuer.OAuthIssuerImpl">
-		<constructor-arg index="0" ref="mdGenerator" />
-	</bean>
-
 	<bean name="kustvakt_encryption" class="de.ids_mannheim.korap.encryption.KustvaktEncryption">
 		<constructor-arg ref="kustvakt_config" />
 	</bean>
 
 	<!-- authentication providers to use -->
-	<!-- <bean id="openid_auth"
-		class="de.ids_mannheim.korap.authentication.OpenIDconnectAuthentication">
-		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
-			ref="kustvakt_config" />
-		<constructor-arg
-			type="de.ids_mannheim.korap.interfaces.db.PersistenceClient" ref="kustvakt_db" />
-	</bean> -->
-
 	<bean id="basic_auth"
 		class="de.ids_mannheim.korap.authentication.BasicAuthentication" />
 
@@ -263,7 +249,6 @@
 		value-type="de.ids_mannheim.korap.interfaces.AuthenticationIface">
 		<ref bean="basic_auth" />
 		<ref bean="session_auth" />
-		<!-- <ref bean="openid_auth" /> -->
 		<ref bean="oauth2_auth" />
 	</util:list>
 
@@ -310,7 +295,7 @@
 		<constructor-arg index="0" value="${mail.username}" />
 		<constructor-arg index="1" value="${mail.password}" />
 	</bean>
-	<bean id="smtpSession" class="javax.mail.Session" factory-method="getInstance">
+	<bean id="smtpSession" class="jakarta.mail.Session" factory-method="getInstance">
 		<constructor-arg index="0">
 			<props>
 				<prop key="mail.smtp.submitter">${mail.username}</prop>

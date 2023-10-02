@@ -6,8 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Defines the list of {@link javax.ws.rs.container.ContainerRequestFilter}
- * and {@link javax.ws.rs.container.ContainerResponseFilter}
+ * Defines the list of {@link jakarta.ws.rs.container.ContainerRequestFilter}
+ * and {@link jakarta.ws.rs.container.ContainerResponseFilter}
  * classes associated with a resource method.
  * <p>
  * This annotation can be specified on a class or on method(s). Specifying it

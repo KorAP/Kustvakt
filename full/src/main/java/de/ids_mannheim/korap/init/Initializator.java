@@ -1,4 +1,4 @@
-package de.ids_mannheim.de.init;
+package de.ids_mannheim.korap.init;
 
 import java.io.IOException;
 import java.util.EnumSet;

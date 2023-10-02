@@ -1,7 +1,7 @@
 package de.ids_mannheim.korap.service;
 
-import javax.mail.Authenticator;
-import javax.mail.PasswordAuthentication;
+import jakarta.mail.Authenticator;
+import jakarta.mail.PasswordAuthentication;
 
 /** Defines Authenticator for creating javax.mail.Session.
  * 

@@ -10,13 +10,14 @@ import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.nimbusds.oauth2.sdk.OAuth2Error;
+
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.AccessScopeDao;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.security.context.TokenContext;
@@ -41,6 +42,7 @@ public class OAuth2ScopeServiceImpl implements OAuth2ScopeService {
      * @return
      * @throws KustvaktException
      */
+    @Deprecated
     public Set<AccessScope> convertToAccessScope (Collection<String> scopes)
             throws KustvaktException {
 
@@ -56,14 +58,47 @@ public class OAuth2ScopeServiceImpl implements OAuth2ScopeService {
             }
             catch (IllegalArgumentException e) {
                 throw new KustvaktException(StatusCodes.INVALID_SCOPE,
-                        scope + " is an invalid scope",
+                        "Invalid scope",
                         OAuth2Error.INVALID_SCOPE);
             }
 
             index = definedScopes.indexOf(new AccessScope(oauth2Scope));
             if (index == -1) {
                 throw new KustvaktException(StatusCodes.INVALID_SCOPE,
-                        scope + " is an invalid scope",
+                        "Invalid scope",
+                        OAuth2Error.INVALID_SCOPE);
+            }
+            else {
+                requestedScopes.add(definedScopes.get(index));
+            }
+        }
+        return requestedScopes;
+    }
+    
+    public Set<AccessScope> convertToAccessScope (String scopes)
+            throws KustvaktException {
+
+        String[] scopeArray = scopes.split("\\s+");
+        List<AccessScope> definedScopes = accessScopeDao.retrieveAccessScopes();
+        Set<AccessScope> requestedScopes =
+                new HashSet<AccessScope>(scopeArray.length);
+        int index;
+        OAuth2Scope oauth2Scope = null;
+        for (String scope : scopeArray) {
+            try {
+                oauth2Scope =
+                        Enum.valueOf(OAuth2Scope.class, scope.toUpperCase());
+            }
+            catch (IllegalArgumentException e) {
+                throw new KustvaktException(StatusCodes.INVALID_SCOPE,
+                        "Invalid scope",
+                        OAuth2Error.INVALID_SCOPE);
+            }
+
+            index = definedScopes.indexOf(new AccessScope(oauth2Scope));
+            if (index == -1) {
+                throw new KustvaktException(StatusCodes.INVALID_SCOPE,
+                        "Invalid scope",
                         OAuth2Error.INVALID_SCOPE);
             }
             else {
