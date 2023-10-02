@@ -1,5 +1,24 @@
 # version 0.71.1
 
+- Replaced javax.ws to jakarta.ws namespace (#648)
+- Upgrading Jersey 2.40 to 3.x (#646)
+- Updated Spring 5.x to 6.x and jetty 9.x to 11.x (#645)
+- Replaced javax.persistence with jakarta.persistence (#648)
+- Migrate Hibernate 5 to 6 (#649)
+- Fix missing placeholders 
+- Fixed conflicting jackson-jarxrs
+- Fixed conflicting commons-logging and spring jcl
+- Replaced javax.servlet with jakarta.servlet (#648)
+- Updated authorization services using Nimbus (#650)
+- Fixed BlockingFilter by replacing javax.annotation.Priority 
+  with jakarta.annotation.Priority (#659, #648)
+- Replaced javax.annotation with jakarta.annotation
+- Enabled legacy support for authorization POST request
+- Changed OAuth2 token request using Nimbus (#650) 
+- Removed Apache Oltu API from token requests (#650)
+- Removed OpenID
+- Fixed clearing cache
+
 # version 0.71
 
 - Removed auditing (#611)

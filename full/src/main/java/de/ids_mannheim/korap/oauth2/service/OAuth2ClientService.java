@@ -13,6 +13,8 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.nimbusds.oauth2.sdk.OAuth2Error;
+
 import de.ids_mannheim.korap.config.FullConfiguration;
 import de.ids_mannheim.korap.dao.AdminDao;
 import de.ids_mannheim.korap.dto.InstalledPluginDto;
@@ -22,7 +24,6 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.interfaces.EncryptionIface;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
-import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dao.AccessTokenDao;
 import de.ids_mannheim.korap.oauth2.dao.AuthorizationDao;
 import de.ids_mannheim.korap.oauth2.dao.InstalledPluginDao;
@@ -34,7 +35,6 @@ import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
-import de.ids_mannheim.korap.oauth2.oltu.service.OltuTokenService;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
 
@@ -66,7 +66,7 @@ public class OAuth2ClientService {
 //                    UrlValidator.NO_FRAGMENTS + UrlValidator.ALLOW_LOCAL_URLS);
 
     @Autowired
-    private OltuTokenService tokenService;
+    private OAuth2TokenService tokenService;
     @Autowired
     private InstalledPluginDao pluginDao;
     @Autowired

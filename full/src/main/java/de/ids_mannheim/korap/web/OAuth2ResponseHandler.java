@@ -3,22 +3,21 @@ package de.ids_mannheim.korap.web;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
-
 import org.apache.http.HttpHeaders;
-import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.OAuthResponse;
 import org.apache.oltu.oauth2.common.message.OAuthResponse.OAuthErrorResponseBuilder;
 
+import com.nimbusds.oauth2.sdk.OAuth2Error;
+
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * OAuth2ResponseHandler builds {@link Response}s from
@@ -81,6 +80,7 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
     
     public WebApplicationException throwit (KustvaktException e, String state) {
         String errorCode = e.getEntity();
+                    
         int responseStatus = e.getResponseStatus();
         try {
             if(responseStatus>0) {
@@ -89,30 +89,30 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
             else if (errorCode == null){
                 return super.throwit(e);
             }
-            else if (errorCode.equals(OAuth2Error.INVALID_CLIENT)
-                    || errorCode.equals(OAuth2Error.UNAUTHORIZED_CLIENT)
-                    || errorCode.equals(OAuth2Error.INVALID_TOKEN)) {
+            else if (errorCode.equals(OAuth2Error.INVALID_CLIENT.getCode())
+                    || errorCode.equals(OAuth2Error.UNAUTHORIZED_CLIENT.getCode())
+                    || errorCode.equals(de.ids_mannheim.korap.oauth2.constant.OAuth2Error.INVALID_TOKEN)) {
                 return throwit(createOAuthProblemException(e,
                         Status.UNAUTHORIZED.getStatusCode(), state));
             }
-            else if (errorCode.equals(OAuth2Error.INVALID_GRANT)
-                    || errorCode.equals(OAuth2Error.INVALID_REQUEST)
-                    || errorCode.equals(OAuth2Error.INVALID_SCOPE)
-                    || errorCode.equals(OAuth2Error.UNSUPPORTED_GRANT_TYPE)
-                    || errorCode.equals(OAuth2Error.UNSUPPORTED_RESPONSE_TYPE)
-                    || errorCode.equals(OAuth2Error.ACCESS_DENIED)) {
+            else if (errorCode.equals(OAuth2Error.INVALID_GRANT.getCode())
+                    || errorCode.equals(OAuth2Error.INVALID_REQUEST.getCode())
+                    || errorCode.equals(OAuth2Error.INVALID_SCOPE.getCode())
+                    || errorCode.equals(OAuth2Error.UNSUPPORTED_GRANT_TYPE.getCode())
+                    || errorCode.equals(OAuth2Error.UNSUPPORTED_RESPONSE_TYPE.getCode())
+                    || errorCode.equals(OAuth2Error.ACCESS_DENIED.getCode())) {
                 return throwit(createOAuthProblemException(e,
                         Status.BAD_REQUEST.getStatusCode(), state));
             }
-            else if (errorCode.equals(OAuth2Error.INSUFFICIENT_SCOPE)) {
+            else if (errorCode.equals(de.ids_mannheim.korap.oauth2.constant.OAuth2Error.INSUFFICIENT_SCOPE)) {
                 return throwit(createOAuthProblemException(e,
                         Status.FORBIDDEN.getStatusCode(), state));
             }
-            else if (errorCode.equals(OAuth2Error.SERVER_ERROR)) {
+            else if (errorCode.equals(OAuth2Error.SERVER_ERROR.getCode())) {
                 return throwit(createOAuthProblemException(e,
                         Status.INTERNAL_SERVER_ERROR.getStatusCode(), state));
             }
-            else if (errorCode.equals(OAuth2Error.TEMPORARILY_UNAVAILABLE)) {
+            else if (errorCode.equals(OAuth2Error.TEMPORARILY_UNAVAILABLE.getCode())) {
                 return throwit(createOAuthProblemException(e,
                         Status.SERVICE_UNAVAILABLE.getStatusCode(), state));
             }
@@ -182,15 +182,8 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
         return builder.build();
     }
 
-    public Response sendRedirect (String locationUri) throws KustvaktException {
-        try {
-            ResponseBuilder builder =
-                    Response.temporaryRedirect(new URI(locationUri));
-            return builder.build();
-        }
-        catch (URISyntaxException e) {
-            throw new KustvaktException(StatusCodes.INVALID_ARGUMENT,
-                    e.getMessage(), OAuthError.CodeResponse.INVALID_REQUEST);
-        }
+    public Response sendRedirect (URI locationUri) {
+        ResponseBuilder builder = Response.temporaryRedirect(locationUri);
+        return builder.build();
     }
 }

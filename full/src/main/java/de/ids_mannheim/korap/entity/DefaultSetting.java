@@ -1,8 +1,8 @@
 package de.ids_mannheim.korap.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 /**
  * Describes default_setting table. Each user may define one set of

@@ -112,7 +112,7 @@ public class StatusCodes {
 
     public static final int STATUS_OK = 1000;
     public static final int NOTHING_CHANGED = 1001;
-    public static final int REQUEST_INVALID = 1002;
+    public static final int INVALID_REQUEST = 1002;
     
 //    public static final int ACCESS_DENIED = 1003;
 
@@ -126,7 +126,7 @@ public class StatusCodes {
     public static final int GROUP_DELETED = 1606;
     
     /**
-     * 1800 Oauth2 and OpenID
+     * 1800 Oauth2
      */
 
     public static final int OAUTH2_SYSTEM_ERROR = 1800;
@@ -144,12 +144,11 @@ public class StatusCodes {
     
     public static final int UNSUPPORTED_GRANT_TYPE = 1811;
     public static final int UNSUPPORTED_AUTHENTICATION_METHOD = 1812;
+    public static final int UNSUPPORTED_RESPONSE_TYPE = 1813;
     
-    public static final int ID_TOKEN_CLAIM_ERROR = 1813;
-    public static final int ID_TOKEN_SIGNING_FAILED = 1814;
-    public static final int USER_REAUTHENTICATION_REQUIRED = 1815;
+    public static final int USER_REAUTHENTICATION_REQUIRED = 1822;
     
-    public static final int INVALID_REFRESH_TOKEN_EXPIRY = 1816;
+    public static final int INVALID_REFRESH_TOKEN_EXPIRY = 1830;
     
     /**
      * 1850 Plugins

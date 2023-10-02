@@ -3,10 +3,11 @@ package de.ids_mannheim.korap.web.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.entity.ContentType;
@@ -66,10 +67,20 @@ public class TokenExpiryTest extends SpringJerseyTest {
         Form form = new Form();
         form.param("response_type", "code");
         form.param("client_id", "fCBbQkAyYzI4NzUxMg");
-        form.param("redirect_uri", "https://korap.ids-mannheim.de/confidential/redirect");
-        form.param("scope", "openid");
+        form.param("redirect_uri",
+                "https://korap.ids-mannheim.de/confidential/redirect");
+        form.param("scope", "search");
         form.param("max_age", "1");
-        Response response = target().path(API_VERSION).path("oauth2").path("openid").path("authorize").request().header(Attributes.AUTHORIZATION, "Bearer " + token).header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED).post(Entity.form(form));
+
+        Response response =
+                target().path(API_VERSION).path("oauth2").path("authorize")
+                        .request()
+                        .header(Attributes.AUTHORIZATION, "Bearer " + token)
+                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                        .header(HttpHeaders.CONTENT_TYPE,
+                                ContentType.APPLICATION_FORM_URLENCODED)
+                        .post(Entity.form(form));
+
         assertEquals(HttpStatus.SC_UNAUTHORIZED, response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);

@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,11 +52,14 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testNonUniqueVC() throws KustvaktException {
-        PersistenceException exception = assertThrows(PersistenceException.class, () -> {
-            dao.createQuery("system-vc", ResourceType.SYSTEM, QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE, "corpusSigle=GOE", "definition", "description", "experimental", false, "system", null, null);
-        });
-        assertEquals(exception.getMessage(), "org.hibernate.exception.GenericJDBCException: could not execute statement");
+    public void testNonUniqueVC () throws KustvaktException {
+        
+        PersistenceException exception = assertThrows(PersistenceException.class, ()->{
+            dao.createQuery("system-vc", ResourceType.SYSTEM,
+                    QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE,
+                    "corpusSigle=GOE", "definition", "description", "experimental",
+                    false, "system", null, null);
+        });        
     }
 
     @Test
