@@ -3,18 +3,11 @@ package de.ids_mannheim.korap.core.web.controller;
 import java.io.IOException;
 import java.util.List;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import de.ids_mannheim.korap.web.utils.ResourceFilters;
+
 import de.ids_mannheim.korap.core.service.AnnotationService;
 import de.ids_mannheim.korap.dto.FoundryDto;
 import de.ids_mannheim.korap.dto.LayerDto;
@@ -25,6 +18,13 @@ import de.ids_mannheim.korap.web.KustvaktResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.DemoUserFilter;
 import de.ids_mannheim.korap.web.filter.PiwikFilter;
+import de.ids_mannheim.korap.web.utils.ResourceFilters;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 /**
  * Provides services regarding annotation related information.

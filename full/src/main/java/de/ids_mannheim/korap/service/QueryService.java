@@ -7,8 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +43,7 @@ import de.ids_mannheim.korap.web.SearchKrill;
 import de.ids_mannheim.korap.web.controller.QueryReferenceController;
 import de.ids_mannheim.korap.web.controller.VirtualCorpusController;
 import de.ids_mannheim.korap.web.input.QueryJson;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * QueryService handles the logic behind

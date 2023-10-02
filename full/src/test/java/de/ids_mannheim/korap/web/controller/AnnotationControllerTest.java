@@ -5,16 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Iterator;
 import java.util.Map.Entry;
-import javax.ws.rs.client.Entity;
 
 import org.junit.jupiter.api.Test;
-import com.fasterxml.jackson.databind.JsonNode;
 
-import javax.ws.rs.core.Response;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Response;
 
 public class AnnotationControllerTest extends SpringJerseyTest {
 

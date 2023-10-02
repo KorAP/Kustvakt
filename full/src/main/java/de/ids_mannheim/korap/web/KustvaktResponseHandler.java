@@ -2,14 +2,13 @@ package de.ids_mannheim.korap.web;
 
 import java.util.EnumSet;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-
 import de.ids_mannheim.korap.constant.AuthenticationScheme;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
 
 /**
  * KustvaktResponseHandler includes exceptions regarding

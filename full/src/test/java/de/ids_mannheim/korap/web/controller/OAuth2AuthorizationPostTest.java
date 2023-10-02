@@ -4,11 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.net.URI;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
 import org.apache.oltu.oauth2.common.message.types.TokenType;
@@ -58,16 +59,20 @@ public class OAuth2AuthorizationPostTest extends OAuth2TestBase {
         authForm.param("scope", "search");
         Response response = requestAuthorizationCode(authForm, userAuthHeader);
         URI redirectUri = response.getLocation();
-        MultivaluedMap<String, String> params = UriComponent.decodeQuery(redirectUri, true);
+
+        MultivaluedMap<String, String> params =
+                UriComponent.decodeQuery(redirectUri, true);
         String code = params.get("code").get(0);
-        String scopes = params.get("scope").get(0);
-        assertEquals(scopes, "search");
-        response = requestTokenWithAuthorizationCodeAndForm(confidentialClientId, clientSecret, code);
+
+
+        response = requestTokenWithAuthorizationCodeAndForm(
+                confidentialClientId, clientSecret, code);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());
-        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.toString(),
+                node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
     }
 }

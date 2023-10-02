@@ -4,9 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -16,6 +13,8 @@ import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * <p>Test scenario for ICC (International Comparable Corpus)

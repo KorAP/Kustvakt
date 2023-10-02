@@ -3,7 +3,8 @@ package de.ids_mannheim.korap.misc;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
-import javax.annotation.PostConstruct;
+
+import jakarta.annotation.PostConstruct;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

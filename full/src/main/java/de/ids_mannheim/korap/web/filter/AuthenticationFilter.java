@@ -1,10 +1,5 @@
 package de.ids_mannheim.korap.web.filter;
 
-import javax.annotation.Priority;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.server.ContainerRequest;
@@ -21,6 +16,10 @@ import de.ids_mannheim.korap.security.context.KustvaktContext;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import de.ids_mannheim.korap.web.KustvaktResponseHandler;
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
 
 /** Authentication filter extracts an authentication token from 
  * authorization header and uses an authentication provider 

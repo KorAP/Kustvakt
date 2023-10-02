@@ -1,52 +1,58 @@
 package de.ids_mannheim.korap.web.controller;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
-
-import org.apache.oltu.oauth2.as.request.AbstractOAuthTokenRequest;
-import org.apache.oltu.oauth2.as.request.OAuthTokenRequest;
-import org.apache.oltu.oauth2.as.request.OAuthUnauthenticatedTokenRequest;
-import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.OAuthResponse;
-import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import de.ids_mannheim.korap.web.utils.ResourceFilters;
+import com.nimbusds.oauth2.sdk.AuthorizationErrorResponse;
+import com.nimbusds.oauth2.sdk.AuthorizationGrant;
+import com.nimbusds.oauth2.sdk.ClientCredentialsGrant;
+import com.nimbusds.oauth2.sdk.OAuth2Error;
+import com.nimbusds.oauth2.sdk.ParseException;
+import com.nimbusds.oauth2.sdk.Scope;
+import com.nimbusds.oauth2.sdk.TokenRequest;
+import com.nimbusds.oauth2.sdk.TokenRevocationRequest;
+import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
+import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod;
+import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
+import com.nimbusds.oauth2.sdk.auth.ClientSecretPost;
+import com.nimbusds.oauth2.sdk.id.ClientID;
+import com.nimbusds.oauth2.sdk.token.Token;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
-import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.dto.OAuth2TokenDto;
-import de.ids_mannheim.korap.oauth2.oltu.OAuth2AuthorizationRequest;
-import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeAllTokenSuperRequest;
-import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
-import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenSuperRequest;
-import de.ids_mannheim.korap.oauth2.oltu.service.OltuAuthorizationService;
-import de.ids_mannheim.korap.oauth2.oltu.service.OltuTokenService;
+import de.ids_mannheim.korap.oauth2.service.OAuth2AuthorizationService;
 import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeService;
+import de.ids_mannheim.korap.oauth2.service.OAuth2TokenService;
 import de.ids_mannheim.korap.security.context.TokenContext;
+import de.ids_mannheim.korap.utils.ParameterChecker;
 import de.ids_mannheim.korap.web.OAuth2ResponseHandler;
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
 import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
-import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
+import de.ids_mannheim.korap.web.utils.ResourceFilters;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.UriBuilder;
 
 /**
  * OAuth2Controller describes OAuth2 web API for authorization
@@ -61,16 +67,19 @@ import de.ids_mannheim.korap.web.utils.FormRequestWrapper;
  */
 @Controller
 @Path("{version}/oauth2")
-@ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class, BlockingFilter.class })
+@ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
+        BlockingFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class OAuth2Controller {
 
     @Autowired
     private OAuth2ResponseHandler responseHandler;
+
     @Autowired
-    private OltuTokenService tokenService;
+    private OAuth2TokenService tokenService;
     @Autowired
-    private OltuAuthorizationService authorizationService;
+    private OAuth2AuthorizationService authorizationService;
+    
     @Autowired
     private OAuth2ScopeService scopeService;
 
@@ -102,6 +111,7 @@ public class OAuth2Controller {
     public Response requestAuthorizationCode (
             @Context HttpServletRequest request,
             @Context SecurityContext context, 
+            @FormParam("scope") String scope,
             @FormParam("state") String state,
             @FormParam("client_id") String clientId,
             @FormParam("redirect_uri") String redirectUri,
@@ -111,28 +121,30 @@ public class OAuth2Controller {
         String username = tokenContext.getUsername();
         ZonedDateTime authTime = tokenContext.getAuthenticationTime();
 
+        URI requestURI;
+        UriBuilder builder = UriBuilder.fromPath(request.getRequestURI());
+        for (String key : form.keySet()) {
+            builder.queryParam(key, form.get(key).toArray());
+        }
+        requestURI = builder.build();
+       
         try {
             scopeService.verifyScope(tokenContext, OAuth2Scope.AUTHORIZE);
-
-            HttpServletRequest requestWithForm =
-                    new FormRequestWrapper(request, form);
-            OAuth2AuthorizationRequest authzRequest =
-                    new OAuth2AuthorizationRequest(requestWithForm);
-            String uri = authorizationService.requestAuthorizationCode(
-                    requestWithForm, authzRequest, username, authTime);
+            URI uri = authorizationService.requestAuthorizationCode(
+                    requestURI, clientId, redirectUri,
+                    scope, state, username, authTime);
             return responseHandler.sendRedirect(uri);
-        }
-        catch (OAuthSystemException e) {
-            throw responseHandler.throwit(e, state);
-        }
-        catch (OAuthProblemException e) {
-            e.state(state);
-            e = authorizationService.checkRedirectUri(e, clientId, redirectUri);
-            throw responseHandler.throwit(e);
         }
         catch (KustvaktException e) {
             e = authorizationService.checkRedirectUri(e, clientId, redirectUri);
-            throw responseHandler.throwit(e, state);
+            if (e.getRedirectUri() != null) {
+                AuthorizationErrorResponse errorResponse =
+                        authorizationService.createAuthorizationError(e, state);
+                return responseHandler.sendRedirect(errorResponse.toURI());
+            }
+            else {
+                throw responseHandler.throwit(e, state);
+            } 
         }
     }
     
@@ -141,35 +153,44 @@ public class OAuth2Controller {
     public Response requestAuthorizationCode (
             @Context HttpServletRequest request,
             @Context SecurityContext context,
+            @QueryParam("response_type") String responseType,
             @QueryParam("client_id") String clientId,
             @QueryParam("redirect_uri") String redirectUri,
-            @QueryParam("state") String state
-            ) {
+            @QueryParam("scope") String scope,
+            @QueryParam("state") String state) {
 
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
         String username = tokenContext.getUsername();
         ZonedDateTime authTime = tokenContext.getAuthenticationTime();
 
+        URI requestURI;
+        try {
+            requestURI = new URI(request.getRequestURI()+"?"+request.getQueryString());
+        }
+        catch (URISyntaxException e) {
+            KustvaktException ke = new KustvaktException(
+                    StatusCodes.INVALID_REQUEST, "Failed parsing request URI.",
+                    OAuth2Error.INVALID_REQUEST_URI);
+            throw responseHandler.throwit(ke, state);
+        }
+        
         try {
             scopeService.verifyScope(tokenContext, OAuth2Scope.AUTHORIZE);
-
-            OAuth2AuthorizationRequest authzRequest =
-                    new OAuth2AuthorizationRequest(request);
-            String uri = authorizationService.requestAuthorizationCode(
-                    request, authzRequest, username, authTime);
+            URI uri = authorizationService.requestAuthorizationCode(
+                    requestURI, clientId, redirectUri,
+                    scope, state, username, authTime);
             return responseHandler.sendRedirect(uri);
-        }
-        catch (OAuthSystemException e) {
-            throw responseHandler.throwit(e,state);
-        }
-        catch (OAuthProblemException e) {
-            e.state(state);
-            e = authorizationService.checkRedirectUri(e,clientId,redirectUri);
-            throw responseHandler.throwit(e);
         }
         catch (KustvaktException e) {
             e = authorizationService.checkRedirectUri(e, clientId, redirectUri);
-            throw responseHandler.throwit(e,state);
+            if (e.getRedirectUri() != null) {
+                AuthorizationErrorResponse errorResponse =
+                        authorizationService.createAuthorizationError(e, state);
+                return responseHandler.sendRedirect(errorResponse.toURI());
+            }
+            else {
+                throw responseHandler.throwit(e, state);
+            } 
         }
     }
 
@@ -240,36 +261,77 @@ public class OAuth2Controller {
     @ResourceFilters({APIVersionFilter.class})
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response requestAccessToken (@Context HttpServletRequest request,
-            @FormParam("grant_type") String grantType,
+            @FormParam("client_id") String clientId,
+            @FormParam("client_secret") String clientSecret,
             MultivaluedMap<String, String> form) {
 
+        OAuthResponse oAuthResponse = null;
         try {
-            boolean grantTypeExist = grantType != null && !grantType.isEmpty();
-            AbstractOAuthTokenRequest oAuthRequest = null;
-            if (grantTypeExist && grantType
-                    .equals(GrantType.CLIENT_CREDENTIALS.toString())) {
-                oAuthRequest = new OAuthTokenRequest(
-                        new FormRequestWrapper(request, form));
+            URI requestURI;
+            UriBuilder builder = UriBuilder.fromPath(
+                    request.getRequestURL().toString());
+            for (String key : form.keySet()) {
+                builder.queryParam(key, form.get(key).toArray());
             }
-            else {
-                oAuthRequest = new OAuthUnauthenticatedTokenRequest(
-                        new FormRequestWrapper(request, form));
+            requestURI = builder.build();
+            
+            try {
+                AuthorizationGrant authGrant = AuthorizationGrant.parse(form);  
+                
+                ClientAuthentication clientAuth = null;
+                String authorizationHeader = request.getHeader("Authorization");
+                if (authorizationHeader!=null && !authorizationHeader.isEmpty() ) {
+                    clientAuth = ClientSecretBasic.parse(authorizationHeader);
+                }
+                else if (authGrant instanceof ClientCredentialsGrant) {
+                    // this doesn't allow public clients
+                    clientAuth = ClientSecretPost.parse(form);
+                }
+                
+                TokenRequest tokenRequest = null;
+                if (clientAuth!=null) {
+                    ClientAuthenticationMethod method = clientAuth.getMethod();
+                    if (method.equals(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)) {
+                        ClientSecretBasic basic = (ClientSecretBasic) clientAuth;
+                        clientSecret = basic.getClientSecret().getValue();
+                        clientId = basic.getClientID().getValue();
+                    }
+                    else if (method.equals(ClientAuthenticationMethod.CLIENT_SECRET_POST)) {
+                        ClientSecretPost post = (ClientSecretPost) clientAuth;
+                        clientSecret = post.getClientSecret().getValue();
+                        clientId = post.getClientID().getValue();
+                    }
+                    
+                    tokenRequest = new TokenRequest(requestURI,
+                            clientAuth,
+                            AuthorizationGrant.parse(form),
+                            Scope.parse(form.getFirst("scope")));
+                }
+                else {
+                    // requires ClientAuthentication for client_credentials grant
+                    tokenRequest = new TokenRequest(requestURI,
+                        new ClientID(clientId),
+                        AuthorizationGrant.parse(form),
+                        Scope.parse(form.getFirst("scope")));
+                }
+            
+                oAuthResponse = tokenService.requestAccessToken(tokenRequest,
+                        clientId, clientSecret);
             }
-
-            OAuthResponse oAuthResponse =
-                    tokenService.requestAccessToken(oAuthRequest);
-
-            return responseHandler.createResponse(oAuthResponse);
+            catch (ParseException | IllegalArgumentException e) {
+                throw new KustvaktException(StatusCodes.INVALID_REQUEST,
+                        e.getMessage(), OAuth2Error.INVALID_REQUEST); 
+            }
+            
         }
         catch (KustvaktException e) {
-            throw responseHandler.throwit(e);
-        }
-        catch (OAuthProblemException e) {
             throw responseHandler.throwit(e);
         }
         catch (OAuthSystemException e) {
             throw responseHandler.throwit(e);
         }
+        
+        return responseHandler.createResponse(oAuthResponse);
     }
 
     /**
@@ -295,20 +357,17 @@ public class OAuth2Controller {
     @ResourceFilters({APIVersionFilter.class})
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response revokeAccessToken (@Context HttpServletRequest request,
-            MultivaluedMap<String, String> form) {
+            @FormParam("client_id") String clientId,
+            @FormParam("client_secret") String clientSecret,
+            @FormParam("token") String token,
+            @FormParam("token_type") String tokenType) {
 
         try {
-            OAuth2RevokeTokenRequest revokeTokenRequest =
-                    new OAuth2RevokeTokenRequest(
-                            new FormRequestWrapper(request, form));
-            tokenService.revokeToken(revokeTokenRequest);
+            ParameterChecker.checkStringValue("client_id", clientId);
+            ParameterChecker.checkStringValue("token", token);
+            tokenService.revokeToken(clientId,clientSecret,token,tokenType);
+            
             return Response.ok("SUCCESS").build();
-        }
-        catch (OAuthProblemException e) {
-            throw responseHandler.throwit(e);
-        }
-        catch (OAuthSystemException e) {
-            throw responseHandler.throwit(e);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
@@ -320,24 +379,22 @@ public class OAuth2Controller {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response revokeTokenViaSuperClient (@Context SecurityContext context,
             @Context HttpServletRequest request,
-            MultivaluedMap<String, String> form) {
-
-        TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
-        String username = tokenContext.getUsername();
+            @FormParam("super_client_id") String superClientId,
+            @FormParam("super_client_secret") String superClientSecret,
+            @FormParam("token") String token) {
 
         try {
-            OAuth2RevokeTokenSuperRequest revokeTokenRequest =
-                    new OAuth2RevokeTokenSuperRequest(
-                            new FormRequestWrapper(request, form));
-            tokenService.revokeTokensViaSuperClient(username,
-                    revokeTokenRequest);
+            ParameterChecker.checkStringValue("super_client_id", superClientId);
+            ParameterChecker.checkStringValue("super_client_secret",
+                    superClientSecret);
+            ParameterChecker.checkStringValue("token", token);
+            
+            TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+            String username = tokenContext.getUsername();
+            
+            tokenService.revokeTokensViaSuperClient(username, superClientId,
+                    superClientSecret, token);
             return Response.ok("SUCCESS").build();
-        }
-        catch (OAuthSystemException e) {
-            throw responseHandler.throwit(e);
-        }
-        catch (OAuthProblemException e) {
-            throw responseHandler.throwit(e);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
@@ -364,24 +421,21 @@ public class OAuth2Controller {
     public Response revokeAllClientTokensViaSuperClient (
             @Context SecurityContext context,
             @Context HttpServletRequest request,
-            MultivaluedMap<String, String> form) {
+            @FormParam("client_id") String clientId,
+            @FormParam("super_client_id") String superClientId,
+            @FormParam("super_client_secret") String superClientSecret) {
 
         TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
         String username = tokenContext.getUsername();
 
         try {
-            OAuth2RevokeAllTokenSuperRequest revokeTokenRequest =
-                    new OAuth2RevokeAllTokenSuperRequest(
-                            new FormRequestWrapper(request, form));
+            ParameterChecker.checkStringValue("super_client_id", superClientId);
+            ParameterChecker.checkStringValue("super_client_secret",
+                    superClientSecret);
+           
             tokenService.revokeAllClientTokensViaSuperClient(username,
-                    revokeTokenRequest);
+                    superClientId, superClientSecret, clientId);
             return Response.ok("SUCCESS").build();
-        }
-        catch (OAuthSystemException e) {
-            throw responseHandler.throwit(e);
-        }
-        catch (OAuthProblemException e) {
-            throw responseHandler.throwit(e);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);

@@ -3,8 +3,6 @@ package de.ids_mannheim.korap.cache;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,16 +11,36 @@ import de.ids_mannheim.korap.config.SpringJerseyTest;
 import de.ids_mannheim.korap.core.service.SearchService;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 public class TotalResultTest extends SpringJerseyTest {
 
     @Autowired
     private SearchService searchService;
+    
+    @Test
+    public void testClearCache () {
+        for (int i = 1; i < 10; i++) {
+            searchService.getTotalResultCache().storeInCache(i, "10");
+        }
+        
+        searchService.getTotalResultCache().clearCache();
+        
+        assertEquals(0, searchService.getTotalResultCache()
+                .getAllCacheElements().size());
+    }
 
     @Test
-    public void testSearchWithPaging() throws KustvaktException {
-        assertEquals(0, searchService.getTotalResultCache().getAllCacheElements().size());
-        Response response = target().path(API_VERSION).path("search").queryParam("q", "[orth=die]").queryParam("ql", "poliqarp").queryParam("page", "1").request().get();
+    public void testSearchWithPaging () throws KustvaktException {
+        searchService.getTotalResultCache().clearCache();
+        
+        assertEquals(0, searchService.getTotalResultCache()
+                .getAllCacheElements().size());
+        
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=die]").queryParam("ql", "poliqarp")
+                .queryParam("page", "1").request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);

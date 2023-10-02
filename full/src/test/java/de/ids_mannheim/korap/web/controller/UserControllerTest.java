@@ -3,9 +3,10 @@ package de.ids_mannheim.korap.web.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.URI;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.util.MultiValueMap;

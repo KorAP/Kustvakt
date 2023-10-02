@@ -2,7 +2,6 @@ package de.ids_mannheim.korap.security.context;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +15,6 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.TimeUtils;
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
 import lombok.Setter;
 
 /**
