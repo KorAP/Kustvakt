@@ -8,29 +8,39 @@ WORKDIR /kustvakt
 
 RUN apk update && \
     apk add --no-cache git \
+            curl \
+            perl \
+            wget \
             maven
 
 RUN git config --global user.email "korap+docker@ids-mannheim.de" && \
     git config --global user.name "Docker"
 
 # Install Koral
-RUN mkdir Koral && git clone https://github.com/KorAP/Koral.git Koral && \
-    cd Koral && \
-    git checkout master && \
+RUN curl -I https://github.com/KorAP/Koral/releases/latest | \
+      grep location | \
+      perl -e '$|++; <> =~ m/tag\/(v[\d\.]+(?:-release)?)/; print "https://github.com/KorAP/Koral/archive/refs/tags/${1}\.zip\n"' |\
+      wget -i - && \
+    unzip *.zip && \
+    cd Koral-* && \
     mvn clean install
 
-RUN rm -r Koral
+RUN rm -r Koral-* v*.zip
+
+RUN mkdir built
 
 # Install Krill
-RUN mkdir built && \
-    git clone https://github.com/KorAP/Krill.git Krill && \
-    cd Krill && \
-    git checkout master && \
+RUN curl -I https://github.com/KorAP/Krill/releases/latest | \
+      grep location | \
+      perl -e '$|++; <> =~ m/tag\/(v[\d\.]+(?:-release)?)/; print "https://github.com/KorAP/Krill/archive/refs/tags/${1}\.zip\n"' |\
+      wget -i - && \
+    unzip *.zip && \
+    cd Krill-* && \
     mvn clean install && \
     mvn -Dmaven.test.skip=true package && \
     mv target/Krill-Indexer.jar /kustvakt/built/Krill-Indexer.jar
 
-RUN rm -r Krill
+RUN rm -r Krill-* v*.zip
 
 # Package lite
 RUN cd full && \
@@ -60,6 +70,9 @@ RUN cat full/src/main/resources/example-users.ldif \
     > built/ldap.ldif
 
 RUN apk del git \
+            perl \
+            curl \
+            wget \
             maven
 
 RUN cd ${M2_HOME} && rm -r .m2
