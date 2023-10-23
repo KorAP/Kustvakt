@@ -41,13 +41,23 @@ public class SearchPipeTest extends SpringJerseyTest {
 
     private int port = 6071;
 
-    private String pipeJson, pipeWithParamJson;
+    private String pipeJson, pipeWithParamJson, pipeTimeout;
 
     private String glemmUri = "http://localhost:" + port + "/glemm";
 
-    public SearchPipeTest() throws URISyntaxException, IOException {
-        pipeJson = IOUtils.toString(ClassLoader.getSystemResourceAsStream("pipe-output/test-pipes.jsonld"), StandardCharsets.UTF_8);
-        pipeWithParamJson = IOUtils.toString(ClassLoader.getSystemResourceAsStream("pipe-output/with-param.jsonld"), StandardCharsets.UTF_8);
+    public SearchPipeTest () throws URISyntaxException, IOException {
+        pipeJson = IOUtils.toString(
+                ClassLoader.getSystemResourceAsStream(
+                        "pipe-output/test-pipes.jsonld"),
+                StandardCharsets.UTF_8);
+        pipeTimeout = IOUtils.toString(
+                ClassLoader.getSystemResourceAsStream(
+                        "pipe-output/test-timeout.jsonld"),
+                StandardCharsets.UTF_8);
+        pipeWithParamJson = IOUtils.toString(
+                ClassLoader.getSystemResourceAsStream(
+                        "pipe-output/with-param.jsonld"),
+                StandardCharsets.UTF_8);
     }
 
     @BeforeEach
@@ -81,16 +91,30 @@ public class SearchPipeTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testSearchWithPipes() throws IOException, KustvaktException, URISyntaxException {
-        mockClient.reset().when(request().withMethod("POST").withPath("/glemm").withHeaders(new Header("Content-Type", "application/json; charset=utf-8"), new Header("Accept", "application/json"))).respond(response().withHeader(new Header("Content-Type", "application/json; charset=utf-8")).withBody(pipeJson).withStatusCode(200));
-        Response response = target().path(API_VERSION).path("search").queryParam("q", "[orth=der]").queryParam("ql", "poliqarp").queryParam("pipes", glemmUri).request().get();
+    public void testSearchWithPipes ()
+            throws IOException, KustvaktException, URISyntaxException {
+        mockClient.reset()
+                .when(request().withMethod("POST").withPath("/glemm")
+                        .withHeaders(
+                                new Header("Content-Type",
+                                        "application/json; charset=utf-8"),
+                                new Header("Accept", "application/json")))
+                .respond(response()
+                        .withHeader(new Header("Content-Type",
+                                "application/json; charset=utf-8"))
+                        .withBody(pipeJson).withStatusCode(200));
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("pipes", glemmUri).request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(2, node.at("/query/wrap/key").size());
         assertEquals(1, node.at("/collection/rewrites").size());
-        assertEquals(node.at("/collection/rewrites/0/operation").asText(), "operation:insertion");
-        assertEquals(node.at("/collection/rewrites/0/scope").asText(), "availability(FREE)");
+        assertEquals(node.at("/collection/rewrites/0/operation").asText(),
+                "operation:insertion");
+        assertEquals(node.at("/collection/rewrites/0/scope").asText(),
+                "availability(FREE)");
         node = node.at("/query/wrap/rewrites");
         assertEquals(2, node.size());
         assertEquals(node.at("/0/src").asText(), "Glemm");
@@ -99,6 +123,28 @@ public class SearchPipeTest extends SpringJerseyTest {
         assertEquals(node.at("/1/src").asText(), "Kustvakt");
         assertEquals(node.at("/1/operation").asText(), "operation:injection");
         assertEquals(node.at("/1/scope").asText(), "foundry");
+    }
+    
+    @Test
+    public void testTimeoutWithPipes ()
+            throws IOException, KustvaktException, URISyntaxException {
+        mockClient.reset()
+                .when(request().withMethod("POST").withPath("/glemm")
+                        .withHeaders(
+                                new Header("Content-Type",
+                                        "application/json; charset=utf-8"),
+                                new Header("Accept", "application/json")))
+                .respond(response()
+                        .withHeader(new Header("Content-Type",
+                                "application/json; charset=utf-8"))
+                        .withBody(pipeTimeout).withStatusCode(200));
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("pipes", glemmUri).request().get();
+        assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        String entity = response.readEntity(String.class);
+        JsonNode node = JsonUtils.readTree(entity);
+        assertEquals(10000, node.at("/meta/timeout").asInt());
     }
 
     @Test

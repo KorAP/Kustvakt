@@ -200,6 +200,7 @@ public class SearchService extends BasicService{
         
         query = runPipes(query,pipeArray);
         
+        
         query = this.rewriteHandler.processQuery(query, user);
         if (DEBUG){
             jlog.debug("the serialized query " + query);
