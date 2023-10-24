@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0030133b_f4801123",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-10-24T13:24:31Z",
+      "side": 1,
+      "message": "This defines a target for an extracted sample index in a content-only-image.",
+      "revId": "a0a0752d02971852a67d532f340922071b1a899e",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
