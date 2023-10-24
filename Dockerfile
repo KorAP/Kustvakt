@@ -59,15 +59,29 @@ RUN sed  's!\(ldifFile\s*=\).\+!\1\/kustvakt\/ldap\/ldap.ldif!' \
 RUN cat full/src/main/resources/example-users.ldif \
     > built/ldap.ldif
 
-# Cleanup
-RUN rm -r full && \
-    rm -r sample-index && \
-    rm -r wiki-index
-
 RUN apk del git \
             maven
 
 RUN cd ${M2_HOME} && rm -r .m2
+
+# Cleanup
+RUN rm -r full && \
+    rm -r wiki-index
+
+FROM busybox:latest AS example-index
+
+WORKDIR /kustvakt
+
+RUN addgroup -S korap && \
+    adduser -S kustvakt -G korap && \
+    mkdir kustvakt && \
+    chown -R kustvakt.korap /kustvakt
+
+COPY --from=builder /kustvakt/sample-index /kustvakt/index
+
+USER kustvakt
+
+CMD ["sh"]
 
 FROM openjdk:19-alpine AS kustvakt-lite
 
@@ -117,3 +131,4 @@ CMD [ "Kustvakt-full.jar" ]
 
 # docker build -f Dockerfile -t korap/kustvakt:{nr}-full --target kustvakt-full .
 # docker build -f Dockerfile -t korap/kustvakt:{nr} --target kustvakt-lite .
+# docker build -f Dockerfile -t korap/example-index:{nr} --target example-index .
