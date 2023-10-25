@@ -9,7 +9,13 @@ import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.OAuthResponse;
 import org.apache.oltu.oauth2.common.message.OAuthResponse.OAuthErrorResponseBuilder;
 
+import com.nimbusds.oauth2.sdk.AccessTokenResponse;
+import com.nimbusds.oauth2.sdk.AuthorizationErrorResponse;
+import com.nimbusds.oauth2.sdk.ErrorObject;
+import com.nimbusds.oauth2.sdk.ErrorResponse;
 import com.nimbusds.oauth2.sdk.OAuth2Error;
+import com.nimbusds.oauth2.sdk.TokenErrorResponse;
+import com.nimbusds.oauth2.sdk.id.State;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
@@ -69,9 +75,12 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
         catch (OAuthSystemException e1) {
             throwit(e1, state);
         }
-        Response r = createResponse(oAuthResponse);
+        Response r = createResponse(oAuthResponse.getResponseStatus(),
+                oAuthResponse.getBody(), oAuthResponse.getLocationUri());
         return new WebApplicationException(r);
     }
+    
+    
 
     @Override
     public WebApplicationException throwit (KustvaktException e){
@@ -136,6 +145,19 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
         }
         return ex;
     }
+    
+    private ErrorResponse createErrorResponse (
+            KustvaktException e, String statusCode, String state){
+        ErrorResponse r = null;
+        
+        if (e.getRedirectUri()!=null) {
+            ErrorObject eo = new ErrorObject(statusCode, e.getMessage());
+            State s = new State(state);
+            r = new AuthorizationErrorResponse(e.getRedirectUri(), eo, s, null);
+        }
+        
+        return r;
+    }
 
     /**
      * RFC 6749 regarding authorization error response:
@@ -156,19 +178,18 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
      * @param oAuthResponse
      * @return
      */
-    public Response createResponse (OAuthResponse oAuthResponse) {
+    public Response createResponse (int status, String body, String uri) {
         ResponseBuilder builder =
-                Response.status(oAuthResponse.getResponseStatus());
-        builder.entity(oAuthResponse.getBody());
+                Response.status(status);
+        builder.entity(body);
         builder.header(HttpHeaders.CACHE_CONTROL, "no-store");
         builder.header(HttpHeaders.PRAGMA, "no-store");
 
-        if (oAuthResponse.getResponseStatus() == Status.UNAUTHORIZED
+        if (status == Status.UNAUTHORIZED
                 .getStatusCode()) {
             builder.header(HttpHeaders.WWW_AUTHENTICATE,
                     "Basic realm=\"Kustvakt\"");
         }
-        String uri = oAuthResponse.getLocationUri();
         if (uri != null && !uri.isEmpty()) {
             try {
                 builder.location(new URI(uri));
@@ -184,6 +205,30 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
 
     public Response sendRedirect (URI locationUri) {
         ResponseBuilder builder = Response.temporaryRedirect(locationUri);
+        return builder.build();
+    }
+    
+    public Response createResponse (AccessTokenResponse tokenResponse) {
+        String jsonString = tokenResponse.toJSONObject().toJSONString();
+        return createResponse(Status.OK, jsonString);
+    }
+
+    public Response createResponse (TokenErrorResponse tokenResponse,
+            Status status) {
+        String jsonString = tokenResponse.toJSONObject().toJSONString();
+        return createResponse(status, jsonString);
+    }
+
+    private Response createResponse (Status status, Object entity) {
+        ResponseBuilder builder = Response.status(status);
+        builder.entity(entity);
+        builder.header(HttpHeaders.CACHE_CONTROL, "no-store");
+        builder.header(HttpHeaders.PRAGMA, "no-store");
+
+        if (status == Status.UNAUTHORIZED) {
+            builder.header(HttpHeaders.WWW_AUTHENTICATE,
+                    "Basic realm=\"Kustvakt\"");
+        }
         return builder.build();
     }
 }
