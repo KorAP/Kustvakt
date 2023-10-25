@@ -5,11 +5,10 @@ import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
-import org.apache.oltu.oauth2.common.message.OAuthResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import com.nimbusds.oauth2.sdk.AccessTokenResponse;
 import com.nimbusds.oauth2.sdk.AuthorizationErrorResponse;
 import com.nimbusds.oauth2.sdk.AuthorizationGrant;
 import com.nimbusds.oauth2.sdk.ClientCredentialsGrant;
@@ -17,13 +16,11 @@ import com.nimbusds.oauth2.sdk.OAuth2Error;
 import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.TokenRequest;
-import com.nimbusds.oauth2.sdk.TokenRevocationRequest;
 import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
 import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod;
 import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
 import com.nimbusds.oauth2.sdk.auth.ClientSecretPost;
 import com.nimbusds.oauth2.sdk.id.ClientID;
-import com.nimbusds.oauth2.sdk.token.Token;
 
 import de.ids_mannheim.korap.constant.OAuth2Scope;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -267,7 +264,6 @@ public class OAuth2Controller {
             @FormParam("client_secret") String clientSecret,
             MultivaluedMap<String, String> form) {
 
-        OAuthResponse oAuthResponse = null;
         try {
             URI requestURI;
             UriBuilder builder = UriBuilder.fromPath(
@@ -317,8 +313,9 @@ public class OAuth2Controller {
                         Scope.parse(form.getFirst("scope")));
                 }
             
-                oAuthResponse = tokenService.requestAccessToken(tokenRequest,
+                AccessTokenResponse r = tokenService.requestAccessToken(tokenRequest,
                         clientId, clientSecret);
+                return responseHandler.createResponse(r);
             }
             catch (ParseException | IllegalArgumentException e) {
                 throw new KustvaktException(StatusCodes.INVALID_REQUEST,
@@ -329,11 +326,6 @@ public class OAuth2Controller {
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
-        catch (OAuthSystemException e) {
-            throw responseHandler.throwit(e);
-        }
-        
-        return responseHandler.createResponse(oAuthResponse);
     }
 
     /**

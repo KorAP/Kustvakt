@@ -12,13 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.oltu.oauth2.as.response.OAuthASResponse;
-import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
-import org.apache.oltu.oauth2.common.message.OAuthResponse;
-import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.nimbusds.oauth2.sdk.AccessTokenResponse;
 import com.nimbusds.oauth2.sdk.AuthorizationCodeGrant;
 import com.nimbusds.oauth2.sdk.AuthorizationGrant;
 import com.nimbusds.oauth2.sdk.GrantType;
@@ -26,11 +23,8 @@ import com.nimbusds.oauth2.sdk.RefreshTokenGrant;
 import com.nimbusds.oauth2.sdk.ResourceOwnerPasswordCredentialsGrant;
 import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.TokenRequest;
-import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
-import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod;
-import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
-import com.nimbusds.oauth2.sdk.auth.ClientSecretPost;
-import com.nimbusds.oauth2.sdk.id.ClientID;
+import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
+import com.nimbusds.oauth2.sdk.token.Tokens;
 import com.unboundid.ldap.sdk.LDAPException;
 
 import de.ids_mannheim.korap.authentication.AuthenticationManager;
@@ -50,11 +44,7 @@ import de.ids_mannheim.korap.oauth2.entity.AccessToken;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.oauth2.entity.RefreshToken;
-import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeAllTokenSuperRequest;
-import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenRequest;
-import de.ids_mannheim.korap.oauth2.oltu.OAuth2RevokeTokenSuperRequest;
 import jakarta.persistence.NoResultException;
-import jakarta.ws.rs.core.Response.Status;
 
 /**
  * OAuth2TokenService manages business logic related to OAuth2
@@ -103,7 +93,6 @@ public class OAuth2TokenService {
      *            client_secret, required if client_secret was issued
      *            for the client in client registration.
      * @return an authorization
-     * @throws OAuthSystemException
      * @throws KustvaktException
      */
     protected Authorization retrieveAuthorization (
@@ -149,9 +138,9 @@ public class OAuth2TokenService {
         return authenticationTime;
     }
 
-    public OAuthResponse requestAccessToken (
+    public AccessTokenResponse requestAccessToken (
             TokenRequest tokenRequest, String clientId, String clientSecret)
-            throws KustvaktException, OAuthSystemException {
+            throws KustvaktException {
 
         AuthorizationGrant authGrant = tokenRequest.getAuthorizationGrant();
         GrantType grantType = authGrant.getType();
@@ -215,12 +204,11 @@ public class OAuth2TokenService {
      * @param clientSecret
      * @return if successful, a new access token
      * @throws KustvaktException
-     * @throws OAuthSystemException
      */
-    private OAuthResponse requestAccessTokenWithRefreshToken (
+    private AccessTokenResponse requestAccessTokenWithRefreshToken (
             String refreshTokenStr, Set<String> requestScopes, String clientId,
             String clientSecret)
-            throws KustvaktException, OAuthSystemException {
+            throws KustvaktException {
 
         if (refreshTokenStr == null || refreshTokenStr.isEmpty()) {
             throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
@@ -292,13 +280,12 @@ public class OAuth2TokenService {
      *            client id, required
      * @param clientSecret
      *            client secret, required
-     * @return an {@link OAuthResponse}
-     * @throws OAuthSystemException
+     * @return an {@link AccessTokenResponse}
      * @throws KustvaktException
      */
-    private OAuthResponse requestAccessTokenWithAuthorizationCode (String code,
+    private AccessTokenResponse requestAccessTokenWithAuthorizationCode (String code,
             String redirectionURI, String clientId, String clientSecret)
-            throws OAuthSystemException, KustvaktException {
+            throws KustvaktException {
         Authorization authorization = retrieveAuthorization(code, redirectionURI,
                 clientId, clientSecret);
 
@@ -336,13 +323,12 @@ public class OAuth2TokenService {
      *            password, required
      * @param scopes
      *            authorization scopes, optional
-     * @return an {@link OAuthResponse}
+     * @return an {@link AccessTokenResponse}
      * @throws KustvaktException
-     * @throws OAuthSystemException
      */
-    private OAuthResponse requestAccessTokenWithPassword (String clientId,
+    private AccessTokenResponse requestAccessTokenWithPassword (String clientId,
             String clientSecret, String username, String password,
-            Set<String> scopes) throws KustvaktException, OAuthSystemException {
+            Set<String> scopes) throws KustvaktException {
 
         OAuth2Client client =
                 clientService.authenticateClient(clientId, clientSecret);
@@ -390,13 +376,12 @@ public class OAuth2TokenService {
      *            client_secret parameter, required
      * @param scopes
      *            authorization scopes, optional
-     * @return an {@link OAuthResponse}
+     * @return an {@link AccessTokenResponse}
      * @throws KustvaktException
-     * @throws OAuthSystemException
      */
-    protected OAuthResponse requestAccessTokenWithClientCredentials (
+    protected AccessTokenResponse requestAccessTokenWithClientCredentials (
             String clientId, String clientSecret, Set<String> scopes)
-            throws KustvaktException, OAuthSystemException {
+            throws KustvaktException {
 
         if (clientSecret == null || clientSecret.isEmpty()) {
             throw new KustvaktException(
@@ -428,7 +413,7 @@ public class OAuth2TokenService {
     }
 
     /**
-     * Creates an OAuthResponse containing an access token of type
+     * Creates an OAuth response containing an access token of type
      * Bearer. By default, MD generator is used to generates access
      * token of 128 bit values, represented in hexadecimal comprising
      * 32 bytes. The generated value is subsequently encoded in
@@ -451,67 +436,59 @@ public class OAuth2TokenService {
      *            the user authentication time
      * @param client
      *            an OAuth2Client
-     * @return an {@link OAuthResponse}
-     * @throws OAuthSystemException
+     * @return an {@link AccessTokenResponse}
      * @throws KustvaktException
      */
-    private OAuthResponse createsAccessTokenResponse (Set<String> scopes,
+    private AccessTokenResponse createsAccessTokenResponse (Set<String> scopes,
             Set<AccessScope> accessScopes, String clientId, String userId,
             ZonedDateTime authenticationTime, OAuth2Client client)
-            throws OAuthSystemException, KustvaktException {
+            throws KustvaktException {
 
         String random = randomGenerator.createRandomCode();
         random += randomGenerator.createRandomCode();
         
-        if (clientService.isPublicClient(client)){
+        if (clientService.isPublicClient(client)) {
             // refresh token == null, getAccessTokenLongExpiry
-            return createsAccessTokenResponse(scopes, accessScopes, clientId,
-                    userId, authenticationTime);
-            }
+            return createsAccessTokenResponse(null, scopes, accessScopes,
+                    clientId, userId, authenticationTime);
+        }
         else {
             // refresh token != null, getAccessTokenExpiry
             // default refresh token expiry: 365 days in seconds
             RefreshToken refreshToken = refreshDao.storeRefreshToken(random,
                     userId, authenticationTime, client, accessScopes);
-            return createsAccessTokenResponse(scopes, accessScopes, clientId,
-                    userId, authenticationTime, refreshToken);
+            return createsAccessTokenResponse(refreshToken, scopes,
+                    accessScopes, clientId, userId, authenticationTime);
         }
     }
 
-    private OAuthResponse createsAccessTokenResponse (Set<String> scopes,
+    private AccessTokenResponse createsAccessTokenResponse (
+            RefreshToken refreshToken, Set<String> scopes,
             Set<AccessScope> accessScopes, String clientId, String userId,
-            ZonedDateTime authenticationTime, RefreshToken refreshToken)
-            throws OAuthSystemException, KustvaktException {
+            ZonedDateTime authenticationTime) throws KustvaktException {
 
         String accessToken = randomGenerator.createRandomCode();
         accessToken +=randomGenerator.createRandomCode();
         tokenDao.storeAccessToken(accessToken, refreshToken, accessScopes,
                 userId, clientId, authenticationTime);
 
-        return OAuthASResponse.tokenResponse(Status.OK.getStatusCode())
-                .setAccessToken(accessToken)
-                .setTokenType(TokenType.BEARER.toString())
-                .setExpiresIn(String.valueOf(config.getAccessTokenExpiry()))
-                .setRefreshToken(refreshToken.getToken())
-                .setScope(String.join(" ", scopes)).buildJSONMessage();
-    }
-    
-    private OAuthResponse createsAccessTokenResponse (Set<String> scopes,
-            Set<AccessScope> accessScopes, String clientId, String userId,
-            ZonedDateTime authenticationTime)
-            throws OAuthSystemException, KustvaktException {
+        Tokens tokens = null;
+        if (refreshToken !=null) {
+            BearerAccessToken bearerToken = new BearerAccessToken(accessToken,
+                    (long) config.getAccessTokenExpiry(), Scope.parse(scopes));
+            com.nimbusds.oauth2.sdk.token.RefreshToken rf =
+                    new com.nimbusds.oauth2.sdk.token.RefreshToken(
+                            refreshToken.getToken());
+            tokens = new Tokens(bearerToken, rf);
+        }
+        else {
+              BearerAccessToken bearerToken = new BearerAccessToken(accessToken,
+              (long) config.getAccessTokenLongExpiry(), Scope.parse(scopes));
+              tokens = new Tokens(bearerToken, null);
+        }
+        return new AccessTokenResponse(tokens);
+    }        
 
-        String accessToken = randomGenerator.createRandomCode();
-        accessToken +=randomGenerator.createRandomCode();
-        tokenDao.storeAccessToken(accessToken, null, accessScopes,
-                userId, clientId, authenticationTime);
-
-        return OAuthASResponse.tokenResponse(Status.OK.getStatusCode())
-                .setAccessToken(accessToken)
-                .setTokenType(TokenType.BEARER.toString())
-                .setExpiresIn(String.valueOf(config.getAccessTokenLongExpiry()))
-                .setScope(String.join(" ", scopes)).buildJSONMessage();
-    }
 
     public void revokeToken (String clientId, String clientSecret,
             String token, String tokenType) throws KustvaktException {

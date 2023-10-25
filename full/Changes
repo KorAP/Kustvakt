@@ -20,6 +20,7 @@
 - Fixed clearing cache
 - Fix JettyServerTest, init package, and some java docs.
 - Make scope extraction more flexible.
+- Updated token response using Nimbus (#650)
 
 
 # version 0.71.1
