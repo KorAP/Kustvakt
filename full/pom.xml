@@ -651,13 +651,6 @@
 		    <scope>provided</scope>
 		</dependency>
 
-		<!-- needed by apache Oltu -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>4.0.1</version>
-		</dependency>
-		
 	    <dependency>
 	      <groupId>org.apache.commons</groupId>
 	      <artifactId>commons-text</artifactId>
@@ -749,18 +742,6 @@
 		</dependency>
 
 		<!-- OAuth -->
-		<dependency>
-			<groupId>org.apache.oltu.oauth2</groupId>
-			<artifactId>org.apache.oltu.oauth2.authzserver</artifactId>
-			<version>1.0.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.oltu.oauth2</groupId>
-			<artifactId>org.apache.oltu.oauth2.client</artifactId>
-			<version>1.0.2</version>
-		</dependency>
-
-		<!-- Nimbus -->
 		<dependency>
 			<groupId>com.nimbusds</groupId>
 			<artifactId>oauth2-oidc-sdk</artifactId>

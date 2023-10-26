@@ -1,33 +1,23 @@
 package de.ids_mannheim.korap.web;
 
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.http.HttpHeaders;
-import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
-import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
-import org.apache.oltu.oauth2.common.message.OAuthResponse;
-import org.apache.oltu.oauth2.common.message.OAuthResponse.OAuthErrorResponseBuilder;
 
 import com.nimbusds.oauth2.sdk.AccessTokenResponse;
-import com.nimbusds.oauth2.sdk.AuthorizationErrorResponse;
 import com.nimbusds.oauth2.sdk.ErrorObject;
-import com.nimbusds.oauth2.sdk.ErrorResponse;
 import com.nimbusds.oauth2.sdk.OAuth2Error;
-import com.nimbusds.oauth2.sdk.TokenErrorResponse;
-import com.nimbusds.oauth2.sdk.id.State;
 
 import de.ids_mannheim.korap.exceptions.KustvaktException;
-import de.ids_mannheim.korap.exceptions.StatusCodes;
 import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.Response.Status;
 
 /**
- * OAuth2ResponseHandler builds {@link Response}s from
- * {@link OAuthResponse}s and handles exceptions by building
+ * OAuth2ResponseHandler builds {@link Response}s and handles exceptions by building
  * OAuth error responses accordingly.
  * 
  * <br/><br/>
@@ -41,171 +31,72 @@ import jakarta.ws.rs.core.Response.Status;
  *
  */
 public class OAuth2ResponseHandler extends KustvaktResponseHandler {
-
-    public WebApplicationException throwit (OAuthSystemException e) {
-        return throwit(StatusCodes.OAUTH2_SYSTEM_ERROR, e.getMessage());
-    }
-
-    public WebApplicationException throwit (OAuthSystemException e,
-            String state) {
-        if (state != null && !state.isEmpty()) {
-            return throwit(StatusCodes.OAUTH2_SYSTEM_ERROR, e.getMessage(),
-                    "state=" + state);
-        }
-        return throwit(e);
-    }
-
-    public WebApplicationException throwit (OAuthProblemException e) {
-        OAuthResponse oAuthResponse = null;
-        String state = e.getState();
-        try {
-            OAuthErrorResponseBuilder builder =
-                    OAuthResponse.errorResponse(e.getResponseStatus()).error(e);
-             if (state != null && !state.isEmpty()) {
-                 builder.setState(state);
-             }
-             if (e.getRedirectUri()!= null && !e.getRedirectUri().isEmpty()) {
-                 builder.location(e.getRedirectUri());
-                 oAuthResponse = builder.buildQueryMessage();
-             }
-             else {
-                 oAuthResponse = builder.buildJSONMessage();
-             }
-        }
-        catch (OAuthSystemException e1) {
-            throwit(e1, state);
-        }
-        Response r = createResponse(oAuthResponse.getResponseStatus(),
-                oAuthResponse.getBody(), oAuthResponse.getLocationUri());
-        return new WebApplicationException(r);
-    }
-    
-    
-
     @Override
-    public WebApplicationException throwit (KustvaktException e){
+    public WebApplicationException throwit (KustvaktException e) {
         return throwit(e, null);
     }
-    
+
     public WebApplicationException throwit (KustvaktException e, String state) {
         String errorCode = e.getEntity();
-                    
         int responseStatus = e.getResponseStatus();
-        try {
-            if(responseStatus>0) {
-                return throwit(createOAuthProblemException(e, responseStatus, state));
-            }
-            else if (errorCode == null){
-                return super.throwit(e);
-            }
-            else if (errorCode.equals(OAuth2Error.INVALID_CLIENT.getCode())
-                    || errorCode.equals(OAuth2Error.UNAUTHORIZED_CLIENT.getCode())
-                    || errorCode.equals(de.ids_mannheim.korap.oauth2.constant.OAuth2Error.INVALID_TOKEN)) {
-                return throwit(createOAuthProblemException(e,
-                        Status.UNAUTHORIZED.getStatusCode(), state));
-            }
-            else if (errorCode.equals(OAuth2Error.INVALID_GRANT.getCode())
-                    || errorCode.equals(OAuth2Error.INVALID_REQUEST.getCode())
-                    || errorCode.equals(OAuth2Error.INVALID_SCOPE.getCode())
-                    || errorCode.equals(OAuth2Error.UNSUPPORTED_GRANT_TYPE.getCode())
-                    || errorCode.equals(OAuth2Error.UNSUPPORTED_RESPONSE_TYPE.getCode())
-                    || errorCode.equals(OAuth2Error.ACCESS_DENIED.getCode())) {
-                return throwit(createOAuthProblemException(e,
-                        Status.BAD_REQUEST.getStatusCode(), state));
-            }
-            else if (errorCode.equals(de.ids_mannheim.korap.oauth2.constant.OAuth2Error.INSUFFICIENT_SCOPE)) {
-                return throwit(createOAuthProblemException(e,
-                        Status.FORBIDDEN.getStatusCode(), state));
-            }
-            else if (errorCode.equals(OAuth2Error.SERVER_ERROR.getCode())) {
-                return throwit(createOAuthProblemException(e,
-                        Status.INTERNAL_SERVER_ERROR.getStatusCode(), state));
-            }
-            else if (errorCode.equals(OAuth2Error.TEMPORARILY_UNAVAILABLE.getCode())) {
-                return throwit(createOAuthProblemException(e,
-                        Status.SERVICE_UNAVAILABLE.getStatusCode(), state));
-            }
-            else {
-                return super.throwit(e);
-            }
-        }
-        catch (OAuthSystemException e1) {
-            return throwit(e1, state);
-        }
-    }
 
-    private OAuthProblemException createOAuthProblemException (
-            KustvaktException e, int statusCode, String state)
-            throws OAuthSystemException {
-        OAuthProblemException ex = OAuthProblemException.error(e.getEntity())
-                .responseStatus(statusCode).state(state)
-                .description(e.getMessage());
-        if (e.getRedirectUri()!= null) {
-            ex.setRedirectUri(e.getRedirectUri().toString());
+        Response r = null;
+        if (responseStatus > 0) {
+            r = createResponse(e,
+                    Status.fromStatusCode(responseStatus), state);
         }
-        return ex;
-    }
-    
-    private ErrorResponse createErrorResponse (
-            KustvaktException e, String statusCode, String state){
-        ErrorResponse r = null;
-        
-        if (e.getRedirectUri()!=null) {
-            ErrorObject eo = new ErrorObject(statusCode, e.getMessage());
-            State s = new State(state);
-            r = new AuthorizationErrorResponse(e.getRedirectUri(), eo, s, null);
+        else if (errorCode == null) {
+            return super.throwit(e);
         }
-        
-        return r;
-    }
-
-    /**
-     * RFC 6749 regarding authorization error response:
-     * 
-     * If the request fails due to a missing, invalid, or mismatching
-     * redirection URI, or if the client identifier is missing or
-     * invalid, the authorization server SHOULD inform the resource
-     * owner of the error and MUST NOT automatically redirect the
-     * user-agent to the invalid redirection URI.
-     * 
-     * If the resource owner denies the access request or if the
-     * request fails for reasons other than a missing or invalid
-     * redirection URI, the authorization server informs the client by
-     * adding the following parameters to the query component of the
-     * redirection URI using the "application/x-www-form-urlencoded"
-     * format.
-     * 
-     * @param oAuthResponse
-     * @return
-     */
-    public Response createResponse (int status, String body, String uri) {
-        ResponseBuilder builder =
-                Response.status(status);
-        builder.entity(body);
-        builder.header(HttpHeaders.CACHE_CONTROL, "no-store");
-        builder.header(HttpHeaders.PRAGMA, "no-store");
-
-        if (status == Status.UNAUTHORIZED
-                .getStatusCode()) {
-            builder.header(HttpHeaders.WWW_AUTHENTICATE,
-                    "Basic realm=\"Kustvakt\"");
+        else if (errorCode.equals(OAuth2Error.INVALID_CLIENT.getCode())
+                || errorCode.equals(OAuth2Error.UNAUTHORIZED_CLIENT.getCode())
+                || errorCode.equals(
+                        de.ids_mannheim.korap.oauth2.constant.OAuth2Error.INVALID_TOKEN)) {
+            r = createResponse(e, Status.UNAUTHORIZED, state);
         }
-        if (uri != null && !uri.isEmpty()) {
-            try {
-                builder.location(new URI(uri));
-                builder.type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-            }
-            catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
+        else if (errorCode.equals(OAuth2Error.INVALID_GRANT.getCode())
+                || errorCode.equals(OAuth2Error.INVALID_REQUEST.getCode())
+                || errorCode.equals(OAuth2Error.INVALID_SCOPE.getCode())
+                || errorCode
+                        .equals(OAuth2Error.UNSUPPORTED_GRANT_TYPE.getCode())
+                || errorCode
+                        .equals(OAuth2Error.UNSUPPORTED_RESPONSE_TYPE.getCode())
+                || errorCode.equals(OAuth2Error.ACCESS_DENIED.getCode())) {
+            r = createResponse(e, Status.BAD_REQUEST, state);
         }
-
-        return builder.build();
+        else if (errorCode.equals(
+                de.ids_mannheim.korap.oauth2.constant.OAuth2Error.INSUFFICIENT_SCOPE)) {
+            r = createResponse(e, Status.FORBIDDEN, state);
+        }
+        else if (errorCode.equals(OAuth2Error.SERVER_ERROR.getCode())) {
+            r = createResponse(e, Status.INTERNAL_SERVER_ERROR,
+                    state);
+        }
+        else if (errorCode
+                .equals(OAuth2Error.TEMPORARILY_UNAVAILABLE.getCode())) {
+            r = createResponse(e, Status.SERVICE_UNAVAILABLE,
+                    state);
+        }
+        else {
+            return super.throwit(e);
+        }
+        return new WebApplicationException(r);
     }
 
     public Response sendRedirect (URI locationUri) {
         ResponseBuilder builder = Response.temporaryRedirect(locationUri);
         return builder.build();
+    }
+
+    private Response createResponse (KustvaktException e, Status statusCode,
+            String state) {
+        ErrorObject eo = new ErrorObject(e.getEntity(), e.getMessage());
+        if (state != null && !state.isEmpty()) {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("state", state);
+            eo = eo.setCustomParams(map);
+        }
+        return createResponse(statusCode, eo.toJSONObject().toJSONString());
     }
     
     public Response createResponse (AccessTokenResponse tokenResponse) {
@@ -213,13 +104,7 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
         return createResponse(Status.OK, jsonString);
     }
 
-    public Response createResponse (TokenErrorResponse tokenResponse,
-            Status status) {
-        String jsonString = tokenResponse.toJSONObject().toJSONString();
-        return createResponse(status, jsonString);
-    }
-
-    private Response createResponse (Status status, Object entity) {
+    private Response createResponse (Status status, String entity) {
         ResponseBuilder builder = Response.status(status);
         builder.entity(entity);
         builder.header(HttpHeaders.CACHE_CONTROL, "no-store");

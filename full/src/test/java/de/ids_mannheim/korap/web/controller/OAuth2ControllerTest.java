@@ -8,16 +8,17 @@ import java.time.ZonedDateTime;
 import java.util.Set;
 
 import org.apache.http.entity.ContentType;
-import org.apache.oltu.oauth2.common.error.OAuthError;
-import org.apache.oltu.oauth2.common.message.types.GrantType;
-import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
+import com.nimbusds.oauth2.sdk.GrantType;
+
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.FullConfiguration;
+import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
@@ -51,7 +52,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         String accessToken = node.at("/access_token").asText();
-        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.displayName(), node.at("/token_type").asText());
         assertEquals(31536000, node.at("/expires_in").asInt());
         testRevokeToken(accessToken, publicClientId, null, ACCESS_TOKEN_TYPE);
         assertTrue(node.at("/refresh_token").isMissingNode());
@@ -70,7 +71,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());
-        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.displayName(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
         testRequestTokenWithUsedAuthorization(code);
         String refreshToken = node.at("/refresh_token").asText();
@@ -86,7 +87,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String entity = response.readEntity(String.class);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_GRANT, node.at("/error").asText());
+        assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
         assertEquals(node.at("/error_description").asText(), "Invalid authorization");
     }
 
@@ -96,7 +97,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String entity = response.readEntity(String.class);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST, node.at("/error").asText());
+        assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
     }
 
     @Test
@@ -149,7 +150,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         Response response = requestToken(tokenForm);
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_GRANT, node.at("/error").asText());
+        assertEquals(OAuth2Error.INVALID_GRANT, node.at("/error").asText());
         assertEquals(node.at("/error_description").asText(), "Invalid authorization");
     }
 
@@ -160,7 +161,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
-        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.displayName(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
         assertEquals(node.at("/scope").asText(), "all");
         String refresh = node.at("/refresh_token").asText();
@@ -186,7 +187,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
-        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.displayName(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
         assertEquals(scope, node.at("/scope").asText());
         String refreshToken = node.at("/refresh_token").asText();
@@ -200,7 +201,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String entity = response.readEntity(String.class);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.UNAUTHORIZED_CLIENT, node.at("/error").asText());
+        assertEquals(OAuth2Error.UNAUTHORIZED_CLIENT, node.at("/error").asText());
         assertEquals(node.at("/error_description").asText(), "Password grant is not allowed for third party clients");
     }
 
@@ -226,7 +227,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());
-        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.displayName(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
     }
 
@@ -248,7 +249,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());
-        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.displayName(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
     }
 
@@ -261,7 +262,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
 
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
+        assertEquals(OAuth2Error.INVALID_REQUEST,
                 node.at("/error").asText());
         assertNotNull(node.at("/error_description").asText());
     }
@@ -274,7 +275,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST, node.at("/error").asText());
+        assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
         assertEquals(node.at("/error_description").asText(), "Missing parameter: client_secret");
     }
 
@@ -284,7 +285,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String entity = response.readEntity(String.class);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
+        assertEquals(OAuth2Error.INVALID_REQUEST,
                 node.at("/error").asText());
         assertNotNull(node.at("/error_description").asText());
     }
@@ -298,7 +299,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
+        assertEquals(OAuth2Error.INVALID_REQUEST,
                 node.at("/error").asText());
         assertNotNull(node.at("/error_description").asText());
     }
@@ -316,7 +317,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         // length?
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());
-        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.displayName(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
     }
 
@@ -334,7 +335,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         String entity = response.readEntity(String.class);
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
+        assertEquals(OAuth2Error.INVALID_REQUEST,
                 node.at("/error").asText());
         assertNotNull(node.at("/error_description").asText());
     }
@@ -353,7 +354,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         // length?
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());
-        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.displayName(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
         assertEquals(node.at("/scope").asText(), "client_info");
     }
@@ -365,7 +366,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST, node.at("/error").asText());
+        assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
     }
 
     @Test
@@ -377,7 +378,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.get("error_description").asText());
-        assertEquals(OAuthError.TokenResponse.INVALID_REQUEST,
+        assertEquals(OAuth2Error.INVALID_REQUEST,
                 node.get("error").asText());
     }
 
@@ -407,7 +408,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertNotNull(node.at("/access_token").asText());
         String newRefreshToken = node.at("/refresh_token").asText();
         assertNotNull(newRefreshToken);
-        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.displayName(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
         assertTrue(!newRefreshToken.equals(refreshToken));
         testRequestTokenWithRevokedRefreshToken(clientId, clientSecret, refreshToken);
@@ -442,7 +443,7 @@ public class OAuth2ControllerTest extends OAuth2TestBase {
         assertNotNull(node.at("/access_token").asText());
         String newRefreshToken = node.at("/refresh_token").asText();
         assertNotNull(newRefreshToken);
-        assertEquals(TokenType.BEARER.toString(), node.at("/token_type").asText());
+        assertEquals(TokenType.BEARER.displayName(), node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
         assertTrue(!newRefreshToken.equals(refreshToken));
         assertEquals(scope, node.at("/scope").asText());
