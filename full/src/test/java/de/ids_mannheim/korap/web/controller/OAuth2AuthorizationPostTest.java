@@ -12,7 +12,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
-import org.apache.oltu.oauth2.common.message.types.TokenType;
 import org.glassfish.jersey.uri.UriComponent;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.MultiValueMap;
@@ -21,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
+import de.ids_mannheim.korap.constant.TokenType;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
@@ -71,7 +71,7 @@ public class OAuth2AuthorizationPostTest extends OAuth2TestBase {
         JsonNode node = JsonUtils.readTree(entity);
         assertNotNull(node.at("/access_token").asText());
         assertNotNull(node.at("/refresh_token").asText());
-        assertEquals(TokenType.BEARER.toString(),
+        assertEquals(TokenType.BEARER.displayName(),
                 node.at("/token_type").asText());
         assertNotNull(node.at("/expires_in").asText());
     }

@@ -12,10 +12,11 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
 import org.apache.http.entity.ContentType;
-import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
+import com.nimbusds.oauth2.sdk.GrantType;
+
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.constant.OAuth2Scope;

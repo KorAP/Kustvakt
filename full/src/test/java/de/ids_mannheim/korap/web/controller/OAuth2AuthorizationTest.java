@@ -7,14 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.net.URI;
 import org.junit.jupiter.api.Test;
 
-import org.apache.oltu.oauth2.common.error.OAuthError;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.nimbusds.oauth2.sdk.OAuth2Error;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
+import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
@@ -119,7 +117,7 @@ public class OAuth2AuthorizationTest extends OAuth2TestBase {
 
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuth2Error.INVALID_REQUEST.getCode(),
+        assertEquals(OAuth2Error.INVALID_REQUEST,
                 node.at("/error").asText());
         assertEquals("Missing parameter: redirect URI",
                 node.at("/error_description").asText());
@@ -149,7 +147,7 @@ public class OAuth2AuthorizationTest extends OAuth2TestBase {
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         
-        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
+        assertEquals(OAuth2Error.INVALID_REQUEST,
                 node.at("/error").asText());
         assertEquals("Missing parameter: client_id",
                 node.at("/error_description").asText());
@@ -162,7 +160,7 @@ public class OAuth2AuthorizationTest extends OAuth2TestBase {
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuth2Error.INVALID_CLIENT.getCode(), node.at("/error").asText());
+        assertEquals(OAuth2Error.INVALID_CLIENT, node.at("/error").asText());
         assertEquals("Unknown client: unknown-client-id",
                 node.at("/error_description").asText());
     }
@@ -249,7 +247,7 @@ public class OAuth2AuthorizationTest extends OAuth2TestBase {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
-        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
+        assertEquals(OAuth2Error.INVALID_REQUEST,
                 node.at("/error").asText());
         assertEquals("Invalid redirect URI",
                 node.at("/error_description").asText());
@@ -262,7 +260,7 @@ public class OAuth2AuthorizationTest extends OAuth2TestBase {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
         node = JsonUtils.readTree(response.readEntity(String.class));
-        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST,
+        assertEquals(OAuth2Error.INVALID_REQUEST,
                 node.at("/error").asText());
         assertEquals("Missing parameter: redirect URI",
                 node.at("/error_description").asText());

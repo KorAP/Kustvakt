@@ -20,6 +20,7 @@
 - Fixed clearing cache
 - Updated token response using Nimbus (#650)
 - Remove Oltu request and validator implementations (#650)
+- Updated OAuth2 response handler (#650)
 
 # version 0.71
 

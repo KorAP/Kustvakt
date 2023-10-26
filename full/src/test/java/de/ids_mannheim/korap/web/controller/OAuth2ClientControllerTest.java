@@ -12,19 +12,14 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import jakarta.ws.rs.ProcessingException;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.core.Form;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.entity.ContentType;
-import org.apache.oltu.oauth2.common.error.OAuthError;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
+
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
 import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
@@ -33,6 +28,11 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 import de.ids_mannheim.korap.oauth2.constant.OAuth2Error;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * @author margaretha
@@ -45,15 +45,6 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
     public OAuth2ClientControllerTest() throws KustvaktException {
         userAuthHeader = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("dory", "password");
-    }
-
-    private void checkWWWAuthenticateHeader(Response response) {
-        Set<Entry<String, List<Object>>> headers = response.getHeaders().entrySet();
-        for (Entry<String, List<Object>> header : headers) {
-            if (header.getKey().equals(ContainerRequest.WWW_AUTHENTICATE)) {
-                assertEquals(header.getValue().get(0), "Basic realm=\"Kustvakt\"");
-            }
-        }
     }
 
     private OAuth2ClientJson createOAuth2ClientJson(String name, OAuth2ClientType type, String description) {
@@ -240,7 +231,7 @@ public class OAuth2ClientControllerTest extends OAuth2TestBase {
 
     private void testInvalidUrl(String entity, int status) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(OAuthError.CodeResponse.INVALID_REQUEST, node.at("/error").asText());
+        assertEquals(OAuth2Error.INVALID_REQUEST, node.at("/error").asText());
         assertEquals(node.at("/error_description").asText(), "Invalid URL");
         assertEquals(Status.BAD_REQUEST.getStatusCode(), status);
     }
