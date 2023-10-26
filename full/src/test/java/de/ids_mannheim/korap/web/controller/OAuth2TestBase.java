@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.http.entity.ContentType;
-import org.apache.oltu.oauth2.common.message.types.GrantType;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.uri.UriComponent;
@@ -18,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.HttpHeaders;
+import com.nimbusds.oauth2.sdk.GrantType;
 import com.nimbusds.oauth2.sdk.OAuth2Error;
 
 import de.ids_mannheim.korap.authentication.http.HttpAuthorizationHandler;
