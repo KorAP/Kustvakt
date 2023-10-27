@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9f24a91_132d6d6e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-10-27T14:27:21Z",
+      "side": 1,
+      "message": "Test suite runs with https://korap.ids-mannheim.de/gerrit/c/KorAP/Krill/+/7394",
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
