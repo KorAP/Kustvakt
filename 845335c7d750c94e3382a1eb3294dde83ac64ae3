@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97e9dc79_658ad1a7",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/constant/OAuth2Scope.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-10-27T16:23:23Z",
+      "side": -1,
+      "message": "Is this a real limitation in the future?",
+      "range": {
+        "startLine": 14,
+        "startChar": 4,
+        "endLine": 14,
+        "endChar": 12
+      },
+      "revId": "845335c7d750c94e3382a1eb3294dde83ac64ae3",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7dab1000_9c479f75",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/dao/VirtualCorpusDaoTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-10-27T16:23:23Z",
+      "side": -1,
+      "message": "There is no equivalent test anymore.",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 122
+      },
+      "revId": "845335c7d750c94e3382a1eb3294dde83ac64ae3",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87387823_100a6230",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/controller/OAuth2ControllerTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-10-27T16:23:23Z",
+      "side": -1,
+      "message": "Why was the scope test removed?",
+      "range": {
+        "startLine": 233,
+        "startChar": 7,
+        "endLine": 233,
+        "endChar": 51
+      },
+      "revId": "845335c7d750c94e3382a1eb3294dde83ac64ae3",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}

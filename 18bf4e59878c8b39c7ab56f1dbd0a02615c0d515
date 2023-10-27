@@ -16,6 +16,161 @@
       "message": "Test suite runs with https://korap.ids-mannheim.de/gerrit/c/KorAP/Krill/+/7394",
       "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de6fdb81_a11ef872",
+        "filename": "full/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-10-27T16:23:23Z",
+      "side": 1,
+      "message": "Because of the incompatibilities, this should upgrade at least on the minor level.",
+      "range": {
+        "startLine": 6,
+        "startChar": 10,
+        "endLine": 6,
+        "endChar": 15
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33ea745a_fd7bf206",
+        "filename": "full/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 649,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-10-27T16:23:23Z",
+      "side": 1,
+      "message": "Order and deletions should be clean. Comments should be removed.",
+      "range": {
+        "startLine": 647,
+        "startChar": 5,
+        "endLine": 649,
+        "endChar": 11
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e995a4af_9e3828ae",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/exceptions/StatusCodes.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-10-27T16:23:23Z",
+      "side": 1,
+      "message": "This ID changed the meaning?",
+      "range": {
+        "startLine": 147,
+        "startChar": 27,
+        "endLine": 147,
+        "endChar": 61
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5dca7ad_10d5f61d",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/oauth2/service/OAuth2AuthorizationService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-10-27T16:23:23Z",
+      "side": 1,
+      "message": "Now \"scope\".",
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c39fcec_a0d62d1c",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/oauth2/service/OAuth2AuthorizationService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-10-27T16:23:23Z",
+      "side": 1,
+      "message": "Only nitpicking: When you change the order and first check and fail on nonexistence (with an or), this would be able to cut short. Of course, that\u0027s not relevant here. Just something I usually look for. ;-)",
+      "range": {
+        "startLine": 285,
+        "startChar": 20,
+        "endLine": 285,
+        "endChar": 72
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4a41871_357d3dda",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/oauth2/service/OAuth2ScopeServiceImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-10-27T16:23:23Z",
+      "side": 1,
+      "message": "I guess that\u0027s correct, but may be more flexible with a regex accepting more than one space.",
+      "range": {
+        "startLine": 81,
+        "startChar": 42,
+        "endLine": 81,
+        "endChar": 47
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2db61376_fdfae476",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/oauth2/service/OAuth2TokenService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-10-27T16:23:23Z",
+      "side": 1,
+      "message": "client not listed as @param",
+      "range": {
+        "startLine": 450,
+        "startChar": 6,
+        "endLine": 450,
+        "endChar": 32
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
