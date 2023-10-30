@@ -18,6 +18,23 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba3374f8_8b2bc03d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-10-30T10:24:17Z",
+      "side": 1,
+      "message": "There are still some references to javax (especially javax.servlet.http.HttpServletRequest) - is that wanted?",
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de6fdb81_a11ef872",
@@ -168,6 +185,29 @@
         "startChar": 6,
         "endLine": 450,
         "endChar": 32
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14d25956_8db4944d",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/JettyServerTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-10-30T10:24:17Z",
+      "side": 1,
+      "message": "Can you explain that?",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 9
       },
       "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"

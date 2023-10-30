@@ -68,6 +68,29 @@
       },
       "revId": "845335c7d750c94e3382a1eb3294dde83ac64ae3",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abc76664_6fb8fd44",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/controller/OAuth2RClientTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-10-30T10:24:17Z",
+      "side": -1,
+      "message": "Why is the scope test removed?",
+      "range": {
+        "startLine": 74,
+        "startChar": 6,
+        "endLine": 74,
+        "endChar": 57
+      },
+      "revId": "845335c7d750c94e3382a1eb3294dde83ac64ae3",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
