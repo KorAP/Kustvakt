@@ -261,10 +261,10 @@ public class OAuth2Controller {
     @ResourceFilters({APIVersionFilter.class})
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response requestAccessToken (@Context HttpServletRequest request,
-            @FormParam("client_id") String clientId,
-            @FormParam("client_secret") String clientSecret,
             MultivaluedMap<String, String> form) {
 
+        String clientSecret="";
+        String clientId="";
         OAuthResponse oAuthResponse = null;
         try {
             URI requestURI;

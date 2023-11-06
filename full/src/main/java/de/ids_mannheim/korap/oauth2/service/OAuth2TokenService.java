@@ -449,6 +449,8 @@ public class OAuth2TokenService {
      *            a user id
      * @param authenticationTime
      *            the user authentication time
+     * @param client
+     *            an OAuth2Client
      * @return an {@link OAuthResponse}
      * @throws OAuthSystemException
      * @throws KustvaktException
