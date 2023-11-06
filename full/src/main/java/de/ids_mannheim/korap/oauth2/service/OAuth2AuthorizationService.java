@@ -160,7 +160,7 @@ public class OAuth2AuthorizationService {
      * @param username
      * @param clientId
      * @param redirectUri
-     * @param scopeSet
+     * @param scope
      * @param code
      * @param authenticationTime
      *            user authentication time
@@ -208,9 +208,6 @@ public class OAuth2AuthorizationService {
      * 
      * @param client
      *            an OAuth2Client
-     * @param hasRedirectUri
-     *            true if request contains redirect_uri, false
-     *            otherwise
      * @param redirectUri
      *            the redirect_uri value
      * @return a client's redirect URI

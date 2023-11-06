@@ -1,4 +1,4 @@
-# version 0.71.1
+# version 0.72-SNAPSHOT
 
 - Replaced javax.ws to jakarta.ws namespace (#648)
 - Upgrading Jersey 2.40 to 3.x (#646)
@@ -18,8 +18,11 @@
 - Removed Apache Oltu API from token requests (#650)
 - Removed OpenID
 - Fixed clearing cache
+- Fix JettyServerTest, init package, and some java docs.
+- Make scope extraction more flexible.
 
-# version 0.71
+
+# version 0.71.1
 
 - Removed auditing (#611)
 - Removed old database configurations (#612)
@@ -35,7 +38,7 @@
 - Fix lombok compile warning
 - Ensure the order of clean token tests.
 
-# version 0.70.1
+# version 0.71
 
 - Renamed entity and service packages in core
 - Renamed web.controller package in core
@@ -43,7 +46,8 @@
 - Merged lite into full
 - Merged core into full
 
-# version 0.70
+
+# version 0.70.1
 
 - Added data folder containing super_client_info and database 
   for mounting into docker
@@ -54,7 +58,7 @@
 - Moved hibernate.properties
 - Added maximum number of user persistent virtual corpora and queries
 
-# version 0.69.4
+# version 0.70
 
 - Support token array in matchinfo (fixes #570; diewald)
 - Updated VC list API and deprecated owner VC list (addressed #580)
@@ -65,6 +69,7 @@
 - Disabled LDAP auth provider and token API in the auth filter (#587)
 - Added LDAP log for users without idsC2Profile
 - Fixed log4j2 properties.
+
 
 # version 0.69.3
 
