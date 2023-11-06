@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "ffad99b8_816d0e44",
+        "filename": "/MERGE_LIST",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-06T20:16:45Z",
+      "side": 1,
+      "message": "Yes, there are a few commits following this removing it completely.",
+      "parentUuid": "0bece8ab_bd05c8a4",
+      "range": {
+        "startLine": 5,
+        "startChar": 11,
+        "endLine": 5,
+        "endChar": 55
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "e9f24a91_132d6d6e",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
@@ -75,6 +99,24 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3bf506bb_69ecba0d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-06T20:16:45Z",
+      "side": 1,
+      "message": "Yes for this commit because there are remaining codes using Oltu, i.e. the OAuth2 exceptions and exception handler.",
+      "parentUuid": "ba3374f8_8b2bc03d",
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de6fdb81_a11ef872",
@@ -100,6 +142,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9cd1cfda_701c212d",
+        "filename": "full/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-06T20:16:45Z",
+      "side": 1,
+      "message": "I would bump the version to  0.72 usually after it is ready to publish. but maybe we can add \"snapshot\" keyword like 0.72-SNAPSHOT.",
+      "parentUuid": "de6fdb81_a11ef872",
+      "range": {
+        "startLine": 6,
+        "startChar": 10,
+        "endLine": 6,
+        "endChar": 15
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "33ea745a_fd7bf206",
         "filename": "full/pom.xml",
         "patchSetId": 2
@@ -111,6 +177,30 @@
       "writtenOn": "2023-10-27T16:23:23Z",
       "side": 1,
       "message": "Order and deletions should be clean. Comments should be removed.",
+      "range": {
+        "startLine": 647,
+        "startChar": 5,
+        "endLine": 649,
+        "endChar": 11
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d85e2300_8d552393",
+        "filename": "full/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 649,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-06T20:16:45Z",
+      "side": 1,
+      "message": "Ok. Thanks for the reminder.",
+      "parentUuid": "33ea745a_fd7bf206",
       "range": {
         "startLine": 647,
         "startChar": 5,
@@ -146,6 +236,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6772afe8_06259f22",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/exceptions/StatusCodes.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-06T20:16:45Z",
+      "side": 1,
+      "message": "I am not sure what you mean.\n\nDo you mean the number is now used for UNSUPPORTED_RESPONSE_TYPE?\n\nIt was ID_TOKEN_CLAIM_ERROR \u003d 1813;\n\nBut it has never been really used and actually it has been removed together with OpenID mechanisms.",
+      "parentUuid": "e995a4af_9e3828ae",
+      "range": {
+        "startLine": 147,
+        "startChar": 27,
+        "endLine": 147,
+        "endChar": 61
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e5dca7ad_10d5f61d",
         "filename": "full/src/main/java/de/ids_mannheim/korap/oauth2/service/OAuth2AuthorizationService.java",
         "patchSetId": 2
@@ -157,6 +271,24 @@
       "writtenOn": "2023-10-27T16:23:23Z",
       "side": 1,
       "message": "Now \"scope\".",
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84b69920_5be7ce94",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/oauth2/service/OAuth2AuthorizationService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-06T20:16:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5dca7ad_10d5f61d",
       "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
@@ -207,6 +339,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "379f6c1c_e7e7cee0",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/oauth2/service/OAuth2ScopeServiceImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-06T20:16:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f4a41871_357d3dda",
+      "range": {
+        "startLine": 81,
+        "startChar": 42,
+        "endLine": 81,
+        "endChar": 47
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2db61376_fdfae476",
@@ -220,6 +376,30 @@
       "writtenOn": "2023-10-27T16:23:23Z",
       "side": 1,
       "message": "client not listed as @param",
+      "range": {
+        "startLine": 450,
+        "startChar": 6,
+        "endLine": 450,
+        "endChar": 32
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3248dcbf_66bffef8",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/oauth2/service/OAuth2TokenService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-06T20:16:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2db61376_fdfae476",
       "range": {
         "startLine": 450,
         "startChar": 6,
@@ -266,6 +446,30 @@
       "writtenOn": "2023-10-30T10:24:17Z",
       "side": 1,
       "message": "Can you explain that?",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 9
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "242ac2f9_0bd275a9",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/JettyServerTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-06T20:16:45Z",
+      "side": 1,
+      "message": "Disabled is the same as Ignore in Junit4.\nThis test was problematic, but I have fixed it now.",
+      "parentUuid": "14d25956_8db4944d",
       "range": {
         "startLine": 21,
         "startChar": 0,

@@ -24,6 +24,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a6b4d19_9e3833c7",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/constant/OAuth2Scope.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-06T20:16:45Z",
+      "side": -1,
+      "message": "No, this is part of deprecated OpenID implementation that I have actually removed in https://github.com/KorAP/Kustvakt/commit/6672fe514d144495f81240500c48629a52140952",
+      "parentUuid": "97e9dc79_658ad1a7",
+      "range": {
+        "startLine": 14,
+        "startChar": 4,
+        "endLine": 14,
+        "endChar": 12
+      },
+      "revId": "845335c7d750c94e3382a1eb3294dde83ac64ae3",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7dab1000_9c479f75",
@@ -70,6 +94,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c661b9bd_5381aa76",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/controller/OAuth2ControllerTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-06T20:16:45Z",
+      "side": -1,
+      "message": "Scope is actually not required to be included in the redirectURI. It was included in Oltu and not included in Nimbus.",
+      "parentUuid": "87387823_100a6230",
+      "range": {
+        "startLine": 233,
+        "startChar": 7,
+        "endLine": 233,
+        "endChar": 51
+      },
+      "revId": "845335c7d750c94e3382a1eb3294dde83ac64ae3",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "abc76664_6fb8fd44",
@@ -83,6 +131,30 @@
       "writtenOn": "2023-10-30T10:24:17Z",
       "side": -1,
       "message": "Why is the scope test removed?",
+      "range": {
+        "startLine": 74,
+        "startChar": 6,
+        "endLine": 74,
+        "endChar": 57
+      },
+      "revId": "845335c7d750c94e3382a1eb3294dde83ac64ae3",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63e3c489_2c64c527",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/controller/OAuth2RClientTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-06T20:16:45Z",
+      "side": -1,
+      "message": "Same reason as mentioned in the two comment above.",
+      "parentUuid": "abc76664_6fb8fd44",
       "range": {
         "startLine": 74,
         "startChar": 6,
