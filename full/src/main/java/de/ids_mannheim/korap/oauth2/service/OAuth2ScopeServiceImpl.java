@@ -78,7 +78,7 @@ public class OAuth2ScopeServiceImpl implements OAuth2ScopeService {
     public Set<AccessScope> convertToAccessScope (String scopes)
             throws KustvaktException {
 
-        String[] scopeArray = scopes.split(" ");
+        String[] scopeArray = scopes.split("\\s+");
         List<AccessScope> definedScopes = accessScopeDao.retrieveAccessScopes();
         Set<AccessScope> requestedScopes =
                 new HashSet<AccessScope>(scopeArray.length);
