@@ -16,7 +16,7 @@
            http://www.springframework.org/schema/util/spring-util.xsd">
 
 	<import resource="classpath:test-config.xml"/>
-	<bean id="initializator" class="de.ids_mannheim.de.init.Initializator"
+	<bean id="initializator" class="de.ids_mannheim.korap.init.Initializator"
 		init-method="initResourceTest">
 	</bean>
 

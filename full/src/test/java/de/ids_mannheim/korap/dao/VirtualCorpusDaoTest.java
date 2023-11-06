@@ -59,7 +59,11 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
                     QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE,
                     "corpusSigle=GOE", "definition", "description", "experimental",
                     false, "system", null, null);
-        });        
+        });
+        
+        assertEquals(exception.getMessage(),
+                "Converting `org.hibernate.exception.GenericJDBCException` "
+                + "to JPA `PersistenceException` : could not execute statement");
     }
 
     @Test

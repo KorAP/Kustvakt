@@ -40,6 +40,7 @@ import de.ids_mannheim.korap.web.filter.AuthenticationFilter;
 import de.ids_mannheim.korap.web.filter.BlockingFilter;
 import de.ids_mannheim.korap.web.utils.ResourceFilters;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.GET;
@@ -261,7 +262,8 @@ public class OAuth2Controller {
     @ResourceFilters({APIVersionFilter.class})
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response requestAccessToken (@Context HttpServletRequest request,
-            @FormParam("client_id") String clientId,
+            @NotEmpty @FormParam("grant_type") String grantType,
+            @NotEmpty @FormParam("client_id") String clientId,
             @FormParam("client_secret") String clientSecret,
             MultivaluedMap<String, String> form) {
 
