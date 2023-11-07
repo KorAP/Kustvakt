@@ -166,6 +166,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "14534eff_9264db68",
+        "filename": "full/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-11-07T07:45:48Z",
+      "side": 1,
+      "message": "This seems weird, shouldn\u0027t the version number upgrade happen prior to release, immediately after the last release?",
+      "parentUuid": "9cd1cfda_701c212d",
+      "range": {
+        "startLine": 6,
+        "startChar": 10,
+        "endLine": 6,
+        "endChar": 15
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "33ea745a_fd7bf206",
         "filename": "full/pom.xml",
         "patchSetId": 2
@@ -248,6 +272,30 @@
       "side": 1,
       "message": "I am not sure what you mean.\n\nDo you mean the number is now used for UNSUPPORTED_RESPONSE_TYPE?\n\nIt was ID_TOKEN_CLAIM_ERROR \u003d 1813;\n\nBut it has never been really used and actually it has been removed together with OpenID mechanisms.",
       "parentUuid": "e995a4af_9e3828ae",
+      "range": {
+        "startLine": 147,
+        "startChar": 27,
+        "endLine": 147,
+        "endChar": 61
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e53721c_854a6fc3",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/exceptions/StatusCodes.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-11-07T07:45:48Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "6772afe8_06259f22",
       "range": {
         "startLine": 147,
         "startChar": 27,

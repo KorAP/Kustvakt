@@ -16,6 +16,24 @@
       "message": "I have created a new commit addressing most of the comments and would like to delete patchset 3.",
       "revId": "6b801ddeb23de773e870f3547669028053818cdd",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0b59628_1c8eef15",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-11-07T07:45:48Z",
+      "side": 1,
+      "message": "Okay!",
+      "parentUuid": "4ef2964a_eea40e5f",
+      "revId": "6b801ddeb23de773e870f3547669028053818cdd",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
