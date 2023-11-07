@@ -71,6 +71,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f5872eb_ec263db0",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/dao/VirtualCorpusDaoTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-07T10:25:15Z",
+      "side": -1,
+      "message": "I have added it. Thanks!",
+      "parentUuid": "7dab1000_9c479f75",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 122
+      },
+      "revId": "845335c7d750c94e3382a1eb3294dde83ac64ae3",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "87387823_100a6230",

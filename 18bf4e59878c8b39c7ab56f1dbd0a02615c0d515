@@ -188,6 +188,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb336664_72115a39",
+        "filename": "full/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-07T10:25:15Z",
+      "side": 1,
+      "message": "Okay. I think you are right and I have misunderstood the versioning mechanism. I used to immediately bump to a patch version, e.g. 0.71.1 after a release 0.70, but then the changes are quite significant that the project should be updated with a minor version. Well but we don\u0027t have to release for every version so it is fine to update patch versions in between releases.",
+      "parentUuid": "14534eff_9264db68",
+      "range": {
+        "startLine": 6,
+        "startChar": 10,
+        "endLine": 6,
+        "endChar": 15
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "33ea745a_fd7bf206",
@@ -364,6 +388,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6de88c31_2fb57ebd",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/oauth2/service/OAuth2AuthorizationService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-07T10:25:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c39fcec_a0d62d1c",
+      "range": {
+        "startLine": 285,
+        "startChar": 20,
+        "endLine": 285,
+        "endChar": 72
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f4a41871_357d3dda",
@@ -471,6 +519,30 @@
       "writtenOn": "2023-10-30T10:51:07Z",
       "side": 1,
       "message": "In what way does this alter the described flow on GH (wiki)? It seems that before these parameter weren\u0027t allowed to be sent via form, while this is what the wiki say?",
+      "range": {
+        "startLine": 264,
+        "startChar": 12,
+        "endLine": 265,
+        "endChar": 60
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42dcee91_cf91d35f",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/web/controller/OAuth2Controller.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-07T10:25:15Z",
+      "side": 1,
+      "message": "They don\u0027t really change anything and can just be removed as parameters, because they are always allowed and included in MultivaluedMap\u003cString, String\u003e form.\n\nMaybe it is clearer and more understandable if the parameters are all listed in the method but for the code it is easier to just get the map and process it later, as also required in Nimbus, since the token request requires different parameters depending on the grant type.",
+      "parentUuid": "5d5f65cd_d121a9de",
       "range": {
         "startLine": 264,
         "startChar": 12,
