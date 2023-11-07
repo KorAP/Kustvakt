@@ -553,6 +553,30 @@
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "271f792c_642c9c7a",
+        "filename": "full/src/main/java/de/ids_mannheim/korap/web/controller/OAuth2Controller.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-07T11:33:47Z",
+      "side": 1,
+      "message": "They are actually required now because Nimbus requires both clientId and clientSecret to be not null and not empty (otherwise it throws a ParseException), where that\u0027s not always the case. It is usually better to use a library to handle/extract client Id and client secret because they can be specified in authorization header or form, but actually I think Nimbus doesn\u0027t really do a good job on that...",
+      "parentUuid": "42dcee91_cf91d35f",
+      "range": {
+        "startLine": 264,
+        "startChar": 12,
+        "endLine": 265,
+        "endChar": 60
+      },
+      "revId": "18bf4e59878c8b39c7ab56f1dbd0a02615c0d515",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "14d25956_8db4944d",
