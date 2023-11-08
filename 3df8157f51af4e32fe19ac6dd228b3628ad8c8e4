@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77496155_f540ea3a",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/controller/OAuth2TestBase.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-11-08T12:40:54Z",
+      "side": 1,
+      "message": "forgot to be removed?",
+      "range": {
+        "startLine": 470,
+        "startChar": 8,
+        "endLine": 470,
+        "endChar": 33
+      },
+      "revId": "3df8157f51af4e32fe19ac6dd228b3628ad8c8e4",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    }
+  ]
+}
