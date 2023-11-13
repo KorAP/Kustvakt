@@ -34,6 +34,24 @@
       "parentUuid": "0030133b_f4801123",
       "revId": "a0a0752d02971852a67d532f340922071b1a899e",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "773e322a_22c0e117",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 19
+      },
+      "writtenOn": "2023-11-13T15:08:58Z",
+      "side": 1,
+      "message": "This may also benefit from slimming.",
+      "parentUuid": "6884b748_6f79772d",
+      "revId": "a0a0752d02971852a67d532f340922071b1a899e",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
