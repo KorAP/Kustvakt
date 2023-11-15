@@ -10,30 +10,12 @@ updates:
     schedule:
       interval: "daily"
     ignore:
-      # Jetty >= 10 has API changes
-      - dependency-name: "org.eclipse.jetty:jetty-server"
+      # Jetty >= 12 has API changes
+      - dependency-name: "org.eclipse.jetty:jetty-*"
         versions:
-          - ">= 10.0.0"
-      - dependency-name: "org.eclipse.jetty:jetty-servlet"
-        versions:
-          - ">= 10.0.0"
-      - dependency-name: "org.eclipse.jetty:jetty-webapp"
-        versions:
-          - ">= 10.0.0"
-      - dependency-name: "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider"
-        versions:
-          - ">= 2.13.0"
+          - ">= 12.0.0"
+      # Hibernate >=12 is incompatible    
       - dependency-name: "org.hibernate:hibernate-*"
         versions:
-          - ">= 6.0.0"
-      - dependency-name: "com.github.gwenn:sqlite-dialect"
-        versions:
-          - "> 0.1.0"
-      # Spring 6 and Jersey 3.1 require Java >= 17
-      - dependency-name: "org.springframework*"
-        versions:
-          - ">=6"
-      - dependency-name: "org.glassfish.jersey.*"
-        versions:
-          - ">=3"
+          - ">= 6.2.0"
     open-pull-requests-limit: 50
