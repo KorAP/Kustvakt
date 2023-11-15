@@ -22,6 +22,30 @@
       },
       "revId": "3df8157f51af4e32fe19ac6dd228b3628ad8c8e4",
       "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04201b6d_5b76090a",
+        "filename": "full/src/test/java/de/ids_mannheim/korap/web/controller/OAuth2TestBase.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 21
+      },
+      "writtenOn": "2023-11-15T09:34:07Z",
+      "side": 1,
+      "message": "Done. Thanks!",
+      "parentUuid": "77496155_f540ea3a",
+      "range": {
+        "startLine": 470,
+        "startChar": 8,
+        "endLine": 470,
+        "endChar": 33
+      },
+      "revId": "3df8157f51af4e32fe19ac6dd228b3628ad8c8e4",
+      "serverId": "626241b7-b7d0-4197-b843-1ee23887649c"
     }
   ]
 }
