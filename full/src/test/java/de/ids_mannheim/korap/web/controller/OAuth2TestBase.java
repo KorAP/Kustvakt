@@ -467,7 +467,6 @@ public abstract class OAuth2TestBase extends SpringJerseyTest {
     protected void testInvalidRedirectUri (String entity, String contentType,
             boolean includeState, int status) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(entity);
-        System.out.println(node);
         assertEquals(OAuth2Error.INVALID_REQUEST.getCode(),
                 node.at("/error").asText());
         assertEquals("Invalid redirect URI",
