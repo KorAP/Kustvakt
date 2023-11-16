@@ -26,7 +26,7 @@ public abstract class User implements Serializable {
     //EM: add
     private String email;
     //EM: finish
-    
+
     private Integer id;
     // in local its username, in shib it's edupersonPrincipalName
     private String username;
@@ -47,57 +47,52 @@ public abstract class User implements Serializable {
 
     private UserSettingProcessor userSettingProcessor;
 
-//    private boolean isSystemAdmin;
+    //    private boolean isSystemAdmin;
 
     // Values for corpusAccess:
-    public enum CorpusAccess	 {
-    	FREE, 	// Access to licence free corpora only, without login   
+    public enum CorpusAccess {
+        FREE, 	// Access to licence free corpora only, without login   
         PUB,	// Access to public (= öffentliche Korpora) only, externes Login.
         ALL 	// Access to all corpora, internes Login.
-    	};
-    	
+    };
+
     @Getter
     @Setter
     private CorpusAccess corpusAccess = CorpusAccess.FREE;
-        
+
     // values for location (set using the X-forwarded-for Header):
-    public enum Location  {
+    public enum Location {
         INTERN, 	// KorAP accessed by internal Client (inside intranet).
         EXTERN		// KorAP accessed by external Client (outside intranet).
     };
-        
+
     @Getter
     @Setter
     private Location location = Location.EXTERN;
 
-    
     protected User () {
         this.fields = new ParamFields();
         this.accountCreation = TimeUtils.getNow().getMillis();
         this.isAccountLocked = false;
         this.username = "";
         this.id = -1;
-        this.location 		= Location.EXTERN;
-        this.corpusAccess 	= CorpusAccess.FREE;
+        this.location = Location.EXTERN;
+        this.corpusAccess = CorpusAccess.FREE;
     }
-
 
     protected User (int type) {
         this();
         this.type = type;
     }
 
-
     protected User (String username, int type) {
         this(type);
         this.username = username;
     }
 
-
     public void addField (ParamFields.Param param) {
         this.fields.add(param);
     }
-
 
     public <T extends ParamFields.Param> T getField (Class<T> cl) {
         return this.fields.get(cl);
@@ -111,7 +106,6 @@ public abstract class User implements Serializable {
         //            this.details.setUserID(this.id);
     }
 
-
     public Map<String, Object> toMap () {
         Map map = new HashMap();
         map.put(Attributes.USERNAME, this.username);
@@ -123,7 +117,6 @@ public abstract class User implements Serializable {
         return map;
     }
 
-
     public Map toCache () {
         Map map = new HashMap();
         map.put(Attributes.ID, this.id);
@@ -134,7 +127,6 @@ public abstract class User implements Serializable {
         map.put(Attributes.TYPE, this.type);
         return map;
     }
-
 
     @Override
     public boolean equals (Object o) {
@@ -148,13 +140,11 @@ public abstract class User implements Serializable {
         return true;
     }
 
-//    public boolean isAdmin () {
-//        return this.getUsername().equals(ADMINISTRATOR_ID);
-//    }
-
+    //    public boolean isAdmin () {
+    //        return this.getUsername().equals(ADMINISTRATOR_ID);
+    //    }
 
     protected abstract User clone ();
-
 
     @Override
     public String toString () {
@@ -164,36 +154,35 @@ public abstract class User implements Serializable {
         return sb.toString();
     }
 
-    public String locationtoString()
-    
+    public String locationtoString ()
+
     {
-    	if( this.location == Location.INTERN)
-    		return "INTERN";
-    	else if( this.location == Location.EXTERN )
-    		return "EXTERN";
-    	else
-    		return "???";
+        if (this.location == Location.INTERN)
+            return "INTERN";
+        else if (this.location == Location.EXTERN)
+            return "EXTERN";
+        else
+            return "???";
     }
-    
-    public String accesstoString()
-    
+
+    public String accesstoString ()
+
     {
-    	if( this.corpusAccess == CorpusAccess.ALL )
-    		return "ALL";
-    	else if( this.corpusAccess == CorpusAccess.PUB )
-    		return "PUB";
-    	else if( this.corpusAccess == CorpusAccess.FREE )
-    		return "FREE";
-    	else
-    		return "???";
+        if (this.corpusAccess == CorpusAccess.ALL)
+            return "ALL";
+        else if (this.corpusAccess == CorpusAccess.PUB)
+            return "PUB";
+        else if (this.corpusAccess == CorpusAccess.FREE)
+            return "FREE";
+        else
+            return "???";
     }
-    
+
     public static class UserFactory {
 
         public static KorAPUser getUser (String username) {
             return new KorAPUser(username);
         }
-
 
         public static KorAPUser getUser (String username, String password) {
             KorAPUser user = new KorAPUser(username);
@@ -201,15 +190,13 @@ public abstract class User implements Serializable {
             return user;
         }
 
-//        public static KorAPUser getAdmin () {
-//            return new KorAPUser(ADMINISTRATOR_ID, ADMINISTRATOR_NAME);
-//        }
-
+        //        public static KorAPUser getAdmin () {
+        //            return new KorAPUser(ADMINISTRATOR_ID, ADMINISTRATOR_NAME);
+        //        }
 
         public static DemoUser getDemoUser () {
             return new DemoUser();
         }
-
 
         public static DemoUser getDemoUser (Integer id) {
             DemoUser demo = new DemoUser();
@@ -217,51 +204,48 @@ public abstract class User implements Serializable {
             return demo;
         }
 
-
         public static boolean isDemo (String username) {
             return new DemoUser().getUsername().equalsIgnoreCase(username);
         }
 
-
-//        public static ShibUser getShibInstance (String eduPersonID,
-//                String mail, String cn) {
-//            ShibUser u = new ShibUser(eduPersonID);
-//            u.setAffiliation("");
-//            u.setMail(mail);
-//            u.setUsername(eduPersonID);
-//            u.setCn(cn);
-//            return u;
-//        }
-
+        //        public static ShibUser getShibInstance (String eduPersonID,
+        //                String mail, String cn) {
+        //            ShibUser u = new ShibUser(eduPersonID);
+        //            u.setAffiliation("");
+        //            u.setMail(mail);
+        //            u.setUsername(eduPersonID);
+        //            u.setCn(cn);
+        //            return u;
+        //        }
 
         public static KorAPUser toKorAPUser (Map<String, Object> map) {
-            KorAPUser user = UserFactory.getUser((String) map
-                    .get(Attributes.USERNAME));
+            KorAPUser user = UserFactory
+                    .getUser((String) map.get(Attributes.USERNAME));
             user.setPassword((String) map.get(Attributes.PASSWORD));
-            int id = map.get(Attributes.ID) == null ? -1 : (int) map
-                    .get(Attributes.ID);
+            int id = map.get(Attributes.ID) == null ? -1
+                    : (int) map.get(Attributes.ID);
             if (id != -1)
                 user.setId(id);
             long cr = map.get(Attributes.ACCOUNT_CREATION) == null ? -1
                     : (long) map.get(Attributes.ACCOUNT_CREATION);
             if (cr != -1)
-                user.setAccountCreation((Long) map
-                        .get(Attributes.ACCOUNT_CREATION));
+                user.setAccountCreation(
+                        (Long) map.get(Attributes.ACCOUNT_CREATION));
             return user;
         }
 
-
         public static User toUser (Map<String, Object> map) {
             KustvaktMap kmap = new KustvaktMap(map);
-            int type = map.get(Attributes.TYPE) == null ? 0 : (Integer) kmap
-                    .get(Attributes.TYPE, Integer.class);
+            int type = map.get(Attributes.TYPE) == null ? 0
+                    : (Integer) kmap.get(Attributes.TYPE, Integer.class);
             User user;
             long created = -1;
             int id = kmap.get(Attributes.ID, Integer.class) == null ? -1
                     : (Integer) kmap.get(Attributes.ID, Integer.class);
 
             if (map.get(Attributes.ACCOUNT_CREATION) != null)
-                created = TimeUtils.getTime(kmap.get(Attributes.ACCOUNT_CREATION))
+                created = TimeUtils
+                        .getTime(kmap.get(Attributes.ACCOUNT_CREATION))
                         .getMillis();
             switch (type) {
                 case 0:
@@ -269,9 +253,10 @@ public abstract class User implements Serializable {
                     if (id != -1)
                         user.setId((Integer) kmap.get(Attributes.ID,
                                 Integer.class));
-                    user.setAccountLocked(map.get(Attributes.ACCOUNTLOCK) == null ? false
-                            : (Boolean) kmap.get(Attributes.ACCOUNTLOCK,
-                                    Boolean.class));
+                    user.setAccountLocked(
+                            map.get(Attributes.ACCOUNTLOCK) == null ? false
+                                    : (Boolean) kmap.get(Attributes.ACCOUNTLOCK,
+                                            Boolean.class));
                     user.setAccountCreation(created);
                     break;
                 default:
@@ -281,15 +266,15 @@ public abstract class User implements Serializable {
             return user;
         }
 
-
         public static KorAPUser toUser (String value) throws KustvaktException {
             JsonNode node = JsonUtils.readTree(value);
-            KorAPUser user = UserFactory.getUser(node.path(Attributes.USERNAME)
-                    .asText());
-            user.setAccountLocked(node.path(Attributes.ACCOUNTLOCK).asBoolean());
+            KorAPUser user = UserFactory
+                    .getUser(node.path(Attributes.USERNAME).asText());
+            user.setAccountLocked(
+                    node.path(Attributes.ACCOUNTLOCK).asBoolean());
             user.setAccountLink(node.path(Attributes.ACCOUNTLINK).asText());
-            user.setAccountCreation(node.path(Attributes.ACCOUNT_CREATION)
-                    .asLong());
+            user.setAccountCreation(
+                    node.path(Attributes.ACCOUNT_CREATION).asLong());
             user.setPassword(node.path(Attributes.PASSWORD).asText());
             return user;
         }

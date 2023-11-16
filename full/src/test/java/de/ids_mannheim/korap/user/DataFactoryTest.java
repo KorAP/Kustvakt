@@ -20,7 +20,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class DataFactoryTest {
 
     @Test
-    public void testDataFactoryAdd() throws KustvaktException {
+    public void testDataFactoryAdd () throws KustvaktException {
         String data = "{}";
         Object node = JsonUtils.readTree(data);
         DataFactory factory = DataFactory.getFactory();
@@ -36,7 +36,7 @@ public class DataFactoryTest {
     }
 
     @Test
-    public void testDataFactoryGet() throws KustvaktException {
+    public void testDataFactoryGet () throws KustvaktException {
         String data = "{}";
         Object node = JsonUtils.readTree(data);
         DataFactory factory = DataFactory.getFactory();
@@ -63,7 +63,7 @@ public class DataFactoryTest {
     }
 
     @Test
-    public void testDataFactoryMerge() throws KustvaktException {
+    public void testDataFactoryMerge () throws KustvaktException {
         String data = "{}";
         Object node = JsonUtils.readTree(data);
         DataFactory factory = DataFactory.getFactory();
@@ -85,7 +85,7 @@ public class DataFactoryTest {
     }
 
     @Test
-    public void testDataFactoryKeys() throws KustvaktException {
+    public void testDataFactoryKeys () throws KustvaktException {
         String data = "{}";
         Object node = JsonUtils.readTree(data);
         DataFactory factory = DataFactory.getFactory();
@@ -98,7 +98,7 @@ public class DataFactoryTest {
 
     @Test
     @Disabled
-    public void testDataFactoryRemove() throws KustvaktException {
+    public void testDataFactoryRemove () throws KustvaktException {
         String data = "{}";
         Object node = JsonUtils.readTree(data);
         DataFactory factory = DataFactory.getFactory();
@@ -136,7 +136,7 @@ public class DataFactoryTest {
     }
 
     @Test
-    public void testDataFactoryEmbeddedProperty() throws KustvaktException {
+    public void testDataFactoryEmbeddedProperty () throws KustvaktException {
         String data = "{}";
         JsonNode node = JsonUtils.readTree(data);
         DataFactory factory = DataFactory.getFactory();

@@ -13,7 +13,8 @@ public class KustvaktLiteServer extends KustvaktBaseServer {
         KustvaktLiteServer server = new KustvaktLiteServer();
         kargs = server.readAttributes(args);
 
-        if (kargs == null) System.exit(0);
+        if (kargs == null)
+            System.exit(0);
 
         File f = new File("kustvakt-lite.conf");
         Properties properties = new Properties();
@@ -32,8 +33,8 @@ public class KustvaktLiteServer extends KustvaktBaseServer {
         config = new KustvaktConfiguration();
         config.loadBasicProperties(properties);
 
-        springConfig =  "default-lite-config.xml";
-        
+        springConfig = "default-lite-config.xml";
+
         rootPackages = "de.ids_mannheim.korap.core.web; "
                 + "de.ids_mannheim.korap.web.filter; "
                 + "de.ids_mannheim.korap.web.utils; "

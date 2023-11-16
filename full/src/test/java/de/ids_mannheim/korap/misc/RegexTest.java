@@ -10,7 +10,7 @@ import de.ids_mannheim.korap.annotation.AnnotationParser;
 public class RegexTest {
 
     @Test
-    public void testQuote() {
+    public void testQuote () {
         String s = "ah[\"-\"]";
         Matcher m = AnnotationParser.quotePattern.matcher(s);
         if (m.find()) {

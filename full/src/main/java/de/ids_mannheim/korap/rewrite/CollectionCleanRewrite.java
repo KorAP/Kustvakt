@@ -9,7 +9,9 @@ import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.user.User;
 import edu.emory.mathcs.backport.java.util.Arrays;
 
-/** EM: not used anymore. This rewrite was to remove an empty koral:doc group in operands.
+/**
+ * EM: not used anymore. This rewrite was to remove an empty koral:doc
+ * group in operands.
  * 
  * @author hanl
  * @date 28/07/2015
@@ -22,7 +24,6 @@ public class CollectionCleanRewrite implements RewriteTask.RewriteNodeAt {
         JsonNode jsonNode = process(node.rawNode());
         return node.wrapNode(jsonNode);
     }
-
 
     private JsonNode process (JsonNode root) {
         JsonNode sub = root;
@@ -50,8 +51,8 @@ public class CollectionCleanRewrite implements RewriteTask.RewriteNodeAt {
             if (!root.equals(sub)) {
                 if (sub.isObject()) {
                     ObjectNode ob = (ObjectNode) root;
-                    ob.remove(Arrays.asList(new String[] { "@type",
-                            "operation", "operands" }));
+                    ob.remove(Arrays.asList(
+                            new String[] { "@type", "operation", "operands" }));
                     ob.putAll((ObjectNode) sub);
                 }
             }
@@ -59,12 +60,10 @@ public class CollectionCleanRewrite implements RewriteTask.RewriteNodeAt {
         return root;
     }
 
-
     @Override
     public JsonNode rewriteResult (KoralNode node) {
         return null;
     }
-
 
     @Override
     public String at () {

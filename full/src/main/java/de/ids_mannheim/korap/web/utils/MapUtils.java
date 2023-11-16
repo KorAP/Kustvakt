@@ -28,7 +28,7 @@ public class MapUtils {
         if (multivaluedMap == null) {
             return new HashMap<String, String>();
         }
-        
+
         Set<String> keySet = multivaluedMap.keySet();
         Map<String, String> map = new HashMap<String, String>(keySet.size());
 

@@ -85,19 +85,21 @@ public class OAuth2ClientDao {
             client.setPermitted(true);
         }
         if (refreshTokenExpiry <= 0) {
-            if (type.equals(OAuth2ClientType.CONFIDENTIAL)){
+            if (type.equals(OAuth2ClientType.CONFIDENTIAL)) {
                 refreshTokenExpiry = config.getRefreshTokenLongExpiry();
             }
         }
-        else if (type.equals(OAuth2ClientType.PUBLIC)){
-            throw new KustvaktException(StatusCodes.INVALID_REFRESH_TOKEN_EXPIRY,
+        else if (type.equals(OAuth2ClientType.PUBLIC)) {
+            throw new KustvaktException(
+                    StatusCodes.INVALID_REFRESH_TOKEN_EXPIRY,
                     "Custom refresh token expiry is only applicable for confidential clients");
         }
-        else if (refreshTokenExpiry > 31536000 ){
-            throw new KustvaktException(StatusCodes.INVALID_REFRESH_TOKEN_EXPIRY,
+        else if (refreshTokenExpiry > 31536000) {
+            throw new KustvaktException(
+                    StatusCodes.INVALID_REFRESH_TOKEN_EXPIRY,
                     "Maximum refresh token expiry is 31536000 seconds (1 year)");
         }
-        
+
         client.setRefreshTokenExpiry(refreshTokenExpiry);
         entityManager.persist(client);
     }
@@ -108,8 +110,8 @@ public class OAuth2ClientDao {
         ParameterChecker.checkStringValue(clientId, "client_id");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<OAuth2Client> query =
-                builder.createQuery(OAuth2Client.class);
+        CriteriaQuery<OAuth2Client> query = builder
+                .createQuery(OAuth2Client.class);
 
         Root<OAuth2Client> root = query.from(OAuth2Client.class);
         query.select(root);
@@ -148,12 +150,12 @@ public class OAuth2ClientDao {
         ParameterChecker.checkStringValue(username, "username");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<OAuth2Client> query =
-                builder.createQuery(OAuth2Client.class);
+        CriteriaQuery<OAuth2Client> query = builder
+                .createQuery(OAuth2Client.class);
 
         Root<OAuth2Client> client = query.from(OAuth2Client.class);
-        Join<OAuth2Client, RefreshToken> refreshToken =
-                client.join(OAuth2Client_.refreshTokens);
+        Join<OAuth2Client, RefreshToken> refreshToken = client
+                .join(OAuth2Client_.refreshTokens);
         Predicate condition = builder.and(
                 builder.equal(refreshToken.get(RefreshToken_.userId), username),
                 builder.equal(refreshToken.get(RefreshToken_.isRevoked), false),
@@ -174,12 +176,12 @@ public class OAuth2ClientDao {
         ParameterChecker.checkStringValue(username, "username");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<OAuth2Client> query =
-                builder.createQuery(OAuth2Client.class);
+        CriteriaQuery<OAuth2Client> query = builder
+                .createQuery(OAuth2Client.class);
 
         Root<OAuth2Client> client = query.from(OAuth2Client.class);
-        Join<OAuth2Client, AccessToken> accessToken =
-                client.join(OAuth2Client_.accessTokens);
+        Join<OAuth2Client, AccessToken> accessToken = client
+                .join(OAuth2Client_.accessTokens);
         Predicate condition = builder.and(
                 builder.equal(accessToken.get(AccessToken_.userId), username),
                 builder.equal(accessToken.get(AccessToken_.isRevoked), false),
@@ -200,8 +202,8 @@ public class OAuth2ClientDao {
         ParameterChecker.checkStringValue(username, "username");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<OAuth2Client> query =
-                builder.createQuery(OAuth2Client.class);
+        CriteriaQuery<OAuth2Client> query = builder
+                .createQuery(OAuth2Client.class);
 
         Root<OAuth2Client> client = query.from(OAuth2Client.class);
         query.select(client);
@@ -215,12 +217,12 @@ public class OAuth2ClientDao {
     public List<OAuth2Client> retrievePlugins (boolean isPermittedOnly)
             throws KustvaktException {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<OAuth2Client> query =
-                builder.createQuery(OAuth2Client.class);
+        CriteriaQuery<OAuth2Client> query = builder
+                .createQuery(OAuth2Client.class);
 
         Root<OAuth2Client> client = query.from(OAuth2Client.class);
-        Predicate restrictions =
-                builder.isNotNull(client.get(OAuth2Client_.SOURCE));
+        Predicate restrictions = builder
+                .isNotNull(client.get(OAuth2Client_.SOURCE));
         if (isPermittedOnly) {
             restrictions = builder.and(restrictions,
                     builder.isTrue(client.get(OAuth2Client_.IS_PERMITTED)));

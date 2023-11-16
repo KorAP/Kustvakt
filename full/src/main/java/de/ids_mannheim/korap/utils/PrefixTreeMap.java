@@ -9,7 +9,6 @@ import java.util.TreeMap;
  */
 public class PrefixTreeMap<V> extends TreeMap<String, V> {
 
-
     public SortedMap<String, V> getPrefixSubMap (String prefix) {
         if (prefix != null && prefix.length() > 0) {
             SortedMap d = this.subMap(prefix, getEnd(prefix));
@@ -20,13 +19,11 @@ public class PrefixTreeMap<V> extends TreeMap<String, V> {
         return null;
     }
 
-
     private String getEnd (String prefix) {
         char nextLetter = (char) (prefix.charAt(prefix.length() - 1) + 1);
         return prefix.substring(0, prefix.length() - 1) + nextLetter;
 
     }
-
 
     public V getFirstValue (String prefix) {
         if (prefix.length() > 0) {
@@ -35,7 +32,6 @@ public class PrefixTreeMap<V> extends TreeMap<String, V> {
         }
         return null;
     }
-
 
     public V getLastValue (String prefix) {
         if (prefix.length() > 0) {

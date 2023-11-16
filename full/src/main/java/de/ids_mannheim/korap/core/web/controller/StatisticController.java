@@ -41,8 +41,8 @@ import jakarta.ws.rs.core.SecurityContext;
 public class StatisticController {
 
     private static final boolean DEBUG = false;
-    private static Logger jlog =
-            LogManager.getLogger(StatisticController.class);
+    private static Logger jlog = LogManager
+            .getLogger(StatisticController.class);
     @Autowired
     private CoreResponseHandler kustvaktResponseHandler;
     @Autowired
@@ -81,10 +81,9 @@ public class StatisticController {
                 jlog.debug("Stats: " + stats);
             }
 
-            return Response
-                .ok(stats)
-                .header("X-Index-Revision", service.getIndexFingerprint())
-                .build();
+            return Response.ok(stats)
+                    .header("X-Index-Revision", service.getIndexFingerprint())
+                    .build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -98,10 +97,9 @@ public class StatisticController {
             String koralQuery) {
         try {
             String stats = service.retrieveStatisticsForKoralQuery(koralQuery);
-            return Response
-                .ok(stats)
-                .header("X-Index-Revision", service.getIndexFingerprint())
-                .build();
+            return Response.ok(stats)
+                    .header("X-Index-Revision", service.getIndexFingerprint())
+                    .build();
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);

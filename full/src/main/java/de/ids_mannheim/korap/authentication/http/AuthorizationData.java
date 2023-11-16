@@ -4,7 +4,9 @@ import de.ids_mannheim.korap.constant.AuthenticationScheme;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Describes the values stored in Authorization header of HTTP requests. 
+/**
+ * Describes the values stored in Authorization header of HTTP
+ * requests.
  * 
  * @author margaretha
  *
@@ -19,4 +21,3 @@ public class AuthorizationData {
     private String password;
 
 }
-

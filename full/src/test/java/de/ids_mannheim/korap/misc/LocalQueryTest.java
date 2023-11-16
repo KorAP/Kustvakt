@@ -29,12 +29,12 @@ public class LocalQueryTest extends SpringJerseyTest {
     KustvaktConfiguration config;
 
     @PostConstruct
-    public void setup() throws Exception {
+    public void setup () throws Exception {
         index = config.getIndexDir();
     }
 
     @Test
-    public void testQuery() throws KustvaktException {
+    public void testQuery () throws KustvaktException {
         String qstring = "creationDate since 1786 & creationDate until 1788";
         // qstring = "creationDate since 1765 & creationDate until 1768";
         // qstring = "textType = Aphorismus";
@@ -47,7 +47,7 @@ public class LocalQueryTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testCollQuery() throws IOException, KustvaktException {
+    public void testCollQuery () throws IOException, KustvaktException {
         String qstring = "creationDate since 1800 & creationDate until 1820";
         CollectionQueryProcessor processor = new CollectionQueryProcessor();
         processor.process(qstring);
@@ -59,7 +59,7 @@ public class LocalQueryTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testCollQuery2() throws IOException {
+    public void testCollQuery2 () throws IOException {
         String query = "{\"@context\":\"http://korap.ids-mannheim.de/ns/koral/0.3/context.jsonld\",\"errors\":[],\"warnings\":[],\"messages\":[],\"collection\":{\"@type\":\"koral:docGroup\",\"operation\":\"operation:and\",\"operands\":[{\"@type\":\"koral:doc\",\"key\":\"creationDate\",\"type\":\"type:date\",\"value\":\"1786\",\"match\":\"match:geq\"},{\"@type\":\"koral:doc\",\"key\":\"creationDate\",\"type\":\"type:date\",\"value\":\"1788\",\"match\":\"match:leq\"}]},\"query\":{},\"meta\":{}}";
         KrillCollection c = new KrillCollection(query);
         c.setIndex(new SearchKrill(index).getIndex());

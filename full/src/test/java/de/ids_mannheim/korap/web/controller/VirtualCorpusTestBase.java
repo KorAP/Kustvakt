@@ -43,7 +43,7 @@ public abstract class VirtualCorpusTestBase extends OAuth2TestBase {
         return JsonUtils.readTree(entity);
     }
 
-    protected void createVC (String authHeader,String username, String vcName, 
+    protected void createVC (String authHeader, String username, String vcName,
             String vcJson) throws KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
                 .path("~" + username).path(vcName).request()
@@ -78,7 +78,7 @@ public abstract class VirtualCorpusTestBase extends OAuth2TestBase {
         // System.out.println(entity);
         return JsonUtils.readTree(entity);
     }
-    
+
     protected JsonNode listVCWithAuthHeader (String authHeader)
             throws ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("vc").request()
@@ -88,7 +88,7 @@ public abstract class VirtualCorpusTestBase extends OAuth2TestBase {
         String entity = response.readEntity(String.class);
         return JsonUtils.readTree(entity);
     }
-    
+
     protected JsonNode testListOwnerVC (String username)
             throws ProcessingException, KustvaktException {
         Response response = target().path(API_VERSION).path("vc")
@@ -146,7 +146,7 @@ public abstract class VirtualCorpusTestBase extends OAuth2TestBase {
 
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
-    
+
     protected void testResponseUnauthorized (Response response, String username)
             throws KustvaktException {
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
@@ -158,19 +158,22 @@ public abstract class VirtualCorpusTestBase extends OAuth2TestBase {
                 node.at("/errors/0/0").asInt());
         assertEquals("Unauthorized operation for user: " + username,
                 node.at("/errors/0/1").asText());
-        
+
         checkWWWAuthenticateHeader(response);
     }
-    
+
     protected void checkWWWAuthenticateHeader (Response response) {
-        Set<Entry<String, List<Object>>> headers =
-                response.getHeaders().entrySet();
+        Set<Entry<String, List<Object>>> headers = response.getHeaders()
+                .entrySet();
 
         for (Entry<String, List<Object>> header : headers) {
             if (header.getKey().equals(ContainerRequest.WWW_AUTHENTICATE)) {
-                assertThat(header.getValue(), not(hasItem("Api realm=\"Kustvakt\"")));
-                assertThat(header.getValue(), hasItem("Bearer realm=\"Kustvakt\""));
-                assertThat(header.getValue(), hasItem("Basic realm=\"Kustvakt\""));
+                assertThat(header.getValue(),
+                        not(hasItem("Api realm=\"Kustvakt\"")));
+                assertThat(header.getValue(),
+                        hasItem("Bearer realm=\"Kustvakt\""));
+                assertThat(header.getValue(),
+                        hasItem("Basic realm=\"Kustvakt\""));
             }
         }
     }

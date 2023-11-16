@@ -87,8 +87,8 @@ public class RoleDao {
         CriteriaQuery<Role> query = criteriaBuilder.createQuery(Role.class);
 
         Root<Role> root = query.from(Role.class);
-        ListJoin<Role, UserGroupMember> memberRole =
-                root.join(Role_.userGroupMembers);
+        ListJoin<Role, UserGroupMember> memberRole = root
+                .join(Role_.userGroupMembers);
 
         query.select(root);
         query.where(criteriaBuilder.equal(memberRole.get(UserGroupMember_.id),

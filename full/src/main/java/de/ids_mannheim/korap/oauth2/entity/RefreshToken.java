@@ -19,7 +19,8 @@ import jakarta.persistence.UniqueConstraint;
 
 /**
  * Describes oauth2_refresh_token database table mapping and refresh
- * token relations to access scopes, access tokens, and oauth2 clients.
+ * token relations to access scopes, access tokens, and oauth2
+ * clients.
  * 
  * @author margaretha
  *
@@ -53,13 +54,8 @@ public class RefreshToken {
     private OAuth2Client client;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "oauth2_refresh_token_scope",
-            joinColumns = @JoinColumn(name = "token_id",
-                    referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "scope_id",
-                    referencedColumnName = "id"),
-            uniqueConstraints = @UniqueConstraint(
-                    columnNames = { "token_id", "scope_id" }))
+    @JoinTable(name = "oauth2_refresh_token_scope", joinColumns = @JoinColumn(name = "token_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "scope_id", referencedColumnName = "id"), uniqueConstraints = @UniqueConstraint(columnNames = {
+            "token_id", "scope_id" }))
     private Set<AccessScope> scopes;
 
     public String getToken () {

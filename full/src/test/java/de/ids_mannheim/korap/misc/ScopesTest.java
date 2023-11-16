@@ -9,10 +9,8 @@ import org.junit.jupiter.api.Test;
 public class ScopesTest {
 
     @Test
-    public void testScopes() {
-    }
+    public void testScopes () {}
 
     @Test
-    public void testOpenIDScopes() {
-    }
+    public void testOpenIDScopes () {}
 }

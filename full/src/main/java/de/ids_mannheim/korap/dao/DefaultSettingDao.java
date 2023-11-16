@@ -60,7 +60,7 @@ public class DefaultSettingDao {
             throws KustvaktException {
         ParameterChecker.checkObjectValue(username, "defaultSetting");
         DefaultSetting defaultSetting = retrieveDefaultSetting(username);
-        if (defaultSetting != null){
+        if (defaultSetting != null) {
             entityManager.remove(defaultSetting);
         }
     }
@@ -70,8 +70,8 @@ public class DefaultSettingDao {
         ParameterChecker.checkStringValue(username, "username");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<DefaultSetting> query =
-                criteriaBuilder.createQuery(DefaultSetting.class);
+        CriteriaQuery<DefaultSetting> query = criteriaBuilder
+                .createQuery(DefaultSetting.class);
         Root<DefaultSetting> defaultSetting = query.from(DefaultSetting.class);
 
         query.select(defaultSetting);

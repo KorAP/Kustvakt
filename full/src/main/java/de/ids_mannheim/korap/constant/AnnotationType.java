@@ -1,6 +1,7 @@
 package de.ids_mannheim.korap.constant;
 
-/** Defines various annotation types as constants  
+/**
+ * Defines various annotation types as constants
  * 
  * @author margaretha
  *

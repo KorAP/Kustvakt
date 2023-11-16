@@ -16,16 +16,13 @@ public class ParamFields extends HashMap<String, ParamFields.Param> {
         this.put(param.getClass().getName(), param);
     }
 
-
     public <T extends Param> T get (Class<T> cl) {
         return (T) this.get(cl.getName());
     }
 
-
     public <T extends Param> T remove (Class<T> cl) {
         return (T) this.remove(cl.getName());
     }
-
 
     public void addAll (Collection<Param> params) {
         for (Param p : params)

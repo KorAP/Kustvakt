@@ -60,8 +60,8 @@ public class DefaultSettingService {
         UserSettingProcessor processor = new UserSettingProcessor();
         processor.readQuietly(map, false);
 
-        DefaultSetting defaultSetting =
-                settingDao.retrieveDefaultSetting(username);
+        DefaultSetting defaultSetting = settingDao
+                .retrieveDefaultSetting(username);
         if (defaultSetting == null) {
             createDefaultSetting(username, processor);
             return HttpStatus.SC_CREATED;
@@ -80,8 +80,8 @@ public class DefaultSettingService {
 
     public void updateDefaultSetting (DefaultSetting setting,
             UserSettingProcessor newProcessor) throws KustvaktException {
-        UserSettingProcessor processor =
-                new UserSettingProcessor(setting.getSettings());
+        UserSettingProcessor processor = new UserSettingProcessor(
+                setting.getSettings());
         processor.update(newProcessor);
 
         String jsonSettings = processor.serialize();
@@ -98,8 +98,8 @@ public class DefaultSettingService {
 
     public String retrieveDefaultSettings (String username)
             throws KustvaktException {
-        DefaultSetting defaultSetting =
-                settingDao.retrieveDefaultSetting(username);
+        DefaultSetting defaultSetting = settingDao
+                .retrieveDefaultSetting(username);
         if (defaultSetting == null) {
             return null;
         }
@@ -109,8 +109,8 @@ public class DefaultSettingService {
     public void deleteKey (String username, String contextUsername, String key)
             throws KustvaktException {
         username = verifiyUsername(username, contextUsername);
-        DefaultSetting defaultSetting =
-                settingDao.retrieveDefaultSetting(username);
+        DefaultSetting defaultSetting = settingDao
+                .retrieveDefaultSetting(username);
 
         String jsonSettings = defaultSetting.getSettings();
         UserSettingProcessor processor = new UserSettingProcessor(jsonSettings);

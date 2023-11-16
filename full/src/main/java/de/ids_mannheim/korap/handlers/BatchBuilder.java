@@ -25,11 +25,9 @@ public class BatchBuilder {
 
     private JdbcOperations operations;
 
-
     public BatchBuilder (JdbcOperations operations) {
         this.operations = operations;
     }
-
 
     public <T> List<T> selectFromIDs (String query, Collection ids,
             RowMapper<T> mapper) {

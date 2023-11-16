@@ -34,20 +34,19 @@ public class VirtualCorpusAdminController {
     private KustvaktResponseHandler kustvaktResponseHandler;
     @Autowired
     private QueryService service;
-    
+
     @Autowired
     private NamedVCLoader vcLoader;
-    
+
     @POST
     @Path("load-cache")
     public Response loadAndCacheSystemVC () {
         Thread t = new Thread(vcLoader);
         t.start();
-        
+
         return Response.status(Status.OK).build();
     }
-    
-    
+
     /**
      * Lists virtual corpora by creator and type. This is a controller
      * for system admin requiring valid system admin authentication.

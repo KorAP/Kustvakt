@@ -50,8 +50,8 @@ public class RefreshTokenDao {
         ParameterChecker.checkObjectValue(client, "client");
         ParameterChecker.checkObjectValue(scopes, "scopes");
 
-        ZonedDateTime now =
-                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+        ZonedDateTime now = ZonedDateTime
+                .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
 
         RefreshToken token = new RefreshToken();
         token.setToken(refreshToken);
@@ -79,8 +79,8 @@ public class RefreshTokenDao {
         ParameterChecker.checkStringValue(token, "refresh_token");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<RefreshToken> query =
-                builder.createQuery(RefreshToken.class);
+        CriteriaQuery<RefreshToken> query = builder
+                .createQuery(RefreshToken.class);
         Root<RefreshToken> root = query.from(RefreshToken.class);
         root.fetch(RefreshToken_.client);
 
@@ -97,8 +97,8 @@ public class RefreshTokenDao {
         ParameterChecker.checkStringValue(username, "username");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<RefreshToken> query =
-                builder.createQuery(RefreshToken.class);
+        CriteriaQuery<RefreshToken> query = builder
+                .createQuery(RefreshToken.class);
 
         Root<RefreshToken> root = query.from(RefreshToken.class);
         Predicate condition = builder.and(
@@ -122,12 +122,12 @@ public class RefreshTokenDao {
         OAuth2Client client = clientDao.retrieveClientById(clientId);
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<RefreshToken> query =
-                builder.createQuery(RefreshToken.class);
+        CriteriaQuery<RefreshToken> query = builder
+                .createQuery(RefreshToken.class);
         Root<RefreshToken> root = query.from(RefreshToken.class);
 
-        Predicate condition =
-                builder.equal(root.get(RefreshToken_.client), client);
+        Predicate condition = builder.equal(root.get(RefreshToken_.client),
+                client);
         if (username != null && !username.isEmpty()) {
             condition = builder.and(condition,
                     builder.equal(root.get(RefreshToken_.userId), username));
@@ -144,8 +144,8 @@ public class RefreshTokenDao {
         ParameterChecker.checkStringValue(username, "username");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<RefreshToken> query =
-                builder.createQuery(RefreshToken.class);
+        CriteriaQuery<RefreshToken> query = builder
+                .createQuery(RefreshToken.class);
 
         Root<RefreshToken> root = query.from(RefreshToken.class);
         root.fetch(RefreshToken_.client);
@@ -172,11 +172,11 @@ public class RefreshTokenDao {
         List<RefreshToken> invalidRefreshTokens = retrieveInvalidRefreshTokens();
         invalidRefreshTokens.forEach(token -> entityManager.remove(token));
     }
-    
+
     public List<RefreshToken> retrieveInvalidRefreshTokens () {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<RefreshToken> query =
-                builder.createQuery(RefreshToken.class);
+        CriteriaQuery<RefreshToken> query = builder
+                .createQuery(RefreshToken.class);
 
         Root<RefreshToken> root = query.from(RefreshToken.class);
         Predicate condition = builder.or(

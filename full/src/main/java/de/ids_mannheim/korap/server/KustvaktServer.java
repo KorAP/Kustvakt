@@ -18,26 +18,27 @@ public class KustvaktServer extends KustvaktBaseServer {
     public static void main (String[] args) throws Exception {
         KustvaktServer server = new KustvaktServer();
         kargs = server.readAttributes(args);
-        
+
         File f = new File("kustvakt.conf");
         Properties properties = new Properties();
-        
+
         InputStream in = null;
-        if (!f.exists()){
-            in = KustvaktServer.class.getClassLoader().getResourceAsStream("kustvakt.conf");
+        if (!f.exists()) {
+            in = KustvaktServer.class.getClassLoader()
+                    .getResourceAsStream("kustvakt.conf");
         }
-        else{
+        else {
             in = new FileInputStream(f);
         }
-        
+
         properties.load(in);
         in.close();
-        
+
         config = new FullConfiguration();
         config.loadBasicProperties(properties);
 
-		if (kargs == null)
-			System.exit(0);
+        if (kargs == null)
+            System.exit(0);
 
         server.start();
     }

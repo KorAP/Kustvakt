@@ -26,19 +26,19 @@ public class ConfigTest extends SpringJerseyTest {
     KustvaktConfiguration config;
 
     @Test
-    public void testConfigLoader() {
+    public void testConfigLoader () {
         InputStream stream = ConfigLoader.loadConfigStream("kustvakt.conf");
         assertNotNull(stream);
     }
 
     @Test
-    public void testPropertyLoader() throws IOException {
+    public void testPropertyLoader () throws IOException {
         Properties p = ConfigLoader.loadProperties("kustvakt.conf");
         assertNotNull(p);
     }
 
     @Test
-    public void testServiceInfo() {
+    public void testServiceInfo () {
         String version = ServiceInfo.getInfo().getVersion();
         String name = ServiceInfo.getInfo().getName();
         assertNotEquals("UNKNOWN", version, "wrong version");
@@ -46,8 +46,10 @@ public class ConfigTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testProperties() {
-        assertEquals("opennlp", config.getDefault_orthography(), "token layer does not match");
-        assertEquals(TimeUtils.convertTimeToSeconds("1D"), config.getLongTokenTTL(), "token expiration does not match");
+    public void testProperties () {
+        assertEquals("opennlp", config.getDefault_orthography(),
+                "token layer does not match");
+        assertEquals(TimeUtils.convertTimeToSeconds("1D"),
+                config.getLongTokenTTL(), "token expiration does not match");
     }
 }

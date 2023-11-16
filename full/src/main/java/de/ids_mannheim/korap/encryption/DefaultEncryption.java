@@ -17,11 +17,9 @@ public class DefaultEncryption implements EncryptionIface {
 
     private SecureRandom randomizer;
 
-
     public DefaultEncryption () {
         randomizer = new SecureRandom();
     }
-
 
     @Override
     public String secureHash (String input, String salt)
@@ -29,24 +27,20 @@ public class DefaultEncryption implements EncryptionIface {
         return null;
     }
 
-
     @Override
     public String secureHash (String input) {
         return null;
     }
-
 
     @Override
     public boolean checkHash (String plain, String hash, String salt) {
         return false;
     }
 
-
     @Override
     public boolean checkHash (String plain, String hash) {
         return false;
     }
-
 
     @Override
     public String createToken (boolean hash, Object ... obj) {
@@ -54,18 +48,15 @@ public class DefaultEncryption implements EncryptionIface {
 
     }
 
-
     @Override
     public String createToken () {
         return new BigInteger(100, randomizer).toString(20);
     }
 
-
     @Override
     public String createRandomNumber (Object ... obj) {
         return createToken();
     }
-
 
     @Override
     public String encodeBase () {

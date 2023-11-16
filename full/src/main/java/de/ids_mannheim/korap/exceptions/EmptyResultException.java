@@ -12,7 +12,6 @@ public class EmptyResultException extends KustvaktException {
         super(StatusCodes.NO_RESULT_FOUND, message, entity);
     }
 
-
     public EmptyResultException (String entity) {
         super(StatusCodes.NO_RESULT_FOUND, "No entity found for id", entity);
     }

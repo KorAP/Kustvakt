@@ -10,10 +10,9 @@ import java.util.Map;
 public interface EncryptionIface {
 
     public enum Encryption {
-                @Deprecated
+        @Deprecated
         SIMPLE, ESAPICYPHER, BCRYPT
     }
-
 
     /**
      * One-way hashing of String input. Used to canonicalize
@@ -25,9 +24,7 @@ public interface EncryptionIface {
     public String secureHash (String input, String salt)
             throws KustvaktException;
 
-
     public String secureHash (String input);
-
 
     /**
      * @param plain
@@ -37,9 +34,7 @@ public interface EncryptionIface {
      */
     public boolean checkHash (String plain, String hash, String salt);
 
-
     public boolean checkHash (String plain, String hash);
-
 
     /**
      * create random String to be used as authentication token
@@ -48,9 +43,7 @@ public interface EncryptionIface {
      */
     public String createToken (boolean hash, Object ... obj);
 
-
     public String createToken ();
-
 
     /**
      * create a random Integer to be used as ID for databases
@@ -59,14 +52,11 @@ public interface EncryptionIface {
      */
     public String createRandomNumber (Object ... obj);
 
-
     public String encodeBase ();
 
-
-   // @Deprecated
+    // @Deprecated
     //public Map<String, Object> validateMap (Map<String, Object> map)
     //        throws KustvaktException;
-
 
     //@Deprecated
     //public String validateEntry (String input, String type)

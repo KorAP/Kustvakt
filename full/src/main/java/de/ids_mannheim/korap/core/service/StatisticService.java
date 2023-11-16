@@ -49,7 +49,7 @@ public class StatisticService extends BasicService {
             node.setAll(warning);
             stats = node.toString();
         }
-        
+
         if (stats.contains("-1")) {
             throw new KustvaktException(StatusCodes.NO_RESULT_FOUND);
         }
@@ -89,7 +89,7 @@ public class StatisticService extends BasicService {
         else {
             stats = searchKrill.getStatistics(null);
         }
-        
+
         if (stats.contains("-1")) {
             throw new KustvaktException(StatusCodes.NO_RESULT_FOUND);
         }

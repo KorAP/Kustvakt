@@ -98,8 +98,8 @@ public class QueryService {
         }
     }
 
-    public List<QueryDto> listOwnerQuery (String username,
-            QueryType queryType) throws KustvaktException {
+    public List<QueryDto> listOwnerQuery (String username, QueryType queryType)
+            throws KustvaktException {
         List<QueryDO> list = queryDao.retrieveOwnerQuery(username, queryType);
         return createQueryDtos(list, queryType);
     }
@@ -120,8 +120,8 @@ public class QueryService {
     public List<QueryDto> listQueryByType (String createdBy, ResourceType type,
             QueryType queryType) throws KustvaktException {
 
-        List<QueryDO> virtualCorpora =
-                queryDao.retrieveQueryByType(type, createdBy, queryType);
+        List<QueryDO> virtualCorpora = queryDao.retrieveQueryByType(type,
+                createdBy, queryType);
         Collections.sort(virtualCorpora);
         return createQueryDtos(virtualCorpora, queryType);
 
@@ -159,8 +159,8 @@ public class QueryService {
                 || adminDao.isAdmin(username)) {
 
             if (query.getType().equals(ResourceType.PUBLISHED)) {
-                QueryAccess access =
-                        accessDao.retrieveHiddenAccess(query.getId());
+                QueryAccess access = accessDao
+                        .retrieveHiddenAccess(query.getId());
                 accessDao.deleteAccess(access, "system");
                 userGroupService.deleteAutoHiddenGroup(
                         access.getUserGroup().getId(), "system");
@@ -252,8 +252,8 @@ public class QueryService {
             QueryDO query = queryDao.retrieveQueryById(queryId);
             // create and assign a new hidden group
             int groupId = userGroupService.createAutoHiddenGroup();
-            UserGroup autoHidden =
-                    userGroupService.retrieveUserGroupById(groupId);
+            UserGroup autoHidden = userGroupService
+                    .retrieveUserGroupById(groupId);
             accessDao.createAccessToQuery(query, autoHidden, "system",
                     QueryAccessStatus.HIDDEN);
         }
@@ -269,40 +269,42 @@ public class QueryService {
         QueryType queryType = query.getQueryType();
         if (!checkNumberOfQueryLimit(username, queryType)) {
             String type = queryType.displayName().toLowerCase();
-            throw new KustvaktException(StatusCodes.NOT_ALLOWED, 
-                    "Cannot create "+type+". The maximum number "
-                            + "of "+type+" has been reached.");
+            throw new KustvaktException(StatusCodes.NOT_ALLOWED,
+                    "Cannot create " + type + ". The maximum number " + "of "
+                            + type + " has been reached.");
         }
-        
+
         String koralQuery = computeKoralQuery(query);
         storeQuery(username, queryName, query.getType(), query.getQueryType(),
                 koralQuery, query.getDefinition(), query.getDescription(),
                 query.getStatus(), query.isCached(), queryCreator,
                 query.getQuery(), query.getQueryLanguage());
     }
-    
+
     private boolean checkNumberOfQueryLimit (String username,
             QueryType queryType) throws KustvaktException {
         Long num = queryDao.countNumberOfQuery(username, queryType);
-        if (num < config.getMaxNumberOfUserQueries()) return true;
-        else return false;
+        if (num < config.getMaxNumberOfUserQueries())
+            return true;
+        else
+            return false;
     }
-    
-    private String computeKoralQuery (QueryJson query) throws KustvaktException {
+
+    private String computeKoralQuery (QueryJson query)
+            throws KustvaktException {
         if (query.getQueryType().equals(QueryType.VIRTUAL_CORPUS)) {
             ParameterChecker.checkStringValue(query.getCorpusQuery(),
                     "corpusQuery");
             return serializeCorpusQuery(query.getCorpusQuery());
         }
-        
+
         if (query.getQueryType().equals(QueryType.QUERY)) {
             ParameterChecker.checkStringValue(query.getQuery(), "query");
             ParameterChecker.checkStringValue(query.getQueryLanguage(),
                     "queryLanguage");
-            return
-                    serializeQuery(query.getQuery(), query.getQueryLanguage());
+            return serializeQuery(query.getQuery(), query.getQueryLanguage());
         }
-        
+
         return null;
     }
 
@@ -316,9 +318,10 @@ public class QueryService {
 
         if (!queryNamePattern.matcher(queryName).matches()) {
             throw new KustvaktException(StatusCodes.INVALID_ARGUMENT, queryType
-                    .displayName() + " must consists of alphanumerical characters "
-                            + "(limited to ASCII), underscores, dashes and periods. "
-                            + "The name has to start with an alphanumerical character.",
+                    .displayName()
+                    + " must consists of alphanumerical characters "
+                    + "(limited to ASCII), underscores, dashes and periods. "
+                    + "The name has to start with an alphanumerical character.",
                     queryName);
         }
 
@@ -335,8 +338,8 @@ public class QueryService {
 
         CorpusAccess requiredAccess = CorpusAccess.PUB;
         if (queryType.equals(QueryType.VIRTUAL_CORPUS)) {
-            requiredAccess =
-                    determineRequiredAccess(isCached, queryName, koralQuery);
+            requiredAccess = determineRequiredAccess(isCached, queryName,
+                    koralQuery);
         }
 
         if (DEBUG) {
@@ -401,8 +404,7 @@ public class QueryService {
             String koralQuery) throws KustvaktException {
 
         if (isCached) {
-            KoralCollectionQueryBuilder koral =
-                    new KoralCollectionQueryBuilder();
+            KoralCollectionQueryBuilder koral = new KoralCollectionQueryBuilder();
             koral.with("referTo " + name);
             koralQuery = koral.toJSON();
             if (DEBUG) {
@@ -454,8 +456,8 @@ public class QueryService {
                     "Unauthorized operation for user: " + username, username);
         }
 
-        UserGroup userGroup =
-                userGroupService.retrieveUserGroupByName(groupName);
+        UserGroup userGroup = userGroupService
+                .retrieveUserGroupByName(groupName);
 
         if (!isQueryAccessAdmin(userGroup, username)
                 && !adminDao.isAdmin(username)) {
@@ -488,8 +490,8 @@ public class QueryService {
 
     private boolean isQueryAccessAdmin (UserGroup userGroup, String username)
             throws KustvaktException {
-        List<UserGroupMember> accessAdmins =
-                userGroupService.retrieveQueryAccessAdmins(userGroup);
+        List<UserGroupMember> accessAdmins = userGroupService
+                .retrieveQueryAccessAdmins(userGroup);
         for (UserGroupMember m : accessAdmins) {
             if (username.equals(m.getUserId())) {
                 return true;
@@ -521,8 +523,8 @@ public class QueryService {
             accessList = accessDao.retrieveAllAccess();
         }
         else {
-            List<UserGroup> groups =
-                    userGroupService.retrieveUserGroup(username);
+            List<UserGroup> groups = userGroupService
+                    .retrieveUserGroup(username);
             for (UserGroup g : groups) {
                 if (isQueryAccessAdmin(g, username)) {
                     accessList.addAll(
@@ -538,8 +540,8 @@ public class QueryService {
 
         List<QueryAccess> accessList;
         if (adminDao.isAdmin(username)) {
-            accessList =
-                    accessDao.retrieveAllAccessByQuery(queryCreator, queryName);
+            accessList = accessDao.retrieveAllAccessByQuery(queryCreator,
+                    queryName);
         }
         else {
             accessList = accessDao.retrieveActiveAccessByQuery(queryCreator,
@@ -578,16 +580,16 @@ public class QueryService {
 
     public List<QueryAccessDto> listQueryAccessByGroup (String username,
             String groupName) throws KustvaktException {
-        UserGroup userGroup =
-                userGroupService.retrieveUserGroupByName(groupName);
+        UserGroup userGroup = userGroupService
+                .retrieveUserGroupByName(groupName);
 
         List<QueryAccess> accessList;
         if (adminDao.isAdmin(username)) {
             accessList = accessDao.retrieveAllAccessByGroup(userGroup.getId());
         }
         else if (isQueryAccessAdmin(userGroup, username)) {
-            accessList =
-                    accessDao.retrieveActiveAccessByGroup(userGroup.getId());
+            accessList = accessDao
+                    .retrieveActiveAccessByGroup(userGroup.getId());
         }
         else {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
@@ -614,8 +616,8 @@ public class QueryService {
 
     public JsonNode retrieveKoralQuery (String username, String queryName,
             String createdBy, QueryType queryType) throws KustvaktException {
-        QueryDO query =
-                searchQueryByName(username, queryName, createdBy, queryType);
+        QueryDO query = searchQueryByName(username, queryName, createdBy,
+                queryType);
         String koralQuery = query.getKoralQuery();
         JsonNode kq = JsonUtils.readTree(koralQuery);
         return kq;
@@ -624,17 +626,18 @@ public class QueryService {
     public JsonNode retrieveFieldValues (String username, String queryName,
             String createdBy, QueryType queryType, String fieldName)
             throws KustvaktException {
-        
+
         ParameterChecker.checkStringValue(fieldName, "fieldName");
-        
-//        if (!adminDao.isAdmin(username)) {
-//            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-//                    "Unauthorized operation for user: " + username, username);
-//        }
-        
+
+        //        if (!adminDao.isAdmin(username)) {
+        //            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+        //                    "Unauthorized operation for user: " + username, username);
+        //        }
+
         if (fieldName.equals("tokens") || fieldName.equals("base")) {
             throw new KustvaktException(StatusCodes.NOT_ALLOWED,
-                    "Retrieving values of field "+fieldName+" is not allowed.");
+                    "Retrieving values of field " + fieldName
+                            + " is not allowed.");
         }
         else {
             QueryDO query = searchQueryByName(username, queryName, createdBy,
@@ -659,8 +662,8 @@ public class QueryService {
 
     public QueryDto retrieveQueryByName (String username, String queryName,
             String createdBy, QueryType queryType) throws KustvaktException {
-        QueryDO query =
-                searchQueryByName(username, queryName, createdBy, queryType);
+        QueryDO query = searchQueryByName(username, queryName, createdBy,
+                queryType);
         // String json = query.getKoralQuery();
         String statistics = null;
         // long start,end;
@@ -721,8 +724,8 @@ public class QueryService {
     private boolean hasAccess (String username, int queryId)
             throws KustvaktException {
         UserGroup userGroup;
-        List<QueryAccess> accessList =
-                accessDao.retrieveActiveAccessByQuery(queryId);
+        List<QueryAccess> accessList = accessDao
+                .retrieveActiveAccessByQuery(queryId);
         for (QueryAccess access : accessList) {
             userGroup = access.getUserGroup();
             if (userGroupService.isMember(username, userGroup)) {

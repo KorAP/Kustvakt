@@ -22,8 +22,9 @@ public class QueryAccessDto {
 
     @Override
     public String toString () {
-        return "accessId=" + accessId + ", createdBy=" + createdBy + " , queryId="
-                + queryId + ", queryName=" + queryName + ", userGroupId=" + userGroupId
-                + ", userGroupName=" + userGroupName;
+        return "accessId=" + accessId + ", createdBy=" + createdBy
+                + " , queryId=" + queryId + ", queryName=" + queryName
+                + ", userGroupId=" + userGroupId + ", userGroupName="
+                + userGroupName;
     }
 }

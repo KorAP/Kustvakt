@@ -70,9 +70,9 @@ public class VirtualCorpusRewrite implements RewriteTask.RewriteQuery {
                                     + "caching process",
                             koralNode.get("ref"));
                 }
-                
-                QueryDO vc =
-                        queryService.searchQueryByName(username, vcName, vcOwner, QueryType.VIRTUAL_CORPUS);
+
+                QueryDO vc = queryService.searchQueryByName(username, vcName,
+                        vcOwner, QueryType.VIRTUAL_CORPUS);
                 if (!vc.isCached()) {
                     rewriteVC(vc, koralNode);
                 }

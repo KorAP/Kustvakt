@@ -81,7 +81,7 @@ public class VirtualCorpusController {
      * VC name cannot be updated.
      * 
      * The VC creator must be the same as the authenticated username,
-     * except for system admins. System admins can create or update 
+     * except for system admins. System admins can create or update
      * system VC and any VC for any users.
      * 
      * 
@@ -102,10 +102,10 @@ public class VirtualCorpusController {
     @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response createUpdateVC (@Context SecurityContext securityContext,
             @PathParam("vcCreator") String vcCreator,
-            @PathParam("vcName") String vcName,
-            QueryJson vc) throws KustvaktException {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+            @PathParam("vcName") String vcName, QueryJson vc)
+            throws KustvaktException {
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
 
         try {
             scopeService.verifyScope(context, OAuth2Scope.EDIT_VC);
@@ -120,7 +120,7 @@ public class VirtualCorpusController {
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
-        
+
     }
 
     /**
@@ -139,13 +139,12 @@ public class VirtualCorpusController {
     @GET
     @Path("~{createdBy}/{vcName}")
     @ResourceFilters({ APIVersionFilter.class, AuthenticationFilter.class,
-        DemoUserFilter.class, PiwikFilter.class })
-    public QueryDto retrieveVCByName (
-            @Context SecurityContext securityContext,
+            DemoUserFilter.class, PiwikFilter.class })
+    public QueryDto retrieveVCByName (@Context SecurityContext securityContext,
             @PathParam("createdBy") String createdBy,
             @PathParam("vcName") String vcName) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
             return service.retrieveQueryByName(context.getUsername(), vcName,
@@ -162,8 +161,8 @@ public class VirtualCorpusController {
             @Context SecurityContext securityContext,
             @PathParam("createdBy") String createdBy,
             @PathParam("vcName") String vcName) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
             return service.retrieveKoralQuery(context.getUsername(), vcName,
@@ -173,8 +172,9 @@ public class VirtualCorpusController {
             throw kustvaktResponseHandler.throwit(e);
         }
     }
-    
-    /** Retrieves field values of a virtual corpus, e.g. corpus sigle.
+
+    /**
+     * Retrieves field values of a virtual corpus, e.g. corpus sigle.
      * 
      * This service is restricted to system admin only.
      * 
@@ -187,13 +187,12 @@ public class VirtualCorpusController {
     @GET
     @Path("/field/~{createdBy}/{vcName}")
     @ResourceFilters({ APIVersionFilter.class, AdminFilter.class })
-    public JsonNode retrieveVCField (
-            @Context SecurityContext securityContext,
+    public JsonNode retrieveVCField (@Context SecurityContext securityContext,
             @PathParam("createdBy") String createdBy,
             @PathParam("vcName") String vcName,
             @QueryParam("fieldName") String fieldName) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             return service.retrieveFieldValues(context.getUsername(), vcName,
                     createdBy, QueryType.VIRTUAL_CORPUS, fieldName);
@@ -202,7 +201,7 @@ public class VirtualCorpusController {
             throw kustvaktResponseHandler.throwit(e);
         }
     }
-    
+
     /**
      * Lists all virtual corpora available to the user.
      *
@@ -222,28 +221,28 @@ public class VirtualCorpusController {
     public List<QueryDto> listAvailableVC (
             @Context SecurityContext securityContext,
             @QueryParam("filter-by") String filter) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
 
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_INFO);
-            if (filter !=null && !filter.isEmpty() ) {
+            if (filter != null && !filter.isEmpty()) {
                 filter = filter.toLowerCase();
                 if (filter.equals("system")) {
                     return service.listSystemQuery(QueryType.VIRTUAL_CORPUS);
                 }
                 else if (filter.equals("own")) {
                     return service.listOwnerQuery(context.getUsername(),
-                            QueryType.VIRTUAL_CORPUS);    
+                            QueryType.VIRTUAL_CORPUS);
                 }
                 else {
-                    throw new KustvaktException(StatusCodes.UNSUPPORTED_VALUE, 
+                    throw new KustvaktException(StatusCodes.UNSUPPORTED_VALUE,
                             "The given filter is unknown or not supported.");
                 }
             }
             else {
                 return service.listAvailableQueryForUser(context.getUsername(),
-                    QueryType.VIRTUAL_CORPUS);
+                        QueryType.VIRTUAL_CORPUS);
             }
         }
         catch (KustvaktException e) {
@@ -276,14 +275,13 @@ public class VirtualCorpusController {
     public List<QueryDto> listUserOrSystemVC (
             @PathParam("createdBy") String createdBy,
             @Context SecurityContext securityContext) {
-        
+
         KustvaktException e = new KustvaktException(StatusCodes.DEPRECATED,
                 "This service has been deprecated. Please use Virtual Corpus List "
-                + "web-service.");
-            throw kustvaktResponseHandler.throwit(e);
+                        + "web-service.");
+        throw kustvaktResponseHandler.throwit(e);
     }
-    
-   
+
     /**
      * Only the VC owner and system admins can delete VC. VCA admins
      * can delete VC-accesses e.g. of project VC, but not the VC
@@ -301,8 +299,8 @@ public class VirtualCorpusController {
     public Response deleteVCByName (@Context SecurityContext securityContext,
             @PathParam("createdBy") String createdBy,
             @PathParam("vcName") String vcName) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.DELETE_VC);
             service.deleteQueryByName(context.getUsername(), vcName, createdBy,
@@ -335,13 +333,14 @@ public class VirtualCorpusController {
     @Path("~{vcCreator}/{vcName}/share/@{groupName}")
     public Response shareVC (@Context SecurityContext securityContext,
             @PathParam("vcCreator") String vcCreator,
-            @PathParam("vcName") String vcName, 
+            @PathParam("vcName") String vcName,
             @PathParam("groupName") String groupName) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.SHARE_VC);
-            service.shareQuery(context.getUsername(), vcCreator, vcName, groupName);
+            service.shareQuery(context.getUsername(), vcCreator, vcName,
+                    groupName);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -365,8 +364,8 @@ public class VirtualCorpusController {
     public Response deleteVCAccessById (
             @Context SecurityContext securityContext,
             @PathParam("accessId") int accessId) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.DELETE_VC_ACCESS);
             service.deleteQueryAccess(accessId, context.getUsername());
@@ -391,12 +390,13 @@ public class VirtualCorpusController {
     public List<QueryAccessDto> listVCAccesses (
             @Context SecurityContext securityContext,
             @QueryParam("groupName") String groupName) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.VC_ACCESS_INFO);
-            if (groupName!=null && !groupName.isEmpty()){
-                return service.listQueryAccessByGroup(context.getUsername(), groupName);
+            if (groupName != null && !groupName.isEmpty()) {
+                return service.listQueryAccessByGroup(context.getUsername(),
+                        groupName);
             }
             else {
                 return service.listQueryAccessByUsername(context.getUsername());

@@ -22,11 +22,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Describes configuration for Kustvakt by importing properties 
- * from kustvakt.conf file and setting default values if they are 
- * not configured.  
+ * Describes configuration for Kustvakt by importing properties
+ * from kustvakt.conf file and setting default values if they are
+ * not configured.
  * 
- * MH: if configuration class is extended, loadSubTypes method should be
+ * MH: if configuration class is extended, loadSubTypes method should
+ * be
  * overriden
  * 
  * @author hanl
@@ -41,7 +42,7 @@ public class KustvaktConfiguration {
     public static final String DATA_FOLDER = "data";
 
     private String vcInCaching;
-    
+
     private String indexDir;
     private int port;
     // todo: make exclusive so that the containg languages can really
@@ -94,7 +95,7 @@ public class KustvaktConfiguration {
     // deprec?!
     private final BACKENDS DEFAULT_ENGINE = BACKENDS.LUCENE;
     private String networkEndpointURL;
-    
+
     // license patterns
     protected Pattern publicLicensePattern;
     protected Pattern freeLicensePattern;
@@ -107,28 +108,28 @@ public class KustvaktConfiguration {
     // EM: metadata restriction
     // another variable might be needed to define which metadata fields are restricted 
     private boolean isMetadataRestricted = false;
-    
+
     // EM: Maybe needed when we support pipe registration
     @Deprecated
     public static Map<String, String> pipes = new HashMap<>();
-    
+
     public KustvaktConfiguration (Properties properties) throws Exception {
         load(properties);
-//        readPipesFile("pipes");
+        //        readPipesFile("pipes");
         KrillProperties.setProp(properties);
     }
 
     public KustvaktConfiguration () {}
-    
+
     public void loadBasicProperties (Properties properties) {
         port = Integer.valueOf(properties.getProperty("server.port", "8095"));
         baseURL = properties.getProperty("kustvakt.base.url", "/api/*");
-        setSecureRandomAlgorithm(properties
-                .getProperty("security.secure.random.algorithm", ""));
+        setSecureRandomAlgorithm(
+                properties.getProperty("security.secure.random.algorithm", ""));
         setMessageDigestAlgorithm(
                 properties.getProperty("security.md.algorithm", "MD5"));
     }
-    
+
     /**
      * loading of the properties and mapping to parameter variables
      * 
@@ -139,23 +140,26 @@ public class KustvaktConfiguration {
     protected void load (Properties properties) throws Exception {
         loadBasicProperties(properties);
 
-        apiWelcomeMessage = properties.getProperty("api.welcome.message", "Welcome to KorAP API!");
+        apiWelcomeMessage = properties.getProperty("api.welcome.message",
+                "Welcome to KorAP API!");
         currentVersion = properties.getProperty("current.api.version", "v1.0");
 
-        String supportedVersions =
-                properties.getProperty("supported.api.versions", "");
-        
+        String supportedVersions = properties
+                .getProperty("supported.api.versions", "");
+
         this.supportedVersions = new HashSet<>();
-        if (!supportedVersions.isEmpty()){
-            List<String> versionArray = Arrays.asList(supportedVersions.split(" "));
+        if (!supportedVersions.isEmpty()) {
+            List<String> versionArray = Arrays
+                    .asList(supportedVersions.split(" "));
             this.supportedVersions.addAll(versionArray);
         }
         this.supportedVersions.add(currentVersion);
 
         maxhits = Integer.valueOf(properties.getProperty("maxhits", "50000"));
-        returnhits = Integer.valueOf(properties.getProperty("returnhits", "50000"));
+        returnhits = Integer
+                .valueOf(properties.getProperty("returnhits", "50000"));
         indexDir = properties.getProperty("krill.indexDir", "");
-        
+
         // server options
         serverHost = String
                 .valueOf(properties.getProperty("server.host", "localhost"));
@@ -165,18 +169,19 @@ public class KustvaktConfiguration {
         for (String querylang : qls)
             queryLanguages.add(querylang.trim().toUpperCase());
 
-        default_const =
-                properties.getProperty("default.foundry.constituent", "corenlp");
-        default_dep =
-                properties.getProperty("default.foundry.dependency", "malt");
+        default_const = properties.getProperty("default.foundry.constituent",
+                "corenlp");
+        default_dep = properties.getProperty("default.foundry.dependency",
+                "malt");
         default_lemma = properties.getProperty("default.foundry.lemma", "tt");
-        default_morphology = properties.getProperty("default.foundry.morphology", "marmot");
-        default_pos =
-                properties.getProperty("default.foundry.partOfSpeech", "tt");
-        default_orthography =
-                properties.getProperty("default.foundry.orthography", "opennlp");
-        defaultStructureFoundry =
-                properties.getProperty("default.foundry.structure", "base");
+        default_morphology = properties
+                .getProperty("default.foundry.morphology", "marmot");
+        default_pos = properties.getProperty("default.foundry.partOfSpeech",
+                "tt");
+        default_orthography = properties
+                .getProperty("default.foundry.orthography", "opennlp");
+        defaultStructureFoundry = properties
+                .getProperty("default.foundry.structure", "base");
 
         // security configuration
         inactiveTime = TimeUtils.convertTimeToSeconds(
@@ -196,8 +201,8 @@ public class KustvaktConfiguration {
         validationEmaillength = Integer.valueOf(properties
                 .getProperty("security.validation.emailLength", "40"));
 
-        sharedSecret =
-                properties.getProperty("security.sharedSecret", "").getBytes();
+        sharedSecret = properties.getProperty("security.sharedSecret", "")
+                .getBytes();
 
         longTokenTTL = TimeUtils.convertTimeToSeconds(
                 properties.getProperty("security.longTokenTTL", "100D"));
@@ -205,12 +210,11 @@ public class KustvaktConfiguration {
                 properties.getProperty("security.tokenTTL", "72H"));
         shortTokenTTL = TimeUtils.convertTimeToSeconds(
                 properties.getProperty("security.shortTokenTTL", "3H"));
-        
+
         // network endpoint
-        networkEndpointURL =
-                properties.getProperty("network.endpoint.url", "");
+        networkEndpointURL = properties.getProperty("network.endpoint.url", "");
     }
-    
+
     @Deprecated
     public void readPipesFile (String filename) throws IOException {
         File file = new File(filename);
@@ -219,19 +223,18 @@ public class KustvaktConfiguration {
                     new InputStreamReader(new FileInputStream(file)));
 
             String line = null;
-            while( (line=br.readLine())!=null ){
+            while ((line = br.readLine()) != null) {
                 String[] parts = line.split("\t");
-                if (parts.length !=2){
+                if (parts.length != 2) {
                     continue;
                 }
-                else{
+                else {
                     pipes.put(parts[0], parts[1]);
                 }
             }
             br.close();
         }
     }
-    
 
     /**
      * set properties

@@ -11,7 +11,6 @@ import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Set;
 
-
 /**
  * A general purpose Multimap implementation for delayed processing and concurrent insertion/deletes.
  * This code is based on an implementation by Guido Medina!
@@ -32,16 +31,13 @@ public class ConcurrentMultiMap<K extends Comparable, V extends Comparable> {
     private final LockMap<K> locks;
     private final ConcurrentMap<K, List<V>> cache;
 
-
     public ConcurrentMultiMap () {
         this(16, 64);
     }
 
-
     public ConcurrentMultiMap (final int concurrencyLevel) {
         this(concurrencyLevel, 64);
     }
-
 
     public ConcurrentMultiMap (final int concurrencyLevel,
                                final int initialCapacity) {
@@ -50,7 +46,6 @@ public class ConcurrentMultiMap<K extends Comparable, V extends Comparable> {
                 .initialCapacity(initialCapacity).makeMap();
         locks = new LockMap<K>(concurrencyLevel, initialCapacity);
     }
-
 
     public void put (final K key, final V value) {
         synchronized (locks.getLock(key)) {
@@ -63,7 +58,6 @@ public class ConcurrentMultiMap<K extends Comparable, V extends Comparable> {
         }
     }
 
-
     public void putAll (final K key, final Collection<V> values) {
         synchronized (locks.getLock(key)) {
             List<V> set = cache.get(key);
@@ -75,13 +69,11 @@ public class ConcurrentMultiMap<K extends Comparable, V extends Comparable> {
         }
     }
 
-
     public List<V> remove (final K key) {
         synchronized (locks.getLock(key)) {
             return cache.remove(key);
         }
     }
-
 
     public void remove (final K key, final V value) {
         List<V> values = cache.get(key);
@@ -90,46 +82,37 @@ public class ConcurrentMultiMap<K extends Comparable, V extends Comparable> {
         }
     }
 
-
     public Set<K> getKeySet () {
         return cache.keySet();
     }
-
 
     public int size () {
         return cache.size();
     }
 
-
     public boolean containsKey (K key) {
         return cache.containsKey(key);
     }
-
 
     public List<V> get (K key) {
         return cache.get(key);
     }
 
-
     public class LockMap<K extends Comparable> {
         private final ConcurrentMap<K, Object> locks;
-
 
         public LockMap () {
             this(16, 64);
         }
 
-
         public LockMap (final int concurrencyLevel) {
             this(concurrencyLevel, 64);
         }
-
 
         public LockMap (final int concurrencyLevel, final int initialCapacity) {
             locks = new MapMaker().concurrencyLevel(concurrencyLevel)
                     .initialCapacity(initialCapacity).weakValues().makeMap();
         }
-
 
         public Object getLock (final K key) {
             final Object object = new Object();
@@ -139,10 +122,8 @@ public class ConcurrentMultiMap<K extends Comparable, V extends Comparable> {
 
     }
 
-
     public String toString () {
         return cache.toString();
     }
-
 
 }

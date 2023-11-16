@@ -19,7 +19,8 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class VirtualCorpusListTest extends VirtualCorpusTestBase {
 
     @Test
-    public void testListVCNemo() throws ProcessingException, KustvaktException {
+    public void testListVCNemo ()
+            throws ProcessingException, KustvaktException {
         JsonNode node = testListOwnerVC("nemo");
         assertEquals(1, node.size());
         node = listSystemVC("nemo");
@@ -29,7 +30,8 @@ public class VirtualCorpusListTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testListVCPearl() throws ProcessingException, KustvaktException {
+    public void testListVCPearl ()
+            throws ProcessingException, KustvaktException {
         JsonNode node = testListOwnerVC("pearl");
         assertEquals(0, node.size());
         node = listVC("pearl");
@@ -37,7 +39,8 @@ public class VirtualCorpusListTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testListVCDory() throws ProcessingException, KustvaktException {
+    public void testListVCDory ()
+            throws ProcessingException, KustvaktException {
         JsonNode node = testListOwnerVC("dory");
         assertEquals(2, node.size());
         node = listVC("dory");
@@ -45,29 +48,43 @@ public class VirtualCorpusListTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testListAvailableVCGuest() throws ProcessingException, KustvaktException {
-        Response response = target().path(API_VERSION).path("vc").request().get();
+    public void testListAvailableVCGuest ()
+            throws ProcessingException, KustvaktException {
+        Response response = target().path(API_VERSION).path("vc").request()
+                .get();
         testResponseUnauthorized(response, "guest");
     }
 
     @Disabled
     @Deprecated
     @Test
-    public void testListAvailableVCByOtherUser() throws ProcessingException, KustvaktException {
-        Response response = target().path(API_VERSION).path("vc").path("~dory").request().header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").header(Attributes.AUTHORIZATION, HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("pearl", "pass")).get();
+    public void testListAvailableVCByOtherUser ()
+            throws ProcessingException, KustvaktException {
+        Response response = target().path(API_VERSION).path("vc").path("~dory")
+                .request().header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("pearl", "pass"))
+                .get();
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
-        assertEquals(StatusCodes.AUTHORIZATION_FAILED, node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(), "Unauthorized operation for user: pearl");
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals(node.at("/errors/0/1").asText(),
+                "Unauthorized operation for user: pearl");
         checkWWWAuthenticateHeader(response);
     }
 
     @Disabled
     @Deprecated
     @Test
-    public void testListUserVC() throws ProcessingException, KustvaktException {
-        Response response = target().path(API_VERSION).path("vc").queryParam("username", "dory").request().header(Attributes.AUTHORIZATION, HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("admin", "pass")).get();
+    public void testListUserVC ()
+            throws ProcessingException, KustvaktException {
+        Response response = target().path(API_VERSION).path("vc")
+                .queryParam("username", "dory").request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("admin", "pass"))
+                .get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);

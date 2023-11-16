@@ -28,16 +28,19 @@ public abstract class SpringJerseyTest extends JerseyTest {
     @Autowired
     protected GenericApplicationContext applicationContext;
 
-    public static String[] classPackages = new String[]{"de.ids_mannheim.korap.web", "de.ids_mannheim.korap.core.web", "de.ids_mannheim.korap.test", "com.fasterxml.jackson.jaxrs.json"};
+    public static String[] classPackages = new String[] {
+            "de.ids_mannheim.korap.web", "de.ids_mannheim.korap.core.web",
+            "de.ids_mannheim.korap.test", "com.fasterxml.jackson.jaxrs.json" };
 
     @Override
-    protected TestContainerFactory getTestContainerFactory() throws TestContainerException {
+    protected TestContainerFactory getTestContainerFactory ()
+            throws TestContainerException {
         return new GrizzlyWebTestContainerFactory();
     }
 
     @BeforeEach
     @Override
-    public void setUp() throws Exception {
+    public void setUp () throws Exception {
         GenericWebApplicationContext genericContext = new GenericWebApplicationContext();
         genericContext.setParent(this.applicationContext);
         genericContext.setClassLoader(this.applicationContext.getClassLoader());
@@ -46,7 +49,11 @@ public abstract class SpringJerseyTest extends JerseyTest {
     }
 
     @Override
-    protected DeploymentContext configureDeployment() {
-        return ServletDeploymentContext.forServlet(new ServletContainer(new ResourceConfig().packages(classPackages))).addListener(StaticContextLoaderListener.class).contextParam("adminToken", "secret").build();
+    protected DeploymentContext configureDeployment () {
+        return ServletDeploymentContext
+                .forServlet(new ServletContainer(
+                        new ResourceConfig().packages(classPackages)))
+                .addListener(StaticContextLoaderListener.class)
+                .contextParam("adminToken", "secret").build();
     }
 }

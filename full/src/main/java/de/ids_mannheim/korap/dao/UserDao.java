@@ -5,7 +5,8 @@ import org.springframework.stereotype.Repository;
 import de.ids_mannheim.korap.user.KorAPUser;
 import de.ids_mannheim.korap.user.User;
 
-/** Dummy DAO for testing using basic authentication.
+/**
+ * Dummy DAO for testing using basic authentication.
  * 
  * @author margaretha
  *
@@ -18,6 +19,5 @@ public class UserDao {
         user.setUsername(username);
         return user;
     }
-
 
 }

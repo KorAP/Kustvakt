@@ -21,8 +21,9 @@ import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 
-/** Authentication filter extracts an authentication token from 
- * authorization header and uses an authentication provider 
+/**
+ * Authentication filter extracts an authentication token from
+ * authorization header and uses an authentication provider
  * with respect to the token type to create a token context as
  * a security context.
  * 
@@ -32,11 +33,11 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
  */
 @Component
 @Priority(Priorities.AUTHENTICATION)
-public class AuthenticationFilter
-        implements ContainerRequestFilter {
+public class AuthenticationFilter implements ContainerRequestFilter {
 
-    private static Logger jlog = LogManager.getLogger(AuthenticationFilter.class);
-    
+    private static Logger jlog = LogManager
+            .getLogger(AuthenticationFilter.class);
+
     @Autowired
     private HttpAuthorizationHandler authorizationHandler;
 
@@ -51,8 +52,8 @@ public class AuthenticationFilter
         String host = request.getHeaderString(ContainerRequest.HOST);
         String ua = request.getHeaderString(ContainerRequest.USER_AGENT);
 
-        String authorization =
-                request.getHeaderString(ContainerRequest.AUTHORIZATION);
+        String authorization = request
+                .getHeaderString(ContainerRequest.AUTHORIZATION);
 
         if (authorization != null && !authorization.isEmpty()) {
             TokenContext context = null;
@@ -102,9 +103,8 @@ public class AuthenticationFilter
         }
     }
 
-
-    private void checkContext (TokenContext context, ContainerRequestContext request)
-            throws KustvaktException {
+    private void checkContext (TokenContext context,
+            ContainerRequestContext request) throws KustvaktException {
         if (context == null) {
             throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
                     "Context is null.");
@@ -114,7 +114,8 @@ public class AuthenticationFilter
                     "Context is not valid: "
                             + "missing username, password or authentication scheme.");
         }
-        else if (context.isSecureRequired() && !request.getSecurityContext().isSecure()) {
+        else if (context.isSecureRequired()
+                && !request.getSecurityContext().isSecure()) {
             throw new KustvaktException(StatusCodes.AUTHENTICATION_FAILED,
                     "Request is not secure.");
         }

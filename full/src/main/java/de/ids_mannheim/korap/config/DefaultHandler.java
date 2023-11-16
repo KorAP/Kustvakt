@@ -12,12 +12,10 @@ public class DefaultHandler {
 
     private Map<String, Object> defaults;
 
-
     public DefaultHandler () {
         this.defaults = new HashMap<>();
         loadClasses();
     }
-
 
     private void loadClasses () {
         Set<Class<?>> cls = KustvaktClassLoader
@@ -34,11 +32,9 @@ public class DefaultHandler {
         }
     }
 
-
     public Object getDefault (String name) {
         return this.defaults.get(name);
     }
-
 
     public <T> T getDefault (Class<T> tClass) {
         for (Object o : this.defaults.values()) {
@@ -48,11 +44,9 @@ public class DefaultHandler {
         return null;
     }
 
-
     public void remove (String name) {
         this.defaults.remove(name);
     }
-
 
     @Override
     public String toString () {

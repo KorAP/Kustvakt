@@ -23,19 +23,19 @@ import jakarta.ws.rs.core.MediaType;
  */
 @Controller
 @Path("{version}/resource")
-@ResourceFilters({APIVersionFilter.class, PiwikFilter.class })
+@ResourceFilters({ APIVersionFilter.class, PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class ResourceController {
 
     @Autowired
     private ResourceService resourceService;
 
-
-    /** Returns descriptions of all free resources stored in 
+    /**
+     * Returns descriptions of all free resources stored in
      * the database.
      * 
-     * @return a json description of all free resources stored in 
-     * the database. 
+     * @return a json description of all free resources stored in
+     *         the database.
      */
     @GET
     public List<ResourceDto> getAllResourceInfo () {

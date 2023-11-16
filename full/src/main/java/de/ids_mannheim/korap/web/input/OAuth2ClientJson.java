@@ -7,7 +7,7 @@ import de.ids_mannheim.korap.oauth2.constant.OAuth2ClientType;
 
 /**
  * Defines attributes to register an OAuth2 client. Application name,
- * client type and description are required attributes. 
+ * client type and description are required attributes.
  * 
  * To accommodate desktop applications such as R, url and redirectURI
  * are not compulsory.
@@ -23,7 +23,7 @@ public class OAuth2ClientJson {
     private String name;
     private OAuth2ClientType type;
     private String description;
-    
+
     // optional
     private String url;
     // redirect URI determines where the OAuth 2.0 service will return
@@ -33,7 +33,7 @@ public class OAuth2ClientJson {
     // Default 365 days
     @JsonProperty("refresh_token_expiry")
     private int refreshTokenExpiry; // in seconds
-    
+
     // plugins
     private JsonNode source;
 

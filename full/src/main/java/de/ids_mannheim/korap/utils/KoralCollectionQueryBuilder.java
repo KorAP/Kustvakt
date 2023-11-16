@@ -35,14 +35,12 @@ public class KoralCollectionQueryBuilder {
         this(false);
     }
 
-
     public KoralCollectionQueryBuilder (boolean verbose) {
         this.verbose = verbose;
         this.builder = new StringBuilder();
         this.base = null;
         this.mergeOperator = null;
     }
-
 
     /**
      * raw method for field - value pair adding. Supports all
@@ -64,7 +62,6 @@ public class KoralCollectionQueryBuilder {
         return this;
     }
 
-
     /**
      * element can be a more complex sub query like
      * (textClass=freizeit & Attributes.CORPUS_SIGLE=WPD)
@@ -82,31 +79,30 @@ public class KoralCollectionQueryBuilder {
         return this;
     }
 
-
-
     public KoralCollectionQueryBuilder and () {
-        if (this.builder.length() != 0) this.builder.append(" & ");
+        if (this.builder.length() != 0)
+            this.builder.append(" & ");
         if (this.base != null && this.mergeOperator == null)
             this.mergeOperator = "AND";
         return this;
     }
 
-
     public KoralCollectionQueryBuilder or () {
-        if (this.builder.length() != 0) this.builder.append(" | ");
+        if (this.builder.length() != 0)
+            this.builder.append(" | ");
         if (this.base != null && this.mergeOperator == null)
             this.mergeOperator = "OR";
         return this;
     }
 
-
     public JsonNode rebaseCollection () throws KustvaktException {
-        if (this.builder.length() == 0 && this.base == null) return null;
+        if (this.builder.length() == 0 && this.base == null)
+            return null;
 
         JsonNode request = null;
         if (this.builder.length() != 0) {
-            CollectionQueryProcessor tree =
-                    new CollectionQueryProcessor(this.verbose);
+            CollectionQueryProcessor tree = new CollectionQueryProcessor(
+                    this.verbose);
             tree.process(this.builder.toString());
             if (tree.getErrors().size() > 0) {
                 // legacy support
@@ -116,15 +112,16 @@ public class KoralCollectionQueryBuilder {
                         int code = (int) e.get(0);
                         notif.addError(code, (String[]) e.get(1));
                         String notificationStr = notif.toJsonString();
-                        throw new KustvaktException(StatusCodes.SERIALIZATION_FAILED,
+                        throw new KustvaktException(
+                                StatusCodes.SERIALIZATION_FAILED,
                                 notificationStr, true);
                     }
-                    else{
+                    else {
                         break;
                     }
                 }
                 // -- end of legacy support
-                
+
                 Map<String, Object> map = new HashMap<>();
                 map.put("errors", tree.getErrors());
                 String errors = JsonUtils.toJSON(map);
@@ -145,7 +142,6 @@ public class KoralCollectionQueryBuilder {
         return request;
     }
 
-
     public JsonNode mergeWith (JsonNode node) {
         if (this.base != null) {
             if (node != null) {
@@ -158,10 +154,10 @@ public class KoralCollectionQueryBuilder {
                 else if (result.isMissingNode() && tobase.isMissingNode())
                     return base;
                 else {
-                    result = JsonBuilder.buildDocGroup(
-                            this.mergeOperator != null
-                                    ? this.mergeOperator.toLowerCase() : "and",
-                            result, tobase);
+                    result = JsonBuilder
+                            .buildDocGroup(this.mergeOperator != null
+                                    ? this.mergeOperator.toLowerCase()
+                                    : "and", result, tobase);
                 }
                 ((ObjectNode) base).put("collection", result);
                 return base;
@@ -171,37 +167,33 @@ public class KoralCollectionQueryBuilder {
         throw new RuntimeException("no query found to merge with!");
     }
 
-
     /**
      * sets base query. All consequent queries are added to the first
      * koral:docGroup within the collection base query
      * If no group in base query, consequent queries are skipped.
      * 
      * @param query
-     * @throws KustvaktException 
+     * @throws KustvaktException
      */
-    public KoralCollectionQueryBuilder setBaseQuery (String query) throws KustvaktException {
+    public KoralCollectionQueryBuilder setBaseQuery (String query)
+            throws KustvaktException {
         this.base = JsonUtils.readTree(query);
         return this;
     }
-
 
     public KoralCollectionQueryBuilder setBaseQuery (JsonNode query) {
         this.base = query;
         return this;
     }
 
-
     public String toJSON () throws KustvaktException {
         return JsonUtils.toJSON(rebaseCollection());
     }
-
 
     @Override
     public String toString () {
         return this.builder.toString();
     }
-
 
     private static class JsonBuilder {
 
@@ -214,7 +206,6 @@ public class KoralCollectionQueryBuilder {
             node.put("value", value);
             return node;
         }
-
 
         public static ObjectNode buildDocGroup (String op,
                 JsonNode ... groups) {

@@ -23,9 +23,9 @@ public abstract class AuthenticationManager extends KustvaktCacheable {
     public AuthenticationManager () {
         super();
     }
-    
+
     public AuthenticationManager (String cache) {
-        super(cache, "key:"+cache);
+        super(cache, "key:" + cache);
         this.providers = new HashMap<>();
     }
 

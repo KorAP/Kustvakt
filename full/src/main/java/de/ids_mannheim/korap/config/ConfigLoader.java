@@ -16,9 +16,7 @@ public class ConfigLoader {
 
     private static final Logger jlog = LogManager.getLogger(ConfigLoader.class);
 
-
     private ConfigLoader () {}
-
 
     public static InputStream loadConfigStream (String name) {
         InputStream stream = null;
@@ -31,25 +29,27 @@ public class ConfigLoader {
             }
             else {
                 jlog.info("Loading config '" + name + "' from classpath!");
-                stream = ConfigLoader.class.getClassLoader().getResourceAsStream(
-                        name);
+                stream = ConfigLoader.class.getClassLoader()
+                        .getResourceAsStream(name);
             }
         }
         catch (IOException e) {
             // do nothing
         }
         if (stream == null)
-            throw new RuntimeException("Config file '"+name+"' could not be loaded ...");
+            throw new RuntimeException(
+                    "Config file '" + name + "' could not be loaded ...");
         return stream;
     }
 
-
-    public static Properties loadProperties (String name){
+    public static Properties loadProperties (String name) {
         Properties p = new Properties();
         try {
             p.load(loadConfigStream(name));
-        } catch (IOException e) {
-            throw new RuntimeException("Properties from config file '"+name+"' could not be loaded ...");
+        }
+        catch (IOException e) {
+            throw new RuntimeException("Properties from config file '" + name
+                    + "' could not be loaded ...");
         }
         return p;
     }

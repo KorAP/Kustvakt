@@ -78,8 +78,8 @@ public class UserGroupMemberDao {
         ParameterChecker.checkIntegerValue(groupId, "groupId");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<UserGroupMember> query =
-                criteriaBuilder.createQuery(UserGroupMember.class);
+        CriteriaQuery<UserGroupMember> query = criteriaBuilder
+                .createQuery(UserGroupMember.class);
 
         Root<UserGroupMember> root = query.from(UserGroupMember.class);
 
@@ -110,8 +110,8 @@ public class UserGroupMemberDao {
         ParameterChecker.checkIntegerValue(groupId, "groupId");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<UserGroupMember> query =
-                criteriaBuilder.createQuery(UserGroupMember.class);
+        CriteriaQuery<UserGroupMember> query = criteriaBuilder
+                .createQuery(UserGroupMember.class);
 
         Root<UserGroupMember> root = query.from(UserGroupMember.class);
         Join<UserGroupMember, Role> memberRole = root.join("roles");
@@ -146,8 +146,8 @@ public class UserGroupMemberDao {
     public List<UserGroupMember> retrieveMemberByGroupId (int groupId,
             boolean isAdmin) throws KustvaktException {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<UserGroupMember> query =
-                criteriaBuilder.createQuery(UserGroupMember.class);
+        CriteriaQuery<UserGroupMember> query = criteriaBuilder
+                .createQuery(UserGroupMember.class);
 
         Root<UserGroupMember> root = query.from(UserGroupMember.class);
 
@@ -169,7 +169,7 @@ public class UserGroupMemberDao {
         }
         catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.NO_RESULT_FOUND,
-                    "No member in group " + groupId+" is found",
+                    "No member in group " + groupId + " is found",
                     String.valueOf(groupId));
         }
     }

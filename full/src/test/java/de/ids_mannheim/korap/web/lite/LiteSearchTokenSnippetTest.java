@@ -18,8 +18,12 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class LiteSearchTokenSnippetTest extends LiteJerseyTest {
 
     @Test
-    public void testSearchWithTokens() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("search").queryParam("q", "[orth=das]").queryParam("ql", "poliqarp").queryParam("show-tokens", "true").queryParam("context", "sentence").queryParam("count", "13").request().get();
+    public void testSearchWithTokens () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
+                .queryParam("show-tokens", "true")
+                .queryParam("context", "sentence").queryParam("count", "13")
+                .request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
@@ -31,8 +35,12 @@ public class LiteSearchTokenSnippetTest extends LiteJerseyTest {
     }
 
     @Test
-    public void testSearchWithoutTokens() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("search").queryParam("q", "[orth=das]").queryParam("ql", "poliqarp").queryParam("show-tokens", "false").queryParam("context", "sentence").queryParam("count", "13").request().get();
+    public void testSearchWithoutTokens () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
+                .queryParam("show-tokens", "false")
+                .queryParam("context", "sentence").queryParam("count", "13")
+                .request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
@@ -42,8 +50,13 @@ public class LiteSearchTokenSnippetTest extends LiteJerseyTest {
     }
 
     @Test
-    public void testSearchPublicMetadataWithTokens() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("search").queryParam("q", "[orth=das]").queryParam("ql", "poliqarp").queryParam("access-rewrite-disabled", "true").queryParam("show-tokens", "true").queryParam("context", "sentence").queryParam("count", "13").request().get();
+    public void testSearchPublicMetadataWithTokens () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
+                .queryParam("access-rewrite-disabled", "true")
+                .queryParam("show-tokens", "true")
+                .queryParam("context", "sentence").queryParam("count", "13")
+                .request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);

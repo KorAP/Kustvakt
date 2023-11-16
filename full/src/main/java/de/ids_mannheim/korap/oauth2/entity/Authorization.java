@@ -54,13 +54,8 @@ public class Authorization {
     private String nonce;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "oauth2_authorization_scope",
-            joinColumns = @JoinColumn(name = "authorization_id",
-                    referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "scope_id",
-                    referencedColumnName = "id"),
-            uniqueConstraints = @UniqueConstraint(
-                    columnNames = { "authorization_id", "scope_id" }))
+    @JoinTable(name = "oauth2_authorization_scope", joinColumns = @JoinColumn(name = "authorization_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "scope_id", referencedColumnName = "id"), uniqueConstraints = @UniqueConstraint(columnNames = {
+            "authorization_id", "scope_id" }))
     private Set<AccessScope> scopes;
 
     @Override

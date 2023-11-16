@@ -21,7 +21,8 @@ import de.ids_mannheim.korap.dao.AnnotationDao;
 import de.ids_mannheim.korap.dao.ResourceDao;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 
-/** Parser for extracting data from free-resources.json containing
+/**
+ * Parser for extracting data from free-resources.json containing
  * listing free (non-licensed) corpora.
  * 
  * @author margaretha
@@ -40,12 +41,12 @@ public class FreeResourceParser {
     public static ObjectMapper mapper = new ObjectMapper();
 
     public void run () throws IOException, KustvaktException {
-        InputStream is=null;
+        InputStream is = null;
         File f = new File(FREE_RESOURCE_FILE);
-        if (f.exists()){
+        if (f.exists()) {
             is = new FileInputStream(f);
         }
-        else{
+        else {
             is = FreeResourceParser.class.getClassLoader()
                     .getResourceAsStream(FREE_RESOURCE_FILE);
         }
@@ -53,7 +54,7 @@ public class FreeResourceParser {
         JsonNode node = mapper.readTree(is);
         for (JsonNode resource : node) {
             String resourceId = resource.at("/id").asText();
-//            log.debug(resourceId);
+            //            log.debug(resourceId);
             Set<AnnotationLayer> layers = parseLayers(resource.at("/layers"));
             try {
                 Resource r = resourceDao.retrieveResource(resourceId);
@@ -74,8 +75,8 @@ public class FreeResourceParser {
         Set<AnnotationLayer> layerSet = new HashSet<>(layers.size());
         for (JsonNode layer : layers) {
             String[] codes = layer.asText().split("/");
-            AnnotationLayer annotationLayer =
-                    annotationDao.retrieveAnnotationLayer(codes[0], codes[1]);
+            AnnotationLayer annotationLayer = annotationDao
+                    .retrieveAnnotationLayer(codes[0], codes[1]);
             layerSet.add(annotationLayer);
         }
         return layerSet;

@@ -49,7 +49,6 @@ public class AdminFilter extends AuthenticationFilter {
         }
     }
 
-
     private boolean checkAdminToken (String adminToken) {
         if (adminToken != null && !adminToken.isEmpty()) {
             if (adminToken
@@ -59,7 +58,6 @@ public class AdminFilter extends AuthenticationFilter {
         }
         return false;
     }
-
 
     private void checkAdminCredentials (TokenContext tokenContext,
             String username) {

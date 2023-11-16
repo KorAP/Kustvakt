@@ -18,17 +18,14 @@ import de.ids_mannheim.korap.interfaces.EncryptionIface;
 public class KustvaktEncryption implements EncryptionIface {
 
     private static final String ALGORITHM = "SHA-256";
-    private static Logger jlog = LogManager
-            .getLogger(KustvaktEncryption.class);
+    private static Logger jlog = LogManager.getLogger(KustvaktEncryption.class);
 
     private final FullConfiguration config;
-
 
     public KustvaktEncryption (FullConfiguration config) {
         jlog.info("initializing KorAPEncryption implementation");
         this.config = config;
     }
-
 
     public static boolean matchTokenByteCode (Object param) {
         if (!(param instanceof String))
@@ -38,11 +35,9 @@ public class KustvaktEncryption implements EncryptionIface {
         return 64 == bytes.length;
     }
 
-
     private String encodeBase (byte[] bytes) throws EncoderException {
         return Base64.encodeBase64String(bytes);
     }
-
 
     @Override
     public String encodeBase () {
@@ -54,11 +49,9 @@ public class KustvaktEncryption implements EncryptionIface {
         }
     }
 
-
     public String secureHash (String input) {
         return secureHash(input, "");
     }
-
 
     @Override
     public String secureHash (String input, String salt) {
@@ -75,7 +68,8 @@ public class KustvaktEncryption implements EncryptionIface {
                     for (byte b : digest)
                         hashString += String.format("%02x", b);
                 }
-                catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
+                catch (UnsupportedEncodingException
+                        | NoSuchAlgorithmException e) {
                     e.printStackTrace();
                 }
                 break;
@@ -83,13 +77,11 @@ public class KustvaktEncryption implements EncryptionIface {
                 hashString = bcryptHash(input, salt);
                 break;
             default:
-                jlog.warn("Invalid value: "+ config.getSecureHashAlgorithm());
+                jlog.warn("Invalid value: " + config.getSecureHashAlgorithm());
                 break;
         }
         return hashString;
     }
-
-
 
     public String hash (String input) {
         String hashString = "";
@@ -113,7 +105,6 @@ public class KustvaktEncryption implements EncryptionIface {
         return hashString;
     }
 
-
     /**
      * // some sort of algorithm to create token and isSystem
      * regularly the integrity
@@ -136,9 +127,9 @@ public class KustvaktEncryption implements EncryptionIface {
         return SecureRGenerator.getNextSecureRandom(size);
     }
 
-
     /**
      * does this need to be equal for every iteration?!
+     * 
      * @param hash
      * @param obj
      * @return
@@ -162,19 +153,17 @@ public class KustvaktEncryption implements EncryptionIface {
 
     }
 
-
     @Override
     public String createToken () {
         return RandomStringUtils.randomAlphanumeric(64);
-        
-        // EM: code from MH
-//        String encoded;
-//        String v = RandomStringUtils.randomAlphanumeric(64);
-//        encoded = hash(v);
-//        jlog.trace("creating new token {}", encoded);
-//        return encoded;
-    }
 
+        // EM: code from MH
+        //        String encoded;
+        //        String v = RandomStringUtils.randomAlphanumeric(64);
+        //        encoded = hash(v);
+        //        jlog.trace("creating new token {}", encoded);
+        //        return encoded;
+    }
 
     @Override
     public String createRandomNumber (Object ... obj) {
@@ -186,7 +175,6 @@ public class KustvaktEncryption implements EncryptionIface {
         }
         return createToken(false, obj);
     }
-
 
     @Override
     public boolean checkHash (String plain, String hash, String salt) {
@@ -209,7 +197,6 @@ public class KustvaktEncryption implements EncryptionIface {
         return pw.equals(hash);
     }
 
-
     @Override
     public boolean checkHash (String plain, String hash) {
         switch (config.getSecureHashAlgorithm()) {
@@ -228,13 +215,11 @@ public class KustvaktEncryption implements EncryptionIface {
         return false;
     }
 
-
     private String bcryptHash (String text, String salt) {
         if (salt == null || salt.isEmpty())
             salt = BCrypt.gensalt(config.getLoadFactor());
         return BCrypt.hashpw(text, salt);
     }
-
 
     @Override
     public String toString () {
@@ -248,8 +233,8 @@ public class KustvaktEncryption implements EncryptionIface {
         protected static final int ID_RANDOM_SIZE = 128;
         protected static final int CORPUS_RANDOM_SIZE = 64;
         private static final char[] HEX_DIGIT = { '0', '1', '2', '3', '4', '5',
-                '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'z', 'x',
-                'h', 'q', 'w' };
+                '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'z', 'x', 'h',
+                'q', 'w' };
         private static final SecureRandom sRandom__;
 
         static {
@@ -260,7 +245,6 @@ public class KustvaktEncryption implements EncryptionIface {
                 throw new Error(e);
             }
         }
-
 
         public static byte[] getNextSecureRandom (int bits) {
             if (bits % 8 != 0) {
@@ -275,7 +259,6 @@ public class KustvaktEncryption implements EncryptionIface {
             return bytes;
         }
 
-
         public static String toHex (byte[] bytes) {
             if (bytes == null) {
                 return null;
@@ -288,7 +271,6 @@ public class KustvaktEncryption implements EncryptionIface {
 
             return buffer.toString();
         }
-
 
         private static String byteToHex (byte b) {
             char[] array = { HEX_DIGIT[(b >> 4 & 0xF)], HEX_DIGIT[(b & 0xF)] };

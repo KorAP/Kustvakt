@@ -6,19 +6,24 @@ import org.springframework.stereotype.Component;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.utils.ParameterChecker;
 
-/** TransferEncoding contains encoding and decoding methods for data transfer, 
- *  e.g. transfering credentials using basic Http authentication.  
- *   
+/**
+ * TransferEncoding contains encoding and decoding methods for data
+ * transfer,
+ * e.g. transfering credentials using basic Http authentication.
+ * 
  * @author margaretha
  *
  */
 @Component
 public class TransferEncoding {
 
-    /** Encodes username and password using Base64.
+    /**
+     * Encodes username and password using Base64.
      * 
-     * @param username username
-     * @param password password
+     * @param username
+     *            username
+     * @param password
+     *            password
      * @return
      */
     public static String encodeBase64 (String username, String password) {
@@ -26,11 +31,12 @@ public class TransferEncoding {
         return new String(Base64.encodeBase64(s.getBytes()));
     }
 
-    /** Decodes the given string using Base64.
+    /**
+     * Decodes the given string using Base64.
      * 
-     * @param encodedStr 
+     * @param encodedStr
      * @return username and password as an array of strings.
-     * @throws KustvaktException 
+     * @throws KustvaktException
      */
     public static String[] decodeBase64 (String encodedStr)
             throws KustvaktException {

@@ -54,8 +54,7 @@ public class OAuth2Error {
      * The authorization grant type is not supported by the
      * authorization server.
      */
-    public static final String UNSUPPORTED_GRANT_TYPE =
-            "unsupported_grant_type";
+    public static final String UNSUPPORTED_GRANT_TYPE = "unsupported_grant_type";
 
     /**
      * The requested scope is invalid, unknown, or malformed.
@@ -74,8 +73,7 @@ public class OAuth2Error {
      * The authorization server does not support obtaining an
      * authorization code using this method.
      */
-    public static final String UNSUPPORTED_RESPONSE_TYPE =
-            "unsupported_response_type";
+    public static final String UNSUPPORTED_RESPONSE_TYPE = "unsupported_response_type";
 
     /**
      * The authorization server encountered an unexpected
@@ -94,8 +92,7 @@ public class OAuth2Error {
      * Service Unavailable HTTP status code cannot be returned
      * to the client via an HTTP redirect.)
      */
-    public static final String TEMPORARILY_UNAVAILABLE =
-            "temporarily_unavailable";
+    public static final String TEMPORARILY_UNAVAILABLE = "temporarily_unavailable";
 
     /**
      * The request requires higher privileges than provided by the

@@ -11,7 +11,6 @@ import de.ids_mannheim.korap.user.User;
  */
 public interface RewriteTask {
 
-
     /**
      * unspecified query rewrite that gets injected the entire root
      * node during preprocessing

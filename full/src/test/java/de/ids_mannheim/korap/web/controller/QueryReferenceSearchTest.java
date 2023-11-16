@@ -28,10 +28,10 @@ public class QueryReferenceSearchTest {
                 .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
                 .queryParam("cq", "referTo \"dory/dory-q\"")
                 .get();
-
+    
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertTrue(node.at("/matches").size() > 0);
     }
-*/
+    */
 }

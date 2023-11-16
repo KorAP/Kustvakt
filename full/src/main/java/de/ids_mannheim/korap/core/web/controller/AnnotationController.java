@@ -34,7 +34,8 @@ import jakarta.ws.rs.core.MediaType;
  */
 @Controller
 @Path("/{version}/annotation/")
-@ResourceFilters({APIVersionFilter.class, DemoUserFilter.class, PiwikFilter.class })
+@ResourceFilters({ APIVersionFilter.class, DemoUserFilter.class,
+        PiwikFilter.class })
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
 public class AnnotationController {
 
@@ -55,7 +56,6 @@ public class AnnotationController {
         return annotationService.getLayerDtos();
     }
 
-
     /**
      * Returns a list of foundry descriptions.
      * 
@@ -71,8 +71,8 @@ public class AnnotationController {
     @Consumes(MediaType.APPLICATION_JSON)
     public List<FoundryDto> getFoundryDescriptions (String json) {
         if (json == null || json.isEmpty()) {
-            throw kustvaktResponseHandler
-                    .throwit(new KustvaktException(StatusCodes.MISSING_PARAMETER,
+            throw kustvaktResponseHandler.throwit(
+                    new KustvaktException(StatusCodes.MISSING_PARAMETER,
                             "Missing a json string.", ""));
         }
 
@@ -122,4 +122,3 @@ public class AnnotationController {
         }
     }
 }
-

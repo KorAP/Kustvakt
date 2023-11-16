@@ -77,7 +77,7 @@ public class OAuth2Controller {
     private OAuth2TokenService tokenService;
     @Autowired
     private OAuth2AuthorizationService authorizationService;
-    
+
     @Autowired
     private OAuth2ScopeService scopeService;
 
@@ -108,8 +108,7 @@ public class OAuth2Controller {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response requestAuthorizationCode (
             @Context HttpServletRequest request,
-            @Context SecurityContext context, 
-            @FormParam("scope") String scope,
+            @Context SecurityContext context, @FormParam("scope") String scope,
             @FormParam("state") String state,
             @FormParam("client_id") String clientId,
             @FormParam("redirect_uri") String redirectUri,
@@ -125,27 +124,26 @@ public class OAuth2Controller {
             builder.queryParam(key, form.get(key).toArray());
         }
         requestURI = builder.build();
-       
+
         try {
             scopeService.verifyScope(tokenContext, OAuth2Scope.AUTHORIZE);
-            URI uri = authorizationService.requestAuthorizationCode(
-                    requestURI, clientId, redirectUri,
-                    scope, state, username, authTime);
+            URI uri = authorizationService.requestAuthorizationCode(requestURI,
+                    clientId, redirectUri, scope, state, username, authTime);
             return responseHandler.sendRedirect(uri);
         }
         catch (KustvaktException e) {
             e = authorizationService.checkRedirectUri(e, clientId, redirectUri);
             if (e.getRedirectUri() != null) {
-                AuthorizationErrorResponse errorResponse =
-                        authorizationService.createAuthorizationError(e, state);
+                AuthorizationErrorResponse errorResponse = authorizationService
+                        .createAuthorizationError(e, state);
                 return responseHandler.sendRedirect(errorResponse.toURI());
             }
             else {
                 throw responseHandler.throwit(e, state);
-            } 
+            }
         }
     }
-    
+
     @GET
     @Path("authorize")
     public Response requestAuthorizationCode (
@@ -163,7 +161,8 @@ public class OAuth2Controller {
 
         URI requestURI;
         try {
-            requestURI = new URI(request.getRequestURI()+"?"+request.getQueryString());
+            requestURI = new URI(
+                    request.getRequestURI() + "?" + request.getQueryString());
         }
         catch (URISyntaxException e) {
             KustvaktException ke = new KustvaktException(
@@ -171,24 +170,23 @@ public class OAuth2Controller {
                     OAuth2Error.INVALID_REQUEST_URI);
             throw responseHandler.throwit(ke, state);
         }
-        
+
         try {
             scopeService.verifyScope(tokenContext, OAuth2Scope.AUTHORIZE);
-            URI uri = authorizationService.requestAuthorizationCode(
-                    requestURI, clientId, redirectUri,
-                    scope, state, username, authTime);
+            URI uri = authorizationService.requestAuthorizationCode(requestURI,
+                    clientId, redirectUri, scope, state, username, authTime);
             return responseHandler.sendRedirect(uri);
         }
         catch (KustvaktException e) {
             e = authorizationService.checkRedirectUri(e, clientId, redirectUri);
             if (e.getRedirectUri() != null) {
-                AuthorizationErrorResponse errorResponse =
-                        authorizationService.createAuthorizationError(e, state);
+                AuthorizationErrorResponse errorResponse = authorizationService
+                        .createAuthorizationError(e, state);
                 return responseHandler.sendRedirect(errorResponse.toURI());
             }
             else {
                 throw responseHandler.throwit(e, state);
-            } 
+            }
         }
     }
 
@@ -256,7 +254,7 @@ public class OAuth2Controller {
      */
     @POST
     @Path("token")
-    @ResourceFilters({APIVersionFilter.class})
+    @ResourceFilters({ APIVersionFilter.class })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response requestAccessToken (@Context HttpServletRequest request,
             @NotEmpty @FormParam("grant_type") String grantType,
@@ -266,62 +264,64 @@ public class OAuth2Controller {
 
         try {
             URI requestURI;
-            UriBuilder builder = UriBuilder.fromPath(
-                    request.getRequestURL().toString());
+            UriBuilder builder = UriBuilder
+                    .fromPath(request.getRequestURL().toString());
             for (String key : form.keySet()) {
                 builder.queryParam(key, form.get(key).toArray());
             }
             requestURI = builder.build();
-            
+
             try {
-                AuthorizationGrant authGrant = AuthorizationGrant.parse(form);  
-                
+                AuthorizationGrant authGrant = AuthorizationGrant.parse(form);
+
                 ClientAuthentication clientAuth = null;
                 String authorizationHeader = request.getHeader("Authorization");
-                if (authorizationHeader!=null && !authorizationHeader.isEmpty() ) {
+                if (authorizationHeader != null
+                        && !authorizationHeader.isEmpty()) {
                     clientAuth = ClientSecretBasic.parse(authorizationHeader);
                 }
                 else if (authGrant instanceof ClientCredentialsGrant) {
                     // this doesn't allow public clients
                     clientAuth = ClientSecretPost.parse(form);
                 }
-                
+
                 TokenRequest tokenRequest = null;
-                if (clientAuth!=null) {
+                if (clientAuth != null) {
                     ClientAuthenticationMethod method = clientAuth.getMethod();
-                    if (method.equals(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)) {
+                    if (method.equals(
+                            ClientAuthenticationMethod.CLIENT_SECRET_BASIC)) {
                         ClientSecretBasic basic = (ClientSecretBasic) clientAuth;
                         clientSecret = basic.getClientSecret().getValue();
                         clientId = basic.getClientID().getValue();
                     }
-                    else if (method.equals(ClientAuthenticationMethod.CLIENT_SECRET_POST)) {
+                    else if (method.equals(
+                            ClientAuthenticationMethod.CLIENT_SECRET_POST)) {
                         ClientSecretPost post = (ClientSecretPost) clientAuth;
                         clientSecret = post.getClientSecret().getValue();
                         clientId = post.getClientID().getValue();
                     }
-                    
-                    tokenRequest = new TokenRequest(requestURI,
-                            clientAuth,
+
+                    tokenRequest = new TokenRequest(requestURI, clientAuth,
                             AuthorizationGrant.parse(form),
                             Scope.parse(form.getFirst("scope")));
                 }
                 else {
                     // requires ClientAuthentication for client_credentials grant
                     tokenRequest = new TokenRequest(requestURI,
-                        new ClientID(clientId),
-                        AuthorizationGrant.parse(form),
-                        Scope.parse(form.getFirst("scope")));
+                            new ClientID(clientId),
+                            AuthorizationGrant.parse(form),
+                            Scope.parse(form.getFirst("scope")));
                 }
-            
-                AccessTokenResponse r = tokenService.requestAccessToken(tokenRequest,
-                        clientId, clientSecret);
+
+                AccessTokenResponse r = tokenService.requestAccessToken(
+                        tokenRequest, clientId, clientSecret);
                 return responseHandler.createResponse(r);
             }
             catch (ParseException | IllegalArgumentException e) {
                 throw new KustvaktException(StatusCodes.INVALID_REQUEST,
-                        e.getMessage(), OAuth2Error.INVALID_REQUEST); 
+                        e.getMessage(), OAuth2Error.INVALID_REQUEST);
             }
-            
+
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
@@ -348,7 +348,7 @@ public class OAuth2Controller {
      */
     @POST
     @Path("revoke")
-    @ResourceFilters({APIVersionFilter.class})
+    @ResourceFilters({ APIVersionFilter.class })
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response revokeAccessToken (@Context HttpServletRequest request,
             @FormParam("client_id") String clientId,
@@ -359,8 +359,8 @@ public class OAuth2Controller {
         try {
             ParameterChecker.checkStringValue("client_id", clientId);
             ParameterChecker.checkStringValue("token", token);
-            tokenService.revokeToken(clientId,clientSecret,token,tokenType);
-            
+            tokenService.revokeToken(clientId, clientSecret, token, tokenType);
+
             return Response.ok("SUCCESS").build();
         }
         catch (KustvaktException e) {
@@ -382,10 +382,11 @@ public class OAuth2Controller {
             ParameterChecker.checkStringValue("super_client_secret",
                     superClientSecret);
             ParameterChecker.checkStringValue("token", token);
-            
-            TokenContext tokenContext = (TokenContext) context.getUserPrincipal();
+
+            TokenContext tokenContext = (TokenContext) context
+                    .getUserPrincipal();
             String username = tokenContext.getUsername();
-            
+
             tokenService.revokeTokensViaSuperClient(username, superClientId,
                     superClientSecret, token);
             return Response.ok("SUCCESS").build();
@@ -426,7 +427,7 @@ public class OAuth2Controller {
             ParameterChecker.checkStringValue("super_client_id", superClientId);
             ParameterChecker.checkStringValue("super_client_secret",
                     superClientSecret);
-           
+
             tokenService.revokeAllClientTokensViaSuperClient(username,
                     superClientId, superClientSecret, clientId);
             return Response.ok("SUCCESS").build();
@@ -439,8 +440,7 @@ public class OAuth2Controller {
     @POST
     @Path("token/list")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public List<OAuth2TokenDto> listUserToken (
-            @Context SecurityContext context,
+    public List<OAuth2TokenDto> listUserToken (@Context SecurityContext context,
             @FormParam("super_client_id") String superClientId,
             @FormParam("super_client_secret") String superClientSecret,
             @FormParam("client_id") String clientId, // optional

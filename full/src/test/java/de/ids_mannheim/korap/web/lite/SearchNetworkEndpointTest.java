@@ -42,26 +42,41 @@ public class SearchNetworkEndpointTest extends LiteJerseyTest {
 
     private String endpointURL = "http://localhost:" + port + "/searchEndpoint";
 
-    public SearchNetworkEndpointTest() throws IOException {
-        searchResult = IOUtils.toString(ClassLoader.getSystemResourceAsStream("network-output/search-result.jsonld"), StandardCharsets.UTF_8);
+    public SearchNetworkEndpointTest () throws IOException {
+        searchResult = IOUtils.toString(
+                ClassLoader.getSystemResourceAsStream(
+                        "network-output/search-result.jsonld"),
+                StandardCharsets.UTF_8);
     }
 
     @BeforeEach
-    public void startMockServer() {
+    public void startMockServer () {
         mockServer = startClientAndServer(port);
         mockClient = new MockServerClient("localhost", mockServer.getPort());
     }
 
     @AfterEach
-    public void stopMockServer() {
+    public void stopMockServer () {
         mockServer.stop();
     }
 
     @Test
-    public void testSearchNetwork() throws IOException, KustvaktException, URISyntaxException {
+    public void testSearchNetwork ()
+            throws IOException, KustvaktException, URISyntaxException {
         config.setNetworkEndpointURL(endpointURL);
-        mockClient.reset().when(request().withMethod("POST").withPath("/searchEndpoint").withHeaders(new Header("Content-Type", "application/json; charset=utf-8"), new Header("Accept", "application/json"))).respond(response().withHeader(new Header("Content-Type", "application/json; charset=utf-8")).withBody(searchResult).withStatusCode(200));
-        Response response = target().path(API_VERSION).path("search").queryParam("q", "[orth=der]").queryParam("ql", "poliqarp").queryParam("engine", "network").request().get();
+        mockClient.reset()
+                .when(request().withMethod("POST").withPath("/searchEndpoint")
+                        .withHeaders(
+                                new Header("Content-Type",
+                                        "application/json; charset=utf-8"),
+                                new Header("Accept", "application/json")))
+                .respond(response()
+                        .withHeader(new Header("Content-Type",
+                                "application/json; charset=utf-8"))
+                        .withBody(searchResult).withStatusCode(200));
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("engine", "network").request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -69,22 +84,29 @@ public class SearchNetworkEndpointTest extends LiteJerseyTest {
     }
 
     @Test
-    public void testSearchWithUnknownURL() throws IOException, KustvaktException {
+    public void testSearchWithUnknownURL ()
+            throws IOException, KustvaktException {
         config.setNetworkEndpointURL("http://localhost:1040/search");
-        Response response = target().path(API_VERSION).path("search").queryParam("q", "[orth=der]").queryParam("ql", "poliqarp").queryParam("engine", "network").request().get();
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("engine", "network").request().get();
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.SEARCH_NETWORK_ENDPOINT_FAILED, node.at("/errors/0/0").asInt());
+        assertEquals(StatusCodes.SEARCH_NETWORK_ENDPOINT_FAILED,
+                node.at("/errors/0/0").asInt());
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     @Test
-    public void testSearchWithUnknownHost() throws KustvaktException {
+    public void testSearchWithUnknownHost () throws KustvaktException {
         config.setNetworkEndpointURL("http://search.com");
-        Response response = target().path(API_VERSION).path("search").queryParam("q", "[orth=der]").queryParam("ql", "poliqarp").queryParam("engine", "network").request().get();
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("engine", "network").request().get();
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.SEARCH_NETWORK_ENDPOINT_FAILED, node.at("/errors/0/0").asInt());
+        assertEquals(StatusCodes.SEARCH_NETWORK_ENDPOINT_FAILED,
+                node.at("/errors/0/0").asInt());
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 }

@@ -22,8 +22,7 @@ import de.ids_mannheim.korap.core.entity.Annotation;
 @Deprecated
 public class ArrayVariables {
 
-    public static HashMap<String, List<Annotation>> annotationMap =
-            new HashMap<>();
+    public static HashMap<String, List<Annotation>> annotationMap = new HashMap<>();
 
     public static void main (String[] args) throws IOException {
         ArrayVariables variables = new ArrayVariables();
@@ -53,7 +52,8 @@ public class ArrayVariables {
 
     public void extractVariables () throws IOException {
         String dir = "annotation-scripts/variables";
-        if (dir.isEmpty()) return;
+        if (dir.isEmpty())
+            return;
 
         File d = new File(dir);
         if (!d.isDirectory()) {

@@ -6,8 +6,10 @@ import de.ids_mannheim.korap.constant.GroupMemberStatus;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Defines UserGroupMember description, e.g. to be sent as 
- *  JSON objects in HTTP Responses.
+/**
+ * Defines UserGroupMember description, e.g. to be sent as
+ * JSON objects in HTTP Responses.
+ * 
  * @author margaretha
  *
  */

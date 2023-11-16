@@ -16,9 +16,10 @@ import de.ids_mannheim.korap.constant.QueryAccessStatus;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Describes the relationship between virtual corpora and user groups, 
- *  i.e. which groups may access which virtual corpora, and the history 
- *  of group-access management.  
+/**
+ * Describes the relationship between virtual corpora and user groups,
+ * i.e. which groups may access which virtual corpora, and the history
+ * of group-access management.
  * 
  * @author margaretha
  * @see QueryDO
@@ -51,10 +52,8 @@ public class QueryAccess {
     @JoinColumn(name = "user_group_id", referencedColumnName = "id")
     private UserGroup userGroup;
 
-
     @Override
     public String toString () {
-        return "id=" + id + ", query= " + query
-                + ", userGroup= " + userGroup;
+        return "id=" + id + ", query= " + query + ", userGroup= " + userGroup;
     }
 }

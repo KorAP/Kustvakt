@@ -19,24 +19,20 @@ public class KorAPUser extends User {
     private String URIFragment;
     private Long URIExpiration;
 
-
     public KorAPUser (String username) {
         super(username, 0);
         this.URIFragment = "";
         this.URIExpiration = 0L;
     }
 
-
     public KorAPUser (Integer id, String username) {
         this(username);
         this.setId(id);
     }
 
-
     public KorAPUser () {
         super();
     }
-
 
     @Override
     protected User clone () {
@@ -45,7 +41,6 @@ public class KorAPUser extends User {
         user.setAccountCreation(this.getAccountCreation());
         return user;
     }
-
 
     @Override
     public int hashCode () {
@@ -58,7 +53,6 @@ public class KorAPUser extends User {
                 + (URIExpiration != null ? URIExpiration.hashCode() : 0);
         return result;
     }
-
 
     @Override
     public boolean equals (Object o) {

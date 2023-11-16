@@ -22,15 +22,14 @@ public class DemoFilter implements ContainerRequestFilter {
 
     @Override
     public void filter (ContainerRequestContext request) {
-        String authentication =
-                request.getHeaderString(ContainerRequest.AUTHORIZATION);
+        String authentication = request
+                .getHeaderString(ContainerRequest.AUTHORIZATION);
         if (authentication == null || authentication.isEmpty()) {
             if (request.getSecurityContext() == null) {
                 request.setSecurityContext(createContext());
             }
         }
     }
-
 
     private SecurityContext createContext () {
         TokenContext context = new TokenContext();

@@ -15,13 +15,16 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class FreeResourceControllerTest extends SpringJerseyTest {
 
     @Test
-    public void testResource() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("resource").request().get();
+    public void testResource () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("resource")
+                .request().get();
         String entity = response.readEntity(String.class);
         JsonNode n = JsonUtils.readTree(entity).get(0);
         assertEquals(n.at("/resourceId").asText(), "WPD17");
-        assertEquals(n.at("/titles/de").asText(), "Deutsche Wikipedia Artikel 2017");
-        assertEquals(n.at("/titles/en").asText(), "German Wikipedia Articles 2017");
+        assertEquals(n.at("/titles/de").asText(),
+                "Deutsche Wikipedia Artikel 2017");
+        assertEquals(n.at("/titles/en").asText(),
+                "German Wikipedia Articles 2017");
         assertEquals(1, n.at("/languages").size());
         assertEquals(6, n.at("/layers").size());
     }

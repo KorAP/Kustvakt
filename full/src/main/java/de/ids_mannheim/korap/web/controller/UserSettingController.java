@@ -113,7 +113,8 @@ public class UserSettingController {
             if (settings == null) {
                 username = tokenContext.getUsername();
                 throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
-                        "No default setting for username: " + username+" is found",
+                        "No default setting for username: " + username
+                                + " is found",
                         username);
             }
             return Response.ok(settings).build();

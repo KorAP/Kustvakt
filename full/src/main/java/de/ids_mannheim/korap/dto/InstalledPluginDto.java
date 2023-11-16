@@ -24,7 +24,7 @@ public class InstalledPluginDto {
     private String redirectUri;
     @JsonProperty("installed_date")
     private String installedDate;
-    
+
     public InstalledPluginDto (InstalledPlugin plugin) {
         OAuth2Client client = plugin.getClient();
         setClientId(client.getId());

@@ -28,8 +28,8 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name = "annotation_key", uniqueConstraints = @UniqueConstraint(
-        columnNames = { "layer_id", "key_id" }))
+@Table(name = "annotation_key", uniqueConstraints = @UniqueConstraint(columnNames = {
+        "layer_id", "key_id" }))
 public class AnnotationKey {
 
     @Id
@@ -49,13 +49,8 @@ public class AnnotationKey {
     private Annotation key;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "annotation_value",
-            joinColumns = @JoinColumn(name = "key_id",
-                    referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "value_id",
-                    referencedColumnName = "id"),
-            uniqueConstraints = @UniqueConstraint(
-                    columnNames = { "key_id", "value_id" }))
+    @JoinTable(name = "annotation_value", joinColumns = @JoinColumn(name = "key_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "value_id", referencedColumnName = "id"), uniqueConstraints = @UniqueConstraint(columnNames = {
+            "key_id", "value_id" }))
     private Set<Annotation> values;
 
     public AnnotationKey () {}

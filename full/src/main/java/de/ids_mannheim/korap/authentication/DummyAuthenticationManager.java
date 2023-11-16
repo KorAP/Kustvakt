@@ -20,7 +20,7 @@ public class DummyAuthenticationManager extends AuthenticationManager {
     private KustvaktConfiguration config;
 
     public DummyAuthenticationManager () {}
-    
+
     @Override
     public TokenContext getTokenContext (TokenType type, String token,
             String host, String useragent) throws KustvaktException {

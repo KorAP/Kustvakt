@@ -23,36 +23,32 @@ public abstract class KustvaktCacheable {
     private String prefix;
     private String name;
 
-    public KustvaktCacheable(String cache_name, String prefix) {
+    public KustvaktCacheable (String cache_name, String prefix) {
         init();
-        if(!enabled())
+        if (!enabled())
             createDefaultFileCache(cache_name);
         this.prefix = prefix;
         this.name = cache_name;
     }
-    
+
     public KustvaktCacheable () {
         // TODO Auto-generated constructor stub
     }
 
-    private static Cache getCache(String name) {
+    private static Cache getCache (String name) {
         return CacheManager.getInstance().getCache(name);
     }
 
-
-    private void createDefaultFileCache(String name) {
-        Cache default_cache = new Cache(
-                new CacheConfiguration(name, 20000)
-                        .memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
-                        .eternal(false)
-                        .timeToLiveSeconds(15000)
-                        .timeToIdleSeconds(5000)
-                        .diskExpiryThreadIntervalSeconds(0)
-                        .persistence(new PersistenceConfiguration().strategy(PersistenceConfiguration.Strategy.LOCALTEMPSWAP)));
+    private void createDefaultFileCache (String name) {
+        Cache default_cache = new Cache(new CacheConfiguration(name, 20000)
+                .memoryStoreEvictionPolicy(MemoryStoreEvictionPolicy.LFU)
+                .eternal(false).timeToLiveSeconds(15000).timeToIdleSeconds(5000)
+                .diskExpiryThreadIntervalSeconds(0)
+                .persistence(new PersistenceConfiguration().strategy(
+                        PersistenceConfiguration.Strategy.LOCALTEMPSWAP)));
         if (!CacheManager.getInstance().cacheExists(name))
             CacheManager.getInstance().addCache(default_cache);
     }
-
 
     public void init () {
         if (!loaded) {
@@ -61,62 +57,62 @@ public abstract class KustvaktCacheable {
                 InputStream in = ConfigLoader.loadConfigStream(file);
                 CacheManager.newInstance(in);
                 loaded = true;
-            } else {
+            }
+            else {
                 CacheManager.create();
             }
         }
     }
 
-    public boolean hasCacheEntry(Object key) {
+    public boolean hasCacheEntry (Object key) {
         return getCache(this.name).isKeyInCache(createKey(key.toString()));
     }
 
-
-    public boolean enabled() {
+    public boolean enabled () {
         // check that caching is enabled
         return ServiceInfo.getInfo().getCacheable();
     }
 
-    public Object getCacheValue(Object key) {
+    public Object getCacheValue (Object key) {
         Element e = getCache(this.name).get(createKey(key.toString()));
-        if (e!= null)
+        if (e != null)
             return e.getObjectValue();
         return null;
     }
 
-    public long getCacheCreationTime(Object key) {
+    public long getCacheCreationTime (Object key) {
         Element e = getCache(this.name).get(createKey(key.toString()));
-        if (e!= null)
+        if (e != null)
             return e.getCreationTime();
         return -1;
     }
 
-    public void storeInCache(Object key, Object value) {
+    public void storeInCache (Object key, Object value) {
         getCache(this.name).put(new Element(createKey(key.toString()), value));
     }
 
-    public void removeCacheEntry(Object key) {
+    public void removeCacheEntry (Object key) {
         getCache(this.name).remove(createKey(key.toString()));
     }
 
-    public void clearCache() {
+    public void clearCache () {
         Cache c = getCache(this.name);
         if (enabled()) {
             c.removeAll();
-//            c.clearStatistics();
-            
+            //            c.clearStatistics();
+
         }
     }
 
-    private String createKey(String input) {
-        return StringUtils.toSHAHash(this.prefix+ "@" + input);
+    private String createKey (String input) {
+        return StringUtils.toSHAHash(this.prefix + "@" + input);
     }
-    
+
     public Map<Object, Element> getAllCacheElements () {
         Cache cache = getCache(name);
         return cache.getAll(cache.getKeysWithExpiryCheck());
     }
-    
+
     public List getKeysWithExpiryCheck () {
         Cache cache = getCache(name);
         return cache.getKeysWithExpiryCheck();

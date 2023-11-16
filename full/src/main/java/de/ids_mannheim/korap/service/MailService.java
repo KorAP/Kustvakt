@@ -34,7 +34,7 @@ public class MailService {
 
     public static Logger jlog = LogManager.getLogger(MailService.class);
     public static boolean DEBUG = false;
-    
+
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
@@ -84,7 +84,8 @@ public class MailService {
                 StandardCharsets.UTF_8.name(), context, stringWriter);
 
         String message = stringWriter.toString();
-        if (DEBUG) jlog.debug(message);
+        if (DEBUG)
+            jlog.debug(message);
         return message;
     }
 }

@@ -22,7 +22,7 @@ public class CoreResponseHandler {
             }
             // KustvaktException just wraps another exception 
             else {
-                s=Response.status(Response.Status.BAD_REQUEST)
+                s = Response.status(Response.Status.BAD_REQUEST)
                         .entity(e.getNotification()).build();
             }
         }
@@ -37,7 +37,6 @@ public class CoreResponseHandler {
         return new WebApplicationException(Response.status(getStatus(code))
                 .entity(buildNotification(code, "", "")).build());
     }
-
 
     public WebApplicationException throwit (int code, String message,
             String entity) {
@@ -80,7 +79,7 @@ public class CoreResponseHandler {
                 break;
             case StatusCodes.CACHING_VC:
                 status = Response.Status.SERVICE_UNAVAILABLE;
-                break;    
+                break;
         }
         return status;
     }

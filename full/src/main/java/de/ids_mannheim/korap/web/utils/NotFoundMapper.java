@@ -32,8 +32,8 @@ import jakarta.ws.rs.ext.Provider;
 public class NotFoundMapper implements ExceptionMapper<NotFoundException> {
 
     private static Logger jlog = LogManager.getLogger(NotFoundMapper.class);
-    public static final Pattern VERSION_PATTERN =
-            Pattern.compile("/(v[0-9][^/]*)(/.*)");
+    public static final Pattern VERSION_PATTERN = Pattern
+            .compile("/(v[0-9][^/]*)(/.*)");
     private static final boolean DEBUG = false;
 
     @Autowired
@@ -44,10 +44,10 @@ public class NotFoundMapper implements ExceptionMapper<NotFoundException> {
 
     @Override
     public Response toResponse (NotFoundException exception) {
-        ContainerRequestContext requestContext =
-                resourceContext.getResource(ContainerRequestContext.class);
+        ContainerRequestContext requestContext = resourceContext
+                .getResource(ContainerRequestContext.class);
 
-    	URI notFoundUri = requestContext.getUriInfo().getRequestUri();
+        URI notFoundUri = requestContext.getUriInfo().getRequestUri();
 
         String path = notFoundUri.getPath();
         String baseUrl = config.getBaseURL();

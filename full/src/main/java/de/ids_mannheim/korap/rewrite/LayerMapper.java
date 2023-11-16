@@ -7,11 +7,13 @@ import de.ids_mannheim.korap.config.Attributes;
 import de.ids_mannheim.korap.config.KustvaktConfiguration;
 import de.ids_mannheim.korap.user.UserSettingProcessor;
 
-/** EM:
- *  <ul>
- *  <li> Added default morphology foundry </li>
- *  <li> Made this class as a spring component</li>
- *  </ul>
+/**
+ * EM:
+ * <ul>
+ * <li> Added default morphology foundry </li>
+ * <li> Made this class as a spring component</li>
+ * </ul>
+ * 
  * @author hanl, margaretha
  * @date 14/10/2014
  */
@@ -55,10 +57,10 @@ public class LayerMapper {
                 // EM: added
                 case "s":
                     return (String) settings
-                            .get(Attributes.DEFAULT_FOUNDRY_STRUCTURE);    
+                            .get(Attributes.DEFAULT_FOUNDRY_STRUCTURE);
                 case "morphology":
                     return (String) settings
-                            .get(Attributes.DEFAULT_FOUNDRY_MORPHOLOGY);    
+                            .get(Attributes.DEFAULT_FOUNDRY_MORPHOLOGY);
                 default:
                     // if the layer is not in this specific listing, assume a default layer
                     // like orth or other tokenization layers
@@ -77,7 +79,7 @@ public class LayerMapper {
                     return config.getDefault_lemma();
                 case "surface":
                     return config.getDefault_orthography();
-                    // refers to "structure" and is used for paragraphs or sentence boundaries
+                // refers to "structure" and is used for paragraphs or sentence boundaries
                 case "s":
                     return config.getDefaultStructureFoundry();
                 //EM: added
@@ -91,23 +93,22 @@ public class LayerMapper {
         }
     }
 
-
     // relevance: map to access control id references. p is usually mapped to pos, l to lemma, etc.
     public String translateLayer (String layer) {
         switch (layer.toLowerCase().trim()) {
-        //            case "pos":
-        //                return "p";
-        //            case "lemma":
-        //                return "l";
+            //            case "pos":
+            //                return "p";
+            //            case "lemma":
+            //                return "l";
             case "m":
                 return "morphology"; // EM: changed msd to morphology
-//                return "msd";
-                //todo the orth layer does not need a foundry entry
+            //                return "msd";
+            //todo the orth layer does not need a foundry entry
             case "orth":
                 return "surface";
             // EM: layer t does not exist at all   
-//            case "t":
-//                return "surface";
+            //            case "t":
+            //                return "surface";
             // EM: this islegacy support    
             case "const":
                 return "c";

@@ -1,6 +1,5 @@
 package de.ids_mannheim.korap.web.utils;
 
-
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import de.ids_mannheim.korap.exceptions.StatusCodes;

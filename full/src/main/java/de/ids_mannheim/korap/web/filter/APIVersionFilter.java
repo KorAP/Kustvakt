@@ -20,8 +20,7 @@ import jakarta.ws.rs.core.PathSegment;
  */
 @Component
 @Priority(Integer.MIN_VALUE)
-public class APIVersionFilter
-        implements ContainerRequestFilter {
+public class APIVersionFilter implements ContainerRequestFilter {
 
     @Autowired
     private KustvaktConfiguration config;

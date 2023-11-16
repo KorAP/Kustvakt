@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans.xsd
            http://www.springframework.org/schema/tx
@@ -10,8 +12,9 @@
            http://www.springframework.org/schema/context/spring-context.xsd
            http://www.springframework.org/schema/util
            http://www.springframework.org/schema/util/spring-util.xsd">
-	
-	<context:component-scan base-package="
+
+	<context:component-scan
+		base-package="
 		de.ids_mannheim.korap.core.service,
 		de.ids_mannheim.korap.core.web,
 		de.ids_mannheim.korap.web.filter, 
@@ -44,14 +47,16 @@
 		</property>
 	</bean>
 
-	<bean id="config" class="de.ids_mannheim.korap.config.KustvaktConfiguration">
-		<constructor-arg index="0" name="properties" ref="properties" />
+	<bean id="config"
+		class="de.ids_mannheim.korap.config.KustvaktConfiguration">
+		<constructor-arg index="0" name="properties"
+			ref="properties" />
 	</bean>
 
 	<!-- Database -->
 
-	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
-		lazy-init="true">
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp2.BasicDataSource" lazy-init="true">
 		<!-- <property name="driverClassName" value="${jdbc.driverClassName}" /> -->
 		<property name="url" value="${jdbc.url}" />
 		<property name="username" value="${jdbc.username}" />
@@ -66,7 +71,8 @@
 	<bean id="sqliteDataSource"
 		class="org.springframework.jdbc.datasource.SingleConnectionDataSource"
 		lazy-init="true">
-		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="driverClassName"
+			value="${jdbc.driverClassName}" />
 		<property name="url" value="${jdbc.url}" />
 		<property name="username" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
@@ -82,17 +88,20 @@
 		</property>
 	</bean>
 
-	<bean id="flywayConfig" class="org.flywaydb.core.api.configuration.ClassicConfiguration">
-	    <property name="baselineOnMigrate" value="true" />
+	<bean id="flywayConfig"
+		class="org.flywaydb.core.api.configuration.ClassicConfiguration">
+		<property name="baselineOnMigrate" value="true" />
 		<!-- <property name="validateOnMigrate" value="false" /> -->
 		<!-- <property name="cleanOnValidationError" value="true" /> -->
-		<property name="locations" value="#{'${jdbc.schemaPath}'.split(',')}"/>
+		<property name="locations"
+			value="#{'${jdbc.schemaPath}'.split(',')}" />
 		<property name="dataSource" ref="dataSource" />
 		<property name="outOfOrder" value="true" />
 	</bean>
-	
-	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
-	    <constructor-arg ref="flywayConfig"/>
+
+	<bean id="flyway" class="org.flywaydb.core.Flyway"
+		init-method="migrate">
+		<constructor-arg ref="flywayConfig" />
 	</bean>
 
 	<bean id="entityManagerFactory"
@@ -107,7 +116,8 @@
 		<property name="jpaVendorAdapter">
 			<bean id="jpaVendorAdapter"
 				class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-				<property name="databasePlatform" value="${hibernate.dialect}" />
+				<property name="databasePlatform"
+					value="${hibernate.dialect}" />
 			</bean>
 		</property>
 		<property name="jpaProperties">
@@ -127,8 +137,10 @@
 	<tx:annotation-driven proxy-target-class="true"
 		transaction-manager="transactionManager" />
 
-	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	<bean id="transactionManager"
+		class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory"
+			ref="entityManagerFactory" />
 	</bean>
 
 	<bean id="transactionTemplate"
@@ -141,10 +153,11 @@
 	</bean>
 
 	<!-- Search Engine -->
-	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">
+	<bean id="search_krill"
+		class="de.ids_mannheim.korap.web.SearchKrill">
 		<constructor-arg value="${krill.indexDir}" />
 	</bean>
-	
+
 
 	<!-- Filters -->
 	<!-- <bean id="APIVersionFilter" class="de.ids_mannheim.korap.web.APIVersionFilter" 
@@ -154,37 +167,42 @@
 		class="de.ids_mannheim.korap.authentication.DummyAuthenticationManager" />
 
 	<!-- Response handler -->
-	<bean id="kustvaktResponseHandler" class="de.ids_mannheim.korap.web.KustvaktResponseHandler">
+	<bean id="kustvaktResponseHandler"
+		class="de.ids_mannheim.korap.web.KustvaktResponseHandler">
 	</bean>
 
 	<!-- Controllers -->
-	<!-- added via component-scan 
-	<bean id="annotationController"
-		class="de.ids_mannheim.korap.web.controller.AnnotationController" />
-	<bean id="searchController" class="de.ids_mannheim.korap.web.controller.SearchController" />
-	<bean id="statisticController"
-		class="de.ids_mannheim.korap.web.controller.StatisticController" />
- -->
+	<!-- added via component-scan <bean id="annotationController" class="de.ids_mannheim.korap.web.controller.AnnotationController" 
+		/> <bean id="searchController" class="de.ids_mannheim.korap.web.controller.SearchController" 
+		/> <bean id="statisticController" class="de.ids_mannheim.korap.web.controller.StatisticController" 
+		/> -->
 	<!-- Services -->
 	<bean id="scopeService"
 		class="de.ids_mannheim.korap.oauth2.service.DummyOAuth2ScopeServiceImpl" />
 
 	<!-- DAO -->
-	<bean id="adminDao" class="de.ids_mannheim.korap.dao.DummyAdminDaoImpl" />
-	<bean id="annotationDao" class="de.ids_mannheim.korap.dao.AnnotationDao" />
+	<bean id="adminDao"
+		class="de.ids_mannheim.korap.dao.DummyAdminDaoImpl" />
+	<bean id="annotationDao"
+		class="de.ids_mannheim.korap.dao.AnnotationDao" />
 
 	<!-- DTO Converter -->
-	<bean id="annotationConverter" class="de.ids_mannheim.korap.dto.converter.AnnotationConverter" />
+	<bean id="annotationConverter"
+		class="de.ids_mannheim.korap.dto.converter.AnnotationConverter" />
 
 	<!-- Rewrite -->
-	<bean id="layerMapper" class="de.ids_mannheim.korap.rewrite.LayerMapper" />
-	<bean id="foundryInject" class="de.ids_mannheim.korap.rewrite.FoundryInject" />
+	<bean id="layerMapper"
+		class="de.ids_mannheim.korap.rewrite.LayerMapper" />
+	<bean id="foundryInject"
+		class="de.ids_mannheim.korap.rewrite.FoundryInject" />
 
-	<util:list id="rewriteTasks" value-type="de.ids_mannheim.korap.rewrite.RewriteTask">
+	<util:list id="rewriteTasks"
+		value-type="de.ids_mannheim.korap.rewrite.RewriteTask">
 		<ref bean="foundryInject" />
 	</util:list>
 
-	<bean id="rewriteHandler" class="de.ids_mannheim.korap.rewrite.RewriteHandler">
+	<bean id="rewriteHandler"
+		class="de.ids_mannheim.korap.rewrite.RewriteHandler">
 		<constructor-arg ref="rewriteTasks" />
 	</bean>
 </beans>

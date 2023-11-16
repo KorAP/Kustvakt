@@ -26,7 +26,6 @@ public class JsonUtils {
 
     private JsonUtils () {}
 
-
     public static String toJSON (Object values) throws KustvaktException {
         try {
             return mapper.writeValueAsString(values);
@@ -37,7 +36,6 @@ public class JsonUtils {
         }
     }
 
-
     public static JsonNode readTree (String json) throws KustvaktException {
         try {
             return mapper.readTree(json);
@@ -47,16 +45,14 @@ public class JsonUtils {
                     "Failed deserializing json object: " + json, json, e);
         }
     }
-    
+
     public static ObjectNode createObjectNode () {
         return mapper.createObjectNode();
     }
 
-
     public static ArrayNode createArrayNode () {
         return mapper.createArrayNode();
     }
-
 
     public static JsonNode valueToTree (Object value) {
         return mapper.valueToTree(value);
@@ -75,20 +71,18 @@ public class JsonUtils {
         return mapper.readValue(is, cl);
     }
 
-
     public static <T> T readFile (String path, Class<T> clazz)
             throws IOException {
         return mapper.readValue(new File(path), clazz);
     }
-
 
     public static void writeFile (String path, Object content)
             throws IOException {
         mapper.writeValue(new File(path), content);
     }
 
-
-    public static <T> T convertToClass (String json, Class<T> cl) throws KustvaktException {
+    public static <T> T convertToClass (String json, Class<T> cl)
+            throws KustvaktException {
         T t = null;
         try {
             t = mapper.readValue(json, cl);
@@ -100,7 +94,6 @@ public class JsonUtils {
         return t;
     }
 
-
     public static List<Map<String, Object>> convertToList (String json)
             throws JsonProcessingException, KustvaktException {
         List d = new ArrayList();
@@ -108,8 +101,8 @@ public class JsonUtils {
         if (node.isArray()) {
             Iterator<JsonNode> nodes = node.iterator();
             while (nodes.hasNext()) {
-                Map<String, Object> map =
-                        mapper.treeToValue(nodes.next(), Map.class);
+                Map<String, Object> map = mapper.treeToValue(nodes.next(),
+                        Map.class);
                 d.add(map);
             }
         }

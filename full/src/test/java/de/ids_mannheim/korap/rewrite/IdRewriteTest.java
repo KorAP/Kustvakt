@@ -26,7 +26,7 @@ public class IdRewriteTest extends SpringJerseyTest {
     private KustvaktConfiguration config;
 
     @Test
-    public void insertTokenId() throws KustvaktException {
+    public void insertTokenId () throws KustvaktException {
         RewriteHandler handler = new RewriteHandler(config);
         assertTrue(handler.add(IdWriter.class));
         String query = "[surface=Wort]";
@@ -39,7 +39,7 @@ public class IdRewriteTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testIdWriterTest() throws KustvaktException {
+    public void testIdWriterTest () throws KustvaktException {
         RewriteHandler handler = new RewriteHandler(config);
         assertTrue(handler.add(IdWriter.class));
         QuerySerializer s = new QuerySerializer();

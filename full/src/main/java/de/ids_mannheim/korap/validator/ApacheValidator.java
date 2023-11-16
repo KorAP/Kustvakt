@@ -20,7 +20,7 @@ import de.ids_mannheim.korap.web.utils.KustvaktMap;
 
 /**
  * Created by hanl on 09.06.16.
- *  
+ * 
  */
 public class ApacheValidator implements Validator {
 
@@ -32,11 +32,9 @@ public class ApacheValidator implements Validator {
 
     private Map<String, RegexValidator> validators;
 
-
     public ApacheValidator () throws IOException {
         this.validators = load();
     }
-
 
     private static Map<String, RegexValidator> load () throws IOException {
         Map<String, RegexValidator> validatorMap = new HashMap<>();
@@ -52,8 +50,6 @@ public class ApacheValidator implements Validator {
         }
         return validatorMap;
     }
-
-
 
     @Override
     public Map<String, Object> validateMap (Map<String, Object> map)
@@ -91,7 +87,6 @@ public class ApacheValidator implements Validator {
         return safeMap;
     }
 
-
     @Override
     public String validateEntry (String input, String type)
             throws KustvaktException {
@@ -100,7 +95,6 @@ public class ApacheValidator implements Validator {
                     "Entry did not validate for type '" + type + "'", input);
         return input;
     }
-
 
     @Override
     public boolean isValid (String input, String type) {
@@ -124,11 +118,11 @@ public class ApacheValidator implements Validator {
             else
                 return this.isValid(input, "string");
         }
-        if (DEBUG){
-            jlog.debug("validating entry "+input+" of type "+type+": "+ (
-                    valid ? "Is valid!" : "Is not valid!"));
+        if (DEBUG) {
+            jlog.debug("validating entry " + input + " of type " + type + ": "
+                    + (valid ? "Is valid!" : "Is not valid!"));
         }
-            
+
         return valid;
     }
 }

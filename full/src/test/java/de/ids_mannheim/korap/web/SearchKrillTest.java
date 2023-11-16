@@ -30,31 +30,33 @@ public class SearchKrillTest extends SpringJerseyTest {
     SearchKrill krill = null;
 
     @PostConstruct
-    private void createKrill() {
+    private void createKrill () {
         krill = new SearchKrill(config.getIndexDir());
         assertNotNull(krill);
     }
 
     @Test
-    public void testIndex() throws KustvaktException {
+    public void testIndex () throws KustvaktException {
         KrillIndex index = krill.getIndex();
         assertNotNull(index);
     }
 
     @Test
-    public void testDocSize() {
+    public void testDocSize () {
         assertNotEquals(0, krill.getIndex().numberOf("documents"));
     }
 
     @Test
-    public void testMatchInfo() throws KustvaktException {
-        String matchinfo = krill.getMatch("WPD/AAA.00002/p169-197", config.getFreeLicensePattern());
+    public void testMatchInfo () throws KustvaktException {
+        String matchinfo = krill.getMatch("WPD/AAA.00002/p169-197",
+                config.getFreeLicensePattern());
         JsonNode node = JsonUtils.readTree(matchinfo);
-        assertEquals(node.at("/errors/0/1").asText(), "Invalid match identifier");
+        assertEquals(node.at("/errors/0/1").asText(),
+                "Invalid match identifier");
     }
 
     @Test
-    public void testSearch() throws KustvaktException {
+    public void testSearch () throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[orth=der]", "poliqarp");
         String result = krill.search(s.toJSON());
@@ -64,7 +66,7 @@ public class SearchKrillTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testTimeOut() throws KustvaktException {
+    public void testTimeOut () throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[orth=der]", "poliqarp");
         // s.setQuery("node ->malt/d[func=/.*/] node", "annis");

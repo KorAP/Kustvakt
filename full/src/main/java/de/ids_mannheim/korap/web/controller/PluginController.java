@@ -62,12 +62,11 @@ public class PluginController {
             throw responseHandler.throwit(e);
         }
     }
-    
+
     @POST
     @Path("/install")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public InstalledPluginDto installPlugin (
-            @Context SecurityContext context,
+    public InstalledPluginDto installPlugin (@Context SecurityContext context,
             @FormParam("super_client_id") String superClientId,
             @FormParam("super_client_secret") String superClientSecret,
             @FormParam("client_id") String clientId) {
@@ -80,13 +79,14 @@ public class PluginController {
                     OAuth2Scope.INSTALL_USER_CLIENT);
 
             clientService.verifySuperClient(superClientId, superClientSecret);
-            return clientService.installPlugin(superClientId,clientId, username);
+            return clientService.installPlugin(superClientId, clientId,
+                    username);
         }
         catch (KustvaktException e) {
             throw responseHandler.throwit(e);
         }
     }
-    
+
     @POST
     @Path("/installed")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -109,12 +109,11 @@ public class PluginController {
             throw responseHandler.throwit(e);
         }
     }
-    
+
     @POST
     @Path("/uninstall")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response uninstallPlugin (
-            @Context SecurityContext context,
+    public Response uninstallPlugin (@Context SecurityContext context,
             @FormParam("super_client_id") String superClientId,
             @FormParam("super_client_secret") String superClientSecret,
             @FormParam("client_id") String clientId) {
@@ -127,7 +126,7 @@ public class PluginController {
                     OAuth2Scope.UNINSTALL_USER_CLIENT);
 
             clientService.verifySuperClient(superClientId, superClientSecret);
-            clientService.uninstallPlugin(superClientId,clientId, username);
+            clientService.uninstallPlugin(superClientId, clientId, username);
             return Response.ok().build();
         }
         catch (KustvaktException e) {

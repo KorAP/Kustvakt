@@ -18,29 +18,30 @@ import org.junit.jupiter.api.Test;
 public class JettyServerTest {
 
     static int selectedPort = 0;
-    
+
     @BeforeAll
-    static void testServerStarts() throws Exception {
-        
-        
+    static void testServerStarts () throws Exception {
+
         for (int port = 1000; port <= 2000; port++) {
             try (ServerSocket ignored = new ServerSocket(port)) {
                 selectedPort = port;
                 break;
-            } catch (IOException ignored) {
+            }
+            catch (IOException ignored) {
                 // Port is already in use, try the next one
             }
         }
-        
+
         Server server = new Server(selectedPort);
-        ShutdownHandler shutdownHandler = new ShutdownHandler("secret"); 
+        ShutdownHandler shutdownHandler = new ShutdownHandler("secret");
         server.setHandler(shutdownHandler);
         server.start();
     }
-    
+
     @Test
-    public void testShutdown() throws IOException {
-        URL url = new URL("http://localhost:"+selectedPort+"/shutdown?token=secret");
+    public void testShutdown () throws IOException {
+        URL url = new URL(
+                "http://localhost:" + selectedPort + "/shutdown?token=secret");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         assertEquals(200, connection.getResponseCode());

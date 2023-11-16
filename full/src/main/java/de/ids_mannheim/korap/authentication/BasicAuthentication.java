@@ -61,9 +61,9 @@ public class BasicAuthentication implements AuthenticationIface {
             throws KustvaktException {
         String[] values = transferEncoding.decodeBase64(authToken);
         User user = dao.getAccount(values[0]);
-        ZonedDateTime authenticationTime =
-                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
-        
+        ZonedDateTime authenticationTime = ZonedDateTime
+                .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+
         if (user != null) {
             TokenContext c = new TokenContext();
             c.setUsername(values[0]);
@@ -83,7 +83,6 @@ public class BasicAuthentication implements AuthenticationIface {
         }
         return null;
     }
-
 
     // not supported!
     @Override

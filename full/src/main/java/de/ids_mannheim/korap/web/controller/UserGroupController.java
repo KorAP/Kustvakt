@@ -64,7 +64,8 @@ public class UserGroupController {
      * 
      * Not suitable for system-admin, instead use
      * {@link UserGroupController#
-     * getUserGroupBySystemAdmin(SecurityContext, String, UserGroupStatus)}
+     * getUserGroupBySystemAdmin(SecurityContext, String,
+     * UserGroupStatus)}
      * 
      * @param securityContext
      * @return a list of user-groups
@@ -73,8 +74,8 @@ public class UserGroupController {
     @GET
     public List<UserGroupDto> listUserGroups (
             @Context SecurityContext securityContext) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.USER_GROUP_INFO);
             return service.retrieveUserGroupDto(context.getUsername());
@@ -90,18 +91,20 @@ public class UserGroupController {
      * context.
      * 
      * @param securityContext
-     * @param groupName the name of the group            
+     * @param groupName
+     *            the name of the group
      * @return if a new group created, HTTP response status 201
      *         Created, otherwise 204 No Content.
      */
     @PUT
     @Path("@{groupName}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response createUpdateUserGroup (@Context SecurityContext securityContext,
+    public Response createUpdateUserGroup (
+            @Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
             @FormParam("description") String description) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.CREATE_USER_GROUP);
             boolean groupExists = service.createUpdateUserGroup(groupName,
@@ -131,8 +134,8 @@ public class UserGroupController {
     @Path("@{groupName}")
     public Response deleteUserGroup (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.DELETE_USER_GROUP);
             service.deleteGroup(groupName, context.getUsername());
@@ -161,8 +164,8 @@ public class UserGroupController {
             @Context SecurityContext securityContext,
             @PathParam("memberUsername") String memberUsername,
             @PathParam("groupName") String groupName) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.DELETE_USER_GROUP_MEMBER);
@@ -179,7 +182,7 @@ public class UserGroupController {
      * Invites users to join a user-group specified by the
      * groupName. Only user-group admins and system admins are
      * allowed to use this service.
-     *  
+     * 
      * The invited users are added as group members with status
      * GroupMemberStatus.PENDING.
      * 
@@ -205,8 +208,8 @@ public class UserGroupController {
             @Context SecurityContext securityContext,
             @PathParam("groupName") String groupName,
             @FormParam("members") String members) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.ADD_USER_GROUP_MEMBER);
@@ -239,8 +242,8 @@ public class UserGroupController {
             @PathParam("groupName") String groupName,
             @FormParam("memberUsername") String memberUsername,
             @FormParam("roleId") List<Integer> roleIds) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.EDIT_USER_GROUP_MEMBER_ROLE);
@@ -273,8 +276,8 @@ public class UserGroupController {
             @PathParam("groupName") String groupName,
             @FormParam("memberUsername") String memberUsername,
             @FormParam("roleId") List<Integer> roleIds) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.ADD_USER_GROUP_MEMBER_ROLE);
@@ -308,8 +311,8 @@ public class UserGroupController {
             @PathParam("groupName") String groupName,
             @FormParam("memberUsername") String memberUsername,
             @FormParam("roleId") List<Integer> roleIds) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.DELETE_USER_GROUP_MEMBER_ROLE);
@@ -335,8 +338,8 @@ public class UserGroupController {
     @Path("@{groupName}/subscribe")
     public Response subscribeToGroup (@Context SecurityContext securityContext,
             @PathParam("groupName") String groupName) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.ADD_USER_GROUP_MEMBER);
@@ -364,8 +367,8 @@ public class UserGroupController {
     public Response unsubscribeFromGroup (
             @Context SecurityContext securityContext,
             @PathParam("groupName") String groupName) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context,
                     OAuth2Scope.DELETE_USER_GROUP_MEMBER);

@@ -22,7 +22,6 @@ public class UserQuery {
     private String description;
     private Integer creator;
 
-
     public UserQuery (Integer id, int creator) {
         setId(id);
         setCreator(creator);
@@ -32,13 +31,11 @@ public class UserQuery {
         setQueryLanguage("");
     }
 
-
     public UserQuery (String ql, String query, String description) {
         setDescription(description);
         setQuery(query);
         setQueryLanguage(ql);
     }
-
 
     public UserQuery () {
         setDescription("");
@@ -47,13 +44,11 @@ public class UserQuery {
         setName("");
     }
 
-
     public void setQuery (String query) {
         this.query = query;
-        setName("Query: "
-                + query.substring(0, query.length() > 20 ? 20 : query.length()));
+        setName("Query: " + query.substring(0,
+                query.length() > 20 ? 20 : query.length()));
     }
-
 
     // todo: use example queries or store in database
     public static List<UserQuery> demoUserQueries () {
@@ -62,7 +57,8 @@ public class UserQuery {
         UserQuery q1 = new UserQuery();
         q1.setQueryLanguage("COSMAS2");
         q1.setQuery("$wegen #IN(L) <s>");
-        q1.setDescription("Findet 'wegen' an Satzanfängen. Berücksichtigt auch Groß- und Kleinschreibung");
+        q1.setDescription(
+                "Findet 'wegen' an Satzanfängen. Berücksichtigt auch Groß- und Kleinschreibung");
 
         //todo: change query
         UserQuery q2 = new UserQuery();
@@ -90,7 +86,6 @@ public class UserQuery {
         return queries;
     }
 
-
     //id is irrevelant, since data was coming
     // from frontend and thus this object does not contain a id that could be compared!
     // same with the userAccount. Not set yet!
@@ -108,7 +103,6 @@ public class UserQuery {
         return true;
     }
 
-
     @Override
     public int hashCode () {
         int result = getId() != null ? getId().hashCode() : 0;
@@ -117,7 +111,6 @@ public class UserQuery {
         result = 31 * result + (query != null ? query.hashCode() : 0);
         return result;
     }
-
 
     @Override
     public String toString () {
@@ -130,7 +123,6 @@ public class UserQuery {
         sb.append('}');
         return sb.toString();
     }
-
 
     public Map toMap () {
         Map map = new HashMap();

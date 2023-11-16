@@ -18,8 +18,12 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 public class LiteMultipleCorpusQueryTest extends LiteJerseyTest {
 
     @Test
-    public void testSearchGet() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("search").queryParam("q", "das").queryParam("ql", "poliqarp").queryParam("cq", "pubPlace=München").queryParam("cq", "textSigle=\"GOE/AGA/01784\"").request().get();
+    public void testSearchGet () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "das").queryParam("ql", "poliqarp")
+                .queryParam("cq", "pubPlace=München")
+                .queryParam("cq", "textSigle=\"GOE/AGA/01784\"").request()
+                .get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -36,8 +40,11 @@ public class LiteMultipleCorpusQueryTest extends LiteJerseyTest {
     }
 
     @Test
-    public void testStatisticsWithMultipleCq() throws ProcessingException, KustvaktException {
-        Response response = target().path(API_VERSION).path("statistics").queryParam("cq", "textType=Abhandlung").queryParam("cq", "corpusSigle=GOE").request().method("GET");
+    public void testStatisticsWithMultipleCq ()
+            throws ProcessingException, KustvaktException {
+        Response response = target().path(API_VERSION).path("statistics")
+                .queryParam("cq", "textType=Abhandlung")
+                .queryParam("cq", "corpusSigle=GOE").request().method("GET");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -49,8 +56,12 @@ public class LiteMultipleCorpusQueryTest extends LiteJerseyTest {
     }
 
     @Test
-    public void testStatisticsWithMultipleCorpusQuery() throws ProcessingException, KustvaktException {
-        Response response = target().path(API_VERSION).path("statistics").queryParam("corpusQuery", "textType=Autobiographie").queryParam("corpusQuery", "corpusSigle=GOE").request().method("GET");
+    public void testStatisticsWithMultipleCorpusQuery ()
+            throws ProcessingException, KustvaktException {
+        Response response = target().path(API_VERSION).path("statistics")
+                .queryParam("corpusQuery", "textType=Autobiographie")
+                .queryParam("corpusQuery", "corpusSigle=GOE").request()
+                .method("GET");
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -59,6 +70,7 @@ public class LiteMultipleCorpusQueryTest extends LiteJerseyTest {
         assertEquals(19387, node.at("/sentences").asInt());
         assertEquals(514, node.at("/paragraphs").asInt());
         assertEquals(StatusCodes.DEPRECATED, node.at("/warnings/0/0").asInt());
-        assertEquals(node.at("/warnings/0/1").asText(), "Parameter corpusQuery is deprecated in favor of cq.");
+        assertEquals(node.at("/warnings/0/1").asText(),
+                "Parameter corpusQuery is deprecated in favor of cq.");
     }
 }

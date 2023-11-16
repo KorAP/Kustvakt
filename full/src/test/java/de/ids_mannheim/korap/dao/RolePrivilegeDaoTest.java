@@ -27,13 +27,14 @@ public class RolePrivilegeDaoTest {
     private PrivilegeDao privilegeDao;
 
     @Test
-    public void retrievePredefinedRole() {
-        Role r = roleDao.retrieveRoleById(PredefinedRole.USER_GROUP_ADMIN.getId());
+    public void retrievePredefinedRole () {
+        Role r = roleDao
+                .retrieveRoleById(PredefinedRole.USER_GROUP_ADMIN.getId());
         assertEquals(1, r.getId());
     }
 
     @Test
-    public void createDeleteRole() {
+    public void createDeleteRole () {
         String roleName = "vc editor";
         List<PrivilegeType> privileges = new ArrayList<PrivilegeType>();
         privileges.add(PrivilegeType.READ);
@@ -46,7 +47,7 @@ public class RolePrivilegeDaoTest {
     }
 
     @Test
-    public void updateRole() {
+    public void updateRole () {
         Role role = roleDao.retrieveRoleByName("USER_GROUP_MEMBER");
         roleDao.editRoleName(role.getId(), "USER_GROUP_MEMBER role");
         role = roleDao.retrieveRoleById(role.getId());
@@ -57,7 +58,7 @@ public class RolePrivilegeDaoTest {
     }
 
     @Test
-    public void addDeletePrivilegeOfExistingRole() {
+    public void addDeletePrivilegeOfExistingRole () {
         Role role = roleDao.retrieveRoleByName("USER_GROUP_MEMBER");
         List<Privilege> privileges = role.getPrivileges();
         assertEquals(1, role.getPrivileges().size());

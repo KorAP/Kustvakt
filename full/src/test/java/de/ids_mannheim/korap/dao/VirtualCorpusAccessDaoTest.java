@@ -23,7 +23,7 @@ public class VirtualCorpusAccessDaoTest {
     private QueryAccessDao dao;
 
     @Test
-    public void getAccessByVC() throws KustvaktException {
+    public void getAccessByVC () throws KustvaktException {
         List<QueryAccess> vcaList = dao.retrieveActiveAccessByQuery(2);
         QueryAccess access = vcaList.get(0);
         assertEquals(QueryAccessStatus.ACTIVE, access.getStatus());

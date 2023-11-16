@@ -9,12 +9,11 @@ import de.ids_mannheim.korap.config.Attributes;
  */
 public class UserDetails extends Userdata {
 
-
-    public UserDetails() {
+    public UserDetails () {
 
     }
 
-    public UserDetails(Integer userid) {
+    public UserDetails (Integer userid) {
         super(userid);
     }
 
@@ -24,7 +23,6 @@ public class UserDetails extends Userdata {
         return new String[] { Attributes.EMAIL, Attributes.ADDRESS,
                 Attributes.LASTNAME, Attributes.FIRSTNAME };
     }
-
 
     @Override
     public String[] defaultFields () {

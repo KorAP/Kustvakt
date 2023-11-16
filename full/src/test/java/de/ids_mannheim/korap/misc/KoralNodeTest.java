@@ -16,7 +16,7 @@ public class KoralNodeTest {
 
     // todo: 21.10.15 --> e.g. injection does not tell you if an entire node was injected, or just a value!
     @Test
-    public void addToNode() {
+    public void addToNode () {
         ObjectNode node = JsonUtils.createObjectNode();
         KoralNode knode = KoralNode.wrapNode(node);
         knode.put("value_1", "setting_1");
@@ -24,7 +24,7 @@ public class KoralNodeTest {
     }
 
     @Test
-    public void removeFromNode() {
+    public void removeFromNode () {
         ObjectNode node = JsonUtils.createObjectNode();
         node.put("value_1", "setting_1");
         KoralNode knode = KoralNode.wrapNode(node);
@@ -33,16 +33,16 @@ public class KoralNodeTest {
     }
 
     @Test
-    public void replaceObject() {
+    public void replaceObject () {
         ObjectNode node = JsonUtils.createObjectNode();
         node.put("value_1", "setting_1");
         KoralNode knode = KoralNode.wrapNode(node);
         knode.replace("value_1", "settings_2", null);
-        assertEquals(knode.rawNode().toString(), "{\"value_1\":\"settings_2\"}");
+        assertEquals(knode.rawNode().toString(),
+                "{\"value_1\":\"settings_2\"}");
     }
 
     // todo: 21.10.15 --> if a node is injected, that node must contain a "rewrites" reference?!
     @Test
-    public void addNodeToKoral() {
-    }
+    public void addNodeToKoral () {}
 }

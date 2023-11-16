@@ -69,7 +69,7 @@ public class OAuth2TokenService {
     protected FullConfiguration config;
     @Autowired
     private AuthenticationManager authenticationManager;
-    
+
     @Autowired
     private RandomCodeGenerator randomGenerator;
 
@@ -95,12 +95,12 @@ public class OAuth2TokenService {
      * @return an authorization
      * @throws KustvaktException
      */
-    protected Authorization retrieveAuthorization (
-            String authorizationCode, String redirectURI, String clientId,
-            String clientSecret) throws KustvaktException {
+    protected Authorization retrieveAuthorization (String authorizationCode,
+            String redirectURI, String clientId, String clientSecret)
+            throws KustvaktException {
 
-        Authorization authorization =
-                authorizationService.retrieveAuthorization(authorizationCode);
+        Authorization authorization = authorizationService
+                .retrieveAuthorization(authorizationCode);
         try {
             clientService.authenticateClient(clientId, clientSecret);
             authorization = authorizationService
@@ -112,7 +112,6 @@ public class OAuth2TokenService {
         }
         return authorization;
     }
-
 
     public ZonedDateTime authenticateUser (String username, String password,
             Set<String> scopes) throws KustvaktException {
@@ -133,34 +132,32 @@ public class OAuth2TokenService {
                 config.getOAuth2passwordAuthentication(), username, password,
                 attributes);
 
-        ZonedDateTime authenticationTime =
-                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+        ZonedDateTime authenticationTime = ZonedDateTime
+                .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
         return authenticationTime;
     }
 
-    public AccessTokenResponse requestAccessToken (
-            TokenRequest tokenRequest, String clientId, String clientSecret)
-            throws KustvaktException {
+    public AccessTokenResponse requestAccessToken (TokenRequest tokenRequest,
+            String clientId, String clientSecret) throws KustvaktException {
 
         AuthorizationGrant authGrant = tokenRequest.getAuthorizationGrant();
         GrantType grantType = authGrant.getType();
         Scope scope = tokenRequest.getScope();
         Set<String> scopeSet = new HashSet<>();
-        if (scope !=null)
+        if (scope != null)
             scopeSet.addAll(scope.toStringList());
-        
+
         if (grantType.equals(GrantType.AUTHORIZATION_CODE)) {
             AuthorizationCodeGrant codeGrant = (AuthorizationCodeGrant) authGrant;
             String authCode = codeGrant.getAuthorizationCode().getValue();
             URI uri = codeGrant.getRedirectionURI();
             String redirectionURI = (uri != null) ? uri.toString() : null;
-            
+
             return requestAccessTokenWithAuthorizationCode(authCode,
                     redirectionURI, clientId, clientSecret);
         }
         else if (grantType.equals(GrantType.PASSWORD)) {
-            ResourceOwnerPasswordCredentialsGrant passwordGrant =
-                    (ResourceOwnerPasswordCredentialsGrant) authGrant;
+            ResourceOwnerPasswordCredentialsGrant passwordGrant = (ResourceOwnerPasswordCredentialsGrant) authGrant;
             String username = passwordGrant.getUsername();
             String password = passwordGrant.getPassword().getValue();
             return requestAccessTokenWithPassword(clientId, clientSecret,
@@ -183,7 +180,6 @@ public class OAuth2TokenService {
         }
 
     }
-    
 
     /**
      * Revokes all access token associated with the given refresh
@@ -207,8 +203,7 @@ public class OAuth2TokenService {
      */
     private AccessTokenResponse requestAccessTokenWithRefreshToken (
             String refreshTokenStr, Set<String> requestScopes, String clientId,
-            String clientSecret)
-            throws KustvaktException {
+            String clientSecret) throws KustvaktException {
 
         if (refreshTokenStr == null || refreshTokenStr.isEmpty()) {
             throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
@@ -216,7 +211,8 @@ public class OAuth2TokenService {
                     OAuth2Error.INVALID_REQUEST);
         }
 
-        OAuth2Client oAuth2Client = clientService.authenticateClient(clientId, clientSecret);
+        OAuth2Client oAuth2Client = clientService.authenticateClient(clientId,
+                clientSecret);
 
         RefreshToken refreshToken;
         try {
@@ -243,11 +239,10 @@ public class OAuth2TokenService {
                     "Refresh token is expired", OAuth2Error.INVALID_GRANT);
         }
 
-        Set<AccessScope> tokenScopes =
-                new HashSet<>(refreshToken.getScopes());
+        Set<AccessScope> tokenScopes = new HashSet<>(refreshToken.getScopes());
         if (requestScopes != null && !requestScopes.isEmpty()) {
-            tokenScopes =
-                    scopeService.verifyRefreshScope(requestScopes, tokenScopes);
+            tokenScopes = scopeService.verifyRefreshScope(requestScopes,
+                    tokenScopes);
             requestScopes = scopeService
                     .convertAccessScopesToStringSet(tokenScopes);
         }
@@ -283,11 +278,11 @@ public class OAuth2TokenService {
      * @return an {@link AccessTokenResponse}
      * @throws KustvaktException
      */
-    private AccessTokenResponse requestAccessTokenWithAuthorizationCode (String code,
-            String redirectionURI, String clientId, String clientSecret)
-            throws KustvaktException {
-        Authorization authorization = retrieveAuthorization(code, redirectionURI,
-                clientId, clientSecret);
+    private AccessTokenResponse requestAccessTokenWithAuthorizationCode (
+            String code, String redirectionURI, String clientId,
+            String clientSecret) throws KustvaktException {
+        Authorization authorization = retrieveAuthorization(code,
+                redirectionURI, clientId, clientSecret);
 
         Set<String> scopes = scopeService
                 .convertAccessScopesToStringSet(authorization.getScopes());
@@ -330,8 +325,8 @@ public class OAuth2TokenService {
             String clientSecret, String username, String password,
             Set<String> scopes) throws KustvaktException {
 
-        OAuth2Client client =
-                clientService.authenticateClient(clientId, clientSecret);
+        OAuth2Client client = clientService.authenticateClient(clientId,
+                clientSecret);
         if (!client.isSuper()) {
             throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
                     "Password grant is not allowed for third party clients",
@@ -344,24 +339,25 @@ public class OAuth2TokenService {
             // scopes = config.getDefaultAccessScopes();
         }
 
-        ZonedDateTime authenticationTime =
-                authenticateUser(username, password, scopes);
+        ZonedDateTime authenticationTime = authenticateUser(username, password,
+                scopes);
 
-        Set<AccessScope> accessScopes =
-                scopeService.convertToAccessScope(scopes);
-        
+        Set<AccessScope> accessScopes = scopeService
+                .convertToAccessScope(scopes);
+
         if (config.getOAuth2passwordAuthentication()
                 .equals(AuthenticationMethod.LDAP)) {
             try {
                 //username = LdapAuth3.getEmail(username, config.getLdapConfig());
-                username = LdapAuth3.getUsername(username, config.getLdapConfig());
+                username = LdapAuth3.getUsername(username,
+                        config.getLdapConfig());
             }
             catch (LDAPException e) {
                 throw new KustvaktException(StatusCodes.LDAP_BASE_ERRCODE,
                         e.getExceptionMessage());
             }
         }
-        
+
         return createsAccessTokenResponse(scopes, accessScopes, clientId,
                 username, authenticationTime, client);
     }
@@ -391,7 +387,8 @@ public class OAuth2TokenService {
         }
 
         // OAuth2Client client =
-        OAuth2Client oAuth2Client = clientService.authenticateClient(clientId, clientSecret);
+        OAuth2Client oAuth2Client = clientService.authenticateClient(clientId,
+                clientSecret);
 
         // if (!client.isNative()) {
         // throw new KustvaktException(
@@ -401,15 +398,15 @@ public class OAuth2TokenService {
         // OAuth2Error.UNAUTHORIZED_CLIENT);
         // }
 
-        ZonedDateTime authenticationTime =
-                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+        ZonedDateTime authenticationTime = ZonedDateTime
+                .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
 
         scopes = scopeService.filterScopes(scopes,
                 config.getClientCredentialsScopes());
-        Set<AccessScope> accessScopes =
-                scopeService.convertToAccessScope(scopes);
+        Set<AccessScope> accessScopes = scopeService
+                .convertToAccessScope(scopes);
         return createsAccessTokenResponse(scopes, accessScopes, clientId, null,
-                authenticationTime,oAuth2Client);
+                authenticationTime, oAuth2Client);
     }
 
     /**
@@ -420,8 +417,10 @@ public class OAuth2TokenService {
      * Base64.
      * 
      * <br /><br />
-     * Additionally, a refresh token is issued for confidential clients. 
-     * It can be used to request a new access token without requiring user
+     * Additionally, a refresh token is issued for confidential
+     * clients.
+     * It can be used to request a new access token without requiring
+     * user
      * re-authentication.
      * 
      * @param scopes
@@ -446,7 +445,7 @@ public class OAuth2TokenService {
 
         String random = randomGenerator.createRandomCode();
         random += randomGenerator.createRandomCode();
-        
+
         if (clientService.isPublicClient(client)) {
             // refresh token == null, getAccessTokenLongExpiry
             return createsAccessTokenResponse(null, scopes, accessScopes,
@@ -468,30 +467,29 @@ public class OAuth2TokenService {
             ZonedDateTime authenticationTime) throws KustvaktException {
 
         String accessToken = randomGenerator.createRandomCode();
-        accessToken +=randomGenerator.createRandomCode();
+        accessToken += randomGenerator.createRandomCode();
         tokenDao.storeAccessToken(accessToken, refreshToken, accessScopes,
                 userId, clientId, authenticationTime);
 
         Tokens tokens = null;
-        if (refreshToken !=null) {
+        if (refreshToken != null) {
             BearerAccessToken bearerToken = new BearerAccessToken(accessToken,
                     (long) config.getAccessTokenExpiry(), Scope.parse(scopes));
-            com.nimbusds.oauth2.sdk.token.RefreshToken rf =
-                    new com.nimbusds.oauth2.sdk.token.RefreshToken(
-                            refreshToken.getToken());
+            com.nimbusds.oauth2.sdk.token.RefreshToken rf = new com.nimbusds.oauth2.sdk.token.RefreshToken(
+                    refreshToken.getToken());
             tokens = new Tokens(bearerToken, rf);
         }
         else {
-              BearerAccessToken bearerToken = new BearerAccessToken(accessToken,
-              (long) config.getAccessTokenLongExpiry(), Scope.parse(scopes));
-              tokens = new Tokens(bearerToken, null);
+            BearerAccessToken bearerToken = new BearerAccessToken(accessToken,
+                    (long) config.getAccessTokenLongExpiry(),
+                    Scope.parse(scopes));
+            tokens = new Tokens(bearerToken, null);
         }
         return new AccessTokenResponse(tokens);
-    }        
+    }
 
-
-    public void revokeToken (String clientId, String clientSecret,
-            String token, String tokenType) throws KustvaktException {
+    public void revokeToken (String clientId, String clientSecret, String token,
+            String tokenType) throws KustvaktException {
         clientService.authenticateClient(clientId, clientSecret);
         if (tokenType != null && tokenType.equals("refresh_token")) {
             if (!revokeRefreshToken(token)) {
@@ -518,10 +516,10 @@ public class OAuth2TokenService {
             throw e;
         }
     }
-    
+
     private void revokeAccessToken (AccessToken accessToken)
             throws KustvaktException {
-        if (accessToken != null){
+        if (accessToken != null) {
             accessToken.setRevoked(true);
             tokenDao.updateAccessToken(accessToken);
         }
@@ -541,10 +539,10 @@ public class OAuth2TokenService {
 
     public boolean revokeRefreshToken (RefreshToken refreshToken)
             throws KustvaktException {
-        if (refreshToken != null){
+        if (refreshToken != null) {
             refreshToken.setRevoked(true);
             refreshDao.updateRefreshToken(refreshToken);
-    
+
             Set<AccessToken> accessTokenList = refreshToken.getAccessTokens();
             for (AccessToken accessToken : accessTokenList) {
                 accessToken.setRevoked(true);
@@ -567,13 +565,13 @@ public class OAuth2TokenService {
 
         revokeAllClientTokensForUser(clientId, username);
     }
-    
+
     public void revokeAllClientTokensForUser (String clientId, String username)
             throws KustvaktException {
         OAuth2Client client = clientService.retrieveClient(clientId);
         if (clientService.isPublicClient(client)) {
-            List<AccessToken> accessTokens =
-                    tokenDao.retrieveAccessTokenByClientId(clientId, username);
+            List<AccessToken> accessTokens = tokenDao
+                    .retrieveAccessTokenByClientId(clientId, username);
             for (AccessToken t : accessTokens) {
                 revokeAccessToken(t);
             }
@@ -586,7 +584,7 @@ public class OAuth2TokenService {
             }
         }
     }
-    
+
     public void revokeTokensViaSuperClient (String username,
             String superClientId, String superClientSecret, String token)
             throws KustvaktException {
@@ -597,30 +595,33 @@ public class OAuth2TokenService {
                     StatusCodes.CLIENT_AUTHENTICATION_FAILED);
         }
 
-        RefreshToken refreshToken =
-                refreshDao.retrieveRefreshToken(token, username);
+        RefreshToken refreshToken = refreshDao.retrieveRefreshToken(token,
+                username);
         if (!revokeRefreshToken(refreshToken)) {
-            AccessToken accessToken =
-                    tokenDao.retrieveAccessToken(token, username);
+            AccessToken accessToken = tokenDao.retrieveAccessToken(token,
+                    username);
             revokeAccessToken(accessToken);
         }
     }
-    
-    public List<OAuth2TokenDto> listUserRefreshToken (String username, String superClientId,
-            String superClientSecret, String clientId) throws KustvaktException {
-        
-        OAuth2Client client = clientService.authenticateClient(superClientId, superClientSecret);
+
+    public List<OAuth2TokenDto> listUserRefreshToken (String username,
+            String superClientId, String superClientSecret, String clientId)
+            throws KustvaktException {
+
+        OAuth2Client client = clientService.authenticateClient(superClientId,
+                superClientSecret);
         if (!client.isSuper()) {
             throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
                     "Only super client is allowed.",
                     OAuth2Error.UNAUTHORIZED_CLIENT);
         }
 
-        List<RefreshToken> tokens = refreshDao.retrieveRefreshTokenByUser(username, clientId);
+        List<RefreshToken> tokens = refreshDao
+                .retrieveRefreshTokenByUser(username, clientId);
         List<OAuth2TokenDto> dtoList = new ArrayList<>(tokens.size());
-        for (RefreshToken t : tokens){
+        for (RefreshToken t : tokens) {
             OAuth2Client tokenClient = t.getClient();
-            if (tokenClient.getId().equals(client.getId())){
+            if (tokenClient.getId().equals(client.getId())) {
                 continue;
             }
             OAuth2TokenDto dto = new OAuth2TokenDto();
@@ -628,19 +629,20 @@ public class OAuth2TokenService {
             dto.setClientName(tokenClient.getName());
             dto.setClientUrl(tokenClient.getUrl());
             dto.setClientDescription(tokenClient.getDescription());
-            
+
             DateTimeFormatter f = DateTimeFormatter.ISO_DATE_TIME;
             dto.setCreatedDate(t.getCreatedDate().format(f));
-            long difference = ChronoUnit.SECONDS.between(ZonedDateTime.now(), t.getExpiryDate());
+            long difference = ChronoUnit.SECONDS.between(ZonedDateTime.now(),
+                    t.getExpiryDate());
             dto.setExpiresIn(difference);
-            
+
             dto.setUserAuthenticationTime(
                     t.getUserAuthenticationTime().format(f));
             dto.setToken(t.getToken());
-            
+
             Set<AccessScope> accessScopes = t.getScopes();
             Set<String> scopes = new HashSet<>(accessScopes.size());
-            for (AccessScope s : accessScopes){
+            for (AccessScope s : accessScopes) {
                 scopes.add(s.getId().toString());
             }
             dto.setScope(scopes);
@@ -648,23 +650,25 @@ public class OAuth2TokenService {
         }
         return dtoList;
     }
-    
-    public List<OAuth2TokenDto> listUserAccessToken (String username, String superClientId,
-            String superClientSecret, String clientId) throws KustvaktException {
-        
-        OAuth2Client superClient = clientService.authenticateClient(superClientId, superClientSecret);
+
+    public List<OAuth2TokenDto> listUserAccessToken (String username,
+            String superClientId, String superClientSecret, String clientId)
+            throws KustvaktException {
+
+        OAuth2Client superClient = clientService
+                .authenticateClient(superClientId, superClientSecret);
         if (!superClient.isSuper()) {
             throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
                     "Only super client is allowed.",
                     OAuth2Error.UNAUTHORIZED_CLIENT);
         }
 
-        List<AccessToken> tokens =
-                tokenDao.retrieveAccessTokenByUser(username, clientId);
+        List<AccessToken> tokens = tokenDao.retrieveAccessTokenByUser(username,
+                clientId);
         List<OAuth2TokenDto> dtoList = new ArrayList<>(tokens.size());
-        for (AccessToken t : tokens){
+        for (AccessToken t : tokens) {
             OAuth2Client tokenClient = t.getClient();
-            if (tokenClient.getId().equals(superClient.getId())){
+            if (tokenClient.getId().equals(superClient.getId())) {
                 continue;
             }
             OAuth2TokenDto dto = new OAuth2TokenDto();
@@ -672,20 +676,21 @@ public class OAuth2TokenService {
             dto.setClientName(tokenClient.getName());
             dto.setClientUrl(tokenClient.getUrl());
             dto.setClientDescription(tokenClient.getDescription());
-            
+
             DateTimeFormatter f = DateTimeFormatter.ISO_DATE_TIME;
             dto.setCreatedDate(t.getCreatedDate().format(f));
-            
-            long difference = ChronoUnit.SECONDS.between(ZonedDateTime.now(), t.getExpiryDate());
+
+            long difference = ChronoUnit.SECONDS.between(ZonedDateTime.now(),
+                    t.getExpiryDate());
             dto.setExpiresIn(difference);
-                    
+
             dto.setUserAuthenticationTime(
                     t.getUserAuthenticationTime().format(f));
             dto.setToken(t.getToken());
-            
+
             Set<AccessScope> accessScopes = t.getScopes();
             Set<String> scopes = new HashSet<>(accessScopes.size());
-            for (AccessScope s : accessScopes){
+            for (AccessScope s : accessScopes) {
                 scopes.add(s.getId().toString());
             }
             dto.setScope(scopes);

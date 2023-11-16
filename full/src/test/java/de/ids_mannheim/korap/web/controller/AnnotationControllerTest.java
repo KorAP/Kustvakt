@@ -19,8 +19,9 @@ import jakarta.ws.rs.core.Response;
 public class AnnotationControllerTest extends SpringJerseyTest {
 
     @Test
-    public void testAnnotationLayers() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("annotation").path("layers").request().get();
+    public void testAnnotationLayers () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("annotation")
+                .path("layers").request().get();
         String entity = response.readEntity(String.class);
         JsonNode n = JsonUtils.readTree(entity);
         assertEquals(31, n.size());
@@ -33,9 +34,10 @@ public class AnnotationControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testAnnotationFoundry() throws KustvaktException {
+    public void testAnnotationFoundry () throws KustvaktException {
         String json = "{\"codes\":[\"opennlp/*\"], \"language\":\"en\"}";
-        Response response = target().path(API_VERSION).path("annotation").path("description").request().post(Entity.json(json));
+        Response response = target().path(API_VERSION).path("annotation")
+                .path("description").request().post(Entity.json(json));
         String entity = response.readEntity(String.class);
         JsonNode n = JsonUtils.readTree(entity);
         n = n.get(0);
@@ -53,9 +55,10 @@ public class AnnotationControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testAnnotationValues() throws KustvaktException {
+    public void testAnnotationValues () throws KustvaktException {
         String json = "{\"codes\":[\"mate/m\"], \"language\":\"en\"}";
-        Response response = target().path(API_VERSION).path("annotation").path("description").request().post(Entity.json(json));
+        Response response = target().path(API_VERSION).path("annotation")
+                .path("description").request().post(Entity.json(json));
         String entity = response.readEntity(String.class);
         JsonNode n = JsonUtils.readTree(entity);
         n = n.get(0);

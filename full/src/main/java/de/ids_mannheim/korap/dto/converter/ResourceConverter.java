@@ -23,8 +23,8 @@ import de.ids_mannheim.korap.dto.ResourceDto;
 public class ResourceConverter {
 
     public List<ResourceDto> convertToResourcesDto (List<Resource> resources) {
-        List<ResourceDto> resourceDtoList =
-                new ArrayList<ResourceDto>(resources.size());
+        List<ResourceDto> resourceDtoList = new ArrayList<ResourceDto>(
+                resources.size());
         ResourceDto dto;
         Map<String, String> titles;
         HashMap<Integer, String> layers;

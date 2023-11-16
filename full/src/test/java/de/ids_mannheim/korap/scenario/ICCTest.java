@@ -28,12 +28,15 @@ import jakarta.ws.rs.core.Response.Status;
  * this instance:<em>kustvakt-icc.conf</em>.
  *
  * <p>
- * To run a Kustvakt jar with ICC setup, the following files are needed:
+ * To run a Kustvakt jar with ICC setup, the following files are
+ * needed:
  * </p>
  * <ul>
  * <li>a Spring configuration file</li>
- * <li>a Kustvakt configuration file that must be placed at the jar folder</li>
- * <li>a JDBC properties file that must be placed at the jar folder</li>
+ * <li>a Kustvakt configuration file that must be placed at the jar
+ * folder</li>
+ * <li>a JDBC properties file that must be placed at the jar
+ * folder</li>
  * </ul>
  * <p>
  * Example:
@@ -67,12 +70,14 @@ import jakarta.ws.rs.core.Response.Status;
  * </code>
  * </pre>
  *
- * <p>For production, the init-method of Initializator should be changed to init.</p>
+ * <p>For production, the init-method of Initializator should be
+ * changed to init.</p>
  *
  * <pre>
  * <code>
- * &lt;bean id="initializator" class="de.ids_mannheim.de.init.Initializator"
- *   init-method="init"&gt;&lt;/bean&gt;
+ * &lt;bean id="initializator"
+ * class="de.ids_mannheim.de.init.Initializator"
+ * init-method="init"&gt;&lt;/bean&gt;
  * </code>
  * </pre>
  *
@@ -129,22 +134,28 @@ public class ICCTest extends SpringJerseyTest {
 
     public String basicAuth;
 
-    public ICCTest() throws KustvaktException {
-        basicAuth = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("user", "password");
+    public ICCTest () throws KustvaktException {
+        basicAuth = HttpAuthorizationHandler
+                .createBasicAuthorizationHeaderValue("user", "password");
     }
 
     @Test
-    public void searchWithoutLogin() throws KustvaktException {
-        Response r = target().path(API_VERSION).path("search").queryParam("q", "[orth=das]").queryParam("ql", "poliqarp").request().get();
+    public void searchWithoutLogin () throws KustvaktException {
+        Response r = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
+                .request().get();
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), r.getStatus());
         String entity = r.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.AUTHORIZATION_FAILED, node.at("/errors/0/0").asInt());
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
     }
 
     @Test
-    public void searchWithLogin() throws KustvaktException {
-        Response r = target().path(API_VERSION).path("search").queryParam("q", "[orth=das]").queryParam("ql", "poliqarp").request().header(Attributes.AUTHORIZATION, basicAuth).get();
+    public void searchWithLogin () throws KustvaktException {
+        Response r = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=das]").queryParam("ql", "poliqarp")
+                .request().header(Attributes.AUTHORIZATION, basicAuth).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
         String entity = r.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -152,17 +163,23 @@ public class ICCTest extends SpringJerseyTest {
     }
 
     @Test
-    public void matchInfoWithoutLogin() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("corpus").path("WDD17").path("982").path("72848").path("p2815-2816").queryParam("foundry", "*").request().get();
+    public void matchInfoWithoutLogin () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("corpus")
+                .path("WDD17").path("982").path("72848").path("p2815-2816")
+                .queryParam("foundry", "*").request().get();
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.AUTHORIZATION_FAILED, node.at("/errors/0/0").asInt());
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
     }
 
     @Test
-    public void matchInfoWithLogin() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("corpus").path("WDD17").path("982").path("72848").path("p2815-2816").queryParam("foundry", "*").request().header(Attributes.AUTHORIZATION, basicAuth).get();
+    public void matchInfoWithLogin () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("corpus")
+                .path("WDD17").path("982").path("72848").path("p2815-2816")
+                .queryParam("foundry", "*").request()
+                .header(Attributes.AUTHORIZATION, basicAuth).get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);

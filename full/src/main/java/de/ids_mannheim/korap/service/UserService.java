@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class UserService {
 
     final static ObjectMapper mapper = new ObjectMapper();
-    
+
     public JsonNode retrieveUserInfo (String username) {
         return mapper.createObjectNode().put("username", username);
     }

@@ -22,43 +22,55 @@ public class LDAPConfig {
     public final String authFilter;
     public final String userNotBlockedFilter;
 
-    public LDAPConfig(String ldapConfigFilename) throws LdapConfigurationException {
+    public LDAPConfig (String ldapConfigFilename)
+            throws LdapConfigurationException {
         Map<String, String> ldapConfig = null;
         try {
             ldapConfig = loadProp(ldapConfigFilename);
-        } catch (IOException e) {
-            System.out.println("Error: LDAPAuth.login: cannot load Property file!");
+        }
+        catch (IOException e) {
+            System.out.println(
+                    "Error: LDAPAuth.login: cannot load Property file!");
         }
 
-        useSSL = Boolean.parseBoolean(ldapConfig.getOrDefault("useSSL", "false"));
+        useSSL = Boolean
+                .parseBoolean(ldapConfig.getOrDefault("useSSL", "false"));
         host = ldapConfig.getOrDefault("host", "localhost");
-        port = Integer.parseInt(ldapConfig.getOrDefault("port", (useSSL ? "636" : "389")));
+        port = Integer.parseInt(
+                ldapConfig.getOrDefault("port", (useSSL ? "636" : "389")));
         searchBase = getConfigOrThrow(ldapConfig, "searchBase");
         sLoginDN = getConfigOrThrow(ldapConfig, "sLoginDN");
         searchFilter = getConfigOrThrow(ldapConfig, "searchFilter");
         authFilter = ldapConfig.getOrDefault("authFilter", null);
-        userNotBlockedFilter = ldapConfig.getOrDefault("userNotBlockedFilter", null);
+        userNotBlockedFilter = ldapConfig.getOrDefault("userNotBlockedFilter",
+                null);
         sPwd = ldapConfig.getOrDefault("pwd", "");
         trustStorePath = ldapConfig.getOrDefault("trustStore", "");
-        additionalCipherSuites = ldapConfig.getOrDefault("additionalCipherSuites", "");
-        useEmbeddedServer = Boolean.parseBoolean(ldapConfig.getOrDefault("useEmbeddedServer", "false"));
+        additionalCipherSuites = ldapConfig
+                .getOrDefault("additionalCipherSuites", "");
+        useEmbeddedServer = Boolean.parseBoolean(
+                ldapConfig.getOrDefault("useEmbeddedServer", "false"));
         emailAttribute = ldapConfig.getOrDefault("emailAttribute", "mail");
         ldif = ldapConfig.getOrDefault("ldifFile", null);
     }
 
-    static HashMap<String, String> typeCastConvert(Properties prop) {
+    static HashMap<String, String> typeCastConvert (Properties prop) {
         Map<String, String> step2 = (Map<String, String>) (Map) prop;
         return new HashMap<>(step2);
     }
 
-    public static HashMap<String, String> loadProp(String sConfFile) throws IOException {
+    public static HashMap<String, String> loadProp (String sConfFile)
+            throws IOException {
         FileInputStream in;
         Properties prop;
 
         try {
             in = new FileInputStream(sConfFile);
-        } catch (IOException ex) {
-            System.err.printf("Error: LDAP.loadProp: cannot load Property file '%s'!\n", sConfFile);
+        }
+        catch (IOException ex) {
+            System.err.printf(
+                    "Error: LDAP.loadProp: cannot load Property file '%s'!\n",
+                    sConfFile);
             ex.printStackTrace();
             return null;
         }
@@ -68,21 +80,25 @@ public class LDAPConfig {
         try {
             prop.load(in);
             return typeCastConvert(prop);
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             ex.printStackTrace();
         }
 
         return new HashMap<>();
     }
 
-    private String getConfigOrThrow(Map<String, String> ldapConfig, String attribute) throws LdapConfigurationException {
+    private String getConfigOrThrow (Map<String, String> ldapConfig,
+            String attribute) throws LdapConfigurationException {
         String value = ldapConfig.get(attribute);
-        if (value != null) return value;
-        else throw new LdapConfigurationException(attribute + " is not set");
+        if (value != null)
+            return value;
+        else
+            throw new LdapConfigurationException(attribute + " is not set");
     }
 
     private class LdapConfigurationException extends RuntimeException {
-        public LdapConfigurationException(String s) {
+        public LdapConfigurationException (String s) {
             super(s);
         }
     }

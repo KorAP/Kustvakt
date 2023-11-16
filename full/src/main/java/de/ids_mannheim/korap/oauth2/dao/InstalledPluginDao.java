@@ -53,8 +53,8 @@ public class InstalledPluginDao {
         ParameterChecker.checkStringValue(installedBy, "installedBy");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<InstalledPlugin> query =
-                builder.createQuery(InstalledPlugin.class);
+        CriteriaQuery<InstalledPlugin> query = builder
+                .createQuery(InstalledPlugin.class);
 
         Root<InstalledPlugin> root = query.from(InstalledPlugin.class);
         query.select(root);
@@ -82,8 +82,8 @@ public class InstalledPluginDao {
         ParameterChecker.checkStringValue(installedBy, "installedBy");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<InstalledPlugin> query =
-                builder.createQuery(InstalledPlugin.class);
+        CriteriaQuery<InstalledPlugin> query = builder
+                .createQuery(InstalledPlugin.class);
 
         Root<InstalledPlugin> root = query.from(InstalledPlugin.class);
         query.select(root);
@@ -104,8 +104,8 @@ public class InstalledPluginDao {
 
     public void uninstallPlugin (String superClientId, String clientId,
             String username) throws KustvaktException {
-        InstalledPlugin plugin =
-                retrieveInstalledPlugin(superClientId, clientId, username);
+        InstalledPlugin plugin = retrieveInstalledPlugin(superClientId,
+                clientId, username);
         entityManager.remove(plugin);
     }
 

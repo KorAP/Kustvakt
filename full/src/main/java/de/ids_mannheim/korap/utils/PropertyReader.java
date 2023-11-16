@@ -31,7 +31,6 @@ public abstract class PropertyReader {
         return res;
     }
 
-
     public abstract void load ();
 
 }

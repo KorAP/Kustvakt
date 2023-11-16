@@ -28,7 +28,6 @@ public class Scopes {
     private static final Enum[] SERVICE_DEFAULTS = { Scope.account,
             Scope.preferences, Scope.search, Scope.queries };
 
-
     public static Scopes getProfileScopes (Userdata values) {
         Scopes r = new Scopes();
         for (String key : profile) {
@@ -38,7 +37,6 @@ public class Scopes {
         }
         return r;
     }
-
 
     /**
      * expects space separated values
@@ -53,7 +51,6 @@ public class Scopes {
             s.add(Scope.valueOf(value.toLowerCase()));
         return s.toArray(new Scope[s.size()]);
     }
-
 
     public static Scopes mapScopes (String scopes, Userdata details) {
         Scopes m = new Scopes();
@@ -73,18 +70,15 @@ public class Scopes {
 
     private Map<String, Object> values;
 
-
     private Scopes () {
         this.values = new HashMap<>();
     }
-
 
     public String toEntity () throws KustvaktException {
         if (this.values.isEmpty())
             return "";
         return JsonUtils.toJSON(this.values);
     }
-
 
     public Map<String, Object> toMap () {
         return new HashMap<>(this.values);

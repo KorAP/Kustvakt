@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.core.web.controller;// package
-                                             // de.ids_mannheim.korap.ext.web;
+
+// de.ids_mannheim.korap.ext.web;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,7 +62,7 @@ public class SearchController {
 
     private static Logger jlog = LogManager.getLogger(SearchController.class);
     private @Context ServletContext context;
-    
+
     @Autowired
     private KustvaktResponseHandler kustvaktResponseHandler;
 
@@ -71,20 +72,19 @@ public class SearchController {
     private OAuth2ScopeService scopeService;
     @Autowired
     private KustvaktConfiguration config;
-    
+
     @GET
     @Path("{version}")
-    public Response index (){
-        return Response
-            .ok(config.getApiWelcomeMessage())
-            .header("X-Index-Revision", searchService.getIndexFingerprint())
-            .build();
+    public Response index () {
+        return Response.ok(config.getApiWelcomeMessage())
+                .header("X-Index-Revision", searchService.getIndexFingerprint())
+                .build();
     }
-    
+
     @GET
     @Path("{version}/info")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-    public Response info (){
+    public Response info () {
         Map<String, Object> m = new HashMap<>();
         m.put("latest_api_version", config.getCurrentVersion());
         m.put("supported_api_versions", config.getSupportedVersions());
@@ -98,12 +98,12 @@ public class SearchController {
             throw kustvaktResponseHandler.throwit(e);
         }
     }
-    
+
     @POST
     @Path("{version}/index/close")
     // overrides the whole filters
-    @ResourceFilters({APIVersionFilter.class,AdminFilter.class})
-    public Response closeIndexReader (){
+    @ResourceFilters({ APIVersionFilter.class, AdminFilter.class })
+    public Response closeIndexReader () {
         try {
             searchService.closeIndexReader();
         }
@@ -112,16 +112,15 @@ public class SearchController {
         }
         return Response.ok().build();
     }
-    
-    
-//     EM: This web service is DISABLED until there is a need for it.
-//     ND: In case rewrite is supported, it could be used to check the authorization 
-//         scope without searching etc. In case not, it helps to compare queries in 
-//         different query languages.
-//     MH: ref query parameter removed!
-//    @GET
-//    @Path("{version}/query")
-//    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+
+    //     EM: This web service is DISABLED until there is a need for it.
+    //     ND: In case rewrite is supported, it could be used to check the authorization 
+    //         scope without searching etc. In case not, it helps to compare queries in 
+    //         different query languages.
+    //     MH: ref query parameter removed!
+    //    @GET
+    //    @Path("{version}/query")
+    //    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response serializeQuery (@Context Locale locale,
             @Context SecurityContext securityContext, @QueryParam("q") String q,
             @QueryParam("ql") String ql, @QueryParam("v") String v,
@@ -138,7 +137,7 @@ public class SearchController {
             String result = searchService.serializeQuery(q, ql, v, cq,
                     pageIndex, startPage, pageLength, context, cutoff,
                     accessRewriteDisabled);
-            if (DEBUG){
+            if (DEBUG) {
                 jlog.debug("Query: " + result);
             }
             return Response.ok(result).build();
@@ -148,21 +147,19 @@ public class SearchController {
         }
     }
 
-    
-//    This web service is DISABLED until there is a need for it. 
+    //    This web service is DISABLED until there is a need for it. 
     @POST
     @Path("{version}/search")
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @SearchResourceFilters
     public Response searchPost (@Context SecurityContext context,
-            @Context Locale locale, 
-            @Context HttpHeaders headers,
+            @Context Locale locale, @Context HttpHeaders headers,
             String jsonld) {
-        
-        if (DEBUG){
+
+        if (DEBUG) {
             jlog.debug("Serialized search: " + jsonld);
         }
-        
+
         TokenContext ctx = (TokenContext) context.getUserPrincipal();
         try {
             scopeService.verifyScope(ctx, OAuth2Scope.SEARCH);
@@ -175,7 +172,8 @@ public class SearchController {
         }
     }
 
-    /** Performs for the given query 
+    /**
+     * Performs for the given query
      * 
      * @param securityContext
      * @param request
@@ -194,8 +192,9 @@ public class SearchController {
      *            or not (default false)
      * @param pageLength
      *            the number of results should be included in a page
-     * @param pageIndex 
-     * @param pageInteger page number
+     * @param pageIndex
+     * @param pageInteger
+     *            page number
      * @param fields
      *            metadata fields to be included, separated by comma
      * @param pipes
@@ -214,10 +213,10 @@ public class SearchController {
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @SearchResourceFilters
     public Response searchGet (@Context SecurityContext securityContext,
-            @Context HttpServletRequest request,
-            @Context HttpHeaders headers, @Context Locale locale,
-            @QueryParam("q") String q, @QueryParam("ql") String ql,
-            @QueryParam("v") String v, @QueryParam("context") String ctx,
+            @Context HttpServletRequest request, @Context HttpHeaders headers,
+            @Context Locale locale, @QueryParam("q") String q,
+            @QueryParam("ql") String ql, @QueryParam("v") String v,
+            @QueryParam("context") String ctx,
             @QueryParam("cutoff") Boolean cutoff,
             @QueryParam("count") Integer pageLength,
             @QueryParam("offset") Integer pageIndex,
@@ -227,19 +226,19 @@ public class SearchController {
             @QueryParam("access-rewrite-disabled") boolean accessRewriteDisabled,
             @QueryParam("show-tokens") boolean showTokens,
             @DefaultValue("true") @QueryParam("show-snippet") boolean showSnippet,
-            @QueryParam("cq") List<String> cq, 
+            @QueryParam("cq") List<String> cq,
             @QueryParam("engine") String engine) {
 
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
 
         String result;
         try {
             scopeService.verifyScope(context, OAuth2Scope.SEARCH);
             result = searchService.search(engine, context.getUsername(),
                     headers, q, ql, v, cq, fields, pipes, pageIndex,
-                    pageInteger, ctx, pageLength, cutoff,
-                    accessRewriteDisabled, showTokens, showSnippet);
+                    pageInteger, ctx, pageLength, cutoff, accessRewriteDisabled,
+                    showTokens, showSnippet);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
@@ -262,15 +261,15 @@ public class SearchController {
             @PathParam("matchId") String matchId,
             @QueryParam("foundry") Set<String> foundries,
             @QueryParam("layer") Set<String> layers,
-            @QueryParam("spans") Boolean spans, 
+            @QueryParam("spans") Boolean spans,
             // Highlights may also be a list of valid highlight classes
             @QueryParam("hls") Boolean highlights) throws KustvaktException {
 
         return retrieveMatchInfo(ctx, headers, locale, corpusId, docId, textId,
-                                 matchId, foundries, layers, spans, "true", "false",
-                                 "sentence", highlights);
+                matchId, foundries, layers, spans, "true", "false", "sentence",
+                highlights);
     }
-    
+
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     @Path("{version}/corpus/{corpusId}/{docId}/{textId}/{matchId}")
@@ -283,10 +282,10 @@ public class SearchController {
             @PathParam("matchId") String matchId,
             @QueryParam("foundry") Set<String> foundries,
             @QueryParam("layer") Set<String> layers,
-            @QueryParam("spans") Boolean spans, 
-            @DefaultValue("true") @QueryParam("show-snippet") String snippetStr, 
-            @DefaultValue("false") @QueryParam("show-tokens") String tokensStr, 
-            @QueryParam("expand") String expansion, 
+            @QueryParam("spans") Boolean spans,
+            @DefaultValue("true") @QueryParam("show-snippet") String snippetStr,
+            @DefaultValue("false") @QueryParam("show-tokens") String tokensStr,
+            @QueryParam("expand") String expansion,
             // Highlights may also be a list of valid highlight classes
             @QueryParam("hls") Boolean highlights) throws KustvaktException {
 
@@ -342,10 +341,8 @@ public class SearchController {
     public Response getMetadata (@PathParam("corpusId") String corpusId,
             @PathParam("docId") String docId,
             @PathParam("textId") String textId,
-            @QueryParam("fields") String fields,
-            @Context SecurityContext ctx,
-            @Context HttpHeaders headers
-    ) throws KustvaktException {
+            @QueryParam("fields") String fields, @Context SecurityContext ctx,
+            @Context HttpHeaders headers) throws KustvaktException {
         TokenContext tokenContext = (TokenContext) ctx.getUserPrincipal();
         try {
             String results = searchService.retrieveDocMetadata(corpusId, docId,
@@ -357,10 +354,10 @@ public class SearchController {
         }
     }
 
-//  EM: This web service requires Karang and is DISABLED.
-//    @POST
-//    @Path("{version}/colloc")
-//    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    //  EM: This web service requires Karang and is DISABLED.
+    //    @POST
+    //    @Path("{version}/colloc")
+    //    @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
     public Response getCollocationBase (@QueryParam("q") String query) {
         String result;
         try {

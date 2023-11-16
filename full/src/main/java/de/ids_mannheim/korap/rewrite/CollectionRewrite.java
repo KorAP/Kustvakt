@@ -1,6 +1,5 @@
 package de.ids_mannheim.korap.rewrite;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,38 +22,39 @@ import de.ids_mannheim.korap.user.User.CorpusAccess;
 import de.ids_mannheim.korap.utils.JsonUtils;
 import de.ids_mannheim.korap.utils.KoralCollectionQueryBuilder;
 
-/** CollectionRewrite determines which availability field values are 
- *  possible for a user with respect to his mean and location of access.
- *  
- *  <br/><br/>
- *  KorAP differentiates 3 kinds of access:
- *  <ul>
- *      <li>FREE: without login</li> 
- *      <li>PUB: login outside IDS network</li> 
- *      <li>ALL: login within IDS network</li> 
- *  </ul>
- *  
- *  Each of these accesses corresponds to a regular expression of license 
- *  formats defined in kustvakt.conf. For a given access, only those 
- *  resources whose availability field matches its regular expression 
- *  are allowed to be retrieved. 
- *  
- *  
+/**
+ * CollectionRewrite determines which availability field values are
+ * possible for a user with respect to his mean and location of
+ * access.
+ * 
+ * <br/><br/>
+ * KorAP differentiates 3 kinds of access:
+ * <ul>
+ * <li>FREE: without login</li>
+ * <li>PUB: login outside IDS network</li>
+ * <li>ALL: login within IDS network</li>
+ * </ul>
+ * 
+ * Each of these accesses corresponds to a regular expression of
+ * license
+ * formats defined in kustvakt.conf. For a given access, only those
+ * resources whose availability field matches its regular expression
+ * are allowed to be retrieved.
+ * 
+ * 
  * @author margaretha
  * @last-update 21 Nov 2017
  * @see CorpusAccess
  */
 public class CollectionRewrite implements RewriteTask.RewriteQuery {
 
-    public static Logger jlog =
-            LogManager.getLogger(CollectionRewrite.class);
+    public static Logger jlog = LogManager.getLogger(CollectionRewrite.class);
 
     public static boolean DEBUG = false;
-    
+
     public CollectionRewrite () {
         super();
     }
-
 
     private List<String> checkAvailability (JsonNode node,
             List<String> originalAvailabilities,
@@ -69,8 +69,8 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
         }
 
         if (node.has("operands")) {
-            ArrayList<JsonNode> operands =
-                    Lists.newArrayList(node.at("/operands").elements());
+            ArrayList<JsonNode> operands = Lists
+                    .newArrayList(node.at("/operands").elements());
 
             if (node.at("/operation").asText()
                     .equals(KoralOperation.AND.toString())) {
@@ -78,7 +78,8 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
                     updatedAvailabilities = checkAvailability(operands.get(i),
                             originalAvailabilities, updatedAvailabilities,
                             false);
-                    if (updatedAvailabilities.isEmpty()) break;
+                    if (updatedAvailabilities.isEmpty())
+                        break;
                 }
             }
             else {
@@ -113,7 +114,7 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
                 updatedAvailabilities.remove(queryAvailability);
             }
             else if (isOperationOr) {
-                if (DEBUG) { 
+                if (DEBUG) {
                     jlog.debug("RESET availabilities 2");
                 }
                 updatedAvailabilities.clear();
@@ -153,8 +154,8 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
         JsonNode rewrittenNode;
 
         if (jsonNode.has("collection")) {
-            List<String> avalabilityCopy =
-                    new ArrayList<String>(userAvailabilities.size());
+            List<String> avalabilityCopy = new ArrayList<String>(
+                    userAvailabilities.size());
             avalabilityCopy.addAll(userAvailabilities);
             if (DEBUG) {
                 jlog.debug("Availabilities: "
@@ -178,19 +179,18 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
             if (DEBUG) {
                 jlog.debug("corpus query: " + builder.toString());
             }
-            rewrittenNode =
-                    JsonUtils.readTree(builder.toJSON()).at("/collection");
+            rewrittenNode = JsonUtils.readTree(builder.toJSON())
+                    .at("/collection");
             node.set("collection", rewrittenNode, identifier);
         }
 
         node = node.at("/collection");
-        if (DEBUG) { 
+        if (DEBUG) {
             jlog.debug("REWRITES: " + node.toString());
         }
-        
+
         return node;
     }
-
 
     private String buildAvailability (List<String> userAvailabilities) {
         StringBuilder sb = new StringBuilder();
@@ -229,4 +229,3 @@ public class CollectionRewrite implements RewriteTask.RewriteQuery {
     }
 
 }
-

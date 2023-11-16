@@ -47,11 +47,12 @@ public class UserGroupDaoTest {
     private FullConfiguration config;
 
     @Test
-    public void createDeleteNewUserGroup() throws KustvaktException {
+    public void createDeleteNewUserGroup () throws KustvaktException {
         String groupName = "test group";
         String createdBy = "test class";
         // create group
-        int groupId = userGroupDao.createGroup(groupName, null, createdBy, UserGroupStatus.ACTIVE);
+        int groupId = userGroupDao.createGroup(groupName, null, createdBy,
+                UserGroupStatus.ACTIVE);
         // retrieve group
         UserGroup group = userGroupDao.retrieveGroupById(groupId, true);
         assertEquals(groupName, group.getName());
@@ -71,39 +72,47 @@ public class UserGroupDaoTest {
         ArrayList<Role> roleList = new ArrayList<>(2);
         roleList.addAll(roles);
         Collections.sort(roleList);
-        assertEquals(PredefinedRole.USER_GROUP_ADMIN.getId(), roleList.get(0).getId());
-        assertEquals(PredefinedRole.VC_ACCESS_ADMIN.getId(), roleList.get(1).getId());
+        assertEquals(PredefinedRole.USER_GROUP_ADMIN.getId(),
+                roleList.get(0).getId());
+        assertEquals(PredefinedRole.VC_ACCESS_ADMIN.getId(),
+                roleList.get(1).getId());
         // retrieve VC by group
         List<QueryDO> vc = virtualCorpusDao.retrieveQueryByGroup(groupId);
         assertEquals(0, vc.size());
         // soft delete group
-        userGroupDao.deleteGroup(groupId, createdBy, config.isSoftDeleteGroup());
+        userGroupDao.deleteGroup(groupId, createdBy,
+                config.isSoftDeleteGroup());
         group = userGroupDao.retrieveGroupById(groupId);
         assertEquals(UserGroupStatus.DELETED, group.getStatus());
         // hard delete
         userGroupDao.deleteGroup(groupId, createdBy, false);
-        KustvaktException exception = assertThrows(KustvaktException.class, () -> {
-            userGroupDao.retrieveGroupById(groupId);
-        });
-        assertEquals(StatusCodes.NO_RESOURCE_FOUND, exception.getStatusCode().intValue());
+        KustvaktException exception = assertThrows(KustvaktException.class,
+                () -> {
+                    userGroupDao.retrieveGroupById(groupId);
+                });
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                exception.getStatusCode().intValue());
     }
 
     @Test
-    public void retrieveGroupWithMembers() throws KustvaktException {
+    public void retrieveGroupWithMembers () throws KustvaktException {
         // dory group
-        List<UserGroupMember> members = userGroupDao.retrieveGroupById(2, true).getMembers();
+        List<UserGroupMember> members = userGroupDao.retrieveGroupById(2, true)
+                .getMembers();
         assertEquals(4, members.size());
         UserGroupMember m = members.get(1);
         Set<Role> roles = m.getRoles();
         assertEquals(2, roles.size());
         List<Role> sortedRoles = new ArrayList<>(roles);
         Collections.sort(sortedRoles);
-        assertEquals(PredefinedRole.USER_GROUP_MEMBER.name(), sortedRoles.get(0).getName());
-        assertEquals(PredefinedRole.VC_ACCESS_MEMBER.name(), sortedRoles.get(1).getName());
+        assertEquals(PredefinedRole.USER_GROUP_MEMBER.name(),
+                sortedRoles.get(0).getName());
+        assertEquals(PredefinedRole.VC_ACCESS_MEMBER.name(),
+                sortedRoles.get(1).getName());
     }
 
     @Test
-    public void retrieveGroupByUserId() throws KustvaktException {
+    public void retrieveGroupByUserId () throws KustvaktException {
         List<UserGroup> group = userGroupDao.retrieveGroupByUserId("dory");
         assertEquals(2, group.size());
         group = userGroupDao.retrieveGroupByUserId("pearl");
@@ -111,15 +120,18 @@ public class UserGroupDaoTest {
     }
 
     @Test
-    public void addVCToGroup() throws KustvaktException {
+    public void addVCToGroup () throws KustvaktException {
         // dory group
         int groupId = 2;
         UserGroup group = userGroupDao.retrieveGroupById(groupId);
         String createdBy = "dory";
         String name = "dory new vc";
-        int id = virtualCorpusDao.createQuery(name, ResourceType.PROJECT, QueryType.VIRTUAL_CORPUS, CorpusAccess.PUB, "corpusSigle=WPD15", "", "", "", false, createdBy, null, null);
+        int id = virtualCorpusDao.createQuery(name, ResourceType.PROJECT,
+                QueryType.VIRTUAL_CORPUS, CorpusAccess.PUB, "corpusSigle=WPD15",
+                "", "", "", false, createdBy, null, null);
         QueryDO virtualCorpus = virtualCorpusDao.retrieveQueryById(id);
-        userGroupDao.addQueryToGroup(virtualCorpus, createdBy, QueryAccessStatus.ACTIVE, group);
+        userGroupDao.addQueryToGroup(virtualCorpus, createdBy,
+                QueryAccessStatus.ACTIVE, group);
         List<QueryDO> vc = virtualCorpusDao.retrieveQueryByGroup(groupId);
         assertEquals(2, vc.size());
         assertEquals(name, vc.get(1).getName());

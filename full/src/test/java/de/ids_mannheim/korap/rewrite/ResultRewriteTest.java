@@ -21,9 +21,11 @@ public class ResultRewriteTest extends SpringJerseyTest {
     public RewriteHandler ha;
 
     @Test
-    public void testPostRewriteNothingToDo() throws KustvaktException {
-        assertEquals(true, ha.add(CollectionRewrite.class), "Handler could not be added to rewrite handler instance!");
+    public void testPostRewriteNothingToDo () throws KustvaktException {
+        assertEquals(true, ha.add(CollectionRewrite.class),
+                "Handler could not be added to rewrite handler instance!");
         String v = ha.processResult(TestVariables.RESULT, null);
-        assertEquals(JsonUtils.readTree(TestVariables.RESULT), JsonUtils.readTree(v), "results do not match");
+        assertEquals(JsonUtils.readTree(TestVariables.RESULT),
+                JsonUtils.readTree(v), "results do not match");
     }
 }

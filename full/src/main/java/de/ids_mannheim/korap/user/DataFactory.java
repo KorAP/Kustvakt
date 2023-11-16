@@ -34,7 +34,6 @@ public abstract class DataFactory {
         return factory;
     }
 
-
     /**
      * if data string null, returns an empty data holding object
      * 
@@ -43,38 +42,31 @@ public abstract class DataFactory {
      */
     public abstract Object convertData (String data);
 
-
     public abstract int size (Object data);
-
 
     public abstract Set<String> keys (Object data);
 
-
     public abstract Collection<Object> values (Object data);
 
-    public abstract Object validate(Object data, Validator validator) throws KustvaktException;
+    public abstract Object validate (Object data, Validator validator)
+            throws KustvaktException;
 
     @Deprecated
     public abstract Map<String, Object> fields (Object data);
 
-
     public abstract Object getValue (Object data, String pointer);
-
 
     public abstract boolean addValue (Object data, String field, Object value);
 
-
     public abstract boolean removeValue (Object data, String field);
-
 
     public abstract String toStringValue (Object data) throws KustvaktException;
 
-    public abstract Object filter(Object data, String ... keys);
+    public abstract Object filter (Object data, String ... keys);
 
     public boolean checkDataType (Object data) {
         throw new RuntimeException("Wrong data type for factory setting!");
     }
-
 
     /**
      * updates data1 with values from data2
@@ -86,8 +78,6 @@ public abstract class DataFactory {
      * @return
      */
     public abstract Object merge (Object data1, Object data2);
-
-
 
     private static class DefaultFactory extends DataFactory {
 
@@ -103,14 +93,12 @@ public abstract class DataFactory {
             }
         }
 
-
         @Override
         public int size (Object data) {
             if (checkDataType(data))
                 return ((JsonNode) data).size();
             return -1;
         }
-
 
         @Override
         public Set<String> keys (Object data) {
@@ -123,32 +111,32 @@ public abstract class DataFactory {
             return keys;
         }
 
-
         @Override
         public Collection<Object> values (Object data) {
             return new HashSet<>();
         }
 
         @Override
-        public Object validate(Object data, Validator validator) throws KustvaktException {
+        public Object validate (Object data, Validator validator)
+                throws KustvaktException {
             if (checkDataType(data) && ((JsonNode) data).isObject()) {
                 try {
                     @SuppressWarnings("unchecked")
-                    Map<String, Object> mdata = JsonUtils.read(toStringValue(data), HashMap.class);
+                    Map<String, Object> mdata = JsonUtils
+                            .read(toStringValue(data), HashMap.class);
                     return validator.validateMap(mdata);
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     // do nothing
                 }
             }
             return JsonUtils.createObjectNode();
         }
 
-
         @Override
         public Map<String, Object> fields (Object data) {
             return new HashMap<>();
         }
-
 
         @Override
         public Object getValue (Object data, String key) {
@@ -169,7 +157,6 @@ public abstract class DataFactory {
             return null;
         }
 
-
         //fixme: test that this works with different types
         @Override
         public boolean addValue (Object data, String field, Object value) {
@@ -185,13 +172,13 @@ public abstract class DataFactory {
                     if (value instanceof JsonNode)
                         node.set(field, (JsonNode) value);
                     // EM: added
-                    if (value instanceof Collection<?>){
+                    if (value instanceof Collection<?>) {
                         Collection<?> list = (Collection<?>) value;
                         ArrayNode arrayNode = JsonUtils.createArrayNode();
-                        for (Object o : list){
+                        for (Object o : list) {
                             addValue(arrayNode, null, o);
                         }
-                        node.set(field,arrayNode);
+                        node.set(field, arrayNode);
                     }
                     return true;
                 }
@@ -209,7 +196,6 @@ public abstract class DataFactory {
             return false;
         }
 
-
         @Override
         public boolean removeValue (Object data, String field) {
             if (checkDataType(data) && ((JsonNode) data).isObject()) {
@@ -220,7 +206,6 @@ public abstract class DataFactory {
             return false;
         }
 
-
         @Override
         public String toStringValue (Object data) throws KustvaktException {
             if (data instanceof JsonNode)
@@ -229,7 +214,7 @@ public abstract class DataFactory {
         }
 
         @Override
-        public Object filter(Object data, String... keys) {
+        public Object filter (Object data, String ... keys) {
             if (checkDataType(data) && ((JsonNode) data).isObject()) {
                 ObjectNode node = ((JsonNode) data).deepCopy();
                 return node.retain(keys);
@@ -237,14 +222,12 @@ public abstract class DataFactory {
             return JsonUtils.createObjectNode();
         }
 
-
         @Override
         public boolean checkDataType (Object data) {
             if (!(data instanceof JsonNode))
                 super.checkDataType(data);
             return true;
         }
-
 
         @Override
         public Object merge (Object data1, Object data2) {

@@ -63,8 +63,8 @@ public class AuthorizationDaoImpl implements AuthorizationDao {
         authorization.setUserAuthenticationTime(authenticationTime);
         authorization.setNonce(nonce);
 
-        ZonedDateTime now =
-                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+        ZonedDateTime now = ZonedDateTime
+                .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
         authorization.setCreatedDate(now);
         authorization.setExpiryDate(
                 now.plusSeconds(config.getAuthorizationCodeExpiry()));
@@ -79,12 +79,12 @@ public class AuthorizationDaoImpl implements AuthorizationDao {
         ParameterChecker.checkStringValue(code, "code");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Authorization> query =
-                builder.createQuery(Authorization.class);
+        CriteriaQuery<Authorization> query = builder
+                .createQuery(Authorization.class);
         Root<Authorization> root = query.from(Authorization.class);
 
-        Predicate restrictions =
-                builder.equal(root.get(Authorization_.code), code);
+        Predicate restrictions = builder.equal(root.get(Authorization_.code),
+                code);
 
         query.select(root);
         query.where(restrictions);
@@ -111,12 +111,12 @@ public class AuthorizationDaoImpl implements AuthorizationDao {
     public List<Authorization> retrieveAuthorizationsByClientId (
             String clientId) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Authorization> query =
-                builder.createQuery(Authorization.class);
+        CriteriaQuery<Authorization> query = builder
+                .createQuery(Authorization.class);
         Root<Authorization> root = query.from(Authorization.class);
 
-        Predicate restrictions =
-                builder.equal(root.get(Authorization_.clientId), clientId);
+        Predicate restrictions = builder
+                .equal(root.get(Authorization_.clientId), clientId);
 
         query.select(root);
         query.where(restrictions);

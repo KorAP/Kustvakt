@@ -28,7 +28,6 @@ public class BlockingFilter implements ContainerRequestFilter {
     @Autowired
     private KustvaktResponseHandler kustvaktResponseHandler;
 
-    
     @Override
     public void filter (ContainerRequestContext request) {
         TokenContext context;
@@ -38,14 +37,14 @@ public class BlockingFilter implements ContainerRequestFilter {
             context = (TokenContext) securityContext.getUserPrincipal();
         }
         else {
-            throw kustvaktResponseHandler.throwit(new KustvaktException(
-                    StatusCodes.UNSUPPORTED_OPERATION));
+            throw kustvaktResponseHandler.throwit(
+                    new KustvaktException(StatusCodes.UNSUPPORTED_OPERATION));
         }
 
         if (context == null || context.isDemo()) {
-            throw kustvaktResponseHandler.throwit(new KustvaktException(
-                    StatusCodes.AUTHORIZATION_FAILED,
-                    "Unauthorized operation for user: guest", "guest"));
+            throw kustvaktResponseHandler.throwit(
+                    new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+                            "Unauthorized operation for user: guest", "guest"));
         }
     }
 }

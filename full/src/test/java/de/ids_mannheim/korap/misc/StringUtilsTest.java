@@ -16,7 +16,7 @@ import de.ids_mannheim.korap.utils.StringUtils;
 public class StringUtilsTest {
 
     @Test
-    public void testTextIToDoc() {
+    public void testTextIToDoc () {
         String textSigle = "WPD_AAA.02439";
         String docSigle = "WPD_AAA";
         assertEquals(docSigle, StringUtils.getDocSigle(textSigle));
@@ -24,13 +24,14 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void testBasicHttpSplit() throws KustvaktException {
+    public void testBasicHttpSplit () throws KustvaktException {
         String s2 = new String(Base64.encodeBase64("test:testPass".getBytes()));
         String[] f2 = TransferEncoding.decodeBase64(s2);
         assertEquals(f2[0], "test");
         assertEquals(f2[1], "testPass");
         HttpAuthorizationHandler handler = new HttpAuthorizationHandler();
-        String s1 = "basic " + new String(Base64.encodeBase64("test:testPass".getBytes()));
+        String s1 = "basic "
+                + new String(Base64.encodeBase64("test:testPass".getBytes()));
         AuthorizationData f1 = handler.parseAuthorizationHeaderValue(s1);
         assertEquals(s2, f1.getToken());
     }

@@ -1,15 +1,16 @@
 package de.ids_mannheim.korap.constant;
 
-/** Defines possible statuses of a user-group member
+/**
+ * Defines possible statuses of a user-group member
  * 
  * @author margaretha
  *
  */
 public enum GroupMemberStatus {
-    ACTIVE, 
+    ACTIVE,
     // membership invitation was sent and has not been accepted 
     // or rejected yet
-    PENDING, 
+    PENDING,
     // either membership invitation was rejected or the member was 
     // deleted by a user-group admin
     DELETED;

@@ -9,8 +9,9 @@ import de.ids_mannheim.korap.constant.UserGroupStatus;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Defines the structure of UserGroup description, e.g.
- *  to be sent as JSON objects in HTTP response. 
+/**
+ * Defines the structure of UserGroup description, e.g.
+ * to be sent as JSON objects in HTTP response.
  * 
  * @author margaretha
  *
@@ -24,10 +25,10 @@ public class UserGroupDto {
     private String description;
     private String owner;
     private UserGroupStatus status;
-    
+
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<UserGroupMemberDto> members;
-    
+
     private GroupMemberStatus userMemberStatus;
     private List<String> userRoles;
 }

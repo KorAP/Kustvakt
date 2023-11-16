@@ -11,7 +11,6 @@ import de.ids_mannheim.korap.user.User;
  */
 public class MetaConstraint implements RewriteTask.RewriteNodeAt {
 
-
     @Override
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) {
@@ -24,12 +23,10 @@ public class MetaConstraint implements RewriteTask.RewriteNodeAt {
         return node;
     }
 
-
     @Override
     public JsonNode rewriteResult (KoralNode node) {
         return null;
     }
-
 
     @Override
     public String at () {

@@ -8,7 +8,7 @@ import org.mindrot.jbcrypt.BCrypt;
 public class BCryptTest {
 
     @Test
-    public void testSalt() {
+    public void testSalt () {
         String salt = BCrypt.gensalt(8);
         // System.out.println(salt);
         String plain = "secret";

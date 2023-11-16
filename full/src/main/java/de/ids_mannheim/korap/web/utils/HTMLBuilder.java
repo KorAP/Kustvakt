@@ -10,7 +10,6 @@ public class HTMLBuilder {
     private StringBuilder body;
     private String bodyAttr;
 
-
     public HTMLBuilder () {
         html = new StringBuilder();
         body = new StringBuilder();
@@ -18,24 +17,20 @@ public class HTMLBuilder {
         html.append("<html>");
     }
 
-
     public void addHeader (String header, int h) {
         html.append("<h" + h + ">");
         html.append(header);
         html.append("</h" + h + ">");
     }
 
-
     public void addToBody (String body) {
         this.body.append(body);
     }
-
 
     public void addToBody (String body, String attributes) {
         this.body.append(body);
         bodyAttr = attributes;
     }
-
 
     public String build () {
         if (bodyAttr.isEmpty())
@@ -51,7 +46,6 @@ public class HTMLBuilder {
         html.append("</html>");
         return html.toString();
     }
-
 
     @Override
     public String toString () {

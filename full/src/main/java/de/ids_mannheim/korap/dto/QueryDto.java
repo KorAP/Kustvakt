@@ -8,8 +8,9 @@ import de.ids_mannheim.korap.entity.QueryDO;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Defines the structure of {@link QueryDO} description to be 
- *  sent as JSON objects in HTTP responses. 
+/**
+ * Defines the structure of {@link QueryDO} description to be
+ * sent as JSON objects in HTTP responses.
  * 
  * @author margaretha
  *
@@ -26,12 +27,12 @@ public class QueryDto {
     private String description;
     private String requiredAccess;
     private String createdBy;
-    
+
     private int numberOfDoc;
     private int numberOfParagraphs;
     private int numberOfSentences;
     private int numberOfTokens;
-    
+
     private String query;
     private String queryLanguage;
     private JsonNode koralQuery;

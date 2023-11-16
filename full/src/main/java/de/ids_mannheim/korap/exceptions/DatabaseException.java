@@ -9,25 +9,25 @@ import java.util.Arrays;
 public class DatabaseException extends KustvaktException {
 
     private DatabaseException (Object userid, Integer status, String message,
-                         String args, Exception e) {
+                               String args, Exception e) {
         super(String.valueOf(userid), status, message, args, e);
     }
 
-    public DatabaseException (Object userid, String target, Integer status, String message,
-            String ... args) {
+    public DatabaseException (Object userid, String target, Integer status,
+                              String message, String ... args) {
         this(null, userid, target, status, message);
     }
 
-    public DatabaseException (Exception e, Object userid, String target, Integer status, String message,
-                        String ... args) {
+    public DatabaseException (Exception e, Object userid, String target,
+                              Integer status, String message, String ... args) {
         this(userid, status, message, Arrays.asList(args).toString(), e);
     }
 
-
-    public DatabaseException (KustvaktException e, Integer status, String ... args) {
-        this(e.getUserid(), e.getStatusCode(), e.getMessage(), e.getEntity(), e);
+    public DatabaseException (KustvaktException e, Integer status,
+                              String ... args) {
+        this(e.getUserid(), e.getStatusCode(), e.getMessage(), e.getEntity(),
+                e);
     }
-
 
     @Override
     public String string () {

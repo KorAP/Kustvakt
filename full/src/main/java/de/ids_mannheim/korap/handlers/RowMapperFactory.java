@@ -18,7 +18,7 @@ import de.ids_mannheim.korap.user.User;
  */
 public class RowMapperFactory {
 
-    public static class UserMapMapper implements RowMapper<Map<?,?>> {
+    public static class UserMapMapper implements RowMapper<Map<?, ?>> {
 
         @Override
         public Map<?, ?> mapRow (ResultSet rs, int rowNum) throws SQLException {
@@ -36,23 +36,23 @@ public class RowMapperFactory {
                 case 0:
                     user = getKorAP(rs);
                     break;
-//                case 1:
-//                    user = getShib(rs);
-//                    break;
+                //                case 1:
+                //                    user = getShib(rs);
+                //                    break;
                 default:
                     user = User.UserFactory.getDemoUser();
                     user.setId(rs.getInt("id"));
-                    user.setAccountCreation(rs.getTimestamp(
-                            Attributes.ACCOUNT_CREATION).getTime());
+                    user.setAccountCreation(
+                            rs.getTimestamp(Attributes.ACCOUNT_CREATION)
+                                    .getTime());
                     return user;
             }
             return user;
         }
 
-
         private KorAPUser getKorAP (ResultSet rs) throws SQLException {
-            KorAPUser user = User.UserFactory.getUser(rs
-                    .getString(Attributes.USERNAME));
+            KorAPUser user = User.UserFactory
+                    .getUser(rs.getString(Attributes.USERNAME));
             user.setPassword(rs.getString(Attributes.PASSWORD));
             user.setId(rs.getInt(Attributes.ID));
             user.setAccountLocked(rs.getBoolean(Attributes.ACCOUNTLOCK));
@@ -60,21 +60,19 @@ public class RowMapperFactory {
             user.setAccountLink(rs.getString(Attributes.ACCOUNTLINK));
             long l = rs.getLong(Attributes.URI_EXPIRATION);
 
-            URIParam param = new URIParam(
-                    rs.getString(Attributes.URI_FRAGMENT), l == 0 ? -1
-                            : new Timestamp(l).getTime());
+            URIParam param = new URIParam(rs.getString(Attributes.URI_FRAGMENT),
+                    l == 0 ? -1 : new Timestamp(l).getTime());
             user.addField(param);
             return user;
         }
 
-
-//        private ShibbolethUser getShib (ResultSet rs) throws SQLException {
-//            ShibbolethUser user = User.UserFactory.getShibInstance(
-//                    rs.getString(Attributes.USERNAME),
-//                    rs.getString(Attributes.MAIL), rs.getString(Attributes.CN));
-//            user.setId(rs.getInt(Attributes.ID));
-//            return user;
-//        }
+        //        private ShibbolethUser getShib (ResultSet rs) throws SQLException {
+        //            ShibbolethUser user = User.UserFactory.getShibInstance(
+        //                    rs.getString(Attributes.USERNAME),
+        //                    rs.getString(Attributes.MAIL), rs.getString(Attributes.CN));
+        //            user.setId(rs.getInt(Attributes.ID));
+        //            return user;
+        //        }
 
     }
 

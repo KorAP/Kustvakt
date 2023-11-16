@@ -79,7 +79,7 @@ public class RewriteHandlerTest extends SpringJerseyTest {
     private KustvaktConfiguration config;
 
     @Test
-    public void testRewriteTaskAdd() {
+    public void testRewriteTaskAdd () {
         RewriteHandler handler = new RewriteHandler(config);
         assertTrue(handler.add(FoundryInject.class));
         assertTrue(handler.add(CollectionCleanRewrite.class));
@@ -88,11 +88,12 @@ public class RewriteHandlerTest extends SpringJerseyTest {
 
     // throws exception cause of missing configuration
     @Test
-    public void testRewriteConfigThrowsException() {
+    public void testRewriteConfigThrowsException () {
         assertThrows(RuntimeException.class, () -> {
             RewriteHandler handler = new RewriteHandler();
             QuerySerializer s = new QuerySerializer();
-            s.setQuery("[(base=laufen | base=gehen) & tt/pos=VVFIN]", "poliqarp");
+            s.setQuery("[(base=laufen | base=gehen) & tt/pos=VVFIN]",
+                    "poliqarp");
             assertTrue(handler.add(FoundryInject.class));
             handler.processQuery(s.toJSON(), null);
         });

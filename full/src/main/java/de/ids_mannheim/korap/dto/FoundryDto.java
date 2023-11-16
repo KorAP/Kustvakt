@@ -30,7 +30,7 @@ public class FoundryDto {
     @Getter
     @Setter
     @JsonInclude(Include.NON_EMPTY)
-//    @JsonSerialize(include=Inclusion.NON_EMPTY) // old codehouse annotation used by jersey
+    //    @JsonSerialize(include=Inclusion.NON_EMPTY) // old codehouse annotation used by jersey
     public class Layer {
         private String code;
         private String description;
@@ -40,8 +40,8 @@ public class FoundryDto {
     @Getter
     @Setter
     @JsonInclude(Include.NON_EMPTY)
-//    @JsonSerialize(include=Inclusion.NON_EMPTY) // old codehouse annotation used by jersey
-    public class Key implements Comparable<Key>{
+    //    @JsonSerialize(include=Inclusion.NON_EMPTY) // old codehouse annotation used by jersey
+    public class Key implements Comparable<Key> {
 
         private String code;
         private String description;
@@ -50,10 +50,10 @@ public class FoundryDto {
         public Key (String code) {
             this.code = code;
         }
-        
+
         @Override
         public int compareTo (Key k) {
-            return this.code.compareTo(k.code); 
+            return this.code.compareTo(k.code);
         }
     }
 }

@@ -40,8 +40,8 @@ public class ResourceDao {
      */
     public List<Resource> getAllResources () {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Resource> query =
-                criteriaBuilder.createQuery(Resource.class);
+        CriteriaQuery<Resource> query = criteriaBuilder
+                .createQuery(Resource.class);
         Root<Resource> resource = query.from(Resource.class);
         query.select(resource);
 
@@ -51,8 +51,8 @@ public class ResourceDao {
 
     public Resource retrieveResource (String id) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Resource> query =
-                criteriaBuilder.createQuery(Resource.class);
+        CriteriaQuery<Resource> query = criteriaBuilder
+                .createQuery(Resource.class);
         Root<Resource> resource = query.from(Resource.class);
         query.select(resource);
         query.where(criteriaBuilder.equal(resource.get(Resource_.id), id));

@@ -17,7 +17,8 @@ import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.Response.Status;
 
 /**
- * OAuth2ResponseHandler builds {@link Response}s and handles exceptions by building
+ * OAuth2ResponseHandler builds {@link Response}s and handles
+ * exceptions by building
  * OAuth error responses accordingly.
  * 
  * <br/><br/>
@@ -42,8 +43,7 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
 
         Response r = null;
         if (responseStatus > 0) {
-            r = createResponse(e,
-                    Status.fromStatusCode(responseStatus), state);
+            r = createResponse(e, Status.fromStatusCode(responseStatus), state);
         }
         else if (errorCode == null) {
             return super.throwit(e);
@@ -69,13 +69,11 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
             r = createResponse(e, Status.FORBIDDEN, state);
         }
         else if (errorCode.equals(OAuth2Error.SERVER_ERROR.getCode())) {
-            r = createResponse(e, Status.INTERNAL_SERVER_ERROR,
-                    state);
+            r = createResponse(e, Status.INTERNAL_SERVER_ERROR, state);
         }
         else if (errorCode
                 .equals(OAuth2Error.TEMPORARILY_UNAVAILABLE.getCode())) {
-            r = createResponse(e, Status.SERVICE_UNAVAILABLE,
-                    state);
+            r = createResponse(e, Status.SERVICE_UNAVAILABLE, state);
         }
         else {
             return super.throwit(e);
@@ -98,7 +96,7 @@ public class OAuth2ResponseHandler extends KustvaktResponseHandler {
         }
         return createResponse(statusCode, eo.toJSONObject().toJSONString());
     }
-    
+
     public Response createResponse (AccessTokenResponse tokenResponse) {
         String jsonString = tokenResponse.toJSONObject().toJSONString();
         return createResponse(Status.OK, jsonString);

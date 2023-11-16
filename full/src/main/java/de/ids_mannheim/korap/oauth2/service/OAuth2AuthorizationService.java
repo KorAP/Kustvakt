@@ -33,7 +33,8 @@ import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.oauth2.entity.Authorization;
 import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 
-/** Describes business logic behind OAuth2 authorization requests.
+/**
+ * Describes business logic behind OAuth2 authorization requests.
  * 
  * @author margaretha
  *
@@ -41,11 +42,11 @@ import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 @Service(value = "authorizationService")
 public class OAuth2AuthorizationService {
 
-    public static Logger jlog =
-            LogManager.getLogger(OAuth2AuthorizationService.class);
+    public static Logger jlog = LogManager
+            .getLogger(OAuth2AuthorizationService.class);
 
     public static boolean DEBUG = false;
-    
+
     @Autowired
     private RandomCodeGenerator codeGenerator;
     @Autowired
@@ -59,25 +60,24 @@ public class OAuth2AuthorizationService {
 
     @Autowired
     protected FullConfiguration config;
-    
+
     public State createAuthorizationState (String state) {
         State authState = null;
-        if (state!=null && !state.isEmpty())
+        if (state != null && !state.isEmpty())
             authState = new State(state);
         return authState;
     }
-    
+
     public AuthorizationErrorResponse createAuthorizationError (
             KustvaktException e, String state) {
         State authState = createAuthorizationState(state);
         ErrorObject error = e.getOauth2Error();
         error = error.setDescription(e.getMessage());
-        AuthorizationErrorResponse errorResponse =
-                new AuthorizationErrorResponse(e.getRedirectUri(),
-                        error,authState, null);
+        AuthorizationErrorResponse errorResponse = new AuthorizationErrorResponse(
+                e.getRedirectUri(), error, authState, null);
         return errorResponse;
     }
-    
+
     public URI requestAuthorizationCode (URI requestURI, String clientId,
             String redirectUri, String scope, String state, String username,
             ZonedDateTime authenticationTime) throws KustvaktException {
@@ -95,7 +95,7 @@ public class OAuth2AuthorizationService {
             createAuthorization(username, clientId, redirectUri, scope,
                     code.toString(), authenticationTime, null);
             return responseURI;
-            
+
         }
         catch (KustvaktException e) {
             e.setRedirectUri(redirectURI);
@@ -104,8 +104,7 @@ public class OAuth2AuthorizationService {
     }
 
     private URI createAuthorizationResponse (URI requestURI, URI redirectURI,
-            String code, String state)
-            throws KustvaktException {
+            String code, String state) throws KustvaktException {
         AuthorizationRequest authRequest = null;
         try {
             authRequest = AuthorizationRequest.parse(requestURI);
@@ -114,10 +113,9 @@ public class OAuth2AuthorizationService {
                     .equals(new ResponseType(ResponseType.Value.CODE))) {
 
                 State authState = createAuthorizationState(state);
-                AuthorizationSuccessResponse response =
-                        new AuthorizationSuccessResponse(redirectURI,
-                                new AuthorizationCode(code), null, authState,
-                                null);
+                AuthorizationSuccessResponse response = new AuthorizationSuccessResponse(
+                        redirectURI, new AuthorizationCode(code), null,
+                        authState, null);
                 return response.toURI();
             }
             else {
@@ -129,13 +127,14 @@ public class OAuth2AuthorizationService {
             }
         }
         catch (ParseException e) {
-            KustvaktException ke =
-                    new KustvaktException(StatusCodes.INVALID_REQUEST,
-                            e.getMessage(), OAuth2Error.INVALID_REQUEST_URI);
+            KustvaktException ke = new KustvaktException(
+                    StatusCodes.INVALID_REQUEST, e.getMessage(),
+                    OAuth2Error.INVALID_REQUEST_URI);
             throw ke;
         }
 
     }
+
     @Deprecated
     public String createAuthorization (String username, String clientId,
             String redirectUri, Set<String> scopeSet, String code,
@@ -152,7 +151,7 @@ public class OAuth2AuthorizationService {
                 scopes, redirectUri, authenticationTime, nonce);
         return String.join(" ", scopeSet);
     }
-    
+
     /**
      * Authorization code request does not require client
      * authentication, but only checks if the client id exists.
@@ -176,7 +175,8 @@ public class OAuth2AuthorizationService {
             throw new KustvaktException(StatusCodes.MISSING_PARAMETER,
                     "scope is required", OAuth2Error.INVALID_SCOPE);
         }
-        Set<AccessScope> accessScopes = scopeService.convertToAccessScope(scope);
+        Set<AccessScope> accessScopes = scopeService
+                .convertToAccessScope(scope);
 
         authorizationDao.storeAuthorizationCode(clientId, username, code,
                 accessScopes, redirectUri, authenticationTime, nonce);
@@ -217,19 +217,19 @@ public class OAuth2AuthorizationService {
             throws KustvaktException {
 
         String registeredUri = client.getRedirectURI();
-        
+
         if (redirectUri != null && !redirectUri.isEmpty()) {
             // check if the redirect URI the same as that in DB
-            if (!redirectURIValidator.isValid(redirectUri) ||
-                    (registeredUri != null && !registeredUri.isEmpty()
-                    && !redirectUri.equals(registeredUri))) {
+            if (!redirectURIValidator.isValid(redirectUri)
+                    || (registeredUri != null && !registeredUri.isEmpty()
+                            && !redirectUri.equals(registeredUri))) {
                 throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
                         "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
             }
         }
         // redirect_uri is not required in client registration
         else if (registeredUri != null && !registeredUri.isEmpty()) {
-                redirectUri = registeredUri;
+            redirectUri = registeredUri;
         }
         else {
             throw new KustvaktException(StatusCodes.MISSING_REDIRECT_URI,
@@ -244,14 +244,14 @@ public class OAuth2AuthorizationService {
             throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
                     "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
         }
-        
+
         return redirectURI;
     }
-    
+
     public KustvaktException checkRedirectUri (KustvaktException e,
-            String clientId, String redirectUri){
+            String clientId, String redirectUri) {
         int statusCode = e.getStatusCode();
-        if (clientId!=null && !clientId.isEmpty()
+        if (clientId != null && !clientId.isEmpty()
                 && statusCode != StatusCodes.CLIENT_NOT_FOUND
                 && statusCode != StatusCodes.AUTHORIZATION_FAILED
                 && statusCode != StatusCodes.INVALID_REDIRECT_URI) {
@@ -265,16 +265,20 @@ public class OAuth2AuthorizationService {
             if (redirectUri != null && !redirectUri.isEmpty()) {
                 if (registeredUri != null && !registeredUri.isEmpty()
                         && !redirectUri.equals(registeredUri)) {
-                    return new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
-                            "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
+                    return new KustvaktException(
+                            StatusCodes.INVALID_REDIRECT_URI,
+                            "Invalid redirect URI",
+                            OAuth2Error.INVALID_REQUEST);
                 }
                 else {
                     try {
                         e.setRedirectUri(new URI(redirectUri));
                     }
                     catch (URISyntaxException e1) {
-                        return new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
-                                "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
+                        return new KustvaktException(
+                                StatusCodes.INVALID_REDIRECT_URI,
+                                "Invalid redirect URI",
+                                OAuth2Error.INVALID_REQUEST);
                     }
                     e.setResponseStatus(HttpStatus.SC_TEMPORARY_REDIRECT);
                 }
@@ -284,14 +288,17 @@ public class OAuth2AuthorizationService {
                     e.setRedirectUri(new URI(registeredUri));
                 }
                 catch (URISyntaxException e1) {
-                    return new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
-                            "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
+                    return new KustvaktException(
+                            StatusCodes.INVALID_REDIRECT_URI,
+                            "Invalid redirect URI",
+                            OAuth2Error.INVALID_REQUEST);
                 }
                 e.setResponseStatus(HttpStatus.SC_TEMPORARY_REDIRECT);
             }
             else {
                 return new KustvaktException(StatusCodes.MISSING_REDIRECT_URI,
-                        "Missing parameter: redirect URI", OAuth2Error.INVALID_REQUEST);
+                        "Missing parameter: redirect URI",
+                        OAuth2Error.INVALID_REQUEST);
             }
         }
 
@@ -327,7 +334,7 @@ public class OAuth2AuthorizationService {
             if (redirectURI == null || redirectURI.isEmpty()) {
                 throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
                         "Missing redirect URI", OAuth2Error.INVALID_GRANT);
-            }    
+            }
             if (!authorizedUri.equals(redirectURI)) {
                 throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
                         "Invalid redirect URI", OAuth2Error.INVALID_GRANT);
@@ -355,8 +362,8 @@ public class OAuth2AuthorizationService {
     }
 
     private boolean isExpired (ZonedDateTime expiryDate) {
-        ZonedDateTime now =
-                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+        ZonedDateTime now = ZonedDateTime
+                .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
         if (DEBUG) {
             jlog.debug("createdDate: " + expiryDate);
             jlog.debug("expiration: " + expiryDate + ", now: " + now);

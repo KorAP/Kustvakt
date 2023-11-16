@@ -19,7 +19,6 @@ public class FormRequestWrapper extends HttpServletRequestWrapper {
 
     private MultivaluedMap<String, String> form;
 
-
     /**
      * Constructs a request object wrapping the given request.
      * 
@@ -33,16 +32,14 @@ public class FormRequestWrapper extends HttpServletRequestWrapper {
         this.form = form;
     }
 
-
     @Override
     public String getParameter (String name) {
         String value = super.getParameter(name);
-        if (value == null){
+        if (value == null) {
             value = form.getFirst(name);
         }
         return value;
     }
-
 
     @Override
     public String[] getParameterValues (String name) {
@@ -54,11 +51,9 @@ public class FormRequestWrapper extends HttpServletRequestWrapper {
         return values;
     }
 
-
     public HashMap<String, Object> singleValueMap () {
         return toMap(this.form, false);
     }
-
 
     /**
      * @param strict
@@ -81,11 +76,9 @@ public class FormRequestWrapper extends HttpServletRequestWrapper {
         return map;
     }
 
-
     public void put (String key, String value) {
         this.form.putSingle(key, value);
     }
-
 
     public void put (String key, String ... values) {
         this.form.put(key, Arrays.<String> asList(values));

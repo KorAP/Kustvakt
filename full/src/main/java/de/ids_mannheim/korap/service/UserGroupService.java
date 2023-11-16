@@ -48,10 +48,10 @@ public class UserGroupService {
 
     public static Logger jlog = LogManager.getLogger(UserGroupService.class);
     public static boolean DEBUG = false;
-    
+
     public static Pattern groupNamePattern = Pattern
             .compile("[a-zA-Z0-9]+[a-zA-Z_0-9-.]+");
-    
+
     @Autowired
     private UserGroupDao userGroupDao;
     @Autowired
@@ -68,7 +68,7 @@ public class UserGroupService {
     private MailService mailService;
     @Autowired
     private RandomCodeGenerator random;
-    
+
     private static Set<Role> memberRoles;
 
     /**
@@ -85,24 +85,24 @@ public class UserGroupService {
     public List<UserGroup> retrieveUserGroup (String username)
             throws KustvaktException {
 
-        List<UserGroup> userGroups =
-                userGroupDao.retrieveGroupByUserId(username);
+        List<UserGroup> userGroups = userGroupDao
+                .retrieveGroupByUserId(username);
         Collections.sort(userGroups);
         return userGroups;
     }
-    
+
     public List<UserGroupDto> retrieveUserGroupDto (String username)
             throws KustvaktException {
         List<UserGroup> userGroups = retrieveUserGroup(username);
-        
+
         ArrayList<UserGroupDto> dtos = new ArrayList<>(userGroups.size());
         UserGroupMember userAsMember;
         List<UserGroupMember> members;
         UserGroupDto groupDto;
         for (UserGroup group : userGroups) {
             members = retrieveMembers(group.getId(), username);
-            userAsMember =
-                    groupMemberDao.retrieveMemberById(username, group.getId());
+            userAsMember = groupMemberDao.retrieveMemberById(username,
+                    group.getId());
             groupDto = converter.createUserGroupDto(group, members,
                     userAsMember.getStatus(), userAsMember.getRoles());
             dtos.add(groupDto);
@@ -132,7 +132,7 @@ public class UserGroupService {
             throws KustvaktException {
         return userGroupDao.retrieveGroupById(groupId);
     }
-    
+
     public UserGroup retrieveUserGroupByName (String groupName)
             throws KustvaktException {
         return userGroupDao.retrieveGroupByName(groupName, false);
@@ -146,16 +146,16 @@ public class UserGroupService {
     public List<UserGroupDto> retrieveUserGroupByStatus (String username,
             UserGroupStatus status) throws KustvaktException {
 
-        List<UserGroup> userGroups =
-                userGroupDao.retrieveGroupByStatus(username, status);
+        List<UserGroup> userGroups = userGroupDao
+                .retrieveGroupByStatus(username, status);
         Collections.sort(userGroups);
         ArrayList<UserGroupDto> dtos = new ArrayList<>(userGroups.size());
 
         List<UserGroupMember> members;
         UserGroupDto groupDto;
         for (UserGroup group : userGroups) {
-            members =
-                    groupMemberDao.retrieveMemberByGroupId(group.getId(), true);
+            members = groupMemberDao.retrieveMemberByGroupId(group.getId(),
+                    true);
             groupDto = converter.createUserGroupDto(group, members, null, null);
             dtos.add(groupDto);
         }
@@ -202,8 +202,8 @@ public class UserGroupService {
      * 
      * 
      */
-    public boolean createUpdateUserGroup (String groupName, String description, String createdBy)
-            throws KustvaktException {
+    public boolean createUpdateUserGroup (String groupName, String description,
+            String createdBy) throws KustvaktException {
         ParameterChecker.checkNameValue(groupName, "groupName");
         ParameterChecker.checkStringValue(createdBy, "createdBy");
 
@@ -214,24 +214,24 @@ public class UserGroupService {
                             + "The name has to start with an alphanumerical character.",
                     groupName);
         }
-        
+
         UserGroup userGroup = null;
         boolean groupExists = false;
-        try{
-            userGroup = userGroupDao.retrieveGroupByName(groupName,false);
+        try {
+            userGroup = userGroupDao.retrieveGroupByName(groupName, false);
             groupExists = true;
         }
         catch (KustvaktException e) {
-            if (e.getStatusCode() != StatusCodes.NO_RESOURCE_FOUND){
+            if (e.getStatusCode() != StatusCodes.NO_RESOURCE_FOUND) {
                 throw e;
             }
         }
-        
-        if (!groupExists){
+
+        if (!groupExists) {
             try {
                 userGroupDao.createGroup(groupName, description, createdBy,
                         UserGroupStatus.ACTIVE);
-                userGroup = userGroupDao.retrieveGroupByName(groupName,false);
+                userGroup = userGroupDao.retrieveGroupByName(groupName, false);
             }
             // handle DB exceptions, e.g. unique constraint
             catch (Exception e) {
@@ -257,7 +257,8 @@ public class UserGroupService {
 
     public void deleteGroup (String groupName, String username)
             throws KustvaktException {
-        UserGroup userGroup = userGroupDao.retrieveGroupByName(groupName,false);
+        UserGroup userGroup = userGroupDao.retrieveGroupByName(groupName,
+                false);
         if (userGroup.getStatus() == UserGroupStatus.DELETED) {
             // EM: should this be "not found" instead?
             throw new KustvaktException(StatusCodes.GROUP_DELETED,
@@ -278,7 +279,7 @@ public class UserGroupService {
 
     public int createAutoHiddenGroup () throws KustvaktException {
         String code = random.createRandomCode();
-        String groupName = "auto-"+code;
+        String groupName = "auto-" + code;
         int groupId = userGroupDao.createGroup(groupName, "auto-hidden-group",
                 "system", UserGroupStatus.HIDDEN);
 
@@ -309,7 +310,8 @@ public class UserGroupService {
      * @param userGroup
      *            a user group
      * @param createdBy
-     *            the user (query-access admin/system) adding the user the user-group
+     *            the user (query-access admin/system) adding the user
+     *            the user-group
      * @param status
      *            the status of the membership
      * @throws KustvaktException
@@ -333,8 +335,8 @@ public class UserGroupService {
         int groupId = userGroup.getId();
         ParameterChecker.checkIntegerValue(groupId, "userGroupId");
 
-        GroupMemberStatus existingStatus =
-                memberExists(username, groupId, status);
+        GroupMemberStatus existingStatus = memberExists(username, groupId,
+                status);
         if (existingStatus != null) {
             throw new KustvaktException(StatusCodes.GROUP_MEMBER_EXISTS,
                     "Username " + username + " with status " + existingStatus
@@ -355,8 +357,8 @@ public class UserGroupService {
             GroupMemberStatus status) throws KustvaktException {
         UserGroupMember existingMember;
         try {
-            existingMember =
-                    groupMemberDao.retrieveMemberById(username, groupId);
+            existingMember = groupMemberDao.retrieveMemberById(username,
+                    groupId);
         }
         catch (KustvaktException e) {
             return null;
@@ -403,8 +405,8 @@ public class UserGroupService {
     private boolean isUserGroupAdmin (String username, UserGroup userGroup)
             throws KustvaktException {
 
-        List<UserGroupMember> userGroupAdmins =
-                groupMemberDao.retrieveMemberByRole(userGroup.getId(),
+        List<UserGroupMember> userGroupAdmins = groupMemberDao
+                .retrieveMemberByRole(userGroup.getId(),
                         PredefinedRole.USER_GROUP_ADMIN.getId());
 
         for (UserGroupMember admin : userGroupAdmins) {
@@ -432,15 +434,16 @@ public class UserGroupService {
         ParameterChecker.checkStringValue(username, "userId");
         ParameterChecker.checkStringValue(groupName, "groupId");
 
-        UserGroup userGroup = userGroupDao.retrieveGroupByName(groupName, false);
+        UserGroup userGroup = userGroupDao.retrieveGroupByName(groupName,
+                false);
         if (userGroup.getStatus() == UserGroupStatus.DELETED) {
             throw new KustvaktException(StatusCodes.GROUP_DELETED,
                     "Group " + userGroup.getName() + " has been deleted.",
                     userGroup.getName());
         }
 
-        UserGroupMember member =
-                groupMemberDao.retrieveMemberById(username, userGroup.getId());
+        UserGroupMember member = groupMemberDao.retrieveMemberById(username,
+                userGroup.getId());
         GroupMemberStatus status = member.getStatus();
         if (status.equals(GroupMemberStatus.DELETED)) {
             throw new KustvaktException(StatusCodes.GROUP_MEMBER_DELETED,
@@ -480,8 +483,8 @@ public class UserGroupService {
 
     public boolean isMember (String username, UserGroup userGroup)
             throws KustvaktException {
-        List<UserGroupMember> members =
-                groupMemberDao.retrieveMemberByGroupId(userGroup.getId());
+        List<UserGroupMember> members = groupMemberDao
+                .retrieveMemberByGroupId(userGroup.getId());
         for (UserGroupMember member : members) {
             if (member.getUserId().equals(username)
                     && member.getStatus().equals(GroupMemberStatus.ACTIVE)) {
@@ -494,7 +497,8 @@ public class UserGroupService {
     public void deleteGroupMember (String memberId, String groupName,
             String deletedBy) throws KustvaktException {
 
-        UserGroup userGroup = userGroupDao.retrieveGroupByName(groupName, false);
+        UserGroup userGroup = userGroupDao.retrieveGroupByName(groupName,
+                false);
         if (userGroup.getStatus() == UserGroupStatus.DELETED) {
             throw new KustvaktException(StatusCodes.GROUP_DELETED,
                     "Group " + userGroup.getName() + " has been deleted.",
@@ -538,8 +542,8 @@ public class UserGroupService {
 
         UserGroup group = userGroupDao.retrieveGroupById(groupId);
 
-        UserGroupMember member =
-                groupMemberDao.retrieveMemberById(username, groupId);
+        UserGroupMember member = groupMemberDao.retrieveMemberById(username,
+                groupId);
         GroupMemberStatus status = member.getStatus();
         if (isSoftDelete && status.equals(GroupMemberStatus.DELETED)) {
             throw new KustvaktException(StatusCodes.GROUP_MEMBER_DELETED,
@@ -576,9 +580,8 @@ public class UserGroupService {
         else if (isUserGroupAdmin(username, userGroup)
                 || adminDao.isAdmin(username)) {
 
-            UserGroupMember member =
-                    groupMemberDao.retrieveMemberById(memberUsername,
-                            userGroup.getId());
+            UserGroupMember member = groupMemberDao
+                    .retrieveMemberById(memberUsername, userGroup.getId());
 
             if (!member.getStatus().equals(GroupMemberStatus.ACTIVE)) {
                 throw new KustvaktException(StatusCodes.GROUP_MEMBER_INACTIVE,
@@ -617,9 +620,8 @@ public class UserGroupService {
         else if (isUserGroupAdmin(username, userGroup)
                 || adminDao.isAdmin(username)) {
 
-            UserGroupMember member =
-                    groupMemberDao.retrieveMemberById(memberUsername,
-                            userGroup.getId());
+            UserGroupMember member = groupMemberDao
+                    .retrieveMemberById(memberUsername, userGroup.getId());
 
             if (!member.getStatus().equals(GroupMemberStatus.ACTIVE)) {
                 throw new KustvaktException(StatusCodes.GROUP_MEMBER_INACTIVE,
@@ -654,9 +656,8 @@ public class UserGroupService {
         if (isUserGroupAdmin(username, userGroup)
                 || adminDao.isAdmin(username)) {
 
-            UserGroupMember member =
-                    groupMemberDao.retrieveMemberById(memberUsername,
-                            userGroup.getId());
+            UserGroupMember member = groupMemberDao
+                    .retrieveMemberById(memberUsername, userGroup.getId());
 
             Set<Role> roles = member.getRoles();
             Iterator<Role> i = roles.iterator();

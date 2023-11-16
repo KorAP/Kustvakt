@@ -31,21 +31,19 @@ public class ServiceInfo {
     @Getter
     private String cache_store;
 
-
     @Getter
     private String krillVersion;
     @Getter
     private String koralVersion;
-    
+
     private ServiceInfo () {
         load();
     }
 
-
     private void load () {
         Properties props = new Properties();
         try {
-            
+
             InputStream stream = getStream();
             props.load(stream);
             stream.close();
@@ -53,13 +51,14 @@ public class ServiceInfo {
             this.name = (String) props.get("kustvakt.name");
             this.config = (String) props.get("kustvakt.properties");
             this.logger = (String) props.get("kustvakt.logging");
-            this.cacheable = Boolean.valueOf((String) props.get("kustvakt.cache"));
+            this.cacheable = Boolean
+                    .valueOf((String) props.get("kustvakt.cache"));
             this.cache_store = (String) props.get("kustvakt.cache_store");
-            
-            this.krillVersion=(String) props.get("krill.version");
-            
+
+            this.krillVersion = (String) props.get("krill.version");
+
             QuerySerializer s = new QuerySerializer();
-            this.koralVersion = s.getVersion() ;
+            this.koralVersion = s.getVersion();
         }
         catch (IOException e) {
             this.version = UNKNOWN;
@@ -68,22 +67,20 @@ public class ServiceInfo {
             this.config = UNKNOWN;
             this.cacheable = false;
             this.cache_store = UNKNOWN;
-            
+
             this.koralVersion = UNKNOWN;
             this.krillVersion = UNKNOWN;
         }
     }
 
-
     private static InputStream getStream () throws IOException {
         String path = "service.properties";
         InputStream stream = ConfigLoader.loadConfigStream(path);
         if (stream == null)
-            throw new IOException("stream for resource " + path
-                    + " could not be found...");
+            throw new IOException(
+                    "stream for resource " + path + " could not be found...");
         return stream;
     }
-
 
     public static ServiceInfo getInfo () {
         return info;

@@ -50,12 +50,10 @@ public class UserGroup implements Comparable<UserGroup> {
     @Enumerated(EnumType.STRING)
     private UserGroupStatus status;
 
-    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY,
-            cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<UserGroupMember> members;
 
-    @OneToMany(mappedBy = "userGroup", fetch = FetchType.LAZY,
-            cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "userGroup", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<QueryAccess> queryAccess;
 
     @Override

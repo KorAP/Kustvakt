@@ -4,17 +4,17 @@ public class Attributes {
 
     public static final String AUTHENTICATION_TIME = "auth_time";
     public static final String DEFAULT_TIME_ZONE = "Europe/Berlin";
-    
+
     public static final String AUTHORIZATION = "Authorization";
     // moved to de.ids_mannheim.korap.config.AuthenticationScheme
-//    public static final String SESSION_AUTHENTICATION = "session_token";
-//    public static final String API_AUTHENTICATION = "api_token";
-//    public static final String OAUTH2_AUTHORIZATION = "bearer";
-//    public static final String BASIC_AUTHENTICATION = "basic";
+    //    public static final String SESSION_AUTHENTICATION = "session_token";
+    //    public static final String API_AUTHENTICATION = "api_token";
+    //    public static final String OAUTH2_AUTHORIZATION = "bearer";
+    //    public static final String BASIC_AUTHENTICATION = "basic";
 
     public static final String LOCATION = "location"; // location of Client: User.INTERN/EXTERN
     public static final String CORPUS_ACCESS = "corpusAccess"; // User.ALL/PUB/FREE.
-    
+
     public static final String CLIENT_ID = "client_id";
     public static final String CLIENT_SECRET = "client_secret";
     public static final String SCOPE = "scope";
@@ -99,7 +99,7 @@ public class Attributes {
     public static final String TEXT_SIGLE = "textSigle";
 
     public static final String AVAILABILITY = "availability";
-    
+
     public static final String REF_CORPUS = "refCorpus";
     public static final String QUERY = "query";
     public static final String CACHE = "cache";
@@ -147,7 +147,7 @@ public class Attributes {
     public static final String DEFAULT_FOUNDRY_RELATION = "relation-foundry";
     public static final String DEFAULT_FOUNDRY_MORPHOLOGY = "morphology-foundry";
     public static final String DEFAULT_FOUNDRY_STRUCTURE = "structure-foundry";
-    
+
     /**
      * db column keys
      */

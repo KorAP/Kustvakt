@@ -49,22 +49,19 @@ public class QueryAccessDao {
         ParameterChecker.checkIntegerValue(accessId, "accessId");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryAccess> query =
-                builder.createQuery(QueryAccess.class);
+        CriteriaQuery<QueryAccess> query = builder
+                .createQuery(QueryAccess.class);
 
-        Root<QueryAccess> access =
-                query.from(QueryAccess.class);
+        Root<QueryAccess> access = query.from(QueryAccess.class);
         query.select(access);
-        query.where(
-                builder.equal(access.get(QueryAccess_.id), accessId));
+        query.where(builder.equal(access.get(QueryAccess_.id), accessId));
         Query q = entityManager.createQuery(query);
-        try{
+        try {
             return (QueryAccess) q.getSingleResult();
         }
         catch (NoResultException e) {
             throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
-                    "Query access is not found",
-                    String.valueOf(accessId));
+                    "Query access is not found", String.valueOf(accessId));
         }
     }
 
@@ -74,13 +71,12 @@ public class QueryAccessDao {
         ParameterChecker.checkIntegerValue(queryId, "queryId");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryAccess> query =
-                builder.createQuery(QueryAccess.class);
+        CriteriaQuery<QueryAccess> query = builder
+                .createQuery(QueryAccess.class);
 
-        Root<QueryAccess> access =
-                query.from(QueryAccess.class);
-        Join<QueryAccess, QueryDO> accessQuery =
-                access.join(QueryAccess_.query);
+        Root<QueryAccess> access = query.from(QueryAccess.class);
+        Join<QueryAccess, QueryDO> accessQuery = access
+                .join(QueryAccess_.query);
 
         Predicate p = builder.and(
                 builder.equal(accessQuery.get(QueryDO_.id), queryId),
@@ -98,17 +94,17 @@ public class QueryAccessDao {
         ParameterChecker.checkStringValue(queryName, "queryName");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryAccess> query =
-                builder.createQuery(QueryAccess.class);
+        CriteriaQuery<QueryAccess> query = builder
+                .createQuery(QueryAccess.class);
 
-        Root<QueryAccess> access =
-                query.from(QueryAccess.class);
-        Join<QueryAccess, QueryDO> accessQuery =
-                access.join(QueryAccess_.query);
+        Root<QueryAccess> access = query.from(QueryAccess.class);
+        Join<QueryAccess, QueryDO> accessQuery = access
+                .join(QueryAccess_.query);
 
         Predicate p = builder.and(
                 builder.equal(accessQuery.get(QueryDO_.name), queryName),
-                builder.equal(accessQuery.get(QueryDO_.createdBy), queryCreator),
+                builder.equal(accessQuery.get(QueryDO_.createdBy),
+                        queryCreator),
                 builder.equal(access.get(QueryAccess_.status),
                         QueryAccessStatus.ACTIVE));
         query.select(access);
@@ -116,15 +112,13 @@ public class QueryAccessDao {
         TypedQuery<QueryAccess> q = entityManager.createQuery(query);
         return q.getResultList();
     }
-    
-    public List<QueryAccess> retrieveAllAccess ()
-            throws KustvaktException {
+
+    public List<QueryAccess> retrieveAllAccess () throws KustvaktException {
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryAccess> query =
-                builder.createQuery(QueryAccess.class);
-        Root<QueryAccess> access =
-                query.from(QueryAccess.class);
+        CriteriaQuery<QueryAccess> query = builder
+                .createQuery(QueryAccess.class);
+        Root<QueryAccess> access = query.from(QueryAccess.class);
         query.select(access);
         TypedQuery<QueryAccess> q = entityManager.createQuery(query);
         return q.getResultList();
@@ -136,13 +130,12 @@ public class QueryAccessDao {
         ParameterChecker.checkStringValue(queryName, "queryName");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryAccess> query =
-                builder.createQuery(QueryAccess.class);
+        CriteriaQuery<QueryAccess> query = builder
+                .createQuery(QueryAccess.class);
 
-        Root<QueryAccess> access =
-                query.from(QueryAccess.class);
-        Join<QueryAccess, QueryDO> accessQuery =
-                access.join(QueryAccess_.query);
+        Root<QueryAccess> access = query.from(QueryAccess.class);
+        Join<QueryAccess, QueryDO> accessQuery = access
+                .join(QueryAccess_.query);
 
         Predicate conditions = builder.and(
                 builder.equal(accessQuery.get(QueryDO_.createdBy),
@@ -159,13 +152,12 @@ public class QueryAccessDao {
         ParameterChecker.checkIntegerValue(groupId, "groupId");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryAccess> query =
-                builder.createQuery(QueryAccess.class);
+        CriteriaQuery<QueryAccess> query = builder
+                .createQuery(QueryAccess.class);
 
-        Root<QueryAccess> access =
-                query.from(QueryAccess.class);
-        Join<QueryAccess, UserGroup> accessQuery =
-                access.join(QueryAccess_.userGroup);
+        Root<QueryAccess> access = query.from(QueryAccess.class);
+        Join<QueryAccess, UserGroup> accessQuery = access
+                .join(QueryAccess_.userGroup);
 
         query.select(access);
         query.where(builder.equal(accessQuery.get(UserGroup_.id), groupId));
@@ -178,18 +170,17 @@ public class QueryAccessDao {
         ParameterChecker.checkIntegerValue(groupId, "groupId");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryAccess> query =
-                builder.createQuery(QueryAccess.class);
+        CriteriaQuery<QueryAccess> query = builder
+                .createQuery(QueryAccess.class);
 
-        Root<QueryAccess> access =
-                query.from(QueryAccess.class);
-        Join<QueryAccess, UserGroup> accessQuery =
-                access.join(QueryAccess_.userGroup);
+        Root<QueryAccess> access = query.from(QueryAccess.class);
+        Join<QueryAccess, UserGroup> accessQuery = access
+                .join(QueryAccess_.userGroup);
 
-        Predicate p =
-                builder.and(builder.equal(accessQuery.get(UserGroup_.id), groupId),
-                        builder.equal(access.get(QueryAccess_.status),
-                                QueryAccessStatus.ACTIVE));
+        Predicate p = builder.and(
+                builder.equal(accessQuery.get(UserGroup_.id), groupId),
+                builder.equal(access.get(QueryAccess_.status),
+                        QueryAccessStatus.ACTIVE));
 
         query.select(access);
         query.where(p);
@@ -212,13 +203,12 @@ public class QueryAccessDao {
         ParameterChecker.checkIntegerValue(queryId, "queryId");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryAccess> query =
-                builder.createQuery(QueryAccess.class);
+        CriteriaQuery<QueryAccess> query = builder
+                .createQuery(QueryAccess.class);
 
-        Root<QueryAccess> access =
-                query.from(QueryAccess.class);
-        Join<QueryAccess, QueryDO> accessQuery =
-                access.join(QueryAccess_.query);
+        Root<QueryAccess> access = query.from(QueryAccess.class);
+        Join<QueryAccess, QueryDO> accessQuery = access
+                .join(QueryAccess_.query);
 
         Predicate p = builder.and(
                 builder.equal(accessQuery.get(QueryDO_.id), queryId),
@@ -241,9 +231,8 @@ public class QueryAccessDao {
         }
     }
 
-    public void createAccessToQuery (QueryDO query,
-            UserGroup userGroup, String createdBy,
-            QueryAccessStatus status) {
+    public void createAccessToQuery (QueryDO query, UserGroup userGroup,
+            String createdBy, QueryAccessStatus status) {
         QueryAccess queryAccess = new QueryAccess();
         queryAccess.setQuery(query);
         queryAccess.setUserGroup(userGroup);

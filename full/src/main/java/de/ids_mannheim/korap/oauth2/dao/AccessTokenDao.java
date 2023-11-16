@@ -65,8 +65,8 @@ public class AccessTokenDao extends KustvaktCacheable {
         ParameterChecker.checkObjectValue(authenticationTime,
                 "authentication time");
 
-        ZonedDateTime now =
-                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+        ZonedDateTime now = ZonedDateTime
+                .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
 
         ZonedDateTime expiry;
         AccessToken accessToken = new AccessToken();
@@ -91,16 +91,17 @@ public class AccessTokenDao extends KustvaktCacheable {
         entityManager.persist(accessToken);
     }
 
-    public void storeAccessToken (AccessToken accessToken) 
-                    throws KustvaktException {
+    public void storeAccessToken (AccessToken accessToken)
+            throws KustvaktException {
         ParameterChecker.checkObjectValue(accessToken, "access token");
         entityManager.persist(accessToken);
     }
+
     public AccessToken updateAccessToken (AccessToken accessToken)
             throws KustvaktException {
         ParameterChecker.checkObjectValue(accessToken, "access_token");
-        AccessToken cachedToken =
-                (AccessToken) this.getCacheValue(accessToken.getToken());
+        AccessToken cachedToken = (AccessToken) this
+                .getCacheValue(accessToken.getToken());
         if (cachedToken != null) {
             this.removeCacheEntry(accessToken.getToken());
         }
@@ -118,8 +119,8 @@ public class AccessTokenDao extends KustvaktCacheable {
         }
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<AccessToken> query =
-                builder.createQuery(AccessToken.class);
+        CriteriaQuery<AccessToken> query = builder
+                .createQuery(AccessToken.class);
         Root<AccessToken> root = query.from(AccessToken.class);
         query.select(root);
         query.where(builder.equal(root.get(AccessToken_.token), accessToken));
@@ -145,8 +146,8 @@ public class AccessTokenDao extends KustvaktCacheable {
         }
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<AccessToken> query =
-                builder.createQuery(AccessToken.class);
+        CriteriaQuery<AccessToken> query = builder
+                .createQuery(AccessToken.class);
         Root<AccessToken> root = query.from(AccessToken.class);
 
         Predicate condition = builder.and(
@@ -172,12 +173,12 @@ public class AccessTokenDao extends KustvaktCacheable {
         OAuth2Client client = clientDao.retrieveClientById(clientId);
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<AccessToken> query =
-                builder.createQuery(AccessToken.class);
+        CriteriaQuery<AccessToken> query = builder
+                .createQuery(AccessToken.class);
         Root<AccessToken> root = query.from(AccessToken.class);
 
-        Predicate condition =
-                builder.equal(root.get(AccessToken_.client), client);
+        Predicate condition = builder.equal(root.get(AccessToken_.client),
+                client);
         if (username != null && !username.isEmpty()) {
             condition = builder.and(condition,
                     builder.equal(root.get(AccessToken_.userId), username));
@@ -194,8 +195,8 @@ public class AccessTokenDao extends KustvaktCacheable {
         ParameterChecker.checkStringValue(username, "username");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<AccessToken> query =
-                builder.createQuery(AccessToken.class);
+        CriteriaQuery<AccessToken> query = builder
+                .createQuery(AccessToken.class);
 
         Root<AccessToken> root = query.from(AccessToken.class);
         root.fetch(AccessToken_.client);
@@ -222,11 +223,11 @@ public class AccessTokenDao extends KustvaktCacheable {
         List<AccessToken> invalidAccessTokens = retrieveInvalidAccessTokens();
         invalidAccessTokens.forEach(token -> entityManager.remove(token));
     }
-    
+
     public List<AccessToken> retrieveInvalidAccessTokens () {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<AccessToken> query =
-                builder.createQuery(AccessToken.class);
+        CriteriaQuery<AccessToken> query = builder
+                .createQuery(AccessToken.class);
 
         Root<AccessToken> root = query.from(AccessToken.class);
         Predicate condition = builder.or(

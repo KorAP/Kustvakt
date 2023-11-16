@@ -22,7 +22,8 @@ import de.ids_mannheim.korap.oauth2.dao.AccessScopeDao;
 import de.ids_mannheim.korap.oauth2.entity.AccessScope;
 import de.ids_mannheim.korap.security.context.TokenContext;
 
-/** Defines business logic related to OAuth2 scopes.
+/**
+ * Defines business logic related to OAuth2 scopes.
  * 
  * @author margaretha
  *
@@ -47,26 +48,24 @@ public class OAuth2ScopeServiceImpl implements OAuth2ScopeService {
             throws KustvaktException {
 
         List<AccessScope> definedScopes = accessScopeDao.retrieveAccessScopes();
-        Set<AccessScope> requestedScopes =
-                new HashSet<AccessScope>(scopes.size());
+        Set<AccessScope> requestedScopes = new HashSet<AccessScope>(
+                scopes.size());
         int index;
         OAuth2Scope oauth2Scope = null;
         for (String scope : scopes) {
             try {
-                oauth2Scope =
-                        Enum.valueOf(OAuth2Scope.class, scope.toUpperCase());
+                oauth2Scope = Enum.valueOf(OAuth2Scope.class,
+                        scope.toUpperCase());
             }
             catch (IllegalArgumentException e) {
                 throw new KustvaktException(StatusCodes.INVALID_SCOPE,
-                        "Invalid scope",
-                        OAuth2Error.INVALID_SCOPE);
+                        "Invalid scope", OAuth2Error.INVALID_SCOPE);
             }
 
             index = definedScopes.indexOf(new AccessScope(oauth2Scope));
             if (index == -1) {
                 throw new KustvaktException(StatusCodes.INVALID_SCOPE,
-                        "Invalid scope",
-                        OAuth2Error.INVALID_SCOPE);
+                        "Invalid scope", OAuth2Error.INVALID_SCOPE);
             }
             else {
                 requestedScopes.add(definedScopes.get(index));
@@ -74,32 +73,30 @@ public class OAuth2ScopeServiceImpl implements OAuth2ScopeService {
         }
         return requestedScopes;
     }
-    
+
     public Set<AccessScope> convertToAccessScope (String scopes)
             throws KustvaktException {
 
         String[] scopeArray = scopes.split("\\s+");
         List<AccessScope> definedScopes = accessScopeDao.retrieveAccessScopes();
-        Set<AccessScope> requestedScopes =
-                new HashSet<AccessScope>(scopeArray.length);
+        Set<AccessScope> requestedScopes = new HashSet<AccessScope>(
+                scopeArray.length);
         int index;
         OAuth2Scope oauth2Scope = null;
         for (String scope : scopeArray) {
             try {
-                oauth2Scope =
-                        Enum.valueOf(OAuth2Scope.class, scope.toUpperCase());
+                oauth2Scope = Enum.valueOf(OAuth2Scope.class,
+                        scope.toUpperCase());
             }
             catch (IllegalArgumentException e) {
                 throw new KustvaktException(StatusCodes.INVALID_SCOPE,
-                        "Invalid scope",
-                        OAuth2Error.INVALID_SCOPE);
+                        "Invalid scope", OAuth2Error.INVALID_SCOPE);
             }
 
             index = definedScopes.indexOf(new AccessScope(oauth2Scope));
             if (index == -1) {
                 throw new KustvaktException(StatusCodes.INVALID_SCOPE,
-                        "Invalid scope",
-                        OAuth2Error.INVALID_SCOPE);
+                        "Invalid scope", OAuth2Error.INVALID_SCOPE);
             }
             else {
                 requestedScopes.add(definedScopes.get(index));
@@ -131,9 +128,9 @@ public class OAuth2ScopeServiceImpl implements OAuth2ScopeService {
     public Set<String> filterScopes (Set<String> scopes,
             Set<String> defaultScopes) {
         Stream<String> stream = scopes.stream();
-        Set<String> filteredScopes =
-                stream.filter(scope -> defaultScopes.contains(scope))
-                        .collect(Collectors.toSet());
+        Set<String> filteredScopes = stream
+                .filter(scope -> defaultScopes.contains(scope))
+                .collect(Collectors.toSet());
         return filteredScopes;
     }
 
@@ -147,7 +144,7 @@ public class OAuth2ScopeServiceImpl implements OAuth2ScopeService {
             throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
                     "Authentication required. Please log in!");
         }
-        
+
         if (!adminDao.isAdmin(context.getUsername())
                 && context.getTokenType().equals(TokenType.BEARER)) {
             Map<String, Object> parameters = context.getParameters();

@@ -29,10 +29,12 @@ public class InitialSuperClientTest extends OAuth2TestBase {
     @Autowired
     private OAuth2ClientDao clientDao;
 
-    private String path = KustvaktConfiguration.DATA_FOLDER + "/" + OAuth2InitClientService.TEST_OUTPUT_FILENAME;
+    private String path = KustvaktConfiguration.DATA_FOLDER + "/"
+            + OAuth2InitClientService.TEST_OUTPUT_FILENAME;
 
     @Test
-    public void testCreatingInitialSuperClient() throws IOException, KustvaktException {
+    public void testCreatingInitialSuperClient ()
+            throws IOException, KustvaktException {
         assertTrue(config.createInitialSuperClient());
         File f = new File(path);
         assertTrue(f.exists());
@@ -45,8 +47,10 @@ public class InitialSuperClientTest extends OAuth2TestBase {
         removeSuperClientFile();
     }
 
-    private void testLogin(String superClientId, String superClientSecret) throws KustvaktException {
-        Response response = requestTokenWithPassword(superClientId, superClientSecret, "username", "password");
+    private void testLogin (String superClientId, String superClientSecret)
+            throws KustvaktException {
+        Response response = requestTokenWithPassword(superClientId,
+                superClientSecret, "username", "password");
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         assertTrue(!node.at("/access_token").isMissingNode());
@@ -56,7 +60,7 @@ public class InitialSuperClientTest extends OAuth2TestBase {
         assertEquals(node.at("/token_type").asText(), "Bearer");
     }
 
-    private void removeSuperClientFile() {
+    private void removeSuperClientFile () {
         File f = new File(path);
         if (f.exists()) {
             f.delete();

@@ -34,9 +34,13 @@ public class APIAuthenticationTest extends OAuth2TestBase {
     private FullConfiguration config;
 
     @Test
-    public void testDeprecatedService() throws KustvaktException {
-        String userAuthHeader = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("dory", "password");
-        Response response = target().path(API_VERSION).path("auth").path("apiToken").request().header(Attributes.AUTHORIZATION, userAuthHeader).header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").get();
+    public void testDeprecatedService () throws KustvaktException {
+        String userAuthHeader = HttpAuthorizationHandler
+                .createBasicAuthorizationHeaderValue("dory", "password");
+        Response response = target().path(API_VERSION).path("auth")
+                .path("apiToken").request()
+                .header(Attributes.AUTHORIZATION, userAuthHeader)
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").get();
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -44,7 +48,8 @@ public class APIAuthenticationTest extends OAuth2TestBase {
     }
 
     @Test
-    public void testCreateGetTokenContext() throws KustvaktException, IOException, InterruptedException, JOSEException {
+    public void testCreateGetTokenContext () throws KustvaktException,
+            IOException, InterruptedException, JOSEException {
         User user = new KorAPUser();
         user.setUsername("testUser");
         Map<String, Object> attr = new HashMap<>();

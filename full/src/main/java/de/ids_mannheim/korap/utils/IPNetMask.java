@@ -23,7 +23,6 @@ public class IPNetMask {
 
     private static final int default_mask = 16;
 
-
     private IPNetMask (Inet4Address i4addr, byte mask) {
         this.i4addr = i4addr;
         this.maskCtr = mask;
@@ -31,7 +30,6 @@ public class IPNetMask {
         this.addrInt = addrToInt(i4addr);
         this.maskInt = ~((1 << (32 - maskCtr)) - 1);
     }
-
 
     /**
      * IPNetMask factory method.
@@ -63,7 +61,6 @@ public class IPNetMask {
                 maskCtr);
     }
 
-
     /**
      * Test given IPv4 address against this IPNetMask object.
      * 
@@ -75,7 +72,6 @@ public class IPNetMask {
         int testAddrInt = addrToInt(testAddr);
         return ((addrInt & maskInt) == (testAddrInt & maskInt));
     }
-
 
     /**
      * Convenience method that converts String host to IPv4 address.
@@ -91,7 +87,6 @@ public class IPNetMask {
         return matches((Inet4Address) InetAddress.getByName(addr));
     }
 
-
     /**
      * Converts IPv4 address to integer representation.
      */
@@ -101,12 +96,10 @@ public class IPNetMask {
                 | (ba[3] & 0xFF);
     }
 
-
     @Override
     public String toString () {
         return i4addr.getHostAddress() + "/" + maskCtr;
     }
-
 
     @Override
     public boolean equals (Object obj) {
@@ -117,7 +110,6 @@ public class IPNetMask {
         final IPNetMask that = (IPNetMask) obj;
         return (this.addrInt == that.addrInt && this.maskInt == that.maskInt);
     }
-
 
     @Override
     public int hashCode () {

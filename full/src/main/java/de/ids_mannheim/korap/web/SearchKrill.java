@@ -62,11 +62,9 @@ public class SearchKrill {
         };
     };
 
-
     public KrillIndex getIndex () {
         return index;
     };
-
 
     public void closeIndexReader () throws KustvaktException {
         try {
@@ -76,7 +74,6 @@ public class SearchKrill {
             throw new KustvaktException(500, "Failed closing index reader");
         }
     }
-
 
     /**
      * Search in the Lucene index.
@@ -101,7 +98,6 @@ public class SearchKrill {
         return kr.toJsonString();
     };
 
-
     /**
      * Search in the Lucene index and return matches as token lists.
      * 
@@ -120,7 +116,6 @@ public class SearchKrill {
         kr.addError(601, "Unable to find index");
         return kr.toJsonString();
     };
-
 
     /**
      * Get info on a match - by means of a richly annotated html
@@ -152,7 +147,6 @@ public class SearchKrill {
         return km.toJsonString();
     };
 
-
     private void checkAvailability (Pattern licensePattern, String availability,
             String id) throws KustvaktException {
         if (DEBUG) {
@@ -174,7 +168,6 @@ public class SearchKrill {
         }
 
     }
-
 
     /*
      * Retrieve the meta fields for a certain document
@@ -208,19 +201,17 @@ public class SearchKrill {
         return meta.toJsonString();
     };
 
-
-    public String getMatch (
-        String id, boolean info, List<String> foundries,
-        List<String> layers, boolean includeSpans,
-        boolean includeSnippet, boolean includeTokens,
-        boolean includeHighlights, boolean sentenceExpansion,
-        Pattern licensePattern) throws KustvaktException {
+    public String getMatch (String id, boolean info, List<String> foundries,
+            List<String> layers, boolean includeSpans, boolean includeSnippet,
+            boolean includeTokens, boolean includeHighlights,
+            boolean sentenceExpansion, Pattern licensePattern)
+            throws KustvaktException {
         Match km;
         if (index != null) {
             try {
                 km = index.getMatchInfo(id, "tokens", info, foundries, layers,
-                                        includeSpans, includeSnippet, includeTokens,
-                                        includeHighlights, sentenceExpansion);
+                        includeSpans, includeSnippet, includeTokens,
+                        includeHighlights, sentenceExpansion);
                 String availability = km.getAvailability();
                 checkAvailability(licensePattern, availability, id);
             }
@@ -235,7 +226,6 @@ public class SearchKrill {
         }
         return km.toJsonString();
     };
-
 
     /**
      * Get info on a match - by means of a richly annotated html
@@ -283,7 +273,6 @@ public class SearchKrill {
         km.addError(601, "Unable to find index");
         return km.toJsonString();
     };
-
 
     /**
      * Get statistics on (virtual) collections.
@@ -345,7 +334,6 @@ public class SearchKrill {
         return sb.toString();
     };
 
-
     /**
      * Return the match identifier as a string.
      * This is a convenient method to deal with legacy instantiation
@@ -361,7 +349,6 @@ public class SearchKrill {
         return sb.toString();
     };
 
-
     /**
      * Return the text sigle as a string.
      */
@@ -373,7 +360,6 @@ public class SearchKrill {
         return sb.toString();
     };
 
-
     /**
      * Return the fingerprint of the latest index revision.
      */
@@ -383,7 +369,6 @@ public class SearchKrill {
         };
         return "null";
     }
-
 
     public JsonNode getFieldValuesForVC (String koralQuery, String fieldName) {
         return new Krill().retrieveFieldValues(koralQuery, index, fieldName);

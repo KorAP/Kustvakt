@@ -18,28 +18,30 @@ public class FoundryInject implements RewriteTask.IterableRewritePath {
 
     @Autowired
     protected LayerMapper mapper;
-    
+
     @Override
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) throws KustvaktException {
-        
+
         if (node.get("@type").equals("koral:span")) {
-            if (!node.isMissingNode("/wrap")){
+            if (!node.isMissingNode("/wrap")) {
                 node = node.at("/wrap");
                 JsonNode term = rewriteQuery(node, config, user).rawNode();
-                node.replaceAt("/wrap", term, new RewriteIdentifier("koral:term", "replace"));
+                node.replaceAt("/wrap", term,
+                        new RewriteIdentifier("koral:term", "replace"));
             }
         }
-        else if (node.get("@type").equals("koral:term") && !node.has("foundry")) {
+        else if (node.get("@type").equals("koral:term")
+                && !node.has("foundry")) {
             String layer;
-            if (node.has("layer")){
+            if (node.has("layer")) {
                 layer = node.get("layer");
             }
-            else{
+            else {
                 layer = node.get("key");
             }
             UserSettingProcessor settingProcessor = null;
-            if (user!=null){
+            if (user != null) {
                 settingProcessor = user.getUserSettingProcessor();
             }
             String foundry = mapper.findFoundry(layer, settingProcessor);
@@ -53,7 +55,6 @@ public class FoundryInject implements RewriteTask.IterableRewritePath {
     public String path () {
         return "query";
     }
-
 
     @Override
     public JsonNode rewriteResult (KoralNode node) {

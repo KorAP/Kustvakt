@@ -1,6 +1,5 @@
 package de.ids_mannheim.korap.web.filter;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +14,8 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.SecurityContext;
 
 /**
- * EM: pretty much identical to {@link BlockingFilter}, should be deleted? 
+ * EM: pretty much identical to {@link BlockingFilter}, should be
+ * deleted?
  * 
  * @author hanl
  * @date 11/12/2014
@@ -25,8 +25,7 @@ import jakarta.ws.rs.core.SecurityContext;
  */
 @Component
 @Priority(Priorities.AUTHORIZATION)
-public class NonDemoBlockingFilter
-        implements ContainerRequestFilter {
+public class NonDemoBlockingFilter implements ContainerRequestFilter {
 
     @Autowired
     private KustvaktResponseHandler kustvaktResponseHandler;
@@ -39,8 +38,8 @@ public class NonDemoBlockingFilter
             context = (TokenContext) securityContext.getUserPrincipal();
         }
         else {
-            throw kustvaktResponseHandler.throwit(new KustvaktException(
-                    StatusCodes.UNSUPPORTED_OPERATION));
+            throw kustvaktResponseHandler.throwit(
+                    new KustvaktException(StatusCodes.UNSUPPORTED_OPERATION));
         }
 
         if (context == null || context.isDemo()) {

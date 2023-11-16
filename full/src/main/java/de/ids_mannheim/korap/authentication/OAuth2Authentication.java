@@ -16,7 +16,8 @@ import de.ids_mannheim.korap.oauth2.service.OAuth2ScopeServiceImpl;
 import de.ids_mannheim.korap.security.context.TokenContext;
 import de.ids_mannheim.korap.user.User;
 
-/** Authentication provider for Bearer tokens
+/**
+ * Authentication provider for Bearer tokens
  * 
  * @author margaretha
  *
@@ -44,7 +45,8 @@ public class OAuth2Authentication implements AuthenticationIface {
 
         TokenContext c = new TokenContext();
         c.setUsername(accessToken.getUserId());
-        c.setExpirationTime(accessToken.getExpiryDate().toInstant().toEpochMilli());
+        c.setExpirationTime(
+                accessToken.getExpiryDate().toInstant().toEpochMilli());
         c.setToken(authToken);
         c.setTokenType(TokenType.BEARER);
         c.addContextParameter(Attributes.SCOPE, scopes);

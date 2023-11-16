@@ -14,23 +14,23 @@ public class MapUtilsTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testConvertToMap() {
+    public void testConvertToMap () {
         MultivaluedMap<String, String> mm = new MultivaluedHashMap<String, String>();
-        mm.put("k1", Arrays.asList(new String[]{"a", "b", "c"}));
-        mm.put("k2", Arrays.asList(new String[]{"d", "e", "f"}));
+        mm.put("k1", Arrays.asList(new String[] { "a", "b", "c" }));
+        mm.put("k2", Arrays.asList(new String[] { "d", "e", "f" }));
         Map<String, String> map = MapUtils.toMap(mm);
         assertEquals(map.get("k1"), "a b c");
         assertEquals(map.get("k2"), "d e f");
     }
 
     @Test
-    public void testConvertNullMap() {
+    public void testConvertNullMap () {
         Map<String, String> map = MapUtils.toMap(null);
         assertEquals(0, map.size());
     }
 
     @Test
-    public void testConvertEmptyMap() {
+    public void testConvertEmptyMap () {
         MultivaluedMap<String, String> mm = new MultivaluedHashMap<String, String>();
         Map<String, String> map = MapUtils.toMap(mm);
         assertEquals(0, map.size());

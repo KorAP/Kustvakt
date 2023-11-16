@@ -27,7 +27,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  */
 // todo: do post processing!
 //todo: load rewritenode and rewritequery automatically from classpath by default, but namespaced from package
-public class RewriteHandler{
+public class RewriteHandler {
     //implements BeanInjectable {
 
     private static Logger jlog = LogManager.getLogger(RewriteHandler.class);
@@ -41,15 +41,15 @@ public class RewriteHandler{
 
     public RewriteHandler (List<RewriteTask> rewriteTasks) {
         this();
-        for (RewriteTask t : rewriteTasks){
+        for (RewriteTask t : rewriteTasks) {
             addProcessor(t);
         }
     }
-    
+
     // EM: for testing
     public RewriteHandler (KustvaktConfiguration config) {
         this();
-        this.config=config;
+        this.config = config;
     }
 
     public RewriteHandler () {
@@ -62,7 +62,6 @@ public class RewriteHandler{
     public Set getFailedProcessors () {
         return this.failed_task_registration;
     }
-
 
     public boolean addProcessor (RewriteTask rewriter) {
         if (rewriter instanceof RewriteTask.RewriteKoralToken)
@@ -79,7 +78,6 @@ public class RewriteHandler{
         return false;
     }
 
-
     @Override
     public String toString () {
         StringBuilder b = new StringBuilder();
@@ -92,7 +90,6 @@ public class RewriteHandler{
         b.append("---------------------------");
         return b.toString();
     }
-
 
     /**
      * expects extended RewriteNode/Query class with empty default
@@ -117,8 +114,6 @@ public class RewriteHandler{
         return addProcessor(task);
     }
 
-
-
     public String processQuery (JsonNode root, User user)
             throws KustvaktException {
         RewriteProcess process = new RewriteProcess(root, user);
@@ -126,18 +121,15 @@ public class RewriteHandler{
         return JsonUtils.toJSON(pre);
     }
 
-
     public String processQuery (String json, User user)
             throws KustvaktException {
         return processQuery(JsonUtils.readTree(json), user);
     }
 
-
     public String processResult (String json, User user)
             throws KustvaktException {
         return processResult(JsonUtils.readTree(json), user);
     }
-
 
     public String processResult (JsonNode node, User user)
             throws KustvaktException {
@@ -146,20 +138,16 @@ public class RewriteHandler{
         return JsonUtils.toJSON(pre);
     }
 
-
     public void clear () {
         this.node_processors.clear();
         this.query_processors.clear();
         this.token_node_processors.clear();
     }
 
-
-//    public <T extends ContextHolder> void insertBeans (T beans) {
-//        this.beans = beans;
-//        this.config = beans.getConfiguration();
-//    }
-
-
+    //    public <T extends ContextHolder> void insertBeans (T beans) {
+    //        this.beans = beans;
+    //        this.config = beans.getConfiguration();
+    //    }
 
     public class RewriteProcess {
 
@@ -167,12 +155,10 @@ public class RewriteHandler{
         private JsonNode root;
         private User user;
 
-
         private RewriteProcess (JsonNode root, User user) {
             this.root = root;
             this.user = user;
         }
-
 
         private KoralNode processNode (String key, JsonNode value,
                 boolean result) throws KustvaktException {
@@ -211,10 +197,9 @@ public class RewriteHandler{
             return kroot;
         }
 
-
         private JsonNode start (boolean result) throws KustvaktException {
-            if (DEBUG){
-                jlog.debug("Running rewrite process on query "+ root);
+            if (DEBUG) {
+                jlog.debug("Running rewrite process on query " + root);
             }
             if (root != null) {
                 Iterator<Map.Entry<String, JsonNode>> it = root.fields();
@@ -228,7 +213,6 @@ public class RewriteHandler{
             return root;
         }
 
-
         /**
          * @param node
          * @param tasks
@@ -240,7 +224,8 @@ public class RewriteHandler{
                 Collection<? extends RewriteTask> tasks, boolean result)
                 throws KustvaktException {
             if (RewriteHandler.this.config == null)
-                throw new RuntimeException("KustvaktConfiguration must be set!");
+                throw new RuntimeException(
+                        "KustvaktConfiguration must be set!");
 
             for (RewriteTask task : tasks) {
                 if (DEBUG) {
@@ -248,15 +233,15 @@ public class RewriteHandler{
                     jlog.debug("on processor: " + task.getClass().toString());
                 }
 
-//                if (RewriteHandler.this.beans != null
-//                        && task instanceof BeanInjectable)
-//                    ((BeanInjectable) task)
-//                            .insertBeans(RewriteHandler.this.beans);
+                //                if (RewriteHandler.this.beans != null
+                //                        && task instanceof BeanInjectable)
+                //                    ((BeanInjectable) task)
+                //                            .insertBeans(RewriteHandler.this.beans);
 
                 if (task instanceof RewriteTask.IterableRewritePath) {
                     RewriteTask.IterableRewritePath rw = (RewriteTask.IterableRewritePath) task;
                     if (rw.path() != null && !rw.path().equals(rootNode)) {
-                        if (DEBUG){
+                        if (DEBUG) {
                             jlog.debug("skipping node: " + node);
                         }
                         continue;
@@ -280,7 +265,6 @@ public class RewriteHandler{
             return node;
         }
 
-
         // fixme: merge with processNode!
         private void processFixedNode (JsonNode node,
                 Collection<RewriteTask> tasks, boolean post)
@@ -289,7 +273,8 @@ public class RewriteHandler{
                 KoralNode next = KoralNode.wrapNode(node);
                 if (task instanceof RewriteTask.RewriteNodeAt) {
                     RewriteTask.RewriteNodeAt rwa = (RewriteTask.RewriteNodeAt) task;
-                    if ((rwa.at() != null && !node.at(rwa.at()).isMissingNode()))
+                    if ((rwa.at() != null
+                            && !node.at(rwa.at()).isMissingNode()))
                         next = next.at(rwa.at());
                 }
 
@@ -302,7 +287,6 @@ public class RewriteHandler{
 
             }
         }
-
 
     }
 

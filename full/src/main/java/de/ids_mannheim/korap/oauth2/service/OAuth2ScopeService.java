@@ -14,8 +14,10 @@ public interface OAuth2ScopeService {
      * Verifies whether the given token context contains the required
      * scope
      * 
-     * @param context a token context containing authorized scopes
-     * @param requiredScope the required scope
+     * @param context
+     *            a token context containing authorized scopes
+     * @param requiredScope
+     *            the required scope
      * @throws KustvaktException
      */
     void verifyScope (TokenContext context, OAuth2Scope requiredScope)

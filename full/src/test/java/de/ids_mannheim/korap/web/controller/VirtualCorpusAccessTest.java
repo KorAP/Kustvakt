@@ -21,10 +21,12 @@ public class VirtualCorpusAccessTest extends VirtualCorpusTestBase {
     private String testUser = "VirtualCorpusAccessTest";
 
     @Test
-    public void testlistAccessByNonVCAAdmin() throws KustvaktException {
+    public void testlistAccessByNonVCAAdmin () throws KustvaktException {
         JsonNode node = listAccessByGroup("nemo", "dory-group");
-        assertEquals(StatusCodes.AUTHORIZATION_FAILED, node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(), "Unauthorized operation for user: nemo");
+        assertEquals(StatusCodes.AUTHORIZATION_FAILED,
+                node.at("/errors/0/0").asInt());
+        assertEquals(node.at("/errors/0/1").asText(),
+                "Unauthorized operation for user: nemo");
     }
 
     // @Test
@@ -48,8 +50,12 @@ public class VirtualCorpusAccessTest extends VirtualCorpusTestBase {
     // assertEquals("vcId", node.at("/errors/0/1").asText());
     // }
     @Test
-    public void testlistAccessByGroup() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("vc").path("access").queryParam("groupName", "dory-group").request().header(Attributes.AUTHORIZATION, HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("dory", "pass")).get();
+    public void testlistAccessByGroup () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("vc").path("access")
+                .queryParam("groupName", "dory-group").request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("dory", "pass"))
+                .get();
         String entity = response.readEntity(String.class);
         // System.out.println(entity);
         JsonNode node = JsonUtils.readTree(entity);
@@ -61,11 +67,14 @@ public class VirtualCorpusAccessTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testDeleteSharedVC() throws KustvaktException {
-        String json = "{\"type\": \"PROJECT\"" + ",\"queryType\": \"VIRTUAL_CORPUS\"" + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
+    public void testDeleteSharedVC () throws KustvaktException {
+        String json = "{\"type\": \"PROJECT\""
+                + ",\"queryType\": \"VIRTUAL_CORPUS\""
+                + ",\"corpusQuery\": \"corpusSigle=GOE\"}";
         String vcName = "new_project_vc";
         String username = "dory";
-        String authHeader = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(username, "pass");
+        String authHeader = HttpAuthorizationHandler
+                .createBasicAuthorizationHeaderValue(username, "pass");
         createVC(authHeader, username, vcName, json);
         String groupName = "dory-group";
         testShareVCByCreator(username, vcName, groupName);
@@ -78,7 +87,8 @@ public class VirtualCorpusAccessTest extends VirtualCorpusTestBase {
     }
 
     @Test
-    public void testCreateDeleteAccess() throws ProcessingException, KustvaktException {
+    public void testCreateDeleteAccess ()
+            throws ProcessingException, KustvaktException {
         String vcName = "marlin-vc";
         String groupName = "marlin-group";
         // check the vc type
@@ -116,30 +126,40 @@ public class VirtualCorpusAccessTest extends VirtualCorpusTestBase {
         String json = "{\"type\": \"" + ResourceType.PRIVATE + "\"}";
         editVC("marlin", "marlin", vcName, json);
         node = retrieveVCInfo("marlin", "marlin", vcName);
-        assertEquals(ResourceType.PRIVATE.displayName(), node.at("/type").asText());
+        assertEquals(ResourceType.PRIVATE.displayName(),
+                node.at("/type").asText());
     }
 
-    private void testShareVC_nonUniqueAccess(String vcCreator, String vcName, String groupName) throws ProcessingException, KustvaktException {
+    private void testShareVC_nonUniqueAccess (String vcCreator, String vcName,
+            String groupName) throws ProcessingException, KustvaktException {
         Response response = testShareVCByCreator(vcCreator, vcName, groupName);
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertEquals(HttpStatus.SC_BAD_REQUEST, response.getStatus());
-        assertEquals(StatusCodes.DB_INSERT_FAILED, node.at("/errors/0/0").asInt());
+        assertEquals(StatusCodes.DB_INSERT_FAILED,
+                node.at("/errors/0/0").asInt());
         // EM: message differs depending on the database used
         // for testing. The message below is from sqlite.
         // assertTrue(node.at("/errors/0/1").asText()
         // .startsWith("[SQLITE_CONSTRAINT_UNIQUE]"));
     }
 
-    private Response testDeleteAccess(String username, String accessId) throws ProcessingException, KustvaktException {
-        Response response = target().path(API_VERSION).path("vc").path("access").path(accessId).request().header(Attributes.AUTHORIZATION, HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(username, "pass")).delete();
+    private Response testDeleteAccess (String username, String accessId)
+            throws ProcessingException, KustvaktException {
+        Response response = target().path(API_VERSION).path("vc").path("access")
+                .path(accessId).request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .delete();
         return response;
     }
 
     @Test
-    public void testDeleteNonExistingAccess() throws ProcessingException, KustvaktException {
+    public void testDeleteNonExistingAccess ()
+            throws ProcessingException, KustvaktException {
         Response response = testDeleteAccess("dory", "100");
         assertEquals(Status.NOT_FOUND.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
-        assertEquals(StatusCodes.NO_RESOURCE_FOUND, node.at("/errors/0/0").asInt());
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                node.at("/errors/0/0").asInt());
     }
 }

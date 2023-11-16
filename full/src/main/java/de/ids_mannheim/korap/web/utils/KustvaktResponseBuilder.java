@@ -10,20 +10,16 @@ import java.util.Map;
 public class KustvaktResponseBuilder {
     Map<String, Object> _values;
 
-
     public KustvaktResponseBuilder () {
         this._values = new HashMap<>();
     }
-
 
     public KustvaktResponseBuilder addEntity (Object o) {
         if (o instanceof Map && !((Map) o).isEmpty())
             this._values.putAll((Map<? extends String, ?>) o);
 
-
         return this;
     }
-
 
     @Override
     public String toString () {

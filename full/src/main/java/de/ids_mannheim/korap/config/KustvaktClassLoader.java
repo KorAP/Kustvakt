@@ -16,9 +16,7 @@ public class KustvaktClassLoader {
     private static final Reflections reflections = new Reflections(
             "de.ids_mannheim.korap");
 
-
     private KustvaktClassLoader () {}
-
 
     /**
      * loads interface implementations in current classpath
@@ -31,12 +29,10 @@ public class KustvaktClassLoader {
         return reflections.getSubTypesOf(iface);
     }
 
-
     public static Set<Class<?>> loadFromAnnotation (
             Class<? extends Annotation> annotation) {
         return reflections.getTypesAnnotatedWith(annotation);
     }
-
 
     public static <T> Class<? extends T> getTypeClass (Class type,
             Class<T> iface) {

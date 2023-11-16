@@ -21,26 +21,24 @@ public class ClientsHandler {
 
     private WebTarget service;
 
-
     public ClientsHandler (URI address) {
         Client client = ClientBuilder.newClient();
         this.service = client.target(address);
     }
 
-
     public String getResponse (String path, String key, Object value)
             throws KustvaktException {
         try {
-            return service.path(path).queryParam(key, value).request().get(String.class);
+            return service.path(path).queryParam(key, value).request()
+                    .get(String.class);
         }
         catch (WebApplicationException e) {
             throw new KustvaktException(StatusCodes.INVALID_REQUEST);
         }
     }
 
-
-    public String getResponse (MultivaluedMap<String, String> map, String ... paths)
-            throws KustvaktException {
+    public String getResponse (MultivaluedMap<String, String> map,
+            String ... paths) throws KustvaktException {
         try {
             WebTarget resource = service;
             for (String p : paths)

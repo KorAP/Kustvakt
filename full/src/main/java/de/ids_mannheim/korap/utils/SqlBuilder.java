@@ -11,12 +11,10 @@ public class SqlBuilder {
     private String[] fields;
     private String where;
 
-
     public SqlBuilder (String table) {
         this.buffer = new StringBuffer();
         this.table = table;
     }
-
 
     public SqlBuilder select (String ... fields) {
         this.buffer.append("SELECT ");
@@ -33,13 +31,11 @@ public class SqlBuilder {
         return this;
     }
 
-
     public SqlBuilder update (String ... fields) {
         this.buffer.append("UPDATE ").append(table);
         this.fields = fields;
         return this;
     }
-
 
     public SqlBuilder insert (String ... fields) {
         this.buffer.append("INSERT INTO ").append(table);
@@ -47,12 +43,10 @@ public class SqlBuilder {
         return this;
     }
 
-
     public SqlBuilder delete () {
         this.buffer.append("DELETE FROM ").append(table);
         return this;
     }
-
 
     public SqlBuilder params (String ... values) {
         if (values.length != fields.length)
@@ -84,12 +78,10 @@ public class SqlBuilder {
         return this;
     }
 
-
     public SqlBuilder where (String where) {
         this.where = where;
         return this;
     }
-
 
     @Override
     public String toString () {

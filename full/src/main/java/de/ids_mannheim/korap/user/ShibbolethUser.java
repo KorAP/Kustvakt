@@ -19,14 +19,12 @@ public class ShibbolethUser extends User {
     // EM: common name
     private String commonName;
 
-
     protected ShibbolethUser () {
         super(1);
     }
 
-
     private ShibbolethUser (String eduPersonID, String mail, String cn,
-                      String affiliation) {
+                            String affiliation) {
         this(eduPersonID);
         this.setUsername(eduPersonID);
         this.setMail(mail);
@@ -34,12 +32,10 @@ public class ShibbolethUser extends User {
         this.setCommonName(cn);
     }
 
-
     public ShibbolethUser (String username) {
         super(username, 1);
 
     }
-
 
     @Override
     public String toString () {
@@ -51,38 +47,31 @@ public class ShibbolethUser extends User {
         return sb.toString();
     }
 
-
     @Override
     protected User clone () {
-        return new ShibbolethUser(this.getUsername(), this.getMail(), this.getCommonName(),
-                this.getAffiliation());
+        return new ShibbolethUser(this.getUsername(), this.getMail(),
+                this.getCommonName(), this.getAffiliation());
     }
-
 
     public String getMail () {
         return mail;
     }
 
-
     public void setMail (String mail) {
         this.mail = mail;
     }
-
 
     public String getAffiliation () {
         return affiliation;
     }
 
-
     public void setAffiliation (String affiliation) {
         this.affiliation = affiliation;
     }
 
-
     public String getCommonName () {
         return commonName;
     }
-
 
     public void setCommonName (String commonName) {
         this.commonName = commonName;

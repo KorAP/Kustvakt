@@ -27,19 +27,21 @@ public class UserGroupMemberDaoTest {
     private RoleDao roleDao;
 
     @Test
-    public void testRetrieveMemberByRole() throws KustvaktException {
+    public void testRetrieveMemberByRole () throws KustvaktException {
         // dory group
-        List<UserGroupMember> vcaAdmins = dao.retrieveMemberByRole(2, PredefinedRole.VC_ACCESS_ADMIN.getId());
+        List<UserGroupMember> vcaAdmins = dao.retrieveMemberByRole(2,
+                PredefinedRole.VC_ACCESS_ADMIN.getId());
         // System.out.println(vcaAdmins);
         assertEquals(1, vcaAdmins.size());
         assertEquals(vcaAdmins.get(0).getUserId(), "dory");
     }
 
     @Test
-    public void testAddSameMemberRole() throws KustvaktException {
+    public void testAddSameMemberRole () throws KustvaktException {
         UserGroupMember member = dao.retrieveMemberById("dory", 1);
         Set<Role> roles = member.getRoles();
-        Role adminRole = roleDao.retrieveRoleById(PredefinedRole.USER_GROUP_ADMIN.getId());
+        Role adminRole = roleDao
+                .retrieveRoleById(PredefinedRole.USER_GROUP_ADMIN.getId());
         roles.add(adminRole);
         member.setRoles(roles);
         dao.updateMember(member);

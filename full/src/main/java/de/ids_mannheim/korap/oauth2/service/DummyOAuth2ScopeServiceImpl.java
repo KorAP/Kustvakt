@@ -7,7 +7,7 @@ import de.ids_mannheim.korap.security.context.TokenContext;
 
 public class DummyOAuth2ScopeServiceImpl implements OAuth2ScopeService {
 
-      @Override
+    @Override
     public void verifyScope (TokenContext context, OAuth2Scope requiredScope)
             throws KustvaktException {
         // TODO Auto-generated method stub

@@ -42,7 +42,6 @@ public class SessionFactory implements Runnable {
     private final boolean multipleEnabled;
     private final int inactive;
 
-
     public SessionFactory (boolean multipleEnabled, int inactive) {
         if (DEBUG) {
             jlog.debug("allow multiple sessions per user: " + multipleEnabled);
@@ -53,7 +52,6 @@ public class SessionFactory implements Runnable {
         this.timeCheck = new ConcurrentHashMap<>();
         this.loggedInRecord = new ConcurrentMultiMap<>();
     }
-
 
     public boolean hasSession (TokenContext context) {
         if (context.getUsername().equalsIgnoreCase(DemoUser.DEMOUSER_NAME))
@@ -79,9 +77,8 @@ public class SessionFactory implements Runnable {
                 throw new KustvaktException(StatusCodes.EXPIRED);
 
         }
-         return context;
+        return context;
     }
-
 
     //todo: ?!
     @CacheEvict(value = "session", key = "#session.token")
@@ -98,7 +95,6 @@ public class SessionFactory implements Runnable {
         }
     }
 
-
     public void removeAll (final TokenContext activeUser) {
         for (String existing : loggedInRecord.get(activeUser.getUsername())) {
             timeCheck.remove(existing);
@@ -106,7 +102,6 @@ public class SessionFactory implements Runnable {
         }
         loggedInRecord.remove(activeUser.getUsername());
     }
-
 
     @CacheEvict(value = "session", key = "#session.token")
     public void removeSession (String token) {
@@ -118,7 +113,6 @@ public class SessionFactory implements Runnable {
         sessionsObject.remove(token);
     }
 
-
     /**
      * reset inactive time interval to 0
      * 
@@ -128,7 +122,6 @@ public class SessionFactory implements Runnable {
         timeCheck.put(token, TimeUtils.getNow());
     }
 
-
     /**
      * if user possesses a valid non-expired session token
      * 
@@ -137,18 +130,21 @@ public class SessionFactory implements Runnable {
      */
     private boolean isUserSessionValid (String token) {
         if (timeCheck.containsKey(token)) {
-            if (TimeUtils.plusSeconds(timeCheck.get(token).getMillis(),
-                    inactive).isAfterNow()) {
-                if (DEBUG){ jlog.debug("user has session");}
+            if (TimeUtils
+                    .plusSeconds(timeCheck.get(token).getMillis(), inactive)
+                    .isAfterNow()) {
+                if (DEBUG) {
+                    jlog.debug("user has session");
+                }
                 return true;
             }
-            else if (DEBUG){
-                jlog.debug("user with token "+token+" has an invalid session");
+            else if (DEBUG) {
+                jlog.debug(
+                        "user with token " + token + " has an invalid session");
             }
         }
         return false;
     }
-
 
     /**
      * clean inactive sessions from session object
@@ -160,21 +156,20 @@ public class SessionFactory implements Runnable {
         for (Entry<String, DateTime> entry : timeCheck.entrySet()) {
             if (!isUserSessionValid(entry.getKey())) {
                 TokenContext user = sessionsObject.get(entry.getKey());
-                jlog.trace("removing user session for user "+
-                        user.getUsername());
+                jlog.trace(
+                        "removing user session for user " + user.getUsername());
                 inactive.add(user.getUsername());
                 removeSession(entry.getKey());
             }
         }
         // fixme: not doing anything!
-        if (inactive.size() > 0){
-            if (DEBUG){
-            jlog.trace("removing inactive user session for users "+
-                    inactive);
+        if (inactive.size() > 0) {
+            if (DEBUG) {
+                jlog.trace(
+                        "removing inactive user session for users " + inactive);
             }
         }
     }
-
 
     /**
      * run cleanup-thread
@@ -183,6 +178,6 @@ public class SessionFactory implements Runnable {
     public void run () {
         timeoutMaintenance();
         if (loggedInRecord.size() > 0)
-            jlog.debug("logged users: "+ loggedInRecord.toString());
+            jlog.debug("logged users: " + loggedInRecord.toString());
     }
 }

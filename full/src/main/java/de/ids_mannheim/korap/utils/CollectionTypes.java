@@ -15,11 +15,9 @@ public class CollectionTypes {
 
     private ObjectMapper mapper;
 
-
     public CollectionTypes () {
         this.mapper = new ObjectMapper();
     }
-
 
     public Map createGroup (String relation, String field, List terms) {
         if (relation == null)
@@ -33,7 +31,6 @@ public class CollectionTypes {
         kgroup.put("operands", terms);
         return kgroup;
     }
-
 
     public Map createTerm (String field, String subtype, String value,
             String type) {
@@ -49,16 +46,13 @@ public class CollectionTypes {
         return term;
     }
 
-
     public Map createTerm (String field, String value, String type) {
         return createTerm(field, null, value, type);
     }
 
-
     public Map createTerm (String field, String value) {
         return createTerm(field, value, null);
     }
-
 
     public Map createResourceFilter (String resource, Map value) {
         Map meta = new LinkedHashMap();
@@ -68,12 +62,10 @@ public class CollectionTypes {
         return meta;
     }
 
-
     public Map createResourceFilter (String resource, String value)
             throws IOException {
         return createResourceFilter(resource, mapify(value));
     }
-
 
     public Map createResourceExtend (String resource, Map value) {
         Map meta = new LinkedHashMap();
@@ -83,7 +75,6 @@ public class CollectionTypes {
         return meta;
     }
 
-
     public Map createMetaFilter (Map value) {
         Map meta = new LinkedHashMap();
         meta.put("@type", "korap:meta-filter");
@@ -91,14 +82,12 @@ public class CollectionTypes {
         return meta;
     }
 
-
     public Map createMetaExtend (Map value) {
         Map meta = new LinkedHashMap();
         meta.put("@type", "korap:meta-extend");
         meta.put("@value", value);
         return meta;
     }
-
 
     public Map mapify (String s) throws IOException {
         return mapper.readValue(s, Map.class);

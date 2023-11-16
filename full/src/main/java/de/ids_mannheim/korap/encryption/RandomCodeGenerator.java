@@ -35,13 +35,13 @@ public class RandomCodeGenerator {
     public static List<Character> charList = alphanumeric.chars()
             .mapToObj(c -> (char) c).collect(Collectors.toList());
 
-    public final static List<String> LIMITED_CHARACTERS =
-            Arrays.asList(new String[] { "3", "4", "6", "7", "9", "b", "d", "f",
-                    "h", "m", "n", "p", "r", "t", "F", "G", "H", "J", "L", "M",
-                    "N", "P", "R", "T" });
+    public final static List<String> LIMITED_CHARACTERS = Arrays
+            .asList(new String[] { "3", "4", "6", "7", "9", "b", "d", "f", "h",
+                    "m", "n", "p", "r", "t", "F", "G", "H", "J", "L", "M", "N",
+                    "P", "R", "T" });
 
     private Logger log = LogManager.getLogger(RandomCodeGenerator.class);
-    
+
     @Autowired
     public KustvaktConfiguration config;
 
@@ -56,8 +56,7 @@ public class RandomCodeGenerator {
         else {
             secureRandom = new SecureRandom();
         }
-        log.info(
-                "Secure random algorithm: " + secureRandom.getAlgorithm());
+        log.info("Secure random algorithm: " + secureRandom.getAlgorithm());
     }
 
     public String createRandomCode (KustvaktConfiguration c)
@@ -95,8 +94,7 @@ public class RandomCodeGenerator {
         StringBuffer s = new StringBuffer();
         for (char c : code.toCharArray()) {
             if (!charList.contains(c)) {
-                int n = ThreadLocalRandom.current().nextInt(0,
-                        charList.size());
+                int n = ThreadLocalRandom.current().nextInt(0, charList.size());
                 c = charList.get(n);
             }
             s.append(c);

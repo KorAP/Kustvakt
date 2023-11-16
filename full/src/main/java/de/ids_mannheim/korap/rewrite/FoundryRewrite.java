@@ -21,11 +21,10 @@ public class FoundryRewrite extends FoundryInject {
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
             User user) throws KustvaktException {
         String username = user.getUsername();
-        String jsonSettings =
-                settingService.retrieveDefaultSettings(username);
+        String jsonSettings = settingService.retrieveDefaultSettings(username);
         if (jsonSettings != null) {
-            UserSettingProcessor processor =
-                    new UserSettingProcessor(jsonSettings);
+            UserSettingProcessor processor = new UserSettingProcessor(
+                    jsonSettings);
             user.setUserSettingProcessor(processor);
         }
         return super.rewriteQuery(node, config, user);

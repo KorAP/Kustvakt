@@ -58,8 +58,8 @@ public class CachedAuthorizationDaoImpl extends KustvaktCacheable
         authorization.setUserAuthenticationTime(authenticationTime);
         authorization.setNonce(nonce);
 
-        ZonedDateTime now =
-                ZonedDateTime.now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+        ZonedDateTime now = ZonedDateTime
+                .now(ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
         authorization.setCreatedDate(now);
         authorization.setExpiryDate(
                 now.plusSeconds(config.getAuthorizationCodeExpiry()));
@@ -87,8 +87,8 @@ public class CachedAuthorizationDaoImpl extends KustvaktCacheable
             throws KustvaktException {
 
         this.storeInCache(authorization.getCode(), authorization);
-        Authorization auth =
-                (Authorization) this.getCacheValue(authorization.getCode());
+        Authorization auth = (Authorization) this
+                .getCacheValue(authorization.getCode());
         return auth;
     }
 

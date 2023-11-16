@@ -18,7 +18,7 @@ import lombok.Data;
 import lombok.Setter;
 
 /**
- * EM: 
+ * EM:
  * - change datatype of tokenType from string to enum
  * - added authenticationTime
  * 
@@ -39,12 +39,11 @@ public class TokenContext implements java.security.Principal, Serializable {
     private String token;
     private boolean secureRequired;
 
-//    @Getter(AccessLevel.PRIVATE)
+    //    @Getter(AccessLevel.PRIVATE)
     @Setter(AccessLevel.PRIVATE)
     private Map<String, Object> parameters;
     private String hostAddress;
     private String userAgent;
-
 
     public TokenContext () {
         this.parameters = new HashMap<>();
@@ -53,7 +52,6 @@ public class TokenContext implements java.security.Principal, Serializable {
         this.setSecureRequired(false);
         this.setExpirationTime(-1);
     }
-
 
     private Map statusMap () {
         Map m = new HashMap();
@@ -66,11 +64,10 @@ public class TokenContext implements java.security.Principal, Serializable {
         return m;
     }
 
-
     public Map<String, Object> params () {
         return new HashMap<>(parameters);
     }
-    
+
     public boolean match (TokenContext other) {
         if (other.getToken().equals(this.token))
             if (this.getHostAddress().equals(this.hostAddress))
@@ -81,27 +78,22 @@ public class TokenContext implements java.security.Principal, Serializable {
         return false;
     }
 
-
     public void addContextParameter (String key, String value) {
         this.parameters.put(key, value);
     }
-
 
     public void addParams (Map<String, Object> map) {
         for (Map.Entry<String, Object> e : map.entrySet())
             this.parameters.put(e.getKey(), String.valueOf(e.getValue()));
     }
 
-
     public void removeContextParameter (String key) {
         this.parameters.remove(key);
     }
 
-
     public void setExpirationTime (long date) {
         this.expirationTime = date;
     }
-
 
     // todo: complete
     public static TokenContext fromJSON (String s) throws KustvaktException {
@@ -113,7 +105,6 @@ public class TokenContext implements java.security.Principal, Serializable {
         }
         return c;
     }
-
 
     public static TokenContext fromOAuth2 (String s) throws KustvaktException {
         JsonNode node = JsonUtils.readTree(s);
@@ -129,40 +120,32 @@ public class TokenContext implements java.security.Principal, Serializable {
         return c;
     }
 
-
     public boolean isValid () {
         return (this.username != null && !this.username.isEmpty())
                 && (this.token != null && !this.token.isEmpty())
                 && (this.tokenType != null);
     }
 
-
     public String getToken () {
         return token;
     }
-
 
     public String toJson () throws KustvaktException {
         return JsonUtils.toJSON(this.statusMap());
     }
 
-
     public boolean isDemo () {
         return User.UserFactory.isDemo(this.username);
     }
-
-
 
     @Override
     public String getName () {
         return this.getUsername();
     }
 
-
     public ZonedDateTime getAuthenticationTime () {
         return authenticationTime;
     }
-
 
     public void setAuthenticationTime (ZonedDateTime authTime) {
         this.authenticationTime = authTime;

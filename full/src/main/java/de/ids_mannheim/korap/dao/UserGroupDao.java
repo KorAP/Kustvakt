@@ -55,8 +55,8 @@ public class UserGroupDao {
     @Autowired
     private RoleDao roleDao;
 
-    public int createGroup (String name, String description,
-            String createdBy, UserGroupStatus status) throws KustvaktException {
+    public int createGroup (String name, String description, String createdBy,
+            UserGroupStatus status) throws KustvaktException {
         ParameterChecker.checkStringValue(name, "name");
         ParameterChecker.checkStringValue(createdBy, "createdBy");
         ParameterChecker.checkObjectValue(status, "UserGroupStatus");
@@ -117,7 +117,7 @@ public class UserGroupDao {
         ParameterChecker.checkObjectValue(group, "user-group");
         entityManager.merge(group);
     }
-    
+
     /**
      * Retrieves the UserGroup by the given group id. This methods
      * does not
@@ -140,8 +140,8 @@ public class UserGroupDao {
         ParameterChecker.checkIntegerValue(groupId, "groupId");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<UserGroup> query =
-                criteriaBuilder.createQuery(UserGroup.class);
+        CriteriaQuery<UserGroup> query = criteriaBuilder
+                .createQuery(UserGroup.class);
 
         Root<UserGroup> root = query.from(UserGroup.class);
         if (fetchMembers) {
@@ -176,13 +176,13 @@ public class UserGroupDao {
         ParameterChecker.checkStringValue(userId, "userId");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<UserGroup> query =
-                criteriaBuilder.createQuery(UserGroup.class);
+        CriteriaQuery<UserGroup> query = criteriaBuilder
+                .createQuery(UserGroup.class);
 
         Root<UserGroup> root = query.from(UserGroup.class);
 
-        ListJoin<UserGroup, UserGroupMember> members =
-                root.join(UserGroup_.members);
+        ListJoin<UserGroup, UserGroupMember> members = root
+                .join(UserGroup_.members);
         Predicate restrictions = criteriaBuilder.and(
                 criteriaBuilder.equal(root.get(UserGroup_.status),
                         UserGroupStatus.ACTIVE),
@@ -207,13 +207,13 @@ public class UserGroupDao {
         }
     }
 
-    public UserGroup retrieveGroupByName (String groupName, boolean fetchMembers)
-            throws KustvaktException {
+    public UserGroup retrieveGroupByName (String groupName,
+            boolean fetchMembers) throws KustvaktException {
         ParameterChecker.checkStringValue(groupName, "groupName");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<UserGroup> query =
-                criteriaBuilder.createQuery(UserGroup.class);
+        CriteriaQuery<UserGroup> query = criteriaBuilder
+                .createQuery(UserGroup.class);
 
         Root<UserGroup> root = query.from(UserGroup.class);
         if (fetchMembers) {
@@ -238,14 +238,12 @@ public class UserGroupDao {
         ParameterChecker.checkIntegerValue(queryId, "queryId");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<UserGroup> criteriaQuery =
-                criteriaBuilder.createQuery(UserGroup.class);
+        CriteriaQuery<UserGroup> criteriaQuery = criteriaBuilder
+                .createQuery(UserGroup.class);
 
         Root<UserGroup> root = criteriaQuery.from(UserGroup.class);
-        Join<UserGroup, QueryAccess> access =
-                root.join(UserGroup_.queryAccess);
-        Join<QueryAccess, QueryDO> query =
-                access.join(QueryAccess_.query);
+        Join<UserGroup, QueryAccess> access = root.join(UserGroup_.queryAccess);
+        Join<QueryAccess, QueryDO> query = access.join(QueryAccess_.query);
 
         Predicate p = criteriaBuilder.and(
                 criteriaBuilder.equal(root.get(UserGroup_.status),
@@ -283,8 +281,8 @@ public class UserGroupDao {
             UserGroupStatus status) throws KustvaktException {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<UserGroup> query =
-                criteriaBuilder.createQuery(UserGroup.class);
+        CriteriaQuery<UserGroup> query = criteriaBuilder
+                .createQuery(UserGroup.class);
 
         Root<UserGroup> root = query.from(UserGroup.class);
 
@@ -292,8 +290,8 @@ public class UserGroupDao {
 
         if (userId != null && !userId.isEmpty()) {
 
-            ListJoin<UserGroup, UserGroupMember> members =
-                    root.join(UserGroup_.members);
+            ListJoin<UserGroup, UserGroupMember> members = root
+                    .join(UserGroup_.members);
             restrictions = criteriaBuilder.and(criteriaBuilder
                     .equal(members.get(UserGroupMember_.userId), userId));
 
@@ -303,8 +301,8 @@ public class UserGroupDao {
             }
         }
         else if (status != null) {
-            restrictions =
-                    criteriaBuilder.equal(root.get(UserGroup_.status), status);
+            restrictions = criteriaBuilder.equal(root.get(UserGroup_.status),
+                    status);
 
         }
 
@@ -335,9 +333,8 @@ public class UserGroupDao {
         entityManager.persist(accessGroup);
     }
 
-    public void addQueryToGroup (List<QueryDO> queries,
-            String createdBy, UserGroup group,
-            QueryAccessStatus status) {
+    public void addQueryToGroup (List<QueryDO> queries, String createdBy,
+            UserGroup group, QueryAccessStatus status) {
 
         for (QueryDO q : queries) {
             addQueryToGroup(q, createdBy, status, group);
@@ -350,25 +347,22 @@ public class UserGroupDao {
         ParameterChecker.checkIntegerValue(groupId, "groupId");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryAccess> criteriaQuery =
-                criteriaBuilder.createQuery(QueryAccess.class);
+        CriteriaQuery<QueryAccess> criteriaQuery = criteriaBuilder
+                .createQuery(QueryAccess.class);
 
         Root<QueryAccess> root = criteriaQuery.from(QueryAccess.class);
-        Join<QueryAccess, QueryDO> queryAccess =
-                root.join(QueryAccess_.query);
-        Join<QueryAccess, UserGroup> group =
-                root.join(QueryAccess_.userGroup);
+        Join<QueryAccess, QueryDO> queryAccess = root.join(QueryAccess_.query);
+        Join<QueryAccess, UserGroup> group = root.join(QueryAccess_.userGroup);
 
-        Predicate query = criteriaBuilder
-                .equal(queryAccess.get(QueryDO_.id), queryId);
-        Predicate userGroup =
-                criteriaBuilder.equal(group.get(UserGroup_.id), groupId);
+        Predicate query = criteriaBuilder.equal(queryAccess.get(QueryDO_.id),
+                queryId);
+        Predicate userGroup = criteriaBuilder.equal(group.get(UserGroup_.id),
+                groupId);
 
         criteriaQuery.select(root);
         criteriaQuery.where(criteriaBuilder.and(query, userGroup));
         Query q = entityManager.createQuery(criteriaQuery);
-        QueryAccess access =
-                (QueryAccess) q.getSingleResult();
+        QueryAccess access = (QueryAccess) q.getSingleResult();
         entityManager.remove(access);
     }
 

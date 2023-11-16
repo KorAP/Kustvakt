@@ -56,7 +56,7 @@ public class QueryDO implements Comparable<QueryDO> {
     private String createdBy;
     @Column(name = "is_cached")
     private boolean isCached;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(name = "query_type")
     private QueryType queryType;
@@ -64,8 +64,7 @@ public class QueryDO implements Comparable<QueryDO> {
     @Column(name = "query_language")
     private String queryLanguage;
 
-    @OneToMany(mappedBy = "query", fetch = FetchType.LAZY,
-            cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "query", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<QueryAccess> queryAccess;
 
     @Override

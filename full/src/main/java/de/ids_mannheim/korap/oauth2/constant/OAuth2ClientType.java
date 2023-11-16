@@ -4,7 +4,7 @@ package de.ids_mannheim.korap.oauth2.constant;
  * Defines possible OAuth2 client types.
  * 
  * Quoted from RFC 6749:
- * <ul> 
+ * <ul>
  * 
  * <li> <b>Confidential clients</b> are clients capable of maintaining
  * the confidentiality of their

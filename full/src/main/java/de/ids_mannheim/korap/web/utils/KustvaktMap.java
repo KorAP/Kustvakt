@@ -13,29 +13,24 @@ public class KustvaktMap {
     private boolean monoTyped;
     private Map<String, Object> values;
 
-
     public KustvaktMap () {
         this.values = new HashMap<>();
         this.monoTyped = false;
     }
-
 
     public KustvaktMap (Map<String, Object> m) {
         this();
         setMap(m);
     }
 
-
     public void setMap (Map<String, Object> m) {
         if (!isGeneric(m) | !this.monoTyped)
             this.values.putAll(m);
     }
 
-
     public boolean isGeneric () {
         return !this.monoTyped && isGeneric(this.values);
     }
-
 
     private static boolean isGeneric (Map<String, Object> map) {
         int i = 0;
@@ -46,11 +41,9 @@ public class KustvaktMap {
         return !(i == map.size());
     }
 
-
     public void setMonoValue (boolean monovalue) {
         this.monoTyped = monovalue;
     }
-
 
     public String get (String key) {
         Object o = this.values.get(key);
@@ -59,18 +52,15 @@ public class KustvaktMap {
         return String.valueOf(o);
     }
 
-
     public Object getRaw (String key) {
         return this.values.get(key);
     }
-
 
     public <T extends Object> Object get (String key, Class<T> cl) {
         if (isGeneric())
             return (T) this.values.get(key);
         return get(key);
     }
-
 
     public Set<String> keySet () {
         return this.values.keySet();

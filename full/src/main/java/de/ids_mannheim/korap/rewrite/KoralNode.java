@@ -16,39 +16,34 @@ public class KoralNode {
     private KoralRewriteBuilder rewrites;
     private boolean remove;
 
-
     public KoralNode (JsonNode node) {
         this.node = node;
         this.rewrites = new KoralRewriteBuilder();
         this.remove = false;
     }
-    
+
     public KoralNode (JsonNode node, KoralRewriteBuilder rewrites) {
         this.node = node;
         this.rewrites = rewrites;
         this.remove = false;
     }
 
-
     public static KoralNode wrapNode (JsonNode node) {
         return new KoralNode(node);
     }
-    
+
     public void buildRewrites (JsonNode node) {
         this.rewrites.build(node);
     }
-
 
     public void buildRewrites () {
         this.rewrites.build(this.node);
     }
 
-
     @Override
     public String toString () {
         return this.node.toString();
     }
-
 
     public void put (String name, Object value) {
         if (this.node.isObject() && this.node.path(name).isMissingNode()) {
@@ -65,7 +60,6 @@ public class KoralNode {
             throw new UnsupportedOperationException(
                     "node doesn't support this operation");
     }
-
 
     public void remove (Object identifier, RewriteIdentifier ident) {
         boolean set = false;
@@ -88,7 +82,6 @@ public class KoralNode {
         }
     }
 
-
     public void replace (String name, Object value, RewriteIdentifier ident) {
         if (this.node.isObject() && this.node.has(name)) {
             ObjectNode n = (ObjectNode) this.node;
@@ -105,12 +98,12 @@ public class KoralNode {
             this.rewrites.add("override", name);
         }
     }
-    
+
     public void replaceAt (String path, Object value, RewriteIdentifier ident) {
         if (this.node.isObject() && !this.node.at(path).isMissingNode()) {
             ObjectNode n = (ObjectNode) this.node.at(path);
             n.removeAll();
-            n.putAll((ObjectNode)value);
+            n.putAll((ObjectNode) value);
 
             String name = path;
             if (ident != null)
@@ -130,7 +123,6 @@ public class KoralNode {
             else if (value instanceof JsonNode)
                 n.put(name, (JsonNode) value);
 
-
             if (ident != null)
                 name = ident.toString();
 
@@ -143,7 +135,7 @@ public class KoralNode {
             ObjectNode n = (ObjectNode) this.node;
             n.setAll(other);
         }
-        this.rewrites.add("insertion",null);
+        this.rewrites.add("insertion", null);
     }
 
     public String get (String name) {
@@ -152,13 +144,11 @@ public class KoralNode {
         return null;
     }
 
-
     public KoralNode at (String name) {
-//        this.node = this.node.at(name);
-//        return this;
+        //        this.node = this.node.at(name);
+        //        return this;
         return new KoralNode(this.node.at(name), this.rewrites);
     }
-
 
     public boolean has (Object ident) {
         if (ident instanceof String)
@@ -168,11 +158,9 @@ public class KoralNode {
         return false;
     }
 
-
     public JsonNode rawNode () {
         return this.node;
     }
-
 
     public void removeNode (RewriteIdentifier ident) {
         this.rewrites.add("deletion", ident.toString());
@@ -183,47 +171,39 @@ public class KoralNode {
 
         private String key, value;
 
-
         public RewriteIdentifier (String key, Object value) {
             this.key = key;
             this.value = value.toString();
         }
-
 
         @Override
         public String toString () {
             return key + "(" + value + ")";
         }
 
-
     }
-
 
     public boolean isRemove () {
         return this.remove;
     }
 
-
     public static class KoralRewriteBuilder {
 
         private List<KoralRewrite> rewrites;
-
 
         public KoralRewriteBuilder () {
             this.rewrites = new ArrayList<>();
         }
 
-
         public KoralRewriteBuilder add (String op, Object scope) {
             KoralRewrite rewrite = new KoralRewrite();
             rewrite.setOperation(op);
-            if (scope !=null){
+            if (scope != null) {
                 rewrite.setScope(scope.toString());
             }
             this.rewrites.add(rewrite);
             return this;
         }
-
 
         public JsonNode build (JsonNode node) {
             for (KoralRewrite rewrite : this.rewrites) {
@@ -252,19 +232,15 @@ public class KoralNode {
 
     }
 
-
-
     private static class KoralRewrite {
 
         private Map<String, String> map;
-
 
         private KoralRewrite () {
             this.map = new LinkedHashMap<>();
             this.map.put("@type", "koral:rewrite");
             this.map.put("src", "Kustvakt");
         }
-
 
         public KoralRewrite setOperation (String op) {
             if (!op.startsWith("operation:"))
@@ -273,7 +249,6 @@ public class KoralNode {
             return this;
         }
 
-
         public KoralRewrite setScope (String scope) {
             this.map.put("scope", scope);
             return this;
@@ -281,21 +256,17 @@ public class KoralNode {
 
     }
 
-
     public boolean isMissingNode (String string) {
         return this.node.at(string).isMissingNode();
     }
-
 
     public int size () {
         return this.node.size();
     }
 
-
     public KoralNode get (int i) {
-//        this.node = this.node.get(i);
+        //        this.node = this.node.get(i);
         return this.wrapNode(this.node.get(i));
     }
-    
-    
+
 }

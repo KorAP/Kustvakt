@@ -31,7 +31,7 @@ public class APIAuthentication implements AuthenticationIface {
 
     private static Logger jlog = LogManager.getLogger(APIAuthentication.class);
     public static boolean DEBUG = false;
-    
+
     private JWTSigner signedToken;
 
     public APIAuthentication (FullConfiguration config) throws JOSEException {
@@ -65,7 +65,6 @@ public class APIAuthentication implements AuthenticationIface {
         return context;
     }
 
-
     @Override
     public TokenContext createTokenContext (User user, Map<String, Object> attr)
             throws KustvaktException {
@@ -75,7 +74,7 @@ public class APIAuthentication implements AuthenticationIface {
         try {
             c.setExpirationTime(
                     jwt.getJWTClaimsSet().getExpirationTime().getTime());
-            if (DEBUG ) {
+            if (DEBUG) {
                 jlog.debug(jwt.getJWTClaimsSet()
                         .getClaim(Attributes.AUTHENTICATION_TIME));
             }
@@ -93,7 +92,6 @@ public class APIAuthentication implements AuthenticationIface {
         // id_tokens.put(new Element(c.getToken(), c));
         return c;
     }
-
 
     @Override
     public TokenType getTokenType () {

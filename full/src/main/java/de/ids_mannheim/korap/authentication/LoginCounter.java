@@ -30,11 +30,9 @@ public class LoginCounter {
         this.failedLogins = new HashMap<>();
     }
 
-
     public void resetFailedCounter (String username) {
         failedLogins.remove(username);
     }
-
 
     public void registerFail (String username) {
         long expires = TimeUtils.plusSeconds(config.getLoginAttemptTTL())
@@ -49,10 +47,9 @@ public class LoginCounter {
         set[1] = expires;
 
         failedLogins.put(username, set);
-        jlog.warn("user failed to login "+
-                Arrays.asList(failedLogins.get(username)));
+        jlog.warn("user failed to login "
+                + Arrays.asList(failedLogins.get(username)));
     }
-
 
     public boolean validate (String username) {
         Long[] set = failedLogins.get(username);

@@ -8,17 +8,17 @@ import de.ids_mannheim.korap.config.Attributes;
  */
 public class UserSettingProcessor extends Userdata {
 
-    public UserSettingProcessor() {
+    public UserSettingProcessor () {
 
     }
 
     @Deprecated
-    public UserSettingProcessor(Integer userid) {
+    public UserSettingProcessor (Integer userid) {
         super(userid);
     }
 
     // EM: added
-    public UserSettingProcessor(String data) {
+    public UserSettingProcessor (String data) {
         super(data);
     }
 
@@ -26,7 +26,6 @@ public class UserSettingProcessor extends Userdata {
     public String[] requiredFields () {
         return new String[] {};
     }
-
 
     @Override
     public String[] defaultFields () {

@@ -16,7 +16,8 @@ import jakarta.ws.rs.ext.Provider;
 /**
  * Registers {@link jakarta.ws.rs.container.ContainerRequestFilter}
  * and {@link jakarta.ws.rs.container.ContainerResponseFilter}
- * classes for a resource method annotated with {@link ResourceFilters}.
+ * classes for a resource method annotated with
+ * {@link ResourceFilters}.
  */
 @Provider
 @Component
@@ -24,7 +25,7 @@ public class SearchResourceFiltersFeature implements DynamicFeature {
 
     @Value("${search.resource.filters:AuthenticationFilter,DemoUserFilter}")
     private String[] resourceFilters;
-    
+
     @Override
     public void configure (ResourceInfo resourceInfo, FeatureContext context) {
         SearchResourceFilters filters = resourceInfo.getResourceMethod()
@@ -32,25 +33,26 @@ public class SearchResourceFiltersFeature implements DynamicFeature {
         if (filters != null) {
             CommonConfig con = (CommonConfig) context.getConfiguration();
             con.getComponentBag().clear();
-        }        
+        }
         else {
             filters = resourceInfo.getResourceClass()
-            .getAnnotation(SearchResourceFilters.class);
+                    .getAnnotation(SearchResourceFilters.class);
         }
-        
+
         if (filters != null) {
             List<?> list = Arrays.asList(resourceFilters);
             if (!list.contains("APIVersionFilter")) {
                 context.register(APIVersionFilter.class);
             }
-            
-             for(String c : resourceFilters) {
-                    try {
-                        context.register(Class.forName("de.ids_mannheim.korap.web.filter." + c));
-                    }
-                    catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
+
+            for (String c : resourceFilters) {
+                try {
+                    context.register(Class
+                            .forName("de.ids_mannheim.korap.web.filter." + c));
+                }
+                catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

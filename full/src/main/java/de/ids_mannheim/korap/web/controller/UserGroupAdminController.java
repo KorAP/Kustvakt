@@ -31,7 +31,7 @@ public class UserGroupAdminController {
     private KustvaktResponseHandler kustvaktResponseHandler;
     @Autowired
     private UserGroupService service;
-    
+
     /**
      * Lists user-groups for system-admin purposes. If username is
      * specified, lists user-groups of the given user, otherwise list
@@ -53,14 +53,13 @@ public class UserGroupAdminController {
             @FormParam("username") String username,
             @FormParam("status") UserGroupStatus status) {
         try {
-            return service.retrieveUserGroupByStatus(username,
-                    status);
+            return service.retrieveUserGroupByStatus(username, status);
         }
         catch (KustvaktException e) {
             throw kustvaktResponseHandler.throwit(e);
         }
     }
-    
+
     /**
      * Retrieves a specific user-group. Only system admins are
      * allowed.

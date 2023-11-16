@@ -94,8 +94,8 @@ public class OAuthClientController {
     public OAuth2ClientDto registerClient (
             @Context SecurityContext securityContext,
             OAuth2ClientJson clientJson) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.REGISTER_CLIENT);
             return clientService.registerClient(clientJson,
@@ -107,7 +107,7 @@ public class OAuthClientController {
     }
 
     /**
-     * Deregisters a client requires client owner authentication. 
+     * Deregisters a client requires client owner authentication.
      * 
      * 
      * @param securityContext
@@ -117,11 +117,10 @@ public class OAuthClientController {
      */
     @DELETE
     @Path("deregister/{client_id}")
-    public Response deregisterClient (
-            @Context SecurityContext securityContext,
+    public Response deregisterClient (@Context SecurityContext securityContext,
             @PathParam("client_id") String clientId) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.DEREGISTER_CLIENT);
             clientService.deregisterClient(clientId, context.getUsername());
@@ -148,8 +147,8 @@ public class OAuthClientController {
     public OAuth2ClientDto resetClientSecret (
             @Context SecurityContext securityContext,
             @FormParam("client_id") String clientId) {
-        TokenContext context =
-                (TokenContext) securityContext.getUserPrincipal();
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
         try {
             scopeService.verifyScope(context, OAuth2Scope.RESET_CLIENT_SECRET);
             return clientService.resetSecret(clientId, context.getUsername());
@@ -159,11 +158,10 @@ public class OAuthClientController {
         }
     }
 
-
     @POST
     @Path("{client_id}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @ResourceFilters({ APIVersionFilter.class})
+    @ResourceFilters({ APIVersionFilter.class })
     public OAuth2ClientInfoDto retrieveClientInfo (
             @PathParam("client_id") String clientId,
             @FormParam("super_client_id") String superClientId,

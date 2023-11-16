@@ -17,7 +17,9 @@ import de.ids_mannheim.korap.dto.converter.AnnotationConverter;
 import de.ids_mannheim.korap.exceptions.KustvaktException;
 import de.ids_mannheim.korap.exceptions.StatusCodes;
 
-/** AnnotationService defines the logic behind {@link AnnotationController}.
+/**
+ * AnnotationService defines the logic behind
+ * {@link AnnotationController}.
  * 
  * @author margaretha
  *
@@ -27,8 +29,7 @@ public class AnnotationService {
 
     private static final boolean DEBUG = false;
 
-    private static Logger jlog =
-            LogManager.getLogger(AnnotationService.class);
+    private static Logger jlog = LogManager.getLogger(AnnotationService.class);
 
     @Autowired
     private AnnotationDao annotationDao;
@@ -38,7 +39,7 @@ public class AnnotationService {
 
     public List<LayerDto> getLayerDtos () {
         List<AnnotationLayer> layers = annotationDao.getAllFoundryLayerPairs();
-        if (DEBUG){
+        if (DEBUG) {
             jlog.debug("/layers " + layers.toString());
         }
         List<LayerDto> layerDto = annotationConverter.convertToLayerDto(layers);
@@ -50,14 +51,14 @@ public class AnnotationService {
         List<AnnotationLayer> annotationPairs = null;
         String foundry = "", layer = "";
         if (codes.contains("*")) {
-            annotationPairs =
-                    annotationDao.getAnnotationDescriptions(foundry, layer);
+            annotationPairs = annotationDao.getAnnotationDescriptions(foundry,
+                    layer);
         }
         else {
             String[] annotationCode;
             annotationPairs = new ArrayList<AnnotationLayer>();
             for (String code : codes) {
-                if (DEBUG){
+                if (DEBUG) {
                     jlog.debug("code " + code);
                 }
                 annotationCode = code.split("/");
@@ -82,7 +83,7 @@ public class AnnotationService {
         if (annotationPairs != null && !annotationPairs.isEmpty()) {
             List<FoundryDto> foundryDtos = annotationConverter
                     .convertToFoundryDto(annotationPairs, language);
-            if (DEBUG){
+            if (DEBUG) {
                 jlog.debug("/description " + annotationPairs.toString());
             }
             return foundryDtos;

@@ -94,7 +94,7 @@ public class AnnotationConverter {
                 for (AnnotationKey ak : f.getKeys()) {
                     Annotation a = ak.getKey();
                     Map<String, String> values = new TreeMap<>();
-                    
+
                     Key key = dto.new Key(a.getCode());
                     if (language.equals("de")) {
                         key.setDescription(a.getGermanDescription());
@@ -136,16 +136,14 @@ public class AnnotationConverter {
 
     private Map<String, List<AnnotationLayer>> createFoundryMap (
             List<AnnotationLayer> pairs) {
-        Map<String, List<AnnotationLayer>> foundries =
-                new HashMap<String, List<AnnotationLayer>>();
+        Map<String, List<AnnotationLayer>> foundries = new HashMap<String, List<AnnotationLayer>>();
         for (AnnotationLayer p : pairs) {
             String foundryCode = p.getFoundry().getCode();
             if (foundries.containsKey(foundryCode)) {
                 foundries.get(foundryCode).add(p);
             }
             else {
-                List<AnnotationLayer> foundryList =
-                        new ArrayList<AnnotationLayer>();
+                List<AnnotationLayer> foundryList = new ArrayList<AnnotationLayer>();
                 foundryList.add(p);
                 foundries.put(foundryCode, foundryList);
             }

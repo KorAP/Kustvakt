@@ -37,8 +37,7 @@ public class Role implements Comparable<Role> {
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private List<UserGroupMember> userGroupMembers;
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.EAGER,
-            cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "role", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private List<Privilege> privileges;
 
     public String toString () {
@@ -64,7 +63,7 @@ public class Role implements Comparable<Role> {
         }
         return false;
     }
-    
+
     @Override
     public int hashCode () {
         int hash = 7;

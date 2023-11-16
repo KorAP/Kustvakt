@@ -40,12 +40,11 @@ public class JWTSigner {
 
     private static Logger jlog = LogManager.getLogger(JWTSigner.class);
     public static boolean DEBUG = false;
-    
+
     private URL issuer;
     private JWSSigner signer;
     private JWSVerifier verifier;
     private final int defaultttl;
-
 
     public JWTSigner (final byte[] secret, URL issuer, final int defaulttl)
             throws JOSEException {
@@ -55,17 +54,14 @@ public class JWTSigner {
         this.defaultttl = defaulttl;
     }
 
-
     public JWTSigner (final byte[] secret, String issuer)
             throws MalformedURLException, JOSEException {
         this(secret, new URL(issuer), 72 * 60 * 60);
     }
 
-
     public SignedJWT createJWT (User user, Map<String, Object> attr) {
         return signContent(user, attr, defaultttl);
     }
-
 
     public SignedJWT signContent (User user, Map<String, Object> attr,
             int ttl) {
@@ -91,11 +87,12 @@ public class JWTSigner {
         csBuilder.expirationTime(TimeUtils.getNow().plusSeconds(ttl).toDate());
         csBuilder.claim(Attributes.AUTHENTICATION_TIME,
                 attr.get(Attributes.AUTHENTICATION_TIME));
-        
+
         JWTClaimsSet jwtClaimsSet = csBuilder.build();
-        if (DEBUG) jlog.debug(jwtClaimsSet.getClaim(Attributes.AUTHENTICATION_TIME));
-        SignedJWT signedJWT =
-                new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), jwtClaimsSet);
+        if (DEBUG)
+            jlog.debug(jwtClaimsSet.getClaim(Attributes.AUTHENTICATION_TIME));
+        SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256),
+                jwtClaimsSet);
         try {
             signedJWT.sign(signer);
         }
@@ -104,7 +101,6 @@ public class JWTSigner {
         }
         return signedJWT;
     }
-
 
     /**
      * @param username
@@ -115,14 +111,16 @@ public class JWTSigner {
             String json, int ttl) {
         Builder cs = new JWTClaimsSet.Builder();
         cs.subject(username);
-        if (!json.isEmpty()) cs.claim("data", json);
+        if (!json.isEmpty())
+            cs.claim("data", json);
         cs.expirationTime(TimeUtils.getNow().plusSeconds(ttl).toDate());
         cs.issuer(this.issuer.toString());
 
-        if (!userclient.isEmpty()) cs.claim("userip", userclient);
+        if (!userclient.isEmpty())
+            cs.claim("userip", userclient);
 
-        SignedJWT signedJWT =
-                new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), cs.build());
+        SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256),
+                cs.build());
         try {
             signedJWT.sign(signer);
         }
@@ -132,23 +130,19 @@ public class JWTSigner {
         return signedJWT;
     }
 
-
     public SignedJWT signContent (String username, String userclient,
             String json) {
         return signContent(username, userclient, json, defaultttl);
     }
 
-
     public SignedJWT createSignedToken (String username) {
         return createSignedToken(username, defaultttl);
     }
-
 
     // add client info
     public SignedJWT createSignedToken (String username, int ttl) {
         return signContent(username, "", "", ttl);
     }
-
 
     public SignedJWT verifyToken (String token) throws KustvaktException {
         SignedJWT client;
@@ -171,7 +165,6 @@ public class JWTSigner {
         return client;
     }
 
-
     // does not care about expiration times
     public String retrieveContent (String signedContent)
             throws KustvaktException {
@@ -188,7 +181,6 @@ public class JWTSigner {
         }
     }
 
-
     public TokenContext getTokenContext (String idtoken)
             throws ParseException, JOSEException, KustvaktException {
         SignedJWT signedJWT = verifyToken(idtoken);
@@ -202,10 +194,10 @@ public class JWTSigner {
         c.setExpirationTime(
                 signedJWT.getJWTClaimsSet().getExpirationTime().getTime());
 
-        Instant instant = Instant.ofEpochMilli((long) signedJWT.getJWTClaimsSet()
-                .getClaim(Attributes.AUTHENTICATION_TIME));
-        ZonedDateTime zonedAuthTime = ZonedDateTime.ofInstant(
-                instant, ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
+        Instant instant = Instant.ofEpochMilli((long) signedJWT
+                .getJWTClaimsSet().getClaim(Attributes.AUTHENTICATION_TIME));
+        ZonedDateTime zonedAuthTime = ZonedDateTime.ofInstant(instant,
+                ZoneId.of(Attributes.DEFAULT_TIME_ZONE));
         c.setAuthenticationTime(zonedAuthTime);
         c.setToken(idtoken);
         c.addParams(signedJWT.getJWTClaimsSet().getClaims());

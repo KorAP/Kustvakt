@@ -60,10 +60,10 @@ import de.ids_mannheim.korap.web.input.OAuth2ClientJson;
  */
 @Service
 public class OAuth2ClientService {
-    
-//    public static final UrlValidator redirectURIValidator =
-//            new UrlValidator(new String[] { "http", "https" },
-//                    UrlValidator.NO_FRAGMENTS + UrlValidator.ALLOW_LOCAL_URLS);
+
+    //    public static final UrlValidator redirectURIValidator =
+    //            new UrlValidator(new String[] { "http", "https" },
+    //                    UrlValidator.NO_FRAGMENTS + UrlValidator.ALLOW_LOCAL_URLS);
 
     @Autowired
     private OAuth2TokenService tokenService;
@@ -93,15 +93,18 @@ public class OAuth2ClientService {
     public OAuth2ClientDto registerClient (OAuth2ClientJson clientJson,
             String registeredBy) throws KustvaktException {
         try {
-            ParameterChecker.checkNameValue(clientJson.getName(), "client_name");
-            ParameterChecker.checkObjectValue(clientJson.getType(), "client_type");
-            ParameterChecker.checkStringValue(clientJson.getName(), "client_description");
+            ParameterChecker.checkNameValue(clientJson.getName(),
+                    "client_name");
+            ParameterChecker.checkObjectValue(clientJson.getType(),
+                    "client_type");
+            ParameterChecker.checkStringValue(clientJson.getName(),
+                    "client_description");
         }
         catch (KustvaktException e) {
             throw new KustvaktException(e.getStatusCode(), e.getMessage(),
                     OAuth2Error.INVALID_REQUEST);
         }
-    
+
         String url = clientJson.getUrl();
         if (url != null && !url.isEmpty()) {
             if (!urlValidator.isValid(url)) {
@@ -114,7 +117,7 @@ public class OAuth2ClientService {
         if (redirectURI != null && !redirectURI.isEmpty()
                 && !redirectURIValidator.isValid(redirectURI)) {
             throw new KustvaktException(StatusCodes.INVALID_REDIRECT_URI,
-                   "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
+                    "Invalid redirect URI", OAuth2Error.INVALID_REQUEST);
         }
 
         // boolean isNative = isNativeClient(url, redirectURI);
@@ -140,17 +143,16 @@ public class OAuth2ClientService {
 
         String id = codeGenerator.createRandomCode();
         id = codeGenerator.filterRandomCode(id);
-        
+
         try {
             clientDao.registerClient(id, secretHashcode, clientJson.getName(),
                     clientJson.getType(), url, redirectURI, registeredBy,
                     clientJson.getDescription(),
-                    clientJson.getRefreshTokenExpiry(),
-                    clientJson.getSource());
+                    clientJson.getRefreshTokenExpiry(), clientJson.getSource());
         }
         catch (KustvaktException e) {
-            throw new KustvaktException(e.getStatusCode(),
-                    e.getMessage(), OAuth2Error.INVALID_REQUEST);
+            throw new KustvaktException(e.getStatusCode(), e.getMessage(),
+                    OAuth2Error.INVALID_REQUEST);
         }
         catch (Exception e) {
             Throwable cause = e;
@@ -212,7 +214,7 @@ public class OAuth2ClientService {
             throws KustvaktException {
 
         OAuth2Client client = clientDao.retrieveClientById(clientId);
-        
+
         if (adminDao.isAdmin(username)
                 || client.getRegisteredBy().equals(username)) {
 
@@ -229,23 +231,23 @@ public class OAuth2ClientService {
             throws KustvaktException {
 
         // revoke all related authorization codes
-        List<Authorization> authList =
-                authorizationDao.retrieveAuthorizationsByClientId(clientId);
+        List<Authorization> authList = authorizationDao
+                .retrieveAuthorizationsByClientId(clientId);
         for (Authorization authorization : authList) {
             authorization.setRevoked(true);
             authorizationDao.updateAuthorization(authorization);
         }
 
         // revoke all related access tokens
-        List<AccessToken> tokens =
-                tokenDao.retrieveAccessTokenByClientId(clientId,null);
+        List<AccessToken> tokens = tokenDao
+                .retrieveAccessTokenByClientId(clientId, null);
         for (AccessToken token : tokens) {
             token.setRevoked(true);
             tokenDao.updateAccessToken(token);
         }
 
-        List<RefreshToken> refreshTokens =
-                refreshDao.retrieveRefreshTokenByClientId(clientId,null);
+        List<RefreshToken> refreshTokens = refreshDao
+                .retrieveRefreshTokenByClientId(clientId, null);
         for (RefreshToken token : refreshTokens) {
             token.setRevoked(true);
             refreshDao.updateRefreshToken(token);
@@ -281,18 +283,18 @@ public class OAuth2ClientService {
             String clientSecret) throws KustvaktException {
         return authenticateClient(clientId, clientSecret, false);
     }
-    
+
     public OAuth2Client authenticateClient (String clientId,
             String clientSecret, boolean isSuper) throws KustvaktException {
         String errorClient = "client";
         if (isSuper) {
             errorClient = "super_client";
         }
-        
+
         if (clientId == null || clientId.isEmpty()) {
             throw new KustvaktException(
                     StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                    "Missing parameter: "+errorClient+"_id",
+                    "Missing parameter: " + errorClient + "_id",
                     OAuth2Error.INVALID_REQUEST);
         }
 
@@ -307,7 +309,7 @@ public class OAuth2ClientService {
             if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
                 throw new KustvaktException(
                         StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                        "Missing parameter: "+errorClient+"_secret",
+                        "Missing parameter: " + errorClient + "_secret",
                         OAuth2Error.INVALID_REQUEST);
             }
         }
@@ -315,14 +317,15 @@ public class OAuth2ClientService {
             if (client.getType().equals(OAuth2ClientType.CONFIDENTIAL)) {
                 throw new KustvaktException(
                         StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                        errorClient+"_secret was not registered",
+                        errorClient + "_secret was not registered",
                         OAuth2Error.INVALID_CLIENT);
             }
         }
         else if (!encryption.checkHash(clientSecret, client.getSecret())) {
             throw new KustvaktException(
                     StatusCodes.CLIENT_AUTHENTICATION_FAILED,
-                    "Invalid "+errorClient+" credentials", OAuth2Error.INVALID_CLIENT);
+                    "Invalid " + errorClient + " credentials",
+                    OAuth2Error.INVALID_CLIENT);
         }
     }
 
@@ -341,14 +344,14 @@ public class OAuth2ClientService {
     public OAuth2ClientInfoDto retrieveClientInfo (String clientId)
             throws KustvaktException {
         OAuth2Client client = clientDao.retrieveClientById(clientId);
-//        if (adminDao.isAdmin(username)
-//                || username.equals(client.getRegisteredBy())) {
-            return new OAuth2ClientInfoDto(client);
-//        }
-//        else {
-//            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
-//                    "Unauthorized operation for user: " + username, username);
-//        }
+        //        if (adminDao.isAdmin(username)
+        //                || username.equals(client.getRegisteredBy())) {
+        return new OAuth2ClientInfoDto(client);
+        //        }
+        //        else {
+        //            throw new KustvaktException(StatusCodes.AUTHORIZATION_FAILED,
+        //                    "Unauthorized operation for user: " + username, username);
+        //        }
     }
 
     public OAuth2Client retrieveClient (String clientId)
@@ -358,33 +361,32 @@ public class OAuth2ClientService {
 
     public List<OAuth2ClientInfoDto> listUserAuthorizedClients (String username)
             throws KustvaktException {
-        List<OAuth2Client> userClients =
-                clientDao.retrieveUserAuthorizedClients(username);
+        List<OAuth2Client> userClients = clientDao
+                .retrieveUserAuthorizedClients(username);
         userClients.addAll(clientDao.retrieveClientsByAccessTokens(username));
-        
+
         List<String> clientIds = new ArrayList<>();
         List<OAuth2Client> uniqueClients = new ArrayList<>();
-        for (OAuth2Client c : userClients){
+        for (OAuth2Client c : userClients) {
             String id = c.getId();
-            if (!clientIds.contains(id)){
+            if (!clientIds.contains(id)) {
                 clientIds.add(id);
                 uniqueClients.add(c);
-            }        
+            }
         }
-        
+
         Collections.sort(uniqueClients);
         return createClientDtos(uniqueClients);
     }
-    
+
     public List<OAuth2ClientInfoDto> listUserRegisteredClients (String username)
             throws KustvaktException {
-        List<OAuth2Client> userClients =
-                clientDao.retrieveUserRegisteredClients(username);
+        List<OAuth2Client> userClients = clientDao
+                .retrieveUserRegisteredClients(username);
         Collections.sort(userClients);
         return createClientDtos(userClients);
     }
-    
-       
+
     public List<OAuth2ClientInfoDto> listPlugins (boolean isPermitted)
             throws KustvaktException {
 
@@ -392,46 +394,47 @@ public class OAuth2ClientService {
         Collections.sort(plugins);
         return createClientDtos(plugins);
     }
-    
+
     public List<InstalledPluginDto> listInstalledPlugins (String superClientId,
             String username) throws KustvaktException {
 
-        List<InstalledPlugin> plugins =
-                pluginDao.retrieveInstalledPlugins(superClientId, username);
+        List<InstalledPlugin> plugins = pluginDao
+                .retrieveInstalledPlugins(superClientId, username);
         Collections.sort(plugins); // by client name
-        
-        List<InstalledPluginDto> list = new ArrayList<InstalledPluginDto>(plugins.size());
+
+        List<InstalledPluginDto> list = new ArrayList<InstalledPluginDto>(
+                plugins.size());
         for (InstalledPlugin p : plugins) {
             list.add(new InstalledPluginDto(p));
         }
-        
+
         return list;
     }
-    
+
     public InstalledPluginDto installPlugin (String superClientId,
             String clientId, String installedBy) throws KustvaktException {
-        
+
         OAuth2Client client = clientDao.retrieveClientById(clientId);
         if (!client.isPermitted()) {
             throw new KustvaktException(StatusCodes.PLUGIN_NOT_PERMITTED,
                     "Plugin is not permitted", clientId);
         }
-        
-        if (isPluginInstalled(superClientId,clientId,installedBy)) {
+
+        if (isPluginInstalled(superClientId, clientId, installedBy)) {
             throw new KustvaktException(StatusCodes.PLUGIN_HAS_BEEN_INSTALLED,
                     "Plugin has been installed", clientId);
         }
-        
+
         OAuth2Client superClient = clientDao.retrieveClientById(superClientId);
-        InstalledPlugin plugin =
-                pluginDao.storeUserPlugin(superClient, client, installedBy);
-        
+        InstalledPlugin plugin = pluginDao.storeUserPlugin(superClient, client,
+                installedBy);
+
         InstalledPluginDto dto = new InstalledPluginDto(plugin);
         return dto;
     }
-    
-    public void uninstallPlugin (String superClientId,
-            String clientId, String username) throws KustvaktException {
+
+    public void uninstallPlugin (String superClientId, String clientId,
+            String username) throws KustvaktException {
         pluginDao.uninstallPlugin(superClientId, clientId, username);
         tokenService.revokeAllClientTokensForUser(clientId, username);
     }
@@ -452,7 +455,8 @@ public class OAuth2ClientService {
             List<OAuth2Client> userClients) throws KustvaktException {
         List<OAuth2ClientInfoDto> dtoList = new ArrayList<>(userClients.size());
         for (OAuth2Client uc : userClients) {
-            if (uc.isSuper()) continue;
+            if (uc.isSuper())
+                continue;
             OAuth2ClientInfoDto dto = new OAuth2ClientInfoDto(uc);
             dtoList.add(dto);
         }
@@ -465,7 +469,7 @@ public class OAuth2ClientService {
 
     public void verifySuperClient (String clientId, String clientSecret)
             throws KustvaktException {
-        OAuth2Client client = authenticateClient(clientId, clientSecret,true);
+        OAuth2Client client = authenticateClient(clientId, clientSecret, true);
         if (!client.isSuper()) {
             throw new KustvaktException(StatusCodes.CLIENT_AUTHORIZATION_FAILED,
                     "Only super client is allowed to use this service",

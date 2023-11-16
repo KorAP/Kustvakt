@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 public class SerializationTest {
 
     @Test
-    public void testSettingsObject() {
+    public void testSettingsObject () {
         // String t = "poliqarp_test";
         // UserSettings s = new UserSettings();
         // Map map = s.toObjectMap();

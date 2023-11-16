@@ -9,17 +9,15 @@ import de.ids_mannheim.korap.user.User;
 
 public interface AuthenticationIface {
 
-    public TokenContext getTokenContext(String authToken) throws KustvaktException;
-
-
-    public TokenContext createTokenContext(User user, Map<String, Object> attr)
+    public TokenContext getTokenContext (String authToken)
             throws KustvaktException;
 
+    public TokenContext createTokenContext (User user, Map<String, Object> attr)
+            throws KustvaktException;
 
-//    void removeUserSession (String token) throws KustvaktException;
-//
-//    public TokenContext refresh (TokenContext context) throws KustvaktException;
-
+    //    void removeUserSession (String token) throws KustvaktException;
+    //
+    //    public TokenContext refresh (TokenContext context) throws KustvaktException;
 
     public TokenType getTokenType ();
 

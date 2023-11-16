@@ -26,7 +26,7 @@ import de.ids_mannheim.korap.utils.TimeUtils;
  */
 
 public class FullConfiguration extends KustvaktConfiguration {
-    public static Logger jlog = LogManager.getLogger(FullConfiguration.class);    
+    public static Logger jlog = LogManager.getLogger(FullConfiguration.class);
     // mail configuration
     private boolean isMailEnabled;
     private String testEmail;
@@ -63,19 +63,19 @@ public class FullConfiguration extends KustvaktConfiguration {
     private int refreshTokenLongExpiry;
     private int refreshTokenExpiry;
     private int authorizationCodeExpiry;
-    
+
     private int maxNumberOfUserQueries;
-    
+
     private URL issuer;
 
     private String namedVCPath;
-    
+
     private boolean createInitialSuperClient;
 
     public FullConfiguration (Properties properties) throws Exception {
         super(properties);
     }
-    
+
     public FullConfiguration () {
         super();
     }
@@ -97,23 +97,24 @@ public class FullConfiguration extends KustvaktConfiguration {
         setOAuth2Configuration(properties);
 
         setNamedVCPath(properties.getProperty("krill.namedVC", ""));
-        
-//        Cache cache = CacheManager.newInstance().getCache("named_vc");
-//        CacheConfiguration config = cache.getCacheConfiguration();
-//        config.setMaxBytesLocalHeap(properties.getProperty("cache.max.bytes.local.heap", "256m"));
-//        config.setMaxBytesLocalDisk(properties.getProperty("cache.max.bytes.local.disk", "2G"));
-//        jlog.info("max local heap:"+config.getMaxBytesLocalHeapAsString());
-//        jlog.info("max local disk:"+config.getMaxBytesLocalDiskAsString());
-        
+
+        //        Cache cache = CacheManager.newInstance().getCache("named_vc");
+        //        CacheConfiguration config = cache.getCacheConfiguration();
+        //        config.setMaxBytesLocalHeap(properties.getProperty("cache.max.bytes.local.heap", "256m"));
+        //        config.setMaxBytesLocalDisk(properties.getProperty("cache.max.bytes.local.disk", "2G"));
+        //        jlog.info("max local heap:"+config.getMaxBytesLocalHeapAsString());
+        //        jlog.info("max local disk:"+config.getMaxBytesLocalDiskAsString());
+
         setMaxNumberOfUserQueries(Integer.parseInt(
                 properties.getProperty("max.user.persistent.queries", "20")));
     }
 
-    private void setSecurityConfiguration (Properties properties) throws MalformedURLException {
+    private void setSecurityConfiguration (Properties properties)
+            throws MalformedURLException {
         setSecureHashAlgorithm(Enum.valueOf(EncryptionIface.Encryption.class,
                 properties.getProperty("security.secure.hash.algorithm",
                         "BCRYPT")));
-        
+
         String issuerStr = properties.getProperty("security.jwt.issuer",
                 "https://korap.ids-mannheim.de");
 
@@ -129,8 +130,8 @@ public class FullConfiguration extends KustvaktConfiguration {
                         "oauth2.password.authentication", "TEST")));
         setNativeClientHost(properties.getProperty("oauth2.native.client.host",
                 "korap.ids-mannheim.de"));
-        setCreateInitialSuperClient(Boolean.valueOf(
-                properties.getProperty("oauth2.initial.super.client", "false")));
+        setCreateInitialSuperClient(Boolean.valueOf(properties
+                .getProperty("oauth2.initial.super.client", "false")));
 
         setMaxAuthenticationAttempts(Integer
                 .parseInt(properties.getProperty("oauth2.max.attempts", "1")));
@@ -146,11 +147,11 @@ public class FullConfiguration extends KustvaktConfiguration {
                 properties.getProperty("oauth2.refresh.token.expiry", "90D"));
         authorizationCodeExpiry = TimeUtils.convertTimeToSeconds(properties
                 .getProperty("oauth2.authorization.code.expiry", "10M"));
-        
-        setAccessTokenLongExpiry(TimeUtils.convertTimeToSeconds(
-                properties.getProperty("oauth2.access.token.long.expiry", "365D")));
-        setRefreshTokenLongExpiry(TimeUtils.convertTimeToSeconds(
-                properties.getProperty("oauth2.refresh.token.long.expiry", "365D")));
+
+        setAccessTokenLongExpiry(TimeUtils.convertTimeToSeconds(properties
+                .getProperty("oauth2.access.token.long.expiry", "365D")));
+        setRefreshTokenLongExpiry(TimeUtils.convertTimeToSeconds(properties
+                .getProperty("oauth2.refresh.token.long.expiry", "365D")));
     }
 
     private void setMailConfiguration (Properties properties) {
@@ -476,7 +477,7 @@ public class FullConfiguration extends KustvaktConfiguration {
     public boolean createInitialSuperClient () {
         return createInitialSuperClient;
     }
-    
+
     public void setCreateInitialSuperClient (boolean initialSuperClient) {
         this.createInitialSuperClient = initialSuperClient;
     }
@@ -488,5 +489,5 @@ public class FullConfiguration extends KustvaktConfiguration {
     public void setMaxNumberOfUserQueries (int maxNumberOfUserQueries) {
         this.maxNumberOfUserQueries = maxNumberOfUserQueries;
     }
-    
+
 }

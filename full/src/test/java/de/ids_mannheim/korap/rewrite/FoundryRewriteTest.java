@@ -44,50 +44,67 @@ public class FoundryRewriteTest extends SpringJerseyTest {
     private LayerMapper m;
 
     @Test
-    public void testSearchRewriteFoundryWithUserSetting() throws KustvaktException {
+    public void testSearchRewriteFoundryWithUserSetting ()
+            throws KustvaktException {
         // create user setting
         String json = "{\"pos-foundry\":\"opennlp\"}";
         String username = "foundryRewriteTest";
         String pathUsername = "~" + username;
-        Response response = target().path(API_VERSION).path(pathUsername).path("setting").request().header(Attributes.AUTHORIZATION, HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(username, "pass")).put(Entity.json(json));
+        Response response = target().path(API_VERSION).path(pathUsername)
+                .path("setting").request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .put(Entity.json(json));
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         // search
-        response = target().path(API_VERSION).path("search").queryParam("q", "[pos=ADJA]").queryParam("ql", "poliqarp").request().header(Attributes.AUTHORIZATION, HttpAuthorizationHandler.createBasicAuthorizationHeaderValue(username, "pass")).accept(MediaType.APPLICATION_JSON).get();
+        response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[pos=ADJA]").queryParam("ql", "poliqarp")
+                .request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue(username, "pass"))
+                .accept(MediaType.APPLICATION_JSON).get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(node.at("/query/wrap/foundry").asText(), "opennlp");
-        assertEquals(node.at("/query/wrap/rewrites/0/scope").asText(), "foundry");
+        assertEquals(node.at("/query/wrap/rewrites/0/scope").asText(),
+                "foundry");
     }
 
     @Test
-    public void testRewritePosFoundryWithUserSetting() throws KustvaktException {
+    public void testRewritePosFoundryWithUserSetting ()
+            throws KustvaktException {
         // EM: see
         // full/src/main/resources/db/insert/V3.6__insert_default_settings.sql
         String username = "bubbles";
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[pos=ADJA]", "poliqarp");
-        String result = handler.processQuery(s.toJSON(), new KorAPUser(username));
+        String result = handler.processQuery(s.toJSON(),
+                new KorAPUser(username));
         JsonNode node = JsonUtils.readTree(result);
         assertEquals(node.at("/query/wrap/foundry").asText(), "corenlp");
-        assertEquals(node.at("/query/wrap/rewrites/0/scope").asText(), "foundry");
+        assertEquals(node.at("/query/wrap/rewrites/0/scope").asText(),
+                "foundry");
     }
 
     @Test
-    public void testRewriteLemmaFoundryWithUserSetting() throws KustvaktException {
+    public void testRewriteLemmaFoundryWithUserSetting ()
+            throws KustvaktException {
         String username = "bubbles";
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[base=Haus]", "poliqarp");
-        String result = handler.processQuery(s.toJSON(), new KorAPUser(username));
+        String result = handler.processQuery(s.toJSON(),
+                new KorAPUser(username));
         JsonNode node = JsonUtils.readTree(result);
         // EM: only for testing, in fact, opennlp lemma does not
         // exist!
         assertEquals(node.at("/query/wrap/foundry").asText(), "opennlp");
-        assertEquals(node.at("/query/wrap/rewrites/0/scope").asText(), "foundry");
+        assertEquals(node.at("/query/wrap/rewrites/0/scope").asText(),
+                "foundry");
     }
 
     @Test
-    public void testDefaultLayerMapperThrowsNoException() {
+    public void testDefaultLayerMapperThrowsNoException () {
         assertEquals(config.getDefault_lemma(), m.findFoundry("lemma"));
         assertEquals(config.getDefault_pos(), m.findFoundry("pos"));
         assertEquals(config.getDefault_orthography(), m.findFoundry("surface"));
@@ -96,35 +113,42 @@ public class FoundryRewriteTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testDefaultFoundryInjectLemmaThrowsNoError() throws KustvaktException {
+    public void testDefaultFoundryInjectLemmaThrowsNoError ()
+            throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[base=Haus]", "poliqarp");
         String result = handler.processQuery(s.toJSON(), new KorAPUser("test"));
         JsonNode node = JsonUtils.readTree(result);
         assertNotNull(node);
         assertFalse(node.at("/query/wrap/foundry").isMissingNode());
-        assertEquals(config.getDefault_lemma(), node.at("/query/wrap/foundry").asText());
+        assertEquals(config.getDefault_lemma(),
+                node.at("/query/wrap/foundry").asText());
         assertEquals(node.at("/query/wrap/layer").asText(), "lemma");
         assertFalse(node.at("/query/wrap/rewrites").isMissingNode());
-        assertEquals(node.at("/query/wrap/rewrites/0/@type").asText(), "koral:rewrite");
+        assertEquals(node.at("/query/wrap/rewrites/0/@type").asText(),
+                "koral:rewrite");
     }
 
     @Test
-    public void testDefaultFoundryInjectPOSNoErrors() throws KustvaktException {
+    public void testDefaultFoundryInjectPOSNoErrors ()
+            throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[pos=ADJA]", "poliqarp");
         String result = handler.processQuery(s.toJSON(), new KorAPUser("test"));
         JsonNode node = JsonUtils.readTree(result);
         assertNotNull(node);
         assertFalse(node.at("/query/wrap/foundry").isMissingNode());
-        assertEquals(config.getDefault_pos(), node.at("/query/wrap/foundry").asText());
+        assertEquals(config.getDefault_pos(),
+                node.at("/query/wrap/foundry").asText());
         assertEquals(node.at("/query/wrap/layer").asText(), "pos");
         assertFalse(node.at("/query/wrap/rewrites").isMissingNode());
-        assertEquals(node.at("/query/wrap/rewrites/0/@type").asText(), "koral:rewrite");
+        assertEquals(node.at("/query/wrap/rewrites/0/@type").asText(),
+                "koral:rewrite");
     }
 
     @Test
-    public void testFoundryInjectJoinedQueryNoErrors() throws KustvaktException {
+    public void testFoundryInjectJoinedQueryNoErrors ()
+            throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[orth=laufe/i & base!=Lauf]", "poliqarp");
         String result = handler.processQuery(s.toJSON(), new KorAPUser("test"));
@@ -138,7 +162,8 @@ public class FoundryRewriteTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testFoundryInjectGroupedQueryNoErrors() throws KustvaktException {
+    public void testFoundryInjectGroupedQueryNoErrors ()
+            throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[(base=laufen | tt/pos=VVFIN)]", "poliqarp");
         String result = handler.processQuery(s.toJSON(), new KorAPUser("test"));
@@ -152,7 +177,7 @@ public class FoundryRewriteTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testFoundryBaseRewrite() throws KustvaktException {
+    public void testFoundryBaseRewrite () throws KustvaktException {
         QuerySerializer s = new QuerySerializer();
         s.setQuery("[orth=laufen]", "poliqarp");
         String result = handler.processQuery(s.toJSON(), new KorAPUser("test"));

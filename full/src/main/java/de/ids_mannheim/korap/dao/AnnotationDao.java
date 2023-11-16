@@ -24,7 +24,8 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
 /**
- * AnnotationDao manages queries to database regarding annotations including
+ * AnnotationDao manages queries to database regarding annotations
+ * including
  * foundry and layer pairs.
  * 
  * @author margaretha
@@ -44,8 +45,8 @@ public class AnnotationDao {
     @SuppressWarnings("unchecked")
     public List<AnnotationLayer> getAllFoundryLayerPairs () {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<AnnotationLayer> query =
-                criteriaBuilder.createQuery(AnnotationLayer.class);
+        CriteriaQuery<AnnotationLayer> query = criteriaBuilder
+                .createQuery(AnnotationLayer.class);
         Root<AnnotationLayer> layer = query.from(AnnotationLayer.class);
         layer.fetch(AnnotationLayer_.foundry);
         layer.fetch(AnnotationLayer_.layer);
@@ -72,8 +73,8 @@ public class AnnotationDao {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Object> query = criteriaBuilder.createQuery();
-        Root<AnnotationLayer> annotationPair =
-                query.from(AnnotationLayer.class);
+        Root<AnnotationLayer> annotationPair = query
+                .from(AnnotationLayer.class);
         annotationPair.fetch(AnnotationLayer_.foundry);
         annotationPair.fetch(AnnotationLayer_.layer);
         annotationPair.fetch(AnnotationLayer_.keys);
@@ -97,8 +98,8 @@ public class AnnotationDao {
                 Predicate layerPredicate = criteriaBuilder.equal(annotationPair
                         .get(AnnotationLayer_.layer).get(Annotation_.code),
                         layer);
-                Predicate andPredicate =
-                        criteriaBuilder.and(foundryPredicate, layerPredicate);
+                Predicate andPredicate = criteriaBuilder.and(foundryPredicate,
+                        layerPredicate);
                 query.where(andPredicate);
             }
         }
@@ -109,8 +110,8 @@ public class AnnotationDao {
 
     public Annotation retrieveAnnotation (String code, String type) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Annotation> query =
-                criteriaBuilder.createQuery(Annotation.class);
+        CriteriaQuery<Annotation> query = criteriaBuilder
+                .createQuery(Annotation.class);
 
         Root<Annotation> annotation = query.from(Annotation.class);
         Predicate predicates = criteriaBuilder.and(
@@ -132,8 +133,8 @@ public class AnnotationDao {
         Annotation ann2 = retrieveAnnotation(layer, AnnotationType.LAYER);
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<AnnotationLayer> query =
-                criteriaBuilder.createQuery(AnnotationLayer.class);
+        CriteriaQuery<AnnotationLayer> query = criteriaBuilder
+                .createQuery(AnnotationLayer.class);
 
         Root<AnnotationLayer> annotation = query.from(AnnotationLayer.class);
         Predicate predicates = criteriaBuilder.and(
@@ -188,8 +189,8 @@ public class AnnotationDao {
     @Transactional
     public AnnotationKey createAnnotationKey (AnnotationLayer layer,
             Annotation key) {
-        AnnotationKey annotation =
-                new AnnotationKey(layer.getId(), key.getId());
+        AnnotationKey annotation = new AnnotationKey(layer.getId(),
+                key.getId());
         entityManager.persist(annotation);
         return annotation;
     }
@@ -198,8 +199,8 @@ public class AnnotationDao {
             Annotation key) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<AnnotationKey> query =
-                criteriaBuilder.createQuery(AnnotationKey.class);
+        CriteriaQuery<AnnotationKey> query = criteriaBuilder
+                .createQuery(AnnotationKey.class);
 
         Root<AnnotationKey> annotation = query.from(AnnotationKey.class);
         Predicate predicates = criteriaBuilder.and(

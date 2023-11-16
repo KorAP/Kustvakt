@@ -17,14 +17,16 @@ public class RandomCodeGeneratorTest extends SpringJerseyTest {
     private RandomCodeGenerator random;
 
     @Test
-    public void testRandomGenerator() throws NoSuchAlgorithmException, KustvaktException {
+    public void testRandomGenerator ()
+            throws NoSuchAlgorithmException, KustvaktException {
         String value = random.createRandomCode();
         assertEquals(22, value.length());
         // System.out.println(value);
     }
 
     @Disabled
-    public void testRandomGeneratorPerformance() throws NoSuchAlgorithmException, KustvaktException {
+    public void testRandomGeneratorPerformance ()
+            throws NoSuchAlgorithmException, KustvaktException {
         long min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
         String code;
         while (true) {
@@ -39,7 +41,8 @@ public class RandomCodeGeneratorTest extends SpringJerseyTest {
                 min = duration;
             else if (duration > max)
                 max = duration;
-            System.out.println("d : " + duration + " min :" + min + ", max: " + max);
+            System.out.println(
+                    "d : " + duration + " min :" + min + ", max: " + max);
         }
     }
 }

@@ -1,6 +1,5 @@
 package de.ids_mannheim.korap.config;
 
-
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -23,14 +22,14 @@ public class StaticContextLoaderListener extends ContextLoaderListener {
         super(applicationContext);
     }
 
-	@Override
-	public void contextInitialized(ServletContextEvent event) {
+    @Override
+    public void contextInitialized (ServletContextEvent event) {
         contextClassLoader = Thread.currentThread().getContextClassLoader();
         super.contextInitialized(event);
-	}
+    }
 
-	@Override
-	public void contextDestroyed(ServletContextEvent event) {
+    @Override
+    public void contextDestroyed (ServletContextEvent event) {
         // Perform the destruction with the same contextual ClassLoader that was present
         // during initialization.
         // This a workaround for a bug in org.glassfish.grizzly.servlet.WebappContext
@@ -43,5 +42,5 @@ public class StaticContextLoaderListener extends ContextLoaderListener {
         super.contextDestroyed(event);
 
         Thread.currentThread().setContextClassLoader(loader);
-	}
+    }
 }

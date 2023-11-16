@@ -5,17 +5,14 @@ package de.ids_mannheim.korap.user;
  */
 public class GenericUserData extends Userdata {
 
-
     public GenericUserData () {
         super(-1);
     }
-
 
     @Override
     public String[] requiredFields () {
         return new String[0];
     }
-
 
     @Override
     public String[] defaultFields () {

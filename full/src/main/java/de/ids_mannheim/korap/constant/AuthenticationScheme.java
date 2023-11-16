@@ -2,8 +2,10 @@ package de.ids_mannheim.korap.constant;
 
 import org.apache.commons.lang.WordUtils;
 
-/** Lists possible authentication schemes used in the Authorization header 
- *  of HTTP requests.  
+/**
+ * Lists possible authentication schemes used in the Authorization
+ * header
+ * of HTTP requests.
  * 
  * @author margaretha
  *

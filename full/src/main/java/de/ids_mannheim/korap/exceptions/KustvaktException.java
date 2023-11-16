@@ -21,18 +21,18 @@ public class KustvaktException extends Exception {
     private String userid;
     private Integer statusCode;
     private int responseStatus;
-    
+
     private String entity;
     private String notification;
     private boolean isNotification;
-//    private TokenType authType;
+    //    private TokenType authType;
     private URI redirectUri;
     private ErrorObject oauth2Error;
 
     public KustvaktException (int status) {
         this.statusCode = status;
     }
-    
+
     public KustvaktException (int status, String ... args) {
         super(args[0]);
         this.statusCode = status;
@@ -40,12 +40,13 @@ public class KustvaktException extends Exception {
         this.entity = Arrays.asList(subarray).toString();
     }
 
-    public KustvaktException (int status, String notification, boolean isNotification) {
+    public KustvaktException (int status, String notification,
+                              boolean isNotification) {
         this.statusCode = status;
         this.notification = notification;
         this.isNotification = isNotification;
     }
-    
+
     public boolean hasNotification () {
         return isNotification;
     }
@@ -61,7 +62,6 @@ public class KustvaktException extends Exception {
         this(userid, status, message, entity, null);
     }
 
-
     public KustvaktException (Object userid, int status, String message,
                               String entity, Exception e) {
         super(message, e);
@@ -69,7 +69,6 @@ public class KustvaktException extends Exception {
         this.entity = entity;
         this.userid = String.valueOf(userid);
     }
-
 
     public KustvaktException (Object userid, int status, String entity) {
         super(StatusCodes.getMessage(status));
@@ -83,20 +82,21 @@ public class KustvaktException extends Exception {
         this.statusCode = status;
         this.entity = entity;
     }
-    
-    public KustvaktException (int status, String message, String entity, Throwable e) {
+
+    public KustvaktException (int status, String message, String entity,
+                              Throwable e) {
         super(message, e);
         this.statusCode = status;
         this.entity = entity;
     }
-    
+
     public KustvaktException (int status, String message, Throwable e) {
         super(message, e);
         this.statusCode = status;
     }
 
     public KustvaktException (int status, String message,
-            ErrorObject oauth2Error) {
+                              ErrorObject oauth2Error) {
         super(message);
         this.statusCode = status;
         this.oauth2Error = oauth2Error;
@@ -108,13 +108,10 @@ public class KustvaktException extends Exception {
         this.statusCode = status;
     }
 
-
     public KustvaktException (String message, Throwable cause, int status) {
         super(message, cause);
         this.statusCode = status;
     }
-
-
 
     public KustvaktException (String notification) {
         this.notification = notification;

@@ -20,14 +20,15 @@ import de.ids_mannheim.korap.utils.JsonUtils;
 /**
  * @author hanl, margaretha
  * @lastUpdate 19/04/2017
- * EM: FIX ME: Database restructure
+ *             EM: FIX ME: Database restructure
  */
 @Disabled
 public class ResourceInfoControllerTest extends SpringJerseyTest {
 
     @Test
-    public void testGetPublicVirtualCollectionInfo() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("collection").request().get();
+    public void testGetPublicVirtualCollectionInfo () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("collection")
+                .request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
@@ -36,8 +37,15 @@ public class ResourceInfoControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testGetVirtualCollectionInfoWithAuthentication() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("collection").request().header(Attributes.AUTHORIZATION, HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("kustvakt", "kustvakt2015")).get();
+    public void testGetVirtualCollectionInfoWithAuthentication ()
+            throws KustvaktException {
+        Response response = target().path(API_VERSION).path("collection")
+                .request()
+                .header(Attributes.AUTHORIZATION,
+                        HttpAuthorizationHandler
+                                .createBasicAuthorizationHeaderValue("kustvakt",
+                                        "kustvakt2015"))
+                .get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(response.readEntity(String.class));
         assertNotNull(node);
@@ -46,32 +54,38 @@ public class ResourceInfoControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testGetVirtualCollectionInfoById() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("collection").path("GOE-VC").request().get();
+    public void testGetVirtualCollectionInfoById () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("collection")
+                .path("GOE-VC").request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.size());
         assertEquals(node.path("name").asText(), "Goethe Virtual Collection");
-        assertEquals(node.path("description").asText(), "Goethe works from 1810");
+        assertEquals(node.path("description").asText(),
+                "Goethe works from 1810");
     }
 
     @Test
-    public void testGetVirtualCollectionInfoByIdUnauthorized() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("collection").path("WPD15-VC").request().get();
+    public void testGetVirtualCollectionInfoByIdUnauthorized ()
+            throws KustvaktException {
+        Response response = target().path(API_VERSION).path("collection")
+                .path("WPD15-VC").request().get();
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.size());
         assertEquals(101, node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/2").asText(), "[Cannot found public VirtualCollection with ids: [WPD15-VC]]");
+        assertEquals(node.at("/errors/0/2").asText(),
+                "[Cannot found public VirtualCollection with ids: [WPD15-VC]]");
     }
 
     @Test
-    public void testGetPublicCorporaInfo() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("corpus").request().get();
+    public void testGetPublicCorporaInfo () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("corpus").request()
+                .get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
@@ -81,8 +95,9 @@ public class ResourceInfoControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testGetCorpusInfoById() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("corpus").path("WPD13").request().get();
+    public void testGetCorpusInfoById () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("corpus")
+                .path("WPD13").request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         // System.out.println(ent);
@@ -93,8 +108,9 @@ public class ResourceInfoControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testGetCorpusInfoById2() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("corpus").path("GOE").request().get();
+    public void testGetCorpusInfoById2 () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("corpus")
+                .path("GOE").request().get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
@@ -104,8 +120,9 @@ public class ResourceInfoControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testGetPublicFoundriesInfo() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("foundry").request().get();
+    public void testGetPublicFoundriesInfo () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("foundry").request()
+                .get();
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
@@ -115,8 +132,9 @@ public class ResourceInfoControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testGetFoundryInfoById() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("foundry").path("tt").request().get();
+    public void testGetFoundryInfoById () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("foundry")
+                .path("tt").request().get();
         String ent = response.readEntity(String.class);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(ent);
@@ -125,15 +143,17 @@ public class ResourceInfoControllerTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testGetUnexistingCorpusInfo() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("corpus").path("ZUW19").request().get();
+    public void testGetUnexistingCorpusInfo () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("corpus")
+                .path("ZUW19").request().get();
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.size());
         assertEquals(101, node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/2").asText(), "[Cannot found public Corpus with ids: [ZUW19]]");
+        assertEquals(node.at("/errors/0/2").asText(),
+                "[Cannot found public Corpus with ids: [ZUW19]]");
     }
 
     // EM: queries for an unauthorized corpus get the same responses /
@@ -141,14 +161,16 @@ public class ResourceInfoControllerTest extends SpringJerseyTest {
     // asking for an unexisting corpus info. Does it need a specific
     // exception instead?
     @Test
-    public void testGetUnauthorizedCorpusInfo() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("corpus").path("BRZ10").request().get();
+    public void testGetUnauthorizedCorpusInfo () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("corpus")
+                .path("BRZ10").request().get();
         assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         assertNotNull(node);
         assertNotEquals(0, node.size());
         assertEquals(101, node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/2").asText(), "[Cannot found public Corpus with ids: [BRZ10]]");
+        assertEquals(node.at("/errors/0/2").asText(),
+                "[Cannot found public Corpus with ids: [BRZ10]]");
     }
 }

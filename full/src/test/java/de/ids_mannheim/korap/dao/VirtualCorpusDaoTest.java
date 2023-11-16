@@ -25,8 +25,9 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
     private QueryDao dao;
 
     @Test
-    public void testListVCByType() throws KustvaktException {
-        List<QueryDO> vcList = dao.retrieveQueryByType(ResourceType.PUBLISHED, null, QueryType.VIRTUAL_CORPUS);
+    public void testListVCByType () throws KustvaktException {
+        List<QueryDO> vcList = dao.retrieveQueryByType(ResourceType.PUBLISHED,
+                null, QueryType.VIRTUAL_CORPUS);
         assertEquals(1, vcList.size());
         QueryDO vc = vcList.get(0);
         assertEquals(4, vc.getId());
@@ -35,40 +36,48 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testSystemVC() throws KustvaktException {
+    public void testSystemVC () throws KustvaktException {
         // insert vc
-        int id = dao.createQuery("system-vc", ResourceType.SYSTEM, QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE, "corpusSigle=GOE", "definition", "description", "experimental", false, "test class", null, null);
+        int id = dao.createQuery("system-vc", ResourceType.SYSTEM,
+                QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE,
+                "corpusSigle=GOE", "definition", "description", "experimental",
+                false, "test class", null, null);
         // select vc
-        List<QueryDO> vcList = dao.retrieveQueryByType(ResourceType.SYSTEM, null, QueryType.VIRTUAL_CORPUS);
+        List<QueryDO> vcList = dao.retrieveQueryByType(ResourceType.SYSTEM,
+                null, QueryType.VIRTUAL_CORPUS);
         assertEquals(2, vcList.size());
         QueryDO vc = dao.retrieveQueryById(id);
         // delete vc
         dao.deleteQuery(vc);
         // check if vc has been deleted
-        KustvaktException exception = assertThrows(KustvaktException.class, () -> {
-            dao.retrieveQueryById(id);
-        });
-        assertEquals(StatusCodes.NO_RESOURCE_FOUND, exception.getStatusCode().intValue());
+        KustvaktException exception = assertThrows(KustvaktException.class,
+                () -> {
+                    dao.retrieveQueryById(id);
+                });
+        assertEquals(StatusCodes.NO_RESOURCE_FOUND,
+                exception.getStatusCode().intValue());
     }
 
     @Test
     public void testNonUniqueVC () throws KustvaktException {
-        
-        PersistenceException exception = assertThrows(PersistenceException.class, ()->{
-            dao.createQuery("system-vc", ResourceType.SYSTEM,
-                    QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE,
-                    "corpusSigle=GOE", "definition", "description", "experimental",
-                    false, "system", null, null);
-        });
-        
+
+        PersistenceException exception = assertThrows(
+                PersistenceException.class, () -> {
+                    dao.createQuery("system-vc", ResourceType.SYSTEM,
+                            QueryType.VIRTUAL_CORPUS, User.CorpusAccess.FREE,
+                            "corpusSigle=GOE", "definition", "description",
+                            "experimental", false, "system", null, null);
+                });
+
         assertEquals(exception.getMessage(),
                 "Converting `org.hibernate.exception.GenericJDBCException` "
-                + "to JPA `PersistenceException` : could not execute statement");
+                        + "to JPA `PersistenceException` : could not execute statement");
     }
 
     @Test
-    public void retrieveSystemVC() throws KustvaktException {
-        List<QueryDO> vc = dao.retrieveQueryByType(ResourceType.SYSTEM, null, QueryType.VIRTUAL_CORPUS);
+    public void retrieveSystemVC () throws KustvaktException {
+        List<QueryDO> vc = dao.retrieveQueryByType(ResourceType.SYSTEM, null,
+                QueryType.VIRTUAL_CORPUS);
         assertEquals(1, vc.size());
     }
 
@@ -78,8 +87,9 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
      * @throws KustvaktException
      */
     @Test
-    public void retrieveVCByUserDory() throws KustvaktException {
-        List<QueryDO> virtualCorpora = dao.retrieveQueryByUser("dory", QueryType.VIRTUAL_CORPUS);
+    public void retrieveVCByUserDory () throws KustvaktException {
+        List<QueryDO> virtualCorpora = dao.retrieveQueryByUser("dory",
+                QueryType.VIRTUAL_CORPUS);
         // System.out.println(virtualCorpora);
         assertEquals(4, virtualCorpora.size());
         // ordered by id
@@ -97,8 +107,9 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
      * @throws KustvaktException
      */
     @Test
-    public void retrieveVCByUserNemo() throws KustvaktException {
-        List<QueryDO> virtualCorpora = dao.retrieveQueryByUser("nemo", QueryType.VIRTUAL_CORPUS);
+    public void retrieveVCByUserNemo () throws KustvaktException {
+        List<QueryDO> virtualCorpora = dao.retrieveQueryByUser("nemo",
+                QueryType.VIRTUAL_CORPUS);
         assertEquals(3, virtualCorpora.size());
         Iterator<QueryDO> i = virtualCorpora.iterator();
         assertEquals(i.next().getName(), "group-vc");
@@ -113,8 +124,9 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
      * @throws KustvaktException
      */
     @Test
-    public void retrieveVCByUserMarlin() throws KustvaktException {
-        List<QueryDO> virtualCorpora = dao.retrieveQueryByUser("marlin", QueryType.VIRTUAL_CORPUS);
+    public void retrieveVCByUserMarlin () throws KustvaktException {
+        List<QueryDO> virtualCorpora = dao.retrieveQueryByUser("marlin",
+                QueryType.VIRTUAL_CORPUS);
         assertEquals(3, virtualCorpora.size());
         Iterator<QueryDO> i = virtualCorpora.iterator();
         assertEquals(i.next().getName(), "system-vc");
@@ -129,8 +141,9 @@ public class VirtualCorpusDaoTest extends SpringJerseyTest {
      * @throws KustvaktException
      */
     @Test
-    public void retrieveVCByUserPearl() throws KustvaktException {
-        List<QueryDO> virtualCorpora = dao.retrieveQueryByUser("pearl", QueryType.VIRTUAL_CORPUS);
+    public void retrieveVCByUserPearl () throws KustvaktException {
+        List<QueryDO> virtualCorpora = dao.retrieveQueryByUser("pearl",
+                QueryType.VIRTUAL_CORPUS);
         assertEquals(2, virtualCorpora.size());
         Iterator<QueryDO> i = virtualCorpora.iterator();
         assertEquals(i.next().getName(), "system-vc");

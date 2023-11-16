@@ -8,7 +8,6 @@ public class BooleanUtils {
 
     public static String dbname;
 
-
     public static Object getBoolean (Object val) {
         if (val == null)
             val = false;

@@ -43,8 +43,8 @@ public class UserGroupConverter {
         }
 
         if (members != null) {
-            ArrayList<UserGroupMemberDto> memberDtos =
-                    new ArrayList<>(members.size());
+            ArrayList<UserGroupMemberDto> memberDtos = new ArrayList<>(
+                    members.size());
             for (UserGroupMember member : members) {
 
                 UserGroupMemberDto memberDto = new UserGroupMemberDto();

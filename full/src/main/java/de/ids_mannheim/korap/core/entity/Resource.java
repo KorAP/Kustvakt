@@ -40,11 +40,7 @@ public class Resource {
     private String englishDescription;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "resource_layer",
-            joinColumns = @JoinColumn(name = "resource_id",
-                    referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "layer_id",
-                    referencedColumnName = "id"))
+    @JoinTable(name = "resource_layer", joinColumns = @JoinColumn(name = "resource_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "layer_id", referencedColumnName = "id"))
     private Set<AnnotationLayer> layers;
 
     public Resource () {}

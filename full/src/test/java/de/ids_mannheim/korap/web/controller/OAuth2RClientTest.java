@@ -26,11 +26,12 @@ public class OAuth2RClientTest extends OAuth2TestBase {
 
     private String userAuthHeader;
 
-    public OAuth2RClientTest() throws KustvaktException {
-        userAuthHeader = HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("R-user", "password");
+    public OAuth2RClientTest () throws KustvaktException {
+        userAuthHeader = HttpAuthorizationHandler
+                .createBasicAuthorizationHeaderValue("R-user", "password");
     }
 
-    public OAuth2ClientJson createOAuth2RClient() {
+    public OAuth2ClientJson createOAuth2RClient () {
         OAuth2ClientJson client = new OAuth2ClientJson();
         client.setName("R client");
         client.setType(OAuth2ClientType.PUBLIC);
@@ -40,7 +41,8 @@ public class OAuth2RClientTest extends OAuth2TestBase {
     }
 
     @Test
-    public void testRClientWithLocalhost() throws ProcessingException, KustvaktException, IOException {
+    public void testRClientWithLocalhost ()
+            throws ProcessingException, KustvaktException, IOException {
         // Register client
         OAuth2ClientJson clientJson = createOAuth2RClient();
         Response response = registerClient(username, clientJson);
@@ -50,7 +52,8 @@ public class OAuth2RClientTest extends OAuth2TestBase {
         // send authorization
         String code = testAuthorize(clientId);
         // send token request
-        response = requestTokenWithAuthorizationCodeAndForm(clientId, null, code);
+        response = requestTokenWithAuthorizationCodeAndForm(clientId, null,
+                code);
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         String entity = response.readEntity(String.class);
         node = JsonUtils.readTree(entity);
@@ -62,14 +65,17 @@ public class OAuth2RClientTest extends OAuth2TestBase {
         testSearchWithRevokedAccessToken(accessToken);
     }
 
-    private String testAuthorize(String clientId) throws KustvaktException {
-        Response response = requestAuthorizationCode("code", clientId, "", "search", "", userAuthHeader);
-        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(), response.getStatus());
+    private String testAuthorize (String clientId) throws KustvaktException {
+        Response response = requestAuthorizationCode("code", clientId, "",
+                "search", "", userAuthHeader);
+        assertEquals(Status.TEMPORARY_REDIRECT.getStatusCode(),
+                response.getStatus());
         URI redirectUri = response.getLocation();
         assertEquals(redirectUri.getScheme(), "http");
         assertEquals(redirectUri.getHost(), "localhost");
         assertEquals(1410, redirectUri.getPort());
-        MultiValueMap<String, String> params = UriComponentsBuilder.fromUri(redirectUri).build().getQueryParams();
+        MultiValueMap<String, String> params = UriComponentsBuilder
+                .fromUri(redirectUri).build().getQueryParams();
         String code = params.getFirst("code");
         assertNotNull(code);
         return code;

@@ -13,7 +13,9 @@ import de.ids_mannheim.korap.dto.ResourceDto;
 import de.ids_mannheim.korap.dto.converter.ResourceConverter;
 import de.ids_mannheim.korap.web.controller.ResourceController;
 
-/** ResourceService defines the logic behind {@link ResourceController}.
+/**
+ * ResourceService defines the logic behind
+ * {@link ResourceController}.
  * 
  * @author margaretha
  *
@@ -31,8 +33,8 @@ public class ResourceService {
 
     public List<ResourceDto> getResourceDtos () {
         List<Resource> resources = resourceDao.getAllResources();
-        List<ResourceDto> resourceDtos =
-                resourceConverter.convertToResourcesDto(resources);
+        List<ResourceDto> resourceDtos = resourceConverter
+                .convertToResourcesDto(resources);
         if (DEBUG) {
             jlog.debug("/info " + resourceDtos.toString());
         }

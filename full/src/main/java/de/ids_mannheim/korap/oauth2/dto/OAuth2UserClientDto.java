@@ -11,9 +11,10 @@ import de.ids_mannheim.korap.oauth2.entity.OAuth2Client;
 import de.ids_mannheim.korap.utils.JsonUtils;
 
 /**
- * Please use {@link OAuth2ClientInfoDto} instead. 
+ * Please use {@link OAuth2ClientInfoDto} instead.
  * 
- * This class is not used anymore to describe OAuth2 clients of a user.
+ * This class is not used anymore to describe OAuth2 clients of a
+ * user.
  * 
  * @author margaretha
  *
@@ -37,7 +38,7 @@ public class OAuth2UserClientDto {
     private String registrationDate;
     @JsonProperty("refresh_token_expiry")
     private int refreshTokenExpiry;
-    
+
     private boolean permitted;
     private JsonNode source;
 
@@ -55,11 +56,11 @@ public class OAuth2UserClientDto {
             this.setRefreshTokenExpiry(client.getRefreshTokenExpiry());
         }
         String source = client.getSource();
-        if (source!=null) {
+        if (source != null) {
             this.setSource(JsonUtils.readTree(client.getSource()));
         }
     }
-    
+
     public String getClientName () {
         return clientName;
     }
@@ -119,20 +120,23 @@ public class OAuth2UserClientDto {
     public JsonNode getSource () {
         return source;
     }
+
     public void setSource (JsonNode source) {
         this.source = source;
     }
-    
+
     public String getRegistrationDate () {
         return registrationDate;
     }
+
     public void setRegistrationDate (String registrationDate) {
         this.registrationDate = registrationDate;
     }
-    
+
     public int getRefreshTokenExpiry () {
         return refreshTokenExpiry;
     }
+
     public void setRefreshTokenExpiry (int refreshTokenExpiry) {
         this.refreshTokenExpiry = refreshTokenExpiry;
     }

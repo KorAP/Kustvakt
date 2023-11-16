@@ -53,11 +53,9 @@ public class TreeConstraint implements RewriteTask.RewriteNodeAt {
 
     private String pointer;
 
-
     public TreeConstraint () {
         super();
     }
-
 
     @Override
     public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
@@ -67,12 +65,10 @@ public class TreeConstraint implements RewriteTask.RewriteNodeAt {
         return node;
     }
 
-
     @Override
     public JsonNode rewriteResult (KoralNode node) {
         return null;
     }
-
 
     @Override
     public String at () {

@@ -27,14 +27,12 @@ public abstract class ContextHolder {
     private ApplicationContext context = null;
     private DefaultHandler handler;
 
-
     public ContextHolder (ApplicationContext context) {
         this.handler = new DefaultHandler();
         this.context = context;
         // todo: better method?!
         new CoreResponseHandler();
     }
-
 
     protected <T> T getBean (Class<T> clazz) {
         if (this.context != null) {
@@ -47,7 +45,6 @@ public abstract class ContextHolder {
         }
         return this.handler.getDefault(clazz);
     }
-
 
     protected <T> T getBean (String name) {
         T bean = null;
@@ -63,7 +60,6 @@ public abstract class ContextHolder {
 
         return bean;
     }
-
 
     @Deprecated
     public <T extends KustvaktConfiguration> T getConfiguration () {

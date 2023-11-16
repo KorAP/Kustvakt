@@ -2,7 +2,8 @@ package de.ids_mannheim.korap.constant;
 
 import de.ids_mannheim.korap.entity.QueryDO;
 
-/** Defines types of {@link QueryDO} 
+/**
+ * Defines types of {@link QueryDO}
  * 
  * @author margaretha
  *
@@ -16,21 +17,22 @@ public enum ResourceType {
     /**
      * available for all
      */
-    SYSTEM, 
+    SYSTEM,
     // 
-    /** available to project group members
+    /**
+     * available to project group members
      * 
      */
-    PROJECT, 
+    PROJECT,
     /**
      * available only for the creator
      */
-    PRIVATE, 
+    PRIVATE,
     /**
-     * available for all, but not listed for all 
+     * available for all, but not listed for all
      */
     PUBLISHED;
-    
+
     public String displayName () {
         return name().toLowerCase();
 

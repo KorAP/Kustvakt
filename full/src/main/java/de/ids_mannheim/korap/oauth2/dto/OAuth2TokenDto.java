@@ -90,8 +90,7 @@ public class OAuth2TokenDto {
         return userAuthenticationTime;
     }
 
-    public void setUserAuthenticationTime (
-            String userAuthenticationTime) {
+    public void setUserAuthenticationTime (String userAuthenticationTime) {
         this.userAuthenticationTime = userAuthenticationTime;
     }
 

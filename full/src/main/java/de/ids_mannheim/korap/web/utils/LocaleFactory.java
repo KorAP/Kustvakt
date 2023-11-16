@@ -15,7 +15,7 @@ public class LocaleFactory implements Factory<Locale> {
     private ContainerRequestContext context;
 
     @Override
-    public Locale provide() {
+    public Locale provide () {
         final List<Locale> locales = context.getAcceptableLanguages();
         if (locales.isEmpty())
             return Locale.US;
@@ -23,5 +23,5 @@ public class LocaleFactory implements Factory<Locale> {
     }
 
     @Override
-    public void dispose(Locale instance) {}
+    public void dispose (Locale instance) {}
 }

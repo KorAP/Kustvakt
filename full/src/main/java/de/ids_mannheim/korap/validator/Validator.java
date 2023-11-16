@@ -14,13 +14,10 @@ import de.ids_mannheim.korap.exceptions.KustvaktException;
 @Component
 public interface Validator {
 
-
-    Map<String, Object> validateMap (Map<String, Object> map) throws KustvaktException;
-
-
-    String validateEntry (String input, String type)
+    Map<String, Object> validateMap (Map<String, Object> map)
             throws KustvaktException;
 
+    String validateEntry (String input, String type) throws KustvaktException;
 
     boolean isValid (String input, String type);
 }

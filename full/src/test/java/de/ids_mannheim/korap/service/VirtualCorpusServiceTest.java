@@ -33,7 +33,7 @@ public class VirtualCorpusServiceTest {
     private UserGroupService groupService;
 
     @Test
-    public void testCreateNonUniqueVC() throws KustvaktException {
+    public void testCreateNonUniqueVC () throws KustvaktException {
         // EM: message differs depending on the database used
         // for testing. The message below is from sqlite.
         // thrown.expectMessage("A UNIQUE constraint failed "
@@ -43,11 +43,12 @@ public class VirtualCorpusServiceTest {
         vc.setCorpusQuery("corpusSigle=GOE");
         vc.setType(ResourceType.PRIVATE);
         vc.setQueryType(QueryType.VIRTUAL_CORPUS);
-        assertThrows(KustvaktException.class, () -> vcService.storeQuery(vc, "dory-vc", "dory", "dory"));
+        assertThrows(KustvaktException.class,
+                () -> vcService.storeQuery(vc, "dory-vc", "dory", "dory"));
     }
 
     @Test
-    public void createDeletePublishVC() throws KustvaktException {
+    public void createDeletePublishVC () throws KustvaktException {
         String vcName = "new-published-vc";
         QueryJson vc = new QueryJson();
         vc.setCorpusQuery("corpusSigle=GOE");
@@ -55,7 +56,8 @@ public class VirtualCorpusServiceTest {
         vc.setQueryType(QueryType.VIRTUAL_CORPUS);
         String username = "VirtualCorpusServiceTest";
         vcService.storeQuery(vc, vcName, username, username);
-        List<QueryAccessDto> accesses = vcService.listQueryAccessByUsername("admin");
+        List<QueryAccessDto> accesses = vcService
+                .listQueryAccessByUsername("admin");
         int size = accesses.size();
         QueryAccessDto dto = accesses.get(accesses.size() - 1);
         assertEquals(vcName, dto.getQueryName());
@@ -66,21 +68,25 @@ public class VirtualCorpusServiceTest {
         UserGroup group = groupService.retrieveUserGroupById(groupId);
         assertEquals(UserGroupStatus.HIDDEN, group.getStatus());
         // delete vc
-        vcService.deleteQueryByName(username, vcName, username, QueryType.VIRTUAL_CORPUS);
+        vcService.deleteQueryByName(username, vcName, username,
+                QueryType.VIRTUAL_CORPUS);
         // check hidden access
         accesses = vcService.listQueryAccessByUsername("admin");
         assertEquals(size - 1, accesses.size());
         // check hidden group
-        KustvaktException e = assertThrows(KustvaktException.class, () -> groupService.retrieveUserGroupById(groupId));
-        assertEquals("Group with id " + groupId + " is not found", e.getMessage());
+        KustvaktException e = assertThrows(KustvaktException.class,
+                () -> groupService.retrieveUserGroupById(groupId));
+        assertEquals("Group with id " + groupId + " is not found",
+                e.getMessage());
     }
 
     @Test
-    public void testEditPublishVC() throws KustvaktException {
+    public void testEditPublishVC () throws KustvaktException {
         String username = "dory";
         int vcId = 2;
         String vcName = "group-vc";
-        QueryDO existingVC = vcService.searchQueryByName(username, vcName, username, QueryType.VIRTUAL_CORPUS);
+        QueryDO existingVC = vcService.searchQueryByName(username, vcName,
+                username, QueryType.VIRTUAL_CORPUS);
         QueryJson vcJson = new QueryJson();
         vcJson.setType(ResourceType.PUBLISHED);
         vcService.editQuery(existingVC, vcJson, vcName, username);
@@ -89,7 +95,8 @@ public class VirtualCorpusServiceTest {
         assertEquals(vcName, vcDto.getName());
         assertEquals(ResourceType.PUBLISHED.displayName(), vcDto.getType());
         // check access
-        List<QueryAccessDto> accesses = vcService.listQueryAccessByUsername("admin");
+        List<QueryAccessDto> accesses = vcService
+                .listQueryAccessByUsername("admin");
         int size = accesses.size();
         QueryAccessDto dto = accesses.get(accesses.size() - 1);
         assertEquals(vcName, dto.getQueryName());
@@ -110,7 +117,9 @@ public class VirtualCorpusServiceTest {
         // check access
         accesses = vcService.listQueryAccessByUsername("admin");
         assertEquals(size - 1, accesses.size());
-        KustvaktException e = assertThrows(KustvaktException.class, () -> groupService.retrieveUserGroupById(groupId));
-        assertEquals("Group with id " + groupId + " is not found", e.getMessage());
+        KustvaktException e = assertThrows(KustvaktException.class,
+                () -> groupService.retrieveUserGroupById(groupId));
+        assertEquals("Group with id " + groupId + " is not found",
+                e.getMessage());
     }
 }

@@ -32,7 +32,6 @@ public class DemoUserFilter implements ContainerRequestFilter {
     @Autowired
     private KustvaktConfiguration config;
 
-
     @Override
     public void filter (ContainerRequestContext request) {
         String host = request.getHeaderString(ContainerRequest.HOST);
@@ -48,11 +47,10 @@ public class DemoUserFilter implements ContainerRequestFilter {
                 pr = securityContext.getUserPrincipal();
             }
             if (pr == null)
-                request.setSecurityContext(new KustvaktContext(
-                        createShorterToken(host, ua)));
+                request.setSecurityContext(
+                        new KustvaktContext(createShorterToken(host, ua)));
         }
     }
-
 
     private TokenContext createShorterToken (String host, String agent) {
         User demo = User.UserFactory.getDemoUser();

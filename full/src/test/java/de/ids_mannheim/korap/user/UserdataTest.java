@@ -27,7 +27,7 @@ public class UserdataTest {
 
     // EM: added
     @Test
-    public void testReadEmptyMap() throws KustvaktException {
+    public void testReadEmptyMap () throws KustvaktException {
         Userdata userData = new UserSettingProcessor();
         userData.read(new HashMap<>(), false);
         String jsonSettings = userData.serialize();
@@ -35,7 +35,7 @@ public class UserdataTest {
     }
 
     @Test
-    public void testReadNullMap() throws KustvaktException {
+    public void testReadNullMap () throws KustvaktException {
         Userdata userData = new UserSettingProcessor();
         userData.read(null, false);
         String jsonSettings = userData.serialize();
@@ -53,10 +53,10 @@ public class UserdataTest {
     // 
     // At the moment, validation is not needed for default settings.
     @Test
-    public void testValidateMap() throws IOException, KustvaktException {
+    public void testValidateMap () throws IOException, KustvaktException {
         Map<String, Object> map = new HashMap<>();
-        map.put("k1", Arrays.asList(new String[]{"a", "b", "c"}));
-        map.put("k2", Arrays.asList(new Integer[]{1, 2, 3}));
+        map.put("k1", Arrays.asList(new String[] { "a", "b", "c" }));
+        map.put("k2", Arrays.asList(new Integer[] { 1, 2, 3 }));
         Userdata data = new UserSettingProcessor();
         data.read(map, false);
         data.validate(new ApacheValidator());
@@ -64,7 +64,7 @@ public class UserdataTest {
 
     // EM: below are tests from MH
     @Test
-    public void testDataValidation() {
+    public void testDataValidation () {
         Userdata data = new UserDetails(1);
         data.setField(Attributes.COUNTRY, "Germany");
         String[] req = data.requiredFields();
@@ -75,7 +75,7 @@ public class UserdataTest {
     }
 
     @Test
-    public void testSettingsValidation() {
+    public void testSettingsValidation () {
         Userdata data = new UserSettingProcessor();
         data.setField(Attributes.FILE_FORMAT_FOR_EXPORT, "export");
         String[] req = data.requiredFields();
@@ -86,7 +86,7 @@ public class UserdataTest {
     }
 
     @Test
-    public void testUserdataRequiredFields() throws KustvaktException {
+    public void testUserdataRequiredFields () throws KustvaktException {
         UserDetails details = new UserDetails(-1);
         Map<String, Object> m = new HashMap<>();
         m.put(Attributes.FIRSTNAME, "first");
@@ -100,7 +100,7 @@ public class UserdataTest {
     }
 
     @Test
-    public void testUserdataDefaultFields() throws KustvaktException {
+    public void testUserdataDefaultFields () throws KustvaktException {
         UserSettingProcessor settings = new UserSettingProcessor();
         Map<String, Object> m = new HashMap<>();
         m.put(Attributes.DEFAULT_FOUNDRY_RELATION, "rel_1");
@@ -113,15 +113,17 @@ public class UserdataTest {
         settings.read(m, true);
         assertNotEquals(m.size(), settings.size());
         assertEquals(settings.defaultFields().length, settings.size());
-        assertEquals(settings.get(Attributes.DEFAULT_FOUNDRY_RELATION), "rel_1");
+        assertEquals(settings.get(Attributes.DEFAULT_FOUNDRY_RELATION),
+                "rel_1");
         assertEquals(settings.get(Attributes.DEFAULT_FOUNDRY_POS), "pos_1");
         assertEquals(settings.get(Attributes.DEFAULT_FOUNDRY_LEMMA), "lemma_1");
-        assertEquals(settings.get(Attributes.DEFAULT_FOUNDRY_CONSTITUENT), "const_1");
+        assertEquals(settings.get(Attributes.DEFAULT_FOUNDRY_CONSTITUENT),
+                "const_1");
         assertEquals(10, settings.get(Attributes.PAGE_LENGTH));
     }
 
     @Test
-    public void testUserDataRequiredFieldsException() {
+    public void testUserDataRequiredFieldsException () {
         assertThrows(KustvaktException.class, () -> {
             UserDetails details = new UserDetails(-1);
             Map<String, Object> m = new HashMap<>();
@@ -137,7 +139,7 @@ public class UserdataTest {
     }
 
     @Test
-    public void testUserDataPointerFunction() throws KustvaktException {
+    public void testUserDataPointerFunction () throws KustvaktException {
         UserDetails details = new UserDetails(-1);
         Map<String, Object> m = new HashMap<>();
         m.put(Attributes.FIRSTNAME, "first");
@@ -154,7 +156,7 @@ public class UserdataTest {
     }
 
     @Test
-    public void testUserDataUpdate() {
+    public void testUserDataUpdate () {
         UserDetails details = new UserDetails(-1);
         details.setField(Attributes.FIRSTNAME, "first");
         details.setField(Attributes.LASTNAME, "last");

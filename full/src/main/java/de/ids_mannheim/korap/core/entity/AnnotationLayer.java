@@ -31,8 +31,8 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name = "annotation_layer", uniqueConstraints = @UniqueConstraint(
-        columnNames = { "foundry_id", "layer_id" }))
+@Table(name = "annotation_layer", uniqueConstraints = @UniqueConstraint(columnNames = {
+        "foundry_id", "layer_id" }))
 public class AnnotationLayer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,8 +54,7 @@ public class AnnotationLayer {
     @JoinColumn(name = "layer_id", insertable = false, updatable = false)
     private Annotation layer;
 
-    @OneToMany(mappedBy = "layer", fetch = FetchType.EAGER,
-            cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "layer", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private Set<AnnotationKey> keys;
 
     @Override

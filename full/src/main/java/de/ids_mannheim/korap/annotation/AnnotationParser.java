@@ -23,7 +23,9 @@ import de.ids_mannheim.korap.core.entity.AnnotationKey;
 import de.ids_mannheim.korap.core.entity.AnnotationLayer;
 import de.ids_mannheim.korap.dao.AnnotationDao;
 
-/** Parser for extracting annotation descriptions from Kalamar javascripts 
+/**
+ * Parser for extracting annotation descriptions from Kalamar
+ * javascripts
  * 
  * @author margaretha
  *
@@ -47,23 +49,23 @@ public class AnnotationParser {
     private Set<Annotation> values = new HashSet<>();
 
     public void run () throws IOException {
-        PathMatchingResourcePatternResolver resolver =
-                new PathMatchingResourcePatternResolver(
-                        getClass().getClassLoader());
+        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver(
+                getClass().getClassLoader());
         Resource[] resources = resolver
                 .getResources("classpath:annotation-scripts/foundries/*.js");
 
-        if (resources.length < 1) return;
+        if (resources.length < 1)
+            return;
 
         for (Resource r : resources) {
-//            log.debug(r.getFilename());
+            //            log.debug(r.getFilename());
             readFile(r.getInputStream());
         }
     }
 
     private void readFile (InputStream inputStream) throws IOException {
-        BufferedReader br =
-                new BufferedReader(new InputStreamReader(inputStream), 1024);
+        BufferedReader br = new BufferedReader(
+                new InputStreamReader(inputStream), 1024);
 
         foundry = null;
 
@@ -128,8 +130,8 @@ public class AnnotationParser {
             Annotation layer = retrieveOrCreateAnnotation(code, annotationType,
                     null, array.get(0));
             try {
-                AnnotationLayer annotationLayer =
-                        annotationDao.retrieveAnnotationLayer(foundry.getCode(),
+                AnnotationLayer annotationLayer = annotationDao
+                        .retrieveAnnotationLayer(foundry.getCode(),
                                 layer.getCode());
                 if (annotationLayer == null) {
                     annotationDao.createAnnotationLayer(foundry, layer);
@@ -161,8 +163,8 @@ public class AnnotationParser {
                         annotationType, array.get(1), array.get(2));
             }
             if (annotation != null) {
-                AnnotationKey annotationKey =
-                        annotationDao.retrieveAnnotationKey(layer, annotation);
+                AnnotationKey annotationKey = annotationDao
+                        .retrieveAnnotationKey(layer, annotation);
                 if (annotationKey == null) {
                     annotationDao.createAnnotationKey(layer, annotation);
                 }
@@ -203,8 +205,8 @@ public class AnnotationParser {
             if (layerCode.endsWith("=")) {
                 layerCode = layerCode.substring(0, layerCode.length() - 1);
             }
-            this.layer =
-                    annotationDao.retrieveAnnotationLayer(codes[0], layerCode);
+            this.layer = annotationDao.retrieveAnnotationLayer(codes[0],
+                    layerCode);
             if (layer == null) {
                 log.warn("Layer is null for " + code);
             }

@@ -33,8 +33,8 @@ public class AccessScopeDao {
     @SuppressWarnings("unchecked")
     public List<AccessScope> retrieveAccessScopes () {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<AccessScope> query =
-                builder.createQuery(AccessScope.class);
+        CriteriaQuery<AccessScope> query = builder
+                .createQuery(AccessScope.class);
         Root<AccessScope> root = query.from(AccessScope.class);
         query.select(root);
         Query q = entityManager.createQuery(query);

@@ -33,7 +33,8 @@ import de.ids_mannheim.korap.web.SearchKrill;
  * <p>
  * All predefined VC are set as SYSTEM VC. The filenames are used as
  * VC names. Acceptable file extensions are .jsonld.gz or .jsonld. The
- * VC should be located at the folder indicated by <em>krill.namedVC</em>
+ * VC should be located at the folder indicated by
+ * <em>krill.namedVC</em>
  * specified in kustvakt.conf.
  * </p>
  * 
@@ -41,7 +42,7 @@ import de.ids_mannheim.korap.web.SearchKrill;
  *
  */
 @Component
-public class NamedVCLoader implements Runnable{
+public class NamedVCLoader implements Runnable {
     @Autowired
     private FullConfiguration config;
     @Autowired
@@ -58,12 +59,13 @@ public class NamedVCLoader implements Runnable{
             loadVCToCache();
         }
         catch (IOException | QueryException e) {
-//            e.printStackTrace();
+            //            e.printStackTrace();
             throw new RuntimeException(e.getMessage(), e.getCause());
         }
     }
-    
-    /** Used for testing 
+
+    /**
+     * Used for testing
      * 
      * @param filename
      * @param filePath
@@ -77,18 +79,18 @@ public class NamedVCLoader implements Runnable{
         InputStream is = NamedVCLoader.class.getResourceAsStream(filePath);
         String json = IOUtils.toString(is, "utf-8");
         if (json != null) {
-            cacheVC(filename,json);
-            vcService.storeQuery("system",filename, ResourceType.SYSTEM,
+            cacheVC(filename, json);
+            vcService.storeQuery("system", filename, ResourceType.SYSTEM,
                     QueryType.VIRTUAL_CORPUS, json, null, null, null, true,
                     "system", null, null);
         }
     }
 
-    public void loadVCToCache ()
-            throws IOException, QueryException {
+    public void loadVCToCache () throws IOException, QueryException {
 
         String dir = config.getNamedVCPath();
-        if (dir.isEmpty()) return;
+        if (dir.isEmpty())
+            return;
 
         File d = new File(dir);
         if (!d.isDirectory()) {
@@ -96,7 +98,7 @@ public class NamedVCLoader implements Runnable{
         }
 
         jlog.info(Arrays.toString(d.list()));
-        
+
         for (File file : d.listFiles()) {
             if (!file.exists()) {
                 throw new IOException("File " + file + " is not found.");
@@ -107,14 +109,13 @@ public class NamedVCLoader implements Runnable{
             filename = strArr[0];
             String json = strArr[1];
             if (json != null) {
-                cacheVC(filename,json);
+                cacheVC(filename, json);
                 storeVCinDB(filename, json);
             }
         }
     }
 
-    private String[] readFile (File file, String filename)
-            throws IOException {
+    private String[] readFile (File file, String filename) throws IOException {
         String json = null;
         long start = System.currentTimeMillis();
         if (filename.endsWith(".jsonld")) {
@@ -123,8 +124,8 @@ public class NamedVCLoader implements Runnable{
         }
         else if (filename.endsWith(".jsonld.gz")) {
             filename = filename.substring(0, filename.length() - 10);
-            GZIPInputStream gzipInputStream =
-                    new GZIPInputStream(new FileInputStream(file));
+            GZIPInputStream gzipInputStream = new GZIPInputStream(
+                    new FileInputStream(file));
             ByteArrayOutputStream bos = new ByteArrayOutputStream(512);
             bos.write(gzipInputStream);
             json = bos.toString("utf-8");
@@ -161,7 +162,7 @@ public class NamedVCLoader implements Runnable{
         else {
             jlog.info("Storing {} in cache ", vcId);
         }
-        
+
         long start, end;
         start = System.currentTimeMillis();
         VirtualCorpusCache.store(vcId, searchKrill.getIndex());
@@ -169,8 +170,9 @@ public class NamedVCLoader implements Runnable{
         jlog.info("Duration : {}", (end - start));
         config.setVcInCaching("");
     }
-    
-    /** Stores the VC if it doesn't exist in the database. 
+
+    /**
+     * Stores the VC if it doesn't exist in the database.
      * 
      * @param vcId
      * @param koralQuery
@@ -196,6 +198,6 @@ public class NamedVCLoader implements Runnable{
                 throw new RuntimeException(e);
             }
         }
-        
+
     }
 }

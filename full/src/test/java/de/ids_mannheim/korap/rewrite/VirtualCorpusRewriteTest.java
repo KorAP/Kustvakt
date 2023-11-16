@@ -36,10 +36,13 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
     private QueryDao dao;
 
     @Test
-    public void testRefCachedVC() throws KustvaktException, IOException, QueryException {
+    public void testRefCachedVC ()
+            throws KustvaktException, IOException, QueryException {
         vcLoader.loadVCToCache("named-vc1", "/vc/named-vc1.jsonld");
         assertTrue(VirtualCorpusCache.contains("named-vc1"));
-        Response response = target().path(API_VERSION).path("search").queryParam("q", "[orth=der]").queryParam("ql", "poliqarp").queryParam("cq", "referTo named-vc1").request().get();
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("cq", "referTo named-vc1").request().get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/collection");
@@ -54,8 +57,12 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
         assertFalse(VirtualCorpusCache.contains("named-vc1"));
     }
 
-    private void testRefCachedVCWithUsername() throws KustvaktException, IOException, QueryException {
-        Response response = target().path(API_VERSION).path("search").queryParam("q", "[orth=der]").queryParam("ql", "poliqarp").queryParam("cq", "referTo \"system/named-vc1\"").request().get();
+    private void testRefCachedVCWithUsername ()
+            throws KustvaktException, IOException, QueryException {
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("cq", "referTo \"system/named-vc1\"").request()
+                .get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/collection");
@@ -67,8 +74,11 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testRewriteFreeAndSystemVCRef() throws KustvaktException, Exception {
-        Response response = target().path(API_VERSION).path("search").queryParam("q", "[orth=der]").queryParam("ql", "poliqarp").queryParam("cq", "referTo \"system-vc\"").request().get();
+    public void testRewriteFreeAndSystemVCRef ()
+            throws KustvaktException, Exception {
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("cq", "referTo \"system-vc\"").request().get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/collection");
@@ -85,8 +95,13 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testRewritePubAndSystemVCRef() throws KustvaktException {
-        Response response = target().path(API_VERSION).path("search").queryParam("q", "[orth=der]").queryParam("ql", "poliqarp").queryParam("cq", "referTo \"system/system-vc\"").request().header(Attributes.AUTHORIZATION, HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("user", "pass")).header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").get();
+    public void testRewritePubAndSystemVCRef () throws KustvaktException {
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "[orth=der]").queryParam("ql", "poliqarp")
+                .queryParam("cq", "referTo \"system/system-vc\"").request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("user", "pass"))
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32").get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/collection");
@@ -100,8 +115,14 @@ public class VirtualCorpusRewriteTest extends SpringJerseyTest {
     }
 
     @Test
-    public void testRewriteWithDoryVCRef() throws KustvaktException, IOException, QueryException {
-        Response response = target().path(API_VERSION).path("search").queryParam("q", "Fisch").queryParam("ql", "poliqarp").queryParam("cq", "referTo \"dory/dory-vc\"").request().header(Attributes.AUTHORIZATION, HttpAuthorizationHandler.createBasicAuthorizationHeaderValue("dory", "pass")).get();
+    public void testRewriteWithDoryVCRef ()
+            throws KustvaktException, IOException, QueryException {
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "Fisch").queryParam("ql", "poliqarp")
+                .queryParam("cq", "referTo \"dory/dory-vc\"").request()
+                .header(Attributes.AUTHORIZATION, HttpAuthorizationHandler
+                        .createBasicAuthorizationHeaderValue("dory", "pass"))
+                .get();
         String ent = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(ent);
         node = node.at("/collection");

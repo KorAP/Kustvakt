@@ -31,10 +31,10 @@ public class TimeUtils {
     private static DecimalFormat df = new DecimalFormat("#.#############");
     private static DateTimeFormatter dtf = DateTimeFormat
             .forPattern("dd/MM/yyyy");
-    private static final DateTimeZone dtz = DateTimeZone.forID(Attributes.DEFAULT_TIME_ZONE);
+    private static final DateTimeZone dtz = DateTimeZone
+            .forID(Attributes.DEFAULT_TIME_ZONE);
     private static final boolean DEBUG = false;
     private static Logger jlog = LogManager.getLogger(TimeUtils.class);
-
 
     public static int convertTimeToSeconds (String expirationVal) {
         expirationVal = expirationVal.trim();
@@ -55,8 +55,9 @@ public class TimeUtils {
             case 'S':
                 return returnSec;
             default:
-                if (DEBUG){
-                    jlog.debug("no time unit specified. Trying to read from default (minutes)");
+                if (DEBUG) {
+                    jlog.debug(
+                            "no time unit specified. Trying to read from default (minutes)");
                 }
                 return Integer.valueOf(expirationVal) * 60;
         }
@@ -67,53 +68,50 @@ public class TimeUtils {
         return DateTime.now(dtz);
     }
 
-    public static DateTime getTime(String time) {
+    public static DateTime getTime (String time) {
         return DateTime.parse(time).withZone(dtz);
     }
 
-    public static DateTime getTime(long time) {
+    public static DateTime getTime (long time) {
         return new DateTime(time).withZone(dtz);
     }
 
     //returns difference in milliseconds
     public static long calcDiff (DateTime now, DateTime future) {
-        long diff = (future.withZone(dtz).getMillis() - now.withZone(dtz)
-                .getMillis());
+        long diff = (future.withZone(dtz).getMillis()
+                - now.withZone(dtz).getMillis());
         return diff;
     }
 
-
-    public static boolean isExpired(long time) {
+    public static boolean isExpired (long time) {
         return getNow().isAfter(time);
 
     }
 
-
     // returns difference in seconds in floating number
     public static float floating (DateTime past, DateTime now) {
-        long diff = (now.withZone(dtz).getMillis() - past.withZone(dtz)
-                .getMillis());
+        long diff = (now.withZone(dtz).getMillis()
+                - past.withZone(dtz).getMillis());
         double fin = diff / 1000.0;
         BigDecimal bd = new BigDecimal(fin).setScale(8, RoundingMode.HALF_EVEN);
         return bd.floatValue();
     }
 
-
     public static DateTime fromCosmas (String date) {
         int idx = date.length();
         try {
-            Integer sec = Integer.valueOf(date.substring((idx = idx - 2),
-                    date.length()).trim());
-            Integer min = Integer.valueOf(date.substring((idx = idx - 2),
-                    idx + 2).trim());
-            Integer hours = Integer.valueOf(date.substring((idx = idx - 2),
-                    idx + 2).trim());
-            Integer day = Integer.valueOf(date.substring((idx = idx - 2),
-                    idx + 2).trim());
-            Integer month = Integer.valueOf(date.substring((idx = idx - 2),
-                    idx + 2).trim());
-            Integer year = Integer.valueOf(date.substring((idx = idx - 4),
-                    idx + 4).trim());
+            Integer sec = Integer.valueOf(
+                    date.substring((idx = idx - 2), date.length()).trim());
+            Integer min = Integer
+                    .valueOf(date.substring((idx = idx - 2), idx + 2).trim());
+            Integer hours = Integer
+                    .valueOf(date.substring((idx = idx - 2), idx + 2).trim());
+            Integer day = Integer
+                    .valueOf(date.substring((idx = idx - 2), idx + 2).trim());
+            Integer month = Integer
+                    .valueOf(date.substring((idx = idx - 2), idx + 2).trim());
+            Integer year = Integer
+                    .valueOf(date.substring((idx = idx - 4), idx + 4).trim());
             return new DateTime(year, month, day, hours, min, sec);
         }
         catch (NumberFormatException e) {
@@ -121,11 +119,9 @@ public class TimeUtils {
         }
     }
 
-
     public static String formatDiff (DateTime now, DateTime after) {
         return df.format(calcDiff(now, after));
     }
-
 
     /**
      * converts time to the ISO8601 standard.
@@ -138,12 +134,10 @@ public class TimeUtils {
         return fmt.withZone(dtz).print(time);
     }
 
-
     public static String format (long time) {
         DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
         return fmt.withZone(dtz).print(time);
     }
-
 
     /**
      * calculate expiration time
@@ -157,11 +151,9 @@ public class TimeUtils {
         return new DateTime(creation).withZone(dtz).plusSeconds(plus);
     }
 
-
     public static DateTime getExpiration (long now, int exp) {
         return new DateTime(now).withZone(dtz).plusSeconds(exp);
     }
-
 
     /**
      * @param plus
@@ -171,16 +163,13 @@ public class TimeUtils {
         return getNow().withZone(dtz).plusSeconds(plus);
     }
 
-
     public static DateTime plusHours (int hours) {
         return getNow().withZone(dtz).plusHours(hours);
     }
 
-
     public static DateTime plusMinutes (int minutes) {
         return getNow().withZone(dtz).plusMinutes(minutes);
     }
-
 
     /**
      * create time stamp from long value
@@ -193,12 +182,10 @@ public class TimeUtils {
         return new DateTime(t).withZone(dtz).toLocalDate();
     }
 
-
     public static DateTime getDate (int day, int month, int year) {
         DateTime date = new DateTime().withZone(dtz);
         return date.withDate(year, month, day);
     }
-
 
     public static String toString (long val, Locale locale) {
         if (locale == Locale.GERMAN)
@@ -209,7 +196,6 @@ public class TimeUtils {
                     Locale.ENGLISH);
 
     }
-
 
     public static String dateToString (long val, int i) {
         switch (i) {

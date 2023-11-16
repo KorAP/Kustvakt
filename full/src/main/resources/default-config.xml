@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:cache="http://www.springframework.org/schema/cache"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans.xsd
@@ -15,7 +18,8 @@
            http://www.springframework.org/schema/util
            http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<context:component-scan base-package="de.ids_mannheim.korap" />
+	<context:component-scan
+		base-package="de.ids_mannheim.korap" />
 	<context:annotation-config />
 
 	<bean id="props"
@@ -46,18 +50,15 @@
 		</property>
 	</bean>
 
-	<!-- <bean id='cacheManager' class='org.springframework.cache.ehcache.EhCacheCacheManager'
-		p:cacheManager-ref='ehcache' />
-
-	<bean id='ehcache'
-		class='org.springframework.cache.ehcache.EhCacheManagerFactoryBean'
-		p:configLocation='classpath:ehcache.xml' p:shared='true' />
- -->
+	<!-- <bean id='cacheManager' class='org.springframework.cache.ehcache.EhCacheCacheManager' 
+		p:cacheManager-ref='ehcache' /> <bean id='ehcache' class='org.springframework.cache.ehcache.EhCacheManagerFactoryBean' 
+		p:configLocation='classpath:ehcache.xml' p:shared='true' /> -->
 	<!--class="org.apache.commons.dbcp2.BasicDataSource" -->
 	<!-- org.springframework.jdbc.datasource.SingleConnectionDataSource -->
-	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
-		lazy-init="true">
-		<property name="driverClassName" value="${jdbc.driverClassName}" />
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp2.BasicDataSource" lazy-init="true">
+		<property name="driverClassName"
+			value="${jdbc.driverClassName}" />
 		<property name="url" value="${jdbc.url}" />
 		<property name="username" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
@@ -70,8 +71,9 @@
 		<property name="maxWaitMillis" value="-1" />
 		<!--<property name="poolPreparedStatements" value="true"/> -->
 	</bean>
-	
-	<bean id="c3p0DataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+
+	<bean id="c3p0DataSource"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close" lazy-init="true">
 		<property name="driverClass" value="${jdbc.driverClassName}" />
 		<property name="jdbcUrl" value="${jdbc.url}" />
@@ -88,7 +90,8 @@
 	<bean id="sqliteDataSource"
 		class="org.springframework.jdbc.datasource.SingleConnectionDataSource"
 		lazy-init="true">
-		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="driverClassName"
+			value="${jdbc.driverClassName}" />
 		<property name="url" value="${jdbc.url}" />
 		<property name="username" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
@@ -107,26 +110,29 @@
 	</bean>
 
 	<!-- to configure database for sqlite, mysql, etc. migrations -->
-	<bean id="flywayConfig" class="org.flywaydb.core.api.configuration.ClassicConfiguration">
+	<bean id="flywayConfig"
+		class="org.flywaydb.core.api.configuration.ClassicConfiguration">
 		<property name="baselineOnMigrate" value="true" />
 		<!-- <property name="validateOnMigrate" value="false" /> -->
 		<!-- <property name="cleanOnValidationError" value="true" /> -->
-		<property name="locations" value="#{'${jdbc.schemaPath}'.split(',')}"/>
+		<property name="locations"
+			value="#{'${jdbc.schemaPath}'.split(',')}" />
 		<property name="dataSource" ref="dataSource" />
 		<!-- <property name="dataSource" ref="sqliteDataSource" /> -->
 		<!-- <property name="dataSource" ref="c3p0DataSource" /> -->
 		<property name="outOfOrder" value="true" />
 	</bean>
-	
-	<bean id="flyway" class="org.flywaydb.core.Flyway" init-method="migrate">
-		<constructor-arg ref="flywayConfig"/>
+
+	<bean id="flyway" class="org.flywaydb.core.Flyway"
+		init-method="migrate">
+		<constructor-arg ref="flywayConfig" />
 	</bean>
 
 	<bean id="entityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
 		depends-on="flyway">
 		<property name="dataSource" ref="dataSource" />
-		<!--  <property name="dataSource" ref="sqliteDataSource" /> -->
+		<!-- <property name="dataSource" ref="sqliteDataSource" /> -->
 		<!-- <property name="dataSource" ref="c3p0DataSource" /> -->
 
 		<property name="packagesToScan">
@@ -139,7 +145,8 @@
 		<property name="jpaVendorAdapter">
 			<bean id="jpaVendorAdapter"
 				class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-				<property name="databasePlatform" value="${hibernate.dialect}" />
+				<property name="databasePlatform"
+					value="${hibernate.dialect}" />
 			</bean>
 		</property>
 		<property name="jpaProperties">
@@ -160,8 +167,10 @@
 	<tx:annotation-driven proxy-target-class="true"
 		transaction-manager="transactionManager" />
 
-	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	<bean id="transactionManager"
+		class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory"
+			ref="entityManagerFactory" />
 	</bean>
 
 	<bean id="transactionTemplate"
@@ -171,94 +180,103 @@
 
 	<!-- Data access objects -->
 	<bean id="adminDao" class="de.ids_mannheim.korap.dao.AdminDaoImpl" />
-	<bean id="authorizationDao" class="de.ids_mannheim.korap.oauth2.dao.CachedAuthorizationDaoImpl" />
+	<bean id="authorizationDao"
+		class="de.ids_mannheim.korap.oauth2.dao.CachedAuthorizationDaoImpl" />
 
 	<!-- Filters -->
-	<!-- <bean id="authenticationFilter" class="de.ids_mannheim.korap.web.filter.AuthenticationFilter" >
-		<property name="authenticationManager" ref="kustvakt_authenticationmanager"/>
-	</bean>
-	<bean id="piwikFilter" class="de.ids_mannheim.korap.web.filter.PiwikFilter" >
-		<property name="authenticationManager" ref="kustvakt_authenticationmanager"/>
-	</bean> -->
-	
+	<!-- <bean id="authenticationFilter" class="de.ids_mannheim.korap.web.filter.AuthenticationFilter" 
+		> <property name="authenticationManager" ref="kustvakt_authenticationmanager"/> 
+		</bean> <bean id="piwikFilter" class="de.ids_mannheim.korap.web.filter.PiwikFilter" 
+		> <property name="authenticationManager" ref="kustvakt_authenticationmanager"/> 
+		</bean> -->
+
 	<!-- Services -->
-	<bean id="scopeService" class="de.ids_mannheim.korap.oauth2.service.OAuth2ScopeServiceImpl" />
-	
+	<bean id="scopeService"
+		class="de.ids_mannheim.korap.oauth2.service.OAuth2ScopeServiceImpl" />
+
 	<!-- props are injected from default-config.xml -->
-	<bean id="kustvakt_config" class="de.ids_mannheim.korap.config.FullConfiguration">
+	<bean id="kustvakt_config"
+		class="de.ids_mannheim.korap.config.FullConfiguration">
 		<constructor-arg name="properties" ref="props" />
 	</bean>
 
-	<bean id="initializator" class="de.ids_mannheim.korap.init.Initializator"
-		init-method="init">
+	<bean id="initializator"
+		class="de.ids_mannheim.korap.init.Initializator" init-method="init">
 	</bean>
-	
+
 	<!-- Krill -->
-	<bean id="search_krill" class="de.ids_mannheim.korap.web.SearchKrill">
+	<bean id="search_krill"
+		class="de.ids_mannheim.korap.web.SearchKrill">
 		<constructor-arg value="${krill.indexDir}" />
 	</bean>
-	
+
 	<!-- Validator -->
-	<bean id="validator" class="de.ids_mannheim.korap.validator.ApacheValidator"/>
+	<bean id="validator"
+		class="de.ids_mannheim.korap.validator.ApacheValidator" />
 
 	<!-- URLValidator -->
-	<bean id="redirectURIValidator" class="org.apache.commons.validator.routines.UrlValidator">
+	<bean id="redirectURIValidator"
+		class="org.apache.commons.validator.routines.UrlValidator">
 		<constructor-arg value="http,https" index="0" />
-		<constructor-arg index="1" type="long" 
-		value="#{T(org.apache.commons.validator.routines.UrlValidator).ALLOW_LOCAL_URLS + 
-		T(org.apache.commons.validator.routines.UrlValidator).NO_FRAGMENTS}"/>
-		
-		<!-- <constructor-arg index="1" type="long">
-			<util:constant
-				static-field="org.apache.commons.validator.routines.UrlValidator.NO_FRAGMENTS" />
-		</constructor-arg> -->
+		<constructor-arg index="1" type="long"
+			value="#{T(org.apache.commons.validator.routines.UrlValidator).ALLOW_LOCAL_URLS + 
+		T(org.apache.commons.validator.routines.UrlValidator).NO_FRAGMENTS}" />
+
+		<!-- <constructor-arg index="1" type="long"> <util:constant static-field="org.apache.commons.validator.routines.UrlValidator.NO_FRAGMENTS" 
+			/> </constructor-arg> -->
 	</bean>
-	<bean id="urlValidator" class="org.apache.commons.validator.routines.UrlValidator">
+	<bean id="urlValidator"
+		class="org.apache.commons.validator.routines.UrlValidator">
 		<constructor-arg value="http,https" />
 	</bean>
-	
+
 	<!-- Rewrite -->
-	<bean id="foundryRewrite" class="de.ids_mannheim.korap.rewrite.FoundryRewrite"/>
-	<bean id="collectionRewrite" class="de.ids_mannheim.korap.rewrite.CollectionRewrite"/>
-	<bean id="virtualCorpusRewrite" class="de.ids_mannheim.korap.rewrite.VirtualCorpusRewrite"/>
- 	<bean id="queryReferenceRewrite" class="de.ids_mannheim.korap.rewrite.QueryReferenceRewrite"/>
-	
+	<bean id="foundryRewrite"
+		class="de.ids_mannheim.korap.rewrite.FoundryRewrite" />
+	<bean id="collectionRewrite"
+		class="de.ids_mannheim.korap.rewrite.CollectionRewrite" />
+	<bean id="virtualCorpusRewrite"
+		class="de.ids_mannheim.korap.rewrite.VirtualCorpusRewrite" />
+	<bean id="queryReferenceRewrite"
+		class="de.ids_mannheim.korap.rewrite.QueryReferenceRewrite" />
+
 	<util:list id="rewriteTasks"
 		value-type="de.ids_mannheim.korap.rewrite.RewriteTask">
 		<ref bean="foundryRewrite" />
 		<ref bean="collectionRewrite" />
 		<ref bean="virtualCorpusRewrite" />
-    <ref bean="queryReferenceRewrite" />
+		<ref bean="queryReferenceRewrite" />
 	</util:list>
-	
-	<bean id="rewriteHandler" class="de.ids_mannheim.korap.rewrite.RewriteHandler">
-		<constructor-arg ref="rewriteTasks"/>
+
+	<bean id="rewriteHandler"
+		class="de.ids_mannheim.korap.rewrite.RewriteHandler">
+		<constructor-arg ref="rewriteTasks" />
 	</bean>
 
-	<bean id="kustvaktResponseHandler" class="de.ids_mannheim.korap.web.KustvaktResponseHandler">
+	<bean id="kustvaktResponseHandler"
+		class="de.ids_mannheim.korap.web.KustvaktResponseHandler">
 	</bean>
 
 	<!-- OAuth -->
-	<bean id="oauth2ResponseHandler" class="de.ids_mannheim.korap.web.OAuth2ResponseHandler">
+	<bean id="oauth2ResponseHandler"
+		class="de.ids_mannheim.korap.web.OAuth2ResponseHandler">
 	</bean>
 
-	<bean name="kustvakt_encryption" class="de.ids_mannheim.korap.encryption.KustvaktEncryption">
+	<bean name="kustvakt_encryption"
+		class="de.ids_mannheim.korap.encryption.KustvaktEncryption">
 		<constructor-arg ref="kustvakt_config" />
 	</bean>
 
 	<!-- authentication providers to use -->
 
-	<!-- <bean id="session_auth"
-		class="de.ids_mannheim.korap.authentication.SessionAuthentication">
-		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration"
-			ref="kustvakt_config" />
-		<constructor-arg type="de.ids_mannheim.korap.interfaces.EncryptionIface"
-			ref="kustvakt_encryption" />
-	</bean> -->
+	<!-- <bean id="session_auth" class="de.ids_mannheim.korap.authentication.SessionAuthentication"> 
+		<constructor-arg type="de.ids_mannheim.korap.config.KustvaktConfiguration" 
+		ref="kustvakt_config" /> <constructor-arg type="de.ids_mannheim.korap.interfaces.EncryptionIface" 
+		ref="kustvakt_encryption" /> </bean> -->
 
 	<bean id="oauth2_auth"
 		class="de.ids_mannheim.korap.authentication.OAuth2Authentication" />
-	
+
 	<util:list id="kustvakt_authproviders"
 		value-type="de.ids_mannheim.korap.interfaces.AuthenticationIface">
 		<!-- <ref bean="session_auth" /> -->
@@ -269,13 +287,14 @@
 	<!-- specify type for constructor argument -->
 	<bean id="authenticationManager"
 		class="de.ids_mannheim.korap.authentication.KustvaktAuthenticationManager">
-		<constructor-arg type="de.ids_mannheim.korap.interfaces.EncryptionIface"
+		<constructor-arg
+			type="de.ids_mannheim.korap.interfaces.EncryptionIface"
 			ref="kustvakt_encryption" />
 		<constructor-arg ref="kustvakt_config" />
 		<!-- inject authentication providers to use -->
 		<property name="providers" ref="kustvakt_authproviders" />
 	</bean>
-	
+
 	<!-- todo: if db interfaces not loaded via spring, does transaction even 
 		work then? -->
 	<!-- the transactional advice (i.e. what 'happens'; see the <aop:advisor/> 
@@ -284,7 +303,8 @@
 		<!-- the transactional semantics... -->
 		<tx:attributes>
 			<!-- all methods starting with 'get' are read-only -->
-			<tx:method name="get*" read-only="true" rollback-for="KorAPException" />
+			<tx:method name="get*" read-only="true"
+				rollback-for="KorAPException" />
 			<!-- other methods use the default transaction settings (see below) -->
 			<tx:method name="*" rollback-for="KorAPException" />
 		</tx:attributes>
@@ -307,11 +327,13 @@
 	</bean>
 
 	<!-- mail -->
-	<bean id="authenticator" class="de.ids_mannheim.korap.service.MailAuthenticator">
+	<bean id="authenticator"
+		class="de.ids_mannheim.korap.service.MailAuthenticator">
 		<constructor-arg index="0" value="${mail.username}" />
 		<constructor-arg index="1" value="${mail.password}" />
 	</bean>
-	<bean id="smtpSession" class="jakarta.mail.Session" factory-method="getInstance">
+	<bean id="smtpSession" class="jakarta.mail.Session"
+		factory-method="getInstance">
 		<constructor-arg index="0">
 			<props>
 				<prop key="mail.smtp.submitter">${mail.username}</prop>
@@ -324,12 +346,14 @@
 		</constructor-arg>
 		<constructor-arg index="1" ref="authenticator" />
 	</bean>
-	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+	<bean id="mailSender"
+		class="org.springframework.mail.javamail.JavaMailSenderImpl">
 		<property name="username" value="${mail.username}" />
 		<property name="password" value="${mail.password}" />
 		<property name="session" ref="smtpSession" />
 	</bean>
-	<bean id="velocityEngine" class="org.apache.velocity.app.VelocityEngine">
+	<bean id="velocityEngine"
+		class="org.apache.velocity.app.VelocityEngine">
 		<constructor-arg index="0">
 			<props>
 				<prop key="resource.loader">class</prop>

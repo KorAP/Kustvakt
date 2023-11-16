@@ -53,11 +53,11 @@ public class QueryDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public int createQuery (String name, ResourceType type,
-            QueryType queryType, CorpusAccess requiredAccess, String koralQuery,
-            String definition, String description, String status,
-            boolean isCached, String createdBy, String query,
-            String queryLanguage) throws KustvaktException {
+    public int createQuery (String name, ResourceType type, QueryType queryType,
+            CorpusAccess requiredAccess, String koralQuery, String definition,
+            String description, String status, boolean isCached,
+            String createdBy, String query, String queryLanguage)
+            throws KustvaktException {
 
         QueryDO q = new QueryDO();
         q.setName(name);
@@ -103,18 +103,17 @@ public class QueryDao {
         if (status != null && !status.isEmpty()) {
             queryDO.setStatus(status);
         }
-        if(queryStr!=null && !queryStr.isEmpty()) {
+        if (queryStr != null && !queryStr.isEmpty()) {
             queryDO.setQuery(queryStr);
         }
-        if(queryLanguage!=null && !queryLanguage.isEmpty()) {
+        if (queryLanguage != null && !queryLanguage.isEmpty()) {
             queryDO.setQueryLanguage(queryLanguage);
         }
         queryDO.setCached(isCached);
         entityManager.merge(queryDO);
     }
 
-    public void deleteQuery (QueryDO query)
-            throws KustvaktException {
+    public void deleteQuery (QueryDO query) throws KustvaktException {
         if (!entityManager.contains(query)) {
             query = entityManager.merge(query);
         }
@@ -141,23 +140,23 @@ public class QueryDao {
             String createdBy, QueryType queryType) throws KustvaktException {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryDO> criteriaQuery =
-                criteriaBuilder.createQuery(QueryDO.class);
+        CriteriaQuery<QueryDO> criteriaQuery = criteriaBuilder
+                .createQuery(QueryDO.class);
         Root<QueryDO> query = criteriaQuery.from(QueryDO.class);
 
         Predicate conditions = criteriaBuilder
                 .equal(query.get(QueryDO_.queryType), queryType);
         if (createdBy != null && !createdBy.isEmpty()) {
-            conditions = criteriaBuilder.and(conditions, criteriaBuilder.equal(
-                    query.get(QueryDO_.createdBy), createdBy));
+            conditions = criteriaBuilder.and(conditions, criteriaBuilder
+                    .equal(query.get(QueryDO_.createdBy), createdBy));
             if (type != null) {
-                conditions = criteriaBuilder.and(conditions, criteriaBuilder
-                        .equal(query.get(QueryDO_.type), type));
+                conditions = criteriaBuilder.and(conditions,
+                        criteriaBuilder.equal(query.get(QueryDO_.type), type));
             }
         }
         else if (type != null) {
-            conditions = criteriaBuilder.and(conditions, criteriaBuilder
-                    .equal(query.get(QueryDO_.type), type));
+            conditions = criteriaBuilder.and(conditions,
+                    criteriaBuilder.equal(query.get(QueryDO_.type), type));
         }
 
         criteriaQuery.select(query);
@@ -170,12 +169,11 @@ public class QueryDao {
         ParameterChecker.checkIntegerValue(id, "id");
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryDO> criteriaQuery =
-                criteriaBuilder.createQuery(QueryDO.class);
+        CriteriaQuery<QueryDO> criteriaQuery = criteriaBuilder
+                .createQuery(QueryDO.class);
         Root<QueryDO> query = criteriaQuery.from(QueryDO.class);
         criteriaQuery.select(query);
-        criteriaQuery.where(criteriaBuilder.equal(query.get(QueryDO_.id),
-                id));
+        criteriaQuery.where(criteriaBuilder.equal(query.get(QueryDO_.id), id));
 
         QueryDO qe = null;
         try {
@@ -196,14 +194,13 @@ public class QueryDao {
         ParameterChecker.checkStringValue(queryName, "queryName");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryDO> criteriaQuery =
-                builder.createQuery(QueryDO.class);
+        CriteriaQuery<QueryDO> criteriaQuery = builder
+                .createQuery(QueryDO.class);
 
         Root<QueryDO> query = criteriaQuery.from(QueryDO.class);
 
         Predicate condition = builder.and(
-                builder.equal(query.get(QueryDO_.createdBy),
-                        createdBy),
+                builder.equal(query.get(QueryDO_.createdBy), createdBy),
                 builder.equal(query.get(QueryDO_.name), queryName));
 
         criteriaQuery.select(query);
@@ -228,20 +225,17 @@ public class QueryDao {
     }
 
     @SuppressWarnings("unchecked")
-    public List<QueryDO> retrieveOwnerQuery (String userId,
-            QueryType queryType) throws KustvaktException {
+    public List<QueryDO> retrieveOwnerQuery (String userId, QueryType queryType)
+            throws KustvaktException {
         ParameterChecker.checkStringValue(userId, "userId");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryDO> cq =
-                builder.createQuery(QueryDO.class);
+        CriteriaQuery<QueryDO> cq = builder.createQuery(QueryDO.class);
 
         Root<QueryDO> query = cq.from(QueryDO.class);
         Predicate conditions = builder.and(
-                builder.equal(query.get(QueryDO_.createdBy),
-                        userId),
-                builder.equal(query.get(QueryDO_.queryType),
-                        queryType));
+                builder.equal(query.get(QueryDO_.createdBy), userId),
+                builder.equal(query.get(QueryDO_.queryType), queryType));
 
         cq.select(query);
         cq.where(conditions);
@@ -256,15 +250,13 @@ public class QueryDao {
         ParameterChecker.checkStringValue(userId, "userId");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryDO> cq =
-                builder.createQuery(QueryDO.class);
+        CriteriaQuery<QueryDO> cq = builder.createQuery(QueryDO.class);
 
         Root<QueryDO> query = cq.from(QueryDO.class);
         cq.select(query);
 
         Predicate p = builder.and(
-                builder.equal(query.get(QueryDO_.createdBy),
-                        userId),
+                builder.equal(query.get(QueryDO_.createdBy), userId),
                 builder.equal(query.get(QueryDO_.type), type));
         cq.where(p);
 
@@ -273,17 +265,15 @@ public class QueryDao {
     }
 
     @SuppressWarnings("unchecked")
-    public List<QueryDO> retrieveGroupQueryByUser (String userId, QueryType queryType)
-            throws KustvaktException {
+    public List<QueryDO> retrieveGroupQueryByUser (String userId,
+            QueryType queryType) throws KustvaktException {
         ParameterChecker.checkStringValue(userId, "userId");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryDO> cq =
-                builder.createQuery(QueryDO.class);
+        CriteriaQuery<QueryDO> cq = builder.createQuery(QueryDO.class);
 
         Root<QueryDO> query = cq.from(QueryDO.class);
-        Join<QueryDO, QueryAccess> access =
-                query.join(QueryDO_.queryAccess);
+        Join<QueryDO, QueryAccess> access = query.join(QueryDO_.queryAccess);
 
         // Predicate corpusStatus = builder.and(
         // builder.notEqual(access.get(QueryAccess_.status),
@@ -291,28 +281,27 @@ public class QueryDao {
         // builder.notEqual(access.get(QueryAccess_.status),
         // VirtualCorpusAccessStatus.DELETED));
 
-        Predicate type = builder
-                .equal(query.get(QueryDO_.queryType), queryType);
-                
-        Predicate accessStatus =
-                builder.notEqual(access.get(QueryAccess_.status),
-                        QueryAccessStatus.DELETED);
+        Predicate type = builder.equal(query.get(QueryDO_.queryType),
+                queryType);
 
-        Predicate userGroupStatus =
-                builder.notEqual(access.get(QueryAccess_.userGroup)
-                        .get(UserGroup_.status), UserGroupStatus.DELETED);
+        Predicate accessStatus = builder.notEqual(
+                access.get(QueryAccess_.status), QueryAccessStatus.DELETED);
+
+        Predicate userGroupStatus = builder.notEqual(
+                access.get(QueryAccess_.userGroup).get(UserGroup_.status),
+                UserGroupStatus.DELETED);
         Join<UserGroup, UserGroupMember> members = access
                 .join(QueryAccess_.userGroup).join(UserGroup_.members);
 
         Predicate memberStatus = builder.equal(
                 members.get(UserGroupMember_.status), GroupMemberStatus.ACTIVE);
 
-        Predicate user =
-                builder.equal(members.get(UserGroupMember_.userId), userId);
+        Predicate user = builder.equal(members.get(UserGroupMember_.userId),
+                userId);
 
         cq.select(query);
-        cq.where(
-                builder.and(type, accessStatus, userGroupStatus, memberStatus, user));
+        cq.where(builder.and(type, accessStatus, userGroupStatus, memberStatus,
+                user));
 
         Query q = entityManager.createQuery(cq);
         return q.getResultList();
@@ -324,15 +313,13 @@ public class QueryDao {
         ParameterChecker.checkObjectValue(queryType, "queryType");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryDO> criteriaQuery =
-                builder.createQuery(QueryDO.class);
+        CriteriaQuery<QueryDO> criteriaQuery = builder
+                .createQuery(QueryDO.class);
 
         Root<QueryDO> query = criteriaQuery.from(QueryDO.class);
         Predicate predicate = builder.and(
-                builder.equal(query.get(QueryDO_.queryType),
-                        queryType),
-                builder.or(builder.equal(
-                        query.get(QueryDO_.createdBy), userId),
+                builder.equal(query.get(QueryDO_.queryType), queryType),
+                builder.or(builder.equal(query.get(QueryDO_.createdBy), userId),
                         builder.equal(query.get(QueryDO_.type),
                                 ResourceType.SYSTEM)));
 
@@ -361,17 +348,18 @@ public class QueryDao {
         ParameterChecker.checkIntegerValue(groupId, "groupId");
 
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<QueryDO> criteriaQuery =
-                builder.createQuery(QueryDO.class);
+        CriteriaQuery<QueryDO> criteriaQuery = builder
+                .createQuery(QueryDO.class);
 
         Root<QueryDO> query = criteriaQuery.from(QueryDO.class);
-        Join<QueryDO, QueryAccess> queryAccess =
-                query.join(QueryDO_.queryAccess);
-        Join<QueryAccess, UserGroup> accessGroup =
-                queryAccess.join(QueryAccess_.userGroup);
+        Join<QueryDO, QueryAccess> queryAccess = query
+                .join(QueryDO_.queryAccess);
+        Join<QueryAccess, UserGroup> accessGroup = queryAccess
+                .join(QueryAccess_.userGroup);
 
         criteriaQuery.select(query);
-        criteriaQuery.where(builder.equal(accessGroup.get(UserGroup_.id), groupId));
+        criteriaQuery
+                .where(builder.equal(accessGroup.get(UserGroup_.id), groupId));
         Query q = entityManager.createQuery(criteriaQuery);
         return q.getResultList();
     }

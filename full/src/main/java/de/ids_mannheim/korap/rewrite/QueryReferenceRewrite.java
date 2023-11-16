@@ -20,7 +20,7 @@ import de.ids_mannheim.korap.utils.JsonUtils;
  * Rewrites query reference with the corresponding koral
  * query describing the actual query fragment.
  * 
- * Based on VirtualCorpusRewrite. 
+ * Based on VirtualCorpusRewrite.
  *
  * @author diewald, margaretha
  *
@@ -32,9 +32,8 @@ public class QueryReferenceRewrite implements RewriteTask.RewriteQuery {
     private QueryService service;
 
     @Override
-    public KoralNode rewriteQuery (KoralNode node,
-                                   KustvaktConfiguration config,
-                                   User user) throws KustvaktException {
+    public KoralNode rewriteQuery (KoralNode node, KustvaktConfiguration config,
+            User user) throws KustvaktException {
         if (node.has("query")) {
             node = node.at("/query");
             findQueryRef(user.getUsername(), node);
@@ -43,14 +42,13 @@ public class QueryReferenceRewrite implements RewriteTask.RewriteQuery {
     }
 
     private void findQueryRef (String username, KoralNode koralNode)
-        throws KustvaktException {
+            throws KustvaktException {
         if (koralNode.has("@type")
-            && koralNode.get("@type").equals("koral:queryRef")) {
+                && koralNode.get("@type").equals("koral:queryRef")) {
             if (!koralNode.has("ref")) {
                 throw new KustvaktException(
-                    de.ids_mannheim.korap.util.StatusCodes.MISSING_QUERY_REFERENCE,
-                    "ref is not found"
-                    );
+                        de.ids_mannheim.korap.util.StatusCodes.MISSING_QUERY_REFERENCE,
+                        "ref is not found");
             }
             else {
                 String queryRefName = koralNode.get("ref");
@@ -63,8 +61,8 @@ public class QueryReferenceRewrite implements RewriteTask.RewriteQuery {
                     }
                 }
 
-                QueryDO qr = service.searchQueryByName(username,
-                        queryRefName, queryRefOwner, QueryType.QUERY);
+                QueryDO qr = service.searchQueryByName(username, queryRefName,
+                        queryRefOwner, QueryType.QUERY);
 
                 if (qr == null) {
                     throw new KustvaktException(StatusCodes.NO_RESOURCE_FOUND,
@@ -76,13 +74,13 @@ public class QueryReferenceRewrite implements RewriteTask.RewriteQuery {
                 // TODO:
                 //   checkVCAcess(q, username);
                 JsonNode qref = JsonUtils.readTree(qr.getKoralQuery());;
-                rewriteQuery(qref,koralNode);
+                rewriteQuery(qref, koralNode);
             }
         }
-        
+
         else if (koralNode.has("operands")) {
             KoralNode operands = koralNode.at("/operands");
-        
+
             for (int i = 0; i < operands.size(); i++) {
                 KoralNode operand = operands.get(i);
                 this.findQueryRef(username, operand);
@@ -91,9 +89,8 @@ public class QueryReferenceRewrite implements RewriteTask.RewriteQuery {
         }
     }
 
-
     private void rewriteQuery (JsonNode qref, KoralNode koralNode)
-        throws KustvaktException {
+            throws KustvaktException {
         JsonNode jsonNode = koralNode.rawNode();
         koralNode.remove("@type",
                 new RewriteIdentifier("@type", jsonNode.at("/@type").asText()));

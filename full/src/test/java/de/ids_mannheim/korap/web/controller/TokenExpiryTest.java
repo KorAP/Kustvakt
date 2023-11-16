@@ -32,14 +32,19 @@ public class TokenExpiryTest extends SpringJerseyTest {
 
     @Disabled
     @Test
-    public void requestToken() throws KustvaktException, InterruptedException, IOException {
+    public void requestToken ()
+            throws KustvaktException, InterruptedException, IOException {
         Form form = new Form();
         form.param("grant_type", "password");
         form.param("client_id", "fCBbQkAyYzI4NzUxMg");
         form.param("client_secret", "secret");
         form.param("username", "dory");
         form.param("password", "password");
-        Response response = target().path(API_VERSION).path("oauth2").path("token").request().header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED).post(Entity.form(form));
+        Response response = target().path(API_VERSION).path("oauth2")
+                .path("token").request()
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(form));
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
         String token = node.at("/access_token").asText();
@@ -53,17 +58,23 @@ public class TokenExpiryTest extends SpringJerseyTest {
     // because sqlite needs a trigger after INSERT to
     // oauth_access_token to store created_date. Before INSERT trigger
     // does not work.
-    private void testSearchWithExpiredToken(String token) throws KustvaktException, IOException {
-        Response response = target().path(API_VERSION).path("search").queryParam("q", "Wasser").queryParam("ql", "poliqarp").request().header(Attributes.AUTHORIZATION, "Bearer " + token).get();
+    private void testSearchWithExpiredToken (String token)
+            throws KustvaktException, IOException {
+        Response response = target().path(API_VERSION).path("search")
+                .queryParam("q", "Wasser").queryParam("ql", "poliqarp")
+                .request().header(Attributes.AUTHORIZATION, "Bearer " + token)
+                .get();
         String ent = response.readEntity(String.class);
         assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         JsonNode node = JsonUtils.readTree(ent);
         assertEquals(StatusCodes.EXPIRED, node.at("/errors/0/0").asInt());
-        assertEquals(node.at("/errors/0/1").asText(), "Access token is expired");
+        assertEquals(node.at("/errors/0/1").asText(),
+                "Access token is expired");
     }
 
     // cannot be tested dynamically
-    private void testRequestAuthorizationCodeAuthenticationTooOld(String token) throws KustvaktException {
+    private void testRequestAuthorizationCodeAuthenticationTooOld (String token)
+            throws KustvaktException {
         Form form = new Form();
         form.param("response_type", "code");
         form.param("client_id", "fCBbQkAyYzI4NzUxMg");
@@ -72,19 +83,22 @@ public class TokenExpiryTest extends SpringJerseyTest {
         form.param("scope", "search");
         form.param("max_age", "1");
 
-        Response response =
-                target().path(API_VERSION).path("oauth2").path("authorize")
-                        .request()
-                        .header(Attributes.AUTHORIZATION, "Bearer " + token)
-                        .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
-                        .header(HttpHeaders.CONTENT_TYPE,
-                                ContentType.APPLICATION_FORM_URLENCODED)
-                        .post(Entity.form(form));
+        Response response = target().path(API_VERSION).path("oauth2")
+                .path("authorize").request()
+                .header(Attributes.AUTHORIZATION, "Bearer " + token)
+                .header(HttpHeaders.X_FORWARDED_FOR, "149.27.0.32")
+                .header(HttpHeaders.CONTENT_TYPE,
+                        ContentType.APPLICATION_FORM_URLENCODED)
+                .post(Entity.form(form));
 
         assertEquals(HttpStatus.SC_UNAUTHORIZED, response.getStatus());
         String entity = response.readEntity(String.class);
         JsonNode node = JsonUtils.readTree(entity);
-        assertEquals(StatusCodes.USER_REAUTHENTICATION_REQUIRED, node.at("/errors/0/0").asInt());
-        assertEquals("User reauthentication is required because the authentication " + "time is too old according to max_age", node.at("/errors/0/1").asText());
+        assertEquals(StatusCodes.USER_REAUTHENTICATION_REQUIRED,
+                node.at("/errors/0/0").asInt());
+        assertEquals(
+                "User reauthentication is required because the authentication "
+                        + "time is too old according to max_age",
+                node.at("/errors/0/1").asText());
     }
 }

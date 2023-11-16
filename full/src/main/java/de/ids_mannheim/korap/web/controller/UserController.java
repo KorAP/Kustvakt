@@ -24,7 +24,7 @@ import jakarta.ws.rs.core.SecurityContext;
 @Controller
 @Path("{version}/user")
 @Produces(MediaType.APPLICATION_JSON + ";charset=utf-8")
-@ResourceFilters({ AuthenticationFilter.class, APIVersionFilter.class})
+@ResourceFilters({ AuthenticationFilter.class, APIVersionFilter.class })
 public class UserController {
 
     @Autowired
@@ -36,16 +36,15 @@ public class UserController {
 
     @GET
     @Path("/info")
-    public JsonNode getUsername (
-        @Context SecurityContext securityContext) {
-            TokenContext context =
-                    (TokenContext) securityContext.getUserPrincipal();
-            try {
-                scopeService.verifyScope(context, OAuth2Scope.USER_INFO);
-                return userService.retrieveUserInfo(context.getUsername());
-            }
-            catch (KustvaktException e) {
-                throw kustvaktResponseHandler.throwit(e);
-            }
+    public JsonNode getUsername (@Context SecurityContext securityContext) {
+        TokenContext context = (TokenContext) securityContext
+                .getUserPrincipal();
+        try {
+            scopeService.verifyScope(context, OAuth2Scope.USER_INFO);
+            return userService.retrieveUserInfo(context.getUsername());
         }
+        catch (KustvaktException e) {
+            throw kustvaktResponseHandler.throwit(e);
+        }
+    }
 }

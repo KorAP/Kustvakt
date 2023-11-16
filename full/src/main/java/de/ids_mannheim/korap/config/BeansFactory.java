@@ -20,33 +20,29 @@ public class BeansFactory {
 
     private static ContextHolder beanHolder;
 
-
     //todo: allow this for external plugin systems that are not kustvakt specific
     @Deprecated
     public static void setCustomBeansHolder (ContextHolder holder) {
         beanHolder = holder;
     }
 
-
     public static synchronized ContextHolder getKustvaktContext () {
         return beanHolder;
     }
-
 
     public static synchronized ContextHolder getKustvaktContext (int i) {
         return beanHolder;
     }
 
-
     public static synchronized TypeBeanFactory getTypeFactory () {
         return new TypeBeanFactory();
     }
 
-
     public static int loadClasspathContext (String ... files) {
         ApplicationContext context;
         if (files.length == 0)
-            throw new IllegalArgumentException("Spring XML config file is not specified.");
+            throw new IllegalArgumentException(
+                    "Spring XML config file is not specified.");
         else
             context = new ClassPathXmlApplicationContext(files);
         ContextHolder h = new ContextHolder(context) {};
@@ -54,7 +50,6 @@ public class BeansFactory {
         //        return BeansFactory.beanHolder.indexOf(h);
         return 0;
     }
-
 
     public static synchronized int addApplicationContext (
             ApplicationContext context) {
@@ -64,11 +59,9 @@ public class BeansFactory {
         return 0;
     }
 
-
     public static synchronized void setKustvaktContext (ContextHolder holder) {
         BeansFactory.beanHolder = holder;
     }
-
 
     public static synchronized int setApplicationContext (
             ApplicationContext context) {
@@ -76,7 +69,6 @@ public class BeansFactory {
         BeansFactory.beanHolder = h;
         return 0;
     }
-
 
     public static synchronized int loadFileContext (String filepath) {
         ApplicationContext context = new FileSystemXmlApplicationContext(
@@ -86,18 +78,15 @@ public class BeansFactory {
         return 0;
     }
 
-
     public static void closeApplication () {
         BeansFactory.beanHolder = null;
     }
-
 
     //todo: set response handler
     @Deprecated
     public static CoreResponseHandler getResponseHandler () {
         return null;
     }
-
 
     public BeansFactory () {}
 
@@ -115,7 +104,6 @@ public class BeansFactory {
                     "Could not find typed bean in context for class '" + type
                             + "'");
         }
-
 
         @Deprecated
         public <T> T getTypedBean (Collection objs, Class type) {

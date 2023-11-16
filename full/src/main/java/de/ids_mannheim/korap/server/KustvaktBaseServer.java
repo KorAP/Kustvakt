@@ -43,7 +43,7 @@ public abstract class KustvaktBaseServer {
         rootPackages = "de.ids_mannheim.korap.core.web; "
                 + "de.ids_mannheim.korap.web; "
                 + "com.fasterxml.jackson.jaxrs.json;";
-        
+
         File d = new File(KustvaktConfiguration.DATA_FOLDER);
         if (!d.exists()) {
             d.mkdir();
@@ -63,8 +63,8 @@ public abstract class KustvaktBaseServer {
                 case "--help":
                     StringBuffer b = new StringBuffer();
 
-                    b.append("Parameter description: \n")
-                            .append("--spring-config  <Spring XML configuration>\n")
+                    b.append("Parameter description: \n").append(
+                            "--spring-config  <Spring XML configuration>\n")
                             .append("--port  <Server port number>\n")
                             .append("--help : This help menu\n");
                     System.out.println(b.toString());
@@ -82,14 +82,14 @@ public abstract class KustvaktBaseServer {
             kargs.setPort(config.getPort());
         }
 
-        String adminToken="";
+        String adminToken = "";
         File f = new File("adminToken");
         if (!f.exists()) {
             RandomCodeGenerator random = new RandomCodeGenerator();
             adminToken = random.createRandomCode(config);
             FileOutputStream fos = new FileOutputStream(new File("adminToken"));
-            OutputStreamWriter writer =
-                    new OutputStreamWriter(fos, StandardCharsets.UTF_8.name());
+            OutputStreamWriter writer = new OutputStreamWriter(fos,
+                    StandardCharsets.UTF_8.name());
             writer.append("token=");
             writer.append(adminToken);
             writer.flush();
@@ -103,11 +103,11 @@ public abstract class KustvaktBaseServer {
 
         Server server = new Server();
 
-        ServletContextHandler contextHandler =
-                new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+        ServletContextHandler contextHandler = new ServletContextHandler(
+                ServletContextHandler.NO_SESSIONS);
         contextHandler.setContextPath("/");
-        
-        if (kargs.getSpringConfig()!=null) {
+
+        if (kargs.getSpringConfig() != null) {
             contextHandler.setInitParameter("contextConfigLocation",
                     "file:" + kargs.getSpringConfig());
         }
@@ -115,14 +115,14 @@ public abstract class KustvaktBaseServer {
             contextHandler.setInitParameter("contextConfigLocation",
                     "classpath:" + this.springConfig);
         }
-        
+
         ServletContextListener listener = new ContextLoaderListener();
         contextHandler.addEventListener(listener);
         contextHandler.setInitParameter("adminToken", adminToken);
 
         ServletHolder servletHolder = new ServletHolder(new ServletContainer());
-        servletHolder.setInitParameter(
-                ServerProperties.PROVIDER_PACKAGES, rootPackages);
+        servletHolder.setInitParameter(ServerProperties.PROVIDER_PACKAGES,
+                rootPackages);
         servletHolder.setInitOrder(1);
         contextHandler.addServlet(servletHolder, config.getBaseURL());
 
@@ -130,9 +130,10 @@ public abstract class KustvaktBaseServer {
         connector.setPort(kargs.port);
         connector.setIdleTimeout(60000);
         connector.getConnectionFactory(HttpConnectionFactory.class)
-        .getHttpConfiguration().setRequestHeaderSize(64000);
+                .getHttpConfiguration().setRequestHeaderSize(64000);
 
-        ShutdownHandler shutdownHandler = new ShutdownHandler(adminToken,true,true);
+        ShutdownHandler shutdownHandler = new ShutdownHandler(adminToken, true,
+                true);
 
         HandlerList handlers = new HandlerList();
         handlers.addHandler(shutdownHandler);
@@ -152,7 +153,7 @@ public abstract class KustvaktBaseServer {
             System.exit(-1);
         }
     }
-    
+
     @Setter
     public static class KustvaktArgs {
 

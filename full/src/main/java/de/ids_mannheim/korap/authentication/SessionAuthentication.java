@@ -30,12 +30,11 @@ public class SessionAuthentication implements AuthenticationIface {
     private static final Logger jlog = LogManager
             .getLogger(SessionAuthentication.class);
     public static boolean DEBUG = false;
-    
+
     public static SessionFactory sessions;
     private ScheduledThreadPoolExecutor scheduled;
     private EncryptionIface crypto;
     private KustvaktConfiguration config;
-
 
     public SessionAuthentication (KustvaktConfiguration config,
                                   EncryptionIface crypto) {
@@ -50,9 +49,8 @@ public class SessionAuthentication implements AuthenticationIface {
                 this.config.getInactiveTime(), TimeUnit.SECONDS);
     }
 
-
     @Override
-    public TokenContext getTokenContext(String authenticationToken)
+    public TokenContext getTokenContext (String authenticationToken)
             throws KustvaktException {
         if (DEBUG) {
             jlog.debug(
@@ -61,9 +59,8 @@ public class SessionAuthentication implements AuthenticationIface {
         return this.sessions.getSession(authenticationToken);
     }
 
-
     @Override
-    public TokenContext createTokenContext(User user, Map<String, Object> attr)
+    public TokenContext createTokenContext (User user, Map<String, Object> attr)
             throws KustvaktException {
         DateTime now = TimeUtils.getNow();
         DateTime ex = TimeUtils.getExpiration(now.getMillis(),
@@ -74,23 +71,22 @@ public class SessionAuthentication implements AuthenticationIface {
         ctx.setUsername(user.getUsername());
         ctx.setTokenType(TokenType.SESSION);
         ctx.setToken(token);
-        ctx.setExpirationTime(ex.getMillis()+(1000));
+        ctx.setExpirationTime(ex.getMillis() + (1000));
         ctx.setHostAddress(attr.get(Attributes.HOST).toString());
         ctx.setUserAgent(attr.get(Attributes.USER_AGENT).toString());
         this.sessions.putSession(token, ctx);
         if (DEBUG) {
             jlog.debug(ctx.toJson());
-            jlog.debug("session " +sessions.getSession(token).toString());
+            jlog.debug("session " + sessions.getSession(token).toString());
             jlog.info("create session for user: " + user.getUsername());
         }
         return ctx;
     }
 
-
-//    @Override
-//    public void removeUserSession (String token) {
-//        this.sessions.removeSession(token);
-//    }
+    //    @Override
+    //    public void removeUserSession (String token) {
+    //        this.sessions.removeSession(token);
+    //    }
 
     @Override
     public TokenType getTokenType () {

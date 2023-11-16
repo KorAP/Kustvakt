@@ -54,7 +54,7 @@ public class KustvaktResponseHandler extends CoreResponseHandler {
         EnumSet<AuthenticationScheme> schemes = EnumSet
                 .allOf(AuthenticationScheme.class);
         schemes.remove(AuthenticationScheme.API);
-        
+
         for (AuthenticationScheme s : schemes) {
             builder = builder.header(HttpHeaders.WWW_AUTHENTICATE,
                     s.displayName() + " realm=\"Kustvakt\"");
