@@ -133,7 +133,7 @@ public abstract class KustvaktBaseServer {
                 .getHttpConfiguration().setRequestHeaderSize(64000);
 
         ShutdownHandler shutdownHandler = new ShutdownHandler(adminToken, true,
-                true);
+                false);
 
         HandlerList handlers = new HandlerList();
         handlers.addHandler(shutdownHandler);
