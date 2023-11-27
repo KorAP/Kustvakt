@@ -1,5 +1,6 @@
 package de.ids_mannheim.korap.web.utils;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.glassfish.jersey.model.internal.CommonConfig;
@@ -7,7 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import de.ids_mannheim.korap.web.filter.APIVersionFilter;
-import edu.emory.mathcs.backport.java.util.Arrays;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Priority;
 import jakarta.ws.rs.container.DynamicFeature;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.FeatureContext;

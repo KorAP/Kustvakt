@@ -23,6 +23,8 @@
 - Updated token response using Nimbus (#650)
 - Remove Oltu request and validator implementations (#650)
 - Updated OAuth2 response handler (#650)
+- Fixed ShutdownHandler (fixed #708)
+- Fixed issues with multi-release jar (#706, #708)
 
 
 # version 0.71.1
